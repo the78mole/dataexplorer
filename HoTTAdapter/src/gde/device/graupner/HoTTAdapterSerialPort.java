@@ -394,7 +394,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SENSOR_DATA_ELECTRIC;
 				this.DATA_LENGTH = 66;
 				break;
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 				HoTTAdapterSerialPort.log.log(Level.FINE, ">>>SpeedControl<<<");
 				this.ANSWER_DATA = new byte[30];
 				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SENSOR_DATA_MOTOR_DRIVER;
@@ -437,9 +437,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 				HoTTAdapterSerialPort.log.log(Level.FINE, 
-						sensorType == HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200 ? ">>>SpeedControl<<<"
+						sensorType == HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200 ? ">>>SpeedControl<<<"
 					: sensorType == HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200 ? ">>>Electric<<<"
 					: sensorType == HoTTAdapter.SENSOR_TYPE_GENERAL_19200 ? ">>>General<<<" 
 					: sensorType == HoTTAdapter.SENSOR_TYPE_GPS_19200 ? ">>>GPS<<<"

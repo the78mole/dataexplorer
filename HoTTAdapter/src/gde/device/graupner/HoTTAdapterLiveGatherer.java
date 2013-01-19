@@ -225,10 +225,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		pointsElectric = new int[recordSetElectric.size()];
 		//SpeedControl
 		this.channel = this.channels.get(7);
-		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.MOTORDRIVER.value() + recordSetNameExtend;
+		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
 		recordSetMotorDriver = RecordSet.createRecordSet(recordSetKey, this.device, 7, true, true);
 		this.channel.put(recordSetKey, recordSetMotorDriver);
-		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.MOTORDRIVER.value(), recordSetElectric);
+		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.SPEED_CONTROL.value(), recordSetElectric);
 		this.channel.applyTemplate(recordSetKey, true);
 		pointsMotorDriver = new int[recordSetMotorDriver.size()];
 
@@ -259,7 +259,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		}
 		else if (HoTTAdapter.isSensorType[5]) {
 			this.dialog.selectTab(7);
-			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.MOTORDRIVER.value() + recordSetNameExtend;
+			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
 		}
 		this.channel.switchRecordSet(recordSetKey);
 		this.application.setStatusMessage(sb.toString(), SWT.COLOR_BLACK);
@@ -298,10 +298,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 							recordSetGeneral.addPoints(this.device.convertDataBytes(pointsGeneral, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
 							switchRecordSetDisplay(HoTTAdapter.Sensor.GENRAL, recordSetNumber, recordSetNameExtend);
 						}
-						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200)) {
-							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
+						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200)) {
+							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 							recordSetMotorDriver.addPoints(this.device.convertDataBytes(pointsMotorDriver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
-							switchRecordSetDisplay(HoTTAdapter.Sensor.MOTORDRIVER, recordSetNumber, recordSetNameExtend);
+							switchRecordSetDisplay(HoTTAdapter.Sensor.SPEED_CONTROL, recordSetNumber, recordSetNameExtend);
 						}
 						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_GPS_19200)) {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
@@ -361,7 +361,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						}
 						if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 							try {
-								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
+								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 								//HoTTAdapterLiveGatherer.this.serialPort.getData(false);
 								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
@@ -535,7 +535,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					}
 					if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 						try {
-							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200);
+							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200);
 							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
@@ -840,14 +840,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (!HoTTAdapter.isSensorType[5]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
-						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
+						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 						this.serialPort.getData(false);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						this.serialPort.getData(true);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						this.serialPort.getData(true);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-						HoTTAdapter.isSensorType[5] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
+						HoTTAdapter.isSensorType[5] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
 					catch (Exception e) {
@@ -882,7 +882,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (!HoTTAdapter.isSensorType[5]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
-						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200);
+						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200);
 						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
@@ -952,7 +952,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						}
 						this.dataBuffer = this.serialPort.getData();
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-						HoTTAdapter.isSensorType[1] = (DataParser.parse2Short(dataBuffer, 10) != 0 || dataBuffer[16] != 0);
+						HoTTAdapter.isSensorType[1] = (dataBuffer[3] != 0 || DataParser.parse2Short(dataBuffer, 10) != 0 || dataBuffer[16] != 0);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
 					catch (Exception e) {

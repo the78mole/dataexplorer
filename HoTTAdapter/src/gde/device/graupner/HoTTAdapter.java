@@ -79,7 +79,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_GPS_19200							= (byte) (0x8A & 0xFF);
 	final static byte										SENSOR_TYPE_GENERAL_19200					= (byte) (0x8D & 0xFF);
 	final static byte										SENSOR_TYPE_ELECTRIC_19200				= (byte) (0x8E & 0xFF);
-	final static byte										SENSOR_TYPE_MOTOR_DRIVER_19200		= (byte) (0x8C & 0xFF);
+	final static byte										SENSOR_TYPE_SPEED_CONTROL_19200		= (byte) (0x8C & 0xFF);
 	final static byte										ANSWER_SENSOR_VARIO_19200					= (byte) (0x90 & 0xFF);
 	final static byte										ANSWER_SENSOR_GPS_19200						= (byte) (0xA0 & 0xFF);
 	final static byte										ANSWER_SENSOR_GENERAL_19200				= (byte) (0xD0 & 0xFF);
@@ -93,7 +93,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_GPS_115200						= 0x38;
 	final static byte										SENSOR_TYPE_GENERAL_115200				= 0x35;
 	final static byte										SENSOR_TYPE_ELECTRIC_115200				= 0x36;
-	final static byte										SENSOR_TYPE_MOTOR_DRIVER_115200		= 0x39;
+	final static byte										SENSOR_TYPE_SPEED_CONTROL_115200	= 0x39;
 	final static byte										SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
 	final static byte										SENSOR_TYPE_SWITCHES_115200				= 0x41;
 	final static byte										SENSOR_TYPE_CONTROL_1_115200			= 0x42;
@@ -107,7 +107,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean								isSensorType[]								= { false, false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	public enum Sensor {
-		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air"), CHANNEL("Channel"), MOTORDRIVER("MotorDriver");
+		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air"), CHANNEL("Channel"), SPEED_CONTROL("MotorDriver");
 		private final String	value;
 
 		private Sensor(String v) {
@@ -546,7 +546,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 				break;
 
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 				if (dataBuffer.length == 57) {
 					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
@@ -709,10 +709,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					}
 				}
 				break;
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 				if (dataBuffer.length >= 28) {
 					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
-					points[0] = (dataBuffer[9] & 0xFF) * 1000;
+					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {

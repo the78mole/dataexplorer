@@ -364,7 +364,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				}
 				break;
 
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 				if (dataBuffer.length == 57) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
@@ -539,7 +539,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				}
 				break;
 				
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 				if (dataBuffer.length >= 28) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);

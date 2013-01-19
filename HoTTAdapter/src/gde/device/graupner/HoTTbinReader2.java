@@ -102,7 +102,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader2.points[2] = 100000;
-		HoTTbinReader2.pointsGeneral = HoTTbinReader2.pointsElectric = HoTTbinReader2.pointsMotorDriver = HoTTbinReader2.pointsVario = HoTTbinReader2.pointsGPS = HoTTbinReader2.points;
+		HoTTbinReader2.pointsGeneral = HoTTbinReader2.pointsElectric = HoTTbinReader2.pointsSpeedControl = HoTTbinReader2.pointsVario = HoTTbinReader2.pointsGPS = HoTTbinReader2.points;
 		HoTTbinReader2.timeStep_ms = 0;
 		HoTTbinReader2.buf = new byte[HoTTbinReader2.dataBlockSize];
 		HoTTbinReader2.buf0 = null;
@@ -282,8 +282,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						}
 						break;
 
-					case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
-					case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
+					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 						//fill data block 0 to 4
 						if (HoTTbinReader2.buf0 == null && HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 							HoTTbinReader2.buf0 = new byte[30];
@@ -399,7 +399,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader2.pointsGeneral = new int[HoTTbinReader2.points.length];
 		HoTTbinReader2.pointsElectric = new int[HoTTbinReader2.points.length];
-		HoTTbinReader2.pointsMotorDriver = new int[HoTTbinReader2.points.length];
+		HoTTbinReader2.pointsSpeedControl = new int[HoTTbinReader2.points.length];
 		HoTTbinReader2.pointsVario = new int[HoTTbinReader2.points.length];
 		HoTTbinReader2.pointsVario[2] = 100000;
 		HoTTbinReader2.pointsGPS = new int[HoTTbinReader2.points.length];
@@ -514,8 +514,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								isElectricData = true;
 								break;
 
-							case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
-							case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
+							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 								if (isMotorDriverData && isReceiverData) {
 									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
 									//System.out.println("isElectricData i = " + i);
@@ -556,8 +556,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 							++logCountElectric;
 							break;
-						case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
-						case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
+						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 							++logCountMotorDriver;
 							break;
 						}
@@ -676,12 +676,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			if (channelNumber == 4)
 				//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 				for (int j = 78; j < 78 + 6 && j < HoTTbinReader2.points.length; j++) {
-					HoTTbinReader2.points[j] = HoTTbinReader2.pointsMotorDriver[j];
+					HoTTbinReader2.points[j] = HoTTbinReader2.pointsSpeedControl[j];
 				}
 			else
 				//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
 				for (int j = 58; j < 58 + 6 && j < HoTTbinReader2.points.length; j++) {
-					HoTTbinReader2.points[j] = HoTTbinReader2.pointsMotorDriver[j];
+					HoTTbinReader2.points[j] = HoTTbinReader2.pointsSpeedControl[j];
 				}
 		}
 		HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
@@ -944,7 +944,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.points[71] = (DataParser.parse2UnsignedShort(_buf, 26) / 2) * 1000;
 			HoTTbinReader2.points[72] = (DataParser.parse2UnsignedShort(_buf, 28) / 2) * 1000;
 			HoTTbinReader2.points[73] = (DataParser.parse2UnsignedShort(_buf, 30) / 2) * 1000;
-			if (HoTTbinReader2.points[11] == 0) {
+			if (HoTTbinReader2.points[66] == 0) {
 				HoTTbinReader2.points[66] = 1500 * 1000;
 				HoTTbinReader2.points[67] = 1500 * 1000;
 				HoTTbinReader2.points[68] = 1500 * 1000;
@@ -972,29 +972,29 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		if (channelNumber == 4) {
 			//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage > -1 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000) {
-				HoTTbinReader2.pointsMotorDriver[78] = HoTTbinReader2.tmpVoltage * 1000;
+				HoTTbinReader2.pointsSpeedControl[78] = HoTTbinReader2.tmpVoltage * 1000;
 				//filter current drops to zero if current > 10 A
-				HoTTbinReader2.pointsMotorDriver[79] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsMotorDriver[79] > 10000 && (HoTTbinReader2.pointsMotorDriver[79] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsMotorDriver[79]) ? HoTTbinReader2.pointsMotorDriver[79] : HoTTbinReader2.tmpCurrent * 1000;
-				HoTTbinReader2.pointsMotorDriver[81] = Double.valueOf(HoTTbinReader2.pointsMotorDriver[78] / 1000.0 * HoTTbinReader2.pointsMotorDriver[79]).intValue();
+				HoTTbinReader2.pointsSpeedControl[79] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsSpeedControl[79] > 10000 && (HoTTbinReader2.pointsSpeedControl[79] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsSpeedControl[79]) ? HoTTbinReader2.pointsSpeedControl[79] : HoTTbinReader2.tmpCurrent * 1000;
+				HoTTbinReader2.pointsSpeedControl[81] = Double.valueOf(HoTTbinReader2.pointsSpeedControl[78] / 1000.0 * HoTTbinReader2.pointsSpeedControl[79]).intValue();
 			}
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsMotorDriver[76] / 1000) { // && tmpTemperature > -20 && tmpTemperature < 150
-				HoTTbinReader2.pointsMotorDriver[80] = HoTTbinReader2.tmpCapacity * 1000;
-				HoTTbinReader2.pointsMotorDriver[82] = HoTTbinReader2.tmpRevolution * 1000;
-				HoTTbinReader2.pointsMotorDriver[83] = HoTTbinReader2.tmpTemperature * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsSpeedControl[76] / 1000) { // && tmpTemperature > -20 && tmpTemperature < 150
+				HoTTbinReader2.pointsSpeedControl[80] = HoTTbinReader2.tmpCapacity * 1000;
+				HoTTbinReader2.pointsSpeedControl[82] = HoTTbinReader2.tmpRevolution * 1000;
+				HoTTbinReader2.pointsSpeedControl[83] = HoTTbinReader2.tmpTemperature * 1000;
 			}
 		}
 		else {
 			//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage > -1 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000) {
-				HoTTbinReader2.pointsMotorDriver[58] = HoTTbinReader2.tmpVoltage * 1000;
+				HoTTbinReader2.pointsSpeedControl[58] = HoTTbinReader2.tmpVoltage * 1000;
 				//filter current drops to zero if current > 10 A
-				HoTTbinReader2.pointsMotorDriver[59] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsMotorDriver[59] > 10000 && (HoTTbinReader2.pointsMotorDriver[59] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsMotorDriver[59]) ? HoTTbinReader2.pointsMotorDriver[59] : HoTTbinReader2.tmpCurrent * 1000;
-				HoTTbinReader2.pointsMotorDriver[61] = Double.valueOf(HoTTbinReader2.pointsMotorDriver[58] / 1000.0 * HoTTbinReader2.pointsMotorDriver[59]).intValue();
+				HoTTbinReader2.pointsSpeedControl[59] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsSpeedControl[59] > 10000 && (HoTTbinReader2.pointsSpeedControl[59] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsSpeedControl[59]) ? HoTTbinReader2.pointsSpeedControl[59] : HoTTbinReader2.tmpCurrent * 1000;
+				HoTTbinReader2.pointsSpeedControl[61] = Double.valueOf(HoTTbinReader2.pointsSpeedControl[58] / 1000.0 * HoTTbinReader2.pointsSpeedControl[59]).intValue();
 			}
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsMotorDriver[60] / 1000) { // && tmpTemperature > -20 && tmpTemperature < 150
-				HoTTbinReader2.pointsMotorDriver[60] = HoTTbinReader2.tmpCapacity * 1000;
-				HoTTbinReader2.pointsMotorDriver[62] = HoTTbinReader2.tmpRevolution * 1000;
-				HoTTbinReader2.pointsMotorDriver[63] = HoTTbinReader2.tmpTemperature * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsSpeedControl[60] / 1000) { // && tmpTemperature > -20 && tmpTemperature < 150
+				HoTTbinReader2.pointsSpeedControl[60] = HoTTbinReader2.tmpCapacity * 1000;
+				HoTTbinReader2.pointsSpeedControl[62] = HoTTbinReader2.tmpRevolution * 1000;
+				HoTTbinReader2.pointsSpeedControl[63] = HoTTbinReader2.tmpTemperature * 1000;
 			}
 		}
 	}
