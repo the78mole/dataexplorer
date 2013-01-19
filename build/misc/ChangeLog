@@ -7,6 +7,7 @@ add GPXAdapter - enable import of GPX files, analyze geo coordinates as well as 
 fix bug #37976: installer.nsi is missing, not required, changed build target
 fix bug #37991: Prefix is not recognized, changed target directories to prefix if in use
 fix bug in HoTTAdapter saving modified filter data
+fix bug HoTTAdapter2 reading channel data 9-12
 fix bugs in JetiAdapter - exporting KMZ/KML/IGC
 fix DevicePropertiesEditor - statistics type and property types doesn't persist after change
 
