@@ -8,8 +8,10 @@ fix bug #37976: installer.nsi is missing, not required, changed build target
 fix bug #37991: Prefix is not recognized, changed target directories to prefix if in use
 fix bug in HoTTAdapter saving modified filter data
 fix bug HoTTAdapter2 reading channel data 9-12
+fix bug HoTTAdapter* reading HF data
 fix bugs in JetiAdapter - exporting KMZ/KML/IGC
 fix DevicePropertiesEditor - statistics type and property types doesn't persist after change
+add HoTTAdapter* mc-16 converter capabilities
 
 Version 3.06 - 11 Dec 2012
 add JetiAdapter to analyze flight record data from Jeti transmitters
