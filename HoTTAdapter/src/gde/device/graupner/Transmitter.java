@@ -45,14 +45,14 @@ public enum Transmitter {
 	public final static byte[] mc_32_PROD_CODE 		=  new byte[] {(byte) 0x04, 0x34, (byte) 0xf4, 0x00, (byte) 0x05, 0x04, 0x00, 0x00};
 	public final static byte[] mc_20_PROD_CODE 		=  new byte[] {(byte) 0xcc, 0x34, (byte) 0xf4, 0x00, (byte) 0xe8, 0x03, 0x00, 0x00};
 	public final static byte[] mx_20_PROD_CODE 		=  new byte[] {(byte) 0x74, 0x32, (byte) 0xf4, 0x00, (byte) 0x5f, 0x04, 0x00, 0x00};
-	public final static byte[] mc_16_PROD_CODE 		=  new byte[] {(byte) 0xF8, 0x35, (byte) 0xF4, 0x00, (byte) 0xb3, 0x06, 0x00, 0x00};
+	public final static byte[] mc_16_PROD_CODE 		=  new byte[] {(byte) 0xF8, 0x35, (byte) 0xF4, 0x00, (byte) 0x09, 0x03, 0x00, 0x00};
 	public final static byte[] mx_16_PROD_CODE		=  new byte[] {(byte) 0xe4, 0x30, (byte) 0xf4, 0x00, (byte) 0xb3, 0x06, 0x00, 0x00};
 	public final static byte[] mx_12_PROD_CODE 		=  new byte[] {(byte) 0x10, 0x32, (byte) 0xf4, 0x00, (byte) 0x73, 0x06, 0x00, 0x00};
 	
 	public final static byte[] mc_32_APP_VERSION 	=  new byte[] {(byte) 0xe8, 0x03, 0x00, 0x00};
 	public final static byte[] mc_20_APP_VERSION 	=  new byte[] {(byte) 0xea, 0x03, 0x00, 0x00};
 	public final static byte[] mx_20_APP_VERSION 	=  new byte[] {(byte) 0xea, 0x03, 0x00, 0x00};
-	public final static byte[] mc_16_APP_VERSION 	=  new byte[] {(byte) 0xe9, 0x03, 0x00, 0x00};
+	public final static byte[] mc_16_APP_VERSION 	=  new byte[] {(byte) 0xea, 0x03, 0x00, 0x00};
 	public final static byte[] mx_16_APP_VERSION 	=  new byte[] {(byte) 0xe9, 0x03, 0x00, 0x00};
 	public final static byte[] mx_12_APP_VERSION 	=  new byte[] {(byte) 0xe9, 0x03, 0x00, 0x00};
 
@@ -61,6 +61,7 @@ public enum Transmitter {
 	public final static byte[] mc_32_MEM_INFO 		=  new byte[] {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, (byte) 0xFF,(byte) 0xFF,(byte) 0xFF};
 	public final static byte[] mc_20_MEM_INFO 		=  new byte[] {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, (byte) 0x20,(byte) 0x20,(byte) 0x20};
 	public final static byte[] mx_20_MEM_INFO 		=  new byte[] {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, (byte) 0x20,(byte) 0x20,(byte) 0x20};
+	public final static byte[] mc_16_MEM_INFO 		=  new byte[] {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, (byte) 0x20,(byte) 0x20,(byte) 0xFF};
 	
 	public final static int[]		mc_32_20_0x1840_0X1988	= new int[] { 0x1840, 0x1988 };
 	public final static int[]		mc_32_20_0x1840					= new int[] { 0x1848, 0x1870, 0x1898, 0x18C0, 0x18E8, 0x1910, 0x1938, 0x1960 };
@@ -131,7 +132,7 @@ public enum Transmitter {
 			result = isMC32 ? Transmitter.MC_32 : Transmitter.UNSPECIFIED;
 		}
 		else if ((inBytes[0x08]&0xFF) == 0xEA) {
-			boolean isMC20 = true, isMX20 = true;
+			boolean isMC20 = true, isMX20 = true, isMC16 = true;
 			for (int i = 0; i < 2; i++) {
 				if (inBytes[i] != Transmitter.mc_20_PROD_CODE[i]) {
 					isMC20 = false;
@@ -144,7 +145,13 @@ public enum Transmitter {
 					break;
 				}
 			}
-			result = isMC20 ? Transmitter.MC_20 : isMX20 ? Transmitter.MX_20 : Transmitter.UNSPECIFIED;
+			for (int i = 0; i < 2; i++) {
+				if ((inBytes[0x00 + i]&0xFF) != Transmitter.mc_16_PROD_CODE[i]){
+					isMC16 = false;
+					break;
+				}
+			}
+			result = isMC20 ? Transmitter.MC_20 : isMX20 ? Transmitter.MX_20 : isMC16 ? Transmitter.MC_16 : Transmitter.UNSPECIFIED;
 		}
 		else if ((inBytes[0x08]&0xFF) == 0xE9) {
 			boolean isMX16 = true, isMX12 = true;
@@ -238,6 +245,24 @@ public enum Transmitter {
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
 				bytes[0x160] = (byte) 0xFF;
 
+				convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
+				break;
+			case MC_16:
+				if (log.isLoggable(Level.FINE)) System.out.println("to " + MC_16.value());
+				cleanReceiverBinding(bytes);
+
+				if (detectTransmitter(bytes) == Transmitter.MC_32) {
+					cleanPhaseSetting(bytes);
+				}
+				cleanSwAssignements(bytes);
+				cleanControlAdustSw(bytes);
+				
+				System.arraycopy(Transmitter.mc_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_16_PROD_CODE.length);
+				bytes[0x08] = (byte) 0xEA;
+				bytes[0x108] = (byte) 0xEA;
+				System.arraycopy(Transmitter.mc_16_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_16_MEM_INFO.length);
+				bytes[0x160] = (byte) 0x05;
+				
 				convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
 				break;
 			case MX_16:

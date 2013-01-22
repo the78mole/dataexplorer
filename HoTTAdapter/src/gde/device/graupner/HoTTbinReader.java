@@ -931,11 +931,12 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddChannel(byte[] _buf) throws DataInconsitsentException {
+		
 		//0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		//19=PowerOff, 20=BattLow, 21=Reset, 22=reserved
 		HoTTbinReader.pointsChannel[0] = (_buf[1] & 0xFF) * 1000;
-		HoTTbinReader.pointsChannel[1] = (_buf[3] & 0xFF) > 0 ? (_buf[3] & 0xFF) * -1000 : HoTTbinReader.pointsChannel[1];
-		HoTTbinReader.pointsChannel[2] = (_buf[4] & 0xFF) > 0 ? (_buf[4] & 0xFF) * -1000 : HoTTbinReader.pointsChannel[2];
+		HoTTbinReader.pointsChannel[1] = (_buf[3] & 0xFF) * -1000;
+		HoTTbinReader.pointsChannel[2] = (_buf[4] & 0xFF) * -1000;
 		HoTTbinReader.pointsChannel[3] = (DataParser.parse2UnsignedShort(_buf, 8) / 2) * 1000; 
 		HoTTbinReader.pointsChannel[4] = (DataParser.parse2UnsignedShort(_buf, 10) / 2) * 1000;
 		HoTTbinReader.pointsChannel[5] = (DataParser.parse2UnsignedShort(_buf, 12) / 2) * 1000;
