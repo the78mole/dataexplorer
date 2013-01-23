@@ -558,8 +558,11 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
-				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2903), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"),
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2903), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
+						findRecordByUnit(activeRecordSet, "km/h"),
 						findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
 		}
@@ -578,6 +581,9 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 
 				containsGPSdata = activeRecordSet.containsGPSdata();
+				if (!containsGPSdata) {
+					containsGPSdata = (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE) >= 0) && (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE) >= 0);
+				}
 			}
 		}
 		return containsGPSdata;
@@ -593,9 +599,10 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ) && activeRecordSet.containsGPSdata()) {
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ) && this.isActualRecordSetWithGpsData()) {
 				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
+						findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"),
 						findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
 			}
 		}
