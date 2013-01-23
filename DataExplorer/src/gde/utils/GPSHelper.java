@@ -336,7 +336,7 @@ public class GPSHelper {
 			//input records
 			Record recordLatitude = recordSet.get(recordOrdinalLatitude);
 			Record recordLongitude = recordSet.get(recordOrdinalLongitude);
-			Record recordAltitude = recordSet.get(recordOrdinalAltitude);
+			Record recordAltitude = recordOrdinalAltitude < 0 ? null : recordSet.get(recordOrdinalAltitude);
 			int recordSize = recordLatitude.realSize();
 
 			if (recordSize >= 3 && recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData()) {
@@ -379,7 +379,7 @@ public class GPSHelper {
 
 					if (indexMovement == 0) {
 						double zeta = zeta_rad / rad;
-						double powDeltaHeight = Math.pow((recordAltitude.get(i - 1) - recordAltitude.get(i)) / 1000.0, 2);
+						double powDeltaHeight = recordAltitude == null ? 0 : Math.pow((recordAltitude.get(i - 1) - recordAltitude.get(i)) / 1000.0, 2);
 						double powOrthodrome = Math.pow((zeta * (40041000.0 / 360.0)), 2);
 						if((int) (Math.sqrt(powOrthodrome + powDeltaHeight) * 1000.0) > 1500) 
 						indexMovement = i;

@@ -248,7 +248,7 @@ public class KMZWriter {
  final boolean isHeightRelative, boolean isClampToGround) throws Exception {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		StringBuilder sb = new StringBuilder();
-		double height0 = 0;
+		double height0 = 0.0, altitudeDelta = 0.0;
 		long startTime = new Date().getTime();
 		ZipOutputStream zipWriter = null;
 		IDevice device = DataExplorer.getInstance().getActiveDevice();
@@ -272,16 +272,21 @@ public class KMZWriter {
 			if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setProgress(progressCycle, sThreadId);
 			Record recordLongitude = recordSet.get(ordinalLongitude);
 			Record recordLatitude = recordSet.get(ordinalLatitude);
-			Record recordHeight = recordSet.get(ordinalHeight);
+			Record recordHeight = ordinalHeight < 0 ? null : recordSet.get(ordinalHeight);
 			Record recordVelocity = ordinalVelocity < 0 ? null : recordSet.get(ordinalVelocity);
 			Record recordSlope = ordinalSlope < 0 ? null : recordSet.get(ordinalSlope);
 			String velocityUnit = recordVelocity != null ? recordVelocity.getUnit(): GDE.STRING_EMPTY;
 
-			if (recordLongitude == null || recordLatitude == null || recordHeight == null)
+			if (recordLongitude == null || recordLatitude == null)
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() }));
-
-			double altitudeDelta = Math.abs(device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - device.translateValue(recordHeight, recordHeight.getMinValue() / 1000.0));
-			isClampToGround = isClampToGround || altitudeDelta < 10;
+			if (recordHeight == null) {
+				isClampToGround = true;
+				altitudeDelta = 0.0;
+			}
+			else {
+				altitudeDelta = Math.abs(device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - device.translateValue(recordHeight, recordHeight.getMinValue() / 1000.0));
+				isClampToGround = isClampToGround || altitudeDelta < 10;
+			}
 			String altitudeMode = isClampToGround ? ALTITUDE_CLAMP2GROUNDE : isHeightRelative ? ALTITUDE_RELATIVE2GROUND : ALTITUDE_ABSOLUTE;
 
 			Record recordTripLength = ordinalTripLength < 0 ? null : recordSet.get(ordinalTripLength);
@@ -335,10 +340,10 @@ public class KMZWriter {
 						positionLatitude = device.translateValue(recordLongitude, recordLatitude.realGet(i) / 1000.0);
 						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(), recordSet.getRecordSetDescription(), 
 								dateString, new SimpleDateFormat("HH:mm:ss").format(date), 
-								dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordHeight.size() - 1)),
+								dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)),
 								positionLongitude, positionLatitude, -50, 70, 1000).getBytes());
 						isPositionWritten = true;
-						height0 = isHeightRelative ? device.translateValue(recordHeight, recordHeight.realGet(i) / 1000.0) : 0;
+						height0 = isHeightRelative && !isClampToGround && recordHeight != null ? device.translateValue(recordHeight, recordHeight.realGet(i) / 1000.0) : 0;
 						break;
 					}
 				}
@@ -438,14 +443,13 @@ public class KMZWriter {
 			String[] velocityColors = new String[] { lowerLimitColor, withinLimitsColor, upperLimitColor };
 
 			//write track statistics
-			double height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
+			double height = !isClampToGround && recordHeight != null ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0 : 0;
 			zipWriter.write(String.format(Locale.ENGLISH, statistics, "Statistics", recordTripLength == null ? 0 : device.translateValue(recordTripLength, recordTripLength.getMaxValue() / 1000.0),
-					height, 
-					device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0, 
-					isHeightRelative ? "" : String.format("(%.0f)", (device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height)),
+					height, recordHeight == null ? 0 : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0, 
+					isHeightRelative ? "" : String.format("(%.0f)", (recordHeight == null ? 0.0f : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height)),
 					recordVelocity == null ? 0 : device.translateValue(recordVelocity, recordVelocity.getMaxValue() / 1000.0), recordVelocity == null ? 0 : device.translateValue(recordVelocity, recordVelocity.getAvgValue() / 1000.0), dateString,
-					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordHeight.size() - 1)), dateString,
-					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordHeight.size() - 1))).getBytes());
+					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)), dateString,
+					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1))).getBytes());
 
 			//speed-track
 			zipWriter.write(KMZWriter.speedHeader.getBytes());
@@ -471,7 +475,7 @@ public class KMZWriter {
 					}
 					sb = new StringBuilder();
 	
-					height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
+					height = recordHeight == null ? 0 : (device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0);
 					// add data entries, translate according device and measurement unit
 					sb.append(String.format(Locale.ENGLISH, "\t\t\t\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0))) //$NON-NLS-1$
 							.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0))) //$NON-NLS-1$
@@ -497,7 +501,7 @@ public class KMZWriter {
 					double slope = recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i) / 1000.0);
 					double slopeLast = i==0 ? slope : recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i-1) / 1000.0);
 					boolean isSlope0 = speed > 2 && ((slope <= 0 && slopeLast > 0) || (slope > 0 && slopeLast <= 0) || slope == 0);
-					height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
+					height = recordHeight == null ? 0 : (device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0);
 					zipWriter.write(String.format(Locale.ENGLISH, dataPoint, 
 							recordSet.getTime(i) / 1000 / 10, speed, height, 
 							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), height, speed, recordAzimuth.get(i) / 1000.0, 
