@@ -43,7 +43,6 @@ import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -562,8 +561,12 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						findRecordByUnit(activeRecordSet, "km/h"),
-						findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"}), 	//speed
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
+						-1, 
+						type == DeviceConfiguration.HEIGHT_RELATIVE, 
+						type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
 		}
 	}
@@ -600,20 +603,17 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ) && this.isActualRecordSetWithGpsData()) {
-				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
+				exportFileName = new FileHandler().exportFileKMZ(
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"),
-						findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"}), 	//speed
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
+						-1, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
-	}
-
-	private int findRecordByUnit(RecordSet recordSet, String unit) {
-		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
-		}
-		return -1;
 	}
 
 	/**
