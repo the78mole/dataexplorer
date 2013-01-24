@@ -1446,12 +1446,14 @@ public class DataExplorer extends Composite {
 				if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
 					if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 						this.menuToolBar.selectObjectKey(searchSelectionIndex);
+						this.channels.getActiveChannel().setObjectKey(newObjectKey);
 					}
 					else {
 						final int selectionIndex = searchSelectionIndex;
 						GDE.display.asyncExec(new Runnable() {
 							public void run() {
 								DataExplorer.this.menuToolBar.selectObjectKey(selectionIndex);
+								DataExplorer.this.channels.getActiveChannel().setObjectKey(newObjectKey);
 							}
 						});
 					}

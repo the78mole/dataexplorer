@@ -2187,7 +2187,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public int findRecordOrdinalByUnit(String[] units) {
 		for (Record record : this.values()) {
 			for (int i = 0; i < units.length; i++) {
-				if (record.getUnit().contains(units[i])) 
+				if (record.getUnit().contains(units[i]) && record.hasReasonableData()) 
 					return record.getOrdinal();
 			}
 		}

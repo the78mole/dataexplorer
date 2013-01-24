@@ -602,7 +602,7 @@ public class FileHandler {
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
 				KMZWriter.write(kmzFilePath, fileName.substring(fileName.lastIndexOf(GDE.FILE_SEPARATOR) + 1) + GDE.FILE_ENDING_DOT_KML, activeRecordSet, ordinalLongitude, ordinalLatitude, ordinalHeight,
-						ordinalVelocity, ordinalSlope, ordinalTripLength, ordinalAzimuth, isHeightRelative, false);
+						ordinalVelocity, ordinalSlope, ordinalTripLength, ordinalAzimuth, isHeightRelative, ordinalHeight == -1);
 			}
 			catch (Exception e) {
 				FileHandler.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
