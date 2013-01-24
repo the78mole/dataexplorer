@@ -140,13 +140,13 @@ public enum Transmitter {
 				}
 			}
 			for (int i = 0; i < 2; i++) {
-				if ((inBytes[0x00 + i]&0xFF) != Transmitter.mx_20_PROD_CODE[i]){
+				if ((inBytes[0x00 + i]&0xFF) != (Transmitter.mx_20_PROD_CODE[i]&0xFF)){
 					isMX20 = false;
 					break;
 				}
 			}
 			for (int i = 0; i < 2; i++) {
-				if ((inBytes[0x00 + i]&0xFF) != Transmitter.mc_16_PROD_CODE[i]){
+				if ((inBytes[0x00 + i]&0xFF) != (Transmitter.mc_16_PROD_CODE[i]&0xFF)){
 					isMC16 = false;
 					break;
 				}
@@ -181,7 +181,7 @@ public enum Transmitter {
 	public static void convert2target(String filepath, Transmitter target) {
 		DataInputStream in = null;
 		DataOutputStream out = null;
-		byte[] bytes = new byte[target.ordinal() <= 2 ? 12288 : 8192];
+		byte[] bytes = new byte[target.ordinal() <= 3 ? 12288 : 8192];
 
 		try {
 			filepath = filepath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -263,7 +263,7 @@ public enum Transmitter {
 				System.arraycopy(Transmitter.mc_16_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_16_MEM_INFO.length);
 				bytes[0x160] = (byte) 0x05;
 				
-				convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
+				convertCurves(bytes, MC_32.ordinal(), MC_16.ordinal());
 				break;
 			case MX_16:
 				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
@@ -297,6 +297,7 @@ public enum Transmitter {
 					break;
 				case MC_20:
 				case MX_20:
+				case MC_16:
 					if (detectTransmitter(bytes) == Transmitter.MC_32) {
 						DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2402));
 					}
