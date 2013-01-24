@@ -2178,4 +2178,19 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		}
 		return -1;
 	}
+
+	/**
+	 * find the first occurrence of given unit samples and return the record ordinal
+	 * @param unit
+	 * @return record ordinal or -1 if not found
+	 */
+	public int findRecordOrdinalByUnit(String[] units) {
+		for (Record record : this.values()) {
+			for (int i = 0; i < units.length; i++) {
+				if (record.getUnit().contains(units[i])) 
+					return record.getOrdinal();
+			}
+		}
+		return -1;
+	}
 }
