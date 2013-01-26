@@ -622,6 +622,13 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
+				return activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"});	//speed;
+			}
+		}
 		return -1;
 	}
 
