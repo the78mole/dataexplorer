@@ -77,6 +77,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 	CLabel upperLimitLabel;
 	Text avgFactorText;
 	CLabel averageFactorLabel;
+	Text avgText;
+	CLabel averageLabel;
 	Composite fillerComposite;
 	Text lowerLimitText;
 	CLabel lowerLimitLabel;
@@ -322,8 +324,9 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						public void keyReleased(KeyEvent arg0) {
 							Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 							RecordSet activeRecordSet = application.getActiveRecordSet();
-							if (activeRecordSet != null && measurementOrdinal != null) {
+							if (activeRecordSet != null && measurementOrdinal != null && measurementOrdinal >= 0) {
 								int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
+								avgText.setText(GDE.STRING_BLANK + avgValue);
 								try {
 									double factor = Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
 									if (factor >= 1) {
@@ -344,7 +347,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 								catch (Exception e) {
 									// ignore
 								}
-							}						
+							}		
+							else avgText.setText("0");
 						}
 					});
 				}
@@ -370,7 +374,29 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						}
 					});
 				}
-//				limitComposite.pack();
+				{
+					averageLabel = new CLabel(limitComposite, SWT.RIGHT);
+					RowData averageLabelLData = new RowData();
+					averageLabelLData.width = 115;
+					averageLabelLData.height = 22;
+					averageLabel.setLayoutData(averageLabelLData);
+					averageLabel.setText(Messages.getString(MessageIds.GDE_MSGT0678));
+					averageLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0679));
+				}
+				{
+					avgText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
+					RowData avgTextLData = new RowData();
+					avgTextLData.width = 35;
+					avgTextLData.height = 16;
+					avgText.setLayoutData(avgTextLData);
+					avgText.setEditable(false);
+					Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
+					RecordSet activeRecordSet = application.getActiveRecordSet();
+					if (activeRecordSet != null && measurementOrdinal != null && measurementOrdinal >= 0) {
+						avgText.setText(String.format(" %d", (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0)));
+					}
+					avgText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0679));
+				}
 				limitComposite.layout();
 			}
 			{
@@ -551,7 +577,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 		if(avgLimitFactor >= 1) {
 			Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 			RecordSet activeRecordSet = application.getActiveRecordSet();
-			if (activeRecordSet != null && measurementOrdinal != null) {
+			if (activeRecordSet != null && measurementOrdinal != null && measurementOrdinal >= 0) {
 				int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
 				try {
 					lowerLimitText.setText(String.format("%d", (int)(avgValue/Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$
