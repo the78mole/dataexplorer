@@ -10,6 +10,7 @@ fix bug in HoTTAdapter saving modified filter data
 fix bug HoTTAdapter2 reading channel data 9-12
 fix bug HoTTAdapter* reading HF data
 fix bugs in JetiAdapter - exporting KMZ/KML/IGC
+fix bug in GPS color and velocity configuration dialog
 fix DevicePropertiesEditor - statistics type and property types doesn't persist after change
 add HoTTAdapter* mc-16 converter capabilities
 
