@@ -40,7 +40,7 @@
     <Channels lastUseOrdinal="0">
         <Channel type="TYPE_CONFIG" name="Allgemein">
             <Measurement>
-                <name>RF_RXSQ</name>
+                <name>TX-RX-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
@@ -60,7 +60,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Paketverlust</name>
+                <name>VPack</name>
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
@@ -570,7 +570,7 @@
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorGeneral">
             <Measurement>
-                <name>RF_RXSQ</name>
+                <name>TX-RX-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
@@ -590,7 +590,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Paketverlust</name>
+                <name>VPack</name>
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
@@ -1100,7 +1100,7 @@
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorElectric">
             <Measurement>
-                <name>RF_RXSQ</name>
+                <name>TX-RX-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
@@ -1120,7 +1120,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Paketverlust</name>
+                <name>VPack</name>
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
@@ -1630,7 +1630,7 @@
         </Channel>
         <Channel type="TYPE_CONFIG" name="Kanäle">
             <Measurement>
-                <name>RF_RXSQ</name>
+                <name>TX-RX-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
@@ -1650,7 +1650,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Paketverlust</name>
+                <name>VPack</name>
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
@@ -2315,7 +2315,7 @@
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorControl">
             <Measurement>
-                <name>RF_RXSQ</name>
+                <name>TX-RX-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
@@ -2335,7 +2335,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Paketverlust</name>
+                <name>VPack</name>
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>

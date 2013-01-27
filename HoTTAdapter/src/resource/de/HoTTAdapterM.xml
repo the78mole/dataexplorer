@@ -40,7 +40,7 @@
     <Channels lastUseOrdinal="2">
         <Channel type="TYPE_CONFIG" name="Receiver">
             <Measurement>
-                <name>RF_RXSQ</name>
+                <name>TX-RX-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
@@ -60,7 +60,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Paketverlust</name>
+                <name>VPack</name>
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>

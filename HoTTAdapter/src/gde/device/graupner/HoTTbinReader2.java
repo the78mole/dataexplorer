@@ -101,7 +101,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//74=PowerOff, 75=BattLow, 76=Reset, 77=reserved
 		//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
-		HoTTbinReader2.points[2] = 100000;
+		HoTTbinReader2.points[2] = 0;
 		HoTTbinReader2.pointsGeneral = HoTTbinReader2.pointsElectric = HoTTbinReader2.pointsSpeedControl = HoTTbinReader2.pointsVario = HoTTbinReader2.pointsGPS = HoTTbinReader2.points;
 		HoTTbinReader2.timeStep_ms = 0;
 		HoTTbinReader2.buf = new byte[HoTTbinReader2.dataBlockSize];
@@ -154,16 +154,13 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38] & 0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) >= 0) {
 						parseReceiver(HoTTbinReader2.buf);
-						isReceiverData = isSensorDataStart;
+						isReceiverData = isSensorDataStart || channelNumber == 4;
 					}
 					if (channelNumber == 4) 
 						parseChannel(HoTTbinReader2.buf); //Channels
 
 					//create and fill sensor specific data record sets 
 					switch ((byte) (HoTTbinReader2.buf[7] & 0xFF)) {
-					default:
-						isSensorDataStart = true; // make sure receiver data are processed
-						break;
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 						//fill data block 0 receiver voltage an temperature
@@ -314,22 +311,27 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						}
 						break;
 					}
-
-					
-					HoTTbinReader2.timeStep_ms += 10; // add default time step from device of 10 msec
 					
 					if (isSensorData || isReceiverData) {
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
 						isSensorData = isReceiverData = false;
 					}
+					else if (channelNumber == 4) {
+						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
+					}
+					
+					HoTTbinReader2.timeStep_ms += 10; // add default time step from device of 10 msec
+
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
+					++countPackageLoss;	// add up lost packages in telemetry data 
+					HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+
 					if (channelNumber == 4) {
 						parseChannel(HoTTbinReader2.buf); //Channels
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
 					}
-					++countPackageLoss;
 					HoTTbinReader2.timeStep_ms += 10;
 					//reset buffer to avoid mixing data
 					HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
@@ -460,8 +462,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					if (channelNumber == 4) 
 						parseChannel(HoTTbinReader2.buf);
 
-					HoTTbinReader2.timeStep_ms += 10;// add default time step from log record of 10 msec
-
 					if (actualSensor == -1)
 						lastSensor = actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
 					else
@@ -585,15 +585,19 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					if (HoTTbinReader2.buf[33] == 4) {
 						System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
 					}
+
+					HoTTbinReader2.timeStep_ms += 10;// add default time step from log record of 10 msec
 				
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
+					++countPackageLoss;	// add up lost packages in telemetry data 
+					HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+
 					if (channelNumber == 4) {
 						parseChannel(HoTTbinReader2.buf); //Channels
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
 					}
-					++countPackageLoss;
 					HoTTbinReader2.timeStep_ms += 10;
 					//reset buffer to avoid mixing data
 					logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountMotorDriver = 0;
@@ -692,13 +696,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf
 	 */
 	private static void parseReceiver(byte[] _buf) {
-		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader2.tmpVoltageRx = (_buf[35] & 0xFF);
 		HoTTbinReader2.tmpTemperatureRx = (_buf[36] & 0xFF);
 		HoTTbinReader2.points[1] = (_buf[38] & 0xFF) * 1000;
 		HoTTbinReader2.points[3] = DataParser.parse2Short(_buf, 40) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltageRx > -1 && HoTTbinReader2.tmpVoltageRx < 100 && HoTTbinReader2.tmpTemperatureRx < 100) {
-			HoTTbinReader2.points[0] = _buf[37] * 1000;
 			HoTTbinReader2.points[2] = (convertRxDbm2Strength(_buf[4] & 0xFF)) * 1000;
 			HoTTbinReader2.points[4] = (_buf[3] & 0xFF) * -1000;
 			HoTTbinReader2.points[5] = (_buf[4] & 0xFF) * -1000;
@@ -913,6 +916,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf
 	 */
 	private static void parseChannel(byte[] _buf) {
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		HoTTbinReader2.points[4] = (_buf[3] & 0xFF) * -1000;
+		HoTTbinReader2.points[5] = (_buf[4] & 0xFF) * -1000;
 		//58=Ch 1, 59=Ch 2 , 50=Ch 3 .. 73=Ch 16
 		HoTTbinReader2.points[58] = (DataParser.parse2UnsignedShort(_buf, 8) / 2) * 1000; //1197
 		HoTTbinReader2.points[59] = (DataParser.parse2UnsignedShort(_buf, 10) / 2) * 1000; //

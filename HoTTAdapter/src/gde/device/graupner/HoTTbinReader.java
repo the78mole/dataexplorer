@@ -157,7 +157,6 @@ public class HoTTbinReader {
 	 * @return
 	 */
 	static int convertRxDbm2Strength(int inValue) {
-		// RF_RXSQ_to_Strength(72-ShortInt(buf[0].data_3_1[3]) DIV 2)
 		if (inValue >= 40 && inValue < HoTTbinReader.lookup.length + 40) {
 			return HoTTbinReader.lookup[inValue - 40];
 		}
@@ -521,10 +520,13 @@ public class HoTTbinReader {
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
+					++countPackageLoss;	// add up lost packages in telemetry data 
+					HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+
 					if (HoTTAdapter.isChannelsChannelEnabled) {
 						parseAddChannel(HoTTbinReader.buf);
 					}
-					++countPackageLoss;
+					
 					HoTTbinReader.timeStep_ms += 10;
 					//reset buffer to avoid mixing data
 					HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
@@ -866,10 +868,13 @@ public class HoTTbinReader {
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //tx,rx == 0
+					++countPackageLoss;	// add up lost packages in telemetry data 
+					HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+
 					if (HoTTAdapter.isChannelsChannelEnabled) {
 						parseAddChannel(HoTTbinReader.buf);
 					}
-					++countPackageLoss;
+					
 					HoTTbinReader.timeStep_ms += 10;
 					//reset buffer to avoid mixing data
 					logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
@@ -906,13 +911,12 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddReceiver(byte[] _buf) throws DataInconsitsentException {
-		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.tmpVoltageRx = (_buf[35] & 0xFF);
 		HoTTbinReader.tmpTemperatureRx = (_buf[36] & 0xFF);
 		HoTTbinReader.pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
 		HoTTbinReader.pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltageRx > -1 && HoTTbinReader.tmpVoltageRx < 100 && HoTTbinReader.tmpTemperatureRx < 120) {
-			HoTTbinReader.pointsReceiver[0] = _buf[37] * 1000;
 			HoTTbinReader.pointsReceiver[2] = (convertRxDbm2Strength(_buf[4] & 0xFF)) * 1000;
 			HoTTbinReader.pointsReceiver[4] = (_buf[3] & 0xFF) * -1000;
 			HoTTbinReader.pointsReceiver[5] = (_buf[4] & 0xFF) * -1000;
