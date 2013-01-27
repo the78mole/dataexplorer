@@ -2181,15 +2181,33 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * find the first occurrence of given unit samples and return the record ordinal
-	 * @param unit
+	 * @param units string array of unit 
 	 * @return record ordinal or -1 if not found
 	 */
 	public int findRecordOrdinalByUnit(String[] units) {
 		for (Record record : this.values()) {
 			for (int i = 0; i < units.length; i++) {
-				if (record.getUnit().contains(units[i]) && record.hasReasonableData()) 
+				if (record.getUnit().toLowerCase().contains(units[i].toLowerCase()) && record.hasReasonableData()) 
 					return record.getOrdinal();
 			}
+		}
+		return -1;
+	}
+
+	/**
+	 * find the first occurrence of given unit samples and return the record ordinal if the value range is within the given boundaries
+	 * @param units string array of unit 
+	 * @param minBoundaryValue lower value boundary
+	 * @param maxBoundaryValue upper value boundary
+	 * @return record ordinal or -1 if not found
+	 */
+	public int findRecordOrdinalByUnit(String[] units, int minBoundaryValue, int maxBoundaryValue) {
+		for (Record record : this.values()) {
+			if (record.getMinValue()/1000 >= minBoundaryValue && record.getMaxValue()/1000 <= maxBoundaryValue)
+				for (int i = 0; i < units.length; i++) {
+					if (record.getUnit().toLowerCase().contains(units[i].toLowerCase()) && record.hasReasonableData()) 
+						return record.getOrdinal();
+				}
 		}
 		return -1;
 	}
