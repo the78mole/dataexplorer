@@ -564,7 +564,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"}), 	//speed
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
-						-1, 
+						-1, 																																		//azimuth
 						type == DeviceConfiguration.HEIGHT_RELATIVE, 
 						type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
@@ -610,7 +610,8 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"}), 	//speed
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
-						-1, true, isExportTmpDir);
+						-1, 																																		//azimuth
+						true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
