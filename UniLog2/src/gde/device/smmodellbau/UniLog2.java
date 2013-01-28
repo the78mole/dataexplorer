@@ -90,7 +90,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
-		UniLog2SerialPort.TIME_OUT_MS = 2000 + this.getRTOExtraDelayTime();
+		UniLog2SerialPort.TIME_OUT_MS = this.getReadTimeOut();
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
-		UniLog2SerialPort.TIME_OUT_MS = 2000 + this.getRTOExtraDelayTime();
+		UniLog2SerialPort.TIME_OUT_MS = this.getReadTimeOut();
 	}
 
 	/**
