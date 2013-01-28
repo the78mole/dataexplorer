@@ -330,10 +330,10 @@ public class SeriaPortTypeTabItem extends CTabItem {
 								SeriaPortTypeTabItem.this.useTimeOut = SeriaPortTypeTabItem.this.timeOutButton.getSelection();
 								if (SeriaPortTypeTabItem.this.useTimeOut) {
 									if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-										SeriaPortTypeTabItem.this.deviceConfig.setRTOCharDelayTime(SeriaPortTypeTabItem.this.RTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getRTOCharDelayTime());
-										SeriaPortTypeTabItem.this.deviceConfig.setRTOExtraDelayTime(SeriaPortTypeTabItem.this.RTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getRTOExtraDelayTime());
-										SeriaPortTypeTabItem.this.deviceConfig.setWTOCharDelayTime(SeriaPortTypeTabItem.this.WTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWTOCharDelayTime());
-										SeriaPortTypeTabItem.this.deviceConfig.setWTOExtraDelayTime(SeriaPortTypeTabItem.this.WTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWTOExtraDelayTime());
+										SeriaPortTypeTabItem.this.deviceConfig.setReadTimeOut(SeriaPortTypeTabItem.this.RTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getReadTimeOut());
+										SeriaPortTypeTabItem.this.deviceConfig.setReadStableIndex(SeriaPortTypeTabItem.this.RTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getReadStableIndex());
+										SeriaPortTypeTabItem.this.deviceConfig.setWriteCharDelayTime(SeriaPortTypeTabItem.this.WTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWriteCharDelayTime());
+										SeriaPortTypeTabItem.this.deviceConfig.setWriteDelayTime(SeriaPortTypeTabItem.this.WTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWriteDelayTime());
 										SeriaPortTypeTabItem.this.propsEditor.enableSaveButton(true);
 									}
 									else {
@@ -378,7 +378,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 								log.log(java.util.logging.Level.FINEST, "_RTOCharDelayTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
 								SeriaPortTypeTabItem.this.RTOCharDelayTime = Integer.parseInt(SeriaPortTypeTabItem.this._RTOCharDelayTimeText.getText());
 								if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-									SeriaPortTypeTabItem.this.deviceConfig.setRTOCharDelayTime(SeriaPortTypeTabItem.this.RTOCharDelayTime);
+									SeriaPortTypeTabItem.this.deviceConfig.setReadTimeOut(SeriaPortTypeTabItem.this.RTOCharDelayTime);
 									SeriaPortTypeTabItem.this.propsEditor.enableSaveButton(true);
 								}
 							}
@@ -406,7 +406,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 								log.log(java.util.logging.Level.FINEST, "_RTOExtraDelayTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
 								SeriaPortTypeTabItem.this.RTOExtraDelayTime = Integer.parseInt(SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.getText());
 								if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-									SeriaPortTypeTabItem.this.deviceConfig.setRTOExtraDelayTime(SeriaPortTypeTabItem.this.RTOExtraDelayTime);
+									SeriaPortTypeTabItem.this.deviceConfig.setReadStableIndex(SeriaPortTypeTabItem.this.RTOExtraDelayTime);
 									SeriaPortTypeTabItem.this.propsEditor.enableSaveButton(true);
 								}
 							}
@@ -434,7 +434,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 								log.log(java.util.logging.Level.FINEST, "_WRTOCharDelayTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
 								SeriaPortTypeTabItem.this.WTOCharDelayTime = Integer.parseInt(SeriaPortTypeTabItem.this._WTOCharDelayTimeText.getText());
 								if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-									SeriaPortTypeTabItem.this.deviceConfig.setWTOCharDelayTime(SeriaPortTypeTabItem.this.WTOCharDelayTime);
+									SeriaPortTypeTabItem.this.deviceConfig.setWriteCharDelayTime(SeriaPortTypeTabItem.this.WTOCharDelayTime);
 									SeriaPortTypeTabItem.this.propsEditor.enableSaveButton(true);
 								}
 							}
@@ -462,7 +462,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 								log.log(java.util.logging.Level.FINEST, "_WTOExtraDelayTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
 								SeriaPortTypeTabItem.this.WTOExtraDelayTime = Integer.parseInt(SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.getText());
 								if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-									SeriaPortTypeTabItem.this.deviceConfig.setWTOExtraDelayTime(SeriaPortTypeTabItem.this.WTOExtraDelayTime);
+									SeriaPortTypeTabItem.this.deviceConfig.setWriteDelayTime(SeriaPortTypeTabItem.this.WTOExtraDelayTime);
 									SeriaPortTypeTabItem.this.propsEditor.enableSaveButton(true);
 								}
 							}
@@ -536,10 +536,10 @@ public class SeriaPortTypeTabItem extends CTabItem {
 		else {
 			this.timeOutButton.setSelection(this.useTimeOut = false);
 		}
-		this.RTOCharDelayTime = deviceConfig.getRTOCharDelayTime();
-		this.RTOExtraDelayTime = deviceConfig.getRTOExtraDelayTime();
-		this.WTOCharDelayTime = deviceConfig.getWTOCharDelayTime();
-		this.WTOExtraDelayTime = deviceConfig.getWTOExtraDelayTime();
+		this.RTOCharDelayTime = deviceConfig.getReadTimeOut();
+		this.RTOExtraDelayTime = deviceConfig.getReadStableIndex();
+		this.WTOCharDelayTime = deviceConfig.getWriteCharDelayTime();
+		this.WTOExtraDelayTime = deviceConfig.getWriteDelayTime();
 		this.timeOutComposite.redraw();
 
 		initialize();

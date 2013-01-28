@@ -547,60 +547,60 @@ public class DeviceConfiguration {
 		this.serialPort.setIsRTS(value);
 	}
 	
-	public int getRTOCharDelayTime() {
+	public int getReadTimeOut() {
 		if (this.serialPort == null) createSerialPort();
-		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getRTOCharDelayTime() : 0;
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getReadTimeOut() : 0;
 	}
 
-	public void setRTOCharDelayTime(int value) {
+	public void setReadTimeOut(int value) {
 		this.isChangePropery = true;
 		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
-		this.serialPort.getTimeOut().setRTOCharDelayTime(value);
+		this.serialPort.getTimeOut().setReadTimeOut(value);
 	}
 	
-	public int getRTOExtraDelayTime() {
+	public int getReadStableIndex() {
 		if (this.serialPort == null) createSerialPort();
-		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getRTOExtraDelayTime() : 0;
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getReadStableIndex() : 0;
 	}
 
-	public void setRTOExtraDelayTime(int value) {
+	public void setReadStableIndex(int value) {
 		this.isChangePropery = true;
 		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
-		this.serialPort.getTimeOut().setRTOExtraDelayTime(value);
+		this.serialPort.getTimeOut().setReadStableIndex(value);
 	}
 	
-	public int getWTOCharDelayTime() {
+	public int getWriteCharDelayTime() {
 		if (this.serialPort == null) createSerialPort();
-		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWTOCharDelayTime() : 0;
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWriteCharDelayTime() : 0;
 	}
 
-	public void setWTOCharDelayTime(int value) {
+	public void setWriteCharDelayTime(int value) {
 		this.isChangePropery = true;
 		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
-		this.serialPort.getTimeOut().setWTOCharDelayTime(value);
+		this.serialPort.getTimeOut().setWriteCharDelayTime(value);
 	}
 	
-	public int getWTOExtraDelayTime() {
+	public int getWriteDelayTime() {
 		if (this.serialPort == null) createSerialPort();
-		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWTOExtraDelayTime() : 0;
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWriteDelayTime() : 0;
 	}
 
-	public void setWTOExtraDelayTime(int value) {
+	public void setWriteDelayTime(int value) {
 		this.isChangePropery = true;
 		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
-		this.serialPort.getTimeOut().setWTOExtraDelayTime(value);
+		this.serialPort.getTimeOut().setWriteDelayTime(value);
 	}
 	
 	public void removeSerialPortTimeOut() {
