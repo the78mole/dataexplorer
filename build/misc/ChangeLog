@@ -14,6 +14,7 @@ fix bug in GPS color and velocity configuration dialog
 fix DevicePropertiesEditor - statistics type and property types doesn't persist after change
 add HoTTAdapter* mc-16 converter capabilities
 add HoTTAdapter* TX-Rx-VPack curve
+update device XSD to simplify timeout configuration 
 
 Version 3.06 - 11 Dec 2012
 add JetiAdapter to analyze flight record data from Jeti transmitters
