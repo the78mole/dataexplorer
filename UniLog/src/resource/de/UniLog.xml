@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V20.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V21.xsd">
     <Device>
         <name>UniLog</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -17,6 +17,12 @@
         <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
         <isRTS>true</isRTS>
         <isDTR>true</isDTR>
+        <TimeOut>
+            <ReadTimeOut>2000</ReadTimeOut>
+            <ReadStableIndex>50</ReadStableIndex>
+            <WriteCharDelayTime>0</WriteCharDelayTime>
+            <WriteDelayTime>0</WriteDelayTime>
+        </TimeOut>
     </SerialPort>
     <TimeBase>
         <name>Zeit</name>
