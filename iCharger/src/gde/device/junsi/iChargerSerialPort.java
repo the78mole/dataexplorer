@@ -64,8 +64,8 @@ public class iChargerSerialPort extends DeviceCommPort {
 		this.endByte = this.device.getDataBlockEnding()[this.device.getDataBlockEnding().length - 1];
 		this.endByte_1 = this.device.getDataBlockEnding().length == 2 ? this.device.getDataBlockEnding()[0] : 0x00;
 		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
-		this.timeout = this.device.getDeviceConfiguration().getRTOCharDelayTime();
-		this.stableIndex = this.device.getDeviceConfiguration().getRTOExtraDelayTime();
+		this.timeout = this.device.getDeviceConfiguration().getReadTimeOut();
+		this.stableIndex = this.device.getDeviceConfiguration().getReadStableIndex();
 		this.isDataReceived = false;
 		this.index = 0;
 		this.tmpData = new byte[0];
