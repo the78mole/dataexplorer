@@ -31,7 +31,6 @@ import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
-import gde.io.CSVSerialDataReaderWriter;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
@@ -452,7 +451,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
 								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								CSVSerialDataReaderWriter.read(selectedImportFile, GPXAdapter.this, recordNameExtend, channelConfigNumber, true);
+								GPXDataReaderWriter.read(selectedImportFile, GPXAdapter.this, recordNameExtend, channelConfigNumber);
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
