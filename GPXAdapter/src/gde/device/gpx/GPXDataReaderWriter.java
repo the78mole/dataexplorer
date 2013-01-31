@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -206,11 +207,16 @@ public class GPXDataReaderWriter {
 			boolean isElevation = false;
 			boolean isTime = false, isDateSet = false;
 			boolean isNumSatelites = false;
+			Boolean isExtensionFirstCalled = null;
+			boolean isExtension = false;
 			final int[] date = new int[3];
 			final int[] time = new int[3];
 			long timeStamp = 0, startTimeStamp = 0;
 			final Map<String, String> tmpPoints = new LinkedHashMap<String, String>();
+			final Vector<String> extensionNames = new Vector<String>();
+			String extensionName = GDE.STRING_EMPTY;
 			int[] points = new int[activeRecordSet.size()];
+			int pointsIndex = 0;
 
 
 			@Override
@@ -236,6 +242,16 @@ public class GPXDataReaderWriter {
 						isTime = true;//<time>2012-04-19T15:37:33Z</time>
 					else if (qName.equalsIgnoreCase("sat")) 
 						isNumSatelites = true;//<sat>10</sat>
+
+					//<extensions>
+					else if (qName.equalsIgnoreCase("extensions")) {
+						isExtension  = true;
+						if (isExtensionFirstCalled == null)
+							isExtensionFirstCalled = true;
+					}
+					else if (isExtension) {
+						extensionName = qName;
+					}
 
 					
 				}
@@ -280,10 +296,11 @@ public class GPXDataReaderWriter {
 			public void endElement(String uri, String localName, String qName) throws SAXException {
 				//System.out.println("End Element :" + qName);
 				if (qName.equalsIgnoreCase("trkpt")) {
-					points[0] = (int) (Double.valueOf(tmpPoints.get("lat").replace("+", "").trim()) * 1000000); 
-					points[1] = (int) (Double.valueOf(tmpPoints.get("lon").replace("+", "").trim()) * 1000000);  
-					points[2] = Integer.valueOf(tmpPoints.get("ele").replace(".", "").trim()); 
-					points[3] = Integer.valueOf(tmpPoints.get("sat").trim()) * 1000; 
+					pointsIndex = 0;
+					points[pointsIndex++] = (int) (Double.valueOf(tmpPoints.get("lat").replace("+", "").trim()) * 1000000); 
+					points[pointsIndex++] = (int) (Double.valueOf(tmpPoints.get("lon").replace("+", "").trim()) * 1000000);  
+					points[pointsIndex++] = Integer.valueOf(tmpPoints.get("ele").replace(".", "").trim()); 
+					points[pointsIndex++] = Integer.valueOf(tmpPoints.get("sat").trim()) * 1000; 
 					try {
 						if (startTimeStamp == 0) startTimeStamp = timeStamp;
 						System.out.println(""+(timeStamp - startTimeStamp)*1.0);
@@ -292,6 +309,38 @@ public class GPXDataReaderWriter {
 					catch (DataInconsitsentException e) {
 						e.printStackTrace();
 					}
+				}
+				else if (qName.equalsIgnoreCase("extensions")) {
+					if (isExtensionFirstCalled) {
+						for (String tmpExtensionName : extensionNames) {
+							String[] values = tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
+							for (int i = 0; i < values.length && i < points.length-pointsIndex; i++) {
+								activeRecordSet.getRecordNames()[pointsIndex] = tmpExtensionName + GDE.STRING_UNDER_BAR + (i+1);
+								activeRecordSet.get(pointsIndex).setName(activeRecordSet.getRecordNames()[pointsIndex]);
+								try {
+									points[pointsIndex++] = Integer.valueOf(values[1].trim()) * 1000;
+								}
+								catch (NumberFormatException e) {
+									// ignore and keep existing value
+								} 
+							}
+						}
+						isExtensionFirstCalled = false;
+					}
+					else if (!isExtensionFirstCalled) {
+						for (String tmpExtensionName : extensionNames) {
+							String[] values = tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
+							for (int i = 0; i < values.length && i < points.length-pointsIndex; i++) {
+								try {
+									points[pointsIndex++] = Integer.valueOf(values[1].trim()) * 1000;
+								}
+								catch (NumberFormatException e) {
+									// ignore and keep existing value
+								} 
+							}
+						}
+					}
+					
 				}
 			}
 
@@ -330,6 +379,10 @@ public class GPXDataReaderWriter {
 				else if (isNumSatelites) {
 					tmpPoints.put("sat", new String(ch, start, length)); //<sat>10</sat>
 					isNumSatelites = false;
+				}
+				else if (isExtension) {
+					extensionNames.add(extensionName);
+					tmpPoints.put(extensionName, new String(ch, start, length)); //<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
 				}
 			}
 		};
