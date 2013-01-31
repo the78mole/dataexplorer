@@ -23,7 +23,6 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
-import gde.device.InputTypes;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
@@ -86,7 +85,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 		super(parent);
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
-		this.measurementsCount = (Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO))+1)/2;
+		this.measurementsCount = this.device.getMeasurementNames(1).length;
 	}
 
 	@Override
@@ -110,7 +109,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + this.measurementsCount * 26 + 50 + 42); //header + tab + label + this.measurementsCount * 26 + buttons
+				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + (this.measurementsCount/2) * 26 + 50 + 42); //header + tab + label + this./2 * 26 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -161,7 +160,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSimple(false);
 					{
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, 24);
+							createVisualizationTabItem(i, this.measurementsCount);
 						}
 					}
 					FormData tabFolderLData = new FormData();
