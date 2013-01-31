@@ -276,11 +276,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
-					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-					double value = (record.realGet(rowIndex) / 1000000.0);
-					int grad = (int)value;
-					double minuten = (value - grad) * 100;
-					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
 			}
 		}
@@ -319,9 +315,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = ((int)(value / 1000));
-			double minuten = (value - (grad*1000.0))/10.0;
-			newValue = grad + minuten/60.0;
+			newValue = value / 1000.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -359,9 +353,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = (int)value;
-			double minuten =  (value - grad*1.0) * 60.0;
-			newValue = (grad + minuten/100.0)*1000.0;
+			newValue = value * 1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;
