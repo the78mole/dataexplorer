@@ -279,16 +279,19 @@ public class MeasurementControlConfigurable extends Composite {
 	boolean synchronizeRecord(boolean enable) {
 		boolean isEnabled = !enable;
 		if (enable) {
-			String syncMeasurementName_1 = this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0,	this.measurementType.getName().length() - this.filterExtend.length()) : this.measurementType.getName();
-			String syncMeasurementName_0 = syncMeasurementName_1.split(GDE.STRING_BLANK)[0];
 			RecordSet activeRecordSet = this.application.getActiveRecordSet();
-			if (activeRecordSet != null  && activeRecordSet.get(syncMeasurementName_0) != null && activeRecordSet.get(syncMeasurementName_0).getOrdinal() != this.ordinal) {
-				this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_0).getOrdinal());
-				isEnabled = true;
-			}
-			else if (activeRecordSet != null && activeRecordSet.get(syncMeasurementName_1) != null && activeRecordSet.get(syncMeasurementName_1).getOrdinal() != this.ordinal) {
-				this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_1).getOrdinal());
-				isEnabled = true;
+			if (activeRecordSet != null) {
+				String syncMeasurementName_1 = this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0, this.measurementType.getName().length() - this.filterExtend.length()) : this.measurementType.getName();
+				String syncMeasurementName_0 = activeRecordSet.get(syncMeasurementName_1.split(GDE.STRING_BLANK)[0]) != null && syncMeasurementName_1.contains(syncMeasurementName_1.split(GDE.STRING_BLANK)[0])
+						? syncMeasurementName_1.split(GDE.STRING_BLANK)[0] : syncMeasurementName_1.split(GDE.STRING_BLANK)[0] + GDE.STRING_BLANK + 1;
+				if (activeRecordSet.get(syncMeasurementName_0) != null && activeRecordSet.get(syncMeasurementName_0).getOrdinal() != this.ordinal) {
+					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_0).getOrdinal());
+					isEnabled = true;
+				}
+				else if (activeRecordSet.get(syncMeasurementName_1) != null && activeRecordSet.get(syncMeasurementName_1).getOrdinal() != this.ordinal) {
+					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_1).getOrdinal());
+					isEnabled = true;
+				}
 			}
 		}
 		else {
