@@ -445,6 +445,146 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
+            <Measurement>
+                <name>60????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>61????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>62????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>63????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>64????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>65????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>66????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>67????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>68????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>69????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>70????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>71????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>72????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>73????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>74????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>75????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>76????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>77????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>78????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>79????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
        	</Channel>
         <Channel type="TYPE_CONFIG" name="Konfig_2">
 			<Measurement>
@@ -860,6 +1000,146 @@
             </Measurement>
             <Measurement>
                 <name>59????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>60????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>61????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>62????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>63????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>64????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>65????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>66????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>67????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>68????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>69????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>70????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>71????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>72????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>73????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>74????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>75????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>76????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>77????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>78????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>79????</name>
                 <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>

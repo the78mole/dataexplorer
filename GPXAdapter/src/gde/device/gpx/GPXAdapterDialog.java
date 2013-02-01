@@ -27,8 +27,6 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -46,7 +44,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -57,24 +54,20 @@ import org.eclipse.swt.widgets.Shell;
  * @author Winfried Brügmann
  */
 public class GPXAdapterDialog extends DeviceDialog {
-	final static Logger						log									= Logger.getLogger(GPXAdapterDialog.class.getName());
+	final static Logger	log									= Logger.getLogger(GPXAdapterDialog.class.getName());
 
-	CTabFolder										tabFolder, subTabFolder1, subTabFolder2;
-	CTabItem											visualizationTabItem;
-	Composite											visualizationMainComposite, uniLogVisualization, mLinkVisualization;
-	Composite											configurationMainComposite;
+	CTabFolder					tabFolder, subTabFolder1, subTabFolder2;
+	CTabItem						visualizationTabItem;
+	Button							saveVisualizationButton, inputFileButton, helpButton, closeButton;
 
-	Button												saveVisualizationButton, inputFileButton, helpButton, closeButton;
+	CTabItem						gpsLoggerTabItem, telemetryTabItem;
 
-	CTabItem											gpsLoggerTabItem, telemetryTabItem;
+	final GPXAdapter		device;																																	// get device specific things, get serial port, ...
+	final Settings			settings;																																// application configuration settings
 
-	final GPXAdapter								device;																																						// get device specific things, get serial port, ...
-	final Settings								settings;																																					// application configuration settings
-
-	RecordSet											lastActiveRecordSet		= null;
-	boolean												isVisibilityChanged	= false;
-	int														measurementsCount		= 0;
-	final List<CTabItem>					configurations			= new ArrayList<CTabItem>();
+	RecordSet						lastActiveRecordSet	= null;
+	boolean							isVisibilityChanged	= false;
+	int									measurementsCount		= 0;
 
 	/**
 	 * default constructor initialize all variables required
@@ -94,7 +87,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			GPXAdapterDialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -109,28 +102,30 @@ public class GPXAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + (this.measurementsCount/2) * 26 + 50 + 42); //header + tab + label + this./2 * 26 + buttons
+				this.dialogShell.setSize(GDE.IS_LINUX ? 750 : 685, 30 + 25 + 25 + (this.measurementsCount / 4) * 26 + 50 + 42); //header + tab + label + this./2 * 26 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
-		        switch (event.detail) {
-		        case SWT.TRAVERSE_ESCAPE:
-		        	GPXAdapterDialog.this.dialogShell.close();
-		          event.detail = SWT.TRAVERSE_NONE;
-		          event.doit = false;
-		          break;
-		        }
-		      }
-		    });
+					@Override
+					public void handleEvent(Event event) {
+						switch (event.detail) {
+						case SWT.TRAVERSE_ESCAPE:
+							GPXAdapterDialog.this.dialogShell.close();
+							event.detail = SWT.TRAVERSE_NONE;
+							event.doit = false;
+							break;
+						}
+					}
+				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						GPXAdapterDialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (GPXAdapterDialog.this.device.isChangePropery()) {
 							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { GPXAdapterDialog.this.device.getPropertiesFileName() });
 							if (GPXAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								GPXAdapterDialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								GPXAdapterDialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
@@ -139,17 +134,19 @@ public class GPXAdapterDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						GPXAdapterDialog.this.application.openHelpDialog(GPXAdapterDialog.this.device.getName(), "HelpInfo.html");  //$NON-NLS-1$
+						GPXAdapterDialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						GPXAdapterDialog.this.application.openHelpDialog(GPXAdapterDialog.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent paintevent) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
+						if (GPXAdapterDialog.log.isLoggable(Level.FINEST)) GPXAdapterDialog.log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = GPXAdapterDialog.this.application.getActiveRecordSet();
-						if (GPXAdapterDialog.this.lastActiveRecordSet == null && activeRecordSet != null 
-								|| ( activeRecordSet != null && !GPXAdapterDialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
+						if (GPXAdapterDialog.this.lastActiveRecordSet == null && activeRecordSet != null
+								|| (activeRecordSet != null && !GPXAdapterDialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
 							GPXAdapterDialog.this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 						}
 						GPXAdapterDialog.this.lastActiveRecordSet = GPXAdapterDialog.this.application.getActiveRecordSet();
@@ -160,7 +157,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSimple(false);
 					{
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, this.measurementsCount);
+							new GPXAdapterDialogTabItem(this.tabFolder, this, i, this.device);
 						}
 					}
 					FormData tabFolderLData = new FormData();
@@ -187,7 +184,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 					this.saveVisualizationButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPXAdapterDialog.log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPXAdapterDialog.this.device.storeDeviceProperties();
 							GPXAdapterDialog.this.saveVisualizationButton.setEnabled(false);
 						}
@@ -207,11 +204,11 @@ public class GPXAdapterDialog extends DeviceDialog {
 					this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPXAdapterDialog.log.log(Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPXAdapterDialog.this.isVisibilityChanged) {
 								String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { GPXAdapterDialog.this.device.getPropertiesFileName() });
 								if (GPXAdapterDialog.this.application.openYesNoMessageDialog(GPXAdapterDialog.this.dialogShell, msg) == SWT.YES) {
-									log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+									GPXAdapterDialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 									GPXAdapterDialog.this.device.storeDeviceProperties();
 								}
 							}
@@ -232,8 +229,8 @@ public class GPXAdapterDialog extends DeviceDialog {
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPXAdapterDialog.this.application.openHelpDialog(GPXAdapterDialog.this.device.getName(), "HelpInfo.html");  //$NON-NLS-1$
+							GPXAdapterDialog.log.log(Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPXAdapterDialog.this.application.openHelpDialog(GPXAdapterDialog.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
 						}
 					});
 				}
@@ -250,7 +247,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPXAdapterDialog.log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPXAdapterDialog.this.dispose();
 						}
 					});
@@ -269,31 +266,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 			}
 		}
 		catch (Exception e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * create a visualization control tab item
-	 * @param channelNumber
-	 */
-	private void createVisualizationTabItem(int channelNumber, int numMeasurements) {
-		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT1785) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber));
-
-		this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
-		FormLayout visualizationMainCompositeLayout = new FormLayout();
-		this.visualizationMainComposite.setLayout(visualizationMainCompositeLayout);
-		this.visualizationTabItem.setControl(this.visualizationMainComposite);
-		{
-			FormData layoutData = new FormData();
-			layoutData.top = new FormAttachment(0, 1000, 0);
-			layoutData.left = new FormAttachment(0, 1000, 0);
-			layoutData.right = new FormAttachment(1000, 1000, 0);
-			layoutData.bottom = new FormAttachment(1000, 1000, 0);
-			new VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT1785), 0, numMeasurements);
-
+			GPXAdapterDialog.log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
