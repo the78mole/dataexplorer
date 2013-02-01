@@ -22,7 +22,6 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
-import gde.device.ChannelTypes;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
@@ -38,8 +37,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -87,7 +84,6 @@ public class GPXDataReaderWriter {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR;
 		Channel activeChannel = null;
-		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
 		long inputFileSize = new File(filePath).length();
 		int progressLineLength = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO));
 		int lineNumber = 0;
@@ -111,26 +107,20 @@ public class GPXDataReaderWriter {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber);
 
 				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
+				recordSetName = recordNameExtend.length() > 2 ? recordSetName + GDE.STRING_BLANK_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET : recordSetName;
 
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize); //$NON-NLS-1$
 
-				int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(channelConfigNumber) : activeChannel
-						.getNextRecordSetNumber();
-				recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
 				activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannel.getNumber(), true, false));
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
 				activeChannel.setActiveRecordSet(recordSetName);
 				channelRecordSet = activeChannel.get(recordSetName);
 				recordSetName = channelRecordSet.getName(); // cut/correct length
 
-				if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
-					activeChannel.applyTemplate(recordSetName, false);
-				else
-					activeChannel.applyTemplateBasics(recordSetName);
-
 				parseInputXML(filePath, device, channelRecordSet);
-
+				activeChannel.applyTemplate(recordSetName, false);
+				
 				if (application.getStatusBar() != null && activeChannel.getName().equals(channels.getActiveChannel().getName())) {
 					channels.getActiveChannel().switchRecordSet(recordSetName);
 				}
@@ -142,14 +132,6 @@ public class GPXDataReaderWriter {
 				}
 
 				if (application.getStatusBar() != null) application.setProgress(100, sThreadId);
-
-				long startTimeStamp = (long) (new File(filePath).lastModified() - channelRecordSet.getMaxTime_ms());
-				channelRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129)
-						+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
-				channelRecordSet.setStartTimeStamp(startTimeStamp);
-				activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
-				channelRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129)
-						+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 
 				channelRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
 				device.updateVisibilityStatus(channelRecordSet, true);
@@ -349,11 +331,11 @@ public class GPXDataReaderWriter {
 				if (!values.contains("\n") && !values.contains("\r")) {
 					System.out.println(values);
 					if (isDescription) {
-						activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + new String(ch, start, length));
+						activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + new String(ch, start, length));
 						isDescription = false;
 					}
 					else if (isDescription2) {
-						activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + new String(ch, start, length));
+						activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.STRING_SEMICOLON + new String(ch, start, length));
 						isDescription2 = false;
 					}
 					else if (isElevation) {
@@ -367,7 +349,6 @@ public class GPXDataReaderWriter {
 							date[0] = Integer.parseInt(strDate.substring(0, 4));
 							date[1] = Integer.parseInt(strDate.substring(5, 7));
 							date[2] = Integer.parseInt(strDate.substring(8, 10));
-							isDateSet = true;
 						}
 						String strValueTime = dateTime.split("T|Z")[1];
 						time[0] = Integer.parseInt(strValueTime.substring(0, 2));
@@ -375,6 +356,16 @@ public class GPXDataReaderWriter {
 						time[2] = Integer.parseInt(strValueTime.substring(6, 8));
 						GregorianCalendar calendar = new GregorianCalendar(date[0], date[1] - 1, date[2], time[0], time[1], time[2]);
 						timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+						if (!isDateSet) {
+							String description = activeRecordSet.getRecordSetDescription();
+							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON)+2) 
+									+ dateTime.split("T")[0] + GDE.STRING_COMMA + GDE.STRING_BLANK + dateTime.split("T|Z")[1] + description.substring(description.indexOf(GDE.LINE_SEPARATOR)));
+
+							//System.out.println(description);
+							//System.out.println(description.substring(0, description.indexOf(GDE.STRING_COLON)+2) 
+							//		+ dateTime.split("T")[0] + GDE.STRING_COMMA + GDE.STRING_BLANK + dateTime.split("T|Z")[1] + description.substring(description.indexOf(GDE.LINE_SEPARATOR)));
+							isDateSet = true;
+						}
 						isTime = false;
 					}
 					else if (isNumSatelites) {

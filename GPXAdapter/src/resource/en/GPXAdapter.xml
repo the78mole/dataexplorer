@@ -23,7 +23,7 @@
         <preferredFileExtention>*.gpx</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="flight record"/>
     </State>
     <Channels lastUseOrdinal="0">
         <Channel type="TYPE_CONFIG" name="Config_1">
