@@ -23,11 +23,11 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.IDevice;
-import gde.device.MeasurementType;
 import gde.exception.DataInconsitsentException;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.menu.MenuToolBar;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -73,9 +73,13 @@ public class GPXDataReaderWriter {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		Channel activeChannel = null;
 		int lineNumber = 0;
-		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
 		RecordSet channelRecordSet = null;
+		MenuToolBar menuToolBar = GPXDataReaderWriter.application.getMenuToolBar();
+		if (menuToolBar != null) {
+			GPXDataReaderWriter.application.setProgress(0, sThreadId);
+			GPXDataReaderWriter.application.setStatusMessage(Messages.getString(gde.device.gpx.MessageIds.GDE_MSGT1776) + filePath);
+		}
 
 		try {
 			if (channelConfigNumber == null)
@@ -85,45 +89,26 @@ public class GPXDataReaderWriter {
 			channelConfigNumber = GPXDataReaderWriter.channels.getActiveChannelNumber();
 
 			if (activeChannel != null) {
-				if (GPXDataReaderWriter.application.getStatusBar() != null) {
-					GPXDataReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
-					GPXDataReaderWriter.application.setProgress(0, sThreadId);
-				}
-				activeChannelConfigNumber = activeChannel.getNumber();
 				if (GPXDataReaderWriter.log.isLoggable(Level.FINE))
 					GPXDataReaderWriter.log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber);
 
 				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend;
 				recordSetName = recordNameExtend.length() > 2 ? recordSetName + GDE.STRING_BLANK_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET : recordSetName;
 
-				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "measurementSize = " + measurementSize); //$NON-NLS-1$
+				if (menuToolBar != null) GPXDataReaderWriter.application.setProgress(30, sThreadId);
 
-				activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, GPXDataReaderWriter.application.getActiveDevice(), activeChannel.getNumber(), true, false));
-				if (GPXDataReaderWriter.log.isLoggable(Level.FINE))
-					GPXDataReaderWriter.log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
-				activeChannel.setActiveRecordSet(recordSetName);
+				parseInputXML(filePath, device, activeChannel, recordSetName);
 				channelRecordSet = activeChannel.get(recordSetName);
-				recordSetName = channelRecordSet.getName(); // cut/correct length
-
-				if (GPXDataReaderWriter.application.getStatusBar() != null) GPXDataReaderWriter.application.setProgress(30, sThreadId);
-
-				parseInputXML(filePath, device, channelRecordSet);
 				
-				if (GPXDataReaderWriter.application.getStatusBar() != null) GPXDataReaderWriter.application.setProgress(90, sThreadId);
-				activeChannel.applyTemplate(recordSetName, false);
+				if (menuToolBar != null) GPXDataReaderWriter.application.setProgress(100, sThreadId);
 
-				if (GPXDataReaderWriter.application.getStatusBar() != null && activeChannel.getName().equals(GPXDataReaderWriter.channels.getActiveChannel().getName())) {
-					GPXDataReaderWriter.channels.getActiveChannel().switchRecordSet(recordSetName);
-				}
+				if (menuToolBar != null) {
+					Channels.getInstance().switchChannel(activeChannel.getName());
+					activeChannel.switchRecordSet(recordSetName);
+					device.updateVisibilityStatus(channelRecordSet, true);
 
-				if (GPXDataReaderWriter.application.getStatusBar() != null) GPXDataReaderWriter.application.setProgress(100, sThreadId);
-
-				device.updateVisibilityStatus(channelRecordSet, true);
-				channelRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
-
-				if (activeChannel.getActiveRecordSet() != null) {
-					activeChannel.switchRecordSet(activeChannel.getActiveRecordSet().getName());
+					menuToolBar.updateChannelSelector();
+					menuToolBar.updateRecordSetSelectCombo();
 				}
 			}
 		}
@@ -159,7 +144,7 @@ public class GPXDataReaderWriter {
 		return channelRecordSet;
 	}
 
-	public static void parseInputXML(final String localUnixFullQualifiedPath, final IDevice device, final RecordSet activeRecordSet) throws ParserConfigurationException, SAXException, IOException {
+	public static void parseInputXML(final String localUnixFullQualifiedPath, final IDevice device, final Channel activeChannel, final String recordSetName) throws ParserConfigurationException, SAXException, IOException {
 
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -182,8 +167,10 @@ public class GPXDataReaderWriter {
 			final Map<String, String>	tmpPoints								= new LinkedHashMap<String, String>();
 			final Vector<String>			extensionNames					= new Vector<String>();
 			String										extensionName						= GDE.STRING_EMPTY;
-			int[]											points									= new int[activeRecordSet.size()];
+			int[]											points									= new int[device.getMeasurementNames(activeChannel.getNumber()).length];
 			int												pointsIndex							= 0;
+			RecordSet									activeRecordSet;
+			String 										recordSetDescription 		= GDE.STRING_EMPTY;
 
 			@Override
 			public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -267,20 +254,17 @@ public class GPXDataReaderWriter {
 
 					if (this.isExtensionFirstCalled != null) {
 						if (this.isExtensionFirstCalled) {
-							//cleanup previous used records
-							for (int i = pointsIndex; i < this.points.length; i++) {
-								MeasurementType measurement = device.getMeasurement(activeRecordSet.getChannelConfigNumber(), i);
-								measurement.setName(i+"?????");
-								activeRecordSet.get(i).setName(i+"?????");
-							}
+							
+							int measurementSize = device.getNumberOfMeasurements(activeChannel.getNumber());
+							if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "measurementSize = " + measurementSize); //$NON-NLS-1$
+
 							for (String tmpExtensionName : this.extensionNames) {
 								String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
 								for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
 									//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
 									String newRecordName = tmpExtensionName + (values.length > 1 ? GDE.STRING_BLANK + (i + 1) : GDE.STRING_EMPTY);
 									//System.out.print(activeRecordSet.getRecordNames()[this.pointsIndex] + " -> ");
-									device.getMeasurement(activeRecordSet.getChannelConfigNumber(), this.pointsIndex).setName(newRecordName);
-									activeRecordSet.get(this.pointsIndex).setName(newRecordName);
+									device.getMeasurement(activeChannel.getNumber(), this.pointsIndex).setName(newRecordName);
 									//System.out.println(activeRecordSet.getRecordNames()[this.pointsIndex]);
 									try {
 										this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
@@ -290,6 +274,18 @@ public class GPXDataReaderWriter {
 									}
 								}
 							}
+							for (int i = pointsIndex; i < this.points.length; i++) {
+								device.getMeasurement(activeChannel.getNumber(), i).setName(i+"?????");
+							}
+
+							//create the recordSet 
+							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, GPXDataReaderWriter.application.getActiveDevice(), activeChannel.getNumber(), true, false));
+							if (GPXDataReaderWriter.log.isLoggable(Level.FINE))
+								GPXDataReaderWriter.log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
+							activeChannel.setActiveRecordSet(recordSetName);
+							activeRecordSet = activeChannel.get(recordSetName);
+							activeChannel.applyTemplate(recordSetName, false);
+							
 							this.isExtensionFirstCalled = false;
 						}
 						else if (!this.isExtensionFirstCalled) {
@@ -325,11 +321,13 @@ public class GPXDataReaderWriter {
 				if (!values.contains("\n") && !values.contains("\r")) {
 					if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, values);
 					if (this.isDescription) {
-						activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + new String(ch, start, length));
+						recordSetDescription = GDE.LINE_SEPARATOR + new String(ch, start, length);
 						this.isDescription = false;
 					}
 					else if (this.isDescription2) {
-						activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.STRING_COLON + GDE.STRING_BLANK + new String(ch, start, length));
+						recordSetDescription = recordSetDescription.length() > 1 
+							? recordSetDescription + GDE.STRING_COLON + GDE.STRING_BLANK + new String(ch, start, length)
+							: GDE.LINE_SEPARATOR + new String(ch, start, length);
 						this.isDescription2 = false;
 					}
 					else if (this.isElevation) {
@@ -350,10 +348,10 @@ public class GPXDataReaderWriter {
 						this.time[2] = Integer.parseInt(strValueTime.substring(6, 8));
 						GregorianCalendar calendar = new GregorianCalendar(this.date[0], this.date[1] - 1, this.date[2], this.time[0], this.time[1], this.time[2]);
 						this.timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
-						if (!this.isDateSet) {
+						if (!this.isDateSet && this.isExtensionFirstCalled != null) {
 							String description = activeRecordSet.getRecordSetDescription();
 							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + dateTime.split("T")[0] + GDE.STRING_COMMA + GDE.STRING_BLANK
-									+ dateTime.split("T|Z")[1] + description.substring(description.indexOf(GDE.LINE_SEPARATOR)));
+									+ dateTime.split("T|Z")[1] + recordSetDescription);
 							this.isDateSet = true;
 						}
 						this.isTime = false;
