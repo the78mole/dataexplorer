@@ -177,7 +177,7 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementUnitLabelLData.height = GDE.IS_MAC ? 16 : 12;
 			this.measurementUnit.setLayoutData(measurementUnitLabelLData);
 			this.measurementUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
-			this.measurementUnit.setText(GDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + GDE.STRING_RIGHT_BRACKET);
+			this.measurementUnit.setText(this.measurementType.getUnit());
 			this.measurementUnit.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyReleased(KeyEvent evt) {
@@ -256,9 +256,7 @@ public class MeasurementControlConfigurable extends Composite {
 	 */
 	void updateUnit(String newUnit) {
 		if (newUnit.contains(GDE.STRING_LEFT_BRACKET) || newUnit.contains(GDE.STRING_RIGHT_BRACKET)) {
-			newUnit = newUnit.trim();
-			newUnit = newUnit.startsWith(GDE.STRING_LEFT_BRACKET) ? newUnit.substring(1) : newUnit;
-			newUnit = newUnit.endsWith(GDE.STRING_RIGHT_BRACKET) ? newUnit.substring(0, newUnit.length()-1) : newUnit;
+			newUnit = newUnit.replace(GDE.STRING_LEFT_BRACKET, GDE.STRING_EMPTY).replace(GDE.STRING_RIGHT_BRACKET, GDE.STRING_EMPTY).trim();
 		}
 		for (int i = this.filterExtend.length(); i > 0; i--) {
 			if (newUnit.endsWith(this.filterExtend.substring(0, i))) {
