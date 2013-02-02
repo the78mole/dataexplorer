@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.exception.DataInconsitsentException;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -118,8 +119,8 @@ public class GPXDataReaderWriter {
 
 				if (GPXDataReaderWriter.application.getStatusBar() != null) GPXDataReaderWriter.application.setProgress(100, sThreadId);
 
-				channelRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
 				device.updateVisibilityStatus(channelRecordSet, true);
+				channelRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
 
 				if (activeChannel.getActiveRecordSet() != null) {
 					activeChannel.switchRecordSet(activeChannel.getActiveRecordSet().getName());
@@ -266,9 +267,16 @@ public class GPXDataReaderWriter {
 
 					if (this.isExtensionFirstCalled != null) {
 						if (this.isExtensionFirstCalled) {
+							//cleanup previous used records
+							for (int i = pointsIndex; i < this.points.length; i++) {
+								MeasurementType measurement = device.getMeasurement(activeRecordSet.getChannelConfigNumber(), i);
+								measurement.setName(i+"?????");
+								activeRecordSet.get(i).setName(i+"?????");
+							}
 							for (String tmpExtensionName : this.extensionNames) {
 								String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
-								for (int i = 0; i < values.length && i < this.points.length - this.pointsIndex; i++) {
+								for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
+									//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
 									String newRecordName = tmpExtensionName + (values.length > 1 ? GDE.STRING_BLANK + (i + 1) : GDE.STRING_EMPTY);
 									//System.out.print(activeRecordSet.getRecordNames()[this.pointsIndex] + " -> ");
 									device.getMeasurement(activeRecordSet.getChannelConfigNumber(), this.pointsIndex).setName(newRecordName);
@@ -287,7 +295,8 @@ public class GPXDataReaderWriter {
 						else if (!this.isExtensionFirstCalled) {
 							for (String tmpExtensionName : this.extensionNames) {
 								String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
-								for (int i = 0; i < values.length && i < this.points.length - this.pointsIndex; i++) {
+								for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
+									//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
 									try {
 										this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
 									}
@@ -301,6 +310,7 @@ public class GPXDataReaderWriter {
 					try {
 						if (this.startTimeStamp == 0) this.startTimeStamp = this.timeStamp;
 						if (GPXDataReaderWriter.log.isLoggable(Level.FINER)) GPXDataReaderWriter.log.log(Level.FINER, "" + (this.timeStamp - this.startTimeStamp) * 1.0);
+						//System.out.println(StringHelper.intArrayToString(this.points));
 						activeRecordSet.addPoints(this.points, (this.timeStamp - this.startTimeStamp) * 1.0);
 					}
 					catch (DataInconsitsentException e) {
@@ -353,7 +363,8 @@ public class GPXDataReaderWriter {
 						this.isNumSatelites = false;
 					}
 					else if (this.isExtension && this.extensionName.length() > 3) {
-						this.extensionNames.add(this.extensionName);
+						if (isExtensionFirstCalled != null && isExtensionFirstCalled) 
+							this.extensionNames.add(this.extensionName);
 						this.tmpPoints.put(this.extensionName, new String(ch, start, length)); //<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
 					}
 				}
