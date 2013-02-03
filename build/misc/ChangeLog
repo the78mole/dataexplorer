@@ -8,6 +8,7 @@ fix bug #37976: installer.nsi is missing, not required, changed build target
 fix bug #37991: Prefix is not recognized, changed target directories to prefix if in use
 fix bug in HoTTAdapter saving modified filter data
 fix bug HoTTAdapter2 reading channel data 9-12
+fix bug HoTTAdapter2 displaying cell voltage values
 fix bug HoTTAdapter* reading HF data
 fix bugs in JetiAdapter - exporting KMZ/KML/IGC
 fix bug in GPS color and velocity configuration dialog
