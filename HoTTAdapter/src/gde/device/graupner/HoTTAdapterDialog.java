@@ -581,7 +581,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 				}
 
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - this.dialogShell.getSize().x/2, 50));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - this.dialogShell.getSize().x/2, 0));
 				this.dialogShell.open();
 			}
 			else {

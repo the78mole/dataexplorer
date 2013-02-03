@@ -478,7 +478,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						if (tmpVoltage > 0) {
 							for (int i = 0, j = 0; i < 6; i++, j += 2) {
 								tmpCellVoltage = DataParser.parse2Short(dataBuffer, j + 10);
-								points[i + 23] = tmpCellVoltage > 0 ? tmpCellVoltage * 10 : points[i + 23];
+								points[i + 23] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[i + 23];
 								if (points[i + 23] > 0) {
 									maxVotage = points[i + 23] > maxVotage ? points[i + 23] : maxVotage;
 									minVotage = points[i + 23] < minVotage ? points[i + 23] : minVotage;
@@ -519,7 +519,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						if (tmpVoltage > 0) {
 							for (int i = 0, j = 0; i < 14; i++, j += 2) {
 								tmpCellVoltage = DataParser.parse2Short(dataBuffer, j + 10);
-								points[i + 40] = tmpCellVoltage > 0 ? tmpCellVoltage * 10 : points[i + 40];
+								points[i + 40] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[i + 40];
 								if (points[i + 40] > 0) {
 									maxVotage = points[i + 40] > maxVotage ? points[i + 40] : maxVotage;
 									minVotage = points[i + 40] < minVotage ? points[i + 40] : minVotage;
