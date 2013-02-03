@@ -28,6 +28,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -350,8 +351,8 @@ public class GPXDataReaderWriter {
 						this.timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
 						if (!this.isDateSet && this.isExtensionFirstCalled != null) {
 							String description = activeRecordSet.getRecordSetDescription();
-							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + dateTime.split("T")[0] + GDE.STRING_COMMA + GDE.STRING_BLANK
-									+ dateTime.split("T|Z")[1] + recordSetDescription);
+							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.startTimeStamp) + recordSetDescription);
+							activeRecordSet.setStartTimeStamp(this.startTimeStamp);
 							this.isDateSet = true;
 						}
 						this.isTime = false;
