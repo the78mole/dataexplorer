@@ -32,6 +32,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -61,6 +63,31 @@ public class UniLog2SetupReaderWriter {
 	final static int		AUTO_START_CURRENT			= 0x0001;
 	final static int		AUTO_START_RX						= 0x0002;
 	final static int		AUTO_START_TIME					= 0x0004;
+	
+	public enum Sensor { 
+		GAM("GAM"), EAM("EAM"), ESC("ESC");
+		private final String	value;
+
+		private Sensor(String v) {
+			this.value = v;
+		}
+
+		public String value() {
+			return this.value;
+		}
+		
+		public static List<Sensor> getAsList() {
+			List<UniLog2SetupReaderWriter.Sensor> sensors = new ArrayList<UniLog2SetupReaderWriter.Sensor>();
+			for (Sensor sensor : Sensor.values()) {
+				sensors.add(sensor);
+			}
+			return sensors;
+		}
+	};
+	
+	final static byte		SENSOR_TYPE_GAM					= 0x00;
+	final static int		SENSOR_TYPE_EAM					= 0x01;
+	final static int		SENSOR_TYPE_ESC					= 0x02;
 
 	//$UL2SETUP,192 Byte*
 	short								serialNumber						= 357;																												// 1
@@ -83,7 +110,8 @@ public class UniLog2SetupReaderWriter {
 	short								minMaxRx								= 0;																													// 18 0=off, 1=on
 	short								stopModus								= 0;																													// 19 0=off, 1=on
 	short								varioThresholdSink			= 5;																													// 20 value/10 m/sec
-	//short[] A = new short[17]; 																																							// 21-37
+	short								sensorType							= 0;																													// 21 GAM=0;EAM=1;ESC=2
+	//short[] A = new short[16]; 																																							// 22-37
 	short								telemetryAlarms					= 0x0000;																											// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
 	short								currentAlarm						= 100;																												// 39 1A --> 400A
 	short								voltageStartAlarm				= 124;																												// 40 10V/10 --> 600V/10
@@ -163,6 +191,7 @@ public class UniLog2SetupReaderWriter {
 				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
 				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
 				this.varioThresholdSink = DataParser.parse2Short(buffer, 38); // 20 value/10 m/sec		
+				this.sensorType = DataParser.parse2Short(buffer, 40); // 21 GAM=0;EAM=1;ESC=2		
 				//short[] A = new short[17]; // 21-37
 				this.telemetryAlarms = DataParser.parse2Short(buffer, 74); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
@@ -266,6 +295,8 @@ public class UniLog2SetupReaderWriter {
 				buffer[37] = (byte) ((this.stopModus & 0xFF00) >> 8);
 				buffer[38] = (byte) (this.varioThresholdSink & 0x00FF); //20 value/10 m/sec
 				buffer[39] = (byte) ((this.varioThresholdSink & 0xFF00) >> 8);
+				buffer[40] = (byte) (this.sensorType & 0x00FF); // 21 GAM=0;EAM=1;ESC=2	
+				buffer[41] = (byte) ((this.sensorType & 0xFF00) >> 8);
 				//short[] A = new short[17]; // 21-37
 				buffer[74] = (byte) (this.telemetryAlarms & 0x00FF); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				buffer[75] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);

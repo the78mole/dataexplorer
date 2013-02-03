@@ -69,10 +69,10 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 
 	Group														commonAdjustmentsGroup, logStartStopGroup;
 	CLabel													serialNumberLabel, firmwareLabel, dataRateLabel, currentSensorTypeLabel, propellerBladesLabel, motorPolsLabel, gearFactorLabel, varioTriggerLevelLabel, varioTriggerSinkLevelLabel, varioToneLabel;
-	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel, autoStopLabel;
+	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel, sensorTypeLabel, autoStopLabel;
 	Text														serialNumberText, firmwareText, gearFactorText, varioTriggerLevelText, varioTriggerSinkLevelText, energyLimitText;
 	Slider													gearFactorSlider, varioTriggerLevelSlider, varioTriggerSinkLevelSlider, energyLimitSlider;
-	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,	autoStartTimeCombo;
+	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, sensorTypeCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,	autoStartTimeCombo;
 	CCombo													a1ModusCombo, a2ModusCombo, a3ModusCombo;
 	Button													autoStartCurrentButton, autoStartRxButton, autoStartTimeButton;
 	Composite												fillerComposite;
@@ -86,6 +86,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	final String[]									timeStartValues				= { "  5", " 10", " 15", " 20", " 25", " 30", " 35", " 40", " 45", " 50", " 55", " 60", " 65", " 70", " 75", " 80", " 85", " 90" };
 	final String[]									voltageRxValues				= { "  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05",
 			"  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" };
+	final String[]									sensorTypes						= { "  GAM", "  EAM", "  ESC"};
 
 	/**
 	* Auto-generated main method to display this 
@@ -173,6 +174,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.energyLimitSlider.setSelection(this.configuration.energyLimit);
 		this.energyLimitText.setText(GDE.STRING_BLANK + this.configuration.energyLimit);
 		this.minMaxRxCombo.select(this.configuration.minMaxRx);
+		this.sensorTypeCombo.select(this.configuration.sensorType);
 
 		this.autoStartCurrentButton.setSelection((this.configuration.startModus & 0x0001) > 0);
 		this.autoStartRxButton.setSelection((this.configuration.startModus & 0x0002) > 0);
@@ -392,7 +394,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.commonAdjustmentsGroup.setLayout(commonAdjustmentsGroupLayout);
 				FormData commonAdjustmentsGroupLData = new FormData();
 				commonAdjustmentsGroupLData.width = 290;
-				commonAdjustmentsGroupLData.height = 340;
+				commonAdjustmentsGroupLData.height = 360;
 				commonAdjustmentsGroupLData.left = new FormAttachment(0, 1000, 12);
 				commonAdjustmentsGroupLData.top = new FormAttachment(0, 1000, 5);
 				this.commonAdjustmentsGroup.setLayoutData(commonAdjustmentsGroupLData);
@@ -889,6 +891,34 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "minMaxRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.minMaxRx = (short) (UniLog2SetupConfiguration1.this.minMaxRxCombo.getSelectionIndex());
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.sensorTypeLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData sensorTypeLabelLData = new RowData();
+					sensorTypeLabelLData.width = 135;
+					sensorTypeLabelLData.height = 20;
+					this.sensorTypeLabel.setLayoutData(sensorTypeLabelLData);
+					this.sensorTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2579));
+					this.sensorTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.sensorTypeCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
+					RowData sensorTypeComboLData = new RowData();
+					sensorTypeComboLData.width = 84;
+					sensorTypeComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.sensorTypeCombo.setLayoutData(sensorTypeComboLData);
+					this.sensorTypeCombo.setItems(this.sensorTypes);
+					this.sensorTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.sensorTypeCombo.setEditable(false);
+					this.sensorTypeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.sensorTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "sensorTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.sensorType = (short) (UniLog2SetupConfiguration1.this.sensorTypeCombo.getSelectionIndex());
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
