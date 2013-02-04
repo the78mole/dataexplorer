@@ -24,6 +24,7 @@ package gde.device.gpx;
  */ 
 public class MessageIds { 
 
+	public final static String	GDE_MSGW1776 = "GDE_MSGW1776";
 	public final static String	GDE_MSGT1776 = "GDE_MSGT1776";
 	public final static String	GDE_MSGT1779 = "GDE_MSGT1779";
 	public final static String	GDE_MSGT1780 = "GDE_MSGT1780";
