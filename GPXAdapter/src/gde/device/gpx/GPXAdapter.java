@@ -29,6 +29,7 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
@@ -39,10 +40,12 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -66,6 +69,56 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	final DataExplorer		application;
 	final Channels				channels;
 	final GPXAdapterDialog	dialog;
+	final public static Map<String, String> unitMap			= new HashMap<String, String>();	
+	static { // load measurement value to unit lookup table
+		unitMap.put("Altimeter", "m"); 					//<Altimeter>252,' '</Altimeter>
+		unitMap.put("Variometer", "m/sec"); 		//<Variometer>89</Variometer>
+		unitMap.put("Course", "°"); 						//<Course>297</Course>
+		unitMap.put("GroundSpeed", "cm/sec"); 	//<GroundSpeed>175</GroundSpeed>
+		unitMap.put("VerticalSpeed", "cm/sec"); //<VerticalSpeed>508</VerticalSpeed>
+		unitMap.put("FlightTime", "sec"); 			//<FlightTime>3</FlightTime>
+		unitMap.put("Voltage", "V"); 						//<Voltage>15.8</Voltage>
+		unitMap.put("Current", "A"); 						//<Current>68.9</Current>
+		unitMap.put("Capacity", "mAh"); 				//<Capacity>76</Capacity>
+		unitMap.put("RCQuality", "%"); 					//<RCQuality>197</RCQuality>
+		unitMap.put("Compass", "°"); 						//<Compass>094,095</Compass>
+		unitMap.put("NickAngle", "°"); 					//<NickAngle>006</NickAngle>
+		unitMap.put("RollAngle", "°"); 					//<RollAngle>000</RollAngle>
+		unitMap.put("MagnetField", "%"); 				//<MagnetField>102</MagnetField>
+		unitMap.put("MagnetInclination", "°"); 	//<MagnetInclination>64,-4</MagnetInclination>
+		unitMap.put("MotorCurrent", "A"); 			//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
+		unitMap.put("BL_Temperature", "°C"); 		//<BL_Temperature>25,27,20,27,26,24,0,0,0,0,0,0</BL_Temperature>
+		unitMap.put("AvaiableMotorPower", "%"); //<AvaiableMotorPower>255</AvaiableMotorPower>
+		unitMap.put("AnalogInputs", "V"); 			//<AnalogInputs>21,12,24,760</AnalogInputs>
+		unitMap.put("Servo", "°"); 							//<Servo>153,128,0</Servo>
+		unitMap.put("TargetBearing", "°"); 			//<TargetBearing>090</TargetBearing>
+		unitMap.put("TargetDistance", "m"); 		//<TargetDistance>12</TargetDistance>
+	}
+	final public static Map<String, Double> factorMap			= new HashMap<String, Double>();	
+	static { // load measurement value to factor lookup table
+		factorMap.put("Altimeter", 0.05); 						//<Altimeter>252,' '</Altimeter>
+		factorMap.put("MotorCurrent", 0.1); 					//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
+		factorMap.put("AvaiableMotorPower", 0.00392); //<AvaiableMotorPower>255</AvaiableMotorPower>
+		factorMap.put("AnalogInputs", 0.00322); 			//<AnalogInputs>21,12,24,760</AnalogInputs>
+	}
+	final public static Map<String, Boolean> ignoreMap			= new HashMap<String, Boolean>();	
+	static { // load measurement value to be ignored lookup table
+		ignoreMap.put("Servo", true); 				//<Servo>153,128,0</Servo>
+		ignoreMap.put("WP", true); 						//<WP>----,0,13,0</WP>
+		ignoreMap.put("NCFlag", true); 				//<NCFlag>0x82</NCFlag>
+		ignoreMap.put("FCFlags2", true); 			//<FCFlags2>0xc3,0x18</FCFlags2>
+		ignoreMap.put("ErrorCode", true); 		//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
+		ignoreMap.put("RCSticks", true); 			//<RCSticks>0,0,0,30,1,127,1,153,1,1,1,1</RCSticks>
+		ignoreMap.put("GPSSticks", true); 		//<GPSSticks>-77,-14,0,'D'</GPSSticks>
+	}
+	final public static Map<String, Boolean> syncMap			= new HashMap<String, Boolean>();	
+	static { // load measurement value to synchronize lookup table
+		syncMap.put("Altimeter", true); 				//<Altimeter>252,' '</Altimeter>
+		syncMap.put("MotorCurrent", true); 			//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
+		syncMap.put("BL_Temperature", true); 		//<BL_Temperature>25,27,20,27,26,24,0,0,0,0,0,0</BL_Temperature>
+		syncMap.put("AnalogInputs", true); 			//<AnalogInputs>21,12,24,760</AnalogInputs>
+		syncMap.put("Compass", true); 					//<Compass>094,095</Compass>
+	}
 
 	/**
 	 * constructor using properties file
@@ -669,5 +722,35 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				}
 			});
 		}
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check file contained record properties which are not contained in actual configuration
+		String[] recordNames = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if ((recordNames.length - fileRecordsProperties.length) > 0) {
+			for (String recordProps : fileRecordsProperties) {
+				cleanedRecordNames.add(StringHelper.splitString(recordProps, Record.DELIMITER, Record.propertyKeys).get(Record.propertyKeys[0]));
+			}
+			recordNames = cleanedRecordNames.toArray(new String[1]);
+			//correct recordSet with cleaned record names
+			recordSet.clear();
+			for (int j = 0; j < recordNames.length; j++) {
+				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), j);
+				recordSet.addRecordName(recordNames[j]);
+				recordSet.put(recordNames[j],
+						new Record(this, j, recordNames[j], measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5));
+			}
+		}
+		return recordNames;
 	}
 }

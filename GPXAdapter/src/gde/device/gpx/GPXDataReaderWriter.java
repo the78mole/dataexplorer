@@ -22,7 +22,10 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.DataTypes;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.exception.DataInconsitsentException;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -259,46 +262,88 @@ public class GPXDataReaderWriter {
 							int measurementSize = device.getNumberOfMeasurements(activeChannel.getNumber());
 							if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "measurementSize = " + measurementSize); //$NON-NLS-1$
 
+							Vector<String> vecRecordNames = new Vector<String>();
+							//add the 4 always contained records
+							for (int i = 0; i < 4; i++) {
+								vecRecordNames.add(device.getMeasurementNames(activeChannel.getNumber())[i]);
+							}
+							//ad records from extension declaration
 							for (String tmpExtensionName : this.extensionNames) {
-								String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
-								for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
-									//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
-									String newRecordName = tmpExtensionName + (values.length > 1 ? GDE.STRING_BLANK + (i + 1) : GDE.STRING_EMPTY);
-									//System.out.print(activeRecordSet.getRecordNames()[this.pointsIndex] + " -> ");
-									device.getMeasurement(activeChannel.getNumber(), this.pointsIndex).setName(newRecordName);
-									//System.out.println(activeRecordSet.getRecordNames()[this.pointsIndex]);
-									try {
-										this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
-									}
-									catch (NumberFormatException e) {
-										// ignore and keep existing value
+								if (GPXAdapter.ignoreMap.get(tmpExtensionName.split(GDE.STRING_BLANK)[0]) == null) {
+									String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
+									for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
+										//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
+										String newRecordName = tmpExtensionName + (values.length > 1 ? GDE.STRING_BLANK + (i + 1) : GDE.STRING_EMPTY);
+										//System.out.print(activeRecordSet.getRecordNames()[this.pointsIndex] + " -> ");
+										vecRecordNames.add(newRecordName);
+										//System.out.println(activeRecordSet.getRecordNames()[this.pointsIndex]);
+										try {
+											this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
+										}
+										catch (NumberFormatException e) {
+											// ignore and keep existing value
+										}
 									}
 								}
 							}
-							for (int i = pointsIndex; i < this.points.length; i++) {
-								device.getMeasurement(activeChannel.getNumber(), i).setName(i+"?????");
-							}
 
-							//create the recordSet 
-							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, GPXDataReaderWriter.application.getActiveDevice(), activeChannel.getNumber(), true, false));
+							//build up the record set with variable number of records just fit the sensor data
+							String[] recordNames = vecRecordNames.toArray(new String[0]);
+							String[] recordSymbols = new String[recordNames.length];
+							String[] recordUnits = new String[recordNames.length];
+							String referenceName = GDE.STRING_EMPTY;
+							int referenceOrdinal = -1;
+							for (int i = 0; i < recordNames.length; i++) {
+								MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
+								measurement.setName(recordNames[i]);
+								recordSymbols[i] = measurement.getSymbol();
+								recordUnits[i] = measurement.getUnit();
+								if (recordUnits[i].length() == 0 && GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null) {
+									measurement.setUnit(recordUnits[i] = GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+								}
+								if (GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+									measurement.setFactor(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+								
+								if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null 
+										&& recordNames[i].split(GDE.STRING_BLANK).length > 1 && recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) {
+									referenceName = recordNames[i].split(GDE.STRING_BLANK)[0];
+									referenceOrdinal = i;
+								}
+								else if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null && recordNames[i].split(GDE.STRING_BLANK)[0].equals(referenceName)
+										&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK).length > 1 && !recordNames[i].split(GDE.STRING_BLANK)[1].equals("1"))
+									device.setMeasurementPropertyValue(activeChannel.getNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, referenceOrdinal);
+							}
+							activeRecordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
+							String correctedRecordSetName = activeRecordSet.getName(); // cut/correct length of recordSetName
+							activeChannel.put(correctedRecordSetName, activeRecordSet);
+
 							if (GPXDataReaderWriter.log.isLoggable(Level.FINE))
-								GPXDataReaderWriter.log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
-							activeChannel.setActiveRecordSet(recordSetName);
+								GPXDataReaderWriter.log.log(Level.FINE, correctedRecordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
+							activeChannel.setActiveRecordSet(correctedRecordSetName);
 							activeRecordSet = activeChannel.get(recordSetName);
 							activeChannel.applyTemplate(recordSetName, false);
+							
+							//shorten points array to fit actual created recordSet
+							int[] newPoints = new int[activeRecordSet.size()];
+							for (int i = 0; i < newPoints.length; i++) {
+								newPoints[i] = points[i];
+							}
+							points = newPoints;
 							
 							this.isExtensionFirstCalled = false;
 						}
 						else if (!this.isExtensionFirstCalled) {
 							for (String tmpExtensionName : this.extensionNames) {
-								String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
-								for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
-									//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
-									try {
-										this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
-									}
-									catch (NumberFormatException e) {
-										// ignore and keep existing value
+								if (GPXAdapter.ignoreMap.get(tmpExtensionName.split(GDE.STRING_BLANK)[0]) == null) {
+									String[] values = this.tmpPoints.get(tmpExtensionName).split(GDE.STRING_COMMA);
+									for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
+										//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
+										try {
+											this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
+										}
+										catch (NumberFormatException e) {
+											// ignore and keep existing value
+										}
 									}
 								}
 							}

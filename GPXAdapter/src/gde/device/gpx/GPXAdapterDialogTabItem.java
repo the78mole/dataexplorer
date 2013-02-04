@@ -19,6 +19,7 @@
 package gde.device.gpx;
 
 import gde.GDE;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.device.IDevice;
 import gde.messages.Messages;
@@ -114,23 +115,42 @@ public class GPXAdapterDialogTabItem extends CTabItem {
 				filler.setLayoutData(fillerLData);
 			}
 			{
-				for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-					if (i > 3) {
-						this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber)
-								.get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
-					}
-					//GPS	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
-					else {
-						this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
-								this.device, 1));
-					}
-				}
+				Channel channel = Channels.getInstance().get(this.channelConfigNumber);
+				if (channel != null)
+					if (channel.getActiveRecordSet() != null)
+						for (int i = 0; i < channel.getActiveRecordSet().size(); i++) {
+							if (i > 3) {
+								this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber)
+										.get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
+							}
+							//GPS	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
+							else {
+								this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
+										this.device, 1));
+							}
+						}
+					else
+						for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
+							if (i > 3) {
+								this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber)
+										.get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
+							}
+							//GPS	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
+							else {
+								this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
+										this.device, 1));
+							}
+						}
 			}
 			this.scolledComposite.addControlListener(new ControlListener() {
 				@Override
 				public void controlResized(ControlEvent evt) {
 					GPXAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt);
 					int height = 35 + GPXAdapterDialogTabItem.this.device.getChannelMeasuremts(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
+					Channel channel = Channels.getInstance().get(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1);
+					if (channel != null)
+						if (channel.getActiveRecordSet() != null)
+							height = 35 + (channel.getActiveRecordSet().size() + 1) * 28 / 2;
 					GPXAdapterDialogTabItem.this.mainTabComposite.setSize(GPXAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 
@@ -138,6 +158,10 @@ public class GPXAdapterDialogTabItem extends CTabItem {
 				public void controlMoved(ControlEvent evt) {
 					GPXAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt);
 					int height = 35 + GPXAdapterDialogTabItem.this.device.getChannelMeasuremts(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
+					Channel channel = Channels.getInstance().get(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1);
+					if (channel != null)
+						if (channel.getActiveRecordSet() != null)
+							height = 35 + (channel.getActiveRecordSet().size() + 1) * 28 / 2;
 					GPXAdapterDialogTabItem.this.mainTabComposite.setSize(GPXAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 			});
