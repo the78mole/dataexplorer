@@ -695,7 +695,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		//check file contained record properties which are not contained in actual configuration
 		String[] recordNames = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		if ((recordNames.length - fileRecordsProperties.length) > 0) {
