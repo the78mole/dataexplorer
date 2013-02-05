@@ -76,9 +76,11 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1754), Messages.getString(MessageIds.GDE_MSGT1754));
-		updateFileMenu(this.application.getMenuBar().getExportMenu());
-		updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+		if (this.application.getMenuToolBar() != null) {
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1754), Messages.getString(MessageIds.GDE_MSGT1754));
+			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+		}
 	}
 
 	/**
@@ -92,9 +94,11 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1754), Messages.getString(MessageIds.GDE_MSGT1754));
-		updateFileMenu(this.application.getMenuBar().getExportMenu());
-		updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+		if (this.application.getMenuToolBar() != null) {
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1754), Messages.getString(MessageIds.GDE_MSGT1754));
+			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+		}
 	}
 
 	/**
