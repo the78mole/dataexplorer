@@ -311,6 +311,32 @@ public class MeasurementType implements Cloneable {
 	}
 
 	/**
+	 * get the reduction value
+	 * @return the offset, if property does not exist return 0.0 as default value
+	 */
+	public double getReduction() {
+		double value = 0.0;
+		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
+		if (tmpProperty != null) value = new Double(tmpProperty.getValue()).doubleValue();
+
+		return value;
+	}
+
+	/**
+	 * set new value for reduction
+	 * @param reduction the offset to set
+	 */
+	public void setReduction(double reduction) {
+		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
+		if (tmpProperty == null) {
+			createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
+		}
+		else {
+			tmpProperty.setValue("" + reduction); //$NON-NLS-1$
+		}
+	}
+
+	/**
 	 * get the factor value
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
