@@ -72,59 +72,14 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	final DataExplorer												application;
 	final Channels														channels;
 	final GPXAdapterDialog										dialog;
+	final public static Map<String, String>		languageMap				= new HashMap<String, String>();
+	final public static Map<String, String>		symbolMap				= new HashMap<String, String>();
 	final public static Map<String, String>		unitMap				= new HashMap<String, String>();
-	//	static { // load measurement value to unit lookup table
-	//		unitMap.put("Altimeter", "m"); 					//<Altimeter>252,' '</Altimeter>
-	//		unitMap.put("Variometer", "m/sec"); 		//<Variometer>89</Variometer>
-	//		unitMap.put("Course", "°"); 						//<Course>297</Course>
-	//		unitMap.put("GroundSpeed", "cm/sec"); 	//<GroundSpeed>175</GroundSpeed>
-	//		unitMap.put("VerticalSpeed", "cm/sec"); //<VerticalSpeed>508</VerticalSpeed>
-	//		unitMap.put("FlightTime", "sec"); 			//<FlightTime>3</FlightTime>
-	//		unitMap.put("Voltage", "V"); 						//<Voltage>15.8</Voltage>
-	//		unitMap.put("Current", "A"); 						//<Current>68.9</Current>
-	//		unitMap.put("Capacity", "mAh"); 				//<Capacity>76</Capacity>
-	//		unitMap.put("RCQuality", "%"); 					//<RCQuality>197</RCQuality>
-	//		unitMap.put("Compass", "°"); 						//<Compass>094,095</Compass>
-	//		unitMap.put("NickAngle", "°"); 					//<NickAngle>006</NickAngle>
-	//		unitMap.put("RollAngle", "°"); 					//<RollAngle>000</RollAngle>
-	//		unitMap.put("MagnetField", "%"); 				//<MagnetField>102</MagnetField>
-	//		unitMap.put("MagnetInclination", "°"); 	//<MagnetInclination>64,-4</MagnetInclination>
-	//		unitMap.put("MotorCurrent", "A"); 			//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
-	//		unitMap.put("BL_Temperature", "°C"); 		//<BL_Temperature>25,27,20,27,26,24,0,0,0,0,0,0</BL_Temperature>
-	//		unitMap.put("AvaiableMotorPower", "%"); //<AvaiableMotorPower>255</AvaiableMotorPower>
-	//		unitMap.put("AnalogInputs", "V"); 			//<AnalogInputs>21,12,24,760</AnalogInputs>
-	//		unitMap.put("Servo", "°"); 							//<Servo>153,128,0</Servo>
-	//		unitMap.put("TargetBearing", "°"); 			//<TargetBearing>090</TargetBearing>
-	//		unitMap.put("TargetDistance", "m"); 		//<TargetDistance>12</TargetDistance>
-	//	}
 	final public static Map<String, Double>		factorMap			= new HashMap<String, Double>();
 	final public static Map<String, Double>		offsetMap			= new HashMap<String, Double>();
 	final public static Map<String, Double>		reductionMap	= new HashMap<String, Double>();
-	//	static { // load measurement value to factor lookup table
-	//		factorMap.put("Altimeter", 0.05); 						//<Altimeter>252,' '</Altimeter>
-	//		factorMap.put("MotorCurrent", 0.1); 					//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
-	//		factorMap.put("AvaiableMotorPower", 0.00392); //<AvaiableMotorPower>255</AvaiableMotorPower>
-	//		factorMap.put("AnalogInputs", 0.00322); 			//<AnalogInputs>21,12,24,760</AnalogInputs>
-	//	}
 	final public static Map<String, Boolean>	ignoreMap			= new HashMap<String, Boolean>();
-	//	static { // load measurement value to be ignored lookup table
-	//		ignoreMap.put("Servo", true); 				//<Servo>153,128,0</Servo>
-	//		ignoreMap.put("WP", true); 						//<WP>----,0,13,0</WP>
-	//		ignoreMap.put("NCFlag", true); 				//<NCFlag>0x82</NCFlag>
-	//		ignoreMap.put("FCFlags2", true); 			//<FCFlags2>0xc3,0x18</FCFlags2>
-	//		ignoreMap.put("ErrorCode", true); 		//<ErrorCode>000</ErrorCode>
-	//		ignoreMap.put("RCSticks", true); 			//<RCSticks>0,0,0,30,1,127,1,153,1,1,1,1</RCSticks>
-	//		ignoreMap.put("GPSSticks", true); 		//<GPSSticks>-77,-14,0,'D'</GPSSticks>
-	//	}
 	final public static Map<String, Boolean>	syncMap				= new HashMap<String, Boolean>();
-
-	//	static { // load measurement value to synchronize lookup table
-	//		syncMap.put("Altimeter", true); 				//<Altimeter>252,' '</Altimeter>
-	//		syncMap.put("MotorCurrent", true); 			//<MotorCurrent>24,91,143,97,157,88,0,0,0,0,0,0</MotorCurrent>
-	//		syncMap.put("BL_Temperature", true); 		//<BL_Temperature>25,27,20,27,26,24,0,0,0,0,0,0</BL_Temperature>
-	//		syncMap.put("AnalogInputs", true); 			//<AnalogInputs>21,12,24,760</AnalogInputs>
-	//		syncMap.put("Compass", true); 					//<Compass>094,095</Compass>
-	//	}
 
 	/**
 	 * constructor using properties file
@@ -190,11 +145,17 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				if (propertyName.startsWith("unit")) {
 					GPXAdapter.unitMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], properties.getProperty(propertyName).trim());
 				}
+				else if (propertyName.startsWith("language")) {
+					GPXAdapter.languageMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
+				}
 				else if (propertyName.startsWith("sync")) {
 					GPXAdapter.syncMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], true);
 				}
 				else if (propertyName.startsWith("ignore")) {
 					GPXAdapter.ignoreMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], true);
+				}
+				else if (propertyName.startsWith("symbol")) {
+					GPXAdapter.symbolMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], properties.getProperty(propertyName).trim());
 				}
 				else
 					try {

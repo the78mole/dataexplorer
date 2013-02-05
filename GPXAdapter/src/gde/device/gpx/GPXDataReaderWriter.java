@@ -295,14 +295,22 @@ public class GPXDataReaderWriter {
 							int referenceOrdinal = -1;
 							for (int i = 0; i < recordNames.length; i++) {
 								MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
-								measurement.setName(recordNames[i]);
 								recordSymbols[i] = measurement.getSymbol();
+								measurement.setName(recordNames[i]);
+								if (GPXAdapter.languageMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null) {
+									measurement.setName(recordNames[i] = GPXAdapter.languageMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) 
+											+ (recordNames[i].split(GDE.STRING_BLANK).length > 1 ? recordNames[i].substring(recordNames[i].indexOf(GDE.STRING_BLANK)) : GDE.STRING_BLANK));
+								}
 								recordUnits[i] = measurement.getUnit();
 								if (recordUnits[i].length() == 0 && GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null) {
 									measurement.setUnit(recordUnits[i] = GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
 								}
 								if (GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
 									measurement.setFactor(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+								if (GPXAdapter.offsetMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+									measurement.setOffset(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+								if (GPXAdapter.reductionMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+									measurement.setReduction(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
 								
 								if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null 
 										&& recordNames[i].split(GDE.STRING_BLANK).length > 1 && recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) {
