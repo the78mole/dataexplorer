@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.gpx.GPXDataReaderWriter;
 import gde.device.graupner.HoTTbinReader;
 import gde.device.graupner.HoTTbinReader2;
 import gde.device.jeti.JetiAdapter;
@@ -75,6 +76,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 								|| file.getPath().toLowerCase().contains("space pro") 
 								|| file.getPath().toLowerCase().contains("asw")
 								|| file.getPath().toLowerCase().contains("ash")
+								|| file.getPath().toLowerCase().contains("spektrum")
 								|| file.getPath().toLowerCase().contains("flightrecorder"))) {
 					System.out.println("working with : " + file);
 					
@@ -546,7 +548,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 	/**
 	 * test reading LOV files from LogView application directory and writes OSD files to %TEMP%\Write_1_OSD
-	 * all consitent files must red without failures
+	 * all consistent files must red without failures
 	 */
 	public final void testLovReaderOsdWriter() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -593,6 +595,114 @@ public class TestFileReaderWriter extends TestSuperClass {
 						new File(tmpDir1).mkdirs();
 						String absolutFilePath = tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_lov.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading GPX XML files from various application directory and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testGPXReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".gpx")) {
+					System.out.println("working with : " + file);
+					try {
+						String deviceName = "GPXAdapter";
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+
+						Channel activeChannel = this.channels.getActiveChannel();
+						GPXDataReaderWriter.read(file.getAbsolutePath(), device, GDE.STRING_DOLLAR, activeChannel.getNumber());
+
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setSaved(true);
+						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_gpx.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+	}
+
+	/**
+	 * test reading GPX XML files from various application directory and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testIGCReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".igc")) {
+					System.out.println("working with : " + file);
+					try {
+						String deviceName = "IGCAdapter";
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+
+						Channel activeChannel = this.channels.getActiveChannel();
+						IGCReaderWriter.read(file.getAbsolutePath(), device, GDE.STRING_DOLLAR, activeChannel.getNumber());
+
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setSaved(true);
+						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_igc.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}

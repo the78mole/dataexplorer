@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HoTTAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JetiAdapter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GPXAdapter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/IGCAdapter"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
