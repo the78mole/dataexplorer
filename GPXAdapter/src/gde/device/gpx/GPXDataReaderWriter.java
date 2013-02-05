@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
@@ -295,31 +296,47 @@ public class GPXDataReaderWriter {
 							int referenceOrdinal = -1;
 							for (int i = 0; i < recordNames.length; i++) {
 								MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
-								recordSymbols[i] = measurement.getSymbol();
+								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordNames[i]);
 								measurement.setName(recordNames[i]);
+								recordSymbols[i] = measurement.getSymbol();
+								recordUnits[i] = measurement.getUnit();
+								if (GPXAdapter.unitMap.size() > 0 && i > 3) {
+									if (GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+										measurement.setUnit(recordUnits[i] = GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+									else if (!measurement.getUnit().isEmpty()) measurement.setUnit(GDE.STRING_EMPTY);
+								}
+								if (GPXAdapter.factorMap.size() > 0 && i > 3) {
+									if (GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+										measurement.setFactor(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+									else if (measurement.getFactor() != 1.0) measurement.setFactor(1.0);
+								}
+								if (GPXAdapter.offsetMap.size() > 0 && i > 3) {
+									if (GPXAdapter.offsetMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+										measurement.setOffset(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+									else if (measurement.getOffset() != 0) measurement.setOffset(0.0);
+								}
+								if (GPXAdapter.reductionMap.size() > 0 && i > 3) {
+									if (GPXAdapter.reductionMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+										measurement.setReduction(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+									else if (measurement.getReduction() != 0) measurement.setReduction(0.0);
+								}
+								if (GPXAdapter.syncMap.size() > 0 && i > 3) {
+									if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null && recordNames[i].split(GDE.STRING_BLANK).length > 1
+											&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) {
+										referenceName = recordNames[i].split(GDE.STRING_BLANK)[0];
+										referenceOrdinal = i;
+									}
+									else if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null && recordNames[i].split(GDE.STRING_BLANK)[0].equals(referenceName)
+											&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK).length > 1 && !recordNames[i].split(GDE.STRING_BLANK)[1].equals("1"))
+										device.setMeasurementPropertyValue(activeChannel.getNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, referenceOrdinal);
+									else
+										((DeviceConfiguration) device).removeMeasruementProperty(activeChannel.getNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+								}
+								//translate extension names to others, translate
 								if (GPXAdapter.languageMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null) {
 									measurement.setName(recordNames[i] = GPXAdapter.languageMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) 
 											+ (recordNames[i].split(GDE.STRING_BLANK).length > 1 ? recordNames[i].substring(recordNames[i].indexOf(GDE.STRING_BLANK)) : GDE.STRING_BLANK));
 								}
-								recordUnits[i] = measurement.getUnit();
-								if (recordUnits[i].length() == 0 && GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null) {
-									measurement.setUnit(recordUnits[i] = GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
-								}
-								if (GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
-									measurement.setFactor(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
-								if (GPXAdapter.offsetMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
-									measurement.setOffset(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
-								if (GPXAdapter.reductionMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
-									measurement.setReduction(GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
-								
-								if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null 
-										&& recordNames[i].split(GDE.STRING_BLANK).length > 1 && recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) {
-									referenceName = recordNames[i].split(GDE.STRING_BLANK)[0];
-									referenceOrdinal = i;
-								}
-								else if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null && recordNames[i].split(GDE.STRING_BLANK)[0].equals(referenceName)
-										&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK).length > 1 && !recordNames[i].split(GDE.STRING_BLANK)[1].equals("1"))
-									device.setMeasurementPropertyValue(activeChannel.getNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, referenceOrdinal);
 							}
 							activeRecordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
 							String correctedRecordSetName = activeRecordSet.getName(); // cut/correct length of recordSetName

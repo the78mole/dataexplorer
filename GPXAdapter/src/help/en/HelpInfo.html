@@ -71,5 +71,13 @@ With a later version of DataExplorer the device properties schema might change (
 in this case a backup copy of the complete device configurations will be created (Devices_Vxy-1.xsd) and your change will remain there.
 The out dated device configuration file can be used as template to update the new version.
 </P>
+<P>
+<B>Tip: </B>Are there high numbers of extension data contained in the GPX file, for example with Mikrokopter files, there is a capability
+to map measurement values to different names (translation), mapping of units, adding scale factors, scale synchronization, and so on.
+Please look up in the text file Mappings/GPXAdapter.properties and change if required.
+The file can be found below %AppData%/DataExplorer, resp. home-directory/.DataExplorer, resp. home-directory/Library/Application Support/DataExplorer.
+The content should be self explaining.
+If the file gets deleted it will be re-created while next initialization of the GPXAdapter. 
+</P>
 </BODY>
 </HTML>

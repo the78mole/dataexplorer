@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -134,7 +135,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				if (!path.exists() && !path.isDirectory()) 
 					path.mkdir();
 				//extract initial property files
-				FileUtils.extract(this.getClass(), "GPXAdapter.properties", "resource", path.getAbsolutePath(), "555");
+				FileUtils.extract(this.getClass(), "GPXAdapter.properties", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555");
 			}
 			Properties properties = new Properties();
 			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(preopertyFilePath));
