@@ -27,7 +27,6 @@ import gde.io.DataParser;
 import gde.log.Level;
 
 import java.io.FileNotFoundException;
-import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
@@ -71,9 +70,6 @@ public class iCharger306B extends iCharger {
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
-		double lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
-		int timeBufferSize = 10;
-		byte[] timeBuffer = new byte[timeBufferSize];
 
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
@@ -88,28 +84,7 @@ public class iCharger306B extends iCharger {
 					break;
 			}
 
-			//prepare time calculation while individual time steps gets recorded
-//			if (this.getDataBlockLeader().length() > 0) {
-//				timeBufferSize = 0;
-//				while (convertBuffer[timeBufferSize] != this.getDataBlockLeader().charAt(0))
-//					++timeBufferSize;
-//				--timeBufferSize;
-//			}
-//			timeBuffer = new byte[timeBufferSize];
-			System.arraycopy(convertBuffer, 0, timeBuffer, 0, timeBuffer.length);
-			long dateTime = (long) (lastDateTime + 2000);
-			try {
-				dateTime = Long.parseLong(String.format("%c%c%c%c%c%c000", (char)timeBuffer[4], (char)timeBuffer[5], (char)timeBuffer[6], (char)timeBuffer[7], (char)timeBuffer[8], (char)timeBuffer[9]).trim()); //10 digits //$NON-NLS-1$
-			}
-			catch (NumberFormatException e) {
-				// ignore
-			}
-			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime);
-			log.log(java.util.logging.Level.FINE, String.format("%d; %4.1fd ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim())); //$NON-NLS-1$
-			sumTimeDelta += deltaTime;
-			lastDateTime = dateTime;
-
-			recordSet.addPoints(convertDataBytes(points, convertBuffer), sumTimeDelta);
+			recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			offset += lovDataSize+8;
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -186,25 +161,11 @@ public class iCharger306B extends iCharger {
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
-		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
-		int timeStampBufferSize = 0;
-		if(!recordSet.isTimeStepConstant()) {
-			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
-			byte[] timeStampBuffer = new byte[timeStampBufferSize];
-			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
-			}
-		}
-		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
-		
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
-			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize);
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
 			
 			//0=VersorgungsSpg. 1=Spannung 2=Strom  
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
@@ -233,12 +194,7 @@ public class iCharger306B extends iCharger {
 			//calculate balance on the fly
 			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
-
-
-			if(recordSet.isTimeStepConstant()) 
-				recordSet.addPoints(points);
-			else
-				recordSet.addPoints(points, timeStamps.get(i)/10.0);
+			recordSet.addPoints(points);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 		}
