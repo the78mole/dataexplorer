@@ -251,8 +251,9 @@ public class IGCReaderWriter {
 				while ((line = reader.readLine()) != null);
 
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
-				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (IGCReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				else activeChannel.setActiveRecordSet(recordSet);
+				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 				reader.close();
 				reader = null;
