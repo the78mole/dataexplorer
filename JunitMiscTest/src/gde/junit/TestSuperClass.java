@@ -59,7 +59,7 @@ public class TestSuperClass extends TestCase {
 	Logger																rootLogger;
 	static {
 	Settings.getInstance();
-	GDE.display														= new Display();
+	GDE.display														= Display.getDefault();
 	GDE.shell															= new Shell(GDE.display);
 	}
 
