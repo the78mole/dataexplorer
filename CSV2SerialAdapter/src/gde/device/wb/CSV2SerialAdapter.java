@@ -41,6 +41,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -571,5 +572,35 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				}
 			});
 		}
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check file contained record properties which are not contained in actual configuration
+		String[] recordNames = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if ((recordNames.length - fileRecordsProperties.length) > 0) {
+			for (String recordProps : fileRecordsProperties) {
+				cleanedRecordNames.add(StringHelper.splitString(recordProps, Record.DELIMITER, Record.propertyKeys).get(Record.propertyKeys[0]));
+			}
+			recordNames = cleanedRecordNames.toArray(new String[1]);
+			//correct recordSet with cleaned record names
+			recordSet.clear();
+			for (int j = 0; j < recordNames.length; j++) {
+				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), j);
+				recordSet.addRecordName(recordNames[j]);
+				recordSet.put(recordNames[j],
+						new Record(this, j, recordNames[j], measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5));
+			}
+		}
+		return recordNames;
 	}
 }
