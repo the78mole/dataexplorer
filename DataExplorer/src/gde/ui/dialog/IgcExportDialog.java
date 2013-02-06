@@ -794,7 +794,7 @@ public class IgcExportDialog extends Dialog {
 	public StringBuilder getHeader() {
 		StringBuilder header = new StringBuilder();
 		if (this.headerRecordDateText != null) {
-			header.append(String.format("AXXX%s\r\n", GDE.NAME_LONG)); //$NON-NLS-1$
+			header.append(String.format("AXDE %s\r\n", GDE.NAME_LONG, GDE.VERSION.replace(GDE.STRING_DOT, GDE.STRING_EMPTY))); 
 			header.append(String.format("HFDTE%s\r\n", this.headerRecordDateText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFFXA%s\r\n", this.headerFixAccuracyText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFPLTPILOT:%s\r\n", this.headerPilotText.getText())); //$NON-NLS-1$
@@ -811,7 +811,7 @@ public class IgcExportDialog extends Dialog {
 			header.append(String.format("HFTZNTIMEZONE:%s\r\n", tmpUtfOffset.startsWith("+") ? tmpUtfOffset.substring(1) : tmpUtfOffset)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
-			header.append(String.format("AXXX%s %s\r\n", GDE.NAME_LONG)); //$NON-NLS-1$
+			header.append(String.format("AXDE %s %s\r\n", GDE.NAME_LONG, GDE.VERSION.replace(GDE.STRING_DOT, GDE.STRING_EMPTY))); 
 			header.append(String.format("HFDTE%s\r\n", this.headerRecordDate)); //$NON-NLS-1$
 			header.append(String.format("HFFXA%s\r\n", this.headerFixAccuracy)); //$NON-NLS-1$
 			header.append(String.format("HFPLTPILOT:%s\r\n", this.headerPilot)); //$NON-NLS-1$
