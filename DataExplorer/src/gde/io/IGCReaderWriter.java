@@ -259,7 +259,7 @@ public class IGCReaderWriter {
 				reader = null;
 				
 
-				if (GDE.IS_WINDOWS && isGsentence && GDE.BIT_MODE.equals("32")) {
+				if (GDE.IS_WINDOWS && isGsentence && GDE.BIT_MODE.equals("32") && dllID.equalsIgnoreCase("XTT")) {
 					if (IGCDLL.loadIgcDll(dllID)) {
 						System.out.println("verification = " + IGCDLL.validateLog(filePath));
 					}
