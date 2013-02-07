@@ -20,6 +20,7 @@ package gde.junit;
 
 import gde.GDE;
 import gde.utils.FileUtils;
+import gde.utils.ObjectKeyScanner;
 
 import java.io.File;
 
@@ -52,5 +53,9 @@ public class CleanupTestTemp extends TestCase {
 				}
 			}
 		}
+	}
+	
+	public final void testDeleteLinks() {
+		ObjectKeyScanner.cleanFileLinks();
 	}
 }

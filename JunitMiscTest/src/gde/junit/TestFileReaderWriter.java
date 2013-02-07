@@ -1137,7 +1137,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						String deviceName = file.getPath().substring(0, file.getPath().lastIndexOf(GDE.FILE_SEPARATOR));
 						deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
 						deviceName = deviceName.contains(GDE.STRING_UNDER_BAR) ? deviceName.substring(1+deviceName.lastIndexOf(GDE.STRING_UNDER_BAR)) : deviceName;
-						System.out.println("deviceName = " + deviceName);
+						//System.out.println("deviceName = " + deviceName);
 						if (deviceName.startsWith("NMEA") || deviceName.startsWith("GPS") || deviceName.startsWith("DataVario") || deviceName.startsWith("LinkVario") 
 								|| deviceName.startsWith("HoTT")) {
 						
