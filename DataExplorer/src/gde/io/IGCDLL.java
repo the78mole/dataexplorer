@@ -49,10 +49,12 @@ public class IGCDLL {
 		}
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
-			if (t instanceof UnsatisfiedLinkError)
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0037, new Object[] { t.getClass().getSimpleName() }) + Messages.getString(MessageIds.GDE_MSGI0033));
-			else
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] { t.getLocalizedMessage() }));
+			if (DataExplorer.getInstance().getMenuBar() != null) { //no UI is opened while running Junit test
+				if (t instanceof UnsatisfiedLinkError)
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0037, new Object[] { t.getClass().getSimpleName() }) + Messages.getString(MessageIds.GDE_MSGI0033));
+				else
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] { t.getLocalizedMessage() }));
+			}
 		}
 		return isLoaded;
 	}
