@@ -234,7 +234,14 @@ public class TestSuperClass extends TestCase {
 	protected void drawCurves(RecordSet recordSet, int maxX, int maxY) {
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(maxX, maxY);
-		GC gc = new GC(this.curveArea); //SWTResourceManager.getGC(this.curveArea);
+		GC gc;
+		try {
+			gc = new GC(this.curveArea);
+		}
+		catch (Exception e) {
+			this.curveArea = SWTResourceManager.getImage(++maxX, ++maxY);
+			gc = new GC(this.curveArea);
+		}
 		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
 			
 		//prepare time scale
