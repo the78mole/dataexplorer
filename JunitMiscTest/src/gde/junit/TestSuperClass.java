@@ -72,7 +72,6 @@ public class TestSuperClass extends TestCase {
 
 
 	final TimeLine												timeLine		= new TimeLine();
-	Image																	curveArea;
 	Rectangle															curveAreaBounds;
 	int																		offSetX, offSetY;
 
@@ -233,15 +232,8 @@ public class TestSuperClass extends TestCase {
 	 */
 	protected void drawCurves(RecordSet recordSet, int maxX, int maxY) {
 		// get the image and prepare GC
-		this.curveArea = SWTResourceManager.getImage(maxX, maxY);
-		GC gc;
-		try {
-			gc = new GC(this.curveArea);
-		}
-		catch (Exception e) {
-			this.curveArea = SWTResourceManager.getImage(++maxX, ++maxY);
-			gc = new GC(this.curveArea);
-		}
+		Image	 curveArea =  new Image(Display.getDefault(), maxX, maxY);
+		GC gc = new GC(curveArea);
 		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
 			
 		//prepare time scale
@@ -361,6 +353,7 @@ public class TestSuperClass extends TestCase {
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 		}
 		gc.dispose();
+		curveArea.dispose();
 	}
 
 	/**
