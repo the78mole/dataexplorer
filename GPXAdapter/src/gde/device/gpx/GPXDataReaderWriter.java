@@ -279,7 +279,7 @@ public class GPXDataReaderWriter {
 										vecRecordNames.add(newRecordName);
 										//System.out.println(activeRecordSet.getRecordNames()[this.pointsIndex]);
 										try {
-											this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
+											this.points[this.pointsIndex++] = (int) (Double.valueOf(values[i].trim()) * 1000.0);
 										}
 										catch (NumberFormatException e) {
 											// ignore and keep existing value
@@ -296,7 +296,7 @@ public class GPXDataReaderWriter {
 							int referenceOrdinal = -1;
 							for (int i = 0; i < recordNames.length; i++) {
 								MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
-								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordNames[i]);
+								if (log.isLoggable(Level.OFF)) log.log(Level.OFF, recordNames[i]);
 								measurement.setName(recordNames[i]);
 								recordSymbols[i] = measurement.getSymbol();
 								recordUnits[i] = measurement.getUnit();
@@ -304,6 +304,11 @@ public class GPXDataReaderWriter {
 									if (GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
 										measurement.setUnit(recordUnits[i] = GPXAdapter.unitMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
 									else if (!measurement.getUnit().isEmpty()) measurement.setUnit(GDE.STRING_EMPTY);
+								}
+								if (GPXAdapter.symbolMap.size() > 0 && i > 3) {
+									if (GPXAdapter.symbolMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
+										measurement.setSymbol(recordUnits[i] = GPXAdapter.symbolMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]));
+									else if (!measurement.getSymbol().isEmpty()) measurement.setSymbol(GDE.STRING_EMPTY);
 								}
 								if (GPXAdapter.factorMap.size() > 0 && i > 3) {
 									if (GPXAdapter.factorMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null)
@@ -364,7 +369,7 @@ public class GPXDataReaderWriter {
 									for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
 										//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
 										try {
-											this.points[this.pointsIndex++] = Integer.valueOf(values[i].trim()) * 1000;
+											this.points[this.pointsIndex++] = (int) (Double.valueOf(values[i].trim()) * 1000.0);
 										}
 										catch (NumberFormatException e) {
 											// ignore and keep existing value

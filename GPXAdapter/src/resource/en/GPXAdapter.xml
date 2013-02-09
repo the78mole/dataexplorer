@@ -49,7 +49,7 @@
 	        <Measurement>
 	            <name>Satellites</name>
 	            <symbol></symbol>
-	            <unit></unit>
+	            <unit>#</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
