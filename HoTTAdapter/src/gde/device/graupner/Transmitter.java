@@ -227,7 +227,8 @@ public enum Transmitter {
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
 				bytes[0x160] = (byte) 0x05;
 				
-				convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
+				if (detectTransmitter(bytes) == Transmitter.MC_32) 
+					convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
 				break;
 			case MX_20:
 				if (log.isLoggable(Level.FINE)) System.out.println("to " + MX_20.value());			
@@ -245,7 +246,8 @@ public enum Transmitter {
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
 				bytes[0x160] = (byte) 0xFF;
 
-				convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
+				if (detectTransmitter(bytes) == Transmitter.MC_32) 
+					convertCurves(bytes, MC_32.ordinal(), MX_20.ordinal());
 				break;
 			case MC_16:
 				if (log.isLoggable(Level.FINE)) System.out.println("to " + MC_16.value());
@@ -263,7 +265,8 @@ public enum Transmitter {
 				System.arraycopy(Transmitter.mc_16_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_16_MEM_INFO.length);
 				bytes[0x160] = (byte) 0x05;
 				
-				convertCurves(bytes, MC_32.ordinal(), MC_16.ordinal());
+				if (detectTransmitter(bytes) == Transmitter.MC_32) 
+					convertCurves(bytes, MC_32.ordinal(), MC_16.ordinal());
 				break;
 			case MX_16:
 				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
