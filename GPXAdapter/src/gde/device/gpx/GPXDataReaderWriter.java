@@ -279,11 +279,18 @@ public class GPXDataReaderWriter {
 										vecRecordNames.add(newRecordName);
 										//System.out.println(activeRecordSet.getRecordNames()[this.pointsIndex]);
 										try {
-											this.points[this.pointsIndex++] = (int) (Double.valueOf(values[i].trim()) * 1000.0);
+											this.points[this.pointsIndex] = (int) (Double.valueOf(values[i].trim()) * 1000.0);
 										}
 										catch (NumberFormatException e) {
-											// ignore and keep existing value
+											try {
+												if (values[i].indexOf('x') >= 0)
+													this.points[this.pointsIndex] = Integer.valueOf(values[i].substring(values[i].indexOf('x')+1).trim(), 16)*1000;
+											}
+											catch (NumberFormatException e1) {
+												// ignore and keep existing value
+											}
 										}
+										++this.pointsIndex;
 									}
 								}
 							}
@@ -369,11 +376,18 @@ public class GPXDataReaderWriter {
 									for (int i = 0; i < values.length && (this.points.length - this.pointsIndex) > 0; i++) {
 										//System.out.println(i + " values.lenght " + this.pointsIndex + " - " + (this.points.length - this.pointsIndex));
 										try {
-											this.points[this.pointsIndex++] = (int) (Double.valueOf(values[i].trim()) * 1000.0);
+											this.points[this.pointsIndex] = (int) (Double.valueOf(values[i].trim()) * 1000.0);
 										}
 										catch (NumberFormatException e) {
-											// ignore and keep existing value
+											try {
+												if (values[i].indexOf('x') >= 0)
+													this.points[this.pointsIndex] = Integer.valueOf(values[i].substring(values[i].indexOf('x')+1).trim(), 16) * 1000;
+											}
+											catch (NumberFormatException e1) {
+												// ignore and keep existing value
+											}
 										}
+										++this.pointsIndex;
 									}
 								}
 							}
