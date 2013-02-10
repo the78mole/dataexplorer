@@ -217,57 +217,65 @@ public enum Transmitter {
 
 				if (detectTransmitter(bytes) == Transmitter.MC_32) {
 					cleanPhaseSetting(bytes);
+					migrateDualMixerChannel(bytes);
+					migrateChannelMapping(bytes);
+					migrateFreeMixerChannel(bytes);
+					cleanSwAssignements(bytes);
+					cleanControlAdustSw(bytes);
+					convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
 				}
-				cleanSwAssignements(bytes);
-				cleanControlAdustSw(bytes);
 				
 				System.arraycopy(Transmitter.mc_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_20_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xEA;
 				bytes[0x108] = (byte) 0xEA;
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				bytes[0x160] = (byte) 0x05;
-				
-				if (detectTransmitter(bytes) == Transmitter.MC_32) 
-					convertCurves(bytes, MC_32.ordinal(), MC_20.ordinal());
+				bytes[0x160] = (byte) 0x05;			
 				break;
+				
 			case MX_20:
 				if (log.isLoggable(Level.FINE)) System.out.println("to " + MX_20.value());			
 				cleanReceiverBinding(bytes);
 				
 				if (detectTransmitter(bytes) == Transmitter.MC_32) {
 					cleanPhaseSetting(bytes);
+					cleanPhaseSetting(bytes);
+					migrateDualMixerChannel(bytes);
+					migrateChannelMapping(bytes);
+					migrateFreeMixerChannel(bytes);
+					cleanSwAssignements(bytes);
+					cleanControlAdustSw(bytes);
+					convertCurves(bytes, MC_32.ordinal(), MX_20.ordinal());
 				}
-				cleanControlAdustSw(bytes);
-				cleanSwAssignements(bytes);
 				
 				System.arraycopy(Transmitter.mx_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_20_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xEA;
 				bytes[0x108] = (byte) 0xEA;
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
 				bytes[0x160] = (byte) 0xFF;
-
-				if (detectTransmitter(bytes) == Transmitter.MC_32) 
-					convertCurves(bytes, MC_32.ordinal(), MX_20.ordinal());
 				break;
+				
 			case MC_16:
 				if (log.isLoggable(Level.FINE)) System.out.println("to " + MC_16.value());
 				cleanReceiverBinding(bytes);
 
 				if (detectTransmitter(bytes) == Transmitter.MC_32) {
 					cleanPhaseSetting(bytes);
+					cleanPhaseSetting(bytes);
+					migrateDualMixerChannel(bytes);
+					migrateChannelMapping(bytes);
+					migrateFreeMixerChannel(bytes);
+					cleanSwAssignements(bytes);
+					cleanControlAdustSw(bytes);
+					convertCurves(bytes, MC_32.ordinal(), MX_16.ordinal());
 				}
-				cleanSwAssignements(bytes);
-				cleanControlAdustSw(bytes);
 				
 				System.arraycopy(Transmitter.mc_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_16_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xEA;
 				bytes[0x108] = (byte) 0xEA;
 				System.arraycopy(Transmitter.mc_16_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_16_MEM_INFO.length);
 				bytes[0x160] = (byte) 0x05;
-				
-				if (detectTransmitter(bytes) == Transmitter.MC_32) 
-					convertCurves(bytes, MC_32.ordinal(), MC_16.ordinal());
 				break;
+				
 			case MX_16:
 				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
 				bytes[0x1009] = (byte) 0x04; //bind receiver 4=none
@@ -334,6 +342,37 @@ public enum Transmitter {
 		}
 		for (int i = 0; i < 4*16; i++) {
 			bytes[0x1022+i] = (byte) 0x00;
+		}
+	}
+	
+	public static void migrateDualMixerChannel(byte[] bytes) {
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x17CD", bytes, 0x17CD, 1, 1, 12); //from
+		for (int i = 0; i < 4; i++) { //20 max = 12; 32 max = 16
+			if (bytes[0x17CD + i] > 12) bytes[0x1996 + i] = (byte) 0x0D;
+		}
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x17D1", bytes, 0x17D1, 1, 1, 12); //to
+		for (int i = 0; i < 4; i++) { //20 max = 12; 32 max = 16
+			if (bytes[0x17D1 + i] > 12) bytes[0x17D1 + i] = (byte) 0x0D;
+		}
+		calculateAndWriteCRC(bytes, 0x17CD, 0x17D9);
+	}
+	
+	public static void migrateChannelMapping(byte[] bytes) {
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x182E", bytes, 0x182E, 1, 1, 16); 
+		for (int i = 0; i < 12; i++) { //20 max = 12; 32 max = 16
+			if (bytes[0x182E + i] > 12) bytes[0x182E + i] = (byte) 0x0D;
+		}
+		calculateAndWriteCRC(bytes, 0x182E, 0x183E);
+	}
+	
+	public static void migrateFreeMixerChannel(byte[] bytes) {
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1996", bytes, 0x1996, 1, 1, 12); //from
+		for (int i = 0; i < 12; i++) { //20 max = 12; 32 max = 16
+			if (bytes[0x1996 + i] > 12) bytes[0x1996 + i] = (byte) 0x0D;
+		}
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x19A2", bytes, 0x19A2, 1, 1, 12); //to
+		for (int i = 0; i < 12; i++) { //20 max = 13; 32 max = 17
+			if (bytes[0x19A2 + i] > 13) bytes[0x19A2 + i] = (byte) 0x0E;
 		}
 	}
 
