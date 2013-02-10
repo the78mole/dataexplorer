@@ -11,6 +11,7 @@ fix bug HoTTAdapter2 reading channel data 9-12
 fix bug HoTTAdapter2 displaying cell voltage values
 fix bug HoTTAdapter* reading HF data
 fix bug HoTTAdapter* converting mx-20 to mc-20 and vice versa
+fix bug HoTTAdapter* converting mc-32 to m*-20 
 fix bugs in JetiAdapter - exporting KMZ/KML/IGC
 fix bug in GPS color and velocity configuration dialog
 fix DevicePropertiesEditor - statistics type and property types doesn't persist after change
