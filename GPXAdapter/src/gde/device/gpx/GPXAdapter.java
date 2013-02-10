@@ -150,24 +150,24 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 					GPXAdapter.languageMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
 				}
 				else if (propertyName.startsWith("sync")) {
-					GPXAdapter.syncMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], true);
+					GPXAdapter.syncMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), true);
 				}
 				else if (propertyName.startsWith("ignore")) {
-					GPXAdapter.ignoreMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], true);
+					GPXAdapter.ignoreMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), true);
 				}
 				else if (propertyName.startsWith("symbol")) {
-					GPXAdapter.symbolMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], properties.getProperty(propertyName).trim());
+					GPXAdapter.symbolMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
 				}
 				else
 					try {
 						if (propertyName.startsWith("factor")) {
-							GPXAdapter.factorMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], Double.valueOf(properties.getProperty(propertyName).trim()));
+							GPXAdapter.factorMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 						else if (propertyName.startsWith("offset")) {
-							GPXAdapter.offsetMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], Double.valueOf(properties.getProperty(propertyName).trim()));
+							GPXAdapter.offsetMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 						else if (propertyName.startsWith("reduction")) {
-							GPXAdapter.reductionMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], Double.valueOf(properties.getProperty(propertyName).trim()));
+							GPXAdapter.reductionMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 					}
 					catch (NumberFormatException e) {
