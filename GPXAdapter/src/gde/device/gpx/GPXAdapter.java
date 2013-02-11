@@ -128,14 +128,14 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException
 	 */
 	private void readProperties() {
-		String preopertyFilePath = Settings.getInstance().getApplHomePath() + "/Mapping/GPXAdapter.properties";
+		String preopertyFilePath = Settings.getInstance().getApplHomePath() + "/Mapping/GPXAdapter.properties"; //$NON-NLS-1$
 		try {
 			if (!new File(preopertyFilePath).exists()) {
-				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping");
+				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping"); //$NON-NLS-1$
 				if (!path.exists() && !path.isDirectory()) 
 					path.mkdir();
 				//extract initial property files
-				FileUtils.extract(this.getClass(), "GPXAdapter.properties", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555");
+				FileUtils.extract(this.getClass(), "GPXAdapter.properties", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			Properties properties = new Properties();
 			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(preopertyFilePath));
@@ -143,30 +143,30 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			stream.close();
 
 			for (String propertyName : properties.stringPropertyNames()) {
-				if (propertyName.startsWith("unit")) {
+				if (propertyName.startsWith("unit")) { //$NON-NLS-1$
 					GPXAdapter.unitMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], properties.getProperty(propertyName).trim());
 				}
-				else if (propertyName.startsWith("language")) {
+				else if (propertyName.startsWith("language")) { //$NON-NLS-1$
 					GPXAdapter.languageMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
 				}
-				else if (propertyName.startsWith("sync")) {
+				else if (propertyName.startsWith("sync")) { //$NON-NLS-1$
 					GPXAdapter.syncMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), true);
 				}
-				else if (propertyName.startsWith("ignore")) {
+				else if (propertyName.startsWith("ignore")) { //$NON-NLS-1$
 					GPXAdapter.ignoreMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), true);
 				}
-				else if (propertyName.startsWith("symbol")) {
+				else if (propertyName.startsWith("symbol")) { //$NON-NLS-1$
 					GPXAdapter.symbolMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
 				}
 				else
 					try {
-						if (propertyName.startsWith("factor")) {
+						if (propertyName.startsWith("factor")) { //$NON-NLS-1$
 							GPXAdapter.factorMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
-						else if (propertyName.startsWith("offset")) {
+						else if (propertyName.startsWith("offset")) { //$NON-NLS-1$
 							GPXAdapter.offsetMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
-						else if (propertyName.startsWith("reduction")) {
+						else if (propertyName.startsWith("reduction")) { //$NON-NLS-1$
 							GPXAdapter.reductionMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 					}
@@ -244,12 +244,12 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				//System.out.println((subLenght+8));
 				lineBuffer = new byte[subLenght];
 				System.arraycopy(dataBuffer, 4 + lastLength, lineBuffer, 0, subLenght);
-				String textInput = new String(lineBuffer, "ISO-8859-1");
+				String textInput = new String(lineBuffer, "ISO-8859-1"); //$NON-NLS-1$
 				//System.out.println(textInput);
 				StringTokenizer st = new StringTokenizer(textInput);
 				Vector<String> vec = new Vector<String>();
 				while (st.hasMoreTokens())
-					vec.add(st.nextToken("\r\n"));
+					vec.add(st.nextToken("\r\n")); //$NON-NLS-1$
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
 				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
@@ -354,7 +354,10 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 				if (j > 1) {
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					if (record.getName().toLowerCase().indexOf("flag") >= 0) //$NON-NLS-1$
+						dataTableRow[j + 1] = String.format("0x%02x", record.realGet(rowIndex) / 1000); //$NON-NLS-1$
+					else
+						dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
 					dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
@@ -468,7 +471,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
 				if (GPXAdapter.log.isLoggable(java.util.logging.Level.FINE))
-					GPXAdapter.log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+					GPXAdapter.log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -518,7 +521,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	public void open_closeCommPort() {
 		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1776));
 
-		Thread reader = new Thread("reader") {
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
 				try {
@@ -702,7 +705,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1,
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						true, isExportTmpDir);
 			}
 		}
@@ -737,8 +740,8 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		Record gpsAlitude = recordSet.get(2);
 
 		return String.format("%02d%05d%s%03d%05d%s%c%05d%05d", //$NON-NLS-1$
-				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
-				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
+				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$ //$NON-NLS-2$
+				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$ //$NON-NLS-2$
 				fixValidity, Double.valueOf(baroAlitude.get(index) / 10000.0 + startAltitude + offsetAltitude).intValue(), Double.valueOf(gpsAlitude.get(index) / 1000.0 + offsetAltitude).intValue());
 	}
 

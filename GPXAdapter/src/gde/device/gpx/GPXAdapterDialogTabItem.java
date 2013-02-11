@@ -121,7 +121,7 @@ public class GPXAdapterDialogTabItem extends CTabItem {
 						for (int i = 0; i < channel.getActiveRecordSet().size(); i++) {
 							if (i > 3) {
 								this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber)
-										.get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
+										.get(i), this.device, 1, GDE.STRING_BLANK + i, GDE.STRING_EMPTY));
 							}
 							//GPS	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
 							else {
@@ -133,7 +133,7 @@ public class GPXAdapterDialogTabItem extends CTabItem {
 						for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
 							if (i > 3) {
 								this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber)
-										.get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
+										.get(i), this.device, 1, GDE.STRING_BLANK + i, GDE.STRING_EMPTY));
 							}
 							//GPS	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
 							else {
@@ -145,7 +145,7 @@ public class GPXAdapterDialogTabItem extends CTabItem {
 			this.scolledComposite.addControlListener(new ControlListener() {
 				@Override
 				public void controlResized(ControlEvent evt) {
-					GPXAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt);
+					GPXAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt); //$NON-NLS-1$
 					int height = 35 + GPXAdapterDialogTabItem.this.device.getChannelMeasuremts(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					Channel channel = Channels.getInstance().get(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1);
 					if (channel != null)
@@ -156,7 +156,7 @@ public class GPXAdapterDialogTabItem extends CTabItem {
 
 				@Override
 				public void controlMoved(ControlEvent evt) {
-					GPXAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt);
+					GPXAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt); //$NON-NLS-1$
 					int height = 35 + GPXAdapterDialogTabItem.this.device.getChannelMeasuremts(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					Channel channel = Channels.getInstance().get(GPXAdapterDialogTabItem.this.parent.getSelectionIndex() + 1);
 					if (channel != null)

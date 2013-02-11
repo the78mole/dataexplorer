@@ -95,7 +95,7 @@ public class GPXDataReaderWriter {
 
 			if (activeChannel != null) {
 				if (GPXDataReaderWriter.log.isLoggable(Level.FINE))
-					GPXDataReaderWriter.log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber);
+					GPXDataReaderWriter.log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber); //$NON-NLS-1$
 
 				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend;
 				recordSetName = recordNameExtend.length() > 2 ? recordSetName + GDE.STRING_BLANK_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET : recordSetName;
@@ -155,8 +155,8 @@ public class GPXDataReaderWriter {
 		factory.setNamespaceAware(true);
 		factory.setValidating(true);
 		SAXParser saxParser = factory.newSAXParser();
-		saxParser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage", "http://www.w3.org/2001/XMLSchema");
-		saxParser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", "file:/resource/gpx.xsd");
+		saxParser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage", "http://www.w3.org/2001/XMLSchema"); //$NON-NLS-1$ //$NON-NLS-2$
+		saxParser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", "file:/resource/gpx.xsd"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		DefaultHandler handler = new DefaultHandler() {
 			boolean										isDescription						= false;
@@ -180,29 +180,29 @@ public class GPXDataReaderWriter {
 			@Override
 			public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-				if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "Start Element :" + qName);
+				if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "Start Element :" + qName); //$NON-NLS-1$
 				if (qName != null && qName.length() > 1) {
-					if (qName.equalsIgnoreCase("text"))
+					if (qName.equalsIgnoreCase("text")) //$NON-NLS-1$
 						this.isDescription = true; //<text>MikroKopter</text> 
-					else if (qName.equalsIgnoreCase("desc"))
+					else if (qName.equalsIgnoreCase("desc")) //$NON-NLS-1$
 						this.isDescription2 = true;//<desc>FC HW:2.1 SW:0.88e + NC HW:2.0 SW:0.28i</desc>
 
 					// <trkpt lat="+41.0334244" lon="-73.5230532">	
-					else if (qName.equalsIgnoreCase("trkpt")) {
+					else if (qName.equalsIgnoreCase("trkpt")) { //$NON-NLS-1$
 						if (attributes.getLength() == 2) {
-							this.tmpPoints.put("lat", attributes.getValue("lat")); //lat="+41.0334244"
-							this.tmpPoints.put("lon", attributes.getValue("lon")); //lon="-73.5230532"
+							this.tmpPoints.put("lat", attributes.getValue("lat")); //lat="+41.0334244" //$NON-NLS-1$ //$NON-NLS-2$
+							this.tmpPoints.put("lon", attributes.getValue("lon")); //lon="-73.5230532" //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					}
-					else if (qName.equalsIgnoreCase("ele"))
+					else if (qName.equalsIgnoreCase("ele")) //$NON-NLS-1$
 						this.isElevation = true;//<ele>12.863</ele>
-					else if (qName.equalsIgnoreCase("time"))
+					else if (qName.equalsIgnoreCase("time")) //$NON-NLS-1$
 						this.isTime = true;//<time>2012-04-19T15:37:33Z</time>
-					else if (qName.equalsIgnoreCase("sat"))
+					else if (qName.equalsIgnoreCase("sat")) //$NON-NLS-1$
 						this.isNumSatelites = true;//<sat>10</sat>
 
 					//<extensions>
-					else if (qName.equalsIgnoreCase("extensions")) {
+					else if (qName.equalsIgnoreCase("extensions")) { //$NON-NLS-1$
 						this.isExtension = true;
 						if (this.isExtensionFirstCalled == null) this.isExtensionFirstCalled = true;
 					}
@@ -249,13 +249,13 @@ public class GPXDataReaderWriter {
 
 			@Override
 			public void endElement(String uri, String localName, String qName) throws SAXException {
-				if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "End Element :" + qName);
-				if (qName.equalsIgnoreCase("trkpt")) {
+				if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "End Element :" + qName); //$NON-NLS-1$
+				if (qName.equalsIgnoreCase("trkpt")) { //$NON-NLS-1$
 					this.pointsIndex = 0;
-					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lat").replace("+", "").trim()) * 1000000);
-					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lon").replace("+", "").trim()) * 1000000);
-					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("ele").replace(".", "").trim());
-					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("sat").trim()) * 1000;
+					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lat").replace(GDE.STRING_PLUS, GDE.STRING_EMPTY).trim()) * 1000000); //$NON-NLS-1$
+					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lon").replace(GDE.STRING_PLUS, GDE.STRING_EMPTY).trim()) * 1000000); //$NON-NLS-1$
+					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("ele").replace(GDE.STRING_DOT, GDE.STRING_EMPTY).trim()); //$NON-NLS-1$
+					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("sat").trim()) * 1000; //$NON-NLS-1$
 
 					if (this.isExtensionFirstCalled != null) {
 						if (this.isExtensionFirstCalled) {
@@ -334,12 +334,12 @@ public class GPXDataReaderWriter {
 								}
 								if (GPXAdapter.syncMap.size() > 0 && i > 3) {
 									if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null && recordNames[i].split(GDE.STRING_BLANK).length > 1
-											&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) {
+											&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) { //$NON-NLS-1$
 										referenceName = recordNames[i].split(GDE.STRING_BLANK)[0];
 										referenceOrdinal = i;
 									}
 									else if (GPXAdapter.syncMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null && recordNames[i].split(GDE.STRING_BLANK)[0].equals(referenceName)
-											&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK).length > 1 && !recordNames[i].split(GDE.STRING_BLANK)[1].equals("1"))
+											&& recordNames[i].split(GDE.STRING_BLANK)[1] != null && recordNames[i].split(GDE.STRING_BLANK).length > 1 && !recordNames[i].split(GDE.STRING_BLANK)[1].equals("1")) //$NON-NLS-1$
 										device.setMeasurementPropertyValue(activeChannel.getNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, referenceOrdinal);
 									else
 										((DeviceConfiguration) device).removeMeasruementProperty(activeChannel.getNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
@@ -395,7 +395,7 @@ public class GPXDataReaderWriter {
 					}
 					try {
 						if (this.startTimeStamp == 0) this.startTimeStamp = this.timeStamp;
-						if (GPXDataReaderWriter.log.isLoggable(Level.FINER)) GPXDataReaderWriter.log.log(Level.FINER, "" + (this.timeStamp - this.startTimeStamp) * 1.0);
+						if (GPXDataReaderWriter.log.isLoggable(Level.FINER)) GPXDataReaderWriter.log.log(Level.FINER, GDE.STRING_EMPTY + (this.timeStamp - this.startTimeStamp) * 1.0);
 						//System.out.println(StringHelper.intArrayToString(this.points));
 						activeRecordSet.addPoints(this.points, (this.timeStamp - this.startTimeStamp) * 1.0);
 					}
@@ -408,7 +408,7 @@ public class GPXDataReaderWriter {
 			@Override
 			public void characters(char ch[], int start, int length) throws SAXException {
 				String values = new String(ch, start, length);
-				if (!values.contains("\n") && !values.contains("\r")) {
+				if (!values.contains("\n") && !values.contains("\r")) { //$NON-NLS-1$ //$NON-NLS-2$
 					if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, values);
 					if (this.isDescription) {
 						recordSetDescription = GDE.LINE_SEPARATOR + new String(ch, start, length);
@@ -421,18 +421,18 @@ public class GPXDataReaderWriter {
 						this.isDescription2 = false;
 					}
 					else if (this.isElevation) {
-						this.tmpPoints.put("ele", new String(ch, start, length)); //<ele>12.863</ele>
+						this.tmpPoints.put("ele", new String(ch, start, length)); //<ele>12.863</ele> //$NON-NLS-1$
 						this.isElevation = false;
 					}
 					else if (this.isTime) {
 						String dateTime = new String(ch, start, length);//<time>2012-04-19T15:37:33Z</time>
 						if (!this.isDateSet) {
-							String strDate = dateTime.split("T")[0];
+							String strDate = dateTime.split("T")[0]; //$NON-NLS-1$
 							this.date[0] = Integer.parseInt(strDate.substring(0, 4));
 							this.date[1] = Integer.parseInt(strDate.substring(5, 7));
 							this.date[2] = Integer.parseInt(strDate.substring(8, 10));
 						}
-						String strValueTime = dateTime.split("T|Z")[1];
+						String strValueTime = dateTime.split("T|Z")[1]; //$NON-NLS-1$
 						this.time[0] = Integer.parseInt(strValueTime.substring(0, 2));
 						this.time[1] = Integer.parseInt(strValueTime.substring(3, 5));
 						this.time[2] = Integer.parseInt(strValueTime.substring(6, 8));
@@ -440,14 +440,14 @@ public class GPXDataReaderWriter {
 						this.timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
 						if (!this.isDateSet && this.isExtensionFirstCalled != null) {
 							String description = activeRecordSet.getRecordSetDescription();
-							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.startTimeStamp) + recordSetDescription);
+							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.startTimeStamp) + recordSetDescription); //$NON-NLS-1$
 							activeRecordSet.setStartTimeStamp(this.startTimeStamp);
 							this.isDateSet = true;
 						}
 						this.isTime = false;
 					}
 					else if (this.isNumSatelites) {
-						this.tmpPoints.put("sat", new String(ch, start, length)); //<sat>10</sat>
+						this.tmpPoints.put("sat", new String(ch, start, length)); //<sat>10</sat> //$NON-NLS-1$
 						this.isNumSatelites = false;
 					}
 					else if (this.isExtension && this.extensionName.length() > 3) {
