@@ -203,8 +203,8 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 				Record record = recordSet.get(j);
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if(j > 9 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
-					dataTableRow[j + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				if(j > 9 && record.getUnit().equals("V")) //cell voltage no temperature measurements //$NON-NLS-1$
+					dataTableRow[j + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
 				else
 					dataTableRow[j + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 			}
@@ -264,12 +264,12 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 				Record record = recordSet.get(i);
 				record.setDisplayable(record.hasReasonableData());
 				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData());
+					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData()); //$NON-NLS-1$
 		}
 		
 		if (log.isLoggable(Level.FINE)) {
 			for (Record record : recordSet.values()) {
-				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
+				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}

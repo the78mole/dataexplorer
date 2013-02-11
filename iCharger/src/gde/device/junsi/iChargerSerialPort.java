@@ -77,7 +77,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 */
 	public synchronized byte[] getData() throws Exception {
-		final String $METHOD_NAME = "getData";
+		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		int startIndex;
 
 		try {
@@ -118,7 +118,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 	 * @throws TimeOutException
 	 */
 	protected byte[] findDataEnd(int startIndex) throws IOException, TimeOutException {
-		final String $METHOD_NAME = "findDataEnd";
+		final String $METHOD_NAME = "findDataEnd"; //$NON-NLS-1$
 		int endIndex;
 		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1 || this.isEndByte_1 == true) && this.answer[this.index] == this.endByte))
 			++this.index;
@@ -181,7 +181,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 		while (lenght > 0 && !((this.endByte_1 != 0x00 || this.tmpData[lenght - 2] == this.endByte_1) && this.tmpData[lenght - 1] == this.endByte))
 			--lenght;
 		if (iChargerSerialPort.log.isLoggable(Level.FINE))
-			iChargerSerialPort.log.logp(Level.FINE, iChargerSerialPort.$CLASS_NAME, "getArrayLengthByCheckEnding", "array length = " + lenght);
+			iChargerSerialPort.log.logp(Level.FINE, iChargerSerialPort.$CLASS_NAME, "getArrayLengthByCheckEnding", "array length = " + lenght); //$NON-NLS-1$ //$NON-NLS-2$
 		return lenght;
 	}
 
@@ -191,10 +191,10 @@ public class iChargerSerialPort extends DeviceCommPort {
 	 * @return true/false
 	 */
 	protected boolean isChecksumOK(byte[] buffer) {
-		final String $METHOD_NAME = "isChecksumOK";
+		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
 		boolean isOK = false;
 		int check_sum = Checksum.XOR(buffer, buffer.length - 4);
-		if (Integer.parseInt(String.format("%c%c", buffer[buffer.length - 4], buffer[buffer.length - 3])) == check_sum) isOK = true;
+		if (Integer.parseInt(String.format("%c%c", buffer[buffer.length - 4], buffer[buffer.length - 3])) == check_sum) isOK = true; //$NON-NLS-1$
 		if (iChargerSerialPort.log.isLoggable(Level.FINER))
 			iChargerSerialPort.log.logp(Level.FINER, iChargerSerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;

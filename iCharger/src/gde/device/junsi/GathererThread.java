@@ -63,7 +63,7 @@ public class GathererThread extends Thread {
 	 * @throws Exception 
 	 */
 	public GathererThread(DataExplorer currentApplication, iCharger useDevice, iChargerSerialPort useSerialPort, int channelConfigNumber) throws ApplicationConfigurationException, SerialPortException {
-		super("dataGatherer");
+		super("dataGatherer"); //$NON-NLS-1$
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -87,7 +87,7 @@ public class GathererThread extends Thread {
 		long measurementCount = 0;
 		//StringBuilder sb = new StringBuilder();
 		byte[] dataBuffer = null;
-		String processName = "";
+		String processName = GDE.STRING_EMPTY;
 
 		this.isCollectDataStopped = false;
 		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
@@ -123,7 +123,7 @@ public class GathererThread extends Thread {
 					// check state change waiting to discharge to charge
 					// check if a record set matching for re-use is available and prepare a new if required
 					if (this.channel.size() == 0 || recordSet == null || (processName.length() > 3 && !this.recordSetKey.endsWith(" " + processName))) { //$NON-NLS-1$
-						this.application.setStatusMessage(""); //$NON-NLS-1$
+						this.application.setStatusMessage(GDE.STRING_EMPTY);
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 120 * 2500 = 3000 sec
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
@@ -210,7 +210,7 @@ public class GathererThread extends Thread {
 				}
 			}
 		}
-		this.application.setStatusMessage(""); //$NON-NLS-1$
+		this.application.setStatusMessage(GDE.STRING_EMPTY);
 		if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
@@ -264,7 +264,7 @@ public class GathererThread extends Thread {
 			this.application.updateDataTable(this.recordSetKey, false);
 
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms());
+			GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
 		}
 	}
 
