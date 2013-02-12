@@ -56,7 +56,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public final static String		DO_SUBTRACT_FIRST	= MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value();
 	public final static String		DO_SUBTRACT_LAST	= MeasurementPropertyTypes.DO_SUBTRACT_LAST.value();
 
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final PicolarioDialog					dialog;
 	final PicolarioSerialPort			serialPort;
 	final Channels								channels;
