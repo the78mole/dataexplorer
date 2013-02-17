@@ -69,7 +69,7 @@ public class LinearRegression extends CalculationThread {
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
 				int numberDataPoints = recordHeight.realSize();
 				int startPosition = 0; // start position for interval calculation
-				int frontPadding = (pointsPerInterval - pointInterval) / 2; // |-----..-----|		
+				int frontPadding = (pointsPerInterval - pointInterval) / 5 * 4; // |-----..-----|		
 				//int modCounter = ((numberDataPoints - (numberDataPoints % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
 				int modCounter = (numberDataPoints - (pointsPerInterval - pointInterval)) / pointInterval;
 				log.log(Level.FINE, "numberDataPoints = " + numberDataPoints + " modCounter = " + modCounter + " frontPadding = " + frontPadding); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

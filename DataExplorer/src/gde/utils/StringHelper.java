@@ -162,6 +162,16 @@ public class StringHelper {
 		return sb.toString();
 	}
 	
+	public static String intArrayToString(Integer[] values) {
+		StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; values != null && i < values.length; i++) {
+			sb.append(values[i]);
+			if (i != values.length - 1) sb.append(';');
+		}
+		return sb.toString();
+	}
+	
 	public static String intArrayToString(int[] values) {
 		StringBuffer sb = new StringBuffer();
 

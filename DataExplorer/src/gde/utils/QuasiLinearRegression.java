@@ -68,7 +68,7 @@ public class QuasiLinearRegression extends CalculationThread {
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
 				int numberDataPoints = recordHeight.realSize();
 				int startPosition = 0;
-				int frontPadding = timeStepsPerInterval / 2 - pointInterval;
+				int frontPadding = (timeStepsPerInterval / 5 * 4) - pointInterval;
 				int modCounter = (numberDataPoints - (pointsPerInterval - pointInterval)) / pointInterval;
 				for (int i = 0; i < frontPadding; i++) { // padding data points which does not fit into interval
 					record.add(0);
