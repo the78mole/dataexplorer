@@ -113,7 +113,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 
 			while (!this.isTransmitFinished) {
 
-				picolario.getDialog().setAlreadyRedText(numberRed++);
+				((PicolarioDialog)picolario.getDialog()).setAlreadyRedText(numberRed++);
 				readBuffer = new byte[31];
 				readBuffer = read(readBuffer, 2000, 100); // throws timeout exception
 			

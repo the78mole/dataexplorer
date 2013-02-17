@@ -25,6 +25,7 @@ import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
@@ -57,7 +58,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public final static String		DO_SUBTRACT_LAST	= MeasurementPropertyTypes.DO_SUBTRACT_LAST.value();
 
 	final DataExplorer						application;
-	final PicolarioDialog					dialog;
+	protected DeviceDialog						dialog;
 	final PicolarioSerialPort			serialPort;
 	final Channels								channels;
 	DataGathererThread						gatherThread;
@@ -410,7 +411,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return the dialog
 	 */
 	@Override
-	public PicolarioDialog getDialog() {
+	public DeviceDialog getDialog() {
 		return this.dialog;
 	}
 
@@ -430,12 +431,12 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			if (!this.serialPort.isConnected()) {
 				try {
 					if (this.dialog != null) {
-						int availableRecords = this.dialog.numberAvailable.length() == 0 ? 0 : Integer.parseInt(this.dialog.numberAvailable);
-						if (this.dialog.numberAvailable.length() == 0) {
+						int availableRecords = ((PicolarioDialog)this.dialog).numberAvailable.length() == 0 ? 0 : Integer.parseInt(((PicolarioDialog)this.dialog).numberAvailable);
+						if (((PicolarioDialog)this.dialog).numberAvailable.length() == 0) {
 							this.serialPort.open();
 							availableRecords = this.serialPort.readNumberAvailableRecordSets();
 							this.serialPort.close();
-							this.dialog.numberAvailable = Integer.valueOf(availableRecords).toString();
+							((PicolarioDialog)this.dialog).numberAvailable = Integer.valueOf(availableRecords).toString();
 						}
 						this.gatherThread = new DataGathererThread(this.application, this, this.serialPort, StringHelper.int2Array(availableRecords));
 						try {

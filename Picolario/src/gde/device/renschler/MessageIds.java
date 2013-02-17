@@ -49,5 +49,18 @@ public class MessageIds {
 	public final static String	GDE_MSGT1220 = "GDE_MSGT1220";
 	public final static String	GDE_MSGT1221 = "GDE_MSGT1221";
 	public final static String	GDE_MSGT1222 = "GDE_MSGT1222";
+	public final static String	GDE_MSGT1250 = "GDE_MSGT1250";
+	public final static String	GDE_MSGT1251 = "GDE_MSGT1251";
+	public final static String	GDE_MSGT1252 = "GDE_MSGT1252";
+	public final static String	GDE_MSGT1253 = "GDE_MSGT1253";
+	public final static String	GDE_MSGT1254 = "GDE_MSGT1254";
+	public final static String	GDE_MSGT1255 = "GDE_MSGT1255";
+	public final static String	GDE_MSGT1256 = "GDE_MSGT1256";
+	public final static String	GDE_MSGT1257 = "GDE_MSGT1257";
+	public final static String	GDE_MSGT1258 = "GDE_MSGT1258";
+	public final static String	GDE_MSGT1259 = "GDE_MSGT1259";
+	public final static String	GDE_MSGT1260 = "GDE_MSGT1260";
+	public final static String	GDE_MSGT1261 = "GDE_MSGT1261";
+	public final static String	GDE_MSGT1262 = "GDE_MSGT1262";
 
  }
