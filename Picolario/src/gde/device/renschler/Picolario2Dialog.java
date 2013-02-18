@@ -271,7 +271,7 @@ public class Picolario2Dialog extends DeviceDialog {
 				catch (RuntimeException e) {
 					this.tabFolder.setSelection(0);
 				}
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 10));
 				this.dialogShell.open();
 			}
 			else {

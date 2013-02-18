@@ -28,7 +28,8 @@
                 <name>Height</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
-				<statistics countTriggerText="Calculated within slope trigger ranges" sumTriggerText="Sum motor climb height" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
+                <active>true</active>
+  				<statistics countTriggerText="Calculated within slope trigger ranges" sumTriggerText="Sum motor climb height" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
 				<property description="Subtract first height value from subsequent" type="Boolean" value="true" name="do_subtract_first"/>
             </Measurement>
             <Measurement>
@@ -127,6 +128,7 @@
                 <name>Height</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="Motor height" comment="Referenzing motor current trigger" ratioRefOrdinal="6" ratioText="Verbrauchte Kapazität/Höhenmeter"/>
 				<property description="Subtract first height value from subsequent" type="Boolean" value="true" name="do_subtract_first"/>
             </Measurement>

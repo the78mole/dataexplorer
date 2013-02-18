@@ -28,7 +28,8 @@
                 <name>Höhe</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
-				<statistics countTriggerText="Berechnet mittels Steigungstrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
+                <active>true</active>
+  				<statistics countTriggerText="Berechnet mittels Steigungstrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
                 <property name="do_subtract_first" value="true" type="Boolean" description="Reduktion aller gemessenem Werte durch den ersten Messwert"/>
             </Measurement>
             <Measurement>
@@ -127,6 +128,7 @@
                 <name>Höhe</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="Motorhöhe" comment="Bezogen auf Stromtrigger" ratioRefOrdinal="6" ratioText="Verbrauchte Kapazität/Höhenmeter"/>
                 <property name="do_subtract_first" value="true" type="Boolean" description="Reduktion aller gemessenem Werte durch den ersten Messwert"/>
             </Measurement>

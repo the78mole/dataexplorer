@@ -24,6 +24,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
@@ -34,6 +35,8 @@ import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
@@ -81,6 +84,132 @@ public class Picolario2 extends Picolario {
 	}
 
 	/**
+	 * load the mapping exist between lov file configuration keys and GDE keys
+	 * @param lov2osdMap reference to the map where the key mapping has to be put
+	 * @return lov2osdMap same reference as input parameter
+	 */
+	@Override
+	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
+		// ...
+		return lov2osdMap;
+	}
+
+	/**
+	 * convert record LogView config data to GDE config keys into records section
+	 * @param header reference to header data, contain all key value pairs
+	 * @param lov2osdMap reference to the map where the key mapping
+	 * @param channelNumber 
+	 * @return converted configuration data
+	 */
+	@Override
+	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
+		// ...
+		return ""; //$NON-NLS-1$
+	}
+
+	/**
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 */
+	@Override
+	public int getLovDataByteSize() {
+		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
+	}
+
+	/**
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * this method is more usable for real logger, where data can be stored and converted in one block
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
+	 */
+	@Override
+	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
+	}
+
+	/**
+	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param dataBuffer byte arrax with the data to be converted
+	 */
+	@Override
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+		//noop due to previous parsed CSV data
+		return points;
+	}
+	
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
+	 */
+	@Override
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.size()];
+		int timeStampBufferSize = 0;
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int progressCycle = 0;
+		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+		
+		if(!recordSet.isTimeStepConstant()) {
+			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
+			byte[] timeStampBuffer = new byte[timeStampBufferSize];
+			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
+
+			for (int i = 0; i < recordDataSize; i++) {
+				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
+			}
+		}
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		
+		for (int i = 0; i < recordDataSize; i++) {
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
+			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
+			
+			//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
+			for (int j=0,k=0; j < points.length; j++) {
+				switch (j) {
+				case 3://3=Climb
+				case 6://6=Capacity
+				case 7://7=Power
+					//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 6=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)					
+					break;
+
+				default:
+					points[j] = (((convertBuffer[0 + (k * 4)] & 0xff) << 24) + ((convertBuffer[1 + (k * 4)] & 0xff) << 16) + ((convertBuffer[2 + (k * 4)] & 0xff) << 8) + ((convertBuffer[3 + (k * 4)] & 0xff) << 0));
+					++k;
+					break;
+				}
+			}
+			
+			if(recordSet.isTimeStepConstant()) 
+				recordSet.addPoints(points);
+			else
+				recordSet.addPoints(points, timeStamps.get(i)/10.0);
+
+			
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+		}
+		this.makeInActiveDisplayable(recordSet);
+		this.updateVisibilityStatus(recordSet, true);
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+	}
+
+	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
@@ -93,7 +222,7 @@ public class Picolario2 extends Picolario {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				
-				// 0=Höhe, 1=Druck, 2=SpannungRx, 3=Steigung, 4=Spannung, 5=Strom, 6=Drehzahl 7=Temperatur, 8=Speed, 9=Höhe GPS
+				//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 				switch (j) { 
 				case 0: //Höhe/Height
 					PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
@@ -137,7 +266,7 @@ public class Picolario2 extends Picolario {
 		String recordKey = "?"; //$NON-NLS-1$
 		double newValue = 0.0;
 		try {
-			// 0=Höhe, 1=Druck, 2=SpannungRx, 3=Steigung, 4=Spannung, 5=Strom, 6=Drehzahl 7=Temperatur, 8=Speed, 9=Höhe GPS
+			//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 			recordKey = record.getName();
 			double offset = record.getOffset(); // != 0 if curve has an defined offset
 			double reduction = record.getReduction();
@@ -187,7 +316,7 @@ public class Picolario2 extends Picolario {
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 		final String $METHOD_NAME = "reverseTranslateValue()";
 
-		// 0=Höhe, 1=Druck, 2=SpannungRx, 3=Steigung, 4=Spannung, 5=Strom, 6=Drehzahl 7=Temperatur, 8=Speed, 9=Höhe GPS
+		//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double reduction = record.getReduction();
@@ -230,7 +359,7 @@ public class Picolario2 extends Picolario {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
-			// 0=Höhe, 1=Druck, 2=SpannungRx, 3=Steigung, 4=Spannung, 5=Strom, 6=Drehzahl 7=Temperatur, 8=Speed, 9=Höhe GPS
+			//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 			// calculate the values required		
 			Record slopeRecord = recordSet.get(3);//3=Steigrate
 			slopeRecord.setDisplayable(false);
@@ -301,10 +430,7 @@ public class Picolario2 extends Picolario {
 				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-					//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-					//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-					//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+					//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 					new IgcExportDialog().open(1, 0, 2);
 				}
 			});
@@ -316,10 +442,7 @@ public class Picolario2 extends Picolario {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
 	 */
 	public void export2KMZ3D(int type) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+		//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1252), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
@@ -351,7 +474,7 @@ public class Picolario2 extends Picolario {
 	 */
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
+		//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 		return -1;
 	}
 
@@ -406,6 +529,7 @@ public class Picolario2 extends Picolario {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
 		Record record;
+		//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
