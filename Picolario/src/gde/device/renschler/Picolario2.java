@@ -392,4 +392,38 @@ public class Picolario2 extends Picolario {
 		};
 		reader.start();
 	}
+
+	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	@Override
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
+		int channelConfigNumber = recordSet.getChannelConfigNumber();
+		int displayableCounter = 0;
+		Record record;
+		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
+		// check if measurements isActive == false and set to isDisplayable == false
+		for (int i = 0; i < recordSet.size(); ++i) {
+			// since actual record names can differ from device configuration measurement names, match by ordinal
+			record = recordSet.get(i);
+			log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+
+			if (includeReasonableDataCheck) {
+				record.setDisplayable(record.hasReasonableData());
+				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+			}
+
+			if (record.isActive() && record.isDisplayable()) {
+				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				++displayableCounter;
+			}
+		}
+		log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		recordSet.setConfiguredDisplayable(displayableCounter);
+	}
 }

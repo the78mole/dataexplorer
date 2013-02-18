@@ -6,158 +6,230 @@
         <manufacturerURL>http://www.renschler.de</manufacturerURL>
         <group>logger</group>
         <image>Picolario.jpg</image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
     <TimeBase>
-        <name>Zeit</name>
+        <name>Time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="64" formatType="BYTE" inputType="FILE_IO"/>
-        <timeUnit>sec</timeUnit>
-        <leader>$</leader>
-        <trailer>0D0A</trailer>
+        <format inputType="FILE_IO" formatType="BYTE" size="64"/>
         <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.p2l</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
+        <property name="flight record" value="01" type="Integer" description=""/>
     </State>
-    <Channels>
-        <Channel type="TYPE_CONFIG" name="Thermik">
+    <Channels lastUseOrdinal="1">
+        <Channel name="Thermal" type="TYPE_CONFIG">
             <Measurement>
-                <name>Höhe</name>
+                <name>Height</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
+				<statistics countTriggerText="Calculated within slope trigger ranges" sumTriggerText="Sum motor climb height" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
+				<property description="Subtract first height value from subsequent" type="Boolean" value="true" name="do_subtract_first"/>
             </Measurement>
             <Measurement>
-                <name>Druck</name>
+                <name>Pressure</name>
                 <symbol>p</symbol>
                 <unit>mbar</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Measurement factor"/>
             </Measurement>
             <Measurement>
-                <name>SpannungRx</name>
+                <name>VoltageRx</name>
                 <symbol>Urx</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.0038" name="factor"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.0038" type="Double" description="Measurement factor"/>
             </Measurement>
             <Measurement>
-                <name>Steigen</name>
-                <symbol>V</symbol>
+                <name>Climb</name>
+                <symbol>Vh</symbol>
                 <unit>m/s</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Zeit in Sekunden über die die regression durchgeführt wird" type="Integer" value="5" name="regression_interval_sec"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="100.0" name="factor"/>
-                <property description="Benutze die nicht-lineare Regressionsanalyse zur Kurvenglättung" type="String" value="regression_type_curve" name="regression_type"/>
+                <statistics min="false" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="Number climb flights" sumTriggerTimeText="~ Motor run time">
+                    <trigger level="1000" isGreater="true" minTimeSec="15" comment="Trigger: climb rate &gt; 1 m/sec &gt; 15 sec"/>
+                </statistics>
             </Measurement>
             <Measurement>
-                <name>Spannung</name>
+                <name>Voltage</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Strom</name>
+                <name>Current</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Drehzahl</name>
+                <name>Capacity</name>
+                <symbol>c</symbol>
+                <unit>mAh</unit>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Power</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution</name>
                 <symbol></symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Temperatur</name>
+                <name>Temperature</name>
                 <symbol></symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Latitude</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>Longitude</name>
+                <symbol>L</symbol>
+                <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>Altitude (GPS)</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Speed (GPS)</name>
                 <symbol>v</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Motor" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Height</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="Motor height" comment="Referenzing motor current trigger" ratioRefOrdinal="6" ratioText="Verbrauchte Kapazität/Höhenmeter"/>
+				<property description="Subtract first height value from subsequent" type="Boolean" value="true" name="do_subtract_first"/>
             </Measurement>
             <Measurement>
-                <name>Breitengrad</name>
+                <name>Pressure</name>
+                <symbol>p</symbol>
+                <unit>mbar</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Measurement factor"/>
+            </Measurement>
+            <Measurement>
+                <name>VoltageRx</name>
+                <symbol>Urx</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.0038" type="Double" description="Measurement factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Climb</name>
+                <symbol>V</symbol>
+                <unit>m/s</unit>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="regression_interval_sec" value="10" type="Integer" description="Regression time interval in seconds"/>
+                <property name="regression_type" value="regression_type_curve" type="String" description="Regression calculation type"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="5" comment="Referenzing motor current trigger"/>
+            </Measurement>
+            <Measurement>
+                <name>Current</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false" countByTrigger="true" countTriggerText="Number motor climbs" sumTriggerTimeText="Motor run time">
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="Trigger motor current &gt; 3 A &gt; 5 Seconds"/>
+                </statistics>
+            </Measurement>
+            <Measurement>
+                <name>Capacity</name>
+                <symbol>c</symbol>
+                <unit>mAh</unit>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="Referenzing motor current trigger" ratioText="verbrauchte Kapazität/Höhenmeter"/>
+            </Measurement>
+            <Measurement>
+                <name>Power</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="Referenzing motor current trigger"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution</name>
+                <symbol></symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="Referenzing motor current trigger"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Latitude</name>
                 <symbol>B</symbol>
                 <unit>°</unit>
                 <active>true</active>
             </Measurement>
             <Measurement>
-                <name>Längengrad</name>
+                <name>Longitude</name>
                 <symbol>L</symbol>
                 <unit>°</unit>
                 <active>true</active>
             </Measurement>
             <Measurement>
-                <name>Höhe (GPS)</name>
+                <name>Altitude (GPS)</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="Motor">
             <Measurement>
-                <name>Spannung</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
+                <name>Speed (GPS)</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Spannungsoffset" type="Double" value="2.5" name="offset"/>
-                <property description="Messwertreduktion" type="Double" value="45" name="reduction"/>
-                <property description="Spannungsfaktor" type="Double" value="0.0532" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Höhe</name>
-                <symbol>H</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics countTriggerText="Ermittelt im Steigungstriggerbereich" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-                <property description="Höhenwertberechnung von Feet in Meter  (1852 / 6076)" type="Double" value="0.304806" name="factor"/>
-                <property description="Höhenwerte nicht anpassen" type="Boolean" value="false" name="do_no_adaption"/>
-                <property description="ersten Höhenwert von den Restlichen abziehen" type="Boolean" value="false" name="do_subtract_first"/>
-                <property description="letzten Höhenwert von den Restlichen abziehen" type="Boolean" value="true" name="subtract_last"/>
-                <property description="Offset von Höhenwerten abziehen" type="Boolean" value="false" name="do_offset_height"/>
-                <property description="Höhenoffsetwert" type="Double" value="0.0" name="offset"/>
-            </Measurement>
-            <Measurement>
-                <name>Steigen</name>
-                <symbol>V</symbol>
-                <unit>m/s</unit>
-                <statistics sumTriggerTimeText="~ Motorlaufzeit" countTriggerText="Anzahl gewerteter Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
-                    <trigger comment="Trigger: Steigrate &gt; 1 m/sec &gt; 15 sec" minTimeSec="15" isGreater="true" level="1000"/>
-                </statistics>
-                <property description="Zeit in Sekunden über die die regression durchgeführt wird" type="Integer" value="10" name="regression_interval_sec"/>
-                <property description="Regressionsrechnungsart" type="String" value="regression_type_curve" name="regression_type"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
         </Channel>
     </Channels>
     <Desktop>
-        <property value="true" name="table_tab"/>
-        <property value="false" name="voltage_per_cell_tab"/>
-        <property value="true" name="analog_tab"/>
-        <property value="false" name="digital_tab"/>
-        <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
-        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
+        <property name="table_tab" value="true"/>
+        <property name="voltage_per_cell_tab" value="false"/>
+        <property name="analog_tab" value="true"/>
+        <property name="digital_tab" value="false"/>
+        <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
+        <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
     </Desktop>
 </DeviceProperties>

@@ -96,6 +96,7 @@ public class Picolario2LogReader {
 				FileInputStream file_input = new FileInputStream(file);
 				data_in = new DataInputStream(file_input);
 				long fileSize = file.length();
+				long numReads = 0;
 				byte[] buffer = new byte[4];
 				data_in.read(buffer);
 				String firmware = String.format("%.1f", DataParser.parse2Int(buffer, 0)/10.0);
@@ -139,7 +140,7 @@ public class Picolario2LogReader {
 				if (application.getMenuToolBar() != null) {
 					activeChannel.applyTemplate(recordSetName, false);
 				}
-
+				numReads = fileSize/numValues;
 
 				buffer = new byte[numValues]; //signed byte
 				double timeStamp_ms = 0.0;
@@ -187,7 +188,10 @@ public class Picolario2LogReader {
 					recordSet.addPoints(points, timeStamp_ms);
 					timeStamp_ms += dataRate;
 					
-					if (menuToolBar != null && fileSize % 100 == 0) application.setProgress((int) (fileSize * 100 / numValues), sThreadId);
+					if (menuToolBar != null && fileSize % 100 == 0) {
+						application.setProgress((int) (100 - fileSize/numValues * 100 / numReads), sThreadId);
+					}
+					fileSize -= numValues;
 				}
 				while (data_in.read(buffer) > 0);		
 				
