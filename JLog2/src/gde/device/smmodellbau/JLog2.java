@@ -63,7 +63,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 
 	final DataExplorer		application;
 	final Channels				channels;
-	final JLog2Dialog	dialog;
+	final JLog2Dialog			dialog;
 	final JLog2SerialPort	serialPort;
 
 	/**

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V21.xsd">
+    <Device>
+        <name>Kosmik</name>
+        <manufacturer>Kontronik</manufacturer>
+        <manufacturerURL>http://www.kontronik.de</manufacturerURL>
+        <group>logger</group>
+        <image>Kosmik.jpg</image>
+        <usage>false</usage>
+    </Device>
+    <SerialPort>
+        <port></port>
+        <baudeRate>115200</baudeRate>
+        <dataBits>DATABITS_8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>false</isRTS>
+        <isDTR>false</isDTR>
+    </SerialPort>
+    <TimeBase>
+        <name>Time</name>
+        <symbol>t</symbol>
+        <unit>msec</unit>
+        <timeStep>-1.0</timeStep>
+    </TimeBase>
+    <DataBlock>
+        <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
+        <format size="-40" formatType="VALUE" inputType="FILE_IO"/>
+        <timeUnit>sec</timeUnit>
+        <separator>semicolon</separator>
+        <leader>$</leader>
+        <trailer>0D0A</trailer>
+        <preferredFileExtention>*.txt</preferredFileExtention>
+    </DataBlock>
+    <State>
+        <property description="" type="Integer" value="01" name="Record"/>
+    </State>
+    <Channels lastUseOrdinal="0">
+        <Channel type="TYPE_CONFIG" name="Normal">
+			<Measurement>
+				<name>Voltage BEC</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>Current BEC</name>
+				<symbol>I</symbol>
+				<unit>A</unit>
+				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>Voltage Bat</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+			</Measurement>
+            <Measurement>
+                <name>Current</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sumTriggerTimeText="Motor runtime" countTriggerText="Number motor runs" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
+                    <trigger comment="Trigger 2 A &gt; 5 sec" minTimeSec="5" isGreater="true" level="2000"/>
+                </statistics>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current integrated</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Throttle</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>PWM</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution Uni</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution Motor</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics comment="" sumTriggerText="current trigger related" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature FET</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature BEC</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Power</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Power integrated</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Current BEC max</name>
+                <symbol>Imax</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="1" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Current Motor max</name>
+                <symbol>Imax</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Voltage</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Temp FET</name>
+                <symbol>T</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Voltage BEC drop</name>
+                <symbol>U</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Temp_ext 1</name>
+                <symbol>T</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Temp_ext 2</name>
+                <symbol>T</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Temp_ext 3</name>
+                <symbol>T</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Temp_ext 4</name>
+                <symbol>T</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM:Temp_ext 5</name>
+                <symbol>T</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_ext 1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_ext 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_ext 3</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_ext 4</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_ext 5</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution ext</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>?31?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>?32?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>?33?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>?34?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>?35?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>?36?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>?37?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>?38?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>?39?</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+        </Channel>
+    </Channels>
+    <Desktop>
+        <property value="true" name="table_tab"/>
+        <property value="true" name="digital_tab"/>
+        <property value="true" name="analog_tab"/>
+        <property value="false" name="voltage_per_cell_tab"/>
+        <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
+        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
+    </Desktop>
+</DeviceProperties>
