@@ -112,7 +112,7 @@ public class MeasurementControl extends Composite {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-							activeRecordSet.get(MeasurementControl.this.ordinal).setActive(isVisible);
+							//activeRecordSet.get(MeasurementControl.this.ordinal).setActive(isVisible);
 							activeRecordSet.get(MeasurementControl.this.ordinal).setVisible(isVisible);
 							activeRecordSet.get(MeasurementControl.this.ordinal).setDisplayable(isVisible);
 							MeasurementControl.this.device.updateVisibilityStatus(activeRecordSet, false);
