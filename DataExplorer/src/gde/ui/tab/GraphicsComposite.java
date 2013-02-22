@@ -324,13 +324,17 @@ public class GraphicsComposite extends Composite {
 				@Override
 				public void mouseDown(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseDown, event=" + evt); //$NON-NLS-1$
-					mouseDownAction(evt);
+					if (evt.button == 1) {
+						mouseDownAction(evt);
+					}
 				}
 
 				@Override
 				public void mouseUp(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseUp, event=" + evt); //$NON-NLS-1$
-					mouseUpAction(evt);
+					if (evt.button == 1) {
+						mouseUpAction(evt);
+					}
 				}
 			});
 			this.graphicCanvas.addKeyListener(new KeyAdapter() {
