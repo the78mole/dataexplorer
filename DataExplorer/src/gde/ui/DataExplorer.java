@@ -1115,9 +1115,24 @@ public class DataExplorer extends Composite {
 				});
 			}
 			this.progessPercentage = percentage;
+			if (percentage >= 100)
+				DataExplorer.this.resetProgressBar();
 		}
 	}
 
+	private void resetProgressBar() {
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				//Thread.sleep(5);
+				DataExplorer.this.statusBar.setProgress(0);
+				if (DataExplorer.this.taskBarItem != null) {
+					DataExplorer.this.taskBarItem.setProgress(0);
+				}
+			}
+		});
+
+	}
+	
 	public int getProgressPercentage() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.progessPercentage = this.statusBar.getProgressPercentage();
