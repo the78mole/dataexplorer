@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.0.8 - xx yyy 2013
 add Renschler Picolario2 support
 add Kontronik Kosmik support
+update SWT to version 4.2.1
 fix bug #38246 - Multiple actions when right-clicking into graphic
 fix bug #38245 - Allow editing of commentary in table "File comment"
 
