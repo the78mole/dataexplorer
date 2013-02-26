@@ -3,7 +3,8 @@ Development history / change log, please read from bottom up
 Version 3.0.8 - xx yyy 2013
 add Renschler Picolario2 support
 add Kontronik Kosmik support
-
+fix bug #38246 - Multiple actions when right-clicking into graphic
+fix bug #38245 - Allow editing of commentary in table "File comment"
 
 Version 3.07 - 11 Feb 2013
 HoTTAdapter(2) - live data, display detected sensors, optimize performance 
