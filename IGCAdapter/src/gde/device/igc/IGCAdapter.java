@@ -386,7 +386,20 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 						
 						if (fd.getFileName().length() > 4) {
 							try {
-								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								//distinguish between short and long IGC file name
+								int fileNameLength = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT)).length();
+								String  recordNameExtend;
+								if (fileNameLength == 8) { //short name 
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									try {
+										Integer.parseInt(recordNameExtend);
+									}
+									catch (Exception e) { // A to Z will cause an exception
+										recordNameExtend = GDE.STRING_EMPTY + (recordNameExtend.getBytes()[0] - 54);
+									}
+								}
+								else
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 								IGCReaderWriter.read(selectedImportFile, IGCAdapter.this, recordNameExtend, 1);
 							}
 							catch (Throwable e) {
