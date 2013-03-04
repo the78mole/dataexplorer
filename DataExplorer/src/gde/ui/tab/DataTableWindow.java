@@ -25,6 +25,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -111,6 +114,27 @@ public class DataTableWindow extends CTabItem {
 						// Ctrl+End: go to last row and last column
 						DataTableWindow.this.cursor.setSelection(DataTableWindow.this.dataTable.getItemCount() - 1, DataTableWindow.this.dataTable.getColumnCount() - 1);
 						break;
+					case 0x63:
+						// Ctrl+c: copy selection into clip board
+						DataTableWindow.this.dataTable.getSelectionCount();
+						DataTableWindow.this.dataTable.getSelectionIndices();
+						StringBuilder sb = new StringBuilder();
+						int columns = DataTableWindow.this.dataTable.getColumnCount();
+						for (int i = 0; i < columns; i++) {
+							sb.append(DataTableWindow.this.dataTable.getColumn(i).getText().trim()).append('\t');
+						}
+						sb.deleteCharAt(sb.length() - 1).append('\n');
+						for (TableItem tmpItem : DataTableWindow.this.dataTable.getSelection()) {
+							for (int i = 0; i < columns; i++) {
+								sb.append(tmpItem.getText(i).trim()).append('\t');
+							}
+							sb.deleteCharAt(sb.length() - 1).append('\n');
+						}
+						Clipboard cb = new Clipboard(GDE.display);
+						String textData = sb.toString();
+						Transfer textTransfer = TextTransfer.getInstance();
+						cb.setContents(new Object[] { textData }, new Transfer[] { textTransfer });
+						break;
 					}
 				}
 				//else if (event.stateMask == SWT.MOD2) {
@@ -143,7 +167,7 @@ public class DataTableWindow extends CTabItem {
 				}
 
 				// setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
-				if (DataTableWindow.this.cursor.getRow() != null) {
+				if (DataTableWindow.this.cursor.getRow() != null && ((event.stateMask & SWT.MOD1) != 0 || event.character != 'c')) {
 					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
 
 					//select the table row, after repositioning cursor (HOME/END)
@@ -188,7 +212,7 @@ public class DataTableWindow extends CTabItem {
 
 			public void keyPressed(KeyEvent event) {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
-				if (DataTableWindow.this.cursor.getRow() != null) {
+				if (DataTableWindow.this.cursor.getRow() != null && (event.stateMask & SWT.MOD1) != 0) {
 					//select the table row where the cursor get moved to
 					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
 				}
