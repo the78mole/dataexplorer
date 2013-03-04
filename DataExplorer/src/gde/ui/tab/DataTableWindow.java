@@ -167,7 +167,7 @@ public class DataTableWindow extends CTabItem {
 				}
 
 				// setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
-				if (DataTableWindow.this.cursor.getRow() != null && ((event.stateMask & SWT.MOD1) != 0 || event.character != 'c')) {
+				if (DataTableWindow.this.cursor.getRow() != null && ((event.stateMask & SWT.MOD1) != 0 && event.character != 'c')) {
 					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
 
 					//select the table row, after repositioning cursor (HOME/END)
@@ -212,7 +212,7 @@ public class DataTableWindow extends CTabItem {
 
 			public void keyPressed(KeyEvent event) {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
-				if (DataTableWindow.this.cursor.getRow() != null && (event.stateMask & SWT.MOD1) != 0) {
+				if (DataTableWindow.this.cursor.getRow() != null && ((event.stateMask & SWT.MOD1) != 0 && event.character != 'c')) {
 					//select the table row where the cursor get moved to
 					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
 				}
