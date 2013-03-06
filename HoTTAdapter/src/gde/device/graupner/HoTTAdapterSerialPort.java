@@ -59,7 +59,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte			DATA_END										= (byte) 0x7D;
 
 	//HoTT sensor bytes new protocol 
-	final static byte[]		QUERY_SENSOR_DATA_DBM						= { 0x00, 0x00, (byte) 0xff, 0x00, 0x00, 0x04, 0x33, (byte) 0xf4, (byte) 0xca };
+	final static byte[]		QUERY_SENSOR_DATA_DBM						= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x33, (byte) 0xf4, (byte) 0xca };
 	final static byte[]		QUERY_SENSOR_DATA_RECEIVER			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x34, (byte) 0x13, (byte) 0xba };
 	final static byte[]		QUERY_SENSOR_DATA_GENERAL				= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x35, (byte) 0x32, (byte) 0xaa };
 	final static byte[]		QUERY_SENSOR_DATA_ELECTRIC			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x36, (byte) 0x51, (byte) 0x9a };
@@ -283,18 +283,15 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		if (queryDBM && this.QUERY_SENSOR_TYPE[6] == HoTTAdapterSerialPort.QUERY_SENSOR_DATA_RECEIVER[6]) {
 			int rxDBM = 0, txDBM = 0;
 
-			++HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1];
-			--HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2];
-			this.sendQuery(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
-			this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS * 2, true);
-
+			for (int i = 0; i < 5; i++) {
+				this.sendQuery(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
+				this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS * 2, true);
+				if (this.isCheckSumOK(4, (answerDBM))) 
+					break;
+			}
 			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
 				HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
 				HoTTAdapterSerialPort.log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerDBM, answerDBM.length));
-			}
-			if ((HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] & 0xFF) == 0xFE) {
-				HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1] = 0;
-				HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] = (byte) 0xFF;
 			}
 
 			for (int i = 0; i < 75; i++) {
