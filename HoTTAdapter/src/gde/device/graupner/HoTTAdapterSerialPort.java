@@ -286,7 +286,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			for (int i = 0; i < 5; i++) {
 				this.sendQuery(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
 				this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS * 2, true);
-				if (this.isCheckSumOK(4, (answerDBM))) 
+				if (this.isCheckSumOK(3, (answerDBM))) 
 					break;
 			}
 			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
