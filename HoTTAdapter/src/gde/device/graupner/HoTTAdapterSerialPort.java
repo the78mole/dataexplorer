@@ -59,17 +59,17 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte			DATA_END										= (byte) 0x7D;
 
 	//HoTT sensor bytes new protocol 
-	final static byte[]		QUERY_SENSOR_DATA_DBM						= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x33, (byte) 0xf4, (byte) 0xca };
-	final static byte[]		QUERY_SENSOR_DATA_RECEIVER			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x34, (byte) 0x13, (byte) 0xba };
-	final static byte[]		QUERY_SENSOR_DATA_GENERAL				= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x35, (byte) 0x32, (byte) 0xaa };
-	final static byte[]		QUERY_SENSOR_DATA_ELECTRIC			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x36, (byte) 0x51, (byte) 0x9a };
-	final static byte[]		QUERY_SENSOR_DATA_VARIO					= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x37, (byte) 0x70, (byte) 0x8a };
-	final static byte[]		QUERY_SENSOR_DATA_GPS						= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x38, (byte) 0x9f, (byte) 0x7b };
-	final static byte[]		QUERY_SENSOR_DATA_MOTOR_DRIVER	= { 0x00, 0x04, (byte) 0xfb, 0x00, 0x00, 0x04, 0x39, (byte) 0xbe, (byte) 0x6b };
-	final static byte[]		QUERY_SERVO_POSITIONS						= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x40, (byte) 0x00, (byte) 0x84 };
-	final static byte[]		QUERY_SWITCHES									= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x41, (byte) 0x21, (byte) 0x94 };
-	final static byte[]		QUERY_CONTROL_POSITIONS1				= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x42, (byte) 0x42, (byte) 0xA4 };
-	final static byte[]		QUERY_CONTROL_POSITIONS2				= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x43, (byte) 0x63, (byte) 0xB4 };
+	final static byte[]		QUERY_SENSOR_DATA_DBM						= { 0x04, 0x33 };
+	final static byte[]		QUERY_SENSOR_DATA_RECEIVER			= { 0x04, 0x34 };
+	final static byte[]		QUERY_SENSOR_DATA_GENERAL				= { 0x04, 0x35 };
+	final static byte[]		QUERY_SENSOR_DATA_ELECTRIC			= { 0x04, 0x36 };
+	final static byte[]		QUERY_SENSOR_DATA_VARIO					= { 0x04, 0x37 };
+	final static byte[]		QUERY_SENSOR_DATA_GPS						= { 0x04, 0x38 };
+	final static byte[]		QUERY_SENSOR_DATA_MOTOR_DRIVER	= { 0x04, 0x39 };
+	final static byte[]		QUERY_SERVO_POSITIONS						= { 0x04, 0x40 };
+	final static byte[]		QUERY_SWITCHES									= { 0x04, 0x41 };
+	final static byte[]		QUERY_CONTROL_POSITIONS1				= { 0x04, 0x42 };
+	final static byte[]		QUERY_CONTROL_POSITIONS2				= { 0x04, 0x43 };
 	final static byte[]		answerRx												= new byte[21];	//byte array to cache receiver answer data
 
 	byte[]								ANSWER_DATA											= new byte[50];
@@ -217,7 +217,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	 * @param query
 	 * @throws IOException
 	 */
-	private void sendQuery(byte[] query) throws IOException {
+	void sendQuery(byte[] query) throws IOException {
 		System.arraycopy(query, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
 		this.write(HoTTAdapterSerialPort.cmd1);
 
@@ -240,9 +240,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] data = new byte[this.DATA_LENGTH];
 
 		try {
-			this.sendQuery(this.QUERY_SENSOR_TYPE);
+			this.sendCmd(this.QUERY_SENSOR_TYPE);
 			this.read(answer, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
-			data[0] = this.QUERY_SENSOR_TYPE[6];
+			data[0] = this.QUERY_SENSOR_TYPE[1];
 			System.arraycopy(answer, 0, data, 1, answer.length);
 			
 			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
@@ -280,11 +280,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	public void getDataDBM(boolean queryDBM, byte[] bytes) throws IOException, FailedQueryException, TimeOutException {
 		final String $METHOD_NAME = "getDataDBM";
 
-		if (queryDBM && this.QUERY_SENSOR_TYPE[6] == HoTTAdapterSerialPort.QUERY_SENSOR_DATA_RECEIVER[6]) {
+		if (queryDBM && this.QUERY_SENSOR_TYPE[1] == HoTTAdapterSerialPort.QUERY_SENSOR_DATA_RECEIVER[1]) {
 			int rxDBM = 0, txDBM = 0;
 
 			for (int i = 0; i < 5; i++) {
-				this.sendQuery(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
+				this.sendCmd(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
 				this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS * 2, true);
 				if (this.isCheckSumOK(3, (answerDBM))) 
 					break;
