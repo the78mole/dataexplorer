@@ -167,7 +167,8 @@ public class DataTableWindow extends CTabItem {
 				}
 
 				// setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
-				if (DataTableWindow.this.cursor.getRow() != null && ((event.stateMask & SWT.MOD1) != 0 && event.character != 'c')) {
+				System.out.println("cursor.keyReleased " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
+				if (DataTableWindow.this.cursor.getRow() != null && (((event.stateMask & SWT.MOD1) == 0 && event.character != 'c') || ((event.stateMask & SWT.MOD1) == 0 && event.character != 'a'))) {
 					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
 
 					//select the table row, after repositioning cursor (HOME/END)
@@ -212,9 +213,17 @@ public class DataTableWindow extends CTabItem {
 
 			public void keyPressed(KeyEvent event) {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
-				if (DataTableWindow.this.cursor.getRow() != null && ((event.stateMask & SWT.MOD1) != 0 && event.character != 'c')) {
+				System.out.println("cursor.keyPressed " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
+				if (DataTableWindow.this.cursor.getRow() != null 
+						&& !(event.stateMask == SWT.MOD1 && event.keyCode != 0x99) 
+						&& !(event.stateMask == SWT.MOD1 && event.keyCode != 0x97) 
+						&& event.keyCode != SWT.MOD1) {
 					//select the table row where the cursor get moved to
 					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
+				}
+				else if (DataTableWindow.this.cursor.getRow() != null && (event.stateMask & SWT.MOD1) == SWT.MOD1 && event.keyCode == 0x61) {
+					System.out.println("select all");
+					DataTableWindow.this.dataTable.setSelection(DataTableWindow.this.dataTable.getItems());
 				}
 				//to enable multi selection the cursor needs to be set invisible, if the cursor is invisible the dataTable key listener takes effect
 				//the cursor should be set to invisible only when shift key is pressed, not while shift is pressed in combination with others
