@@ -888,7 +888,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								if (this.serialPort.isCheckSumOK(4, this.serialPort.getData())) break;
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 							}
-							catch (final IOException e) {
+							catch (final Exception e) {
+								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS * 2);
 								// ignore, go ahead with data gathering
 							}
 						}

@@ -393,9 +393,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				break;
 			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 				HoTTAdapterSerialPort.log.log(Level.FINE, ">>>SpeedControl<<<");
-				this.ANSWER_DATA = new byte[30];
+				this.ANSWER_DATA = new byte[28];
 				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SENSOR_DATA_MOTOR_DRIVER;
-				this.DATA_LENGTH = 31;
+				this.DATA_LENGTH = 29;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_SWITCHES_115200:
 				HoTTAdapterSerialPort.log.log(Level.FINE, ">>>Switches<<<");
