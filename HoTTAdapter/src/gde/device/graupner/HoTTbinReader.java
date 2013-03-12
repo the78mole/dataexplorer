@@ -218,7 +218,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsSpeedControl = new int[7];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
-		HoTTbinReader.buf0 = null;
+		HoTTbinReader.buf0 = new byte[30];
 		HoTTbinReader.buf1 = null;
 		HoTTbinReader.buf2 = null;
 		HoTTbinReader.buf3 = null;
@@ -291,6 +291,10 @@ public class HoTTbinReader {
 					if (HoTTAdapter.isChannelsChannelEnabled) {
 						parseAddChannel(HoTTbinReader.buf);
 					}
+					//fill data block 0 receiver voltage an temperature
+					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
+						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
+					}
 
 					HoTTbinReader.timeStep_ms += 10;// add default time step from device of 10 msec
 					
@@ -314,12 +318,7 @@ public class HoTTbinReader {
 							}
 						}
 						//recordSetVario initialized and ready to add data
-						//fill data block 0 receiver voltage an temperature
-						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							HoTTbinReader.buf0 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
-						//fill data block 1 to 3
+						//fill data block 1 to 2
 						if (HoTTbinReader.buf[33] == 1) {
 							HoTTbinReader.buf1 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
@@ -329,9 +328,9 @@ public class HoTTbinReader {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
 						}
 
-						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
+						if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
 							version = parseAddVario(version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
-							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
 						}
 						break;
 
@@ -353,11 +352,6 @@ public class HoTTbinReader {
 							}
 						}
 						//recordSetGPS initialized and ready to add data
-						//fill data block 0 receiver voltage an temperature
-						if (HoTTbinReader.buf0 == null && HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							HoTTbinReader.buf0 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
 						//fill data block 1 to 3
 						if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 							HoTTbinReader.buf1 = new byte[30];
@@ -372,9 +366,9 @@ public class HoTTbinReader {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
 						}
 
-						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
+						if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
 							parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
-							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = null;
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = null;
 						}
 						break;
 
@@ -397,10 +391,6 @@ public class HoTTbinReader {
 						}
 						//recordSetGeneral initialized and ready to add data
 						//fill data block 1 to 4
-						if (HoTTbinReader.buf0 == null && HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							HoTTbinReader.buf0 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
 						if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 							HoTTbinReader.buf1 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
@@ -418,9 +408,9 @@ public class HoTTbinReader {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 						}
 
-						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+						if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
 							parseAddGeneral(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 						}
 						break;
 
@@ -442,11 +432,7 @@ public class HoTTbinReader {
 							}
 						}
 						//recordSetElectric initialized and ready to add data
-						//fill data block 0 to 4
-						if (HoTTbinReader.buf0 == null && HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							HoTTbinReader.buf0 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
+						//fill data block 1 to 4
 						if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 							HoTTbinReader.buf1 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
@@ -464,9 +450,9 @@ public class HoTTbinReader {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 						}
 
-						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+						if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
 							parseAddElectric(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 						}
 						break;
 
@@ -488,11 +474,7 @@ public class HoTTbinReader {
 							}
 						}
 						//recordSetMotorDriver initialized and ready to add data
-						//fill data block 0 to 4
-						if (HoTTbinReader.buf0 == null && HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							HoTTbinReader.buf0 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
+						//fill data block 1 to 4
 						if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 							HoTTbinReader.buf1 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
@@ -510,9 +492,9 @@ public class HoTTbinReader {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 						}
 						
-						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+						if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
 							parseAddSpeedControl(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 						}
 						break;
 					}
@@ -529,7 +511,7 @@ public class HoTTbinReader {
 					
 					HoTTbinReader.timeStep_ms += 10;
 					//reset buffer to avoid mixing data
-					HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+					HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 				}
 			}
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss}));
