@@ -147,6 +147,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 
 				if (HoTTbinReader2.buf[33] >= 0 && HoTTbinReader2.buf[33] <= 4 && HoTTbinReader2.buf[3] != 0 && HoTTbinReader2.buf[4] != 0) { //buf 0 to 4, tx,rx			
+					reverseChannelPackageLossCounter.add(1);
+					HoTTbinReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+
 					if (HoTTbinReader2.logger.isLoggable(java.util.logging.Level.FINER))
 						HoTTbinReader2.logger.logp(java.util.logging.Level.FINER, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader2.buf[7] }, 1)
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader2.buf[7], false));
@@ -308,6 +311,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
+					reverseChannelPackageLossCounter.add(0);
+					HoTTbinReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+					
 					++countPackageLoss;	// add up lost packages in telemetry data 
 					HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
@@ -433,6 +439,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 
 				if (HoTTbinReader2.buf[33] >= 0 && HoTTbinReader2.buf[33] <= 4 && HoTTbinReader2.buf[3] != 0 && HoTTbinReader2.buf[4] != 0) { //buf 0 to 4, tx,rx
+					reverseChannelPackageLossCounter.add(1);
+					HoTTbinReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 					//create and fill sensor specific data record sets 
 					if (HoTTbinReader2.logger.isLoggable(java.util.logging.Level.FINEST))
 						HoTTbinReader2.logger.logp(java.util.logging.Level.FINEST, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader2.buf[7] }, 1)
@@ -575,6 +583,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
+					reverseChannelPackageLossCounter.add(0);
+					HoTTbinReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+					
 					++countPackageLoss;	// add up lost packages in telemetry data 
 					HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
