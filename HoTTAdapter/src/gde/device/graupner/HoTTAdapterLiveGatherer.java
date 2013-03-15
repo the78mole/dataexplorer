@@ -907,8 +907,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
-						this.dataBuffer = this.serialPort.getData();
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						//this.dataBuffer = this.serialPort.getData();
+						//Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						HoTTAdapter.isSensorType[5] = DataParser.parse2Short(this.dataBuffer, 22) != 0 || DataParser.parse2Short(this.dataBuffer, 10) != 0;
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
@@ -923,8 +923,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
-						this.dataBuffer = this.serialPort.getData();
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						//this.dataBuffer = this.serialPort.getData();
+						//Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						HoTTAdapter.isSensorType[4] = DataParser.parse2Short(this.dataBuffer, 50) != 0 || DataParser.parse2Short(this.dataBuffer, 42) != 0 || DataParser.parse2Short(this.dataBuffer, 44) != 0;
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
@@ -939,8 +939,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
-						this.dataBuffer = this.serialPort.getData();
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						//this.dataBuffer = this.serialPort.getData();
+						//Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						HoTTAdapter.isSensorType[3] = DataParser.parse2Short(this.dataBuffer, 36) != 0 || DataParser.parse2Short(this.dataBuffer, 26) != 0 || DataParser.parse2Short(this.dataBuffer, 28) != 0;
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
@@ -955,8 +955,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
-						this.dataBuffer = this.serialPort.getData();
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						//this.dataBuffer = this.serialPort.getData();
+						//Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						HoTTAdapter.isSensorType[2] = (this.dataBuffer[31] != 0 || (this.dataBuffer[16] != 0 && this.dataBuffer[17] != 0 && this.dataBuffer[20] != 0 && this.dataBuffer[21] != 0));
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
@@ -971,8 +971,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
-						this.dataBuffer = this.serialPort.getData();
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						//this.dataBuffer = this.serialPort.getData();
+						//Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						HoTTAdapter.isSensorType[1] = (DataParser.parse2Short(dataBuffer, 10) != 0 || dataBuffer[16] != 0);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}

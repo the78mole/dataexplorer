@@ -80,7 +80,7 @@ public class HoTTbinReader {
 	static double							longitudeTolerance		= 1;
 	static long								lastLongitudeTimeStep	= 0;
 
-	static ReverseChannelPackageLoss reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(50);  
+	static ReverseChannelPackageLoss reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(100);  
 	
 	/**
 	 * get data file info data

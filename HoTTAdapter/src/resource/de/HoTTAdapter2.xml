@@ -43,7 +43,7 @@
                 <name>Rx->Tx-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>false</active>
+                <active>true</active>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -573,7 +573,7 @@
                 <name>Rx->Tx-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>false</active>
+                <active>true</active>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -1103,7 +1103,7 @@
                 <name>Rx->Tx-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>false</active>
+                <active>true</active>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -1633,7 +1633,7 @@
                 <name>Rx->Tx-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>false</active>
+                <active>true</active>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -2318,7 +2318,7 @@
                 <name>Rx->Tx-VPack</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>false</active>
+                <active>true</active>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
