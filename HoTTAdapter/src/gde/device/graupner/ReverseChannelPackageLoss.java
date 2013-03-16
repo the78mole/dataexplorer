@@ -27,24 +27,26 @@ import java.util.Vector;
  */
 public class ReverseChannelPackageLoss extends Vector<Integer> {
 	private static final long	serialVersionUID	= 1L;
-	final int integrationInterval;
-	
+	final int									integrationInterval;
+	int												lossCounter;
+
 	public ReverseChannelPackageLoss(int integrationCount) {
 		super(integrationCount);
-		integrationInterval = integrationCount;
+		this.integrationInterval = integrationCount;
+		this.lossCounter = 0;
 	}
-	
+
 	public boolean add(int value) {
 		boolean ret = super.add(value);
-		if (this.size() > integrationInterval) this.remove(0);
+		if (value == 0) ++this.lossCounter;
+		if (this.size() > this.integrationInterval) {
+			if (this.get(0) == 0) --this.lossCounter;
+			this.remove(0);
+		}
 		return ret;
 	}
-	
+
 	public int getPercentage() {
-		int count = 0;
-		for (int i = 0; i < this.size(); i++) {
-			if (this.get(i) == 0) ++count;
-		}
-		return count * 100 / this.size();
+		return this.lossCounter * 100 / this.size();
 	}
 }
