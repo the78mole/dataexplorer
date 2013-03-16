@@ -521,7 +521,8 @@ public class HoTTbinReader {
 					HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 				}
 			}
-			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss}));
+			String packageLossPercentage = String.format("%.1f", (countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true)-1) * 1000));
+			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage}));
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -875,7 +876,8 @@ public class HoTTbinReader {
 					logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
 				}
 			}
-			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss}));
+			String packageLossPercentage = String.format("%.1f", (countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true)-1) * 1000));
+			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage}));
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
