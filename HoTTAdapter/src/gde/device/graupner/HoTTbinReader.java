@@ -507,10 +507,10 @@ public class HoTTbinReader {
 				}
 				else { //skip empty block, but add time step
 					reverseChannelPackageLossCounter.add(0);
+					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 
 					++countPackageLoss;	// add up lost packages in telemetry data 
 					//HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
-					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 
 					if (HoTTAdapter.isChannelsChannelEnabled) {
 						parseAddChannel(HoTTbinReader.buf);
@@ -865,7 +865,7 @@ public class HoTTbinReader {
 					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
-					HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+					//HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (HoTTAdapter.isChannelsChannelEnabled) {
 						parseAddChannel(HoTTbinReader.buf);

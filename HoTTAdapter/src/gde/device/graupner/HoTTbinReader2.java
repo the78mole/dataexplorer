@@ -315,7 +315,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
-					HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+					//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (channelNumber == 4) {
 						parseChannel(HoTTbinReader2.buf); //Channels
@@ -588,7 +588,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
-					HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+					//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (channelNumber == 4) {
 						parseChannel(HoTTbinReader2.buf); //Channels
