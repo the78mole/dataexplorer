@@ -9,9 +9,9 @@ fix bug #38246 - Multiple actions when right-clicking into graphic
 fix bug #38245 - Allow editing of commentary in table "File comment"
 fix bug #38247 - Progress bar not reset after loading files
 fix RFE #38248 - Feature: Copy function for data table
-HoTTAdapter* - change/correct Rx->Tx-VPack measurement name
+HoTTAdapter* - change/correct Rx->Tx-PLoss measurement name
 HoTTAdapter* - change algorithm sending commands during live data gathering
-HoTTAdapter* - update Rx->Tx-VPack calculation, integrate package loss over 1 second period
+HoTTAdapter* - update Rx->Tx-PLoss calculation, integrate package loss over 1 second period
 
 Version 3.07 - 11 Feb 2013
 HoTTAdapter(2) - live data, display detected sensors, optimize performance 
