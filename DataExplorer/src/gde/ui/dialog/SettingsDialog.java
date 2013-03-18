@@ -163,7 +163,7 @@ public class SettingsDialog extends Dialog {
 	Vector<String>											availablePorts = new Vector<String>();
 	final Settings											settings;
 	final DataExplorer									application;
-	final String[]											supportedLocals					= { "en", "de" };																	//$NON-NLS-1$ //$NON-NLS-2$
+	final String[]											supportedLocals					= { "en", "de", "it" };	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	boolean															isLocaleLanguageChanged	= false;
 	
 	final LogLevelSelectionContextMenu	logLevelMenu						= new LogLevelSelectionContextMenu();

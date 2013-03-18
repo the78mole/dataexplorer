@@ -127,11 +127,11 @@ public class MenuToolBar {
 	ToolItem											googleEarthToolItem, googleEarthConfigToolItem;
 	
 	String 												activeObjectKey;
+	String												language;
 	
 	final DataExplorer						application;
 	final Channels								channels;
 	final Settings								settings;
-	final String									language;
 	final FileHandler							fileHandler;
 
 	public MenuToolBar(DataExplorer parent, CoolBar menuCoolBar) {
@@ -727,7 +727,13 @@ public class MenuToolBar {
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					try {
+						this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					catch (IllegalArgumentException e) {
+						this.language = "en";
+						this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
