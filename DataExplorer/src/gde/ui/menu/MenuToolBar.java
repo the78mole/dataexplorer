@@ -140,6 +140,8 @@ public class MenuToolBar {
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 		this.language = this.settings.getLocale().getLanguage();
+		if (null == this.getClass().getClassLoader().getResourceAsStream("gde/resource/" + this.language + "/PortOpen.gif"))
+			this.language = "en";
 		this.fileHandler = new FileHandler();
 		this.activeObjectKey = this.settings.getActiveObject();
 	}
@@ -727,13 +729,7 @@ public class MenuToolBar {
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
-					try {
-						this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-					catch (IllegalArgumentException e) {
-						this.language = "en";
-						this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					}
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
