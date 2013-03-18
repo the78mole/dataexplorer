@@ -40,7 +40,7 @@
     <Channels lastUseOrdinal="2">
         <Channel type="TYPE_CONFIG" name="Receiver">
             <Measurement>
-                <name>Rx->Tx-VPack</name>
+                <name>Rx->Tx-PLoss</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>

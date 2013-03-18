@@ -42,6 +42,14 @@ The 19200 Baud protocol has support for legacy, as well as new firmware. The new
 <P><B>Hint: </B>Curves will be switched invisible if they contain only zero as data points, even if selected! 
 This might be corrected by re-selecting the curve in this configuration dialog.
 </P>
+<P><B>Attention: </B>The selected setting Channels at the HoTTAdapter tool box or at HoTTAdapter2 the configuration Channels will read all data, every 10 msec.
+Packages, where the value of Rx/Tx = 0 dBm get shown. 
+This packages get called back channel lost packages and get displayed in the curve called Rx->Tx-PLoss.
+The curve exist in HoTTAdapter only while displaying the receiver data.
+HoTTAdapter2 will display this curve always and only the Rx/Tx curves are influenced. 
+Lost packages doesn't look complete regarding transmitted values and get skipped normally.
+Channel data are 16 additional time values which get red while this configuration is active, therefore reading of this data may consume more time.
+</P>
 <P><B>Tip: </B>Since the HoTTAdapter stores GPS data it is possible to load and display such data in Google Earth using KMZ files.
 This files can be exported using the file menu or directly launched to an installed Google Earth application.
 How to do so, refer to <A HREF="../../../help/en/HelpInfo_36.html">Toolbar -> Google Earth</A>.
