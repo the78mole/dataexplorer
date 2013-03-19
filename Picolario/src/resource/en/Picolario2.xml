@@ -57,6 +57,32 @@
                 </statistics>
             </Measurement>
             <Measurement>
+                <name>Latitude</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>Longitude</name>
+                <symbol>L</symbol>
+                <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>Altitude (GPS)</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed (GPS)</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
@@ -96,32 +122,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
-            <Measurement>
-                <name>Latitude</name>
-                <symbol></symbol>
-                <unit>°</unit>
-                <active>true</active>
-            </Measurement>
-            <Measurement>
-                <name>Longitude</name>
-                <symbol>L</symbol>
-                <unit>°</unit>
-                <active>true</active>
-            </Measurement>
-            <Measurement>
-                <name>Altitude (GPS)</name>
-                <symbol>h</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-            </Measurement>
-            <Measurement>
-                <name>Speed (GPS)</name>
-                <symbol>v</symbol>
-                <unit>km/h</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-            </Measurement>
         </Channel>
         <Channel name="Motor" type="TYPE_CONFIG">
             <Measurement>
@@ -155,6 +155,32 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="regression_interval_sec" value="10" type="Integer" description="Regression time interval in seconds"/>
                 <property name="regression_type" value="regression_type_curve" type="String" description="Regression calculation type"/>
+            </Measurement>
+            <Measurement>
+                <name>Latitude</name>
+                <symbol>B</symbol>
+                <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>Longitude</name>
+                <symbol>L</symbol>
+                <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>Altitude (GPS)</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed (GPS)</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Voltage</name>
@@ -198,33 +224,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
-            <Measurement>
-                <name>Latitude</name>
-                <symbol>B</symbol>
-                <unit>°</unit>
-                <active>true</active>
-            </Measurement>
-            <Measurement>
-                <name>Longitude</name>
-                <symbol>L</symbol>
-                <unit>°</unit>
-                <active>true</active>
-            </Measurement>
-            <Measurement>
-                <name>Altitude (GPS)</name>
-                <symbol>h</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-            </Measurement>
-            <Measurement>
-                <name>Speed (GPS)</name>
-                <symbol>v</symbol>
-                <unit>km/h</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-            </Measurement>
-        </Channel>
+         </Channel>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>

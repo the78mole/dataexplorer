@@ -197,7 +197,7 @@ public class Picolario2Dialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								Picolario2Dialog.this.application.openHelpDialog("CSV2SerialAdapter", "HelpInfo.html");  //$NON-NLS-1$
+								Picolario2Dialog.this.application.openHelpDialog("Picolario", "HelpInfo2.html");  //$NON-NLS-1$
 							}
 						});
 					}
