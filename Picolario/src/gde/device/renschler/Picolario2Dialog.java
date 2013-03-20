@@ -240,7 +240,7 @@ public class Picolario2Dialog extends DeviceDialog {
 									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = Picolario2Dialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGT1250));
+										int answer = Picolario2Dialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGT1202));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
 											Channel tmpChannel = channels.get(channelNumber);
