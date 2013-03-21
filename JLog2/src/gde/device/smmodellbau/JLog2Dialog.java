@@ -24,7 +24,10 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
+import gde.device.IDevice;
 import gde.device.InputTypes;
+import gde.device.kontronik.Kosmik;
+import gde.device.kontronik.KosmikConfiguration;
 import gde.device.smmodellbau.jlog2.MessageIds;
 import gde.log.Level;
 import gde.messages.Messages;
@@ -79,7 +82,7 @@ public class JLog2Dialog extends DeviceDialog {
 
 	JLog2LiveGathererThread	liveThread;
 
-	final JLog2							device;																																								// get device specific things, get serial port, ...
+	final IDevice						device;																																								// get device specific things, get serial port, ...
 	final Settings					settings;																																							// application configuration settings
 	final JLog2SerialPort		serialPort;																																						// open/close port execute getData()....
 	String									selectedSetupFile;
@@ -182,7 +185,9 @@ public class JLog2Dialog extends DeviceDialog {
 						this.configurationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 						this.configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
 						this.configurationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2814));
-						this.configurationTabItem.setControl(new JLog2Configuration(this.tabFolder, SWT.NONE, this, this.device));
+						this.configurationTabItem.setControl((this.device.getClass().getName().equals("LJog2")
+								? new JLog2Configuration(this.tabFolder, SWT.NONE, this, (JLog2)this.device)
+								: new KosmikConfiguration(this.tabFolder, SWT.NONE, this, (Kosmik)this.device)));
 					}
 					FormData tabFolderLData = new FormData();
 					tabFolderLData.top = new FormAttachment(0, 1000, 0);
@@ -194,22 +199,24 @@ public class JLog2Dialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
-							if (JLog2Dialog.this.tabFolder.getSelectionIndex() == JLog2Dialog.this.tabFolder.getItemCount() - 1) {
-								loadSetup();
-								JLog2Dialog.this.liveGathererButton.setEnabled(false);
-								JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2803));
-								JLog2Dialog.this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2815));
-							}
-							else {
-								if (JLog2Dialog.this.isConfigChanged) {
-									if (SWT.YES == JLog2Dialog.this.application.openYesNoMessageDialog(JLog2Dialog.this.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2802))) {
-										saveSetup();
-									}
-									JLog2Dialog.this.isConfigChanged = false;
+							if (JLog2Dialog.this.device.getClass().getName().equals("LJog2")) {
+								if (JLog2Dialog.this.tabFolder.getSelectionIndex() == JLog2Dialog.this.tabFolder.getItemCount() - 1) {
+									loadSetup();
+									JLog2Dialog.this.liveGathererButton.setEnabled(false);
+									JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2803));
+									JLog2Dialog.this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2815));
 								}
-								JLog2Dialog.this.liveGathererButton.setEnabled(true);
-								JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
-								JLog2Dialog.this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2807));
+								else {
+									if (JLog2Dialog.this.isConfigChanged) {
+										if (SWT.YES == JLog2Dialog.this.application.openYesNoMessageDialog(JLog2Dialog.this.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2802))) {
+											saveSetup();
+										}
+										JLog2Dialog.this.isConfigChanged = false;
+									}
+									JLog2Dialog.this.liveGathererButton.setEnabled(true);
+									JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+									JLog2Dialog.this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2807));
+								}
 							}
 						}
 					});
@@ -289,54 +296,60 @@ public class JLog2Dialog extends DeviceDialog {
 					this.liveGathererButton.setLayoutData(saveSetupButtonLData);
 					this.liveGathererButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2807));
-					this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							if (JLog2Dialog.log.isLoggable(Level.FINE)) JLog2Dialog.log.log(Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (!JLog2Dialog.this.configurationTabItem.getControl().isVisible()) {
-								if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
-									try {
-										JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, JLog2Dialog.this.device, JLog2Dialog.this.serialPort, JLog2Dialog.this.application
-												.getActiveChannelNumber(), JLog2Dialog.this);
+					if (this.device.getClass().getName().equals("LJog2")) {
+						this.liveGathererButton.setEnabled(true);
+						this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								if (JLog2Dialog.log.isLoggable(Level.FINE)) JLog2Dialog.log.log(Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								if (!JLog2Dialog.this.configurationTabItem.getControl().isVisible()) {
+									if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
 										try {
-											JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2806), Messages.getString(MessageIds.GDE_MSGT2806));
-											JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
-											JLog2Dialog.this.liveThread.start();
+											JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, (JLog2)JLog2Dialog.this.device, JLog2Dialog.this.serialPort, JLog2Dialog.this.application
+													.getActiveChannelNumber(), JLog2Dialog.this);
+											try {
+												JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2806), Messages.getString(MessageIds.GDE_MSGT2806));
+												JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
+												JLog2Dialog.this.liveThread.start();
+											}
+											catch (RuntimeException e) {
+												JLog2Dialog.log.log(Level.WARNING, e.getMessage(), e);
+											}
 										}
-										catch (RuntimeException e) {
-											JLog2Dialog.log.log(Level.WARNING, e.getMessage(), e);
+										catch (Exception e) {
+											if (JLog2Dialog.this.liveThread != null && JLog2Dialog.this.liveThread.isAlive()) {
+												JLog2Dialog.this.liveThread.stopDataGathering();
+												JLog2Dialog.this.liveThread.interrupt();
+											}
+											JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
+											JLog2Dialog.this.application.updateGraphicsWindow();
+											JLog2Dialog.this.application.openMessageDialog(JLog2Dialog.this.getDialogShell(),
+													Messages.getString(MessageIds.GDE_MSGW2801, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+											JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+											JLog2Dialog.this.liveThread = null;
 										}
 									}
-									catch (Exception e) {
+									else {
 										if (JLog2Dialog.this.liveThread != null && JLog2Dialog.this.liveThread.isAlive()) {
 											JLog2Dialog.this.liveThread.stopDataGathering();
 											JLog2Dialog.this.liveThread.interrupt();
 										}
 										JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
 										JLog2Dialog.this.application.updateGraphicsWindow();
-										JLog2Dialog.this.application.openMessageDialog(JLog2Dialog.this.getDialogShell(),
-												Messages.getString(MessageIds.GDE_MSGW2801, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 										JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
-										JLog2Dialog.this.liveThread = null;
+										//JLog2Dialog.this.liveThread = null;
 									}
 								}
 								else {
-									if (JLog2Dialog.this.liveThread != null && JLog2Dialog.this.liveThread.isAlive()) {
-										JLog2Dialog.this.liveThread.stopDataGathering();
-										JLog2Dialog.this.liveThread.interrupt();
-									}
-									JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
-									JLog2Dialog.this.application.updateGraphicsWindow();
-									JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
-									//JLog2Dialog.this.liveThread = null;
+									//configuration
+									saveSetup();
 								}
 							}
-							else {
-								//configuration
-								saveSetup();
-							}
-						}
-					});
+						});
+					}
+					else {
+						this.liveGathererButton.setEnabled(false);
+					}
 				}
 				{
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
@@ -422,7 +435,7 @@ public class JLog2Dialog extends DeviceDialog {
 
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2801), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
-				this.device.getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
+				((JLog2)this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
 		this.selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
 
@@ -442,7 +455,7 @@ public class JLog2Dialog extends DeviceDialog {
 
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2802), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
-				this.device.getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT);
+				((JLog2)this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT);
 		String setupFilePath = fileDialog.open();
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + setupFilePath); //$NON-NLS-1$
 		
