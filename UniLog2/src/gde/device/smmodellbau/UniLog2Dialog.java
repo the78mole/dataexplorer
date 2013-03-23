@@ -533,30 +533,28 @@ public class UniLog2Dialog extends DeviceDialog {
 							public void keyReleased(KeyEvent evt) {
 								UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "efficencyN100WText.keyReleaded, evt=" + evt); //$NON-NLS-1$
 								try {
-									if (evt.character == SWT.CR) {
-										int propeller_n100W_Value = new Integer(propeller_n100W_Text.getText().trim());
-										if (UniLog2Dialog.this.channels.getActiveChannel() != null) {
-											RecordSet recordSet = UniLog2Dialog.this.channels.getActiveChannel().getActiveRecordSet();
-											if (recordSet != null) {
-												Record record = recordSet.get(14); //14=Efficiency
-												PropertyType property = record.getProperty(UniLog2Dialog.PROP_n100W);
-												if (property != null) {
-													property.setValue(propeller_n100W_Value);
-												}
-												else {
-													record.createProperty(UniLog2Dialog.PROP_n100W, DataTypes.INTEGER, propeller_n100W_Value);
-												}
-												recordSet.setRecalculationRequired();
-												UniLog2Dialog.this.device.makeInActiveDisplayable(recordSet);
-												UniLog2Dialog.this.application.updateGraphicsWindow();
-												UniLog2Dialog.this.application.updateStatisticsData();
-												UniLog2Dialog.this.application.updateDataTable(recordSet.getName(), true);
-												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
+									int propeller_n100W_Value = new Integer(propeller_n100W_Text.getText().trim());
+									if (UniLog2Dialog.this.channels.getActiveChannel() != null) {
+										RecordSet recordSet = UniLog2Dialog.this.channels.getActiveChannel().getActiveRecordSet();
+										if (recordSet != null) {
+											Record record = recordSet.get(14); //14=Efficiency
+											PropertyType property = record.getProperty(UniLog2Dialog.PROP_n100W);
+											if (property != null) {
+												property.setValue(propeller_n100W_Value);
 											}
-											UniLog2Dialog.this.device.setMeasurementPropertyValue(channelNumber, 14, MeasurementPropertyTypes.PROP_N_100_W.value(), DataTypes.INTEGER, propeller_n100W_Value);
+											else {
+												record.createProperty(UniLog2Dialog.PROP_n100W, DataTypes.INTEGER, propeller_n100W_Value);
+											}
+											recordSet.setRecalculationRequired();
+											UniLog2Dialog.this.device.makeInActiveDisplayable(recordSet);
+											UniLog2Dialog.this.application.updateGraphicsWindow();
+											UniLog2Dialog.this.application.updateStatisticsData();
+											UniLog2Dialog.this.application.updateDataTable(recordSet.getName(), true);
+											recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 										}
-										UniLog2Dialog.this.saveChangesButton.setEnabled(true);
+										UniLog2Dialog.this.device.setMeasurementPropertyValue(channelNumber, 14, MeasurementPropertyTypes.PROP_N_100_W.value(), DataTypes.INTEGER, propeller_n100W_Value);
 									}
+									UniLog2Dialog.this.saveChangesButton.setEnabled(true);
 								}
 								catch (Exception e) {
 									UniLog2Dialog.this.application.openMessageDialog(UniLog2Dialog.this.getDialogShell(),
