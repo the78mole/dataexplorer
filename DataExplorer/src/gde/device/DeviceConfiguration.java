@@ -2293,6 +2293,6 @@ public class DeviceConfiguration {
 	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
 	 */
 	public boolean recordSetNumberFollowChannel() {
-		return this.getName().toLowerCase().contains("av4ms");
+		return this.getChannelTypes(1) == ChannelTypes.TYPE_OUTLET;
 	}
 }
