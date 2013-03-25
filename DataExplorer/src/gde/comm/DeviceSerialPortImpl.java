@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -218,7 +219,15 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			}
 			// Windows COM1, COM2 -> COM20
 			// GNU/Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
+			// MAC /dev/tty.WT12-BT-MX20 /dev/tty.GraupnerHoTTBT32
 			DeviceSerialPortImpl.availablePorts.trimToSize();
+			if (GDE.IS_MAC) {
+				Iterator<String> iterator = DeviceSerialPortImpl.availablePorts.iterator();
+				while (iterator.hasNext()) {
+					if (iterator.next().contains("/cu."))
+						iterator.remove();
+				}
+			}
 		}
 		catch (Throwable t) {
 			log.log(Level.WARNING, t.getMessage(), t);
