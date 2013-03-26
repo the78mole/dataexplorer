@@ -65,46 +65,48 @@ import org.eclipse.swt.widgets.MenuItem;
  * @author Winfried Brügmann
  */
 public class HoTTAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger									log														= Logger.getLogger(HoTTAdapter.class.getName());
+	final static Logger											log																= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String									SENSOR_COUNT									= "SensorCount";																//$NON-NLS-1$
-	final static String									LOG_COUNT											= "LogCount";																		//$NON-NLS-1$
-	final static String									SD_LOG_VERSION								= "SD-Log Version";															//$NON-NLS-1$
-	final static Map<String, RecordSet>	recordSets										= new HashMap<String, RecordSet>();
+	final static String											SENSOR_COUNT											= "SensorCount";																																																			//$NON-NLS-1$
+	final static String											LOG_COUNT													= "LogCount";																																																				//$NON-NLS-1$
+	final static String											SD_LOG_VERSION										= "SD-Log Version";																																																	//$NON-NLS-1$
+	final static Map<String, RecordSet>			recordSets												= new HashMap<String, RecordSet>();
 
 	//HoTT sensor bytes 19200 Baud protocol 
-	static boolean											IS_SLAVE_MODE											= false;
-	final static byte										SENSOR_TYPE_RECEIVER_19200				= (byte) (0x80 & 0xFF);
-	final static byte										SENSOR_TYPE_VARIO_19200						= (byte) (0x89 & 0xFF);
-	final static byte										SENSOR_TYPE_GPS_19200							= (byte) (0x8A & 0xFF);
-	final static byte										SENSOR_TYPE_GENERAL_19200					= (byte) (0x8D & 0xFF);
-	final static byte										SENSOR_TYPE_ELECTRIC_19200				= (byte) (0x8E & 0xFF);
-	final static byte										SENSOR_TYPE_SPEED_CONTROL_19200		= (byte) (0x8C & 0xFF);
-	final static byte										ANSWER_SENSOR_VARIO_19200					= (byte) (0x90 & 0xFF);
-	final static byte										ANSWER_SENSOR_GPS_19200						= (byte) (0xA0 & 0xFF);
-	final static byte										ANSWER_SENSOR_GENERAL_19200				= (byte) (0xD0 & 0xFF);
-	final static byte										ANSWER_SENSOR_ELECTRIC_19200			= (byte) (0xE0 & 0xFF);
-	final static byte										ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xF0 & 0xFF);
+	static boolean													IS_SLAVE_MODE											= false;
+	final static byte												SENSOR_TYPE_RECEIVER_19200				= (byte) (0x80 & 0xFF);
+	final static byte												SENSOR_TYPE_VARIO_19200						= (byte) (0x89 & 0xFF);
+	final static byte												SENSOR_TYPE_GPS_19200							= (byte) (0x8A & 0xFF);
+	final static byte												SENSOR_TYPE_GENERAL_19200					= (byte) (0x8D & 0xFF);
+	final static byte												SENSOR_TYPE_ELECTRIC_19200				= (byte) (0x8E & 0xFF);
+	final static byte												SENSOR_TYPE_SPEED_CONTROL_19200		= (byte) (0x8C & 0xFF);
+	final static byte												ANSWER_SENSOR_VARIO_19200					= (byte) (0x90 & 0xFF);
+	final static byte												ANSWER_SENSOR_GPS_19200						= (byte) (0xA0 & 0xFF);
+	final static byte												ANSWER_SENSOR_GENERAL_19200				= (byte) (0xD0 & 0xFF);
+	final static byte												ANSWER_SENSOR_ELECTRIC_19200			= (byte) (0xE0 & 0xFF);
+	final static byte												ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xF0 & 0xFF);
 
 	//HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
 	//there is no real slave mode for this protocol
-	final static byte										SENSOR_TYPE_RECEIVER_115200				= 0x34;
-	final static byte										SENSOR_TYPE_VARIO_115200					= 0x37;
-	final static byte										SENSOR_TYPE_GPS_115200						= 0x38;
-	final static byte										SENSOR_TYPE_GENERAL_115200				= 0x35;
-	final static byte										SENSOR_TYPE_ELECTRIC_115200				= 0x36;
-	final static byte										SENSOR_TYPE_SPEED_CONTROL_115200	= 0x39;
-	final static byte										SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
-	final static byte										SENSOR_TYPE_SWITCHES_115200				= 0x41;
-	final static byte										SENSOR_TYPE_CONTROL_1_115200			= 0x42;
-	final static byte										SENSOR_TYPE_CONTROL_2_115200			= 0x43;
-	
-	final static boolean                isSwitchS[] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};				
-	final static boolean                isSwitchG[] = {false, false, false, false, false, false, false, false};				
-	final static boolean                isSwitchL[] = {false, false, false, false, false, false, false, false};				
+	final static byte												SENSOR_TYPE_RECEIVER_115200				= 0x34;
+	final static byte												SENSOR_TYPE_VARIO_115200					= 0x37;
+	final static byte												SENSOR_TYPE_GPS_115200						= 0x38;
+	final static byte												SENSOR_TYPE_GENERAL_115200				= 0x35;
+	final static byte												SENSOR_TYPE_ELECTRIC_115200				= 0x36;
+	final static byte												SENSOR_TYPE_SPEED_CONTROL_115200	= 0x39;
+	final static byte												SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
+	final static byte												SENSOR_TYPE_SWITCHES_115200				= 0x41;
+	final static byte												SENSOR_TYPE_CONTROL_1_115200			= 0x42;
+	final static byte												SENSOR_TYPE_CONTROL_2_115200			= 0x43;
 
-	final static int										QUERY_GAP_MS									= 15;
-	final static boolean								isSensorType[]								= { false, false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
+	final static boolean										isSwitchS[]												= { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+	final static boolean										isSwitchG[]												= { false, false, false, false, false, false, false, false };
+	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
+
+	final static int												QUERY_GAP_MS											= 15;
+	final static boolean										isSensorType[]										= { false, false, false, false, false, false };																																			//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
+
+	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 	public enum Sensor {
 		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air"), CHANNEL("Channel"), SPEED_CONTROL("MotorDriver");
@@ -574,7 +576,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
 					tmpTemperatureRx = (DataParser.parse2Short(dataBuffer, 10) + 20);
 					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
-						points[0] = (dataBuffer[16] & 0xFF) * 1000;
+						HoTTAdapter.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
+						points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;//(dataBuffer[16] & 0xFF) * 1000;
 						points[1] = (dataBuffer[17] & 0xFF) * 1000;
 						points[2] = (dataBuffer[14] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;

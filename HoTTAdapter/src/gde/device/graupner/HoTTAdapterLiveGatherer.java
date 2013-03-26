@@ -440,7 +440,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								e.printStackTrace();
 							}
 							*/
-							/*
+							/* switch change detection
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_CONTROL_1_115200);
 								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
@@ -481,7 +481,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								e.printStackTrace();
 							}
 							*/
-							/*
+							/* transmitter voltage detection
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_CONTROL_2_115200);
 								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
@@ -885,7 +885,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
 						for (int i = 0; i < 10; ++i) {
 							try {
-								if (this.serialPort.isCheckSumOK(4, this.serialPort.getData())) break;
+								if (this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData())) break;
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 							}
 							catch (final Exception e) {
@@ -904,7 +904,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200);
-						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						//this.dataBuffer = this.serialPort.getData();
@@ -920,7 +920,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Electric");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200);
-						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						//this.dataBuffer = this.serialPort.getData();
@@ -936,7 +936,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ General");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_115200);
-						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						//this.dataBuffer = this.serialPort.getData();
@@ -952,7 +952,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ GPS");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
-						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						//this.dataBuffer = this.serialPort.getData();
@@ -968,7 +968,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Vario");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_115200);
-						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						//this.dataBuffer = this.serialPort.getData();
@@ -986,11 +986,11 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.dataBuffer = this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
-						this.dataBuffer = this.serialPort.getData();
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						//this.dataBuffer = this.serialPort.getData();
+						//Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						HoTTAdapter.isSensorType[0] = (dataBuffer[17] != 0 && dataBuffer[15] != 0);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}

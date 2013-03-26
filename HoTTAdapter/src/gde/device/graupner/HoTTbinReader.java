@@ -79,8 +79,6 @@ public class HoTTbinReader {
 	static int								tmpLongitudeDelta			= 0;
 	static double							longitudeTolerance		= 1;
 	static long								lastLongitudeTimeStep	= 0;
-
-	static ReverseChannelPackageLoss reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(100);  
 	
 	/**
 	 * get data file info data
@@ -281,8 +279,8 @@ public class HoTTbinReader {
 				}
 
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 0 to 4, tx,rx
-					reverseChannelPackageLossCounter.add(1);
-					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+					HoTTAdapter.reverseChannelPackageLossCounter.add(1);
+					HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					//create and fill sensor specific data record sets 
 					if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
 						HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
@@ -506,8 +504,8 @@ public class HoTTbinReader {
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
-					reverseChannelPackageLossCounter.add(0);
-					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+					HoTTAdapter.reverseChannelPackageLossCounter.add(0);
+					HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
 					++countPackageLoss;	// add up lost packages in telemetry data 
 					//HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
@@ -676,8 +674,8 @@ public class HoTTbinReader {
 				}
 
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 0 to 4, tx,rx
-					reverseChannelPackageLossCounter.add(1);
-					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+					HoTTAdapter.reverseChannelPackageLossCounter.add(1);
+					HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					//create and fill sensor specific data record sets 
 					if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINEST))
 						HoTTbinReader.log.logp(java.util.logging.Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
@@ -861,8 +859,8 @@ public class HoTTbinReader {
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //tx,rx == 0
-					reverseChannelPackageLossCounter.add(0);
-					HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
+					HoTTAdapter.reverseChannelPackageLossCounter.add(0);
+					HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
 					//HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 

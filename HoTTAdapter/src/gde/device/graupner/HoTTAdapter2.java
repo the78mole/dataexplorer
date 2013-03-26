@@ -404,7 +404,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
 					tmpTemperatureRx = DataParser.parse2Short(dataBuffer, 10);
 					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
-						points[0] = (dataBuffer[16] & 0xFF) * 1000;
+						HoTTAdapter.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
+						points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;//(dataBuffer[16] & 0xFF) * 1000;
 						points[1] = (dataBuffer[17] & 0xFF) * 1000;
 						points[2] = (dataBuffer[14] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;
