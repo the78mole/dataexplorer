@@ -96,6 +96,7 @@ public class CSVSerialDataReaderWriter {
 		RecordSet channelRecordSet = null;
 		int lastRecordSetNumberOffset = 0;
 		Vector<RecordSet> createdRecordSets = new Vector<RecordSet>(1);
+		boolean isNewData = true;
 
 		try {
 			if (channelConfigNumber == null)
@@ -146,8 +147,13 @@ public class CSVSerialDataReaderWriter {
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
 					if (line.startsWith(device.getDataBlockLeader())) {
+						//execute special device related parsing operations
 						if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPGGA.name())) {
 							data.parse(line, lineNumber);
+							continue;
+						}
+						else if (line.trim().endsWith(device.getDataBlockSeparator().value())) {
+							log.log(Level.WARNING, filePath + " - skipped " + lineNumber + ", ends with " + device.getDataBlockSeparator().value()); //$NON-NLS-1$
 							continue;
 						}
 					}
@@ -173,14 +179,14 @@ public class CSVSerialDataReaderWriter {
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
-						channelRecordSet = activeChannel.get(activeChannel.getLastActiveRecordSetName());
+						channelRecordSet = activeChannel.get(recordSetName);
 					}
 					catch (Exception e) {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.state, filePath, device.getPropertiesFileName()})); 
 					}
 
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.recordSetNumberOffset) {
+					if (isNewData || activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.recordSetNumberOffset) {
 						//record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
 						if (lastRecordSetNumberOffset != data.recordSetNumberOffset && channelRecordSet != null) {
 							if (channelRecordSet.get(0).size() < 3) {
@@ -211,19 +217,16 @@ public class CSVSerialDataReaderWriter {
 							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
 							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannel.getNumber(), true, false));
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
-							activeChannel.setActiveRecordSet(recordSetName);
-							channelRecordSet = activeChannel.get(recordSetName);
-							createdRecordSets.add(channelRecordSet);
-							recordSetName = channelRecordSet.getName(); // cut/correct length
 							
 							if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
 								activeChannel.applyTemplate(recordSetName, false);
 							else 
 								activeChannel.applyTemplateBasics(recordSetName);
 							
-							if (application.getStatusBar() != null && activeChannel.getName().equals(channels.getActiveChannel().getName())) {
-								channels.getActiveChannel().switchRecordSet(recordSetName);
-							}
+							activeChannel.setActiveRecordSet(recordSetName);
+							channelRecordSet = activeChannel.get(recordSetName);
+							createdRecordSets.add(channelRecordSet);
+							recordSetName = channelRecordSet.getName(); // cut/correct length
 						}
 						
 
@@ -257,7 +260,7 @@ public class CSVSerialDataReaderWriter {
 					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
 						application.setProgress(progress, sThreadId);
 					}
-
+					isNewData = false;
 				}
 				if (application.getStatusBar() != null) 	application.setProgress(100, sThreadId);
 
@@ -284,15 +287,12 @@ public class CSVSerialDataReaderWriter {
 					}
 				}
 				
-				if (createdRecordSets.size() == 1) {
-					activeChannel.setActiveRecordSet(createdRecordSets.firstElement());
-
-					if (application.getStatusBar() != null) 
-						activeChannel.switchRecordSet(createdRecordSets.firstElement().getName());
-				}
-				else {
-					if (activeChannel.getActiveRecordSet() != null) {
-						activeChannel.switchRecordSet(activeChannel.getActiveRecordSet().getName());
+				if (application.getStatusBar() != null) {
+					if (createdRecordSets.size() == 1) {
+						channels.switchChannel(channelConfigNumber, createdRecordSets.firstElement().getName());
+					}
+					else {
+						channels.switchChannel(channelConfigNumber, createdRecordSets.lastElement().getName());
 					}
 				}
 
@@ -309,14 +309,19 @@ public class CSVSerialDataReaderWriter {
 			application.openMessageDialog(e.getMessage());
 		}
 		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
 			// check if previous records are available and needs to be displayed
 			if (activeChannel != null && activeChannel.size() > 0) {
 				String recordSetName = activeChannel.getFirstRecordSetName();
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (application.getStatusBar() != null) 
+					if (createdRecordSets.size() == 1) {
+						channels.switchChannel(channelConfigNumber, createdRecordSets.firstElement().getName());
+					}
+					else {
+						channels.switchChannel(channelConfigNumber, createdRecordSets.lastElement().getName());
+					}
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] {e.getMessage(), lineNumber});
@@ -326,6 +331,7 @@ public class CSVSerialDataReaderWriter {
 		finally {
 			if (application.getStatusBar() != null) {
 				application.setStatusMessage(GDE.STRING_EMPTY);
+				application.setProgress(100, sThreadId);
 			}
 		}
 		

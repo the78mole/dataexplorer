@@ -64,7 +64,7 @@ public class DataParser extends NMEAParser {
 	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
 		super(useLeaderChar, useSeparator, useCheckSumType, useDataSize, DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), (short) 0);
 		this.timeFactor = useTimeFactor;
-		this.checkSumFormatType = FormatTypes.VALUE; //checksum is build using contained values
+		this.checkSumFormatType = FormatTypes.BINARY; //checksum is build using contained values
 		this.dataFormatType = FormatTypes.VALUE; //dataBlockSize specifies the number of contained values
 		this.isMultiply1000 = true;
 	}
@@ -168,9 +168,8 @@ public class DataParser extends NMEAParser {
 		}
 
 		if (this.checkSumType != null) {
-			boolean isValid = isChecksumOK(inputLine, Integer.parseInt(strValues[strValues.length - 1].trim()));
-			if (!isValid) {
-				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0049, new String[] { strValue }));
+			if (!isChecksumOK(inputLine, Integer.parseInt(strValues[strValues.length - 1].trim(), 16))) {
+				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0049, new Object[] { strValues[strValues.length - 1].trim(), String.format("%X", calcChecksum(inputLine)) }));
 				DataParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 				throw e;
 			}
@@ -184,54 +183,63 @@ public class DataParser extends NMEAParser {
 	 * @return
 	 */
 	public boolean isChecksumOK(String inputLine, int tmpCheckSum) {
-		boolean isValid = true;
+		return tmpCheckSum == calcChecksum(inputLine);
+	}
+
+	/**
+	 * calculate the checksum with configured checksum algorithm
+	 * @param inputLine
+	 * @return checksum
+	 */
+	public int calcChecksum(String inputLine) {
+		int checksum = 0;
 		switch (this.checkSumType) {
 		case ADD:
 			switch (this.checkSumFormatType) {
 			case VALUE:
-				isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.valueSize);
+				checksum = Checksum.ADD(this.values, 0, this.valueSize);
 				break;
 			case BINARY:
 			default:
-				isValid = tmpCheckSum == Checksum.ADD(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				checksum = Checksum.ADD(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
 				break;
 			}
 			break;
 		case XOR:
 			switch (this.checkSumFormatType) {
 			case VALUE:
-				isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.valueSize);
+				checksum = Checksum.XOR(this.values, 0, this.valueSize);
 				break;
 			case BINARY:
 			default:
-				isValid = tmpCheckSum == Checksum.XOR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				checksum = Checksum.XOR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
 				break;
 			}
 			break;
 		case OR:
 			switch (this.checkSumFormatType) {
 			case VALUE:
-				isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.valueSize);
+				checksum = Checksum.OR(this.values, 0, this.valueSize);
 				break;
 			case BINARY:
 			default:
-				isValid = tmpCheckSum == Checksum.OR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				checksum = Checksum.OR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
 				break;
 			}
 			break;
 		case AND:
 			switch (this.checkSumFormatType) {
 			case VALUE:
-				isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.valueSize);
+				checksum = Checksum.AND(this.values, 0, this.valueSize);
 				break;
 			case BINARY:
 			default:
-				isValid = tmpCheckSum == Checksum.AND(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				checksum = Checksum.AND(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
 				break;
 			}
 			break;
 		}
-		return isValid;
+		return checksum;
 	}
 
 	/**

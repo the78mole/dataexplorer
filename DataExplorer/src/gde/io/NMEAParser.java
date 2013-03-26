@@ -19,6 +19,7 @@
 package gde.io;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.device.CheckSumTypes;
 import gde.device.IDevice;
 import gde.exception.DevicePropertiesInconsistenceException;
@@ -230,6 +231,17 @@ public class NMEAParser {
 			case UL2SETUP: // UniLog2 setup
 				this.deviceSerialNumber = String.format("%d", Integer.parseInt(strValues[1].trim(), 16)); //$NON-NLS-1$
 				this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[2].trim(), 16)/100.0); //$NON-NLS-1$
+				//0 = „Temperatur“, 1 = „Millivolt“; 2 =„Speed-Sensor 250 kph“, 3 =̈„Speed-Sensor 450 kph“, 4 =„Temperatur PT1000“
+				byte A1 = (byte) (Integer.parseInt(strValues[9].trim(), 16) & 0xFF);
+				byte A2 = (byte) (Integer.parseInt(strValues[10].trim(), 16) & 0xFF);
+				byte A3 = (byte) (Integer.parseInt(strValues[11].trim(), 16) & 0xFF);
+				String tempName = Settings.getInstance().getLocale().getLanguage().equalsIgnoreCase("de") ? "Temperatur" : "Temperature";
+				this.device.setMeasurementName(this.channelConfigNumber, 17, A1 == 0x00 ? tempName+" A1" : A1 == 0x02 ? "Speed_250 A1" : A1 == 0x03 ? "Speed_450 A1" : A1 == 0x04 ? "PT1000 A1" : "Millivolt A1");
+				this.device.setMeasurementName(this.channelConfigNumber, 18, A2 == 0x00 ? tempName+" A2" : A2 == 0x02 ? "Speed_250 A2" : A2 == 0x03 ? "Speed_450 A2" : A2 == 0x04 ? "PT1000 A2" : "Millivolt A2");
+				this.device.setMeasurementName(this.channelConfigNumber, 19, A3 == 0x00 ? tempName+" A3" : A3 == 0x02 ? "Speed_250 A3" : A3 == 0x03 ? "Speed_450 A3" : A3 == 0x04 ? "PT1000 A3" : "Millivolt A3");
+				this.device.setMeasurementUnit(this.channelConfigNumber, 17, A1 == 0x00 || A1 == 0x04 ? "°C" : A1 == 0x02 || A1 == 0x03 ? "km/h" : "mV");
+				this.device.setMeasurementUnit(this.channelConfigNumber, 18, A2 == 0x00 || A2 == 0x04 ? "°C" : A2 == 0x02 || A2 == 0x03 ? "km/h" : "mV");
+				this.device.setMeasurementUnit(this.channelConfigNumber, 19, A3 == 0x00 || A2 == 0x04 ? "°C" : A3 == 0x02 || A3 == 0x03 ? "km/h" : "mV");
 				break;
 			case UL2:
 				if (this.values.length >=25){
@@ -239,7 +251,7 @@ public class NMEAParser {
 						//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 						//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
-						int[] in2out = { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
+						int[] in2out = { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  17,  18,  19,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
 						parseUNILOG2(strValues, in2out, 6, true);
 					}
 					else if (this.deviceName.equals("GPS-Logger")) {

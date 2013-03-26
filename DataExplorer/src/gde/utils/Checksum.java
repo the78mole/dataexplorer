@@ -340,8 +340,8 @@ public class Checksum {
 	 * @param length length of checksum if part of the byte array
 	 * @return integer result
 	 */
-	public static long ADD(int[] a, int offset, int length) {
-		long value = a[offset];
+	public static int ADD(int[] a, int offset, int length) {
+		int value = a[offset];
 		for (int i = offset+1; i < length; i++) {
 			value = value  + a[i];
 		}
