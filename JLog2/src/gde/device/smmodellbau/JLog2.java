@@ -542,18 +542,18 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 					JLog2.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
-						}
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = GDE.STRING_EMPTY;
+								if (this.getClass().getSimpleName().equals("JLog2")) {
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								}
+								else {
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								}
 								CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {

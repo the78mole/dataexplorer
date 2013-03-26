@@ -28,6 +28,11 @@ public class MessageIds {
 	public final static String	GDE_MSGW2801 = "GDE_MSGW2801";
 	public final static String	GDE_MSGW2802 = "GDE_MSGW2802";
 	public final static String	GDE_MSGW2803 = "GDE_MSGW2803";
+	public final static String	GDE_MSGW2804 = "GDE_MSGW2804";
+	public final static String	GDE_MSGW2805 = "GDE_MSGW2805";
+	public final static String	GDE_MSGW2806 = "GDE_MSGW2806";
+	public final static String	GDE_MSGW2807 = "GDE_MSGW2807";
+	public final static String	GDE_MSGW2808 = "GDE_MSGW2808";
 	public final static String	GDE_MSGI2800 = "GDE_MSGI2800";
 	public final static String	GDE_MSGI2801 = "GDE_MSGI2801";
 	public final static String	GDE_MSGI2802 = "GDE_MSGI2802";

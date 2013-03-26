@@ -25,7 +25,6 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
-import gde.device.InputTypes;
 import gde.device.kontronik.Kosmik;
 import gde.device.kontronik.KosmikConfiguration;
 import gde.device.smmodellbau.jlog2.MessageIds;
@@ -92,6 +91,8 @@ public class JLog2Dialog extends DeviceDialog {
 	boolean									isConfigChanged 		= false;
 	int											measurementsCount		= 0;
 	final List<CTabItem>		configurations			= new ArrayList<CTabItem>();
+	
+	boolean 								isJLog2 						= true;	
 
 	/**
 	 * default constructor initialize all variables required
@@ -103,7 +104,8 @@ public class JLog2Dialog extends DeviceDialog {
 		this.device = useDevice;
 		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
-		this.measurementsCount = Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO));
+		this.measurementsCount = this.device.getNumberOfMeasurements(1);
+		this.isJLog2 = this.device.getClass().getSimpleName().equals("JLog2");
 	}
 
 	@Override
@@ -185,8 +187,7 @@ public class JLog2Dialog extends DeviceDialog {
 						this.configurationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 						this.configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
 						this.configurationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2814));
-						this.configurationTabItem.setControl((this.device.getClass().getName().equals("LJog2")
-								? new JLog2Configuration(this.tabFolder, SWT.NONE, this, (JLog2)this.device)
+						this.configurationTabItem.setControl((this.isJLog2 ? new JLog2Configuration(this.tabFolder, SWT.NONE, this, (JLog2)this.device)
 								: new KosmikConfiguration(this.tabFolder, SWT.NONE, this, (Kosmik)this.device)));
 					}
 					FormData tabFolderLData = new FormData();
@@ -199,7 +200,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
-							if (JLog2Dialog.this.device.getClass().getName().equals("LJog2")) {
+							if (JLog2Dialog.this.isJLog2) {
 								if (JLog2Dialog.this.tabFolder.getSelectionIndex() == JLog2Dialog.this.tabFolder.getItemCount() - 1) {
 									loadSetup();
 									JLog2Dialog.this.liveGathererButton.setEnabled(false);

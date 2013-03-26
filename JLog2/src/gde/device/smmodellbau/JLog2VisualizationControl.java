@@ -21,7 +21,9 @@ package gde.device.smmodellbau;
 import gde.GDE;
 import gde.data.Channels;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.device.smmodellbau.jlog2.MessageIds;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.MeasurementControlConfigurable;
@@ -32,6 +34,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -85,8 +89,21 @@ public class JLog2VisualizationControl extends Composite {
 		GridLayout mainTabCompositeLayout = new GridLayout();
 		mainTabCompositeLayout.makeColumnsEqualWidth = true;
 		this.setLayout(mainTabCompositeLayout);
+		this.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent evt) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "focusGained, event="+evt);
+				updateMeasurements();
+			}
+		});
 
 		create();
+	}
+	
+	void updateMeasurements() {
+		for (MeasurementType tmpMeasurement : this.device.getChannelMeasuremts(this.channelConfigNumber)) {
+			System.out.println(tmpMeasurement.getUnit());
+		}		
 	}
 
 	void create() {
@@ -108,11 +125,10 @@ public class JLog2VisualizationControl extends Composite {
 			GridLayout mainTabCompositeLayout = new GridLayout();
 			mainTabCompositeLayout.makeColumnsEqualWidth = true;
 			mainTabCompositeLayout.numColumns = 2;
-			mainTabCompositeLayout.verticalSpacing = (this.measurementCount - 31 + 1) / 2 * 23 / (this.measurementCount - 31 + 1); //adapt while changing measurementCount, actual only 31
-			mainTabCompositeLayout.verticalSpacing = mainTabCompositeLayout.verticalSpacing < 0 ? 0 : mainTabCompositeLayout.verticalSpacing;
+			mainTabCompositeLayout.verticalSpacing = 5;
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
 
-			for (int i = this.measurementOffset; i < this.measurementOffset + 31; i++) { // display actual only the native 31 measurements of JLog2
+			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) { // display actual only the native 31 measurements of JLog2
 				//allow all measurement names, symbols and units to be correctable
 				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
 						this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));

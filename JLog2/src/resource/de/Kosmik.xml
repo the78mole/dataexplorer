@@ -26,12 +26,12 @@
     </TimeBase>
     <DataBlock>
         <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
-        <format size="-40" formatType="VALUE" inputType="FILE_IO"/>
+        <format size="-14" formatType="VALUE" inputType="FILE_IO"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredFileExtention>*.txt</preferredFileExtention>
+        <preferredFileExtention>*.dat</preferredFileExtention>
     </DataBlock>
     <State>
         <property description="" type="Integer" value="01" name="Aufzeichnung"/>
@@ -53,8 +53,8 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
 			</Measurement>
             <Measurement>
-                <name>Motorstrom (integrated)</name>
-                <symbol>Imot(int)</symbol>
+                <name>Akkustrom</name>
+                <symbol>Ibat</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -69,6 +69,13 @@
             <Measurement>
                 <name>Motorstrom</name>
                 <symbol>Imot</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Motorstrom(peak)</name>
+                <symbol>Imotpeak</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
