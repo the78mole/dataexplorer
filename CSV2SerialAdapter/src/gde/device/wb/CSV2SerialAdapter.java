@@ -524,8 +524,22 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 						if (fd.getFileName().length() > 4) {
 							try {
+								String recordNameExtend;
+								try {
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									Integer.valueOf(recordNameExtend);
+								}
+								catch (Exception e) {
+									try {
+										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+										Integer.valueOf(recordNameExtend);
+									}
+									catch (Exception e1) {
+										recordNameExtend = GDE.STRING_EMPTY;
+									}
+								}
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, GDE.STRING_EMPTY, channelConfigNumber, true);
+								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
