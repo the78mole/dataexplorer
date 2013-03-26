@@ -12,6 +12,7 @@ fix RFE #38248 - Feature: Copy function for data table
 HoTTAdapter* - change/correct Rx->Tx-PLoss measurement name
 HoTTAdapter* - change algorithm sending commands during live data gathering
 HoTTAdapter* - update Rx->Tx-PLoss calculation, integrate package loss over 1 second period
+HoTTAdapter* - update to latest firmware (ESC)
 documentation update
 
 Version 3.07 - 11 Feb 2013
