@@ -57,14 +57,14 @@ import org.eclipse.swt.widgets.MenuItem;
  * @author Winfried Brügmann
  */
 public class JLog2 extends DeviceConfiguration implements IDevice {
-	final static Logger		log								= Logger.getLogger(JLog2.class.getName());
+	protected final static Logger		log								= Logger.getLogger(JLog2.class.getName());
 
 	final static String		SM_JLOG2_CONFIG_TXT				= "CONFIG.txt";													//$NON-NLS-1$
 
-	final DataExplorer		application;
-	final Channels				channels;
-	final JLog2Dialog			dialog;
-	final JLog2SerialPort	serialPort;
+	protected final DataExplorer		application;
+	protected final Channels				channels;
+	protected final JLog2Dialog			dialog;
+	protected final JLog2SerialPort	serialPort;
 
 	/**
 	 * constructor using properties file
@@ -547,13 +547,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = GDE.STRING_EMPTY;
-								if (this.getClass().getSimpleName().equals("JLog2")) {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								}
-								else {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								}
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 								CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {

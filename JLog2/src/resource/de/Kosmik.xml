@@ -26,7 +26,7 @@
     </TimeBase>
     <DataBlock>
         <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
-        <format size="-14" formatType="VALUE" inputType="FILE_IO"/>
+        <format size="14" formatType="VALUE" inputType="FILE_IO"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
@@ -46,39 +46,41 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
 			<Measurement>
-                <name>Akkuspannung</name>
+                <name>Spannung Akku</name>
 				<symbol>Ubat</symbol>
 				<unit>V</unit>
 				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
 			</Measurement>
             <Measurement>
-                <name>Akkustrom</name>
+                <name>Strom Akku</name>
                 <symbol>Ibat</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität</name>
+                <name>Kapazität Akku</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Motorstrom</name>
+                <name>Strom Motor</name>
                 <symbol>Imot</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="2" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Motorstrom(peak)</name>
-                <symbol>Imotpeak</symbol>
+                <name>Strom Motor(peak)</name>
+                <symbol>Imot</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="2" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur FET</name>
@@ -114,20 +116,22 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Gas (in)</name>
-                <symbol>thr-in</symbol>
+                <symbol>thr</symbol>
                 <unit>%</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Gas(eff)</name>
-                <symbol>thr-eff</symbol>
+                <name>Gas (eff)</name>
+                <symbol>thr</symbol>
                 <unit>%</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="11" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>         									
             <Measurement>
                 <name>Timing</name>
