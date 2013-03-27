@@ -27,6 +27,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -99,7 +100,7 @@ public class DataParser extends NMEAParser {
 				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY ? strValues.length - 4 : this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE
 						&& this.dataBlockSize > 0 ? Math.abs(this.dataBlockSize) : strValues.length - 4;
 				this.values = new int[this.valueSize];
-				DataParser.log.log(java.util.logging.Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
+				DataParser.log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 
 				parse(inputLine, strValues);
 			}
@@ -109,7 +110,7 @@ public class DataParser extends NMEAParser {
 			}
 		}
 		catch (NumberFormatException e) {
-			DataParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			DataParser.log.log(Level.WARNING, e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -145,7 +146,7 @@ public class DataParser extends NMEAParser {
 		for (int i = 0; i < this.valueSize; i++) {
 			strValue = strValues[i + 3].trim();
 			try {
-				long tmpValue = strValue.length() > 0 ? Long.parseLong(strValue) : 0;
+				double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
 				if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
 					this.values[i] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
 				else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
@@ -170,7 +171,7 @@ public class DataParser extends NMEAParser {
 		if (this.checkSumType != null) {
 			if (!isChecksumOK(inputLine, Integer.parseInt(strValues[strValues.length - 1].trim(), 16))) {
 				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0049, new Object[] { strValues[strValues.length - 1].trim(), String.format("%X", calcChecksum(inputLine)) }));
-				DataParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				DataParser.log.log(Level.WARNING, e.getMessage(), e);
 				throw e;
 			}
 		}

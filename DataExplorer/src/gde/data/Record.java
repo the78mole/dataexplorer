@@ -1009,7 +1009,13 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer realGet(int index) {
-		return super.size() != 0 ? super.get(index) : 0;
+		try {
+			return super.size() != 0 ? super.get(index) : 0;
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, String.format("%s - %20s: size = %d - indesx = %d", this.parent.name, this.name, this.size(), index));
+			return super.size() != 0 ? super.get(index-1) : 0;
+		}
 	}
 
 	public boolean isPositionLeft() {
