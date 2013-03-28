@@ -148,7 +148,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)) * 4;
-		int[] points = new int[this.getNumberOfMeasurements(1)];
+		int[] points = new int[recordSet.size()];
 		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = 0;

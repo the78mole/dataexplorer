@@ -26,7 +26,7 @@
     </TimeBase>
     <DataBlock>
         <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
-        <format size="14" formatType="VALUE" inputType="FILE_IO"/>
+        <format size="-14" formatType="VALUE" inputType="FILE_IO"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
@@ -36,8 +36,104 @@
     <State>
         <property description="" type="Integer" value="01" name="Aufzeichnung"/>
     </State>
-    <Channels lastUseOrdinal="0">
-        <Channel type="TYPE_CONFIG" name="Normal">
+    <Channels lastUseOrdinal="1">
+        <Channel type="TYPE_OUTLET" name="Firmware 3.1">
+            <Measurement>
+                <name>Drehzahl</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+			<Measurement>
+                <name>Spannung Akku</name>
+				<symbol>Ubat</symbol>
+				<unit>V</unit>
+				<active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+			</Measurement>
+            <Measurement>
+                <name>Strom Akku</name>
+                <symbol>Ibat</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität Akku</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom Motor</name>
+                <symbol>Imot</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="2" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur FET</name>
+                <symbol>Tfet</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>PWM</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+			<Measurement>
+				<name>Spannung BEC</name>
+				<symbol>Ubec</symbol>
+				<unit>V</unit>
+				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Strom BEC</name>
+				<symbol>Ibec</symbol>
+				<unit>A</unit>
+				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+			</Measurement>
+            <Measurement>
+                <name>Temperatur BEC</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="5" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Gas (in)</name>
+                <symbol>thr</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Gas (eff)</name>
+                <symbol>thr</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="10" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>         									
+            <Measurement>
+                <name>Timing</name>
+                <symbol>tmg</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+        </Channel>
+        <Channel type="TYPE_OUTLET" name="Firmware 3.2">
             <Measurement>
                 <name>Drehzahl</name>
                 <symbol>rpm</symbol>

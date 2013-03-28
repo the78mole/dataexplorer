@@ -104,8 +104,8 @@ public class JLog2Dialog extends DeviceDialog {
 		this.device = useDevice;
 		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
-		this.measurementsCount = 31; //this.device.getNumberOfMeasurements(1);
 		this.isJLog2 = this.device.getClass().getSimpleName().equals("JLog2");
+		this.measurementsCount = this.isJLog2 ? 31 : this.device.getNumberOfMeasurements(Channels.getInstance().getActiveChannelNumber());
 	}
 
 	@Override
@@ -180,7 +180,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.tabFolder.setSimple(false);
 					{
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, this.measurementsCount); 
+							createVisualizationTabItem(i, this.isJLog2 ? 31 : this.device.getNumberOfMeasurements(i)); 
 						}
 					}
 					{
@@ -197,7 +197,7 @@ public class JLog2Dialog extends DeviceDialog {
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
 					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
-					this.tabFolder.setSelection(0);
+					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
 							if (JLog2Dialog.this.isJLog2) {
