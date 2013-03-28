@@ -113,7 +113,7 @@ public class CSVSerialDataReaderWriter {
 				activeChannelConfigNumber = activeChannel.getNumber();
 				
 //				if (application.getStatusBar() != null) {
-//					channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
+//					channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
 //					application.getMenuToolBar().updateChannelSelector();
 //					activeChannel = channels.getActiveChannel();
 //				}
@@ -194,7 +194,7 @@ public class CSVSerialDataReaderWriter {
 								activeChannel.remove(recordSetName);
 								createdRecordSets.remove(channelRecordSet);
 								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points, last line number = " + (lineNumber - 1)); //$NON-NLS-1$
-								activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannel.getNumber(), true, false));
+								activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false));
 								createdRecordSets.add(activeChannel.get(recordSetName));
 								recordSetName = channelRecordSet.getName(); // cut/correct length
 								
@@ -215,7 +215,7 @@ public class CSVSerialDataReaderWriter {
 						else {
 							int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(channelConfigNumber) : activeChannel.getNextRecordSetNumber();
 							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
-							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannel.getNumber(), true, false));
+							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false));
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
 							
 							if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
@@ -238,7 +238,7 @@ public class CSVSerialDataReaderWriter {
 						}
 
 						// make all records displayable while absolute data
-						String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
+						String[] recordNames = device.getMeasurementNames(activeChannelConfigNumber);
 						if (!isRaw) { // absolute
 							for (String recordKey : recordNames) {
 								channelRecordSet.get(recordKey).setDisplayable(true); // all data available 

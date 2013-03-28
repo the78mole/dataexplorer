@@ -161,7 +161,7 @@ public class LogViewReader {
 		device.getLovKeyMappings(lov2osdMap);
 		
 		HashMap<String, String> header = readHeader(data_in);
-		int channelNumber = new Integer(header.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue();
+		int channelNumber = device.recordSetNumberFollowChannel() ? new Integer(header.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
 		ChannelTypes channelType = device.getChannelTypes(channelNumber);
 		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(GDE.CHANNEL_CONFIG_NAME);
 		String channelConfigName = device.getChannelName(channelNumber);

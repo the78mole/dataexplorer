@@ -437,7 +437,7 @@ public class FileHandler {
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 			}
 
-			int channelNumber = new Integer(lovHeader.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue();
+			int channelNumber = this.application.getActiveDevice().recordSetNumberFollowChannel() ? new Integer(lovHeader.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
 			IDevice activeDevice = this.application.getActiveDevice();
 			String channelType = activeDevice.getChannelTypes(channelNumber).name();
 			String channelConfigName = activeDevice.getChannelName(channelNumber);
