@@ -185,7 +185,7 @@ public class KosmikConfiguration extends Composite {
 				this.motorRotorRpmCombo = new CCombo(this, SWT.BORDER);
 				this.motorRotorRpmCombo.setItems(new String[] { "  Motor", "Propeller/Rotor" }); //$NON-NLS-1$ //$NON-NLS-2$
 				FormData motorRotorRpmComboLData = new FormData();
-				motorRotorRpmComboLData.width = 80;
+				motorRotorRpmComboLData.width = 120;
 				motorRotorRpmComboLData.height = GDE.IS_MAC ? 18 : 16;
 				motorRotorRpmComboLData.left = new FormAttachment(0, 1000, 400);
 				motorRotorRpmComboLData.top = new FormAttachment(0, 1000, 40);
@@ -326,7 +326,7 @@ public class KosmikConfiguration extends Composite {
 				this.mainGearToothCountText = new Text(this, SWT.CENTER | SWT.BORDER);
 				this.mainGearToothCountText.setText("87");
 				FormData mainGearToothCountTextLData = new FormData();
-				mainGearToothCountTextLData.width = 23;
+				mainGearToothCountTextLData.width = 30;
 				mainGearToothCountTextLData.height = GDE.IS_MAC ? 18 : 16;
 				mainGearToothCountTextLData.left = new FormAttachment(0, 1000, 400);
 				mainGearToothCountTextLData.top = new FormAttachment(0, 1000, 145);

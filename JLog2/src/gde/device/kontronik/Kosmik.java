@@ -39,7 +39,12 @@ import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 public class Kosmik extends JLog2 {
 	/**
@@ -264,5 +269,28 @@ public class Kosmik extends JLog2 {
 	@Override
 	public boolean recordSetNumberFollowChannel() {
 		return false;
+	}
+	
+	/**
+	 * update the file import menu by adding new entry to import device specific files
+	 * @param importMenue
+	 */
+	@Override
+	public void updateFileImportMenu(Menu importMenue) {
+		MenuItem importDeviceLogItem;
+
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+			new MenuItem(importMenue, SWT.SEPARATOR);
+
+			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGW2809, GDE.MOD1));
+			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGW2809));
+			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					open_closeCommPort();
+				}
+			});
+		}
 	}
 }
