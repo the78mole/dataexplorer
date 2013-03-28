@@ -931,13 +931,13 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						setupDataChannels(device);
 
-						this.channels.setActiveChannelNumber(1);
+						this.channels.setActiveChannelNumber(2);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
 						activeChannel.setSaved(true);
 
-						CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, true);
+						CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 2, true);
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 						if (recordSet != null) {
