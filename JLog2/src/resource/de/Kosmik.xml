@@ -65,6 +65,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Strom Motor</name>
@@ -161,6 +162,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Strom Motor</name>
