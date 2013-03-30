@@ -34,6 +34,7 @@ import gde.ui.SWTResourceManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
@@ -85,6 +86,7 @@ public class JLog2Dialog extends DeviceDialog {
 	final Settings					settings;																																							// application configuration settings
 	final JLog2SerialPort		serialPort;																																						// open/close port execute getData()....
 	String									selectedSetupFile;
+	String									selectedVersionFile;
 
 	RecordSet								lastActiveRecordSet	= null;
 	boolean									isVisibilityChanged	= false;
@@ -438,18 +440,32 @@ public class JLog2Dialog extends DeviceDialog {
 		FileDialog fd = this.application.openFileOpenDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2801), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
 				((JLog2)this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
 		this.selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		this.selectedVersionFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + "version.txt";
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
+			int version = Integer.valueOf("322");
 			try {
+				File versionFile = new File(this.selectedVersionFile);
+				if (versionFile.exists()) {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(versionFile), "ISO-8859-1")); //$NON-NLS-1$
+					String line = reader.readLine();
+					try {
+						version = Integer.valueOf(line.substring(0, 5).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+					}
+					catch (Exception e) {
+						// ignore
+					}
+					reader.close();
+				}
 				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.selectedSetupFile), "ISO-8859-1")); //$NON-NLS-1$
 				String line = reader.readLine();
-				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(line);
+				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(line, version);
 				reader.close();
 			}
 			catch (Exception e) {
 				JLog2Dialog.log.log(Level.SEVERE, e.getMessage(), e);
-				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(JLog2Configuration.normal);
+				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(JLog2Configuration.normal, version);
 			}
 		}
 	}

@@ -91,20 +91,24 @@ public class JLog2Configuration extends Composite {
 	final DataExplorer						application;
 	final JLog2Dialog							dialog;
 	final JLog2										device;
-	final String[]								jlogFirmware				= new String[] { "3.1", "3.2, 3.2.1", "3.2.2" };																																																															//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	final String[]								jlogConfigurations	= new String[] {
+	final String[]								jlogFirmware				= new String[] { "3.2.2", "4.0.0" };																																																															//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	final String[]								jlogConfigurations322	= new String[] {
 			"---- normal ----", //$NON-NLS-1$
-			Messages.getString(MessageIds.GDE_MSGT2894), Messages.getString(MessageIds.GDE_MSGI2878), Messages.getString(MessageIds.GDE_MSGI2879), Messages.getString(MessageIds.GDE_MSGI2880),
-			Messages.getString(MessageIds.GDE_MSGI2881), Messages.getString(MessageIds.GDE_MSGI2882), Messages.getString(MessageIds.GDE_MSGT2817), Messages.getString(MessageIds.GDE_MSGT2818),
-			Messages.getString(MessageIds.GDE_MSGT2819), Messages.getString(MessageIds.GDE_MSGT2820), Messages.getString(MessageIds.GDE_MSGT2821), Messages.getString(MessageIds.GDE_MSGT2822),
-			Messages.getString(MessageIds.GDE_MSGT2823), Messages.getString(MessageIds.GDE_MSGT2824), Messages.getString(MessageIds.GDE_MSGT2825), Messages.getString(MessageIds.GDE_MSGT2831),
-			Messages.getString(MessageIds.GDE_MSGT2837), Messages.getString(MessageIds.GDE_MSGT2843), Messages.getString(MessageIds.GDE_MSGT2846), Messages.getString(MessageIds.GDE_MSGT2852),
-			Messages.getString(MessageIds.GDE_MSGT2856), Messages.getString(MessageIds.GDE_MSGT2862)
-																										//"P1 (Outputs a phase pulse for VBar Governor on K4-1  -  Slow update rate: 100ms! Yet untested w/ VBar!)", 
-																										//"P2 (Outputs a phase pulse for VBar Governor on K4-2  -  Slow update rate: 100ms! Yet untested w/ VBar!)", 
-																										//"AVP1 (JTX telemetry, \"JLog Air\" module + volt 0..12.8V for temp0 + ppulse for VBar Gov on K4-1  -  Slow update rate: 100ms!)", 
-																										//"AP2 (JTX telemetry, \"JLog Air\" module + outputs a phase pulse for VBar Gov on K4-2  -  Slow update rate: 100ms! Yet untested!)", 
-																										};
+			Messages.getString(MessageIds.GDE_MSGT2894), Messages.getString(MessageIds.GDE_MSGI2878), 
+			Messages.getString(MessageIds.GDE_MSGI2879), Messages.getString(MessageIds.GDE_MSGI2880),
+			Messages.getString(MessageIds.GDE_MSGI2881), Messages.getString(MessageIds.GDE_MSGI2882),
+			Messages.getString(MessageIds.GDE_MSGT2817), Messages.getString(MessageIds.GDE_MSGT2818),
+			Messages.getString(MessageIds.GDE_MSGT2819), Messages.getString(MessageIds.GDE_MSGT2820), 
+			Messages.getString(MessageIds.GDE_MSGT2821), Messages.getString(MessageIds.GDE_MSGT2822),
+			Messages.getString(MessageIds.GDE_MSGT2823), Messages.getString(MessageIds.GDE_MSGT2824), 
+			Messages.getString(MessageIds.GDE_MSGT2825), Messages.getString(MessageIds.GDE_MSGT2831),
+			Messages.getString(MessageIds.GDE_MSGT2837), Messages.getString(MessageIds.GDE_MSGT2843), 
+			Messages.getString(MessageIds.GDE_MSGT2846), Messages.getString(MessageIds.GDE_MSGT2852),
+			Messages.getString(MessageIds.GDE_MSGT2856), Messages.getString(MessageIds.GDE_MSGT2862) };
+	final String[]								jlogConfigurations400	= new String[] {
+			""
+	};
+
 	final static String	normal							= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,0";																													//$NON-NLS-1$
 	final String				HSS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,200";																											//$NON-NLS-1$
 	final String				HSSG2								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,201";																							//$NON-NLS-1$
@@ -155,9 +159,9 @@ public class JLog2Configuration extends Composite {
 
 	/**
 	 * this inner class holds the configuration and contains all logic to insert and update entries
-	 * missing part is the sub device section since there are only the special configurations which contains the required bitmasks
+	 * missing part is the sub device section since there are only the special configurations which contains the required bit masks
 	 */
-	public static class Configuration {
+	public class Configuration {
 
 		String[]	config;
 
@@ -540,6 +544,22 @@ public class JLog2Configuration extends Composite {
 		}
 	}
 
+	public class Configuration322 extends Configuration {
+
+		Configuration322(String newConfiguration) {
+			super(newConfiguration);
+		}
+		
+	}
+
+	public class Configuration400 extends Configuration {
+
+		Configuration400(String newConfiguration) {
+			super(newConfiguration);
+		}
+		
+	}
+	
 	/**
 	 * this UI composite encapsulate Multiplex address configuration drop down configuration
 	 */
@@ -651,13 +671,13 @@ public class JLog2Configuration extends Composite {
 		}
 	}
 
-	final Configuration	configuration;
+	Configuration	configuration;
 
-	public void loadConfiuration(String configString) {
-		if (configString != null)
-			this.configuration.update(configString);
+	public void loadConfiuration(String configString, int version) {
+		if (version == 322)
+			this.configuration = new Configuration322(configString);
 		else
-			this.configuration.update(JLog2Configuration.normal);
+			this.configuration = new Configuration400(configString);
 		
 		initialyzeGUI(this.configuration, true);
 	}
@@ -840,7 +860,7 @@ public class JLog2Configuration extends Composite {
 					this.jlogConfigurationCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					this.jlogConfigurationCombo.setLayoutData(new RowData(420, 17));
 					this.jlogConfigurationCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.jlogConfigurationCombo.setItems(this.jlogConfigurations);
+					this.jlogConfigurationCombo.setItems(this.jlogConfigurations322);
 					this.jlogConfigurationCombo.select(0);
 					this.jlogConfigurationCombo.setVisibleItemCount(10);
 					this.jlogConfigurationCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
