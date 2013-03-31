@@ -30,7 +30,6 @@ import gde.device.kontronik.KosmikConfiguration;
 import gde.device.smmodellbau.jlog2.MessageIds;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.io.BufferedReader;
@@ -91,11 +90,11 @@ public class JLog2Dialog extends DeviceDialog {
 
 	RecordSet								lastActiveRecordSet	= null;
 	boolean									isVisibilityChanged	= false;
-	boolean									isConfigChanged 		= false;
+	boolean									isConfigChanged			= false;
 	int											measurementsCount		= 0;
 	final List<CTabItem>		configurations			= new ArrayList<CTabItem>();
-	
-	boolean 								isJLog2 						= true;	
+
+	boolean									isJLog2							= true;
 
 	/**
 	 * default constructor initialize all variables required
@@ -137,16 +136,16 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
-		        switch (event.detail) {
-		        case SWT.TRAVERSE_ESCAPE:
-		        	JLog2Dialog.this.dialogShell.close();
-		          event.detail = SWT.TRAVERSE_NONE;
-		          event.doit = false;
-		          break;
-		        }
-		      }
-		    });
+					public void handleEvent(Event event) {
+						switch (event.detail) {
+						case SWT.TRAVERSE_ESCAPE:
+							JLog2Dialog.this.dialogShell.close();
+							event.detail = SWT.TRAVERSE_NONE;
+							event.doit = false;
+							break;
+						}
+					}
+				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						JLog2Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
@@ -164,7 +163,7 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						JLog2Dialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						JLog2Dialog.this.application.openHelpDialog("JLog2", JLog2Dialog.this.device.getName().equals("JLOG2") ? "HelpInfo.html" :  "HelpInfo2.html", true); //$NON-NLS-1$
+						JLog2Dialog.this.application.openHelpDialog("JLog2", JLog2Dialog.this.device.getName().equals("JLOG2") ? "HelpInfo.html" : "HelpInfo2.html", true); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addPaintListener(new PaintListener() {
@@ -183,15 +182,15 @@ public class JLog2Dialog extends DeviceDialog {
 					this.tabFolder.setSimple(false);
 					{
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, this.isJLog2 ? 31 : this.device.getNumberOfMeasurements(i)); 
+							createVisualizationTabItem(i, this.isJLog2 ? 31 : this.device.getNumberOfMeasurements(i));
 						}
 					}
 					{
 						this.configurationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 						this.configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
 						this.configurationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2814));
-						this.configurationTabItem.setControl((this.isJLog2 ? new JLog2Configuration(this.tabFolder, SWT.NONE, this, (JLog2)this.device)
-								: new KosmikConfiguration(this.tabFolder, SWT.NONE, this, (Kosmik)this.device)));
+						this.configurationTabItem.setControl((this.isJLog2 ? new JLog2Configuration(this.tabFolder, SWT.NONE, this, (JLog2) this.device) : new KosmikConfiguration(this.tabFolder, SWT.NONE, this,
+								(Kosmik) this.device)));
 					}
 					FormData tabFolderLData = new FormData();
 					tabFolderLData.top = new FormAttachment(0, 1000, 0);
@@ -286,7 +285,7 @@ public class JLog2Dialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Dialog.log.log(Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							JLog2Dialog.this.application.openHelpDialog("JLog2", JLog2Dialog.this.device.getName().equals("JLOG2") ? "HelpInfo.html" :  "HelpInfo2.html", true); //$NON-NLS-1$
+							JLog2Dialog.this.application.openHelpDialog("JLog2", JLog2Dialog.this.device.getName().equals("JLOG2") ? "HelpInfo.html" : "HelpInfo2.html", true); //$NON-NLS-1$
 						}
 					});
 				}
@@ -309,8 +308,8 @@ public class JLog2Dialog extends DeviceDialog {
 								if (!JLog2Dialog.this.configurationTabItem.getControl().isVisible()) {
 									if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
 										try {
-											JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, (JLog2)JLog2Dialog.this.device, JLog2Dialog.this.serialPort, JLog2Dialog.this.application
-													.getActiveChannelNumber(), JLog2Dialog.this);
+											JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, (JLog2) JLog2Dialog.this.device, JLog2Dialog.this.serialPort,
+													JLog2Dialog.this.application.getActiveChannelNumber(), JLog2Dialog.this);
 											try {
 												JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2806), Messages.getString(MessageIds.GDE_MSGT2806));
 												JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
@@ -434,20 +433,19 @@ public class JLog2Dialog extends DeviceDialog {
 	 * @return the tabFolder selection index
 	 */
 	public Integer getTabFolderSelectionIndex() {
-		return this.tabFolder.getItemCount() == this.tabFolder.getSelectionIndex()+1 ? this.tabFolder.getSelectionIndex()-1 : this.tabFolder.getSelectionIndex();
+		return this.tabFolder.getItemCount() == this.tabFolder.getSelectionIndex() + 1 ? this.tabFolder.getSelectionIndex() - 1 : this.tabFolder.getSelectionIndex();
 	}
 
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2801), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
-				((JLog2)this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
+				((JLog2) this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
 		this.selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		this.selectedVersionFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + "version.txt";
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
-		
+
 		if (fd.getFileName().length() > 4) {
-			String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-			String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath;
-			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS,	GDE.FILE_SEPARATOR_UNIX))) 
+			String searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 				device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 			int version = Integer.valueOf("400");
 			try {
@@ -477,14 +475,14 @@ public class JLog2Dialog extends DeviceDialog {
 
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2802), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
-				((JLog2)this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT);
+				((JLog2) this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT);
 		String setupFilePath = fileDialog.open();
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + setupFilePath); //$NON-NLS-1$
-		
+
 		if (setupFilePath != null && setupFilePath.length() > 4) {
-			String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-			String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.equals(fileDialog.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fileDialog.getFilterPath());
+			String searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fileDialog.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+				device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fileDialog.getFilterPath());
 			try {
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setupFilePath), "ISO-8859-1")); //$NON-NLS-1$
 				writer.write(((JLog2Configuration) this.configurationTabItem.getControl()).configuration.getConfiguration());

@@ -1025,10 +1025,7 @@ public class JLog2Configuration extends Composite {
 				}
 				{
 					this.mainConfigLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
-					RowData label_ILLData = new RowData();
-					label_ILLData.width = 70;
-					label_ILLData.height = 20;
-					this.mainConfigLabel.setLayoutData(label_ILLData);
+					this.mainConfigLabel.setLayoutData(new RowData(80, 20));
 					this.mainConfigLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.mainConfigLabel.setText(Messages.getString(MessageIds.GDE_MSGT2830));
 				}

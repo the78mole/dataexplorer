@@ -598,7 +598,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	String getConfigurationFileDirecotry() {
 		String searchPath = this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		if (!FileUtils.checkFileExist(searchPath + GDE.FILE_SEPARATOR_UNIX + JLog2.SM_JLOG2_CONFIG_TXT)) {
-			searchPath = searchPath.substring(0, (searchPath.indexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+			searchPath = searchPath.substring(0, (searchPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 		}
 		return searchPath;
 	}
