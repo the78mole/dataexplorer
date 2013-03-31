@@ -2923,9 +2923,9 @@ public class JLog2Configuration extends Composite {
 	 */
 	private void setMotorShuntCalibration(int value) {
 		if ((value & 0x80) == 0)
-			this.motorShuntCombo.select((value & 0x7E) / 2 + 20);
+			this.motorShuntCombo.select((value & 0x7E) / 2 + 25);
 		else
-			this.motorShuntCombo.select(20 - (value & 0x7E) / 2);
+			this.motorShuntCombo.select(25 - (value & 0x7E) / 2);
 	}
 
 	/**
