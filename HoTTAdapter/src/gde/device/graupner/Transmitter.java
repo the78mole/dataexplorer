@@ -207,7 +207,7 @@ public enum Transmitter {
 				bytes[0x08] = (byte) 0xE8;
 				bytes[0x108] = (byte) 0xE8;
 				System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_32_MEM_INFO.length);
-				bytes[0x160] = (byte) 0xFF;
+				bytes[0x160] = (byte) 0xFF; // bind information
 				
 				convertCurves(bytes, MC_20.ordinal(), MC_32.ordinal());
 				break;
@@ -226,10 +226,10 @@ public enum Transmitter {
 				}
 				
 				System.arraycopy(Transmitter.mc_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_20_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xEA;
+				bytes[0x080] = (byte) 0xEA;
 				bytes[0x108] = (byte) 0xEA;
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				bytes[0x160] = (byte) 0x05;			
+				bytes[0x160] = (byte) 0x05;	// bind information	
 				break;
 				
 			case MX_20:
@@ -248,10 +248,10 @@ public enum Transmitter {
 				}
 				
 				System.arraycopy(Transmitter.mx_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_20_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xEA;
+				bytes[0x008] = (byte) 0xEA;
 				bytes[0x108] = (byte) 0xEA;
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				bytes[0x160] = (byte) 0xFF;
+				bytes[0x160] = (byte) 0xFF; // bind information
 				break;
 				
 			case MC_16:
@@ -270,26 +270,20 @@ public enum Transmitter {
 				}
 				
 				System.arraycopy(Transmitter.mc_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_16_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xEA;
+				bytes[0x008] = (byte) 0xEA;
 				bytes[0x108] = (byte) 0xEA;
 				System.arraycopy(Transmitter.mc_16_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_16_MEM_INFO.length);
-				bytes[0x160] = (byte) 0x05;
+				bytes[0x160] = (byte) 0x05; // bind information
 				break;
 				
 			case MX_16:
-				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
-				bytes[0x1009] = (byte) 0x04; //bind receiver 4=none
-				bytes[0x08] = (byte) 0xE9;
-				bytes[0x108]  = (byte) 0xE9;
+				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);				
 				bytes[0x11db] = (byte) 0xfd;
 				bytes[0x11ef] = (byte) 0x82;
 				bytes[0x11f0] = (byte) 0x81; 
 				break;
 			case MX_12:
 				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
-				bytes[0x1009] = (byte) 0x04; //bind receiver 4=none
-				bytes[0x08] = (byte) 0xE9;
-				bytes[0x108]  = (byte) 0xE9;
 				bytes[0x11db] = (byte) 0xdd;
 				bytes[0x11ef] = (byte) 0x5d;
 				bytes[0x11f0] = (byte) 0x74; 
