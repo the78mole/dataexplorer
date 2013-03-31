@@ -30,6 +30,7 @@ import gde.device.kontronik.KosmikConfiguration;
 import gde.device.smmodellbau.jlog2.MessageIds;
 import gde.log.Level;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.io.BufferedReader;
@@ -107,7 +108,7 @@ public class JLog2Dialog extends DeviceDialog {
 		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		this.isJLog2 = this.device.getClass().getSimpleName().equals("JLog2");
-		this.measurementsCount = this.isJLog2 ? 31 : this.device.getNumberOfMeasurements(Channels.getInstance().getActiveChannelNumber());
+		this.measurementsCount = this.isJLog2 ? 40 : this.device.getNumberOfMeasurements(Channels.getInstance().getActiveChannelNumber());
 	}
 
 	@Override
@@ -299,7 +300,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.liveGathererButton.setLayoutData(saveSetupButtonLData);
 					this.liveGathererButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2807));
-					if (this.device.getClass().getName().equals("LJog2")) {
+					if (this.isJLog2) {
 						this.liveGathererButton.setEnabled(true);
 						this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -442,9 +443,13 @@ public class JLog2Dialog extends DeviceDialog {
 		this.selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		this.selectedVersionFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + "version.txt";
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
-
+		
 		if (fd.getFileName().length() > 4) {
-			int version = Integer.valueOf("322");
+			String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+			String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath;
+			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS,	GDE.FILE_SEPARATOR_UNIX))) 
+				device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+			int version = Integer.valueOf("400");
 			try {
 				File versionFile = new File(this.selectedVersionFile);
 				if (versionFile.exists()) {
@@ -465,7 +470,7 @@ public class JLog2Dialog extends DeviceDialog {
 			}
 			catch (Exception e) {
 				JLog2Dialog.log.log(Level.SEVERE, e.getMessage(), e);
-				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(JLog2Configuration.normal, version);
+				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(JLog2Configuration.Configuration400.noneSelected, version);
 			}
 		}
 	}
@@ -477,6 +482,9 @@ public class JLog2Dialog extends DeviceDialog {
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + setupFilePath); //$NON-NLS-1$
 		
 		if (setupFilePath != null && setupFilePath.length() > 4) {
+			String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+			String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.equals(fileDialog.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fileDialog.getFilterPath());
 			try {
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setupFilePath), "ISO-8859-1")); //$NON-NLS-1$
 				writer.write(((JLog2Configuration) this.configurationTabItem.getControl()).configuration.getConfiguration());

@@ -28,6 +28,7 @@ import gde.device.smmodellbau.JLog2Dialog;
 import gde.device.smmodellbau.jlog2.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
 
 import java.util.logging.Level;
@@ -169,10 +170,12 @@ public class KosmikConfiguration extends Composite {
 				kosmikHeaderLabelLData.width = this.getClientArea().width - 20;
 				kosmikHeaderLabelLData.height = GDE.IS_MAC ? 18 : 16;
 				this.kosmikHeaderLabel.setLayoutData(kosmikHeaderLabelLData);
+				this.kosmikHeaderLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.kosmikHeaderLabel.setText(Messages.getString(MessageIds.GDE_MSGW2804));
 			}
 			{
 				this.motorRotorRpmLabel = new CLabel(this, SWT.NONE);
+				this.motorRotorRpmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.motorRotorRpmLabel.setText(Messages.getString(MessageIds.GDE_MSGW2805));
 				FormData rpmLabelLData = new FormData();
 				rpmLabelLData.width = 272;
@@ -183,6 +186,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.motorRotorRpmCombo = new CCombo(this, SWT.BORDER);
+				this.motorRotorRpmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.motorRotorRpmCombo.setItems(new String[] { "  Motor", "Propeller/Rotor" }); //$NON-NLS-1$ //$NON-NLS-2$
 				FormData motorRotorRpmComboLData = new FormData();
 				motorRotorRpmComboLData.width = 120;
@@ -201,6 +205,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.numMotorPolsLabel = new CLabel(this, SWT.NONE);
+				this.numMotorPolsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.numMotorPolsLabel.setText(Messages.getString(MessageIds.GDE_MSGW2808));
 				FormData numPolsLabelLData = new FormData();
 				numPolsLabelLData.width = 272;
@@ -211,6 +216,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.numMotorPolsCombo = new CCombo(this, SWT.BORDER);
+				this.numMotorPolsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.numMotorPolsCombo.setItems(new String[] { "    2", "    4", "    6", "    8", "   10", "   12", "   14", "   16", "   18" });
 				FormData numMotorPolsComboLData = new FormData();
 				numMotorPolsComboLData.width = 80;
@@ -257,6 +263,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.motorPinionLabel = new CLabel(this, SWT.NONE);
+				this.motorPinionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.motorPinionLabel.setText(Messages.getString(MessageIds.GDE_MSGW2806));
 				FormData motorPinionLabelLData = new FormData();
 				motorPinionLabelLData.width = 272;
@@ -267,6 +274,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.motorPinionText = new Text(this, SWT.CENTER | SWT.BORDER);
+				this.motorPinionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.motorPinionText.setText("17"); //$NON-NLS-1$
 				FormData motorPinionTextLData = new FormData();
 				motorPinionTextLData.width = 23;
@@ -314,6 +322,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.mainGearToothCountLabel = new CLabel(this, SWT.NONE);
+				this.mainGearToothCountLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.mainGearToothCountLabel.setText(Messages.getString(MessageIds.GDE_MSGW2807));
 				FormData mainGearToothCountLabelLData = new FormData();
 				mainGearToothCountLabelLData.width = 272;
@@ -324,6 +333,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.mainGearToothCountText = new Text(this, SWT.CENTER | SWT.BORDER);
+				this.mainGearToothCountText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.mainGearToothCountText.setText("87");
 				FormData mainGearToothCountTextLData = new FormData();
 				mainGearToothCountTextLData.width = 30;
@@ -371,6 +381,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.temperatureUnitLabel = new CLabel(this, SWT.NONE);
+				this.temperatureUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.temperatureUnitLabel.setText("Temperatur(e):"); //$NON-NLS-1$
 				FormData temperatureUnitLabelLData = new FormData();
 				temperatureUnitLabelLData.width = 272;
@@ -381,6 +392,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.temperatureUnitCombo = new CCombo(this, SWT.BORDER);
+				this.temperatureUnitCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.temperatureUnitCombo.setItems(new String[] { "  Celsius", " Fahrenheit" });
 				FormData temperatureUnitComboLData = new FormData();
 				temperatureUnitComboLData.width = 100;
@@ -446,6 +458,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.kosmikVersionLabel = new CLabel(this, SWT.NONE);
+				this.kosmikVersionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.kosmikVersionLabel.setText("Kosmik Version:"); //$NON-NLS-1$
 				FormData kosmikVersionLabelLData = new FormData();
 				kosmikVersionLabelLData.width = 272;
@@ -456,6 +469,7 @@ public class KosmikConfiguration extends Composite {
 			}
 			{
 				this.kosmikVersionCombo = new CCombo(this, SWT.BORDER);
+				this.kosmikVersionCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.kosmikVersionCombo.setItems(new String[] { "  <= 3.1", "  >= 3.2" }); //$NON-NLS-1$ //$NON-NLS-2$
 				FormData kosmikVersionComboLData = new FormData();
 				kosmikVersionComboLData.width = 80;
