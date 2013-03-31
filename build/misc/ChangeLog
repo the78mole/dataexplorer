@@ -13,6 +13,7 @@ HoTTAdapter* - change/correct Rx->Tx-PLoss measurement name
 HoTTAdapter* - change algorithm sending commands during live data gathering
 HoTTAdapter* - update Rx->Tx-PLoss calculation, integrate package loss over 1 second period
 HoTTAdapter* - update to latest firmware (ESC)
+HoTTAdapter* - fix bug in mx-12 <-> mx-16 MDL converter
 Jlog2 - update support firmware 4.0.0
 documentation update
 
