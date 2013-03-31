@@ -663,7 +663,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	}
 	
 	String getConfigurationFileDirecotry() {
-		String searchPath = this.getDataBlockPreferredDataLocation();
+		String searchPath = this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		if (searchPath.contains(UniLog2.SM_UNILOG_2_DIR_STUB)) {
 			searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
 		}
