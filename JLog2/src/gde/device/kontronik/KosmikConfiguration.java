@@ -382,7 +382,7 @@ public class KosmikConfiguration extends Composite {
 			{
 				this.temperatureUnitLabel = new CLabel(this, SWT.NONE);
 				this.temperatureUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.temperatureUnitLabel.setText("Temperatur(e):"); //$NON-NLS-1$
+				this.temperatureUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGW2810));
 				FormData temperatureUnitLabelLData = new FormData();
 				temperatureUnitLabelLData.width = 272;
 				temperatureUnitLabelLData.height = GDE.IS_MAC ? 18 : 16;
