@@ -123,7 +123,7 @@ public class JLog2Configuration extends Composite {
 	final String[]								logModes							= new String[] { "(0) OF/LV", "(2) SER", "(8) JLV" };																																																											//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	final String[]								motorPols							= new String[] {
 			"2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "38", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48" };																																							//$NON-NLS-1$
-	final String[]								currentShuntAdjust		= new String[51];
+	final String[]								currentShuntAdjust		= new String[121];
 	final String[]								zeroTo9								= new String[10];																																																																														;
 	final String[]								zeroTo99							= new String[100];																																																																													;
 	final String[]								zeroTo50							= new String[51];
@@ -139,7 +139,7 @@ public class JLog2Configuration extends Composite {
 	final StringBuilder						comOutput							= new StringBuilder().append(this.comOutputString);
 	final String									hottOutput						= ", HoTT";																																							//$NON-NLS-1$
 	//firmware 4.0.0
-	final String[]								comOutputBase					= new String[] {" ----------- "," FTDI livestream"," Unidisplay"," JETI v1"," MPX"};		//$NON-NLS-1$
+	final String[]								comOutputBase					= new String[] {" ----------- "," FTDI livestream"," Unidisplay"," MPX"," JETI v1"};		//$NON-NLS-1$
 	final String[]								comOutputJetiEx				= new String[] {" ----------- "," FTDI livestream"," JETI EX"};													//$NON-NLS-1$
 	final String[]								comOutputHoTTv4				= new String[] {" ----------- "," FTDI livestream"," JETI v1"," HoTT v4"};							//$NON-NLS-1$
 	final String[]								comOutputFutabaSbus2	= new String[] {" ----------- "," FTDI livestream"," JETI v1"," MPX"," S.BUS2"};				//$NON-NLS-1$
@@ -170,7 +170,7 @@ public class JLog2Configuration extends Composite {
 			for (int i = 0; i < tmpConfig.length; i++) {
 				this.config[i] = tmpConfig[i];
 			}
-			JLog2Configuration.log.log(Level.FINER, getConfiguration());
+			JLog2Configuration.log.log(Level.OFF, getConfiguration());
 		}
 
 		public int get(int index) {
@@ -925,7 +925,7 @@ public class JLog2Configuration extends Composite {
 		this.device = useDevice;
 
 		for (int i = 0; i < this.currentShuntAdjust.length; i++) {
-			this.currentShuntAdjust[i] = GDE.STRING_EMPTY + (i - 25);
+			this.currentShuntAdjust[i] = GDE.STRING_EMPTY + (i - 60);
 		}
 		for (int i = 0; i < this.zeroTo9.length; i++) {
 			this.zeroTo9[i] = GDE.STRING_EMPTY + i;
@@ -1083,7 +1083,7 @@ public class JLog2Configuration extends Composite {
 							if (JLog2Configuration.this.configuration.version == 322 && JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex() > 0)
 								JLog2Configuration.this.application.openMessageDialogAsync(JLog2Configuration.this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2826));
 							JLog2Configuration.this.configuration.switchConfig();
-							JLog2Configuration.this.initialyzeGUI(JLog2Configuration.this.configuration, false);
+							JLog2Configuration.this.initialyzeGUI(JLog2Configuration.this.configuration, true);
 							enableSaveSettings();
 						}
 					});
@@ -1497,7 +1497,7 @@ public class JLog2Configuration extends Composite {
 					this.motorShuntCombo.setLayoutData(motorShuntComboLData);
 					this.motorShuntCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.motorShuntCombo.setItems(this.currentShuntAdjust);
-					this.motorShuntCombo.select(25);
+					this.motorShuntCombo.select(60);
 					this.motorShuntCombo.setVisibleItemCount(10);
 					this.motorShuntCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -2590,13 +2590,14 @@ public class JLog2Configuration extends Composite {
 							case 1: //FTDI live stream
 								JLog2Configuration.this.configuration.setTelemetryBaudrateType(4);
 								break;
-							//case 2: //Jeti
+							//case 2: //Unidisplay
 							//	configuration.setTelemetryBaudrateType(0);
 							//	break;
 							case 3: //MPX
-								enableMpxAddressSelection(true);
+								if (JLog2Configuration.this.telemetryCombo.getText().contains("MPX"))
+									enableMpxAddressSelection(true);
 								break;
-							//case 4: //UniDisplay
+							//case 4: //Jeti v1
 							//	configuration.setTelemetryBaudrateType(0);
 							//	break;
 							}
@@ -2789,6 +2790,7 @@ public class JLog2Configuration extends Composite {
 		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43));
 		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44));
 		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45));
+		enableMpxAddressSelection(false);
 		//setTelemetryLivedata(config.get(46) & 0xFFF0);
 		if (isInitialLoad) {
 			setLogMode(config.get(2)); //enable/disables lots of combos
@@ -2923,9 +2925,9 @@ public class JLog2Configuration extends Composite {
 	 */
 	private void setMotorShuntCalibration(int value) {
 		if ((value & 0x80) == 0)
-			this.motorShuntCombo.select((value & 0x7E) / 2 + 25);
+			this.motorShuntCombo.select((value & 0x7E) / 2 + 60);
 		else
-			this.motorShuntCombo.select(25 - (value & 0x7E) / 2);
+			this.motorShuntCombo.select(60 - (value & 0x7E) / 2);
 	}
 
 	/**
