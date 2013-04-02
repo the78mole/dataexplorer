@@ -18,10 +18,15 @@
 ****************************************************************************************/
 package gde.ui;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.IDevice;
+import gde.log.Level;
+
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -36,15 +41,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Pattern;
 import org.eclipse.swt.graphics.Point;
-//import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-
-import gde.GDE;
-import gde.device.IDevice;
 
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
@@ -456,9 +457,18 @@ public class SWTResourceManager {
 			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
-			log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl);
-			log.log(Level.SEVERE, e.getMessage(), e);
-			return getImage(activeDeviceInstance, "resource/NoDevicePicture.jpg");
+			try {
+				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl + " not found");
+				Image img = new Image(Display.getDefault(), new FileInputStream(Settings.getInstance().getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new image created = " + Settings.getInstance().getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+				resources.put(tmpUrl, img);
+				return img;
+			}
+			catch (Throwable t) {
+				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + Settings.getInstance().getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return getImage(activeDeviceInstance, "resource/NoDevicePicture.jpg");
+			}
 		}
 	}
 
