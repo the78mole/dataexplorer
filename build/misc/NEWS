@@ -1,24 +1,20 @@
-GNU DataExplorer - News - comes with version 3.0.7
+GNU DataExplorer - News - comes with version 3.0.8
 
-1)  HoTTAdapter(2) - live data, display detected sensors, optimize performance 
-2)  add IGCAdapter - enable import of IGC log files to verify before upload
-3)  add GPXAdapter - enable import of GPX files, analyze geo coordinates as well as other data
-4)  fix bug #37976: installer.nsi is missing, not required, changed build target
-5)  fix bug #37991: Prefix is not recognized, changed target directories to prefix if in use
-6)  fix bug in HoTTAdapter saving modified filter data
-7)  fix bug HoTTAdapter2 reading channel data 9-12
-8)  fix bug HoTTAdapter2 displaying cell voltage values
-9)  fix bug HoTTAdapter* reading HF data
-10) fix bug HoTTAdapter* converting mx-20 to mc-20 and vice versa
-11) fix bug HoTTAdapter* converting mc-32 to m*-20 
-12) fix bugs in JetiAdapter - exporting KMZ/KML/IGC
-13) fix bug in GPS color and velocity configuration dialog
-14) fix DevicePropertiesEditor - statistics type and property types doesn't persist after change
-15) add HoTTAdapter* mc-16 converter capabilities
-16) add HoTTAdapter* TX-Rx-VPack curve
-17) update UniLog2 configuration to support HoTT sensor type selection 
-18) update device XSD to simplify timeout configuration 
-19) documentation update
+1)  add Renschler Picolario2 support
+2)  add Kontronik Kosmik support
+3)  update SWT to version 4.2.1
+4)  add IGCAdapter support for short naming
+5)  fix bug #38246 - Multiple actions when right-clicking into graphic
+6)  fix RFE #38245 - Allow editing of commentary in table "File comment"
+7)  fix bug #38247 - Progress bar not reset after loading files
+8)  fix RFE #38248 - Feature: Copy function for data table
+9)  HoTTAdapter* - change/correct Rx->Tx-PLoss measurement name
+10) HoTTAdapter* - change algorithm sending commands during live data gathering
+11) HoTTAdapter* - update Rx->Tx-PLoss calculation, integrate package loss over 1 second period
+12) HoTTAdapter* - update to latest firmware (ESC)
+13) HoTTAdapter* - fix bug in mx-12 <-> mx-16 MDL converter
+14) Jlog2 - update support firmware 4.0.0
+15) documentation update
 
 
 

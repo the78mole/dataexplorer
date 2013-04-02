@@ -1,16 +1,10 @@
 ﻿Development backlog: loose collection of open work items to be done in future
  
-write temporary files of all actual records while live data gathering
-  
 create more junit tests 
  
 ongoing update help content
 
 XML file format (OSD)
-
-universal device (CSV/OF via serial)
-
-refine adding association for existing key MRUList, RegisteryHelper.cpp
 
 Skynavigator Export
 
