@@ -77,7 +77,7 @@ public class GDE {
 
 
 	// ****** begin global constants section *******
-	public static final String		VERSION													= "Version 3.0.7";																																																						//$NON-NLS-1$
+	public static final String		VERSION													= "Version 3.0.8";																																																						//$NON-NLS-1$
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V22";																																																										//$NON-NLS-1$
