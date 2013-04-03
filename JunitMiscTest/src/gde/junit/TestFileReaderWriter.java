@@ -806,7 +806,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/JLog2/"), 1);
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".txt") && !file.getAbsolutePath().toLowerCase().contains("config") && !file.getAbsolutePath().toLowerCase().contains("version")) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".txt") && !file.getAbsolutePath().toLowerCase().contains("config") 
+						&& !file.getAbsolutePath().toLowerCase().contains("version") && !file.getAbsolutePath().toLowerCase().contains("info")) {
 					System.out.println("working with : " + file);
 					
 					try {
