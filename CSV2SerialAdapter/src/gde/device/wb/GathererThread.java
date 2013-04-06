@@ -124,9 +124,9 @@ public class GathererThread extends Thread {
 						this.channelNumber = Integer.valueOf(GDE.STRING_EMPTY+(char)dataBuffer[1]);
 						this.stateNumber = Integer.valueOf(GDE.STRING_EMPTY+(char)dataBuffer[3]);
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME,	device.getChannelCount() + " - data for channel = " + channelNumber + " state = " + stateNumber);
-						this.channel = this.channels.get(this.channelNumber);
 						if (this.channelNumber > device.getChannelCount()) 
 							continue; //skip data if not configured
+						this.channel = this.channels.get(this.channelNumber);
 	
 						processName = this.device.getStateProperty(this.stateNumber).getName();
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME,	"processing mode = " + processName ); //$NON-NLS-1$
