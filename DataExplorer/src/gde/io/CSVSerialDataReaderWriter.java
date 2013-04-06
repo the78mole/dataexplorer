@@ -96,7 +96,6 @@ public class CSVSerialDataReaderWriter {
 		RecordSet channelRecordSet = null;
 		int lastRecordSetNumberOffset = 0;
 		Vector<RecordSet> createdRecordSets = new Vector<RecordSet>(1);
-		boolean isNewData = true;
 
 		try {
 			if (channelConfigNumber == null)
@@ -168,10 +167,11 @@ public class CSVSerialDataReaderWriter {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
 
 					try {
+						if (data.channelConfigNumber > device.getChannelCount()) 
+							continue; //skip data if not configured
+
 						channelConfigNumber = device.recordSetNumberFollowChannel() ? data.channelConfigNumber : channelConfigNumber;
 						activeChannel = channels.get(channelConfigNumber);
-						if (channelConfigNumber > device.getChannelCount()) 
-							continue; //skip data if not configured
 						
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber + " state = " + data.state);
 						
@@ -179,14 +179,14 @@ public class CSVSerialDataReaderWriter {
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
-						channelRecordSet = activeChannel.get(recordSetName);
+						channelRecordSet = activeChannel.get(device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getLastActiveRecordSetName() : recordSetName);
 					}
 					catch (Exception e) {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.state, filePath, device.getPropertiesFileName()})); 
 					}
 
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (isNewData || activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.recordSetNumberOffset) {
+					if (activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.recordSetNumberOffset) {
 						//record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
 						if (lastRecordSetNumberOffset != data.recordSetNumberOffset && channelRecordSet != null) {
 							if (channelRecordSet.get(0).size() < 3) {
@@ -260,7 +260,6 @@ public class CSVSerialDataReaderWriter {
 					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
 						application.setProgress(progress, sThreadId);
 					}
-					isNewData = false;
 				}
 				if (application.getStatusBar() != null) 	application.setProgress(100, sThreadId);
 
@@ -291,8 +290,11 @@ public class CSVSerialDataReaderWriter {
 					if (createdRecordSets.size() == 1) {
 						channels.switchChannel(channelConfigNumber, createdRecordSets.firstElement().getName());
 					}
-					else {
+					else if (createdRecordSets.size() > 1) {
 						channels.switchChannel(channelConfigNumber, createdRecordSets.lastElement().getName());
+					}
+					else {
+						channels.switchChannel(1, GDE.STRING_EMPTY);
 					}
 				}
 
@@ -316,7 +318,10 @@ public class CSVSerialDataReaderWriter {
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) 
-					if (createdRecordSets.size() == 1) {
+					if (createdRecordSets.size() == 0) {
+						channels.switchChannel(1, GDE.STRING_EMPTY);
+					}
+					else if (createdRecordSets.size() == 1) {
 						channels.switchChannel(channelConfigNumber, createdRecordSets.firstElement().getName());
 					}
 					else {
