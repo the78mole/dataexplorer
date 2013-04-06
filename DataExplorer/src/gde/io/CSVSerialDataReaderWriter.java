@@ -102,7 +102,7 @@ public class CSVSerialDataReaderWriter {
 				activeChannel = channels.getActiveChannel();
 			else
 				activeChannel = channels.get(channelConfigNumber);
-			channelConfigNumber = channels.getActiveChannelNumber();
+			activeChannelConfigNumber = channels.getActiveChannelNumber();
 
 			if (activeChannel != null) {
 				if (application.getStatusBar() != null) {
@@ -170,10 +170,10 @@ public class CSVSerialDataReaderWriter {
 						if (data.channelConfigNumber > device.getChannelCount()) 
 							continue; //skip data if not configured
 
-						channelConfigNumber = device.recordSetNumberFollowChannel() ? data.channelConfigNumber : channelConfigNumber;
-						activeChannel = channels.get(channelConfigNumber);
+						activeChannelConfigNumber = device.recordSetNumberFollowChannel() ? data.channelConfigNumber : activeChannelConfigNumber;
+						activeChannel = channels.get(activeChannelConfigNumber);
 						
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber + " state = " + data.state);
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.state);
 						
 						recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
 						if (recordNameExtend.length() > 0) {
@@ -213,7 +213,7 @@ public class CSVSerialDataReaderWriter {
 							}
 						}
 						else {
-							int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(channelConfigNumber) : activeChannel.getNextRecordSetNumber();
+							int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(activeChannelConfigNumber) : activeChannel.getNextRecordSetNumber();
 							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
 							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false));
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
@@ -257,7 +257,7 @@ public class CSVSerialDataReaderWriter {
 					}
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % (GDE.IS_MAC ? 20 : 10) == 0) 	{
 						application.setProgress(progress, sThreadId);
 					}
 				}
@@ -288,10 +288,10 @@ public class CSVSerialDataReaderWriter {
 				
 				if (application.getStatusBar() != null) {
 					if (createdRecordSets.size() == 1) {
-						channels.switchChannel(channelConfigNumber, createdRecordSets.firstElement().getName());
+						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.firstElement().getName());
 					}
 					else if (createdRecordSets.size() > 1) {
-						channels.switchChannel(channelConfigNumber, createdRecordSets.lastElement().getName());
+						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.lastElement().getName());
 					}
 					else {
 						channels.switchChannel(1, GDE.STRING_EMPTY);
@@ -322,10 +322,10 @@ public class CSVSerialDataReaderWriter {
 						channels.switchChannel(1, GDE.STRING_EMPTY);
 					}
 					else if (createdRecordSets.size() == 1) {
-						channels.switchChannel(channelConfigNumber, createdRecordSets.firstElement().getName());
+						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.firstElement().getName());
 					}
 					else {
-						channels.switchChannel(channelConfigNumber, createdRecordSets.lastElement().getName());
+						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.lastElement().getName());
 					}
 			}
 			// now display the error message
