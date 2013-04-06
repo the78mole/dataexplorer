@@ -257,8 +257,14 @@ public class CSVSerialDataReaderWriter {
 					}
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % (GDE.IS_MAC ? 20 : 10) == 0) 	{
+					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
 						application.setProgress(progress, sThreadId);
+						try {
+							Thread.sleep(2);
+						}
+						catch (Exception e) {
+							// ignore
+						}
 					}
 				}
 				if (application.getStatusBar() != null) 	application.setProgress(100, sThreadId);
