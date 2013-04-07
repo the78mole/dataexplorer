@@ -279,14 +279,16 @@ public enum Transmitter {
 			case MX_16:
 				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);				
 				bytes[0x11db] = (byte) 0xfd;
-				bytes[0x11ef] = (byte) 0x82;
-				bytes[0x11f0] = (byte) 0x81; 
+				//bytes[0x11ef] = (byte) 0x82;
+				//bytes[0x11f0] = (byte) 0x81; 
+				calculateAndWriteCRC(bytes, 0x11db, 0x11ef);
 				break;
 			case MX_12:
 				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
 				bytes[0x11db] = (byte) 0xdd;
-				bytes[0x11ef] = (byte) 0x5d;
-				bytes[0x11f0] = (byte) 0x74; 
+				//bytes[0x11ef] = (byte) 0x5d;
+				//bytes[0x11f0] = (byte) 0x74; 
+				calculateAndWriteCRC(bytes, 0x11db, 0x11ef);
 				break;
 			}
 			in.close();
