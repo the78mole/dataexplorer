@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 public class FileTransferTabItem extends CTabItem {
-	private static final int		INNER_COMPOSITE_HEIGHT	= 580;
+	private static final int		INNER_COMPOSITE_HEIGHT	= 250 + 280 + (GDE.IS_MAC ? 70 : 10); //height of pcFolderGroup, sdCardActionGroup
 	final static String					$CLASS_NAME							= FileTransferTabItem.class.getName();
 	final static Logger					log											= Logger.getLogger(FileTransferTabItem.$CLASS_NAME);
 
@@ -230,7 +230,7 @@ public class FileTransferTabItem extends CTabItem {
 			this.setControl(this.scrolledComposite);
 			{
 				this.outherComposite = new Composite(this.scrolledComposite, SWT.NONE);
-				this.outherComposite.setBounds(0, 0, 1100, FileTransferTabItem.INNER_COMPOSITE_HEIGHT);
+				this.outherComposite.setBounds(0, 0, 1100, FileTransferTabItem.INNER_COMPOSITE_HEIGHT+5);
 				this.outherComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 
 				this.innerComposite = new Composite(this.outherComposite, SWT.NONE);
@@ -244,10 +244,7 @@ public class FileTransferTabItem extends CTabItem {
 					if (!GDE.IS_MAC) this.pcFolderGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 					RowLayout pcGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					this.pcFolderGroup.setLayout(pcGroupLayout);
-					RowData pcGroupLData = new RowData();
-					pcGroupLData.width = 1090;
-					pcGroupLData.height = 250;
-					this.pcFolderGroup.setLayoutData(pcGroupLData);
+					this.pcFolderGroup.setLayoutData(new RowData(1090, 250));
 					this.pcFolderGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 					this.pcFolderGroup.setText(Messages.getString(MessageIds.GDE_MSGT2427));
 					{
@@ -375,10 +372,7 @@ public class FileTransferTabItem extends CTabItem {
 					if (!GDE.IS_MAC) this.sdCardActionGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 					RowLayout TransmitterSourceGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					this.sdCardActionGroup.setLayout(TransmitterSourceGroupLayout);
-					RowData transmitterSourceGroupLData = new RowData();
-					transmitterSourceGroupLData.width = 1090;
-					transmitterSourceGroupLData.height = 280;
-					this.sdCardActionGroup.setLayoutData(transmitterSourceGroupLData);
+					this.sdCardActionGroup.setLayoutData(new RowData(1090, 280));
 					this.sdCardActionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 					this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
 					this.sdCardActionGroup.addPaintListener(new PaintListener() {
