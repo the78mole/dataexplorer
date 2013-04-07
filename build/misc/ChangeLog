@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.0.9 - xx yyy 2013
 AV4ms_FV_762 - fix problem importing data
+HoTTAdapter*, DataVario*, LinkVario* - fix/adapt UI in combination with new SWT release
 
 Version 3.0.8 - 03 Apr 2013
 add Renschler Picolario2 support
