@@ -137,7 +137,7 @@ public class VarioToolTabItem extends CTabItem {
 		super(displayTabFolder, style, position);
 		this.tabFolder = displayTabFolder;
 		SWTResourceManager.registerResourceUser(this);
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.device = useDevice;
 		this.isDataVarioTool = isVarioTool;
 		this.setText(isVarioTool ? Messages.getString(MessageIds.GDE_MSGT1803) : Messages.getString(MessageIds.GDE_MSGT1804));
@@ -154,14 +154,14 @@ public class VarioToolTabItem extends CTabItem {
 				{
 					this.innerContentComposite = new Composite(this.mainTabScrolledComposite, SWT.NONE);
 					this.innerContentComposite.setLayout(null);
-					this.innerContentComposite.setBounds(0, 0, 1000, this.isDataVarioTool ? 760 : 870);
+					this.innerContentComposite.setBounds(0, 0, 1000, this.isDataVarioTool ? (GDE.IS_MAC ? 780 : 760) : (GDE.IS_MAC ? 890 : 870));
 					if (this.isDataVarioTool) {
 						this.setupGroup0 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup0.setLayout(group1Layout);
 						this.setupGroup0.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup0.setText(Messages.getString(MessageIds.GDE_MSGT1817));
-						this.setupGroup0.setBounds(5, 6, 490, 45);
+						this.setupGroup0.setBounds(5, 6, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup0, SWT.NONE).setSize(5, 18);
 						}
@@ -230,7 +230,7 @@ public class VarioToolTabItem extends CTabItem {
 					}
 					{
 						this.setupGroup1 = new Group(this.innerContentComposite, SWT.NONE);
-						this.setupGroup1.setBounds(this.isDataVarioTool ? 505 : 5, 6, this.isDataVarioTool ? 490 : 990, 45);
+						this.setupGroup1.setBounds(this.isDataVarioTool ? 505 : 5, 6, this.isDataVarioTool ? 490 : 990, GDE.IS_MAC ? 55 : 45);
 						this.setupGroup1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup1.setText(Messages.getString(MessageIds.GDE_MSGT1805));
 						RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -303,7 +303,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup2.setLayout(group2Layout);
 						this.setupGroup2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup2.setText(Messages.getString(MessageIds.GDE_MSGT1808));
-						this.setupGroup2.setBounds(5, 53, 490, 45);
+						this.setupGroup2.setBounds(5, 53, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup2, SWT.NONE).setSize(5, 18);
 						}
@@ -372,7 +372,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup3.setLayout(group3Layout);
 						this.setupGroup3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup3.setText(Messages.getString(MessageIds.GDE_MSGT1812));
-						this.setupGroup3.setBounds(505, 53, 490, 45);
+						this.setupGroup3.setBounds(505, 53, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup3, SWT.NONE).setSize(5, 18);
 						}
@@ -469,7 +469,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup4.setLayout(group4Layout);
 						this.setupGroup4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup4.setText(Messages.getString(MessageIds.GDE_MSGT1813));
-						this.setupGroup4.setBounds(5, 100, 490, 95);
+						this.setupGroup4.setBounds(5, 100, 490, GDE.IS_MAC ? 105 : 95);
 						{
 							new CLabel(this.setupGroup4, SWT.NONE).setSize(5, 72);
 						}
@@ -626,7 +626,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup5.setLayout(group5Layout);
 						this.setupGroup5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup5.setText(Messages.getString(MessageIds.GDE_MSGT1823));
-						this.setupGroup5.setBounds(505, 100, 490, 95);
+						this.setupGroup5.setBounds(505, 100, 490, GDE.IS_MAC ? 105 : 95);
 						{
 							new CLabel(this.setupGroup5, SWT.NONE).setSize(5, 90);
 						}
@@ -720,7 +720,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup6.setLayout(group6Layout);
 						this.setupGroup6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup6.setText(Messages.getString(MessageIds.GDE_MSGT1828));
-						this.setupGroup6.setBounds(5, 197, 490, 45);
+						this.setupGroup6.setBounds(5, 197, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup6, SWT.NONE).setSize(5, 18);
 						}
@@ -787,7 +787,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup7.setLayout(setupGroup7Layout);
 						this.setupGroup7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup7.setText(Messages.getString(MessageIds.GDE_MSGT1831));
-						this.setupGroup7.setBounds(505, 197, 490, 45);
+						this.setupGroup7.setBounds(505, 197, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup7, SWT.NONE).setSize(5, 18);
 						}
@@ -854,7 +854,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup8.setLayout(setupGroup8Layout);
 						this.setupGroup8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup8.setText(Messages.getString(MessageIds.GDE_MSGT1834));
-						this.setupGroup8.setBounds(5, 244, 990, 114);
+						this.setupGroup8.setBounds(5, 244, 990, GDE.IS_MAC ? 125 : 115);
 						{
 							new CLabel(this.setupGroup8, SWT.NONE).setSize(5, 50);
 						}
@@ -971,7 +971,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup9.setLayout(setupGroup9Layout);
 						this.setupGroup9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup9.setText(Messages.getString(MessageIds.GDE_MSGT1840));
-						this.setupGroup9.setBounds(5, 361, 490, 133);
+						this.setupGroup9.setBounds(5, 361, 490, GDE.IS_MAC ? 145 : 135);
 						{
 							new CLabel(this.setupGroup9, SWT.NONE).setSize(5, 108);
 						}
@@ -1113,7 +1113,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup10.setLayout(setupGroup10Layout);
 						this.setupGroup10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup10.setText(Messages.getString(MessageIds.GDE_MSGT1847));
-						this.setupGroup10.setBounds(505, 361, 490, 133);
+						this.setupGroup10.setBounds(505, 361, 490, GDE.IS_MAC ? 145 : 135);
 						{
 							new CLabel(this.setupGroup10, SWT.NONE).setSize(5, 109);
 						}
@@ -1233,7 +1233,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup11.setLayout(setupGroup11Layout);
 						this.setupGroup11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup11.setText(Messages.getString(MessageIds.GDE_MSGT1854));
-						this.setupGroup11.setBounds(5, 497, 490, 45);
+						this.setupGroup11.setBounds(5, 497, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup3, SWT.NONE).setSize(5, 18);
 						}
@@ -1330,7 +1330,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup12.setLayout(setupGroup12Layout);
 						this.setupGroup12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup12.setText(Messages.getString(MessageIds.GDE_MSGT1857));
-						this.setupGroup12.setBounds(505, 497, 490, 45);
+						this.setupGroup12.setBounds(505, 497, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup12, SWT.NONE).setSize(5, 18);
 						}
@@ -1426,7 +1426,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup13.setLayout(setupGroup13Layout);
 						this.setupGroup13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup13.setText(Messages.getString(MessageIds.GDE_MSGT1860));
-						this.setupGroup13.setBounds(5, 545, 490, 91);
+						this.setupGroup13.setBounds(5, 545, 490, GDE.IS_MAC ? 100 : 90);
 						{
 							this.setupComposite13a = new Composite(this.setupGroup13, SWT.NONE);
 							RowLayout setupComposite13Layout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
@@ -1562,7 +1562,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup14.setLayout(group1Layout1);
 						this.setupGroup14.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup14.setText(Messages.getString(MessageIds.GDE_MSGT1865));
-						this.setupGroup14.setBounds(505, 545, 490, 91);
+						this.setupGroup14.setBounds(505, 545, 490, GDE.IS_MAC ? 100 : 90);
 						{
 							new CLabel(this.setupGroup14, SWT.NONE).setSize(5, 37);
 						}
@@ -1647,7 +1647,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup15.setLayout(setupGroup15Layout);
 						this.setupGroup15.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup15.setText(Messages.getString(MessageIds.GDE_MSGT1869));
-						this.setupGroup15.setBounds(5, 639, 490, 45);
+						this.setupGroup15.setBounds(5, 639, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup15, SWT.NONE);
 						}
@@ -1692,7 +1692,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup16.setLayout(setupGroup16Layout);
 						this.setupGroup16.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup16.setText(Messages.getString(MessageIds.GDE_MSGT1872));
-						this.setupGroup16.setBounds(505, 639, 490, 45);
+						this.setupGroup16.setBounds(505, 639, 490, GDE.IS_MAC ? 55 : 45);
 						{
 							new CLabel(this.setupGroup16, SWT.NONE).setSize(5, 18);
 						}
@@ -1757,7 +1757,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup17.setLayout(setupGroup17Layout);
 						this.setupGroup17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup17.setText(Messages.getString(MessageIds.GDE_MSGT1873));
-						this.setupGroup17.setBounds(5, 687, 490, 71);
+						this.setupGroup17.setBounds(5, 687, 490, GDE.IS_MAC ? 80 : 70);
 						{
 							new CLabel(this.setupGroup17, SWT.NONE).setSize(5, 18);
 						}
@@ -1766,7 +1766,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupButton17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupButton17.setText(Messages.getString(MessageIds.GDE_MSGT1874));
 							RowData setupButton17LData = new RowData();
-							setupButton17LData.width = 465;
+							setupButton17LData.width = GDE.IS_MAC ? 460 : 465;
 							setupButton17LData.height = 18;
 							this.setupButton17.setLayoutData(setupButton17LData);
 							this.setupButton17.setSelection((this.setupValue17 & 0x80) == 0x80);
@@ -1849,7 +1849,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup18.setLayout(setupGroup18Layout);
 						this.setupGroup18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup18.setText(Messages.getString(MessageIds.GDE_MSGT1878));
-						this.setupGroup18.setBounds(505, 687, 490, 71);
+						this.setupGroup18.setBounds(505, 687, 490, GDE.IS_MAC ? 80 : 70);
 						{
 							new CLabel(this.setupGroup18, SWT.NONE).setSize(5, 18);
 						}
@@ -1858,7 +1858,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupButton18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupButton18.setText(Messages.getString(MessageIds.GDE_MSGT1881));
 							RowData setupButton18LData = new RowData();
-							setupButton18LData.width = 470;
+							setupButton18LData.width = GDE.IS_MAC ? 460 : 465;
 							setupButton18LData.height = 18;
 							this.setupButton18.setLayoutData(setupButton18LData);
 							this.setupButton18.setSelection(this.setupValue18 == 0);
@@ -1949,7 +1949,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup19.setLayout(setupGroup19Layout);
 						this.setupGroup19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.setupGroup19.setText(Messages.getString(MessageIds.GDE_MSGT1882));
-						this.setupGroup19.setBounds(5, 760, 990, 105);
+						this.setupGroup19.setBounds(5, 760, 990, GDE.IS_MAC ? 115 : 105);
 						{
 							new CLabel(this.setupGroup19, SWT.NONE).setSize(5, 85);
 						}
@@ -2018,7 +2018,7 @@ public class VarioToolTabItem extends CTabItem {
 							RowLayout setupComposite19bLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 							RowData setupComposite19bLData = new RowData();
 							setupComposite19bLData.width = 308;
-							setupComposite19bLData.height = 78;
+							setupComposite19bLData.height = GDE.IS_MAC ? 85 : 78;
 							this.setupComposite19b.setLayoutData(setupComposite19bLData);
 							this.setupComposite19b.setLayout(setupComposite19bLayout);
 							{
