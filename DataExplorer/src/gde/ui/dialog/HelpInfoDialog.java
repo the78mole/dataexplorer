@@ -124,8 +124,11 @@ public class HelpInfoDialog extends Dialog {
 	private void openURL(String deviceName, String fileName, boolean extractBase) {
 		String jarBasePath = FileUtils.getJarBasePath() + GDE.FILE_SEPARATOR_UNIX;
 		String jarName = GDE.NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
-		String helpDir = extractBase ? "help" + GDE.FILE_SEPARATOR : "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
-		String helpFileDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
+		final String lang = this.settings.getLocale().getLanguage().contains("de") || this.settings.getLocale().getLanguage().contains("en") 
+				? this.settings.getLocale().getLanguage() : "en";
+
+		String helpDir = extractBase ? "help" + GDE.FILE_SEPARATOR : "help" + GDE.FILE_SEPARATOR + lang + GDE.FILE_SEPARATOR;
+		String helpFileDir = "help" + GDE.FILE_SEPARATOR + lang + GDE.FILE_SEPARATOR;
 		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR_UNIX) + "GDE" + GDE.FILE_SEPARATOR_UNIX;
 		
 		try {

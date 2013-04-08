@@ -379,6 +379,9 @@ public class Settings extends Properties {
 	 */
 	private void updateDeviceProperties(String devicePropertiesTargetpath, boolean existCheck) {
 		final String $METHOD_NAME = "updateDeviceProperties"; //$NON-NLS-1$
+		final String lang = this.getLocale().getLanguage().contains("de") || this.getLocale().getLanguage().contains("en") 
+				? this.getLocale().getLanguage() : "en";
+		
 
 		String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
 		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
@@ -398,10 +401,10 @@ public class Settings extends Properties {
 				for (String plugin : plugins) {
 					if (existCheck) {
 						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
-							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + this.getLocale().getLanguage() + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 					else {
-						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + this.getLocale().getLanguage() + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 				}
 			}
