@@ -303,7 +303,7 @@ public class GPXDataReaderWriter {
 							int referenceOrdinal = -1;
 							for (int i = 0; i < recordNames.length; i++) {
 								MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
-								if (log.isLoggable(Level.OFF)) log.log(Level.OFF, recordNames[i]);
+								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordNames[i]);
 								measurement.setName(recordNames[i]);
 								recordSymbols[i] = measurement.getSymbol();
 								recordUnits[i] = measurement.getUnit();
