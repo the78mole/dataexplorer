@@ -185,13 +185,13 @@ public interface IDevice {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isUtilityDeviceTabRequested();
-//	
-//	/**
-//	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
-//	 * specific curve calculated from point combinations or other specific dialog
-//	 * As default the function should return null which stands for no device custom tab item.  
-//	 */
-//	public CTabItem getUtilityGraphicsTabItem();
+	
+	/**
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getUtilityGraphicsTabItem();
 	
 	/**
 	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 

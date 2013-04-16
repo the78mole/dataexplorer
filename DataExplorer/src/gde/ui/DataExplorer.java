@@ -2874,7 +2874,7 @@ public class DataExplorer extends Composite {
 							if (DataExplorer.this.isTmpWriteStop) break;
 
 							String tmpFilePath = DataExplorer.this.settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + GDE.TEMP_FILE_STEM;
-							if (log.isLoggable(Level.FINE)) log.log(Level.OFF, "attempt to save a temporary file(s)");
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "attempt to save a temporary file(s)");
 							if (DataExplorer.this.channels.getActiveChannel() != null && DataExplorer.this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
 								if (DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null)
 									OsdReaderWriter.write(tmpFilePath + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);

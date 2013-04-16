@@ -2095,10 +2095,12 @@ public class DeviceConfiguration {
 	}
 	
 	/**
-	 * query if an utility graphics window tab is requested
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
 	 */
-	public boolean isUtilityGraphicsRequested() {
-		return false;
+	public CTabItem getUtilityGraphicsTabItem() {
+		return null;
 	}
 	
 	/**
