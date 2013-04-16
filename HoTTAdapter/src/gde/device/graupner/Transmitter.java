@@ -282,6 +282,8 @@ public enum Transmitter {
 				//bytes[0x11ef] = (byte) 0x82;
 				//bytes[0x11f0] = (byte) 0x81; 
 				calculateAndWriteCRC(bytes, 0x11db, 0x11ef);
+				calculateAndWriteCRC(bytes, 0x11f1, 0x11f2);
+				calculateAndWriteCRC(bytes, 0x11f4, 0x11f5);
 				break;
 			case MX_12:
 				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
@@ -289,6 +291,8 @@ public enum Transmitter {
 				//bytes[0x11ef] = (byte) 0x5d;
 				//bytes[0x11f0] = (byte) 0x74; 
 				calculateAndWriteCRC(bytes, 0x11db, 0x11ef);
+				calculateAndWriteCRC(bytes, 0x11f1, 0x11f2);
+				calculateAndWriteCRC(bytes, 0x11f4, 0x11f5);
 				break;
 			}
 			in.close();
