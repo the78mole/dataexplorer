@@ -541,7 +541,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				break;
 				
 			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
-				if (dataBuffer.length >= 28) {
+				if (dataBuffer.length >= 34) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					if (this.application.getActiveChannelNumber() == 4) {

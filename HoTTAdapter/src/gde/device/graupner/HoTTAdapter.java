@@ -713,7 +713,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 				break;
 			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
-				if (dataBuffer.length >= 28) {
+				if (dataBuffer.length >= 34) {
 					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
