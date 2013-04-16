@@ -1158,11 +1158,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 //		System.arraycopy(mx_20_RH_0011, 0, this.ANSWER_DATA, 0, mx_20_RH_0011.length);
 //		System.arraycopy(mc_32_RH_0011, 0, this.ANSWER_DATA, 0, mc_32_RH_0011.length);
 //		System.arraycopy(mx_16_RH_0011, 0, this.ANSWER_DATA, 0, mx_16_RH_0011.length);
-			if (HoTTAdapterSerialPort.log.isLoggable(Level.OFF)) {
+			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
 				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
 			//update header data
 			System.arraycopy(this.ANSWER_DATA,  7, header, 0x0000, 8);
@@ -1181,11 +1181,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 //		System.arraycopy(mx_20_RH_0532, 0, this.ANSWER_DATA, 0, mx_20_RH_0532.length);
 //		System.arraycopy(mc_32_RH_0532, 0, this.ANSWER_DATA, 0, this.ANSWER_DATA.length);
 //		System.arraycopy(mx_16_RH_0532, 0, this.ANSWER_DATA, 0, mx_16_RH_0532.length);
-			if (HoTTAdapterSerialPort.log.isLoggable(Level.OFF)) {
+			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
 				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
 			
 			
@@ -1220,11 +1220,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 //		System.arraycopy(mx_20_RH_0533, 0, this.ANSWER_DATA, 0, mx_20_RH_0533.length);
 //		System.arraycopy(mc_32_RH_0533, 0, this.ANSWER_DATA, 0, mc_32_RH_0533.length);
 //		System.arraycopy(mx_16_RH_0533, 0, this.ANSWER_DATA, 0, mx_16_RH_0533.length);
-			if (HoTTAdapterSerialPort.log.isLoggable(Level.OFF)) {
+			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
 				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
-				HoTTAdapterSerialPort.log.log(Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
+				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
 
 			int modelNameLength = 10;//mx-20 i=178 j%10
@@ -1257,7 +1257,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 					sb.append(String.format("%c", (char)this.ANSWER_DATA[startIndex])).append(GDE.STRING_SEMICOLON);
 			}
 			sb.append(GDE.STRING_SEMICOLON);
-			HoTTAdapterSerialPort.log.log(Level.OFF, sb.toString());
+			HoTTAdapterSerialPort.log.log(Level.FINE, sb.toString());
 			
 			Vector<String> vModels = new Vector<String>();
 			int numValidMdls = 0;
@@ -1271,7 +1271,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				}
 				else vModels.add(GDE.STRING_DASH);
 			}
-			HoTTAdapterSerialPort.log.log(Level.OFF, vModels.size() + " - " + vModels.toString());
+			HoTTAdapterSerialPort.log.log(Level.FINE, vModels.size() + " - " + vModels.toString());
 			String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
 			FileUtils.checkDirectoryAndCreate(dirName);
 			if (!FileUtils.checkDirectoryAndCreate(dirName)) {

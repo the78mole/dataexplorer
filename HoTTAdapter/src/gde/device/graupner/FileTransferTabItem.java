@@ -878,7 +878,7 @@ public class FileTransferTabItem extends CTabItem {
 				this.selectedPcFolder = new StringBuilder().append(this.selectedPcBaseFolder);
 			}
 			//update with new folder and file information
-			FileTransferTabItem.log.log(Level.OFF, "selectedPcFolder = " + this.selectedPcFolder.toString());
+			FileTransferTabItem.log.log(Level.FINE, "selectedPcFolder = " + this.selectedPcFolder.toString());
 			List<File> files = FileUtils.getFileListing(new File(this.selectedPcFolder.toString()), 0);
 			int index = 0;
 			for (File file : files) {
@@ -928,7 +928,7 @@ public class FileTransferTabItem extends CTabItem {
 				parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
 				tmpItem = parentItem;
 			}
-			FileTransferTabItem.log.log(Level.OFF, "selectedSdFolder = " + this.selectedSdFolder.toString());
+			FileTransferTabItem.log.log(Level.FINE, "selectedSdFolder = " + this.selectedSdFolder.toString());
 			this.sdFoldersAndFiles = this.serialPort.queryListDir(this.selectedSdFolder.toString(), 0);
 			for (String folder : this.sdFoldersAndFiles.get("FOLDER")) { //$NON-NLS-1$
 				if (folder.length() > 3) {

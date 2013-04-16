@@ -1251,7 +1251,7 @@ public class HoTTbinReader {
 		for (int i = 0; buffer != null && i < buffer.length; i++) {
 			sb.append("(").append(i).append(")").append(buffer[i]).append(GDE.STRING_BLANK);
 		}
-		HoTTbinReader.log.log(java.util.logging.Level.OFF, sb.toString());
+		HoTTbinReader.log.log(java.util.logging.Level.FINE, sb.toString());
 	}
 
 	static void printShortValues(long millisec, byte[] buffer) {
@@ -1259,7 +1259,7 @@ public class HoTTbinReader {
 		for (int i = 0; buffer != null && i < buffer.length - 1; i++) {
 			sb.append("(").append(i).append(")").append(DataParser.parse2Short(buffer, i)).append(GDE.STRING_BLANK);
 		}
-		HoTTbinReader.log.log(java.util.logging.Level.OFF, sb.toString());
+		HoTTbinReader.log.log(java.util.logging.Level.FINE, sb.toString());
 	}
 
 	/**
