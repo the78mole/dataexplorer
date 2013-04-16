@@ -544,14 +544,6 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
-	 * query if an utility graphics window tab is requested
-	 */
-	@Override
-	public boolean isUtilityGraphicsRequested() {
-		return false;
-	}
-	
-	/**
 	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
 	 * specific curve calculated from point combinations or other specific dialog
 	 * As default the function should return null which stands for no device custom tab item.  
