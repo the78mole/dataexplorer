@@ -113,7 +113,7 @@ public class Picolario2LogReader {
 						}
 					}
 				}
-				log.log(Level.OFF, String.format("firmware version = %s; number of values = %d", firmware, numValues));
+				log.log(Level.FINE, String.format("firmware version = %s; number of values = %d", firmware, numValues));
 				int[] startValues = new int[numValues+1]; //height calculated from pressure
 				fileSize -= 4;
 //				0C 00 00 00 	03 00 00 80 	6E 82 01 00 	2F 05 01 FD
@@ -128,7 +128,7 @@ public class Picolario2LogReader {
 				buffer = new byte[2];
 				data_in.read(buffer);
 				points[2] = startValues[2] = DataParser.parse2Short(buffer, 0) * 1000; //0x052F = 1327 * 3.8 mV = 5.0 Volt
-				log.log(Level.OFF, String.format("start pressure = %d; start voltage = %d", startValues[1]/1000, startValues[2]/1000));
+				log.log(Level.FINE, String.format("start pressure = %d; start voltage = %d", startValues[1]/1000, startValues[2]/1000));
 				fileSize -= 4;
 				
 				//activeChannel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
