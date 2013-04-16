@@ -1201,6 +1201,25 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public CTabItem getUtilityDeviceTabItem() {
 		return new FileTransferTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, this.serialPort);
 	}
+	
+	/**
+	 * query if the utility graphics tabulator should be displayed and updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	@Override
+	public boolean isUtilityGraphicsTabRequested() {
+		return false; //TODO check if class from HoTTDecoder can be loaded
+	}
+	
+	/**
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	@Override
+	public CTabItem getUtilityGraphicsTabItem() {
+		return null; // load CTabItem from HoTTDecoder
+	}
 
 	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
