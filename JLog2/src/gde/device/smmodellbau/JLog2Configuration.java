@@ -170,7 +170,7 @@ public class JLog2Configuration extends Composite {
 			for (int i = 0; i < tmpConfig.length; i++) {
 				this.config[i] = tmpConfig[i];
 			}
-			JLog2Configuration.log.log(Level.OFF, getConfiguration());
+			JLog2Configuration.log.log(Level.FINE, getConfiguration());
 		}
 
 		public int get(int index) {
