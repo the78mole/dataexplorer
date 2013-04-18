@@ -721,10 +721,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000; 
 						points[2] = tmpCurrent * 1000;
-						points[3] = DataParser.parse2Short(dataBuffer, 20) * 1000;
+						points[3] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 						points[5] = DataParser.parse2Short(dataBuffer, 18) * 1000;
-						points[6] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+						points[6] = DataParser.parse2Short(dataBuffer, 24) * 1000;
+						//points[7] = dataBuffer[19] * 1000;
 					}
 				}
 				break;

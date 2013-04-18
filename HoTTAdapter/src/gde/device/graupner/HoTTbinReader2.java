@@ -975,7 +975,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsSpeedControl[76] / 1000) { 
 				HoTTbinReader2.pointsSpeedControl[80] = HoTTbinReader2.tmpCapacity * 1000;
 				HoTTbinReader2.pointsSpeedControl[82] = HoTTbinReader2.tmpRevolution * 1000;
-				HoTTbinReader2.pointsSpeedControl[83] = HoTTbinReader2.tmpTemperatureFet * 1000;
+				HoTTbinReader2.pointsSpeedControl[83] = (HoTTbinReader2.tmpTemperatureFet - 20) * 1000;
 			}
 		}
 		else {
@@ -988,7 +988,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsSpeedControl[60] / 1000) {
 				HoTTbinReader2.pointsSpeedControl[60] = HoTTbinReader2.tmpCapacity * 1000;
 				HoTTbinReader2.pointsSpeedControl[62] = HoTTbinReader2.tmpRevolution * 1000;
-				HoTTbinReader2.pointsSpeedControl[63] = HoTTbinReader2.tmpTemperatureFet * 1000;
+				HoTTbinReader2.pointsSpeedControl[63] = (HoTTbinReader2.tmpTemperatureFet - 20) * 1000;
 			}
 		}
 	}

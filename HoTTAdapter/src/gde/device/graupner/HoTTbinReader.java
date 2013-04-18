@@ -1240,7 +1240,7 @@ public class HoTTbinReader {
 		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[3] / 1000) { 
 			HoTTbinReader.pointsSpeedControl[3] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader.pointsSpeedControl[5] = HoTTbinReader.tmpRevolution * 1000;
-			HoTTbinReader.pointsSpeedControl[6] = HoTTbinReader.tmpTemperatureFet * 1000;
+			HoTTbinReader.pointsSpeedControl[6] = (HoTTbinReader.tmpTemperatureFet - 20) * 1000;
 			//HoTTbinReader.pointsSpeedControl[7] = HoTTbinReader.tmpTemperatureExt * 1000;
 		}
 		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
