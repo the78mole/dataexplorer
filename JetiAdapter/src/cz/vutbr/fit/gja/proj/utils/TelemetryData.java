@@ -768,6 +768,7 @@ public class TelemetryData {
     if (params == null) {
       return;
     }
+    if (log.isLoggable(Level.FINE)) log.log(Level.FINE, params[params.length -1]);
     for (String param : params) {
       switch (state) {
         case ST_TIME:
@@ -790,6 +791,7 @@ public class TelemetryData {
           label = param;
           //Vlozeni noveho cidla a ukonceni nacitani radku
           if (timestamp == 0 && paramId == 0) {
+          	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "adding sensor " + label);
             TelemetrySensor sensor = new TelemetrySensor(deviceId, label);
             this.data.add(sensor);
             return;
@@ -802,6 +804,7 @@ public class TelemetryData {
           TelemetryVar var = new TelemetryVar(paramId, label, unit);
           TelemetrySensor s = this.getSensor(deviceId);
           if (s != null) {
+          	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add variable " + var.name);
             s.addVariable(var);
           }
           //Vypadne z funkce
@@ -829,6 +832,7 @@ public class TelemetryData {
           if (sen != null) {
             TelemetryVar par = sen.getVar(paramId);
             if (par != null) {
+            	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add sensor variable " + par.name);
               par.addItem(item);
             }
           }
