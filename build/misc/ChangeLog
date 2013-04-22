@@ -5,6 +5,7 @@ AV4ms_FV_762 - fix problem importing data
 HoTTAdapter*, DataVario*, LinkVario* - fix/adapt UI in combination with new SWT release
 HoTTAdapter* - calculate CRC for mx-21<->mx16 converter instead of static update
 HoTTAdapter* - adapt data reader *.bin and live data of ESC according firmware update 
+fix [bug #38250] Feature: Use keyboard for zooming
 
 Version 3.0.8 - 03 Apr 2013
 add Renschler Picolario2 support
