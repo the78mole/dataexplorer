@@ -341,19 +341,122 @@ public class GraphicsComposite extends Composite {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyPressed() , event=" + e); //$NON-NLS-1$
-					if (e.keyCode == 'x') {
-						//System.out.println("x-direction");
-						GraphicsComposite.this.isZoomX = true;
-						GraphicsComposite.this.isZoomY = false;
-					}
-					else if (e.keyCode == 'y') {
-						//System.out.println("y-direction");
-						GraphicsComposite.this.isZoomY = true;
-						GraphicsComposite.this.isZoomX = false;
-					}
-					else {
-						//System.out.println("x,y off");
-						GraphicsComposite.this.isZoomX = GraphicsComposite.this.isZoomY = false;
+					if (GraphicsComposite.this.isTransientZoom && !isTransientGesture) {
+						GraphicsComposite.this.isResetZoomPosition = false;
+						Channel activeChannel = Channels.getInstance().getActiveChannel();
+						if (activeChannel != null) {
+							RecordSet recordSet = (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
+									: GraphicsComposite.this.application.getCompareSet();
+							if (GraphicsComposite.this.canvasImage != null && recordSet != null) {
+
+								if (e.keyCode == 'x') {
+									//System.out.println("x-direction");
+									GraphicsComposite.this.isZoomX = true;
+									GraphicsComposite.this.isZoomY = false;
+								}
+								else if (e.keyCode == 'y') {
+									//System.out.println("y-direction");
+									GraphicsComposite.this.isZoomY = true;
+									GraphicsComposite.this.isZoomX = false;
+								}
+								else if (e.keyCode == '+' && e.stateMask == SWT.MOD1 || e.keyCode == 0x100002b) {
+									//System.out.println("enlarge");
+
+									float boundsRelation = 1.0f * GraphicsComposite.this.curveAreaBounds.width / GraphicsComposite.this.curveAreaBounds.height;
+									Point point = new Point(canvasBounds.width / 2, canvasBounds.height / 2);
+									float mouseRelationX = 1.0f * point.x / GraphicsComposite.this.curveAreaBounds.width * 2;
+									float mouseRelationY = 1.0f * point.y / GraphicsComposite.this.curveAreaBounds.height * 2;
+									//System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
+
+									int xStart, xEnd, yMin, yMax;
+									if (GraphicsComposite.this.isZoomX) {
+										xStart = (int) (50 * boundsRelation * mouseRelationX);
+										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
+										yMin = 0;
+										yMax = GraphicsComposite.this.curveAreaBounds.height - GraphicsComposite.this.curveAreaBounds.y;
+									}
+									else if (GraphicsComposite.this.isZoomY) {
+										xStart = 0;
+										xEnd = GraphicsComposite.this.curveAreaBounds.width;
+										yMin = (int) (50 * (2 - mouseRelationY));
+										yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
+									}
+									else {
+										xStart = (int) (50 * boundsRelation * mouseRelationX);
+										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
+										yMin = (int) (50 * (2 - mouseRelationY));
+										yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
+									}
+
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+									if (xEnd - xStart > 5 && yMax - yMin > 5) {
+										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+										redrawGraphics();
+									}
+								}
+								else if (e.keyCode == '-' && e.stateMask == SWT.MOD1 || e.keyCode == 0x100002d) {
+									//System.out.println("reduce");
+									if (GraphicsComposite.this.isTransientZoom && !isTransientGesture) {
+
+										float boundsRelation = 1.0f * GraphicsComposite.this.curveAreaBounds.width / GraphicsComposite.this.curveAreaBounds.height;
+										Point point = new Point(canvasBounds.width / 2, canvasBounds.height / 2);
+										float mouseRelationX = 1.0f * point.x / GraphicsComposite.this.curveAreaBounds.width * 2;
+										float mouseRelationY = 1.0f * point.y / GraphicsComposite.this.curveAreaBounds.height * 2;
+										//System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
+
+										int xStart, xEnd, yMin, yMax;
+										if (GraphicsComposite.this.isZoomX) {
+											xStart = (int) (-50 * boundsRelation * mouseRelationX);
+											xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
+											yMin = 0;
+											yMax = GraphicsComposite.this.curveAreaBounds.height - GraphicsComposite.this.curveAreaBounds.y;
+										}
+										else if (GraphicsComposite.this.isZoomY) {
+											xStart = 0;
+											xEnd = GraphicsComposite.this.curveAreaBounds.width;
+											yMin = (int) (-50 * (2 - mouseRelationY));
+											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
+										}
+										else {
+											xStart = (int) (-50 * boundsRelation * mouseRelationX);
+											xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
+											yMin = (int) (-50 * (2 - mouseRelationY));
+											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
+										}
+
+										if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+										if (xEnd - xStart > 5 && yMax - yMin > 5) {
+											recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+											redrawGraphics();
+										}
+									}
+								}
+								else if (e.keyCode == 0x1000001) {
+									//System.out.println("move top direction");
+									recordSet.shift(0, -5); // 10% each direction
+									redrawGraphics(); //this.graphicCanvas.redraw();?
+								}
+								else if (e.keyCode == 0x1000002) {
+									//System.out.println("move bottom direction");
+									recordSet.shift(0, +5); // 10% each direction
+									redrawGraphics(); //this.graphicCanvas.redraw();?
+								}
+								else if (e.keyCode == 0x1000003) {
+									//System.out.println("move left direction");
+									recordSet.shift(+5, 0); // 10% each direction
+									redrawGraphics(); //this.graphicCanvas.redraw();?
+								}
+								else if (e.keyCode == 0x1000004) {
+									//System.out.println("move right direction");
+									recordSet.shift(-5, 0); // 10% each direction
+									redrawGraphics(); //this.graphicCanvas.redraw();?
+								}
+								else {
+									//System.out.println("x,y off");
+									GraphicsComposite.this.isZoomX = GraphicsComposite.this.isZoomY = false;
+								}
+							}
+						}
 					}
 				}
 
@@ -366,7 +469,7 @@ public class GraphicsComposite extends Composite {
 			});
 			this.graphicCanvas.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(MouseEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
 					if (GraphicsComposite.this.isTransientZoom && !isTransientGesture) {
 						GraphicsComposite.this.isResetZoomPosition = false;
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
