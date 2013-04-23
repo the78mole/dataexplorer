@@ -43,6 +43,7 @@ import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
@@ -1209,7 +1211,25 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public boolean isUtilityGraphicsTabRequested() {
-		return false; //TODO check if class from HoTTDecoder can be loaded
+		boolean rc = true;
+		try {
+			String className = "de.treichels.hott.HoTTDecoder";//$NON-NLS-1$
+			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			Class<?> c = loader.loadClass(className);
+			Constructor<?> constructor = c.getDeclaredConstructor();
+			//log.log(java.util.logging.Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (constructor != null) {
+				constructor.newInstance();
+			}
+			else
+				rc = false;
+		}
+		catch (final Throwable t) {
+			t.printStackTrace();
+			rc = false;
+		}
+		return rc;
 	}
 	
 	/**
@@ -1219,7 +1239,22 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public CTabItem getUtilityGraphicsTabItem() {
-		return null; // load CTabItem from HoTTDecoder
+		Object inst = null;
+		try {
+			String className = "gde.mdl.ui.MdlTabItem";//$NON-NLS-1$
+			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			Class<?> c = loader.loadClass(className);
+			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { CTabFolder.class, int.class });
+			//log.log(java.util.logging.Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (constructor != null) {
+				inst = constructor.newInstance(new Object[] {application.getTabFolder(), SWT.NONE});
+			}
+		}
+		catch (final Throwable t) {
+			t.printStackTrace();
+		}
+		return (CTabItem)inst;
 	}
 
 	/**
