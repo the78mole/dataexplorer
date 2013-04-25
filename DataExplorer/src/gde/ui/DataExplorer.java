@@ -173,7 +173,7 @@ public class DataExplorer extends Composite {
 	CellVoltageWindow							cellVoltageTabItem;
 	FileCommentWindow							fileCommentTabItem;
 	ObjectDescriptionWindow				objectDescriptionTabItem;
-	CTabItem											customTabItem;
+	final Vector<CTabItem>				customTabItems = new Vector<CTabItem>();
 	GraphicsWindow								utilGraphicsTabItem;
 	Composite											tabComposite;
 	Composite											statusComposite;
@@ -1248,10 +1248,11 @@ public class DataExplorer extends Composite {
 			this.utilGraphicsTabItem = null;
 		}
 		//cleanup device specific custom tab item
-		if (this.customTabItem != null && !this.customTabItem.isDisposed()) {
-			this.customTabItem.dispose();
-			this.customTabItem = null;
+		for (CTabItem tab : this.customTabItems) {			
+			tab.dispose();
 		}
+		this.customTabItems.clear();
+
 	}
 
 	public void updateTitleBar(final String objectName, final String deviceName, final String devicePort) {
@@ -2751,17 +2752,16 @@ public class DataExplorer extends Composite {
 	/**
 	 * register a custom tab item for device specific purpose
 	 */
-	public CTabItem registerCustomTabItem(CTabItem customDeviceTabItem) {
+	public void registerCustomTabItem(CTabItem customDeviceTabItem) {
 		if (customDeviceTabItem == null) {
-			if (this.customTabItem != null && !this.customTabItem.isDisposed()) {
-				this.customTabItem.dispose();
-				this.customTabItem = null;
+			for (CTabItem tab : this.customTabItems) {			
+				tab.dispose();
 			}
+			this.customTabItems.clear();
 		}
 		else {
-			this.customTabItem = customDeviceTabItem;
+			this.customTabItems.add(customDeviceTabItem);
 		}
-		return customTabItem;
 	}
 
 	/**
