@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 public class FileTransferTabItem extends CTabItem {
-	private static final int		INNER_COMPOSITE_HEIGHT	= 250 + 280 + (GDE.IS_MAC ? 70 : 10); //height of pcFolderGroup, sdCardActionGroup
+	private static final int		INNER_COMPOSITE_HEIGHT	= 250 + 280 + (GDE.IS_MAC ? 70 : 60); //height of pcFolderGroup, sdCardActionGroup
 	final static String					$CLASS_NAME							= FileTransferTabItem.class.getName();
 	final static Logger					log											= Logger.getLogger(FileTransferTabItem.$CLASS_NAME);
 
@@ -230,12 +230,12 @@ public class FileTransferTabItem extends CTabItem {
 			this.setControl(this.scrolledComposite);
 			{
 				this.outherComposite = new Composite(this.scrolledComposite, SWT.NONE);
-				this.outherComposite.setBounds(0, 0, 1100, FileTransferTabItem.INNER_COMPOSITE_HEIGHT+5);
+				this.outherComposite.setBounds(0, 0, 1100, FileTransferTabItem.INNER_COMPOSITE_HEIGHT+10);
 				this.outherComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 
 				this.innerComposite = new Composite(this.outherComposite, SWT.NONE);
 				this.innerComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
-				this.innerComposite.setSize(1100, FileTransferTabItem.INNER_COMPOSITE_HEIGHT);
+				this.innerComposite.setSize(1110, FileTransferTabItem.INNER_COMPOSITE_HEIGHT);
 				this.innerComposite.setLocation(0, 0);
 				RowLayout innerCompositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
 				this.innerComposite.setLayout(innerCompositeLayout);

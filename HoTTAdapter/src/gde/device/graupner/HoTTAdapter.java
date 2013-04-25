@@ -1202,23 +1202,25 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
+		if (isMdlTabRequested())
+			application.registerCustomTabItem(this.getMdlTabItem());
+		
 		return new FileTransferTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, this.serialPort);
 	}
 	
 	/**
-	 * query if the utility graphics tabulator should be displayed and updated
+	 * query if the MDL decoder tab item can be displayed
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
-	@Override
-	public boolean isUtilityGraphicsTabRequested() {
+	public boolean isMdlTabRequested() {
 		boolean rc = true;
 		try {
 			String className = "de.treichels.hott.HoTTDecoder";//$NON-NLS-1$
-			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+			log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
 			Constructor<?> constructor = c.getDeclaredConstructor();
-			//log.log(java.util.logging.Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			log.log(Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 				constructor.newInstance();
 			}
@@ -1233,20 +1235,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
-	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
-	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * This function allows to register a CTabItem to to display MDL content converted to HTML
 	 */
-	@Override
-	public CTabItem getUtilityGraphicsTabItem() {
+	public CTabItem getMdlTabItem() {
 		Object inst = null;
 		try {
 			String className = "gde.mdl.ui.MdlTabItem";//$NON-NLS-1$
-			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+			log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
 			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { CTabFolder.class, int.class });
-			//log.log(java.util.logging.Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			log.log(Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 				inst = constructor.newInstance(new Object[] {application.getTabFolder(), SWT.NONE});
 			}
@@ -1254,6 +1253,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		catch (final Throwable t) {
 			t.printStackTrace();
 		}
+		if (log.isLoggable(Level.OFF) && inst != null) 
+			log.log(Level.OFF, "loading TabItem " + ((CTabItem)inst).getText()); //$NON-NLS-1$
 		return (CTabItem)inst;
 	}
 
