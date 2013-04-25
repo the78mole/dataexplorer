@@ -570,7 +570,7 @@ public class DataExplorer extends Composite {
 			});
 			this.displayTab.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER))
+					if (log.isLoggable(Level.FINER) && DataExplorer.this.displayTab.getSelectionIndex() >= 0)
 						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
 								+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
 					if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
@@ -1062,15 +1062,17 @@ public class DataExplorer extends Composite {
 	}
 
 	public void setStatusMessage(final String message) {
-		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			this.statusBar.setMessage(message);
-		}
-		else {
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					DataExplorer.this.statusBar.setMessage(message);
-				}
-			});
+		if (this.statusBar != null) {
+			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+				this.statusBar.setMessage(message);
+			}
+			else {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						DataExplorer.this.statusBar.setMessage(message);
+					}
+				});
+			}
 		}
 	}
 
