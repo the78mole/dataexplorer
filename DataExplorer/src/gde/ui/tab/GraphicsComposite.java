@@ -359,7 +359,7 @@ public class GraphicsComposite extends Composite {
 									GraphicsComposite.this.isZoomY = true;
 									GraphicsComposite.this.isZoomX = false;
 								}
-								else if (e.keyCode == '+' && e.stateMask == SWT.MOD1 || e.keyCode == 0x100002b) {
+								else if (e.keyCode == '+' || e.keyCode == 0x100002b) {
 									//System.out.println("enlarge");
 
 									float boundsRelation = 1.0f * GraphicsComposite.this.curveAreaBounds.width / GraphicsComposite.this.curveAreaBounds.height;
@@ -394,7 +394,7 @@ public class GraphicsComposite extends Composite {
 										redrawGraphics();
 									}
 								}
-								else if (e.keyCode == '-' && e.stateMask == SWT.MOD1 || e.keyCode == 0x100002d) {
+								else if (e.keyCode == '-' || e.keyCode == 0x100002d) {
 									//System.out.println("reduce");
 									if (GraphicsComposite.this.isTransientZoom && !isTransientGesture) {
 
@@ -424,7 +424,7 @@ public class GraphicsComposite extends Composite {
 											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
 										}
 
-										if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+										if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 										if (xEnd - xStart > 5 && yMax - yMin > 5) {
 											recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
 											redrawGraphics();
@@ -469,7 +469,7 @@ public class GraphicsComposite extends Composite {
 			});
 			this.graphicCanvas.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(MouseEvent evt) {
-					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
 					if (GraphicsComposite.this.isTransientZoom && !isTransientGesture) {
 						GraphicsComposite.this.isResetZoomPosition = false;
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
