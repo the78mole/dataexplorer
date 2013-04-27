@@ -287,7 +287,7 @@
 <entry key="56_defMinValue">0.0</entry>
 <entry key="55_lineStyle">1</entry>
 <entry key="9_color">255,128,0</entry>
-<entry key="1_isStartEndDefined">true</entry>
+<entry key="1_isStartEndDefined">false</entry>
 <entry key="64_isVisible">false</entry>
 <entry key="50_defMinValue">0.0</entry>
 <entry key="79_lineStyle">1</entry>
@@ -638,7 +638,7 @@
 <entry key="12_isRoundOut">false</entry>
 <entry key="21_isRoundOut">false</entry>
 <entry key="30_isRoundOut">false</entry>
-<entry key="6_isStartEndDefined">true</entry>
+<entry key="6_isStartEndDefined">false</entry>
 <entry key="63_color">128,64,0</entry>
 <entry key="6_lineWidth">1</entry>
 <entry key="22_color">255,128,192</entry>
@@ -794,7 +794,7 @@
 <entry key="28_lineStyle">1</entry>
 <entry key="10_defMinValue">0.0</entry>
 <entry key="73_lineWidth">1</entry>
-<entry key="2_isStartEndDefined">true</entry>
+<entry key="2_isStartEndDefined">false</entry>
 <entry key="49_numberFormat">-1</entry>
 <entry key="39_defMaxValue">0.0</entry>
 <entry key="78_isRoundOut">false</entry>
@@ -861,7 +861,7 @@
 <entry key="17_isPositionLeft">true</entry>
 <entry key="31_isPositionLeft">false</entry>
 <entry key="58_lineStyle">1</entry>
-<entry key="0_isStartEndDefined">true</entry>
+<entry key="0_isStartEndDefined">false</entry>
 <entry key="19_defMinValue">0.0</entry>
 <entry key="2_color">0,174,0</entry>
 <entry key="RecordSet_timeGridType">1</entry>

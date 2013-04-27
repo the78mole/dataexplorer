@@ -7,7 +7,7 @@
 <entry key="0_defMinValue">50.0</entry>
 <entry key="0_isPositionLeft">true</entry>
 <entry key="0_isRoundOut">false</entry>
-<entry key="0_isStartEndDefined">true</entry>
+<entry key="0_isStartEndDefined">false</entry>
 <entry key="0_isStartpointZero">false</entry>
 <entry key="0_isVisible">true</entry>
 <entry key="0_lineStyle">1</entry>
@@ -117,7 +117,7 @@
 <entry key="10_defMinValue">4.0</entry>
 <entry key="10_isPositionLeft">true</entry>
 <entry key="10_isRoundOut">false</entry>
-<entry key="10_isStartEndDefined">true</entry>
+<entry key="10_isStartEndDefined">false</entry>
 <entry key="10_isStartpointZero">false</entry>
 <entry key="10_isVisible">true</entry>
 <entry key="10_lineStyle">1</entry>
