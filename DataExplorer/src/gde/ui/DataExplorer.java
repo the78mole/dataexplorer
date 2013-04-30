@@ -391,6 +391,8 @@ public class DataExplorer extends Composite {
 				application.openMessageDialog(GDE.shell, sb.toString());
 			}
 
+			GDE.shell.open();
+
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					DataExplorer.this.postInitGUI(inputFilePath);
@@ -410,8 +412,6 @@ public class DataExplorer extends Composite {
 					}
 				}
 			});
-
-			GDE.shell.open();
 
 			this.enableWritingTmpFiles(this.settings.getUsageWritingTmpFiles());
 			log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1086,41 +1086,42 @@ public class DataExplorer extends Composite {
 	 * @param user
 	 */
 	public void setProgress(final int percentage, final String user) {
-		if (this.progressBarUser == null || user == null || this.progressBarUser.equals(user)) {
-			if (percentage > 99 | percentage == 0)
-				this.progressBarUser = null;
-			else
-				this.progressBarUser = user;
+		if (this.statusBar != null) {
+			if (this.progressBarUser == null || user == null || this.progressBarUser.equals(user)) {
+				if (percentage > 99 | percentage == 0)
+					this.progressBarUser = null;
+				else
+					this.progressBarUser = user;
 
-			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-				this.statusBar.setProgress(percentage);
-				if (this.taskBarItem != null) {
-					if (user == null)
-						this.taskBarItem.setProgressState(SWT.DEFAULT);
-					else
-						this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
+				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+					this.statusBar.setProgress(percentage);
+					if (this.taskBarItem != null) {
+						if (user == null)
+							this.taskBarItem.setProgressState(SWT.DEFAULT);
+						else
+							this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
 
-					this.taskBarItem.setProgress(percentage);
-				}
-			}
-			else {
-				GDE.display.asyncExec(new Runnable() {
-					public void run() {
-						DataExplorer.this.statusBar.setProgress(percentage);
-						if (DataExplorer.this.taskBarItem != null) {
-							if (user == null)
-								DataExplorer.this.taskBarItem.setProgressState(SWT.DEFAULT);
-							else
-								DataExplorer.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
-
-							DataExplorer.this.taskBarItem.setProgress(percentage);
-						}
+						this.taskBarItem.setProgress(percentage);
 					}
-				});
+				}
+				else {
+					GDE.display.asyncExec(new Runnable() {
+						public void run() {
+							DataExplorer.this.statusBar.setProgress(percentage);
+							if (DataExplorer.this.taskBarItem != null) {
+								if (user == null)
+									DataExplorer.this.taskBarItem.setProgressState(SWT.DEFAULT);
+								else
+									DataExplorer.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
+
+								DataExplorer.this.taskBarItem.setProgress(percentage);
+							}
+						}
+					});
+				}
+				this.progessPercentage = percentage;
+				if (percentage >= 100) DataExplorer.this.resetProgressBar();
 			}
-			this.progessPercentage = percentage;
-			if (percentage >= 100)
-				DataExplorer.this.resetProgressBar();
 		}
 	}
 
@@ -1151,38 +1152,58 @@ public class DataExplorer extends Composite {
 		return this.progessPercentage == 100 ? 0 : this.progessPercentage;
 	}
 
+	final boolean[] isRxOn = new boolean[] {true};	
 	public void setSerialTxOn() {
-		GDE.display.asyncExec(new Runnable() {
-			public void run() {
-				DataExplorer.this.statusBar.setSerialTxOn();
-			}
-		});
+		if (isRxOn[0]) {
+			isRxOn[0] = false;
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					DataExplorer.this.statusBar.setSerialTxOn();
+					isRxOn[0] = true;
+				}
+			});
+		}
 	}
 
+	final boolean[] isRxOff = new boolean[] {true};	
 	public void setSerialTxOff() {
-		GDE.display.asyncExec(new Runnable() {
-			public void run() {
-				DataExplorer.this.statusBar.setSerialTxOff();
-			}
-		});
+		if (isRxOff[0]) {
+			isRxOff[0] = false;
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					DataExplorer.this.statusBar.setSerialTxOff();
+					isRxOff[0] = true;
+				}
+			});
+		}
 	}
 
+	final boolean[] doneRxOn = new boolean[] {true};	
 	public void setSerialRxOn() {
-		GDE.display.asyncExec(new Runnable() {
-			public void run() {
-				DataExplorer.this.statusBar.setSerialRxOff();
-				DataExplorer.this.statusBar.setSerialRxOn();
-			}
-		});
+		if (doneRxOn[0]) {
+			doneRxOn[0] = false;
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					DataExplorer.this.statusBar.setSerialRxOff();
+					DataExplorer.this.statusBar.setSerialRxOn();
+					doneRxOn[0] = true;
+				}
+			});
+		}
 	}
 
+	final boolean[] doneRxOff = new boolean[] {true};
 	public void setSerialRxOff() {
-		GDE.display.asyncExec(new Runnable() {
-			public void run() {
-				DataExplorer.this.statusBar.setSerialRxOn();
-				DataExplorer.this.statusBar.setSerialRxOff();
-			}
-		});
+		if (doneRxOff[0]) {
+			doneRxOff[0] = false;
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					DataExplorer.this.statusBar.setSerialRxOn();
+					DataExplorer.this.statusBar.setSerialRxOff();
+					doneRxOff[0] = true;
+				}
+			});
+		}
 	}
 
 	public IDevice getActiveDevice() {
