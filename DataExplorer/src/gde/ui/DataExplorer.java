@@ -598,7 +598,8 @@ public class DataExplorer extends Composite {
 							DataExplorer.this.isObjectWindowVisible = false;
 						}
 					}
-					if (log.isLoggable(Level.FINE) && DataExplorer.this.displayTab != null && getSize().y != 0) {
+					if (log.isLoggable(Level.FINE) && DataExplorer.this.displayTab != null && DataExplorer.this.filler != null 
+							&& DataExplorer.this.menuCoolBar != null && DataExplorer.this.statusComposite != null && getSize().y != 0) {
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "filler.size = " + DataExplorer.this.filler.getSize()); //$NON-NLS-1$
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + DataExplorer.this.menuCoolBar.getSize()); //$NON-NLS-1$
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + new Point(getClientArea().width, getClientArea().height)); //$NON-NLS-1$
@@ -618,17 +619,18 @@ public class DataExplorer extends Composite {
 						DataExplorer.this.enableZoomMenuButtons(true);
 						DataExplorer.this.updateGraphicsWindow();
 					}
-					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-						DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
-						DataExplorer.this.enableZoomMenuButtons(true);
-						DataExplorer.this.updateGraphicsWindow();
+					else if (tabSelectionIndex > 0) {
+						if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+							DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
+							DataExplorer.this.enableZoomMenuButtons(true);
+							DataExplorer.this.updateGraphicsWindow();
+						}
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+							DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
+							DataExplorer.this.enableZoomMenuButtons(false);
+							DataExplorer.this.updateGraphicsWindow();
+						}
 					}
-					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-						DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
-						DataExplorer.this.enableZoomMenuButtons(false);
-						DataExplorer.this.updateGraphicsWindow();
-					}
-
 				}
 			});
 			// drag filePath support
@@ -1803,11 +1805,13 @@ public class DataExplorer extends Composite {
 				if (tabSelectionIndex == 0) { //graphics tab is alwasy the first one
 					this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
 				}
-				else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-					this.compareTabItem.redrawGraphics(refreshCurveSelector);
-				}
-				else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-					this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+				else if (tabSelectionIndex > 0) {
+					if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+						this.compareTabItem.redrawGraphics(refreshCurveSelector);
+					}
+					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+						this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+					}
 				}
 			}
 		}
@@ -2487,38 +2491,39 @@ public class DataExplorer extends Composite {
 			this.settings.setGraphicsCurveAreaBackground(innerAreaBackground);
 			this.graphicsTabItem.setCurveAreaBackground(innerAreaBackground);
 		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
-			this.settings.setSatisticsInnerAreaBackground(innerAreaBackground);
-			this.statisticsTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
-			this.settings.setDigitalInnerAreaBackground(innerAreaBackground);
-			this.digitalTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
-			this.settings.setAnalogInnerAreaBackground(innerAreaBackground);
-			this.analogTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
-			this.settings.setCellVoltageInnerAreaBackground(innerAreaBackground);
-			this.cellVoltageTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
-			this.settings.setFileCommentInnerAreaBackground(innerAreaBackground);
-			this.fileCommentTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
-			this.settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
-			this.objectDescriptionTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-			this.settings.setCompareCurveAreaBackground(innerAreaBackground);
-			this.compareTabItem.setCurveAreaBackground(innerAreaBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-			this.settings.setUtilityCurveAreaBackground(innerAreaBackground);
-			this.utilGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
-		}
+		else if (tabSelectionIndex > 0)
+			if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
+				this.settings.setSatisticsInnerAreaBackground(innerAreaBackground);
+				this.statisticsTabItem.setInnerAreaBackground(innerAreaBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
+				this.settings.setDigitalInnerAreaBackground(innerAreaBackground);
+				this.digitalTabItem.setInnerAreaBackground(innerAreaBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
+				this.settings.setAnalogInnerAreaBackground(innerAreaBackground);
+				this.analogTabItem.setInnerAreaBackground(innerAreaBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
+				this.settings.setCellVoltageInnerAreaBackground(innerAreaBackground);
+				this.cellVoltageTabItem.setInnerAreaBackground(innerAreaBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
+				this.settings.setFileCommentInnerAreaBackground(innerAreaBackground);
+				this.fileCommentTabItem.setInnerAreaBackground(innerAreaBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
+				this.settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
+				this.objectDescriptionTabItem.setInnerAreaBackground(innerAreaBackground);
+			}
+			else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+				this.settings.setCompareCurveAreaBackground(innerAreaBackground);
+				this.compareTabItem.setCurveAreaBackground(innerAreaBackground);
+			}
+			else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+				this.settings.setUtilityCurveAreaBackground(innerAreaBackground);
+				this.utilGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
+			}
 	}
 
 	/**
@@ -2531,14 +2536,15 @@ public class DataExplorer extends Composite {
 			this.settings.setCurveGraphicsBorderColor(borderColor);
 			this.graphicsTabItem.setCurveAreaBorderColor(borderColor);
 		}
-		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-			this.settings.setCurveCompareBorderColor(borderColor);
-			this.compareTabItem.setCurveAreaBorderColor(borderColor);
-		}
-		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-			this.settings.setUtilityCurvesBorderColor(borderColor);
-			this.utilGraphicsTabItem.setCurveAreaBorderColor(borderColor);
-		}
+		else if (tabItemIndex > 0)
+			if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+				this.settings.setCurveCompareBorderColor(borderColor);
+				this.compareTabItem.setCurveAreaBorderColor(borderColor);
+			}
+			else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+				this.settings.setUtilityCurvesBorderColor(borderColor);
+				this.utilGraphicsTabItem.setCurveAreaBorderColor(borderColor);
+			}
 	}
 
 	/**
@@ -2551,37 +2557,38 @@ public class DataExplorer extends Composite {
 			this.settings.setGraphicsSurroundingBackground(surroundingBackground);
 			this.graphicsTabItem.setSurroundingBackground(surroundingBackground);
 		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
-			this.settings.setSatisticsSurroundingAreaBackground(surroundingBackground);
-			this.statisticsTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
-			this.settings.setDigitalSurroundingAreaBackground(surroundingBackground);
-			this.digitalTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
-			this.settings.setAnalogSurroundingAreaBackground(surroundingBackground);
-			this.analogTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
-			this.settings.setCellVoltageSurroundingAreaBackground(surroundingBackground);
-			this.cellVoltageTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
-			this.settings.setFileCommentSurroundingAreaBackground(surroundingBackground);
-			this.fileCommentTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
-			this.settings.setObjectDescriptionSurroundingAreaBackground(surroundingBackground);
-			this.objectDescriptionTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-			this.settings.setCompareSurroundingBackground(surroundingBackground);
-			this.compareTabItem.setSurroundingBackground(surroundingBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-			this.settings.setUtilitySurroundingBackground(surroundingBackground);
-			this.utilGraphicsTabItem.setSurroundingBackground(surroundingBackground);
+		else if (tabSelectionIndex > 0)
+			if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
+				this.settings.setSatisticsSurroundingAreaBackground(surroundingBackground);
+				this.statisticsTabItem.setSurroundingAreaBackground(surroundingBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
+				this.settings.setDigitalSurroundingAreaBackground(surroundingBackground);
+				this.digitalTabItem.setSurroundingAreaBackground(surroundingBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
+				this.settings.setAnalogSurroundingAreaBackground(surroundingBackground);
+				this.analogTabItem.setSurroundingAreaBackground(surroundingBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
+				this.settings.setCellVoltageSurroundingAreaBackground(surroundingBackground);
+				this.cellVoltageTabItem.setSurroundingAreaBackground(surroundingBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
+				this.settings.setFileCommentSurroundingAreaBackground(surroundingBackground);
+				this.fileCommentTabItem.setSurroundingAreaBackground(surroundingBackground);
+			}
+			else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
+				this.settings.setObjectDescriptionSurroundingAreaBackground(surroundingBackground);
+				this.objectDescriptionTabItem.setSurroundingAreaBackground(surroundingBackground);
+			}
+			else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+				this.settings.setCompareSurroundingBackground(surroundingBackground);
+				this.compareTabItem.setSurroundingBackground(surroundingBackground);
+			}
+			else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+				this.settings.setUtilitySurroundingBackground(surroundingBackground);
+				this.utilGraphicsTabItem.setSurroundingBackground(surroundingBackground);
 		}
 	}
 
