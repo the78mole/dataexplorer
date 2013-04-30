@@ -1216,19 +1216,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		boolean rc = true;
 		try {
 			String className = "de.treichels.hott.HoTTDecoder";//$NON-NLS-1$
-			log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
+			//log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
 			Constructor<?> constructor = c.getDeclaredConstructor();
-			log.log(Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 				constructor.newInstance();
 			}
 			else
+				log.log(Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 				rc = false;
 		}
 		catch (final Throwable t) {
-			t.printStackTrace();
+			log.log(Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 			rc = false;
 		}
 		return rc;
