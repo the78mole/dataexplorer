@@ -670,8 +670,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			timeOutCounter--;
 			//if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, "time out counter = " + counter);
 			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { numBytes, timeout_msec }));
-				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, String.format("only %d of %d Bytes are available in %d msec", resBytes, numBytes, timeout_msec));
 				break;
 			}
 		}
