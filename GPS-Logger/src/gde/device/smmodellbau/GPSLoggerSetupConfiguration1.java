@@ -156,7 +156,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 15);
 				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 10);
 				gpsLoggerGroupLData.width = 290;
-				gpsLoggerGroupLData.height = 330;
+				gpsLoggerGroupLData.height = GDE.IS_MAC ? 325 : 330;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
 				this.gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);

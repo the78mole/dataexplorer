@@ -173,7 +173,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData mLinkAddressesGroupLData = new FormData();
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 10);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 270;
+				mLinkAddressesGroupLData.height = GDE.IS_MAC ? 265 : 270;
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
