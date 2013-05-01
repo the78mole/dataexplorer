@@ -77,9 +77,9 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 	final int												comboWidth							= 84;
 
 	Group														mLinkAddressesGroup;
-	CLabel													addressVoltageLabel, addressCurrentLabel, addressRevolutionLabel, addressCapacityLabel, addressVarioLabel, addressHeightLabel, cellMinimumLabel;
-	Text														addressVoltageText, addressCurrentText, addressRevolutionText, addressCapacityText, addressVarioText, addressHeightText, cellMinimumText;
-	Slider													addressVoltageSlider, addressCurrentSlider, addressRevolutionSlider, addressCapacitySlider, addressVarioSlider, addressHeightSlider, cellMinimumSlider;
+	CLabel													addressVoltageLabel, addressCurrentLabel, addressRevolutionLabel, addressCapacityLabel, addressVarioLabel, addressHeightLabel, addressIntHeightLabel, cellMinimumLabel;
+	Text														addressVoltageText, addressCurrentText, addressRevolutionText, addressCapacityText, addressVarioText, addressHeightText, addressIntHeightText, cellMinimumText;
+	Slider													addressVoltageSlider, addressCurrentSlider, addressRevolutionSlider, addressCapacitySlider, addressVarioSlider, addressHeightSlider, addressIntHeightSlider, cellMinimumSlider;
 	final int												labelWidth							= 115;
 	final int												textWidth								= 25;
 	final int												sliderWidth							= 125;
@@ -167,8 +167,10 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		this.addressCapacityText.setText(this.sliderValues[this.configuration.mLinkAddressCapacity]);
 		this.addressVarioSlider.setSelection(this.configuration.mLinkAddressVario);
 		this.addressVarioText.setText(this.sliderValues[this.configuration.mLinkAddressVario]);
-		this.addressHeightSlider.setSelection(this.configuration.mLinkAddressHeight);
 		this.addressHeightText.setText(this.sliderValues[this.configuration.mLinkAddressHeight]);
+		this.addressHeightSlider.setSelection(this.configuration.mLinkAddressHeight);
+		this.addressIntHeightText.setText(this.sliderValues[this.configuration.mLinkAddressIntHeight]);
+		this.addressIntHeightSlider.setSelection(this.configuration.mLinkAddressIntHeight);
 		this.cellMinimumSlider.setSelection(this.configuration.mLinkAddressCellMinimum);
 		this.cellMinimumText.setText(this.sliderValues[this.configuration.mLinkAddressCellMinimum]);
 
@@ -621,10 +623,10 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					});
 				}
 				{
+					this.heightLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData heightLabelLData = new RowData();
 					heightLabelLData.width = 50;
 					heightLabelLData.height = 19;
-					this.heightLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					this.heightLabel.setLayoutData(heightLabelLData);
 					this.heightLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.heightLabel.setText(Messages.getString(MessageIds.GDE_MSGT2555));
@@ -1085,7 +1087,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 260);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 250;
+				mLinkAddressesGroupLData.height = 280;
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.mLinkAddressesGroup.setText(Messages.getString(MessageIds.GDE_MSGT2558));
@@ -1329,6 +1331,45 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							log.log(Level.FINEST, "addressSlider3max.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.mLinkAddressHeight = (byte) UniLog2SetupConfiguration2.this.addressHeightSlider.getSelection();
 							UniLog2SetupConfiguration2.this.addressHeightText.setText(UniLog2SetupConfiguration2.this.sliderValues[UniLog2SetupConfiguration2.this.configuration.mLinkAddressHeight]);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressIntHeightLabel = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressIntHeightLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel3maxLData = new RowData();
+					addressLabel3maxLData.width = this.labelWidth;
+					addressLabel3maxLData.height = 21;
+					this.addressIntHeightLabel.setLayoutData(addressLabel3maxLData);
+					this.addressIntHeightLabel.setText(Messages.getString(MessageIds.GDE_MSGT2585));
+				}
+				{
+					this.addressIntHeightText = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressIntHeightText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText3maxLData = new RowData();
+					addressText3maxLData.width = this.textWidth;
+					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					this.addressIntHeightText.setLayoutData(addressText3maxLData);
+					this.addressIntHeightText.setEditable(false);
+					this.addressIntHeightText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				{
+					this.addressIntHeightSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressIntHeightSlider.setMinimum(this.sliderMinimum);
+					this.addressIntHeightSlider.setMaximum(this.sliderMaximum);
+					this.addressIntHeightSlider.setIncrement(this.sliderIncrement);
+					RowData addressSlider3maxLData = new RowData();
+					addressSlider3maxLData.width = this.sliderWidth;
+					addressSlider3maxLData.height = 17;
+					this.addressIntHeightSlider.setLayoutData(addressSlider3maxLData);
+					//this.addressSlider3max.setSelection(this.configuration.mLinkaddressIntHeightMax);
+					this.addressIntHeightSlider.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "addressSlider3max.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.mLinkAddressIntHeight = (byte) UniLog2SetupConfiguration2.this.addressIntHeightSlider.getSelection();
+							UniLog2SetupConfiguration2.this.addressIntHeightText.setText(UniLog2SetupConfiguration2.this.sliderValues[UniLog2SetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

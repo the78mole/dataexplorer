@@ -69,10 +69,10 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 
 	Group														commonAdjustmentsGroup, logStartStopGroup;
 	CLabel													serialNumberLabel, firmwareLabel, dataRateLabel, currentSensorTypeLabel, propellerBladesLabel, motorPolsLabel, gearFactorLabel, varioTriggerLevelLabel, varioTriggerSinkLevelLabel, varioToneLabel;
-	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel, sensorTypeLabel, autoStopLabel;
+	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel, capacityResetLabel, currentOffsetLabel, sensorTypeLabel, telemetrieTypeLabel, autoStopLabel;
 	Text														serialNumberText, firmwareText, gearFactorText, varioTriggerLevelText, varioTriggerSinkLevelText, energyLimitText;
 	Slider													gearFactorSlider, varioTriggerLevelSlider, varioTriggerSinkLevelSlider, energyLimitSlider;
-	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, sensorTypeCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,	autoStartTimeCombo;
+	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, capacityResetCombo, currentOffsetCombo, sensorTypeCombo, telemetrieTypeCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,	autoStartTimeCombo;
 	CCombo													a1ModusCombo, a2ModusCombo, a3ModusCombo;
 	Button													autoStartCurrentButton, autoStartRxButton, autoStartTimeButton;
 	Composite												fillerComposite;
@@ -87,6 +87,9 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	final String[]									voltageRxValues				= { "  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05",
 			"  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" };
 	final String[]									sensorTypes						= { "  GAM", "  EAM", "  ESC"};
+	final String[]									telemetrieTypes				= { " Jeti | HoTT | M-Link", "  FASST", "  JR DMSS"};
+	final String[]									capacityResets					= Messages.getString(MessageIds.GDE_MSGT2581).split(GDE.STRING_COMMA);
+	final String[]									currentOffsets				= Messages.getString(MessageIds.GDE_MSGT2582).split(GDE.STRING_COMMA);
 
 	/**
 	* Auto-generated main method to display this 
@@ -174,6 +177,9 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.energyLimitSlider.setSelection(this.configuration.energyLimit);
 		this.energyLimitText.setText(GDE.STRING_BLANK + this.configuration.energyLimit);
 		this.minMaxRxCombo.select(this.configuration.minMaxRx);
+		this.capacityResetCombo.select(this.configuration.capacityReset);
+		this.currentOffsetCombo.select(this.configuration.currentOffset);
+		this.telemetrieTypeCombo.select(this.configuration.telemetrieType);
 		this.sensorTypeCombo.select(this.configuration.sensorType);
 
 		this.autoStartCurrentButton.setSelection((this.configuration.startModus & 0x0001) > 0);
@@ -198,7 +204,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				logStartStopGroupLData.width = 290;
 				logStartStopGroupLData.height = 110;
 				logStartStopGroupLData.left = new FormAttachment(0, 1000, 12);
-				logStartStopGroupLData.top = new FormAttachment(0, 1000, 400);
+				logStartStopGroupLData.top = new FormAttachment(0, 1000, 450);
 				this.logStartStopGroup.setLayoutData(logStartStopGroupLData);
 				this.logStartStopGroup.setText(Messages.getString(MessageIds.GDE_MSGT2526));
 				this.logStartStopGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -394,7 +400,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.commonAdjustmentsGroup.setLayout(commonAdjustmentsGroupLayout);
 				FormData commonAdjustmentsGroupLData = new FormData();
 				commonAdjustmentsGroupLData.width = 290;
-				commonAdjustmentsGroupLData.height = 360;
+				commonAdjustmentsGroupLData.height = 425;
 				commonAdjustmentsGroupLData.left = new FormAttachment(0, 1000, 12);
 				commonAdjustmentsGroupLData.top = new FormAttachment(0, 1000, 5);
 				this.commonAdjustmentsGroup.setLayoutData(commonAdjustmentsGroupLData);
@@ -891,6 +897,90 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "minMaxRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.minMaxRx = (short) (UniLog2SetupConfiguration1.this.minMaxRxCombo.getSelectionIndex());
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.capacityResetLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData capacityResetLabelLData = new RowData();
+					capacityResetLabelLData.width = 135;
+					capacityResetLabelLData.height = 20;
+					this.capacityResetLabel.setLayoutData(capacityResetLabelLData);
+					this.capacityResetLabel.setText(Messages.getString(MessageIds.GDE_MSGT2583));
+					this.capacityResetLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.capacityResetCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
+					RowData capacityResetComboLData = new RowData();
+					capacityResetComboLData.width = 130;
+					capacityResetComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.capacityResetCombo.setLayoutData(capacityResetComboLData);
+					this.capacityResetCombo.setItems(this.capacityResets);
+					this.capacityResetCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.capacityResetCombo.setEditable(false);
+					this.capacityResetCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.capacityResetCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "capacityResetCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.capacityReset = (short) (UniLog2SetupConfiguration1.this.capacityResetCombo.getSelectionIndex());
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.currentOffsetLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData currentOffsetLabelLData = new RowData();
+					currentOffsetLabelLData.width = 135;
+					currentOffsetLabelLData.height = 20;
+					this.currentOffsetLabel.setLayoutData(currentOffsetLabelLData);
+					this.currentOffsetLabel.setText(Messages.getString(MessageIds.GDE_MSGT2584));
+					this.currentOffsetLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.currentOffsetCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
+					RowData currentOffsetComboLData = new RowData();
+					currentOffsetComboLData.width = 84;
+					currentOffsetComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.currentOffsetCombo.setLayoutData(currentOffsetComboLData);
+					this.currentOffsetCombo.setItems(this.currentOffsets);
+					this.currentOffsetCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.currentOffsetCombo.setEditable(false);
+					this.currentOffsetCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.currentOffsetCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "currentOffsetCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.currentOffset = (short) (UniLog2SetupConfiguration1.this.currentOffsetCombo.getSelectionIndex());
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.telemetrieTypeLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData telemetrieTypeLabelLData = new RowData();
+					telemetrieTypeLabelLData.width = 135;
+					telemetrieTypeLabelLData.height = 20;
+					this.telemetrieTypeLabel.setLayoutData(telemetrieTypeLabelLData);
+					this.telemetrieTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2580));
+					this.telemetrieTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.telemetrieTypeCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
+					RowData telemetrieTypeComboLData = new RowData();
+					telemetrieTypeComboLData.width = 130;
+					telemetrieTypeComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.telemetrieTypeCombo.setLayoutData(telemetrieTypeComboLData);
+					this.telemetrieTypeCombo.setItems(this.telemetrieTypes);
+					this.telemetrieTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetrieTypeCombo.setEditable(false);
+					this.telemetrieTypeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.telemetrieTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "telemetrieTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.telemetrieType = (short) (UniLog2SetupConfiguration1.this.telemetrieTypeCombo.getSelectionIndex());
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

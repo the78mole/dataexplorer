@@ -91,7 +91,7 @@ public class UniLog2SetupReaderWriter {
 
 	//$UL2SETUP,192 Byte*
 	short								serialNumber						= 357;																												// 1
-	short								firmwareVersion					= 103;																												// 2
+	short								firmwareVersion					= 109;																												// 2
 	short								dataRate								= 2;																													// 3 0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
 	short								startModus							= 1;																													// 4 AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
 	short								startCurrent						= 3;																													// 5 1 - 50 A
@@ -111,7 +111,10 @@ public class UniLog2SetupReaderWriter {
 	short								stopModus								= 0;																													// 19 0=off, 1=on
 	short								varioThresholdSink			= 5;																													// 20 value/10 m/sec
 	short								sensorType							= 0;																													// 21 GAM=0;EAM=1;ESC=2
-	//short[] A = new short[16]; 																																							// 22-37
+	short								telemetrieType					= 0;																													// 22 HoTT=0;FASST=1;JRDMSS=2
+	short								capacityReset 					= 0; 																													// 23 capacity keep=0, reset=1
+	short								currentOffset 					= 0; 																													// 24 current always=0, never=1
+	//short[] A = new short[16]; 																																							// 23-37
 	short								telemetryAlarms					= 0x0000;																											// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
 	short								currentAlarm						= 100;																												// 39 1A --> 400A
 	short								voltageStartAlarm				= 124;																												// 40 10V/10 --> 600V/10
@@ -133,15 +136,16 @@ public class UniLog2SetupReaderWriter {
 	byte								mLinkAddressCapacity		= 3;																													// 66 0 - 15, "--"
 	byte								mLinkAddressVario				= 4;																													// 
 	byte								mLinkAddressHeight			= 5;																													// 67 0 - 15, "--"
-	byte								mLinkAddressA1					= 6;																													// 
-	byte								mLinkAddressA2					= 7;																													// 68 0 - 15, "--"
-	byte								mLinkAddressA3					= 8;																													// 
-	byte								mLinkAddressCellMinimum = 16;																													// 69
-	byte								mLinkAddressCell1				= 16;																													// 70 0 - 15, "--"
-	byte								mLinkAddressCell2				= 16;																													// 
-	byte								mLinkAddressCell3				= 16;																													// 71 0 - 15, "--"
-	byte								mLinkAddressCell4				= 16;																													// 
-	byte								mLinkAddressCell5				= 16;																													// 72 0 - 15, "--"
+	byte								mLinkAddressIntHeight		= 6;																													// 67 0 - 15, "--"
+	byte								mLinkAddressA1					= 7;																													// 
+	byte								mLinkAddressA2					= 8;																													// 68 0 - 15, "--"
+	byte								mLinkAddressA3					= 9;																													// 
+	byte								mLinkAddressCellMinimum = 10;																													// 69
+	byte								mLinkAddressCell1				= 11;																													// 70 0 - 15, "--"
+	byte								mLinkAddressCell2				= 12;																													// 
+	byte								mLinkAddressCell3				= 13;																													// 71 0 - 15, "--"
+	byte								mLinkAddressCell4				= 14;																													// 
+	byte								mLinkAddressCell5				= 15;																													// 72 0 - 15, "--"
 	byte								mLinkAddressCell6				= 16;																													//
 	//short[] C = new short[190/2 - 72]; // 73-95
 	short								checkSum;																																							// 55
@@ -192,7 +196,10 @@ public class UniLog2SetupReaderWriter {
 				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
 				this.varioThresholdSink = DataParser.parse2Short(buffer, 38); // 20 value/10 m/sec		
 				this.sensorType = DataParser.parse2Short(buffer, 40); // 21 GAM=0;EAM=1;ESC=2		
-				//short[] A = new short[17]; // 21-37
+				this.telemetrieType = DataParser.parse2Short(buffer, 42); // 22 HoTT=0, FASST=1, JRDMSS=2
+				this.capacityReset = DataParser.parse2Short(buffer, 44); // 23 capacity keep=0, reset=1
+				this.currentOffset = DataParser.parse2Short(buffer, 46); // 24 current always=0, never=1
+				//short[] A = new short[13]; // 25-37
 				this.telemetryAlarms = DataParser.parse2Short(buffer, 74); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
 				this.currentAlarm = DataParser.parse2Short(buffer, 76); //1A --> 400A
@@ -225,6 +232,7 @@ public class UniLog2SetupReaderWriter {
 				this.mLinkAddressCell4 = buffer[141]; //0 - 15, "--"
 				this.mLinkAddressCell5 = buffer[142]; //0 - 15, "--"
 				this.mLinkAddressCell6 = buffer[143]; //0 - 15, "--"
+				this.mLinkAddressIntHeight = buffer[144]; //0 - 15, "--"
 				//short[] C = new short[190/2 - 72]; // 73-95
 				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));
 
@@ -297,7 +305,13 @@ public class UniLog2SetupReaderWriter {
 				buffer[39] = (byte) ((this.varioThresholdSink & 0xFF00) >> 8);
 				buffer[40] = (byte) (this.sensorType & 0x00FF); // 21 GAM=0;EAM=1;ESC=2	
 				buffer[41] = (byte) ((this.sensorType & 0xFF00) >> 8);
-				//short[] A = new short[17]; // 21-37
+				buffer[42] = (byte) (this.telemetrieType & 0x00FF); // 22 HoTT=0;FASST=1;JRDMSS=2	
+				buffer[43] = (byte) ((this.telemetrieType & 0xFF00) >> 8);
+				buffer[44] = (byte) (this.capacityReset & 0x00FF); // 23 capacity keep=0, reset=1
+				buffer[45] = (byte) ((this.capacityReset & 0xFF00) >> 8);
+				buffer[46] = (byte) (this.currentOffset & 0x00FF); // 24 current always=0, never=1
+				buffer[47] = (byte) ((this.currentOffset & 0xFF00) >> 8);
+				//short[] A = new short[15]; // 23-37
 				buffer[74] = (byte) (this.telemetryAlarms & 0x00FF); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				buffer[75] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
@@ -346,6 +360,7 @@ public class UniLog2SetupReaderWriter {
 				buffer[141] = this.mLinkAddressCell4; //0 - 15, "--"
 				buffer[142] = this.mLinkAddressCell5; //0 - 15, "--"
 				buffer[143] = this.mLinkAddressCell6; //0 - 15, "--"
+				buffer[144] = this.mLinkAddressIntHeight; //0 - 15, "--"
 				//short[] C = new short[190/2 - 72]; 					// 73-95
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
