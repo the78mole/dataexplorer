@@ -1499,7 +1499,7 @@ public class FileUtils {
 			int download = 0;
 			int lastDownloadProgress = -1;
 			
-			DataExplorer.getInstance().setStatusMessage("Downloading new version od DataExplorer");
+			DataExplorer.getInstance().setStatusMessage(Messages.getString(MessageIds.GDE_MSGI0053));
 			int progressStatus = 0;
 			while ((count = in.read(buffer)) > 0) {
 				out.write(buffer, 0, count);

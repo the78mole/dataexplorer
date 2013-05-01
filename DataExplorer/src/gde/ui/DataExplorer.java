@@ -2943,7 +2943,7 @@ public class DataExplorer extends Composite {
 	public void check4update() {
 		final String[] versionCheck = FileUtils.isUpdateAvailable();
 		if (new Boolean(versionCheck[0])) {
-			final MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
+			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052));
 			if (SWT.YES == messageDialog.open()) {
@@ -2962,20 +2962,22 @@ public class DataExplorer extends Composite {
 							else if (GDE.IS_MAC) //DataExplorer-3.0.8_Mac_64.dmg
 								filename = "DataExplorer-" + version + "_Mac_" + arch + ".dmg";
 
-							String targetFilePath = GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR_UNIX + filename;
+							final String targetFilePath = GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR_UNIX + filename;
 							
 							if (!new File(targetFilePath).exists())
 								FileUtils.downloadFile(new URL(downloadUrl + filename), targetFilePath);
 							
-							messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
-							if (SWT.YES == messageDialog.open()) {			
-								OperatingSystemHelper.launchApplication(targetFilePath);
-								GDE.display.syncExec(new Runnable() {
-									public void run() {
+							GDE.display.syncExec(new Runnable() {
+								public void run() {
+									MessageBox message = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
+									message.setText(GDE.NAME_LONG);
+									message.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
+									if (SWT.YES == message.open()) {
+										OperatingSystemHelper.launchApplication(targetFilePath);
 										GDE.shell.dispose();
 									}
-								});
-							}
+								}
+							});
 						}
 						catch (Exception e) {
 							e.printStackTrace();
