@@ -7,7 +7,8 @@ HoTTAdapter* - calculate CRC for mx-21<->mx16 converter instead of static update
 HoTTAdapter* - adapt data reader *.bin and live data of ESC according firmware update 
 HoTTAdapter* - enable MDL Viewer tabulator
 fix [bug #38250] Feature: Use keyboard for zooming
-fix bug - in startup some times an error "null" (NullPointerException) occurs
+fix bug - in startup sometimes an error "null" (NullPointerException) occurs
+graphics templates - remove defined end points from graphics templates while potential value end points may outside this range
 UniLog2 - adapt to latest firmware 1.09
 GPS-Logger - adapt to latest firmware 1.10
 
