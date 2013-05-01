@@ -202,9 +202,9 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.logStartStopGroup.setLayout(logStartStopGroupLayout);
 				FormData logStartStopGroupLData = new FormData();
 				logStartStopGroupLData.width = 290;
-				logStartStopGroupLData.height = 110;
+				logStartStopGroupLData.height = 105;
 				logStartStopGroupLData.left = new FormAttachment(0, 1000, 12);
-				logStartStopGroupLData.top = new FormAttachment(0, 1000, 450);
+				logStartStopGroupLData.top = new FormAttachment(0, 1000, 455);
 				this.logStartStopGroup.setLayoutData(logStartStopGroupLData);
 				this.logStartStopGroup.setText(Messages.getString(MessageIds.GDE_MSGT2526));
 				this.logStartStopGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
