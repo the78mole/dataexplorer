@@ -185,6 +185,7 @@ public class Settings extends Properties {
 	public static final String			IS_DESKTOP_SHORTCUT_CREATED		= "is_desktop_shotcut_created";																																	//$NON-NLS-1$
 	public static final String			IS_APPL_REGISTERED						= "is_GDE_registered";																																					//$NON-NLS-1$
 	public static final String			IS_LOCK_UUCP_HINTED						= "is_lock_uucp_hinted";																																				//$NON-NLS-1$
+	public static final String			LAST_UPDATE_CHECK							= "last_update_check";																																				//$NON-NLS-1$
 
 	public final static String			GRID_DASH_STYLE								= "grid_dash_style";																																						//$NON-NLS-1$
 	public final static String			GRID_COMPARE_WINDOW_HOR_TYPE	= "grid_compare_horizontal_type";																																//$NON-NLS-1$
@@ -566,6 +567,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DESKTOP_SHORTCUT_CREATED, this.isDesktopShortcutCreated())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", Settings.TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
@@ -1432,6 +1434,13 @@ public class Settings extends Properties {
 	 */
 	public boolean isLockUucpHinted() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_LOCK_UUCP_HINTED, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * query value if a hint was displayed to enalble uucp locking used on UNIX based systems with RXTXcomm
+	 */
+	public boolean isUpdateChecked() {
+		return this.getProperty(Settings.LAST_UPDATE_CHECK, "2000-01-01").equals(StringHelper.getDate()); //$NON-NLS-1$
 	}
 
 	/**

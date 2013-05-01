@@ -39,12 +39,10 @@ import gde.ui.dialog.GoogleEarthCustomizingDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
-import gde.utils.ApplicationLauncher;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyScanner;
+import gde.utils.OperatingSystemHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -1019,20 +1017,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "googleEarthToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							ApplicationLauncher launcher;
-							if (GDE.IS_MAC)
-								launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{"Google Earth"}, GDE.STRING_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_MAC_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
-							else if (GDE.IS_LINUX)
-								launcher = new ApplicationLauncher(GDE.STRING_LINUX_APP_OPEN, new String[]{"googleearth", "google-earth"}, "which"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							else //GDE.IS_WINDOWS
-								launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{"Google Earth.kmzfile", "Google Earth.kmlfile"}, "Registry - HKEY_CLASSES_ROOT und HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"); //$NON-NLS-1$
-
-							if (launcher.isLaunchable()) {
-								String kmzFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KMZ, true);
-								List<String> argumentList = new ArrayList<String>();
-								argumentList.add(kmzFilePath);
-								launcher.execute(argumentList);
-							}
+							OperatingSystemHelper.launchGoogleEarth(MenuToolBar.this.application.getActiveDevice());
 						}
 					});
 				}

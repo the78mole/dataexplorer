@@ -45,6 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1330,31 +1331,34 @@ public class FileUtils {
 			log.log(Level.SEVERE, "failed executing cleanup settings "); //$NON-NLS-1$
 		}
 	}
+
 	/**
 	 * main method to execute post execution cleanup, called by cleanupPost()
 	 */
 	public static void main(String[] args) {
-		if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
-			if (GDE.IS_WINDOWS) {
-				OperatingSystemHelper.removeDesktopLink();
-				FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
-				OperatingSystemHelper.deregisterApplication();
-			}
-			else if (GDE.IS_LINUX) {
-				OperatingSystemHelper.removeDesktopLink();
-				OperatingSystemHelper.deregisterApplication();
-				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
-			}
-			else if (GDE.IS_MAC) {
-				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
-			}
-		}
-		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "Register*.exe", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		else if (GDE.IS_LINUX)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "*register.sh", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		else if (GDE.IS_MAC)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
+//		if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
+//			if (GDE.IS_WINDOWS) {
+//				OperatingSystemHelper.removeDesktopLink();
+//				FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
+//				OperatingSystemHelper.deregisterApplication();
+//			}
+//			else if (GDE.IS_LINUX) {
+//				OperatingSystemHelper.removeDesktopLink();
+//				OperatingSystemHelper.deregisterApplication();
+//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
+//			}
+//			else if (GDE.IS_MAC) {
+//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
+//			}
+//		}
+//		if (GDE.IS_WINDOWS) 
+//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "Register*.exe", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+//		else if (GDE.IS_LINUX)
+//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "*register.sh", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//		else if (GDE.IS_MAC)
+//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		System.out.println("isUpdateAvailable = " + isUpdateAvailable());
 	}
 
 	/**
@@ -1440,5 +1444,91 @@ public class FileUtils {
 
 		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() &&  !searchDirectory.equals(fd.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
+	}
+	
+	public static String[] isUpdateAvailable() {
+		BufferedReader in = null;
+		String[] versionCheck = new String[] {"false", GDE.VERSION.substring(8)};
+		try {
+			URL gdeDownload = new URL("http://www.nongnu.org/dataexplorer/download.html");
+			in = new BufferedReader(
+			new InputStreamReader(gdeDownload.openStream()));
+
+			String inputLine;
+			while ((inputLine = in.readLine()) != null)
+				if (inputLine.contains("The latest stable version of DataExplorer is")) {
+			    String versionString = inputLine.substring(inputLine.lastIndexOf("<B>")+3, inputLine.lastIndexOf("</B>"));
+			    int availableVersion = Integer.parseInt(versionString.replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+			    int actualVersion = Integer.parseInt(GDE.VERSION.substring(8).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+			    log.log(Level.OFF, "actualVersion = " + actualVersion + " - availableVersion = " + availableVersion);
+			    versionCheck = new String[] {new Boolean(actualVersion < availableVersion).toString(), versionString};
+				}
+			
+			in.close();
+			in = null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (in != null) try {
+				in.close();
+			}
+			catch (IOException e) {
+				// ignore
+			}
+		}
+		return versionCheck;
+	}
+	
+	public static void downloadFile(URL url, String targetFileName) {
+		InputStream in = null;
+		FileOutputStream out = null;
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		try {
+			URLConnection conn = url.openConnection();
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setRequestProperty("content-type", "binary/data");
+			int size = conn.getContentLength();
+			in = conn.getInputStream();
+			out = new FileOutputStream(targetFileName);
+
+			byte[] buffer = new byte[size / 20];
+			int count;
+			int download = 0;
+			int lastDownloadProgress = -1;
+			
+			DataExplorer.getInstance().setStatusMessage("Downloading new version od DataExplorer");
+			int progressStatus = 0;
+			while ((count = in.read(buffer)) > 0) {
+				out.write(buffer, 0, count);
+				download += count;
+				progressStatus = download * 100 / size;
+				if (lastDownloadProgress < progressStatus && progressStatus % 5 == 0) {
+					lastDownloadProgress = progressStatus;
+					DataExplorer.getInstance().setProgress(progressStatus, sThreadId);
+				}
+			}
+			DataExplorer.getInstance().setStatusMessage("");
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (out != null) try {
+				out.close();
+			}
+			catch (IOException e) {
+				// ignore
+			}
+			if (in != null) try {
+				in.close();
+			}
+			catch (IOException e) {
+				// ignore
+			}
+		}
 	}
 }

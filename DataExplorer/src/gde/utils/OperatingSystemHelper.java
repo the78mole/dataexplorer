@@ -19,6 +19,13 @@
 
 package gde.utils;
 
+import gde.GDE;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,15 +38,11 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.JarFile;
-import gde.log.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipInputStream;
-
-import gde.GDE;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
 
 /**
  * Utility class with helpers around operating system
@@ -865,5 +868,38 @@ public class OperatingSystemHelper {
 			log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		return result;
+	}
+
+	public static void launchGoogleEarth(IDevice activeDevice) {
+		ApplicationLauncher launcher;
+		if (GDE.IS_MAC)
+			launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{"Google Earth"}, GDE.STRING_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_MAC_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
+		else if (GDE.IS_LINUX)
+			launcher = new ApplicationLauncher(GDE.STRING_LINUX_APP_OPEN, new String[]{"googleearth", "google-earth"}, "which"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		else //GDE.IS_WINDOWS
+			launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{"Google Earth.kmzfile", "Google Earth.kmlfile"}, "Registry - HKEY_CLASSES_ROOT und HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"); //$NON-NLS-1$
+
+		if (launcher.isLaunchable()) {
+			String kmzFilePath = activeDevice.exportFile(GDE.FILE_ENDING_KMZ, true);
+			List<String> argumentList = new ArrayList<String>();
+			argumentList.add(kmzFilePath);
+			launcher.execute(argumentList);
+		}
+	}
+
+	public static void launchApplication(final String applicationPath) {
+		ApplicationLauncher launcher;
+		if (GDE.IS_MAC)
+			launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{}, applicationPath); 
+		else if (GDE.IS_LINUX)
+			launcher = new ApplicationLauncher(GDE.STRING_LINUX_APP_OPEN, new String[]{}, applicationPath);
+		else //GDE.IS_WINDOWS
+			launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{}, applicationPath);
+
+		if (launcher.isLaunchable()) {
+			List<String> argumentList = new ArrayList<String>();
+			argumentList.add(applicationPath);
+			launcher.execute(argumentList);
+		}
 	}
 }

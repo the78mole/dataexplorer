@@ -28,6 +28,7 @@ import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.exception.GDEInternalException;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -55,6 +56,7 @@ import gde.utils.WaitTimer;
 import gde.utils.WebBrowser;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
@@ -110,6 +112,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
+
+import com.sun.tools.javadoc.Messager.ExitJavadoc;
 
 /**
  * Main application class of DataExplorer
@@ -413,6 +417,13 @@ public class DataExplorer extends Composite {
 				}
 			});
 
+			if (!this.settings.isUpdateChecked()) {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						check4update();
+					}
+				});
+			}
 			this.enableWritingTmpFiles(this.settings.getUsageWritingTmpFiles());
 			log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -2925,6 +2936,54 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			this.isTmpWriteStop = true;
+		}
+	}
+
+	/**
+	 * checks for update to installed version and enable open download page if a newer version is available
+	 */
+	public void check4update() {
+		final String[] versionCheck = FileUtils.isUpdateAvailable();
+		if (new Boolean(versionCheck[0])) {
+			final MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
+			messageDialog.setText(GDE.NAME_LONG);
+			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052));
+			if (SWT.YES == messageDialog.open()) {
+				new Thread("Download") {
+					@Override
+					public void run() {
+						try {
+							String downloadUrl = "http://download.savannah.gnu.org/releases/dataexplorer/";
+							String arch = System.getProperty("sun.arch.data.model");
+							String version = versionCheck[1];
+							String filename = GDE.STRING_EMPTY;
+							if (GDE.IS_WINDOWS) //DataExplorer_Setup_3.0.8_win64.exe
+								filename = "DataExplorer_Setup_" + version + "_win" + arch + GDE.FILE_ENDING_DOT_EXE;
+							else if (GDE.IS_LINUX) //dataexplorer-3.0.8-bin_GNULinux_x86_64.tar.gz
+								filename = "dataexplorer-" + version + "-bin_GNULinux_x86_" + arch + ".tar.gz";
+							else if (GDE.IS_MAC) //DataExplorer-3.0.8_Mac_64.dmg
+								filename = "DataExplorer-" + version + "_Mac_" + arch + ".dmg";
+
+							String targetFilePath = GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR_UNIX + filename;
+							
+							//FileUtils.downloadFile(new URL(downloadUrl + filename), targetFilePath);
+							
+							messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
+							if (SWT.YES == messageDialog.open()) {			
+								OperatingSystemHelper.launchApplication(targetFilePath);
+								GDE.display.syncExec(new Runnable() {
+									public void run() {
+										GDE.shell.dispose();
+									}
+								});
+							}
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}.start();
+			}
 		}
 	}
 }
