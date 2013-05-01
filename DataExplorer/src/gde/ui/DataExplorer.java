@@ -28,7 +28,6 @@ import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
-import gde.exception.GDEInternalException;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -55,6 +54,7 @@ import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gde.utils.WebBrowser;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
@@ -112,8 +112,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
-
-import com.sun.tools.javadoc.Messager.ExitJavadoc;
 
 /**
  * Main application class of DataExplorer
@@ -2966,7 +2964,8 @@ public class DataExplorer extends Composite {
 
 							String targetFilePath = GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR_UNIX + filename;
 							
-							//FileUtils.downloadFile(new URL(downloadUrl + filename), targetFilePath);
+							if (!new File(targetFilePath).exists())
+								FileUtils.downloadFile(new URL(downloadUrl + filename), targetFilePath);
 							
 							messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
 							if (SWT.YES == messageDialog.open()) {			
