@@ -9,6 +9,7 @@ HoTTAdapter* - enable MDL Viewer tabulator
 fix [bug #38250] Feature: Use keyboard for zooming
 fix bug - in startup some times an error "null" (NullPointerException) occurs
 UniLog2 - adapt to latest firmware 1.09
+GPS-Logger - adapt to latest firmware 1.10
 
 Version 3.0.8 - 03 Apr 2013
 add Renschler Picolario2 support
