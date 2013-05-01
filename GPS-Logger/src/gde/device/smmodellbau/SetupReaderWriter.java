@@ -69,6 +69,7 @@ public class SetupReaderWriter {
 	int									modusDistance								= 0;																										// 9 0=3D; 1=2D
 	int									varioThresholdSink					= 8;																										// 10 0 --> 50 step 1
 	int									daylightSavingModus					= 1;																										// 11 0=manual; 1=auto
+	int									telemetryType								= 0;																										// 12 0=Jeti|HoTT|M-Link; 1=FASST; 2=JR DMSS
 	//short[] A = new short[6]; // 12-17
 	int									telemetryAlarms							= 0x0013;																								// 18 
 	int									heightAlarm									= 200;																									// 19 10m --> 4000m step 50
@@ -85,16 +86,17 @@ public class SetupReaderWriter {
 	int									mLinkAddressSpeed						= 1;																										// 39
 	int									mLinkAddressDirection				= 3;																										// 40
 	int									mLinkAddressHeight					= 4;																										// 41
-	int									mLinkAddressDistance				= 6;																										// 42
-	int									mLinkAddressTripLength			= 7;																										// 43
+	int									mLinkAddressDistance				= 7;																										// 42
+	int									mLinkAddressTripLength			= 8;																										// 43
 	int									mLinkAddressSpeedMax				= 2;																										// 44
 	int									mLinkAddressHeightMax				= 5;																										// 45
-	int									mLinkAddressVoltageUL				= 8;																										// 46
-	int									mLinkAddressCurrentUL				= 9;																										// 47
-	int									mLinkAddressRevolutionUL		= 10;																										// 48
-	int									mLinkAddressCapacityUL			= 11;																										// 49
-	int									mLinkAddressFlightDirection	= 12;																										// 50
-	int									mLinkAddressDirectionRel		= 13;																										// 51
+	int									mLinkAddressVoltageUL				= 9;																										// 46
+	int									mLinkAddressCurrentUL				= 10;																										// 47
+	int									mLinkAddressRevolutionUL		= 11;																										// 48
+	int									mLinkAddressCapacityUL			= 12;																										// 49
+	int									mLinkAddressFlightDirection	= 13;																										// 50
+	int									mLinkAddressDirectionRel		= 14;																										// 51
+	int									mLinkAddressIntHeight				= 6;																										// 52
 	//short[] C = short int[2]; // 52-53
 	int									firmwareVersion							= 103;																									// 54
 	int									modusIGC										= 1;																										// 55
@@ -136,6 +138,7 @@ public class SetupReaderWriter {
 				this.modusDistance					= (buffer[17] << 8) + (buffer[16] & 0x00FF);
 				this.varioThresholdSink			= (buffer[19] << 8) + (buffer[18] & 0x00FF);
 				this.daylightSavingModus		= (buffer[21] << 8) + (buffer[20] & 0x00FF);
+				this.telemetryType					= (buffer[23] << 8) + (buffer[22] & 0x00FF);
 				//A[6]
 				this.telemetryAlarms 				= (buffer[35] << 8) + (buffer[34] & 0x00FF);
 				this.heightAlarm 						= (buffer[37] << 8) + (buffer[36] & 0x00FF);
@@ -159,10 +162,10 @@ public class SetupReaderWriter {
 				this.mLinkAddressVoltageUL		= (buffer[91] << 8) + (buffer[90] & 0x00FF);		// 46
 				this.mLinkAddressCurrentUL		= (buffer[93] << 8) + (buffer[92] & 0x00FF);		// 47
 				this.mLinkAddressRevolutionUL	= (buffer[95] << 8) + (buffer[94] & 0x00FF);		// 48
-				this.mLinkAddressCapacityUL		= (buffer[97] << 8) + (buffer[96] & 0x00FF);		// 49
-				
+				this.mLinkAddressCapacityUL		= (buffer[97] << 8) + (buffer[96] & 0x00FF);		// 49		
 				this.mLinkAddressFlightDirection	= (buffer[99] << 8) + (buffer[98] & 0x00FF);		// 50
-				this.mLinkAddressDirectionRel			= (buffer[101] << 8) + (buffer[100] & 0x00FF);	// 51
+				this.mLinkAddressDirectionRel	= (buffer[101] << 8) + (buffer[100] & 0x00FF);	// 51
+				this.mLinkAddressIntHeight		= (buffer[103] << 8) + (buffer[102] & 0x00FF);	// 51
 				//C[2]
 				this.firmwareVersion 		= (buffer[107] << 8) + (buffer[106] & 0x00FF);
 				this.modusIGC 					= (buffer[109] << 8) + (buffer[108] & 0x00FF);				//55
@@ -215,6 +218,8 @@ public class SetupReaderWriter {
 				buffer[19] = (byte) ((this.varioThresholdSink & 0xFF00) >> 8);
 				buffer[20] = (byte) (this.daylightSavingModus & 0x00FF);
 				buffer[21] = (byte) ((this.daylightSavingModus & 0xFF00) >> 8);
+				buffer[22] = (byte) (this.telemetryType & 0x00FF);
+				buffer[23] = (byte) ((this.telemetryType & 0xFF00) >> 8);
 				//A 6
 				buffer[34] = (byte) (this.telemetryAlarms & 0x00FF);
 				buffer[35] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
@@ -266,6 +271,8 @@ public class SetupReaderWriter {
 				buffer[99] = (byte) ((this.mLinkAddressFlightDirection & 0xFF00) >> 8);	// 50
 				buffer[100] = (byte) (this.mLinkAddressDirectionRel & 0x00FF);					// 51
 				buffer[101] = (byte) ((this.mLinkAddressDirectionRel & 0xFF00) >> 8);		// 51
+				buffer[102] = (byte) (this.mLinkAddressIntHeight & 0x00FF);					// 51
+				buffer[103] = (byte) ((this.mLinkAddressIntHeight & 0xFF00) >> 8);		// 51
 				//C 10
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);
 				buffer[107] = (byte) ((this.firmwareVersion & 0xFF00) >> 8);

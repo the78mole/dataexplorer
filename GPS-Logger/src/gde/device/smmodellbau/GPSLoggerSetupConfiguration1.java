@@ -63,9 +63,9 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 	Composite								fillerComposite;
 
 	Group										gpsLoggerGroup;
-	CLabel									serialNumberLabel, firmwareLabel, dataRatecLabel, startModusLabel, stopModusLabel, timeZoneLabel, timeAutoLabel, varioLimitClimbLabel, varioLimitSinkLabel, varioTonLabel, timeZoneUnitLabel, varioLimitUnitLabel, modusIgcLabel, modusDistanceLabel;
+	CLabel									serialNumberLabel, firmwareLabel, dataRatecLabel, startModusLabel, stopModusLabel, timeZoneLabel, timeAutoLabel, varioLimitClimbLabel, varioLimitSinkLabel, varioTonLabel, timeZoneUnitLabel, varioLimitUnitLabel, modusIgcLabel, modusDistanceLabel,telemetryTypeLabel;
 	Text										serialNumberText, firmwareText;
-	CCombo									dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, modusIgcCombo, modusDistanceCombo;
+	CCombo									dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo;
 
 	Group										gpsTelemertieGroup;
 	Button									heightButton, velocityButton, distanceButton, tripLengthButton, voltageRxButton;
@@ -94,6 +94,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			"  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05", "  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" }; //$NON-NLS-*$
 	final String[]					igcModes				= Messages.getString(MessageIds.GDE_MSGT2069).split(GDE.STRING_COMMA);
 	final String[]					distanceModes		= Messages.getString(MessageIds.GDE_MSGT2071).split(GDE.STRING_COMMA);
+	final String[]					telemetrieTypes	= { " Jeti | HoTT | M-Link", "  FASST", "  JR DMSS"};
 
 	/**
 	 * constructor configuration panel 1
@@ -126,6 +127,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		this.varioToneCombo.select(this.configuration.varioTon);
 		this.modusIgcCombo.select(this.configuration.modusIGC);
 		this.modusDistanceCombo.select(this.configuration.modusDistance);
+		this.telemetryTypeCombo.select(this.configuration.telemetryType);
 
 		this.heightButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_HEIGHT) > 0);
 		this.heightCombo.setText(String.format("%5d", this.configuration.heightAlarm)); //$NON-NLS-1$
@@ -154,7 +156,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 15);
 				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 10);
 				gpsLoggerGroupLData.width = 290;
-				gpsLoggerGroupLData.height = 305;
+				gpsLoggerGroupLData.height = 330;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
 				this.gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
@@ -517,8 +519,37 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.modusDistanceCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "varioToneCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "modusDistanceCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.modusDistance = GPSLoggerSetupConfiguration1.this.modusDistanceCombo.getSelectionIndex();
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.telemetryTypeLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData telemetryTypeLabelLData = new RowData();
+					telemetryTypeLabelLData.width = 130;
+					telemetryTypeLabelLData.height = 22;
+					this.telemetryTypeLabel.setLayoutData(telemetryTypeLabelLData);
+					this.telemetryTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2075));
+				}
+				{
+					this.telemetryTypeCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
+					RowData telemetryTypeComboLData = new RowData();
+					telemetryTypeComboLData.width = 130;
+					telemetryTypeComboLData.height = 17;
+					this.telemetryTypeCombo.setLayoutData(telemetryTypeComboLData);
+					this.telemetryTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryTypeCombo.setItems(this.telemetrieTypes);
+					this.telemetryTypeCombo.select(this.configuration.telemetryType);
+					this.telemetryTypeCombo.setEditable(false);
+					this.telemetryTypeCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.telemetryTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "telemetryTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.telemetryType = GPSLoggerSetupConfiguration1.this.telemetryTypeCombo.getSelectionIndex();
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -527,7 +558,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			{
 				FormData gpsTelemertieGroupLData = new FormData();
 				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 15);
-				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 335);
+				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 360);
 				gpsTelemertieGroupLData.width = 290;
 				gpsTelemertieGroupLData.height = 140;
 				this.gpsTelemertieGroup = new Group(this, SWT.NONE);

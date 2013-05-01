@@ -75,9 +75,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	final int								comboWidth					= 83;
 
 	Group										mLinkAddressesGroup;
-	CLabel									addressLabel1, addressLabel2, addressLabel2max, addressLabel3, addressLabel3max, addressLabel4, addressLabel5, addressLabel6, addressLabel7, addressLabel8;
-	Text										addressText1, addressText2, addressText2max, addressText3, addressText3max, addressText4, addressText5, addressText6, addressText7, addressText8;
-	Slider									addressSlider1, addressSlider2, addressSlider2max, addressSlider3, addressSlider3max, addressSlider4, addressSlider5, addressSlider6, addressSlider7, addressSlider8;
+	CLabel									addressLabel1, addressLabel2, addressLabel2max, addressLabel3, addressLabel3max, addressLabel4, addressLabel5, addressLabel6, addressLabel7, addressLabel8, addressLabel9;
+	Text										addressText1, addressText2, addressText2max, addressText3, addressText3max, addressText4, addressText5, addressText6, addressText7, addressText8, addressText9;
+	Slider									addressSlider1, addressSlider2, addressSlider2max, addressSlider3, addressSlider3max, addressSlider4, addressSlider5, addressSlider6, addressSlider7, addressSlider8, addressSlider9;
 	final int								labelWidth					= 115;
 	final int								textWidth						= 25;
 	final int								sliderWidth					= 125;
@@ -135,6 +135,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.addressSlider8.setSelection(this.configuration.mLinkAddressTripLength);
 		this.addressText8.setText(sliderValues[this.configuration.mLinkAddressTripLength]);
 
+		this.addressSlider9.setSelection(this.configuration.mLinkAddressIntHeight);
+		this.addressText9.setText(sliderValues[this.configuration.mLinkAddressIntHeight]);
+
 		this.addressSlider1UL.setSelection(this.configuration.mLinkAddressVoltageUL);
 		this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
 		this.addressSlider2UL.setSelection(this.configuration.mLinkAddressCurrentUL);
@@ -170,7 +173,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData mLinkAddressesGroupLData = new FormData();
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 10);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 245;
+				mLinkAddressesGroupLData.height = 270;
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -575,6 +578,46 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						}
 					});
 				}
+				{
+					this.addressLabel9 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel9LData = new RowData();
+					addressLabel9LData.width = labelWidth;
+					addressLabel9LData.height = 21;
+					this.addressLabel9.setLayoutData(addressLabel9LData);
+					this.addressLabel9.setText(Messages.getString(MessageIds.GDE_MSGT2076));
+				}
+				{
+					this.addressText9 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText9LData = new RowData();
+					addressText9LData.width = textWidth;
+					addressText9LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					this.addressText9.setLayoutData(addressText9LData);
+					this.addressText9.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
+					this.addressText9.setEditable(false);
+					this.addressText9.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				{
+					this.addressSlider9 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider9.setMinimum(sliderMinimum);
+					this.addressSlider9.setMaximum(sliderMaximum);
+					this.addressSlider9.setIncrement(sliderIncrement);
+					RowData addressSlider9LData = new RowData();
+					addressSlider9LData.width = sliderWidth;
+					addressSlider9LData.height = 17;
+					this.addressSlider9.setLayoutData(addressSlider9LData);
+					this.addressSlider9.setSelection(this.configuration.mLinkAddressTripLength);
+					this.addressSlider9.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider9.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider9.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText9.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
 			}
 			{
 				this.unilogTelemtryAlarmsGroup = new Group(this, SWT.NONE);
@@ -583,7 +626,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.width = 290;
 				unilogTelemtryAlarmsGroupLData.height = 200;
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 275);
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 300);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
