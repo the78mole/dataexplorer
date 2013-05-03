@@ -2973,7 +2973,7 @@ public class DataExplorer extends Composite {
 									message.setText(GDE.NAME_LONG);
 									message.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
 									if (SWT.YES == message.open()) {
-										OperatingSystemHelper.launchApplication(targetFilePath);
+										OperatingSystemHelper.launchInstallApplication(targetFilePath);
 										GDE.shell.dispose();
 									}
 								}

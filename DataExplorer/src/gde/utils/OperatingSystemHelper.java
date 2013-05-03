@@ -887,18 +887,25 @@ public class OperatingSystemHelper {
 		}
 	}
 
-	public static void launchApplication(final String applicationPath) {
+	public static void launchInstallApplication(final String installablePath) {
 		ApplicationLauncher launcher;
 		if (GDE.IS_MAC)
-			launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{}, applicationPath); 
+			launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{}, GDE.STRING_EMPTY); 
 		else if (GDE.IS_LINUX)
-			launcher = new ApplicationLauncher(GDE.STRING_LINUX_APP_OPEN, new String[]{}, applicationPath);
+			launcher = new ApplicationLauncher("bash", new String[]{"bash"}, GDE.STRING_EMPTY);
 		else //GDE.IS_WINDOWS
-			launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{}, applicationPath);
+			launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{}, GDE.STRING_EMPTY);
 
 		if (launcher.isLaunchable()) {
 			List<String> argumentList = new ArrayList<String>();
-			argumentList.add(applicationPath);
+			if (GDE.IS_LINUX) {
+				String installpath = OperatingSystemHelper.class.getProtectionDomain().toString();
+				argumentList.add("-c");
+				argumentList.add("\"cd " + installpath + GDE.STRING_SEMICOLON + " tar -xzf " + installablePath + GDE.STRING_SEMICOLON);
+			}
+			else {
+				argumentList.add(installablePath);
+			}
 			launcher.execute(argumentList);
 		}
 	}
