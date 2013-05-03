@@ -155,7 +155,7 @@ public class ApplicationLauncher {
 				arguments.add(1, "url.dll,FileProtocolHandler");
 			}
 			for (String string : arguments) {
-				log.log(Level.FINE, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
+				log.log(Level.OFF, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
 			}
 
 			try {

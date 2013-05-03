@@ -891,21 +891,22 @@ public class OperatingSystemHelper {
 		ApplicationLauncher launcher;
 		if (GDE.IS_MAC)
 			launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{}, GDE.STRING_EMPTY); 
-		else if (GDE.IS_LINUX)
-			launcher = new ApplicationLauncher("bash", new String[]{"bash"}, GDE.STRING_EMPTY);
+		else if (GDE.IS_LINUX) {
+			URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
+			if (url.getFile().endsWith(GDE.FILE_ENDING_DOT_JAR)) {
+					String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+					installpath = installpath.substring(0, installpath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+					String command = "cd " + installpath + "\nsudo tar -xzf " + installablePath + "\"";
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0055, new String[] {command}));
+			}
+			launcher = new ApplicationLauncher("bash",  new String[]{}, GDE.STRING_EMPTY);
+		}
 		else //GDE.IS_WINDOWS
 			launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{}, GDE.STRING_EMPTY);
 
 		if (launcher.isLaunchable()) {
 			List<String> argumentList = new ArrayList<String>();
-			if (GDE.IS_LINUX) {
-				String installpath = OperatingSystemHelper.class.getProtectionDomain().toString();
-				argumentList.add("-c");
-				argumentList.add("\"cd " + installpath + GDE.STRING_SEMICOLON + " tar -xzf " + installablePath + GDE.STRING_SEMICOLON);
-			}
-			else {
-				argumentList.add(installablePath);
-			}
+			argumentList.add(installablePath);
 			launcher.execute(argumentList);
 		}
 	}
