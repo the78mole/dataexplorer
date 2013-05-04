@@ -400,7 +400,8 @@ public class GDE {
 				String propName = (String) e.nextElement();
 				sb.append(propName).append(" = ").append(props.get(propName)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
+			sb.append("SWT.VERSION = ").append(SWT.getVersion()).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
 			GDE.seStartupProgress(100);
