@@ -2969,12 +2969,25 @@ public class DataExplorer extends Composite {
 							
 							GDE.display.syncExec(new Runnable() {
 								public void run() {
-									MessageBox message = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
-									message.setText(GDE.NAME_LONG);
-									message.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
-									if (SWT.YES == message.open()) {
-										OperatingSystemHelper.launchInstallApplication(targetFilePath);
-										GDE.shell.dispose();
+									if (GDE.IS_LINUX) {
+										URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
+										if (url.getFile().endsWith(GDE.FILE_ENDING_DOT_JAR)) {
+												String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+												installpath = installpath.substring(0, installpath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+												String command = "cd " + installpath + "\nsudo tar -xzf " + targetFilePath + "\"";
+												MessageBox message = new MessageBox(GDE.shell, SWT.ICON_INFORMATION);
+												message.setText(GDE.NAME_LONG);
+												message.setMessage(Messages.getString(MessageIds.GDE_MSGI0055, new String[] {command}));
+										}
+									}
+									else {
+										MessageBox message = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
+										message.setText(GDE.NAME_LONG);
+										message.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
+										if (SWT.YES == message.open()) {
+											OperatingSystemHelper.launchInstallApplication(targetFilePath);
+											GDE.shell.dispose();
+										}
 									}
 								}
 							});
