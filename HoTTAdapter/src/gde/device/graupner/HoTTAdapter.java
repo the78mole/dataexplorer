@@ -1223,9 +1223,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			if (constructor != null) {
 				constructor.newInstance();
 			}
-			else
+			else {
 				log.log(Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 				rc = false;
+			}
 		}
 		catch (final Throwable t) {
 			log.log(Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
