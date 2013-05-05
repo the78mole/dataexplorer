@@ -1,21 +1,16 @@
-GNU DataExplorer - News - comes with version 3.0.8
+GNU DataExplorer - News - comes with version 3.0.9
 
-1)  add Renschler Picolario2 support
-2)  add Kontronik Kosmik support
-3)  update SWT to version 4.2.1
-4)  add IGCAdapter support for short naming
-5)  fix bug #38246 - Multiple actions when right-clicking into graphic
-6)  fix RFE #38245 - Allow editing of commentary in table "File comment"
-7)  fix bug #38247 - Progress bar not reset after loading files
-8)  fix RFE #38248 - Feature: Copy function for data table
-9)  HoTTAdapter* - change/correct Rx->Tx-PLoss measurement name
-10) HoTTAdapter* - change algorithm sending commands during live data gathering
-11) HoTTAdapter* - update Rx->Tx-PLoss calculation, integrate package loss over 1 second period
-12) HoTTAdapter* - update to latest firmware (ESC)
-13) HoTTAdapter* - fix bug in mx-12 <-> mx-16 MDL converter
-14) Jlog2 - update support firmware 4.0.0
-15) documentation update
-
+1) AV4ms_FV_762 - fix problem importing data
+2) HoTTAdapter*, DataVario*, LinkVario* - fix/adapt UI in combination with new SWT release
+3) HoTTAdapter* - calculate CRC for mx-21<->mx16 converter instead of static update
+4) HoTTAdapter* - adapt data reader *.bin and live data of ESC according firmware update
+5) HoTTAdapter* - enable MDL Viewer tabulator (requires extra Java archive)
+6) fix [bug #38250] Feature: Use keyboard for zooming
+7) fix [bug #38251] Feature: Improved update check
+8) fix bug - in startup sometimes an error "null" (NullPointerException) occurs
+9) graphics templates - remove defined end points from graphics templates while potential value end points may outside this range
+10) UniLog2 - adapt to latest firmware 1.09
+11) GPS-Logger - adapt to latest firmware 1.10
 
 
 
