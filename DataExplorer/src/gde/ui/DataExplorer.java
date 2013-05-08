@@ -2198,7 +2198,7 @@ public class DataExplorer extends Composite {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.menuBar.setPortConnected(isOpenStatus);
 			this.menuToolBar.setPortConnected(isOpenStatus);
-			if (isOpenStatus) {
+			if (isOpenStatus && this.statusBar != null) {
 				this.statusBar.setSerialPortConnected();
 			}
 			else {
@@ -2212,7 +2212,7 @@ public class DataExplorer extends Composite {
 				public void run() {
 					DataExplorer.this.menuBar.setPortConnected(isOpenStatus);
 					DataExplorer.this.menuToolBar.setPortConnected(isOpenStatus);
-					if (isOpenStatus) {
+					if (isOpenStatus && DataExplorer.this.statusBar != null) {
 						DataExplorer.this.statusBar.setSerialPortConnected();
 					}
 					else {
