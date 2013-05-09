@@ -127,7 +127,7 @@ public class DataExplorer extends Composite {
 	final HashMap<String, String>	extensionFilterMap								= new HashMap<String, String>();
 
 	public final static String		RECORD_NAME												= "recordName";																						//$NON-NLS-1$
-	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem";																			//$NON-NLS-1$
+	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem";																		//$NON-NLS-1$
 	public final static String		OLD_STATE													= "oldState";																							//$NON-NLS-1$
 
 	public final static Color			COLOR_WHITE												= SWTResourceManager.getColor(SWT.COLOR_WHITE);
@@ -312,6 +312,7 @@ public class DataExplorer extends Composite {
 				{
 					this.statusBar = new StatusBar(this.statusComposite);
 					this.statusBar.create();
+					log.log(Level.OFF, "Statusbar created");
 				}
 			}
 		}
