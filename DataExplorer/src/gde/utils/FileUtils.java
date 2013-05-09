@@ -1096,12 +1096,14 @@ public class FileUtils {
 		Vector<String> pluginNamesVector = new Vector<String>();
 		Manifest m = jarFile.getManifest();
 		String services = m.getMainAttributes().getValue("Export-Service"); //$NON-NLS-1$
-		if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "Export-Service = " + services); //$NON-NLS-1$
-		String[] serviceNames = services.split(", *"); //$NON-NLS-1$
-		for (String name : serviceNames) {
-			name = name.substring(name.lastIndexOf('.') + 1);
-			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "service name = " + name); //$NON-NLS-1$
-			pluginNamesVector.add(name);
+		if (services != null && services.length() > 5) {
+			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "Export-Service = " + services); //$NON-NLS-1$
+			String[] serviceNames = services.split(", *"); //$NON-NLS-1$
+			for (String name : serviceNames) {
+				name = name.substring(name.lastIndexOf('.') + 1);
+				if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "service name = " + name); //$NON-NLS-1$
+				pluginNamesVector.add(name);
+			}
 		}
 		return pluginNamesVector.toArray(new String[0]);
 	}
