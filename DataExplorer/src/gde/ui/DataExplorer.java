@@ -350,6 +350,8 @@ public class DataExplorer extends Composite {
 
 			this.isDeviceDialogModal = this.settings.isDeviceDialogsModal();
 
+			if (this.settings.getWindow().width < 600) this.settings.setWindow(new Point(this.settings.getWindow().x, this.settings.getWindow().y), new Point(600, this.settings.getWindow().height));
+			if (this.settings.getWindow().height < 400) this.settings.setWindow(new Point(this.settings.getWindow().x, this.settings.getWindow().y), new Point(this.settings.getWindow().width, 400));
 			if (this.settings.isWindowMaximized()) {
 				GDE.shell.setLocation(this.settings.getWindow().x, this.settings.getWindow().y);
 				GDE.shell.setSize(this.settings.getWindow().width, this.settings.getWindow().height);
