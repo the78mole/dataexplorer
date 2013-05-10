@@ -395,6 +395,21 @@ public class DataExplorer extends Composite {
 				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.GDE_MSGI0028)).append(GDE.STRING_NEW_LINE);
 				application.openMessageDialog(GDE.shell, sb.toString());
 			}
+			
+			GDE.shell.addControlListener(new ControlListener() {
+				public void controlResized(ControlEvent controlevent) {
+					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
+					if (!DataExplorer.application.settings.isWindowMaximized()) {
+						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
+					}
+				}
+
+				public void controlMoved(ControlEvent controlevent) {
+					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+					if (!GDE.shell.getMaximized()) DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
+				}
+			});
 
 			GDE.shell.open();
 
@@ -501,20 +516,6 @@ public class DataExplorer extends Composite {
 
 					// checkk all data saved - prevent closing application
 					evt.doit = getDeviceSelectionDialog().checkDataSaved();
-				}
-			});
-			GDE.shell.addControlListener(new ControlListener() {
-				public void controlResized(ControlEvent controlevent) {
-					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
-					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
-					if (!DataExplorer.application.settings.isWindowMaximized()) {
-						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
-					}
-				}
-
-				public void controlMoved(ControlEvent controlevent) {
-					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
-					if (!GDE.shell.getMaximized()) DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
 				}
 			});
 			this.addDisposeListener(new DisposeListener() {
