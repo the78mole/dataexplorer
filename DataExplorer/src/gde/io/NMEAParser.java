@@ -1183,8 +1183,8 @@ public class NMEAParser {
 	 */
 	void parseUNILOG2(String[] strValues, int[] inOutMapping, int indexBalance, boolean checkTime) {
 		if (checkTime) {
-			if (this.date == null) {
-				String[] strValueDate = strValues[1].trim().split(GDE.STRING_DASH);
+			String[] strValueDate = strValues[1].trim().split(GDE.STRING_DASH);
+			if (this.date == null || Integer.parseInt(strValueDate[2]) > this.day) {
 				this.year = Integer.parseInt(strValueDate[0]);
 				this.month = Integer.parseInt(strValueDate[1]);
 				this.day = Integer.parseInt(strValueDate[2]);
@@ -1205,7 +1205,8 @@ public class NMEAParser {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
-				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SS").format(timeStamp)); //$NON-NLS-1$);
+				if (log.isLoggable(Level.FINE)) 
+					log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SS").format(timeStamp)); //$NON-NLS-1$);
 				if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 			}
 			else {
@@ -1223,8 +1224,7 @@ public class NMEAParser {
 			try {
 				if (inOutMapping[i] >= 0) {
 					String tmpValue = strValues[i].trim();
-					this.values[inOutMapping[i]] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 ? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 : Double
-							.parseDouble(tmpValue) * 1000.0);
+					this.values[inOutMapping[i]] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 ? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 : Double.parseDouble(tmpValue) * 1000.0);
 					if (i >= 16 && i <= 21 && this.values[inOutMapping[i]] > 0) {
 						maxVotage = this.values[inOutMapping[i]] > maxVotage ? this.values[inOutMapping[i]] : maxVotage;
 						minVotage = this.values[inOutMapping[i]] < minVotage ? this.values[inOutMapping[i]] : minVotage;

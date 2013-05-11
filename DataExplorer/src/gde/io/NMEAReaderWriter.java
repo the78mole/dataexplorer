@@ -90,6 +90,7 @@ public class NMEAReaderWriter {
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
 		long timeStamp = -1;
+		int lastProgress = 0;
 		File inputFile = new File(filePath);
 		if (NMEAReaderWriter.application.getStatusBar() != null) NMEAReaderWriter.application.setProgress(0, sThreadId);
 
@@ -168,6 +169,7 @@ public class NMEAReaderWriter {
 				--lineNumber; // correct do to do-while
 				do {
 					line = line.trim();
+					approximateLines = inputFile.length()/line.length();
 					++lineNumber;
 					if (line.length() > 7 && line.startsWith(device.getDataBlockLeader())) {
 						log.log(java.util.logging.Level.FINER, line);
@@ -178,7 +180,8 @@ public class NMEAReaderWriter {
 					}
 
 					log.log(Level.FINER, "signature = " + signature); //$NON-NLS-1$
-					while ((line = reader.readLine()) != null) {
+					//UniLog2 use like NMEA sentence, but does not have different sentences like a real NMEA GGA, VTC, GGA
+					while (!device.getName().equals("UniLog2") && (line = reader.readLine()) != null) {
 						line = line.trim();
 						++lineNumber;
 						if (line.startsWith(signature)) break;
@@ -193,7 +196,11 @@ public class NMEAReaderWriter {
 					}
 					data.parse(lines, lineNumber);
 					int progress = (int) (lineNumber*100/approximateLines);
-					if (NMEAReaderWriter.application.getStatusBar() != null && progress % 5 == 0) 	NMEAReaderWriter.application.setProgress(progress, sThreadId);
+					if (NMEAReaderWriter.application.getStatusBar() != null && progress > lastProgress && progress % 5 == 0) {
+						NMEAReaderWriter.application.setProgress(progress, sThreadId);
+						lastProgress = progress;
+						System.out.println(progress);
+					}
 					//start over with new line and signature
 					lines.clear();
 					if (line != null && line.length() > 7) {
