@@ -61,6 +61,7 @@ public class NMEAReaderWriter {
 	static String							lineSep			= GDE.LINE_SEPARATOR;
 	static DecimalFormat			df3					= new DecimalFormat("0.000");												//$NON-NLS-1$
 	static StringBuffer				sb;
+	static String							tmpSetupString;
 
 	final static DataExplorer	application	= DataExplorer.getInstance();
 	final static Channels			channels		= Channels.getInstance();
@@ -129,7 +130,8 @@ public class NMEAReaderWriter {
 				}
 				binReader.close();
 				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0042, new Object[] { chars, filePath }));
-				if (new String(buffer).indexOf(NMEAParser.NMEA.SETUP.toString(), 1) > -1) {
+				tmpSetupString = new String(buffer);
+				if (tmpSetupString.indexOf(NMEAParser.NMEA.SETUP.toString(), 1) > -1 && tmpSetupString.indexOf(NMEAParser.NMEA.SETUP.toString(), 1) < 3) {
 					try {
 						//SETUP for GPS-Logger firmware <=1.00
 						data.timeOffsetUTC = (short) ((buffer[7+7] << 8) + (buffer[7+6] & 0x00FF));
