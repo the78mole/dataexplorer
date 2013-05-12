@@ -1256,6 +1256,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		}
 		if (log.isLoggable(Level.OFF) && inst != null) 
 			log.log(Level.OFF, "loading TabItem " + ((CTabItem)inst).getText()); //$NON-NLS-1$
+		
+		//set directory where to start search for mdl files
+		System.setProperty("program.dir", Settings.getInstance().getDataFilePath());
+
 		return (CTabItem)inst;
 	}
 
