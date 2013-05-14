@@ -1258,10 +1258,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			log.log(Level.OFF, "loading TabItem " + ((CTabItem)inst).getText()); //$NON-NLS-1$
 		
 		//set directory where to start search for mdl files
-		System.setProperty("logs.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
-		log.log(Level.OFF, "logs.dir =  " + System.getProperty("logs.dir")); //$NON-NLS-1$
-		System.setProperty("program.dir", Settings.getInstance().getDataFilePath());
+		System.setProperty("log.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+		log.log(Level.OFF, "log.dir =  " + System.getProperty("logs.dir")); //$NON-NLS-1$
+		System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
+		log.log(Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$
+		System.setProperty("program.dir", System.getProperty("mdl.dir"));//$NON-NLS-1$
 		log.log(Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$
+		System.setProperty("template.dir", "");//load from classpath //$NON-NLS-1$
+		log.log(Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
 
 		return (CTabItem)inst;
 	}
