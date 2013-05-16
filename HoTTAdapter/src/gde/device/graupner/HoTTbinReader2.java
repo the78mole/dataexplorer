@@ -874,7 +874,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsElectric[35] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader2.tmpCurrent = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader2.pointsElectric[36] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsElectric[36] > 10000 && (HoTTbinReader2.pointsElectric[36] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsElectric[36]) ? HoTTbinReader2.pointsElectric[36] : HoTTbinReader2.tmpCurrent * 1000;
+			HoTTbinReader2.pointsElectric[36] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsElectric[36] > 10000 && (HoTTbinReader2.pointsElectric[36] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsElectric[36]) ? HoTTbinReader2.pointsElectric[36] : HoTTbinReader2.tmpCurrent;
 			HoTTbinReader2.pointsElectric[37] = HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsElectric[38] = Double.valueOf(HoTTbinReader2.pointsElectric[35] / 1000.0 * HoTTbinReader2.pointsElectric[36]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
