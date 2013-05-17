@@ -5,6 +5,7 @@ add some logs to check UI initialization
 UniLog2 - fix problem interpreting UTC-offset which does not exist
 UniLog2 - fix problem day skip while reading big data files
 HoTTAdapter2 - correct EAM current
+HoTTAdapter* - update filter
 
 Version 3.0.9 - 05 May 2013
 AV4ms_FV_762 - fix problem importing data
