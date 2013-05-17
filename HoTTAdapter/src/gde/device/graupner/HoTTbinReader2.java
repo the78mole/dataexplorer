@@ -752,7 +752,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	private static void parseGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
 		HoTTbinReader2.tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
 		HoTTbinReader2.tmpClimb3 = (_buf3[2] & 0xFF) - 120;
-		if (HoTTbinReader2.tmpClimb3 > -40 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000) {
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -100 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3
 			//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -819,7 +819,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -40 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -100 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
 				&& Math.abs(HoTTbinReader2.tmpVoltage2) < 600 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsGeneral[20] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
@@ -867,7 +867,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -40 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -100 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
 				&& Math.abs(HoTTbinReader2.tmpVoltage2) < 600 && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsElectric[37] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
