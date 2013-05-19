@@ -343,6 +343,7 @@ public class GDE {
 	public static ProgressBar			progBar;
 
 	static final String						DEVICES_PLUG_IN_DIR							= "devices/";																																																								//$NON-NLS-1$
+	static final String						JAVA_EXT_DIR										= "java/ext/";																																																								//$NON-NLS-1$
 
 	/**
 	 * main method to start the DataExplorer application
@@ -449,7 +450,6 @@ public class GDE {
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + GDE.DEVICES_PLUG_IN_DIR;
-
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);
 			String[] files = file.list();
@@ -461,6 +461,22 @@ public class GDE {
 					URL fileUrl = new File(basePath + path).toURI().toURL();
 					urls.add(fileUrl);
 					log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
+				}
+			}
+			
+			//add the jars located below java/ext
+			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + GDE.JAVA_EXT_DIR;
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
+			file = new File(basePath);
+			files = file.list();
+			if (files != null) {
+				for (String path : files) {
+					if (path.endsWith(GDE.FILE_ENDING_DOT_JAR)) {
+						URL fileUrl = new File(basePath + path).toURI().toURL();
+						urls.add(fileUrl);
+						log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
+					}
 				}
 			}
 		}
