@@ -116,7 +116,7 @@
 			<injar name="../HoTTGUI/target/dependency/itextpdf-5.3.0.jar"/>
 			<injar name="../HoTTGUI/target/dependency/log4j-1.2.17.jar"/>
 			
-			<outjar name="build/HoTTMdlViewer-${hott.mdl.viewer.version}.jar"/>
+			<outjar name="build/HoTTMdlViewer.jar"/>
 			
 			<libraryjar name="${java.home}/lib/rt.jar"/>
 			<libraryjar name="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar"/>
