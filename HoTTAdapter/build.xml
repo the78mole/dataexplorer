@@ -119,8 +119,7 @@
 			<outjar name="build/HoTTMdlViewer-${hott.mdl.viewer.version}.jar"/>
 			
 			<libraryjar name="${java.home}/lib/rt.jar"/>
-			<!-- libraryjar name="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar"/ -->
-			<libraryjar name="../build/lib/MAC/64/swt.jar"/>
+			<libraryjar name="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar"/>
 			<libraryjar name="../build/lib/j2ee.jar"/>
 			<libraryjar name="../HoTTAdapter/build/HoTTAdapter.jar"/>
 			<libraryjar name="../DataExplorer/build/DataExplorer.jar"/>
