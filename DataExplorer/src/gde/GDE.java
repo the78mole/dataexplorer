@@ -443,7 +443,22 @@ public class GDE {
 				throw new ApplicationConfigurationException(Messages.getString(MessageIds.GDE_MSGE0001, new Object[] { basePath }));
 			}
 			for (String path : files) {
-				if (!path.startsWith(GDE.STRING_DOT)) urls.add(new URL("file:" + basePath + path + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
+				if (!path.startsWith(GDE.STRING_DOT)) 
+					if (new File(basePath + path + GDE.STRING_WITHIN_ECLIPSE).exists())
+						urls.add(new URL("file:" + basePath + path + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
+					else if (new File(basePath + path + "/target" + GDE.STRING_WITHIN_ECLIPSE).exists())
+						urls.add(new URL("file:" + basePath + path + "/target" + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
+					if (new File(basePath + path + "/target/dependency").exists()) {
+						String dependencyJarPath = basePath + path + "/target/dependency/";
+						String[] jarFiles = new File(dependencyJarPath).list();
+						for (String jar : jarFiles) {
+							if (jar.endsWith(GDE.FILE_ENDING_DOT_JAR)) {
+								URL fileUrl = new File(dependencyJarPath + jar).toURI().toURL();
+								urls.add(fileUrl);
+								log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
+							}
+						}
+					}
 			}
 		}
 		else { // started outside java -jar *.jar
