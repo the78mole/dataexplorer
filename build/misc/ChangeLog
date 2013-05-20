@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.0 - xx yyy 2013
+Version 3.1.0 - 20 May 2013
 add some logs to check UI initialization to prevent initialization exceptions
 UniLog2 - fix problem interpreting UTC-offset which does not exist
 UniLog2 - fix problem day skip while reading big data files > 24 hours
