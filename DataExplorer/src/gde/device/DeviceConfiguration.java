@@ -1162,7 +1162,7 @@ public class DeviceConfiguration {
 	 */
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
 		DesktopPropertyType property = this.getDesktopProperty(desktopPropertyType);
-		return property != null ? property.getTargetReferenceOrdinal() : -1; 
+		return property != null ? property.getTargetReferenceOrdinal() != null ? property.getTargetReferenceOrdinal() : -1 : -1; 
 	}
 	
 	/**
