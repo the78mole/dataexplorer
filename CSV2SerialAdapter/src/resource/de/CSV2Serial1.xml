@@ -127,6 +127,6 @@
         <property value="true" name="table_tab"/>
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
-        <property value="true" name="voltage_per_cell_tab"/>
-    </Desktop>
+        <property name="voltage_per_cell_tab" value="false"/>
+        </Desktop>
 </DeviceProperties>
