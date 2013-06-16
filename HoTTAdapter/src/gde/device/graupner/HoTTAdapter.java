@@ -44,6 +44,7 @@ import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1254,7 +1255,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				log.log(Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$
 				System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
 				log.log(Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$
-				System.setProperty("program.dir", System.getProperty("mdl.dir"));//$NON-NLS-1$
+				URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
+				System.setProperty("program.dir", url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName())));//$NON-NLS-1$
 				log.log(Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$
 				System.setProperty("template.dir", "");//load from classpath //$NON-NLS-1$
 				log.log(Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
