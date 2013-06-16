@@ -26,9 +26,11 @@ import gde.log.LogFormatter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
 
 import java.awt.SplashScreen;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,6 +39,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Vector;
@@ -446,17 +449,16 @@ public class GDE {
 				if (!path.startsWith(GDE.STRING_DOT)) 
 					if (new File(basePath + path + GDE.STRING_WITHIN_ECLIPSE).exists())
 						urls.add(new URL("file:" + basePath + path + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
-					else if (new File(basePath + path + "/target" + GDE.STRING_WITHIN_ECLIPSE).exists())
-						urls.add(new URL("file:" + basePath + path + "/target" + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
-					if (new File(basePath + path + "/target/dependency").exists()) {
-						String dependencyJarPath = basePath + path + "/target/dependency/";
-						String[] jarFiles = new File(dependencyJarPath).list();
-						for (String jar : jarFiles) {
-							if (jar.endsWith(GDE.FILE_ENDING_DOT_JAR)) {
-								URL fileUrl = new File(dependencyJarPath + jar).toURI().toURL();
-								urls.add(fileUrl);
-								log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
+					else if (new File(basePath + path + "/target" + GDE.STRING_WITHIN_ECLIPSE).exists()) {
+						try {
+							List<File> jarFiles = FileUtils.getFileListing(new File(basePath + path + "/target/"), 1);
+							for (File jarFile : jarFiles) {
+								if (jarFile.getName().startsWith("HoTTGUI") && jarFile.getName().endsWith(GDE.FILE_ENDING_DOT_JAR))
+									urls.add(new URL("file:" + basePath + path + "/target/" + jarFile.getName())); //$NON-NLS-1$
 							}
+						}
+						catch (FileNotFoundException e) {
+							// ignore and skip
 						}
 					}
 			}
