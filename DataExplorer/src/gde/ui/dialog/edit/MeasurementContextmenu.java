@@ -56,7 +56,7 @@ public class MeasurementContextmenu {
 	MenuItem											numberMotorPropertyMenuItem, revolutionFactorPropertyMenuItem, prop100WPropertyMenuItem;
 	MenuItem											numberCellsPropertyMenuItem, invertCurrentPropertyMenuItem;
 	MenuItem 											scaleSyncRefOrdinal, googleEarthVelocityAvgLimitFactor, googleEarthVelocityLowerLimit, googleEarthVelocityUpperLimit;
-	MenuItem 											filterFactor, tolerateSignChange;
+	MenuItem 											filterFactor, recordDataType, tolerateSignChange;
 
 
 	public MeasurementContextmenu(Menu useMenu, MeasurementTypeTabItem parent, CTabFolder useChannelConfigMeasurementPropertiesTabFolder) {
@@ -120,6 +120,7 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(true);
 				MeasurementContextmenu.this.filterFactor.setEnabled(true);
 				MeasurementContextmenu.this.tolerateSignChange.setEnabled(true);
+				MeasurementContextmenu.this.recordDataType.setEnabled(true);
 				MeasurementContextmenu.this.defaultPropertyMenuItem.setEnabled(true);
 				if (MeasurementContextmenu.this.measurementPropertiesTabFolder != null) {
 					for (CTabItem tabItem : MeasurementContextmenu.this.measurementPropertiesTabFolder.getItems()) {
@@ -184,6 +185,9 @@ public class MeasurementContextmenu {
 							break;
 						case TOLERATE_SIGN_CHANGE:
 							MeasurementContextmenu.this.tolerateSignChange.setEnabled(false);
+							break;
+						case DATA_TYPE:
+							MeasurementContextmenu.this.recordDataType.setEnabled(false);
 							break;
 						case NONE_SPECIFIED:
 							MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
@@ -349,6 +353,14 @@ public class MeasurementContextmenu {
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "tolerateSignChange action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
+			}
+		});	
+		this.recordDataType = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
+		this.recordDataType.setText(MeasurementPropertyTypes.DATA_TYPE.value());
+		this.recordDataType.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				log.log(java.util.logging.Level.FINEST, "recordDataType action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.DATA_TYPE.value());
 			}
 		});	
 		this.defaultPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);

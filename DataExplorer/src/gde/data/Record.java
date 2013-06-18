@@ -205,8 +205,10 @@ public class Record extends Vector<Integer> {
 		DEFAULT("default"), 						//all normal measurement values which do not require special handling
 		GPS_LATITUDE("GPS latitude"), 	//GPS geo-coordinate require at least 6 decimal digits
 		GPS_LONGITUDE("GPS longitude"), //GPS geo-coordinate require at least 6 decimal digits
-		GPS_ALTITUDE("GPS altitude"),				//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
-		GPS_AZIMUTH("GPS azimuth");					//GPS azimuth, to be used for live display and positioning of icon if used
+		GPS_ALTITUDE("GPS altitude"),		//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
+		GPS_AZIMUTH("GPS azimuth"),			//GPS azimuth, to be used for live display and positioning of icon if used
+		SPEED("speed"),									//speed, to be used for KMZ export with colors of specified velocity
+		DATE_TIME("date time");					//special data type where no formatting or calculation can be executed, just display
 		
 		private final String	value;
 
@@ -227,12 +229,20 @@ public class Record extends Vector<Integer> {
         throw new IllegalArgumentException(v);
     }
 		
-		public static List<DataType> getAsList() {
+		public static List<Record.DataType> getAsList() {
 			List<Record.DataType> dataTypes = new ArrayList<Record.DataType>();
 			for (DataType type : DataType.values()) {
 				dataTypes.add(type);
 			}
 			return dataTypes;
+		}
+		
+		public static List<String> getValuesAsList() {
+			List<String> dataTypeValues = new ArrayList<String>();
+			for (DataType type : DataType.values()) {
+				dataTypeValues.add(type.value);
+			}
+			return dataTypeValues;
 		}
 	};
 

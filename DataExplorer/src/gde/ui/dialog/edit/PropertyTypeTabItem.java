@@ -19,6 +19,7 @@
 package gde.ui.dialog.edit;
 
 import gde.GDE;
+import gde.data.Record;
 import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.MeasurementPropertyTypes;
@@ -176,7 +177,8 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.valueText.setVisible(false);
 			this.valueCombo.setVisible(true);
 		}
-		else if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
+		else if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())
+				|| PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.DATA_TYPE.value())) {
 			this.valueText.setVisible(false);
 			this.valueCombo.setVisible(true);
 		}
@@ -213,6 +215,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				break;
 			case REGRESSION_TYPE_CURVE:
 			case REGRESSION_TYPE_LINEAR:
+			case DATA_TYPE:
 				dataTypeItems = new String[] { DataTypes.STRING.value() };
 				break;
 			case IS_INVERT_CURRENT:
@@ -384,7 +387,6 @@ public class PropertyTypeTabItem extends CTabItem {
 								catch (Exception e) {
 									PropertyTypeTabItem.this.propertyType.setValue(PropertyTypeTabItem.this.valueCombo.getText());
 								}
-
 							}
 						}
 						else {
@@ -452,6 +454,12 @@ public class PropertyTypeTabItem extends CTabItem {
 					this.valueCombo.setVisible(true);
 					this.valueCombo.setItems(DevicePropertiesEditor.getInstance().getMeasurementNames(this.measurementTypeTabItem.channelConfigNumber));
 					this.valueCombo.select(Integer.valueOf(this.propertyType.getValue()));
+				}
+				else if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.DATA_TYPE.value())) {
+					this.valueText.setVisible(false);
+					this.valueCombo.setVisible(true);
+					this.valueCombo.setItems(Record.DataType.getValuesAsList().toArray(new String[1]));
+					this.valueCombo.select(Record.DataType.fromValue(this.propertyType.getValue()).ordinal());
 				}
 				else {
 					this.valueText.setVisible(true);

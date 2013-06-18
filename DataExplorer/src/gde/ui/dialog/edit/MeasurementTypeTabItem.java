@@ -19,6 +19,7 @@
 package gde.ui.dialog.edit;
 
 import gde.GDE;
+import gde.data.Record;
 import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.MeasurementPropertyTypes;
@@ -641,6 +642,12 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				tmpPropertyType.setValue(true);
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0603));
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.BOOLEAN.value() }, true);
+				break;
+			case DATA_TYPE:
+				tmpPropertyType.setType(DataTypes.STRING);
+				tmpPropertyType.setValue(Record.DataType.DEFAULT.value());
+				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0680));
+				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.STRING.value() }, true);
 				break;
 			case NONE_SPECIFIED:
 				tmpPropertyType.setType(DataTypes.DOUBLE);

@@ -103,6 +103,8 @@ public enum MeasurementPropertyTypes {
     @XmlEnumValue("tolerate_sign_change")
     TOLERATE_SIGN_CHANGE("tolerate_sign_change"),
     @XmlEnumValue("none_specified")
+    DATA_TYPE("data_type"),
+    @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;
 
