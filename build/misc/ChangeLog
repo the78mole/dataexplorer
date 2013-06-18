@@ -5,6 +5,9 @@ fix problem while target reference ordinal of cell voltage is not returned from 
 HoTTAdapter* - adapt GPS filter
 HoTTAdapter* - adapt ESC filter
 HoTTAdapter* - updates for HoTTViewer tab
+CSV2SerialAdapter - enable special record data types 
+add 4D-Akkumonitor 
+
 
 Version 3.1.0 - 20 May 2013
 add some logs to check UI initialization to prevent initialization exceptions
