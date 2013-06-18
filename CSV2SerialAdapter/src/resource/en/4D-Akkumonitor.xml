@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V22.xsd">
+    <Device>
+        <name implementation="gde.device.wb.CSV2SerialAdapter">4D-Akkumonitor</name>
+        <manufacturer>4D.control</manufacturer>
+        <manufacturerURL>http://epo-bike.de/?page_id=89</manufacturerURL>
+        <group>logger</group>
+        <image>4d-akkumonitor.png</image>
+        <usage>true</usage>
+    </Device>
+    <TimeBase>
+        <name>Time</name>
+        <symbol>t</symbol>
+        <unit>msec</unit>
+        <timeStep>-1.0</timeStep>
+    </TimeBase>
+    <DataBlock>
+        <format inputType="FILE_IO" formatType="VALUE" size="45"/>
+        <timeUnit>sec</timeUnit>
+        <separator>semicolon</separator>
+        <leader>$</leader>
+        <trailer>0D0A</trailer>
+        <preferredFileExtention>*.csv</preferredFileExtention>
+    </DataBlock>
+    <State>
+        <property name="Datenaufzeichnung" value="01" type="Integer" description=""/>
+    </State>
+    <Channels>
+        <Channel name="Datenaufzeichnung" type="TYPE_CONFIG">
+            <Measurement>
+                <name>T1</name>
+                <symbol>T1</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="false" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>T2</name>
+                <symbol>T2</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="false" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>T3</name>
+                <symbol>T3</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="false" max="true" avg="false" sigma="false"/>
+            </Measurement>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            <Measurement>
+                <name>Trip</name>
+                <symbol>s</symbol>
+                <unit>km</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>v</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="data_type" value="speed" type="String" description="Spezial Datentyp"/>
+            </Measurement>
+            <Measurement>
+                <name>GPS-Länge</name>
+                <symbol>L</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <property name="data_type" value="GPS longitude" type="String" description="Spezial Datentyp"/>
+            </Measurement>
+            <Measurement>
+                <name>GPS-Breite</name>
+                <symbol>B</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <property name="data_type" value="GPS latitude" type="String" description="Spezial Datentyp"/>
+            </Measurement>
+            <Measurement>
+                <name>GPS-Höhe</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <property name="data_type" value="GPS altitude" type="String" description="Spezial Datentyp"/>
+            </Measurement>
+            <Measurement>
+                <name>Lap</name>
+                <symbol>SP</symbol>
+                <unit>s</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Int1</name>
+                <symbol>I1</symbol>
+                <unit>s</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Int2</name>
+                <symbol>I2</symbol>
+                <unit>s</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Int3</name>
+                <symbol>I3</symbol>
+                <unit>s</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>n</name>
+                <symbol>n</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Ladung</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>U01</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+            </Measurement>
+            <Measurement>
+                <name>U02</name>
+                <symbol>U2</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U03</name>
+                <symbol>U3</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U04</name>
+                <symbol>U4</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U05</name>
+                <symbol>U5</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U06</name>
+                <symbol>U6</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U07</name>
+                <symbol>U7</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U08</name>
+                <symbol>U8</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U09</name>
+                <symbol>U9</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Z10</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U11</name>
+                <symbol>U11</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U12</name>
+                <symbol>U12</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U13</name>
+                <symbol>U13</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U14</name>
+                <symbol>U14</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U15</name>
+                <symbol>U15</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U16</name>
+                <symbol>U16</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U17</name>
+                <symbol>U17</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U18</name>
+                <symbol>U18</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U19</name>
+                <symbol>U19</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Z20</name>
+                <symbol>U20</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U21</name>
+                <symbol>U21</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U22</name>
+                <symbol>U22</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U23</name>
+                <symbol>U23</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U24</name>
+                <symbol>U24</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U25</name>
+                <symbol>U25</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U26</name>
+                <symbol>U26</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U27</name>
+                <symbol>U27</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U28</name>
+                <symbol>U28</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>U29</name>
+                <symbol>U29</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Z30</name>
+                <symbol>U30</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.01" type="Double" description="Werte in cV"/>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+    </Channels>
+    <Desktop>
+        <property name="table_tab" value="true"/>
+        <property name="digital_tab" value="false"/>
+        <property name="analog_tab" value="false"/>
+        <property name="voltage_per_cell_tab" value="false"/>
+        <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
+        <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
+    </Desktop>
+</DeviceProperties>
+                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>

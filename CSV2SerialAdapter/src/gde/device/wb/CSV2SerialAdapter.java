@@ -37,6 +37,7 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
+import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -427,14 +428,25 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
 		
-		//for the moment there are no calculations necessary
-		//String[] recordNames = recordSet.getRecordNames();
-		//for (int i=0; i<recordNames.length; ++i) {
-		//	MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
-		//	if (measurement.isCalculation()) {
-		//		log.log(Level.FINE, "do calculation for " + recordNames[i]); //$NON-NLS-1$
-		//	}
-		//}
+		//set record data types if required and/or given with the device properties
+		String[] recordNames = recordSet.getRecordNames();
+		for (int i=0; i<recordNames.length; ++i) {
+			MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
+			PropertyType dataTypeProperty = measurement.getProperty(MeasurementPropertyTypes.DATA_TYPE.value());
+			if (dataTypeProperty != null) {
+				switch (Record.DataType.valueOf(dataTypeProperty.getValue())) {
+				case GPS_ALTITUDE:	
+				case GPS_LATITUDE:	
+				case GPS_LONGITUDE:	
+				case DATE_TIME:	
+					recordSet.get(recordNames[i]).setDataType(Record.DataType.valueOf(dataTypeProperty.getValue()));
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
 		this.application.updateStatisticsData();
 	}
 
@@ -616,5 +628,112 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		return recordNames;
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
+	 */
+	public void export2KMZ3D(int type) {
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1710), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
+						-1, 																																		//azimuth
+						type == DeviceConfiguration.HEIGHT_RELATIVE, 
+						type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+			}
+		}
+	}
+
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * set value of -1 to suppress this measurement
+	 */
+	@Override
+	public boolean isActualRecordSetWithGpsData() {
+		boolean containsGPSdata = false;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 
+				containsGPSdata = activeRecordSet.containsGPSdata();
+				if (!containsGPSdata) {
+					containsGPSdata = (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE) >= 0) && (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE) >= 0);
+				}
+			}
+		}
+		if (containsGPSdata)
+			updateFileMenu(this.application.getMenuBar().getExportMenu());
+
+		return containsGPSdata;
+	}
+
+	/**
+	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 */
+	@Override
+	public Integer getGPS2KMZMeasurementOrdinal() {
+		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
+				int recordOrdinal = activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED);
+				return recordOrdinal >= 0 ? recordOrdinal : activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"});	//speed;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * update the file menu by adding two new entries to export KML/GPX files
+	 * @param exportMenue
+	 */
+	public void updateFileMenu(Menu exportMenue) {
+		MenuItem convertKMZ3DRelativeItem;
+		MenuItem convertKMZ3DAbsoluteItem;
+
+		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+			new MenuItem(exportMenue, SWT.SEPARATOR);
+
+			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1711));
+			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
+				}
+			});
+
+			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1712));
+			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+				}
+			});
+
+			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1713));
+			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+				}
+			});
+		}
 	}
 }
