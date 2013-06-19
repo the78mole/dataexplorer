@@ -302,7 +302,25 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				
+				switch (record.getDataType()) {
+				case GPS_LATITUDE:
+				case GPS_LONGITUDE:
+					if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
+						int grad = record.realGet(rowIndex) / 1000000;
+						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+						dataTableRow[j + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
+					}
+					else { // assume degree only
+						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+					}
+					break;
+
+				default:
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					break;
+				}
+				
 			}
 		}
 		catch (RuntimeException e) {
@@ -337,8 +355,26 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		catch (Throwable e) {
 			reduction = 0;
 		}
+		
+		double newValue = 0;
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+			if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
+				int grad = ((int)(value / 1000));
+				double minuten = (value - (grad*1000.0))/10.0;
+				newValue = grad + minuten/60.0;
+			}
+			else { // assume degree only
+				newValue = value / 1000.0;
+			}
+			break;
 
-		double newValue = (value - reduction) * factor + offset;
+		default:
+			newValue = (value - reduction) * factor + offset;
+			break;
+		}
+
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -370,7 +406,25 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			reduction = 0;
 		}
 
-		double newValue = (value - offset) / factor + reduction;
+		double newValue = 0;
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+			if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
+				int grad = (int)value;
+				double minuten =  (value - grad*1.0) * 60.0;
+				newValue = (grad + minuten/100.0)*1000.0;
+			}
+			else { // assume degree only
+				newValue = value * 1000.0;
+			}
+			break;
+
+		default:
+			newValue = (value - offset) / factor + reduction;
+			break;
+		}
+
 		log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
