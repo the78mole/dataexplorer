@@ -1005,6 +1005,7 @@ public class HoTTbinReader {
 
 			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
 			break;
+		default:
 		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			HoTTbinReader.pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
@@ -1234,7 +1235,7 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpTemperatureFet = _buf1[9];
 		//HoTTbinReader.tmpTemperatureExt = _buf2[9];
 		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000
-				&& HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 2000 && HoTTbinReader.tmpCapacity < 2000) {
+				&& HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 2000 && HoTTbinReader.tmpCapacity < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[3]/1000) {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsSpeedControl[4] = Double.valueOf(HoTTbinReader.pointsSpeedControl[1] / 1000.0 * HoTTbinReader.pointsSpeedControl[2]).intValue();

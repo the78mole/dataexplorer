@@ -722,6 +722,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsVario[10] = (DataParser.parse2UnsignedShort(_buf1[1], _buf2[2]) - 30000) * 10;
 			HoTTbinReader2.pointsVario[11] = (DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) * 10;
 			break;
+		default:
 		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
@@ -968,7 +969,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		if (channelNumber == 4) {
 			//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage > 0 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000
-					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity < 2000) {
+					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[80]/1000) {
 				HoTTbinReader2.pointsSpeedControl[78] = HoTTbinReader2.tmpVoltage * 1000;
 				HoTTbinReader2.pointsSpeedControl[79] = HoTTbinReader2.tmpCurrent * 1000;
 				HoTTbinReader2.pointsSpeedControl[81] = Double.valueOf(HoTTbinReader2.pointsSpeedControl[78] / 1000.0 * HoTTbinReader2.pointsSpeedControl[79]).intValue();
@@ -980,7 +981,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		else {
 			//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage > 0 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000
-					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity < 2000) {
+					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[60]/1000) {
 				HoTTbinReader2.pointsSpeedControl[58] = HoTTbinReader2.tmpVoltage * 1000;
 				HoTTbinReader2.pointsSpeedControl[59] = HoTTbinReader2.tmpCurrent * 1000;
 				HoTTbinReader2.pointsSpeedControl[61] = Double.valueOf(HoTTbinReader2.pointsSpeedControl[58] / 1000.0 * HoTTbinReader2.pointsSpeedControl[59]).intValue();
