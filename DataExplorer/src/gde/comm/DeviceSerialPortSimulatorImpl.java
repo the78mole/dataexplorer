@@ -20,6 +20,7 @@ package gde.comm;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
@@ -356,17 +357,14 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 			}
 			else if (txt_in != null) {
 				if (this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
-					StringBuffer sb = new StringBuffer();
-					int value;
-
-					sb.append('\f');
-					while ((value = txt_in.read()) != -1 && value != '\f')
-						sb.append((char) value);
-
-					if (sb.length() > 1)
-						readBuffer = sb.toString().getBytes();
-					else
+					String line;
+					while ((line = txt_in.readLine()) != null) {
+						if (line.length() >= device.getDataBlockSize(FormatTypes.BYTE)) {
+							readBuffer = (line+"\r\n").getBytes();
+							break;
+						}	
 						this.close();
+					}
 				}
 				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
 					String line;
