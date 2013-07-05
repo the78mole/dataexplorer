@@ -294,7 +294,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCurrent, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitude, tmpLongitude, tmpPackageLoss, tmpVoltageRx, tmpTemperatureRx;
+		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpRevolution, tmpVoltage, tmpCurrent, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitude, tmpLongitude, tmpPackageLoss, tmpVoltageRx, tmpTemperatureRx;
 
 		switch (this.serialPort.protocolType) {
 		case TYPE_19200_V3:
@@ -557,12 +557,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 29) * 1000;
 						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-						points[5] = DataParser.parse2Short(dataBuffer, 25) * 1000;
+						points[5] = tmpRevolution * 1000;
 						points[6] = DataParser.parse2Short(dataBuffer, 33) * 1000;
 					}
 				}
@@ -721,12 +722,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 						points[1] = tmpVoltage * 1000; 
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-						points[5] = DataParser.parse2Short(dataBuffer, 18) * 1000;
+						points[5] = tmpRevolution * 1000;
 						points[6] = DataParser.parse2Short(dataBuffer, 24) * 1000;
 						//points[7] = dataBuffer[19] * 1000;
 					}
