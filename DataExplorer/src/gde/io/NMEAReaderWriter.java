@@ -169,7 +169,9 @@ public class NMEAReaderWriter {
 				--lineNumber; // correct do to do-while
 				do {
 					line = line.trim();
-					approximateLines = inputFile.length()/line.length();
+					if (line.length() > 7) {
+						approximateLines = inputFile.length() / line.length();
+					}
 					++lineNumber;
 					if (line.length() > 7 && line.startsWith(device.getDataBlockLeader())) {
 						log.log(java.util.logging.Level.FINER, line);
