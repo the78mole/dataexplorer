@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.ui.dialog.edit;
 
+import gde.GDE;
+import gde.device.ChannelType;
+import gde.device.ChannelTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.MeasurementType;
+import gde.device.ObjectFactory;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -37,22 +50,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.device.ChannelType;
-import gde.device.ChannelTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.MeasurementType;
-import gde.device.ObjectFactory;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 /**
  * class defining a CTabItem with ChannelType configuration data
