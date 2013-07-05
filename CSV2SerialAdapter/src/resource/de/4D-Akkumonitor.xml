@@ -6,8 +6,18 @@
         <manufacturerURL>http://epo-bike.de/?page_id=89</manufacturerURL>
         <group>logger</group>
         <image>4d-akkumonitor.png</image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
+    <SerialPort>
+        <port></port>
+        <baudeRate>9600</baudeRate>
+        <dataBits>DATABITS_8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>false</isRTS>
+        <isDTR>false</isDTR>
+    </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
@@ -48,8 +58,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="false" max="true" avg="false" sigma="false"/>
-            </Measurement>
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
             <Measurement>
                 <name>Trip</name>
                 <symbol>s</symbol>
@@ -63,6 +73,11 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="data_type" value="speed" type="String" description="Spezial Datentyp"/>
+                <property name="google_earth_velocity_lower_limit" value="20" type="Integer"/>
+                <property name="google_earth_velocity_upper_limit" value="100" type="Integer"/>
+                <property name="google_earth_within_limits_color" value="0,255,0" type="String"/>
+                <property name="google_earth_lower_limit_color" value="255,0,0" type="String"/>
+                <property name="google_earth_upper_limit_color" value="255,255,0" type="String"/>
             </Measurement>
             <Measurement>
                 <name>GPS-Länge</name>
@@ -415,4 +430,3 @@
         <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
     </Desktop>
 </DeviceProperties>
-                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>

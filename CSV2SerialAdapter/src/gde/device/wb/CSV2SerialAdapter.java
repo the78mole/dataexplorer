@@ -488,12 +488,12 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
 			PropertyType dataTypeProperty = measurement.getProperty(MeasurementPropertyTypes.DATA_TYPE.value());
 			if (dataTypeProperty != null) {
-				switch (Record.DataType.valueOf(dataTypeProperty.getValue())) {
+				switch (Record.DataType.fromValue(dataTypeProperty.getValue())) {
 				case GPS_ALTITUDE:	
 				case GPS_LATITUDE:	
 				case GPS_LONGITUDE:	
 				case DATE_TIME:	
-					recordSet.get(recordNames[i]).setDataType(Record.DataType.valueOf(dataTypeProperty.getValue()));
+					recordSet.get(recordNames[i]).setDataType(Record.DataType.fromValue(dataTypeProperty.getValue()));
 					break;
 
 				default:
@@ -683,6 +683,33 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		}
 		return recordNames;
 	}
+	
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	@Override
+	public String exportFile(String fileEndingType, boolean isExportTmpDir) {
+		String exportFileName = GDE.STRING_EMPTY;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+				//13=tripLength 14=distance 15=azimuth 16=directionStart
+				exportFileName = new FileHandler().exportFileKMZ(
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
+						-1, 																																		//azimuth
+						true, isExportTmpDir);
+			}
+		}
+		return exportFileName;
+	}
 
 	/**
 	 * exports the actual displayed data set to KML file format
@@ -752,42 +779,43 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * update the file menu by adding two new entries to export KML/GPX files
 	 * @param exportMenue
 	 */
-	public void updateFileMenu(Menu exportMenue) {
-		MenuItem convertKMZ3DRelativeItem;
-		MenuItem convertKMZ3DAbsoluteItem;
+	public void updateFileMenu(final Menu exportMenue) {
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+					MenuItem convertKMZ3DRelativeItem;
+					MenuItem convertKMZ3DAbsoluteItem;
 
-		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
-			new MenuItem(exportMenue, SWT.SEPARATOR);
-
-			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1711));
-			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
-					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
+					new MenuItem(exportMenue, SWT.SEPARATOR);
+					convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+					convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1711));
+					convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
+							export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
+						}
+					});
+					convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+					convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1712));
+					convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+							export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+						}
+					});
+					convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+					convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1713));
+					convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+							export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+						}
+					});
 				}
-			});
-
-			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1712));
-			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
-				}
-			});
-
-			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1713));
-			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
-				}
-			});
-		}
+			}
+		});
 	}
 }
