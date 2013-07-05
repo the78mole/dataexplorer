@@ -78,6 +78,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 								|| file.getPath().toLowerCase().contains("ash")
 								|| file.getPath().toLowerCase().contains("spektrum")
 								|| file.getPath().toLowerCase().contains("av4ms")
+								|| file.getPath().toLowerCase().contains("akkumonitor")
 								|| file.getPath().toLowerCase().contains("flightrecorder"))) {
 					System.out.println("working with : " + file);
 					
