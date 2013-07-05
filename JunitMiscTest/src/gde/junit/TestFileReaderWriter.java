@@ -440,14 +440,12 @@ public class TestFileReaderWriter extends TestSuperClass {
 								}
 							}
 
-							String tmpDir2 = this.tmpDir + "Write_2_OSD" + GDE.FILE_SEPARATOR;
-							new File(tmpDir2).mkdirs();
-							String absolutFilePath = tmpDir2 + file.getName();
+							String absolutFilePath = tmpDir1 + file.getName();
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
 							System.out.println("writing as   : " + absolutFilePath);
 							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, false);
 
-							absolutFilePath = tmpDir2 + file.getName();
+							absolutFilePath = tmpDir1 + file.getName();
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_raw.csv";
 							System.out.println("writing as   : " + absolutFilePath);
 							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, true);
