@@ -739,10 +739,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getName().toLowerCase().startsWith("LOG")) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getName().toLowerCase().startsWith("log")) {
 					System.out.println("working with : " + file);
 					try {
-						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
+						HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(';',file.getAbsolutePath());
 						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
@@ -750,7 +750,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						setupDataChannels(device);
 
-						OsdReaderWriter.read(file.getAbsolutePath());
+						CSVReaderWriter.read(';', file.getAbsolutePath(), ") Record", file.getAbsolutePath().endsWith("_raw.csv"));
 
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
