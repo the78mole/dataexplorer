@@ -335,7 +335,7 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
-							Display.getCurrent().asyncExec(new Runnable() {
+							GDE.display.asyncExec(new Runnable() {
 								public void run() {
 									MeasurementTypeTabItem tmpMeasurementTypeTabItem = (MeasurementTypeTabItem) ChannelTypeTabItem.this.measurementsTabFolder.getSelection();
 									tmpMeasurementTypeTabItem.setMeasurementType(tmpMeasurementTypeTabItem.deviceConfig, tmpMeasurementTypeTabItem.measurementType, tmpMeasurementTypeTabItem.channelConfigNumber);
