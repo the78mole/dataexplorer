@@ -368,7 +368,7 @@
 			<include name="GPS-Logger/build/*.jar" />
 			<include name="NMEA-Adapter/build/*.jar" />
 			<include name="UltramatUDP/build/*.jar" />
-			<include name="HoTTAdapter/build/HoTTAdapter.jar" />
+			<include name="HoTTAdapter/build/*.jar" />
 			<include name="UniLog2/build/*.jar" />
 			<include name="iCharger/build/*.jar" />
 			<include name="FlightRecorder/build/*.jar" />
@@ -500,37 +500,37 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/Windows/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="HoTTAdapter/build/HoTTMdlViewer*.jar" />
+			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/Windows/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="HoTTAdapter/build/HoTTMdlViewer*.jar" />
+			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="HoTTAdapter/build/HoTTMdlViewer*.jar" />
+			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="HoTTAdapter/build/HoTTMdlViewer*.jar" />
+			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.mac32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="HoTTAdapter/build/HoTTMdlViewer*.jar" />
+			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="HoTTAdapter/build/HoTTMdlViewer*.jar" />
+			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
 		</copy>
 
 		<!-- launcher scripts, README -->
