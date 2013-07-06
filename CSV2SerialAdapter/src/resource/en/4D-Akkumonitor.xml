@@ -82,14 +82,14 @@
             <Measurement>
                 <name>GPS-Länge</name>
                 <symbol>L</symbol>
-                <unit>°</unit>
+                <unit>° '</unit>
                 <active>true</active>
                 <property name="data_type" value="GPS longitude" type="String" description="Spezial Datentyp"/>
             </Measurement>
             <Measurement>
                 <name>GPS-Breite</name>
                 <symbol>B</symbol>
-                <unit>°</unit>
+                <unit>° '</unit>
                 <active>true</active>
                 <property name="data_type" value="GPS latitude" type="String" description="Spezial Datentyp"/>
             </Measurement>
