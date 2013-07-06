@@ -18,21 +18,6 @@
 ****************************************************************************************/
 package gde.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import gde.log.Level;
-import java.util.logging.Logger;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -47,10 +32,26 @@ import gde.exception.DataTypeException;
 import gde.exception.MissMatchDeviceException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.exception.UnitCompareException;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Class to read and write comma separated value files
@@ -262,16 +263,16 @@ public class CSVReaderWriter {
 				}
 				
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
-				String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
-				String[] recordSymbols = new String[recordNames.length];
-				String[] recordUnits = new String[recordNames.length];
 				String[] tmpRecordNames	=	fileHeader.get(GDE.CSV_DATA_HEADER_MEASUREMENTS).split(GDE.STRING_SEMICOLON);
 				String[] tmpRecordUnits = fileHeader.get(GDE.CSV_DATA_HEADER_UNITS).split(GDE.STRING_SEMICOLON);
-				for (int i=0, j=0; i < recordNames.length; i++) {
+				String[] recordNames = isRaw ? device.getMeasurementNames(activeChannel.getNumber()) : new String[tmpRecordNames.length];
+				String[] recordSymbols = new String[recordNames.length];
+				String[] recordUnits = new String[recordNames.length];
+				for (int i=0, j=0; isRaw ? i < recordNames.length : i < tmpRecordNames.length; i++) {
 					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
 					if (isRaw) {
 						if (!measurement.isCalculation()) {
-							recordNames[i] = recordNames[i].equals(tmpRecordNames[j]) ? recordNames[i] : tmpRecordNames[j];
+							recordNames[i] = tmpRecordNames[j];
 							recordSymbols[i] = measurement.getSymbol();
 							recordUnits[i] = measurement.getUnit();
 							++j;
@@ -282,9 +283,9 @@ public class CSVReaderWriter {
 						}
 					}
 					else {
-						recordNames[i] = recordNames[i].equals(tmpRecordNames[i]) ? recordNames[i] : tmpRecordNames[i];
-						recordSymbols[i] = recordNames[i].equals(tmpRecordNames[i]) ? measurement.getSymbol() : "";
-						recordUnits[i] = measurement.getUnit().equals(tmpRecordUnits[i]) ? measurement.getUnit() : tmpRecordUnits[i];
+							recordNames[i] = tmpRecordNames[i];
+							recordSymbols[i] = measurement.getSymbol();
+							recordUnits[i] = tmpRecordUnits[i];
 					}
 				}
 				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true);
@@ -296,6 +297,9 @@ public class CSVReaderWriter {
 						recordSet.get(recordKey).setDisplayable(true); // all data available 
 					}
 				}
+				Date												date = null;
+				int													year=0, month=0, day=0;
+				long startTimeStamp=0, lastTimeStamp=0;
 
 				// now get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
 				String[] updateRecordNames = isRaw ? recordSet.getNoneCalculationRecordNames() : recordNames;
@@ -303,10 +307,33 @@ public class CSVReaderWriter {
 				while ((line = reader.readLine()) != null) {
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
 					String data = dataStr[0].trim().replace(',', '.');
-					time_ms = (int) (new Double(data).doubleValue() * 1000);
+					if (data.contains(GDE.STRING_BLANK)) {
+						if (date == null) {
+							year = Integer.parseInt(data.substring(0,4));
+							month = Integer.parseInt(data.substring(5, 7));
+							day = Integer.parseInt(data.substring(8, 10));
+						}
+						data = data.split(GDE.STRING_BLANK)[1];
+						int hour = Integer.parseInt(data.substring(0, 2));
+						int minute = Integer.parseInt(data.substring(3, 5));
+						int second = Integer.parseInt(data.substring(6, 8));
+						GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+
+						if (lastTimeStamp < timeStamp) {
+							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
+							lastTimeStamp = timeStamp;
+							date = calendar.getTime();
+							if (startTimeStamp == 0) startTimeStamp = timeStamp;
+						}
+						else 
+							continue;
+					}
+					else // decimal time value
+						time_ms = (int) (new Double(data).doubleValue() * 1000);
 					
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
-						data = dataStr[i + 1].trim().replace(',', '.');
+						data = dataStr[i + 1].trim().replace(',', '.').replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
 						points[i] = Double.valueOf(data).intValue()*1000;
 					}
 					if (isRaw) 	recordSet.addNoneCalculationRecordsPoints(points, time_ms);
@@ -339,8 +366,10 @@ public class CSVReaderWriter {
 		}
 		finally {
 			if (application.getStatusBar() != null) {
-				application.setProgress(10, sThreadId);
+				application.setProgress(100, sThreadId);
 				application.setStatusMessage(GDE.STRING_EMPTY);
+				application.getMenuToolBar().updateChannelSelector();
+				application.getMenuToolBar().updateRecordSetSelectCombo();
 			}
 		}
 		
@@ -392,7 +421,7 @@ public class CSVReaderWriter {
 			writer.write(sb.toString());
 
 			// write data
-			long startTime = new Date().getTime();
+			long startTime = new Date(recordSet.getTime(0)).getTime();
 			int recordEntries = recordSet.getRecordDataSize(true);
 			int progressCycle = 0;
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);

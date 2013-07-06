@@ -1691,17 +1691,38 @@ public class LogViewReader {
 			log.log(Level.FINEST, new String(buffer));
 			log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
 			
-			//position += data_in.skip(115);
-			//log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
-			
-			//time format
+//			//search for R_% <17> %@
+//			position += data_in.skip(100);
+//			Vector<Byte> byteBuffer = new Vector<Byte>();
+//			buffer = new byte[1];
+//			boolean isSignature = false;
+//			while (!isSignature) {
+//				position += data_in.read(buffer);
+//				byteBuffer.add(buffer[0]);
+//				if (buffer[0] == 'R') {
+//					position += data_in.read(buffer);
+//					if (buffer[0] != '_')
+//						continue;
+//					position += data_in.read(buffer);
+//					if (buffer[0] == '%')
+//						isSignature = true;
+//				}
+//			}
+//
+//			//time format
+//			buffer = new byte[4];
+//			for (int j = 0; j < buffer.length; j++) {
+//				buffer[i] = byteBuffer.get(byteBuffer.size()-2-j);
+//			}
+//			int numberChars = parse2Int(buffer)-3;
+
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberChars = parse2Int(buffer);
 			log.log(Level.FINER, "numberChars = " + numberChars); //$NON-NLS-1$
-			buffer = new byte[parse2Int(buffer)];
+			buffer = new byte[numberChars];
 			position += data_in.read(buffer);
-			log.log(Level.FINEST, new String(buffer));			
+			log.log(Level.FINEST, "R_%" + new String(buffer) + "%@");			
 			log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$			
 			
 			position += data_in.skip(56);

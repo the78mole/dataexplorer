@@ -93,7 +93,9 @@ public class FileHandler {
 
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemName(), isRaw);
+				RecordSet activeRecordSet = CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemName(), isRaw);
+				activeDevice.updateVisibilityStatus(activeRecordSet, true);
+				this.application.getActiveChannel().applyTemplate(activeRecordSet.getName(), true);
 			}
 			catch (Exception e) {
 				FileHandler.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
