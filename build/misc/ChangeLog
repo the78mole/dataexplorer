@@ -10,6 +10,7 @@ CSV2SerialAdapter - enable special record data types
 add Junsi iCharger3010B
 add 4D-Akkumonitor 
 update SWT to 4.2.2 final stable release
+fix import/export of generic CSV data
 
 
 Version 3.1.0 - 20 May 2013
