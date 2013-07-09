@@ -11,6 +11,7 @@ add Junsi iCharger3010B
 add 4D-Akkumonitor 
 update SWT to 4.2.2 final stable release
 fix import/export of generic CSV data
+fix statistics value display if trigger configured but no occurrence
 
 
 Version 3.1.0 - 20 May 2013
