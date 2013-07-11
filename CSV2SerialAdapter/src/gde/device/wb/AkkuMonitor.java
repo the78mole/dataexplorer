@@ -40,12 +40,12 @@ public class AkkuMonitor extends CSV2SerialAdapter {
 				case GPS_LATITUDE:
 				case GPS_LONGITUDE:
 					if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
-						int grad = record.realGet(rowIndex) / 1000000;
-						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+						int grad = record.realGet(rowIndex) / 100000;
+						double minuten = record.realGet(rowIndex) % 100000 / 10000.0;
 						dataTableRow[j + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 					}
 					else { // assume degree only
-						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 100000.0); //$NON-NLS-1$
 					}
 					break;
 					
