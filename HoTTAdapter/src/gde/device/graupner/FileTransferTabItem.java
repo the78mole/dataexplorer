@@ -931,7 +931,7 @@ public class FileTransferTabItem extends CTabItem {
 			FileTransferTabItem.log.log(Level.FINE, "selectedSdFolder = " + this.selectedSdFolder.toString());
 			this.sdFoldersAndFiles = this.serialPort.queryListDir(this.selectedSdFolder.toString(), 0);
 			for (String folder : this.sdFoldersAndFiles.get("FOLDER")) { //$NON-NLS-1$
-				if (folder.length() > 3) {
+				if (folder.length() >= 1) {
 					TreeItem tmpTreeItem = new TreeItem(evtTreeitem, SWT.NONE);
 					tmpTreeItem.setText(folder);
 					tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
