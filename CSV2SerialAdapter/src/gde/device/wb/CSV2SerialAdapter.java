@@ -315,6 +315,10 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 					}
 					break;
+					
+				case DATE_TIME:
+					dataTableRow[j + 1] = StringHelper.getFormatedTime(record.getUnit(), record.realGet(rowIndex));
+					break;
 
 				default:
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
@@ -369,7 +373,11 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				newValue = value / 1000.0;
 			}
 			break;
-
+			
+		case DATE_TIME:
+			newValue = 0;
+			break;
+			
 		default:
 			newValue = (value - reduction) * factor + offset;
 			break;
@@ -418,6 +426,10 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			else { // assume degree only
 				newValue = value * 1000.0;
 			}
+			break;
+			
+		case DATE_TIME:
+			newValue = 0;
 			break;
 
 		default:
