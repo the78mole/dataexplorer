@@ -1387,10 +1387,11 @@ public class FileUtils {
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
+		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
 
-		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented()) && !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1414,9 +1415,10 @@ public class FileUtils {
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
+		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, fileExtensions, searchDirectory, null, SWT.MULTI);
 
-		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented()) && !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1438,7 +1440,7 @@ public class FileUtils {
 			FileUtils.checkDirectoryAndCreate(objectkeyPath);
 			searchDirectory = objectkeyPath;
 		}
-		else if (DataExplorer.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
+		else if (!DataExplorer.application.isObjectoriented()) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 			if (searchDirectory.contains(baseDirectory)) {
 				searchDirectory = searchDirectory.substring(0, searchDirectory.lastIndexOf(baseDirectory)) + baseDirectory + GDE.FILE_SEPARATOR_UNIX + objectKey;
@@ -1447,10 +1449,11 @@ public class FileUtils {
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
+		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				(GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR) }, searchDirectory, null, SWT.MULTI);
 
-		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.equals(fd.getFilterPath()))
+		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented()) && !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
