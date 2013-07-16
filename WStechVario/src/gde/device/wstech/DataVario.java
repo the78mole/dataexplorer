@@ -264,7 +264,10 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
 								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								CSVSerialDataReaderWriter.read(selectedImportFile, DataVario.this, recordNameExtend, channelConfigNumber, true);
+								CSVSerialDataReaderWriter.read(selectedImportFile, DataVario.this, recordNameExtend, channelConfigNumber, 
+										new DataParser(DataVario.this.getDataBlockTimeUnitFactor(), 
+												DataVario.this.getDataBlockLeader(), DataVario.this.getDataBlockSeparator().value(), 
+												DataVario.this.getDataBlockCheckSumType(), DataVario.this.getDataBlockSize(InputTypes.FILE_IO)));
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
