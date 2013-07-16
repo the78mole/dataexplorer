@@ -6,8 +6,9 @@ HoTTAdapter* - adapt GPS filter
 HoTTAdapter* - adapt ESC filter
 HoTTAdapter* - updates for HoTTViewer tab
 HoTTAdapter* - add SD Log version 1 which appears after firmware update MX20
-CSV2SerialAdapter - enable special record data types 
 add Junsi iCharger3010B
+enable extended special record data types 
+enable device specific data parser
 add 4D-Akkumonitor 
 update SWT to 4.2.2 final stable release
 fix import/export of generic CSV data
