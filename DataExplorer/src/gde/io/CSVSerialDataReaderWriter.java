@@ -81,7 +81,7 @@ public class CSVSerialDataReaderWriter {
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 */
-	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
+	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber, IDataParser data) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR;
 		BufferedReader reader; // to read the data
@@ -125,7 +125,6 @@ public class CSVSerialDataReaderWriter {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
 				if (dataBlockSize > 0 && measurementSize < Math.abs(dataBlockSize))  
 					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
-				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
 				byte[] buffer = new byte[1024];
@@ -167,28 +166,28 @@ public class CSVSerialDataReaderWriter {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
 
 					try {
-						if (data.channelConfigNumber > device.getChannelCount()) 
+						if (data.getChannelConfigNumber() > device.getChannelCount()) 
 							continue; //skip data if not configured
 
-						activeChannelConfigNumber = device.recordSetNumberFollowChannel() ? data.channelConfigNumber : activeChannelConfigNumber;
+						activeChannelConfigNumber = device.recordSetNumberFollowChannel() ? data.getChannelConfigNumber() : activeChannelConfigNumber;
 						activeChannel = channels.get(activeChannelConfigNumber);
 						
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.state);
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.getState());
 						
-						recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
+						recordSetNameExtend = device.getStateType().getProperty().get(data.getState() - 1).getName(); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
 						channelRecordSet = activeChannel.get(device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getLastActiveRecordSetName() : recordSetName);
 					}
 					catch (Exception e) {
-						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.state, filePath, device.getPropertiesFileName()})); 
+						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.getState(), filePath, device.getPropertiesFileName()})); 
 					}
 
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.recordSetNumberOffset) {
+					if (activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.getRecordSetNumberOffset()) {
 						//record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
-						if (lastRecordSetNumberOffset != data.recordSetNumberOffset && channelRecordSet != null) {
+						if (lastRecordSetNumberOffset != data.getRecordSetNumberOffset() && channelRecordSet != null) {
 							if (channelRecordSet.get(0).size() < 3) {
 								channelRecordSet = activeChannel.get(recordSetName);
 								activeChannel.remove(recordSetName);
@@ -239,21 +238,17 @@ public class CSVSerialDataReaderWriter {
 
 						// make all records displayable while absolute data
 						String[] recordNames = device.getMeasurementNames(activeChannelConfigNumber);
-						if (!isRaw) { // absolute
-							for (String recordKey : recordNames) {
-								channelRecordSet.get(recordKey).setDisplayable(true); // all data available 
-							}
+						for (String recordKey : recordNames) {
+							channelRecordSet.get(recordKey).setDisplayable(true); // all data available 
 						}
-						lastRecordSetNumberOffset = data.recordSetNumberOffset;
+					
+						lastRecordSetNumberOffset = data.getRecordSetNumberOffset();
 					}
 					//add data only if 
-					if (data.time_ms - lastTimeStamp >= 0) {
-						if (isRaw)
-							channelRecordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
-						else
-							channelRecordSet.addPoints(data.values, data.time_ms);
+					if (data.getTime_ms() - lastTimeStamp >= 0) {
+						channelRecordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 						data.setTimeResetEnabled(true);
-						lastTimeStamp = data.time_ms;
+						lastTimeStamp = data.getTime_ms();
 					}
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));

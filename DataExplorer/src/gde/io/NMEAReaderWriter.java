@@ -201,7 +201,7 @@ public class NMEAReaderWriter {
 					if (NMEAReaderWriter.application.getStatusBar() != null && progress > lastProgress && progress % 5 == 0) {
 						NMEAReaderWriter.application.setProgress(progress, sThreadId);
 						lastProgress = progress;
-						System.out.println(progress);
+						//System.out.println(progress);
 					}
 					//start over with new line and signature
 					lines.clear();

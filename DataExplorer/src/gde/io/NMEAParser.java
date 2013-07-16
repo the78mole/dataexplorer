@@ -42,34 +42,38 @@ import java.util.logging.Logger;
  * All properties around the textual data in this line has to be specified in DataBlockType (type=TEXT, size number of values, separator=;, ...), refer to DeviceProperties_XY.XSD
  * @author Winfried Brügmann
  */
-public class NMEAParser {
+public class NMEAParser implements IDataParser {
 	private static final Logger	log												= Logger.getLogger(NMEAParser.class.getName());
 	private final String				$CLASS_NAME								= "NMEAParser."; //$NON-NLS-1$
 	private static final String	STRING_SENTENCE_SPLITTER	= " |:";																				//$NON-NLS-1$
 
-	int													time_ms;
-	int													state											= 1; //default value
-	long												startTimeStamp						= 0;
-	long												lastTimeStamp							= 0;
-	int[]												values;
-	Date												date;
-	short												timeOffsetUTC							= 0;
-	int													checkSum;
-	String											comment;
-	int													year, month, day;
-	int													numGSVsentence 						= 1; //check if GSV sentences are in sync
-	int													numSattelites							= 0;
-	Vector<String>							missingImpleWarned				= new Vector<String>();
-	String 											deviceSerialNumber				= GDE.STRING_EMPTY;
-	String											firmwareVersion           = GDE.STRING_EMPTY;
+	protected int													time_ms;
+	protected int													state											= 1; //default value
+	protected long												startTimeStamp						= 0;
+	protected long												lastTimeStamp							= 0;
+	protected int[]												values;
+	protected Date												date;
+	protected short												timeOffsetUTC							= 0;
+	protected int													checkSum;
+	protected String											comment;
+	protected int													year, month, day;
+	protected int													numGSVsentence 						= 1; //check if GSV sentences are in sync
+	protected int													numSattelites							= 0;
+	protected Vector<String>							missingImpleWarned				= new Vector<String>();
+	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
+	protected String											firmwareVersion           = GDE.STRING_EMPTY;
+	
+	protected int													recordSetNumberOffset			= 0;
+	protected int													timeResetCounter					= 0;
+	protected boolean											isTimeResetEnabled				= false;
 
-	final int										dataBlockSize;
-	final String								separator;
-	final String								leader;
-	final CheckSumTypes					checkSumType;
-	final IDevice								device;
-	final String								deviceName;
-	int													channelConfigNumber;
+	protected final int										dataBlockSize;
+	protected final String								separator;
+	protected final String								leader;
+	protected final CheckSumTypes					checkSumType;
+	protected final IDevice								device;
+	protected final String								deviceName;
+	protected int													channelConfigNumber;
 	
 	int lineNumber = 0;
 
@@ -102,6 +106,34 @@ public class NMEAParser {
 		this.deviceName = this.device.getName();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.timeOffsetUTC = useTimeOffsetUTC;
+	}
+	
+	/**
+	 * @return the channel/config number to locate the parsed data
+	 */
+	public int getChannelConfigNumber(){
+		return this.channelConfigNumber;
+	}
+	
+	/**
+	 * @return the actual state number
+	 */
+	public int getState(){
+		return this.state;
+	}
+
+	/**
+	 * @return the recordSetNumberOffset
+	 */
+	public int getRecordSetNumberOffset() {
+		return this.recordSetNumberOffset;
+	}
+
+	/**
+	 * @param isTimeResetPrepared the isTimeResetPrepared to set
+	 */
+	public synchronized void setTimeResetEnabled(boolean isTimeResetPrepared) {
+		this.isTimeResetEnabled = isTimeResetPrepared;
 	}
 
 	/**

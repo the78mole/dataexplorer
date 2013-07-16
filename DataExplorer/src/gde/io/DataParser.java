@@ -40,17 +40,13 @@ import java.util.logging.Logger;
 public class DataParser extends NMEAParser {
 	static Logger			log										= Logger.getLogger(DataParser.class.getName());
 
-	int								start_time_ms					= Integer.MIN_VALUE;
-	int								valueSize;
+	protected int								start_time_ms					= Integer.MIN_VALUE;
+	protected int								valueSize;
 
-	int								recordSetNumberOffset	= 0;
-	int								timeResetCounter			= 0;
-	boolean						isTimeResetEnabled		= false;
-
-	final int					timeFactor;
-	final FormatTypes	checkSumFormatType;
-	final FormatTypes	dataFormatType;
-	final boolean			isMultiply1000;
+	protected final int					timeFactor;
+	protected final FormatTypes	checkSumFormatType;
+	protected final FormatTypes	dataFormatType;
+	protected final boolean			isMultiply1000;
 
 	/**
 	 * constructor to initialize required configuration parameter
@@ -244,20 +240,6 @@ public class DataParser extends NMEAParser {
 	}
 
 	/**
-	 * @return the recordSetNumberOffset
-	 */
-	public int getRecordSetNumberOffset() {
-		return this.recordSetNumberOffset;
-	}
-
-	/**
-	 * @return the state
-	 */
-	public int getState() {
-		return this.state;
-	}
-
-	/**
 	 * parse 4 byte of a data buffer to integer value
 	 * @param buffer
 	 * @param startIndex index of low byte
@@ -300,12 +282,5 @@ public class DataParser extends NMEAParser {
 	 */
 	public static int parse2UnsignedShort(byte low, byte high) {
 		return ((high & 0xFF) << 8) | (low & 0xFF);
-	}
-
-	/**
-	 * @param isTimeResetPrepared the isTimeResetPrepared to set
-	 */
-	public synchronized void setTimeResetEnabled(boolean isTimeResetPrepared) {
-		this.isTimeResetEnabled = isTimeResetPrepared;
 	}
 }
