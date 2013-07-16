@@ -32,6 +32,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
+import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
@@ -458,7 +459,10 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
 								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, true);
+								CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, 
+										new DataParser(FlightRecorder.this.getDataBlockTimeUnitFactor(), 
+												FlightRecorder.this.getDataBlockLeader(), FlightRecorder.this.getDataBlockSeparator().value(), 
+												FlightRecorder.this.getDataBlockCheckSumType(), FlightRecorder.this.getDataBlockSize(InputTypes.FILE_IO)));
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
