@@ -617,7 +617,10 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 									}
 								}
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, recordNameExtend, channelConfigNumber, true);
+								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, recordNameExtend, channelConfigNumber, 
+										new DataParser(CSV2SerialAdapter.this.getDataBlockTimeUnitFactor(), 
+												CSV2SerialAdapter.this.getDataBlockLeader(), CSV2SerialAdapter.this.getDataBlockSeparator().value(), 
+												CSV2SerialAdapter.this.getDataBlockCheckSumType(), CSV2SerialAdapter.this.getDataBlockSize(InputTypes.FILE_IO)));
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
