@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.device.gpx.GPXDataReaderWriter;
 import gde.device.graupner.HoTTbinReader;
 import gde.device.graupner.HoTTbinReader2;
@@ -31,6 +32,7 @@ import gde.device.jeti.JetiDataReader;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
 import gde.io.CSVSerialDataReaderWriter;
+import gde.io.DataParser;
 import gde.io.IGCReaderWriter;
 import gde.io.LogViewReader;
 import gde.io.NMEAReaderWriter;
@@ -138,7 +140,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 							activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
 							activeChannel.setSaved(true);
 
-							CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, true);
+							CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, 
+									new DataParser(device.getDataBlockTimeUnitFactor(), 
+											device.getDataBlockLeader(), device.getDataBlockSeparator().value(), 
+											device.getDataBlockCheckSumType(), device.getDataBlockSize(InputTypes.FILE_IO)));
 							RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 							if (recordSet != null) {
@@ -865,7 +870,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 							activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
 							activeChannel.setSaved(true);
 
-							CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, true);
+							CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, 
+									new DataParser(device.getDataBlockTimeUnitFactor(), 
+											device.getDataBlockLeader(), device.getDataBlockSeparator().value(), 
+											device.getDataBlockCheckSumType(), device.getDataBlockSize(InputTypes.FILE_IO)));
 							RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 							if (recordSet != null) {
@@ -937,7 +945,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
 						activeChannel.setSaved(true);
 
-						CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 2, true);
+						CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 2, 
+								new DataParser(device.getDataBlockTimeUnitFactor(), 
+										device.getDataBlockLeader(), device.getDataBlockSeparator().value(), 
+										device.getDataBlockCheckSumType(), device.getDataBlockSize(InputTypes.FILE_IO)));
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 						if (recordSet != null) {
@@ -1239,7 +1250,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 								ordinalAltitude = 2;
 							}
 							else if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && (device.getName().startsWith("DataVario") || device.getName().startsWith("LinkVario"))) {
-								recordSet = CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, true);
+								recordSet = CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, 
+										new DataParser(device.getDataBlockTimeUnitFactor(), 
+												device.getDataBlockLeader(), device.getDataBlockSeparator().value(), 
+												device.getDataBlockCheckSumType(), device.getDataBlockSize(InputTypes.FILE_IO)));
 								if (recordSet != null) {
 									activeChannel.setActiveRecordSet(recordSet);
 								}
