@@ -19,8 +19,11 @@
 package gde.device.wb;
 
 import gde.GDE;
+import gde.data.Record;
 import gde.device.CheckSumTypes;
 import gde.device.FormatTypes;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.io.DataParser;
 import gde.messages.MessageIds;
@@ -86,16 +89,37 @@ public class AkkuMonitorParser extends DataParser {
 
 		for (int i = 0; i < this.valueSize; i++) {
 			strValue = strValues[i + 3].trim();
+			PropertyType property = device.getMeasurement(this.channelConfigNumber, i).getProperty(MeasurementPropertyTypes.DATA_TYPE.value());
 			try {
-				double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
-				if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
-					this.values[i] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
-				else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
-				if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
-					this.values[i] = (int) tmpValue;
+				if (property == null) { //no special data type
+					double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
+					if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
+						this.values[i] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
+					else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
+					if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
+						this.values[i] = (int) tmpValue;
+					}
+					else {
+						this.values[i] = (int) (tmpValue / 1000);
+					}
 				}
 				else {
-					this.values[i] = (int) (tmpValue / 1000);
+					log.log(Level.FINE, Record.DataType.fromValue(property.getValue()).toString());
+					switch (Record.DataType.fromValue(property.getValue())) {
+					case GPS_LATITUDE:
+					case GPS_LONGITUDE:
+						this.values[i] = Integer.parseInt(strValue.replace(GDE.STRING_DOT, GDE.STRING_BLANK)); //degree minutes 4 decimals
+						break;
+					case GPS_ALTITUDE:
+						this.values[i] = Integer.parseInt(strValue) * 1000; 
+						break;
+					case DATE_TIME:
+						String[] tmpValues = strValue.split(":|.");
+						this.values[i] = Integer.parseInt(tmpValues[0].trim()) * 60 * 60 * 1000; //mm:ss.S
+						this.values[i] += Integer.parseInt(tmpValues[1].trim()) * 60 * 1000; //mm:ss.S
+						this.values[i] += Integer.parseInt(tmpValues[2].trim()) * 1000; //mm:ss.S
+						break;
+					}
 				}
 			}
 			catch (NumberFormatException e) {
