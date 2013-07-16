@@ -231,7 +231,10 @@ public class Kosmik extends JLog2 {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
 								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								RecordSet redRecordSet = CSVSerialDataReaderWriter.read(selectedImportFile, Kosmik.this, recordNameExtend, channelConfigNumber, true);
+								RecordSet redRecordSet = CSVSerialDataReaderWriter.read(selectedImportFile, Kosmik.this, recordNameExtend, channelConfigNumber, 
+										new DataParser(Kosmik.this.getDataBlockTimeUnitFactor(), 
+												Kosmik.this.getDataBlockLeader(), Kosmik.this.getDataBlockSeparator().value(), 
+												Kosmik.this.getDataBlockCheckSumType(), Kosmik.this.getDataBlockSize(InputTypes.FILE_IO)));
 								try {
 									BufferedReader lineReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedImportFile), "ISO-8859-1")); //$NON-NLS-1$		
 									String line;

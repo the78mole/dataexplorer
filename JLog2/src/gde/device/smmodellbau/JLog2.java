@@ -548,7 +548,10 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
 								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, true);
+								CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, 
+										new DataParser(JLog2.this.getDataBlockTimeUnitFactor(), 
+												JLog2.this.getDataBlockLeader(), JLog2.this.getDataBlockSeparator().value(), 
+												JLog2.this.getDataBlockCheckSumType(), JLog2.this.getDataBlockSize(InputTypes.FILE_IO)));
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
