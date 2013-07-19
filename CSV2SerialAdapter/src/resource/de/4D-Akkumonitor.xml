@@ -105,7 +105,7 @@
                 <name>Lap</name>
                 <symbol>SP</symbol>
                 <unit>mm:ss,S</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Spezial Datentyp" type="String" value="date time" name="data_type"/>
             </Measurement>
@@ -113,7 +113,7 @@
                 <name>Int1</name>
                 <symbol>I1</symbol>
                 <unit>mm:ss,S</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Spezial Datentyp" type="String" value="date time" name="data_type"/>
             </Measurement>
@@ -121,7 +121,7 @@
                 <name>Int2</name>
                 <symbol>I2</symbol>
                 <unit>mm:ss,S</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Spezial Datentyp" type="String" value="date time" name="data_type"/>
             </Measurement>
@@ -129,7 +129,7 @@
                 <name>Int3</name>
                 <symbol>I3</symbol>
                 <unit>mm:ss,S</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Spezial Datentyp" type="String" value="date time" name="data_type"/>
             </Measurement>

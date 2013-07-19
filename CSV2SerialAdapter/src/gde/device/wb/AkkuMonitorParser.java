@@ -108,16 +108,18 @@ public class AkkuMonitorParser extends DataParser {
 					switch (Record.DataType.fromValue(property.getValue())) {
 					case GPS_LATITUDE:
 					case GPS_LONGITUDE:
-						this.values[i] = Integer.parseInt(strValue.replace(GDE.STRING_DOT, GDE.STRING_BLANK)); //degree minutes 4 decimals
+						this.values[i] = Integer.parseInt(strValue.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)); //degree minutes 4 decimals
 						break;
 					case GPS_ALTITUDE:
 						this.values[i] = Integer.parseInt(strValue) * 1000; 
 						break;
 					case DATE_TIME:
-						String[] tmpValues = strValue.split(":|.");
-						this.values[i] = Integer.parseInt(tmpValues[0].trim()) * 60 * 60 * 1000; //mm:ss.S
-						this.values[i] += Integer.parseInt(tmpValues[1].trim()) * 60 * 1000; //mm:ss.S
-						this.values[i] += Integer.parseInt(tmpValues[2].trim()) * 1000; //mm:ss.S
+						String[] tmpValues = strValue.split(":");
+						this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 60 * 1000 : 0; //mm:ss.S
+						tmpValues[0] = tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_DOT));
+						tmpValues[1] = tmpValues[1].substring(tmpValues[1].indexOf(GDE.STRING_DOT)+1);
+						this.values[i] += tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
+						this.values[i] += tmpValues[1].trim().length() > 0 ? Integer.parseInt(tmpValues[1].trim()) * 1000 : 0; //mm:ss.S
 						break;
 					}
 				}
