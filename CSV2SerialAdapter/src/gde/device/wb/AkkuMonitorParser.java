@@ -114,12 +114,30 @@ public class AkkuMonitorParser extends DataParser {
 						this.values[i] = Integer.parseInt(strValue) * 1000; 
 						break;
 					case DATE_TIME:
-						String[] tmpValues = strValue.split(":");
-						this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 60 * 1000 : 0; //mm:ss.S
-						tmpValues[0] = tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_DOT));
-						tmpValues[1] = tmpValues[1].substring(tmpValues[1].indexOf(GDE.STRING_DOT)+1);
-						this.values[i] += tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
-						this.values[i] += tmpValues[1].trim().length() > 0 ? Integer.parseInt(tmpValues[1].trim()) * 1000 : 0; //mm:ss.S
+						System.out.println(strValue);
+						String[] tmpValues = strValue.split(GDE.STRING_COLON);
+						if (tmpValues.length == 2) { //: contained
+							this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 60 * 1000 : 0; //mm:ss.S
+							if (tmpValues[1].indexOf(GDE.STRING_DOT) >= 0) {
+								tmpValues[0] = tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_DOT));
+								tmpValues[1] = tmpValues[1].substring(tmpValues[1].indexOf(GDE.STRING_DOT)+1);
+								this.values[i] += tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
+								this.values[i] += tmpValues[1].trim().length() > 0 ? Integer.parseInt(tmpValues[1].trim()) * 1000 : 0; //mm:ss.S
+							}
+							else {
+								this.values[i] += Integer.parseInt(tmpValues[1].substring(0, 2).trim()) * 1000;
+							}
+						}
+						else if (strValue.contains(GDE.STRING_DOT)) { // dot contained
+							tmpValues = new String[2];
+							tmpValues[0] = strValue.substring(0, strValue.indexOf(GDE.STRING_DOT));
+							tmpValues[1] = strValue.substring(strValue.indexOf(GDE.STRING_DOT)+1);
+							this.values[i] += tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
+							this.values[i] += tmpValues[1].trim().length() > 0 ? Integer.parseInt(tmpValues[1].trim()) * 1000 : 0; //mm:ss.S
+						}
+						else {
+							this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
+						}
 						break;
 					}
 				}
