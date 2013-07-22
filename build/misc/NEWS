@@ -1,11 +1,17 @@
-GNU DataExplorer - News - comes with version 3.1.0
+GNU DataExplorer - News - comes with version 3.1.1
 
-1) add some logs to check UI initialization to prevent initialization exceptions
-2) UniLog2 - fix problem interpreting UTC-offset which does not exist
-3) UniLog2 - fix problem day skip while reading big data files > 24 hours
-4) HoTTAdapter2 - correct EAM current
-5) HoTTAdapter* - update filter
-6) HoTTAdapter* - integrate HoTTMdlViewer with actual version
+1)  problem while target reference ordinal of cell voltage is not returned from device
+2)  HoTTAdapter* - adapt GPS filter
+3)  HoTTAdapter* - adapt ESC filter
+4)  HoTTAdapter* - updates for HoTTViewer tab
+5)  HoTTAdapter* - add SD Log version 1 which appears after firmware update MX20
+6)  add Junsi iCharger3010B
+7)  enable extended special record data types 
+8)  enable device specific data parser
+9)  add 4D-Akkumonitor 
+10) update SWT to 4.2.2 final stable release
+11) fix import/export of generic CSV data
+12) fix statistics value display if trigger configured but no occurrence
 
 
 

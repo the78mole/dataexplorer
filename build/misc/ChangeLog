@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.1 - xx yyy 2013
+Version 3.1.1 - 22 Jul 2013
 fix problem while target reference ordinal of cell voltage is not returned from device
 HoTTAdapter* - adapt GPS filter
 HoTTAdapter* - adapt ESC filter
