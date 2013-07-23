@@ -8,16 +8,6 @@
         <image>4d-akkumonitor.png</image>
         <usage>false</usage>
     </Device>
-    <SerialPort>
-        <port></port>
-        <baudeRate>9600</baudeRate>
-        <dataBits>DATABITS_8</dataBits>
-        <stopBits>STOPBITS_1</stopBits>
-        <parity>PARITY_NONE</parity>
-        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
-        <isRTS>false</isRTS>
-        <isDTR>false</isDTR>
-    </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
