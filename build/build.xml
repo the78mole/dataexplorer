@@ -669,7 +669,11 @@
 		<delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip" />
 	</target>
 
-	<target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
+	<target name="create_HoTTGUI_target" unless="${basedir}/HoTTGUI_/target">
+		<mkdir dir="${basedir}/HoTTGUI_/target" />
+	</target>
+	
+	<target name="source_package" depends="init,create_HoTTGUI_target" description="builds the source distribution package to run configure and make">
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-src.tar.gz" compression="gzip">
 			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
 				<include name="**/src/**" />
