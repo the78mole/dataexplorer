@@ -381,7 +381,7 @@
 	</fileset>
 
 	<!-- create internal temporay file structure -->
-	<target name="copy-files" depends="package">
+	<target name="copy-files" depends="package,create_HoTTGUI_target">
 		<!-- programm directory -->
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
