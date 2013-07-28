@@ -84,6 +84,7 @@ public class NMEAReaderWriter {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
+		String recordSetName = GDE.STRING_EMPTY;
 		BufferedReader reader; // to read the data
 		Channel activeChannel = null;
 		int lineNumber = 1;
@@ -109,7 +110,7 @@ public class NMEAReaderWriter {
 					NMEAReaderWriter.application.getMenuToolBar().updateChannelSelector();
 					activeChannel = NMEAReaderWriter.channels.getActiveChannel();
 				}
-				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
+				recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
@@ -269,6 +270,9 @@ public class NMEAReaderWriter {
 
 				reader.close();
 				reader = null;
+				
+				//write filename after import to record description
+				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -282,7 +286,7 @@ public class NMEAReaderWriter {
 		catch (Exception e) {
 			// check if previous records are available and needs to be displayed
 			if (activeChannel != null && activeChannel.size() > 0) {
-				String recordSetName = activeChannel.getFirstRecordSetName();
+				recordSetName = activeChannel.getFirstRecordSetName();
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records

@@ -285,6 +285,8 @@ public class CSVSerialDataReaderWriter {
 						tmpRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
 						device.updateVisibilityStatus(tmpRecordSet, true);
 					}
+					//write filename after import to record description			
+					tmpRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 				}
 				
 				if (application.getStatusBar() != null) {

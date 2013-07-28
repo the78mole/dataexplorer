@@ -1019,6 +1019,21 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public void setRecordSetDescription(String newRecordSetDescription) {
 		this.description = newRecordSetDescription;
 	}
+	
+	/**
+	 * append import file name to description text
+	 */
+	public void descriptionAppendFilename(String fileName) {
+		String tmpDescription = this.getRecordSetDescription();
+		if (this.description.contains(GDE.STRING_NEW_LINE)) {
+			this.description = this.description.substring(0, this.description.indexOf(GDE.STRING_NEW_LINE)).trim() 
+					+ Messages.getString(MessageIds.GDE_MSGT0681, new String[] {fileName})
+					+ this.description.substring(tmpDescription.indexOf(GDE.STRING_NEW_LINE));
+		}
+		else {
+			this.description = this.description.trim() + Messages.getString(MessageIds.GDE_MSGT0681, new String[] {fileName});
+		}
+	}
 
 	/**
 	 * check if all records from this record set are displayable, starts calculation if required by calling makeInActiveDisplayable()

@@ -96,6 +96,9 @@ public class FileHandler {
 				RecordSet activeRecordSet = CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemName(), isRaw);
 				activeDevice.updateVisibilityStatus(activeRecordSet, true);
 				this.application.getActiveChannel().applyTemplate(activeRecordSet.getName(), true);
+				
+				//write filename after import to record description
+				activeRecordSet.descriptionAppendFilename(csvFileDialog.getFileName());
 			}
 			catch (Exception e) {
 				FileHandler.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
