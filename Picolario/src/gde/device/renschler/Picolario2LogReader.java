@@ -208,6 +208,9 @@ public class Picolario2LogReader {
 					menuToolBar.updateChannelSelector();
 					menuToolBar.updateRecordSetSelectCombo();
 				}
+				
+				//write filename after import to record description
+				recordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 				log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
