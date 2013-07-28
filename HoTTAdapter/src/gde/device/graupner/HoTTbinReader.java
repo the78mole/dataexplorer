@@ -534,11 +534,14 @@ public class HoTTbinReader {
 				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 					device.makeInActiveDisplayable(recordSet);
 					device.updateVisibilityStatus(recordSet, true);
+					
+					//write filename after import to record description
+					recordSet.descriptionAppendFilename(file.getName());
 				}
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				HoTTbinReader.application.setProgress(100, sThreadId);
+				HoTTbinReader.application.setProgress(100, sThreadId);			
 			}
 		}
 		finally {
@@ -889,6 +892,9 @@ public class HoTTbinReader {
 				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 					device.makeInActiveDisplayable(recordSet);
 					device.updateVisibilityStatus(recordSet, true);
+					
+					//write filename after import to record description
+					recordSet.descriptionAppendFilename(file.getName());
 				}
 
 				menuToolBar.updateChannelSelector();

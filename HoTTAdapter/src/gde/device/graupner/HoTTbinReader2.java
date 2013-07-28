@@ -334,6 +334,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
 				}
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
+				
+				//write filename after import to record description
+				recordSet.descriptionAppendFilename(file.getName());
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
@@ -607,6 +610,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
 				}
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
+				
+				//write filename after import to record description
+				recordSet.descriptionAppendFilename(file.getName());
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
