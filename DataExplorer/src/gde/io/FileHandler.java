@@ -733,12 +733,12 @@ public class FileHandler {
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 				
 				StringBuffer errorTxt = new StringBuffer();
-				if (0 < activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
-				if (0 < activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
-				if (0 < activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
-				if (0 < activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
+				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
+				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
+				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
+				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
 				if (errorTxt.length() > 1) {
-					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0051));
+					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0051, new String[]{errorTxt.toString()}));
 					return;
 				}
 
