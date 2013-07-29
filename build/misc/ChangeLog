@@ -2,7 +2,8 @@ Development history / change log, please read from bottom up
 
 Version 3.1.2 - xx yyy 2013
 all devices mainly importing data - write filename after import to record set description
-HoTTAdapter* - fix balance calculation
+HoTTAdapter* - fix balance calculation while import from bin
+fix IGC export file error
 
 Version 3.1.1 - 22 Jul 2013
 fix problem while target reference ordinal of cell voltage is not returned from device
