@@ -843,7 +843,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					minVotage = HoTTbinReader2.pointsGeneral[j + 23] < minVotage ? HoTTbinReader2.pointsGeneral[j + 23] : minVotage;
 				}
 			}
-			HoTTbinReader2.pointsGeneral[22] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			HoTTbinReader2.pointsGeneral[22] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
 			HoTTbinReader2.pointsGeneral[29] = DataParser.parse2Short(_buf2, 8) * 1000;
 			HoTTbinReader2.pointsGeneral[8] = HoTTbinReader2.tmpHeight * 1000;
 			HoTTbinReader2.pointsGeneral[9] = (DataParser.parse2UnsignedShort(_buf3, 2) - 30000) * 10;
@@ -899,7 +899,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 			}
 			//calculate balance on the fly
-			HoTTbinReader2.pointsElectric[39] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			HoTTbinReader2.pointsElectric[39] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
 			HoTTbinReader2.pointsElectric[8] = HoTTbinReader2.tmpHeight * 1000;
 			HoTTbinReader2.pointsElectric[9] = (DataParser.parse2UnsignedShort(_buf4, 1) - 30000) * 10;
 			HoTTbinReader2.pointsElectric[10] = HoTTbinReader2.tmpClimb3 * 1000;

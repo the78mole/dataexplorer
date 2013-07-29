@@ -1150,7 +1150,7 @@ public class HoTTbinReader {
 					minVotage = HoTTbinReader.pointsGeneral[j + 6] < minVotage ? HoTTbinReader.pointsGeneral[j + 6] : minVotage;
 				}
 			}
-			HoTTbinReader.pointsGeneral[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			HoTTbinReader.pointsGeneral[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
 			HoTTbinReader.pointsGeneral[12] = DataParser.parse2Short(_buf2, 8) * 1000;
 			HoTTbinReader.pointsGeneral[13] = HoTTbinReader.tmpHeight * 1000;
 			HoTTbinReader.pointsGeneral[14] = DataParser.parse2UnsignedShort(_buf3, 2) * 1000;
@@ -1208,7 +1208,7 @@ public class HoTTbinReader {
 				}
 			}
 			//calculate balance on the fly
-			HoTTbinReader.pointsElectric[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			HoTTbinReader.pointsElectric[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
 			HoTTbinReader.pointsElectric[20] = HoTTbinReader.tmpHeight * 1000;
 			HoTTbinReader.pointsElectric[21] = DataParser.parse2UnsignedShort(_buf4, 1) * 1000;
 			HoTTbinReader.pointsElectric[22] = HoTTbinReader.tmpClimb3 * 1000;
