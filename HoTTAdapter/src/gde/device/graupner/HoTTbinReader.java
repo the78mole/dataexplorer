@@ -105,37 +105,45 @@ public class HoTTbinReader {
 				fileInfo = new HashMap<String, String>();
 				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
 					HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
-				for (int i = 0; i < 120; i++) {
-					data_in.read(buffer);
-					if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
-						HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+				long position = (file.length()-120*64)/2;
+				if (position <= 0) 
+					sensorCount = 1;
+				
+				if (sensorCount == 0) {
+					data_in.skip(position);
+					for (int i = 0; i < 120; i++) {
+						data_in.read(buffer);
+						if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
+							HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 
-					switch (buffer[7]) {
-					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-						HoTTAdapter.isSensorType[1] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-						HoTTAdapter.isSensorType[2] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-						HoTTAdapter.isSensorType[3] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-						HoTTAdapter.isSensorType[4] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-						HoTTAdapter.isSensorType[5] = true;
-						break;
+						switch (buffer[7]) {
+						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+							HoTTAdapter.isSensorType[1] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+							HoTTAdapter.isSensorType[2] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+							HoTTAdapter.isSensorType[3] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+							HoTTAdapter.isSensorType[4] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+							HoTTAdapter.isSensorType[5] = true;
+							break;
+						}
 					}
-				}
-				for (boolean element : HoTTAdapter.isSensorType) {
-					if (element == true) ++sensorCount;
+					for (boolean element : HoTTAdapter.isSensorType) {
+						if (element == true) ++sensorCount;
+					}
 				}
 				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
 				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
 
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
-					HoTTbinReader.log.logp(java.util.logging.Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
+				if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
+					HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
 				}
 			}
 			else {
@@ -486,18 +494,10 @@ public class HoTTbinReader {
 							HoTTbinReader.buf2 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
 						}
-						if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-							HoTTbinReader.buf3 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-						}
-						if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-							HoTTbinReader.buf4 = new byte[30];
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-						}
 						
 						if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
 							parseAddSpeedControl(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
-							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
 						}
 						break;
 					}
@@ -1139,7 +1139,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGeneral[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf3, 5);
-			HoTTbinReader.pointsGeneral[2] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader.pointsGeneral[2] > 10000 && (HoTTbinReader.pointsGeneral[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsGeneral[2]) ? HoTTbinReader.pointsGeneral[2] : HoTTbinReader.tmpCurrent * 1000;
+			HoTTbinReader.pointsGeneral[2] = (!HoTTAdapter.isFilterEnabled && HoTTbinReader.pointsGeneral[2] > 10000 && (HoTTbinReader.pointsGeneral[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsGeneral[2]) ? HoTTbinReader.pointsGeneral[2] : HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsGeneral[3] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader.pointsGeneral[4] = Double.valueOf(HoTTbinReader.pointsGeneral[1] / 1000.0 * HoTTbinReader.pointsGeneral[2]).intValue();
 			HoTTbinReader.pointsGeneral[5] = 0;
@@ -1189,7 +1189,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsElectric[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf3, 5);
-			HoTTbinReader.pointsElectric[2] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader.pointsElectric[2] > 10000 && (HoTTbinReader.pointsElectric[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsElectric[2]) ? HoTTbinReader.pointsElectric[2] : HoTTbinReader.tmpCurrent * 1000;
+			HoTTbinReader.pointsElectric[2] = (!HoTTAdapter.isFilterEnabled && HoTTbinReader.pointsElectric[2] > 10000 && (HoTTbinReader.pointsElectric[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsElectric[2]) ? HoTTbinReader.pointsElectric[2] : HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsElectric[3] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader.pointsElectric[4] = Double.valueOf(HoTTbinReader.pointsElectric[1] / 1000.0 * HoTTbinReader.pointsElectric[2]).intValue(); // power U*I [W];
 			HoTTbinReader.pointsElectric[5] = 0; //5=Balance

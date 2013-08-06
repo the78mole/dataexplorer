@@ -54,10 +54,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	public static synchronized void read(String filePath) throws Exception {
 		HashMap<String, String> header = null;
 		File file = new File(filePath);
-		HoTTbinReader2.log.log(java.util.logging.Level.FINER, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
+		HoTTbinReader2.log.log(Level.FINER, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
 		header = getFileInfo(file);
-
-		HoTTbinReader2.log.log(java.util.logging.Level.FINE, file.getName() + " - " + "sensor count = " + header.get(HoTTAdapter.SENSOR_COUNT));
 
 		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1)
 			readSingle(file);
@@ -833,7 +831,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsGeneral[18] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader2.tmpCurrent = DataParser.parse2Short(_buf3, 5);
-			HoTTbinReader2.pointsGeneral[19] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsGeneral[19] > 10000 && (HoTTbinReader2.pointsGeneral[19] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsGeneral[19]) ? HoTTbinReader2.pointsGeneral[19] : HoTTbinReader2.tmpCurrent * 1000;
+			HoTTbinReader2.pointsGeneral[19] = (!HoTTAdapter.isFilterEnabled && HoTTbinReader2.pointsGeneral[19] > 10000 && (HoTTbinReader2.pointsGeneral[19] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsGeneral[19]) ? HoTTbinReader2.pointsGeneral[19] : HoTTbinReader2.tmpCurrent * 1000;
 			HoTTbinReader2.pointsGeneral[20] = HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsGeneral[21] = Double.valueOf(HoTTbinReader2.pointsGeneral[18] / 1000.0 * HoTTbinReader2.pointsGeneral[19]).intValue();
 			for (int j = 0; j < 6; j++) {
@@ -881,7 +879,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsElectric[35] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader2.tmpCurrent = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader2.pointsElectric[36] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsElectric[36] > 10000 && (HoTTbinReader2.pointsElectric[36] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsElectric[36]) ? HoTTbinReader2.pointsElectric[36] : HoTTbinReader2.tmpCurrent;
+			HoTTbinReader2.pointsElectric[36] = (!HoTTAdapter.isFilterEnabled && HoTTbinReader2.pointsElectric[36] > 10000 && (HoTTbinReader2.pointsElectric[36] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsElectric[36]) ? HoTTbinReader2.pointsElectric[36] : HoTTbinReader2.tmpCurrent;
 			HoTTbinReader2.pointsElectric[37] = HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsElectric[38] = Double.valueOf(HoTTbinReader2.pointsElectric[35] / 1000.0 * HoTTbinReader2.pointsElectric[36]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
