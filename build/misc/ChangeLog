@@ -4,6 +4,8 @@ Version 3.1.2 - xx yyy 2013
 all devices mainly importing data - write filename after import to record set description
 HoTTAdapter* - fix balance calculation while import from bin
 HoTTAdapter* - fix switch off filter capability for current GAM/EAM
+HoTTAdapter* - adapt filter current, allow 255 A max
+HoTTAdapter* - adapt filter capacity high increase value without increasing energy
 fix IGC export file error
 
 Version 3.1.1 - 22 Jul 2013
