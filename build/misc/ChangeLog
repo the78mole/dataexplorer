@@ -9,6 +9,7 @@ HoTTAdapter* - adapt filter capacity high increase value without increasing ener
 fix IGC export file error
 add name of import file to description for all devices receiving data via import
 add Ultra Duo Plus 80 (Graupner) dual channel 1000W charger
+JetiAdapter - add import progress display
 documentation update
 
 Version 3.1.1 - 22 Jul 2013
