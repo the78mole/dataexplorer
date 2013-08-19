@@ -484,9 +484,24 @@ public class StringHelper {
 	 * @param size
 	 * @return string with converted characters
 	 */
-	public static String byte2CharString(byte[] bytes, int size) {
+	public static String byte2CharString(final byte[] bytes, final int size) {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(size).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < size; i++) {
+			sb.append(String.format("%c", (char)bytes[i])); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * convert a byte array into a 2 hex character string representation
+	 * @param bytes
+	 * @param start
+	 * @param size
+	 * @return string with converted characters
+	 */
+	public static String byte2CharString(final byte[] bytes, final int start, final int size) {
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(start).append(GDE.STRING_SEMICOLON).append(size).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		for (int i = start >= 0 ? start : 0; i < size; i++) {
 			sb.append(String.format("%c", (char)bytes[i])); //$NON-NLS-1$
 		}
 		return sb.toString();
