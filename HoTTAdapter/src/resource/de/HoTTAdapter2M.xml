@@ -2,7 +2,7 @@
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V22.xsd">
     <Device>
         <name implementation="gde.device.graupner.HoTTAdapter2M">HoTTAdapter2M</name>
-        <manufacturer>Graupner</manufacturer>
+        <manufacturer>Graupner(Mikrokopter)</manufacturer>
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>logger</group>
         <image>HoTTAdapter2M.png</image>
