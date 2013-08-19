@@ -602,11 +602,13 @@ public class TelemetryData {
    * @param file nazev souboru
    * @return
    */
-  boolean loadJML(String filename) 
-  {
-    try 
-    {
+  boolean loadJML(String filename) {
+  	DataExplorer application = DataExplorer.getInstance();
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		
+    try {
       File file = new File(filename);
+      
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document doc = db.parse(file);
@@ -625,8 +627,7 @@ public class TelemetryData {
           this.data.add(tel);
           //Projdu atributy
           NodeList elements = fstElmnt.getElementsByTagName("attrDescription"); //$NON-NLS-1$
-          for(int i=0;i<elements.getLength();i++)
-          {
+          for(int i=0; i<elements.getLength(); i++) {
             Node var = elements.item(i);
             if (var.getNodeType() == Node.ELEMENT_NODE)
             {
@@ -661,30 +662,45 @@ public class TelemetryData {
             }
           }
         }
+				int progress = s*100/(sensors.getLength()*2/3);
+				if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+					application.setProgress(progress, sThreadId);
+					try {
+						Thread.sleep(2);
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+
       }
       return true;
     } 
-    catch (Exception e)
-    {
+    catch (Exception e) {
       this.getData().clear();
     	log.log(Level.SEVERE, e.getMessage(), e);
       DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2901, new String[] {filename}));
       //JOptionPane.showMessageDialog(null, "Chyba JML, " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       return false;
     }
-    
   }
 
   /**
    * Nahraje soubor CSV. Vraci info o uspechu
    */
   boolean loadCSV(String file) {
+  	DataExplorer application = DataExplorer.getInstance();
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+  	
     int line = 0;
     try {
       // Open the file that is the first
       // command line parameter
       FileInputStream fis = new FileInputStream(file);
       InputStreamReader in = new InputStreamReader(fis, "windows-1250"); //$NON-NLS-1$
+      
+      long inputFileSize = new File(file).length();
+      int progressLineLength = 0;
 
       //FileInputStream fstream = new FileInputStream(file);
       // Get the object of DataInputStream
@@ -701,6 +717,18 @@ public class TelemetryData {
           this.modelName = strLine.substring(1).trim();
           continue;
         }
+        
+				progressLineLength = progressLineLength > strLine.length() ? progressLineLength : strLine.length();
+				int progress = (int) (line*100/(inputFileSize/progressLineLength));
+				if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+					application.setProgress(progress, sThreadId);
+					try {
+						Thread.sleep(2);
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
 
         String arr[] = strLine.split(";"); //$NON-NLS-1$
         if (arr != null && arr.length > 0) {
@@ -716,7 +744,7 @@ public class TelemetryData {
       DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2902,new String[] { file, String.valueOf(line)}));
       //JOptionPane.showMessageDialog(null, "Chyba na Å™Ã¡dku " + String.valueOf(line) + ", " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       return false;
-    }
+    } 
   }
 
 

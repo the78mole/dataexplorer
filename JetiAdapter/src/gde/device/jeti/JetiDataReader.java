@@ -83,12 +83,9 @@ public class JetiDataReader {
 	public static RecordSet read(String filePath, JetiAdapter device, String recordNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException,
 			DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
-		long inputFileSize = new File(filePath).length();
-		int progressLineLength = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO));
 		boolean isOutdated = false;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
@@ -247,10 +244,6 @@ public class JetiDataReader {
 						index = 0;
 						//System.out.println();
 					}
-					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
-					int progress = (int) (lineNumber * 100 / (inputFileSize / progressLineLength));
-					if (application.getStatusBar() != null && progress % 5 == 0) application.setProgress(progress, sThreadId);
-
 					if (application.getStatusBar() != null) application.setProgress(100, sThreadId);
 
 					activeChannel.setActiveRecordSet(recordSetName);
