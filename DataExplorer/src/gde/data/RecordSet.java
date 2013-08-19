@@ -1690,12 +1690,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			}
 			
 			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
-			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = Integer.valueOf(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(TIME_GRID_LINE_STYLE);
-			if (tmpValue != null && tmpValue.length() > 0) this.timeGridLineStyle = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.timeGridLineStyle = Integer.valueOf(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(TIME_GRID_COLOR);
 			if (tmpValue != null && tmpValue.length() > 5)
-				this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(GDE.STRING_COMMA)[0]), new Integer(tmpValue.split(GDE.STRING_COMMA)[1]), new Integer(tmpValue
+				this.timeGridColor = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue
 						.split(GDE.STRING_COMMA)[2]));
 
 			// begin depreciated
@@ -1712,19 +1712,19 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD_ORDINAL);
 			if (tmpValue != null && tmpValue.length() > 0) {
 				try {
-					this.horizontalGridRecordOrdinal = new Integer(tmpValue.trim());
+					this.horizontalGridRecordOrdinal = Integer.valueOf(tmpValue.trim());
 				}
 				catch (Exception e) {
 					this.horizontalGridRecordOrdinal = -1; 
 				}
 			}
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
-			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = Integer.valueOf(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_LINE_STYLE);
-			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridLineStyle = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridLineStyle = Integer.valueOf(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_COLOR);
 			if (tmpValue != null && tmpValue.length() > 5)
-				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(GDE.STRING_COMMA)[0]), new Integer(tmpValue.split(GDE.STRING_COMMA)[1]), new Integer(tmpValue
+				this.horizontalGridColor = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue
 						.split(GDE.STRING_COMMA)[2]));
 				
 			tmpValue = recordSetProps.get(SMOOTH_AT_CURRENT_DROP);
@@ -1734,7 +1734,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 0) {
 				String[] strVoltageValues = tmpValue.trim().split(GDE.STRING_COMMA);
 				for (int i = 0; i < strVoltageValues.length && i < this.voltageLimits.length; i++) {
-					this.voltageLimits[i] = new Integer(strVoltageValues[i].trim());
+					this.voltageLimits[i] = Integer.valueOf(strVoltageValues[i].trim());
 				}
 			}
 		}

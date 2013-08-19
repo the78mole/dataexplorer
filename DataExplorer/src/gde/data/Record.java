@@ -681,7 +681,7 @@ public class Record extends Vector<Integer> {
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = Double.valueOf(property.getValue()).doubleValue();
 		else
 			try {
 				value = this.getDevice().getMeasurementFactor(this.parent.parent.number, this.ordinal);
@@ -704,7 +704,7 @@ public class Record extends Vector<Integer> {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = Double.valueOf(property.getValue()).doubleValue();
 		else
 			try {
 				value = this.getDevice().getMeasurementOffset(this.parent.parent.number, this.ordinal);
@@ -727,11 +727,11 @@ public class Record extends Vector<Integer> {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = Double.valueOf(property.getValue()).doubleValue();
 		else {
 			try {
 				String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.parent.parent.number, this.ordinal, IDevice.REDUCTION);
-				if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
+				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
@@ -1538,13 +1538,13 @@ public class Record extends Vector<Integer> {
 		//PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 		//if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 		//	Record syncRecord = this.parent.get(this.ordinal);
-		//		displayPointValue = syncRecord.df.format(new Double(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		//		displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		//}	
 		//else 
 		if(this.parent.isZoomMode)
-			displayPointValue = this.df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+			displayPointValue = this.df.format(Double.valueOf(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		else
-			displayPointValue = this.df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+			displayPointValue = this.df.format(Double.valueOf(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		
 		return displayPointValue;
 	}
@@ -1574,9 +1574,9 @@ public class Record extends Vector<Integer> {
 	public String getVerticalDisplayDeltaAsFormattedValue(int deltaPos, Rectangle drawAreaBounds) {
 		String textValue;
 		if(this.parent.isZoomMode || this.parent.isScopeMode)
-			textValue = this.df.format(new Double((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
+			textValue = this.df.format(Double.valueOf((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
 		else
-			textValue = this.df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+			textValue = this.df.format(Double.valueOf((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
 	
 		return textValue;
 	}
@@ -1862,11 +1862,11 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
-		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(GDE.STRING_COMMA)[0]), new Integer(tmpValue.split(GDE.STRING_COMMA)[1]), new Integer(tmpValue.split(GDE.STRING_COMMA)[2]));
+		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
 		tmpValue = recordProps.get(LINE_WITH);
-		if (tmpValue!=null && tmpValue.length() > 0) this.lineWidth =  new Integer(tmpValue.trim()).intValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.lineWidth =  Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(LINE_STYLE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.lineStyle =  new Integer(tmpValue.trim()).intValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.lineStyle =  Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(IS_ROUND_OUT);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isRoundOut =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_START_POINT_ZERO);
@@ -1874,15 +1874,15 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_START_END_DEFINED);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isStartEndDefined =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(NUMBER_FORMAT);
-		if (tmpValue!=null && tmpValue.length() > 0) this.setNumberFormat(new Integer(tmpValue.trim()).intValue());
+		if (tmpValue!=null && tmpValue.length() > 0) this.setNumberFormat(Integer.valueOf(tmpValue.trim()).intValue());
 		tmpValue = recordProps.get(MAX_VALUE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.maxValue =  new Integer(tmpValue.trim()).intValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.maxValue =  Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(MIN_VALUE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.minValue =  new Integer(tmpValue.trim()).intValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.minValue =  Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(DEFINED_MAX_VALUE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.maxScaleValue =  new Double(tmpValue.trim()).doubleValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.maxScaleValue =  Double.valueOf(tmpValue.trim()).doubleValue();
 		tmpValue = recordProps.get(DEFINED_MIN_VALUE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  new Double(tmpValue.trim()).doubleValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  Double.valueOf(tmpValue.trim()).doubleValue();
 		tmpValue = recordProps.get(DATA_TYPE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.dataType =  Record.DataType.fromValue(tmpValue);
 
