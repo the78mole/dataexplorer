@@ -1139,7 +1139,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGeneral[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf3, 5);
-			HoTTbinReader.pointsGeneral[2] = (!HoTTAdapter.isFilterEnabled && HoTTbinReader.pointsGeneral[2] > 10000 && (HoTTbinReader.pointsGeneral[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsGeneral[2]) ? HoTTbinReader.pointsGeneral[2] : HoTTbinReader.tmpCurrent * 1000;
+			HoTTbinReader.pointsGeneral[2] = (!HoTTAdapter.isFilterEnabled && (HoTTbinReader.pointsGeneral[2] > 10000 && (HoTTbinReader.pointsGeneral[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsElectric[2])) ? HoTTbinReader.pointsGeneral[2] : HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsGeneral[3] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader.pointsGeneral[4] = Double.valueOf(HoTTbinReader.pointsGeneral[1] / 1000.0 * HoTTbinReader.pointsGeneral[2]).intValue();
 			HoTTbinReader.pointsGeneral[5] = 0;
@@ -1189,7 +1189,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsElectric[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			//filter current drops to zero if current > 10 A
 			HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf3, 5);
-			HoTTbinReader.pointsElectric[2] = (!HoTTAdapter.isFilterEnabled && HoTTbinReader.pointsElectric[2] > 10000 && (HoTTbinReader.pointsElectric[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsElectric[2]) ? HoTTbinReader.pointsElectric[2] : HoTTbinReader.tmpCurrent * 1000;
+			HoTTbinReader.pointsElectric[2] = (!HoTTAdapter.isFilterEnabled && (HoTTbinReader.pointsElectric[2] > 10000 && (HoTTbinReader.pointsElectric[2] - HoTTbinReader.tmpCurrent) == HoTTbinReader.pointsElectric[2])) ? HoTTbinReader.pointsElectric[2] : HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsElectric[3] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader.pointsElectric[4] = Double.valueOf(HoTTbinReader.pointsElectric[1] / 1000.0 * HoTTbinReader.pointsElectric[2]).intValue(); // power U*I [W];
 			HoTTbinReader.pointsElectric[5] = 0; //5=Balance

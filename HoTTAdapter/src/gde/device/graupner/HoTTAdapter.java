@@ -558,7 +558,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 29) * 1000;
@@ -723,7 +723,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 						points[1] = tmpVoltage * 1000; 
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 22) * 1000;

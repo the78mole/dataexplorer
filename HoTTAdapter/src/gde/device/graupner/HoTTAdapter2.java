@@ -370,7 +370,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
 					if (this.application.getActiveChannelNumber() == 4) {					
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 							//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 							points[78] = tmpVoltage * 1000;
 							points[79] = tmpCurrent * 1000;
@@ -382,7 +382,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					else {
 						//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 							points[58] = tmpVoltage * 1000;
 							points[59] = tmpCurrent * 1000;
 							points[60] = DataParser.parse2Short(dataBuffer, 29) * 1000;
@@ -548,7 +548,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
 					if (this.application.getActiveChannelNumber() == 4) {
 						//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 							points[74] = tmpVoltage * 1000; 
 							points[75] = tmpCurrent * 1000;
 							points[76] = DataParser.parse2Short(dataBuffer, 22) * 1000;
@@ -560,7 +560,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					else {
 						//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
 							points[58] = tmpVoltage * 1000; 
 							points[59] = tmpCurrent * 1000;
 							points[60] = DataParser.parse2Short(dataBuffer, 22) * 1000;
