@@ -30,6 +30,7 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
 import java.util.logging.Logger;
@@ -117,6 +118,7 @@ public class GathererThread extends Thread {
 
 				case UltraDuoPlus40:
 				case UltraDuoPlus45:
+				case UltraDuoPlus80:
 					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
 					this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
 					this.isProgrammExecuting3 = false;
@@ -257,6 +259,26 @@ public class GathererThread extends Thread {
 							}
 						}
 						break;
+						
+					case UltraDuoPlus80:
+						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
+							recordSet1 = (RecordSet) ch1[0];
+							this.recordSetKey1 = (String) ch1[1];
+						}
+						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
+							System.arraycopy(dataBuffer, buffer.length - 4, buffer, 0, buffer.length);
+							if (log.isLoggable(Level.FINER)) {
+								log.log(Level.FINER, StringHelper.byte2CharString(dataBuffer, 1, buffer.length));
+								log.log(Level.FINER, StringHelper.byte2CharString(buffer, 1, buffer.length));
+							}
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
+							recordSet2 = (RecordSet) ch2[0];
+							this.recordSetKey2 = (String) ch2[1];
+						}
+						break;
+
 					}
 					
 					//finalize record sets for devices with > 1 outlet channel while one is still processing
@@ -387,7 +409,9 @@ public class GathererThread extends Thread {
 		// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 		int processNumber = this.device.getProcessingMode(dataBuffer);
 		String processName = this.device.USAGE_MODE[processNumber];
-
+		if (log.isLoggable(Level.FINER)) {
+			log.log(Level.FINER, "processName = " + processName + " " + processNumber);
+		}
 		Channel channel = this.channels.get(number);
 		if (channel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required

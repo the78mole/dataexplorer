@@ -1,4 +1,3 @@
-package gde.device.graupner;
 /**************************************************************************************
   	This file is part of GNU DataExplorer.
 
@@ -17,7 +16,7 @@ package gde.device.graupner;
     
     Copyright (c) 2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
-
+package gde.device.graupner;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -42,7 +41,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 
 /**
- * Graupner Ultra Duo Plus 60 base class
+ * Graupner Ultra Duo Plus 50 base class
  * @author Winfried Brügmann
  */
 public class UltraDuoPlus50 extends Ultramat {

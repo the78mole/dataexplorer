@@ -62,7 +62,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 	public enum GraupnerDeviceType {
 		//0=Ultramat50, 1=UltraDuoPlus40, 2=UltramatTrio14, 3=Ultramat18 4=Ultramat45, 5=Ultramat60, 6=UltramatTrioPlus16S ?=Ultramat12 ?=Ultramat16 ?=Ultramat16S
-		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, /*unknown*/Ultramat16S
+		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, /*unknown*/Ultramat16S, UltraDuoPlus80
 	};
 
 	protected String[]														USAGE_MODE;
@@ -361,7 +361,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 						byte[] dataBuffer = this.serialPort.getData(false);
 						this.firmware = this.getFirmwareVersion(dataBuffer);
 						//check if device fits this.device.getProductCode(dataBuffer)
-						if (this.getDeviceTypeIdentifier().ordinal() != this.getProductCode(dataBuffer)) {
+						if (!this.getDeviceTypeIdentifier().name().equals(this.getClass().getSimpleName()) && this.getDeviceTypeIdentifier().ordinal() != this.getProductCode(dataBuffer)) {
 							int answer = this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW2202, new String[] {GraupnerDeviceType.values()[this.getProductCode(dataBuffer)].toString()}));
 							if (answer == SWT.YES) {
 								this.application.getDeviceSelectionDialog().setupDevice(GraupnerDeviceType.values()[this.getProductCode(dataBuffer)].toString());
