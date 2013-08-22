@@ -168,124 +168,129 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					switch ((byte) (HoTTbinReader2.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-						//fill data block 1 to 2
-						if (HoTTbinReader2.buf[33] == 1) {
-							HoTTbinReader2.buf1 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
-						}
-						if (HoTTbinReader2.buf[33] == 2) {
-							HoTTbinReader2.buf2 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
-						}
-
-						if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null) {
-							version = parseVario(version, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = null;
-							isSensorData = true;
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
+							//fill data block 1 to 2
+							if (HoTTbinReader2.buf[33] == 1) {
+								HoTTbinReader2.buf1 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
+							}
+							if (HoTTbinReader2.buf[33] == 2) {
+								HoTTbinReader2.buf2 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
+							}
+							if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null) {
+								version = parseVario(version, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
+								HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = null;
+								isSensorData = true;
+							}
 						}
 						break;
 
 					case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-						//fill data block 1 to 3
-						if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
-							HoTTbinReader2.buf1 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
-						}
-						if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
-							HoTTbinReader2.buf2 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
-						}
-						if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
-							HoTTbinReader2.buf3 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
-						}
-
-						if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null) {
-							parseGPS(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = null;
-							isSensorData = true;
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
+							//fill data block 1 to 3
+							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
+								HoTTbinReader2.buf1 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
+							}
+							if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
+								HoTTbinReader2.buf2 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
+							}
+							if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
+								HoTTbinReader2.buf3 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
+							}
+							if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null) {
+								parseGPS(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
+								HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = null;
+								isSensorData = true;
+							}
 						}
 						break;
 
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-						//fill data block 1 to 4
-						if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
-							HoTTbinReader2.buf1 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
-						}
-						if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
-							HoTTbinReader2.buf2 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
-						}
-						if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
-							HoTTbinReader2.buf3 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
-						}
-						if (HoTTbinReader2.buf4 == null && HoTTbinReader2.buf[33] == 4) {
-							HoTTbinReader2.buf4 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
-						}
-
-						if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
-							parseGeneral(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
-							isSensorData = true;
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+							//fill data block 1 to 4
+							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
+								HoTTbinReader2.buf1 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
+							}
+							if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
+								HoTTbinReader2.buf2 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
+							}
+							if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
+								HoTTbinReader2.buf3 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
+							}
+							if (HoTTbinReader2.buf4 == null && HoTTbinReader2.buf[33] == 4) {
+								HoTTbinReader2.buf4 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
+							}
+							if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
+								parseGeneral(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+								HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
+								isSensorData = true;
+							}
 						}
 						break;
 
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-						//fill data block 1 to 4
-						if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
-							HoTTbinReader2.buf1 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
-						}
-						if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
-							HoTTbinReader2.buf2 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
-						}
-						if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
-							HoTTbinReader2.buf3 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
-						}
-						if (HoTTbinReader2.buf4 == null && HoTTbinReader2.buf[33] == 4) {
-							HoTTbinReader2.buf4 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
-						}
-
-						if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
-							parseElectric(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
-							isSensorData = true;
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+							//fill data block 1 to 4
+							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
+								HoTTbinReader2.buf1 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
+							}
+							if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
+								HoTTbinReader2.buf2 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
+							}
+							if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
+								HoTTbinReader2.buf3 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
+							}
+							if (HoTTbinReader2.buf4 == null && HoTTbinReader2.buf[33] == 4) {
+								HoTTbinReader2.buf4 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
+							}
+							if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
+								parseElectric(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+								HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
+								isSensorData = true;
+							}
 						}
 						break;
 
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-						//fill data block 0 to 4
-						if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
-							HoTTbinReader2.buf1 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
-						}
-						if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
-							HoTTbinReader2.buf2 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
-						}
-						if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
-							HoTTbinReader2.buf3 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
-						}
-						if (HoTTbinReader2.buf4 == null && HoTTbinReader2.buf[33] == 4) {
-							HoTTbinReader2.buf4 = new byte[30];
-							System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
-						}
-
-						if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null) {
-							parseSpeedControl(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, channelNumber);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
-							isSensorData = true;
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+							//fill data block 0 to 4
+							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
+								HoTTbinReader2.buf1 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf1, 0, HoTTbinReader2.buf1.length);
+							}
+							if (HoTTbinReader2.buf2 == null && HoTTbinReader2.buf[33] == 2) {
+								HoTTbinReader2.buf2 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf2, 0, HoTTbinReader2.buf2.length);
+							}
+							if (HoTTbinReader2.buf3 == null && HoTTbinReader2.buf[33] == 3) {
+								HoTTbinReader2.buf3 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf3, 0, HoTTbinReader2.buf3.length);
+							}
+							if (HoTTbinReader2.buf4 == null && HoTTbinReader2.buf[33] == 4) {
+								HoTTbinReader2.buf4 = new byte[30];
+								System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
+							}
+							if (HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null) {
+								parseSpeedControl(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, channelNumber);
+								HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
+								isSensorData = true;
+							}
 						}
 						break;
 					}
@@ -460,57 +465,67 @@ public class HoTTbinReader2 extends HoTTbinReader {
 							switch (lastSensor) {
 							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-								if (isVarioData && isReceiverData) {
-									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
-									//System.out.println("isVarioData i = " + i);
-									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
+									if (isVarioData && isReceiverData) {
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
+										//System.out.println("isVarioData i = " + i);
+										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+									}
+									parseVario(1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
+									isVarioData = true;
 								}
-								parseVario(1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
-								isVarioData = true;
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-								if (isGPSData && isReceiverData) {
-									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
-									//System.out.println("isGPSData i = " + i);
-									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
+									if (isGPSData && isReceiverData) {
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
+										//System.out.println("isGPSData i = " + i);
+										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+									}
+									parseGPS(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
+									isGPSData = true;
 								}
-								parseGPS(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
-								isGPSData = true;
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-								if (isGeneralData && isReceiverData) {
-									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
-									//System.out.println("isGeneralData i = " + i);
-									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+									if (isGeneralData && isReceiverData) {
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
+										//System.out.println("isGeneralData i = " + i);
+										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
+									}
+									parseGeneral(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+									isGeneralData = true;
 								}
-								parseGeneral(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-								isGeneralData = true;
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-								if (isElectricData && isReceiverData) {
-									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
-									//System.out.println("isElectricData i = " + i);
-									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+									if (isElectricData && isReceiverData) {
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
+										//System.out.println("isElectricData i = " + i);
+										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+									}
+									parseElectric(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+									isElectricData = true;
 								}
-								parseElectric(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-								isElectricData = true;
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-								if (isMotorDriverData && isReceiverData) {
-									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
-									//System.out.println("isElectricData i = " + i);
-									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+									if (isMotorDriverData && isReceiverData) {
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
+										//System.out.println("isElectricData i = " + i);
+										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
+									}
+									parseSpeedControl(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, channelNumber);
+									isMotorDriverData = true;
 								}
-								parseSpeedControl(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, channelNumber);
-								isMotorDriverData = true;
 								break;
 							}
 
@@ -730,9 +745,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-			HoTTbinReader2.tmpHeight = DataParser.parse2Short(_buf1, 2);
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpHeight > 1 && HoTTbinReader2.tmpHeight < 5000) {
-				HoTTbinReader2.pointsVario[8] = (HoTTbinReader2.tmpHeight - 500) * 1000;
+			HoTTbinReader2.tmpHeight = DataParser.parse2Short(_buf1, 2) - 500;
+			if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader2.tmpHeight >= -490 && HoTTbinReader2.tmpHeight < 5000)) {
+				HoTTbinReader2.pointsVario[8] = HoTTbinReader2.tmpHeight * 1000;
 				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
 				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
 				HoTTbinReader2.pointsVario[9] = (DataParser.parse2UnsignedShort(_buf1, 8) - 30000) * 10;
@@ -756,10 +771,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 */
 	private static void parseGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
 		HoTTbinReader2.tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
+		HoTTbinReader2.tmpClimb1 = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000);
 		HoTTbinReader2.tmpClimb3 = (_buf3[2] & 0xFF) - 120;
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -50 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000) {
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
-			//8=Height, 9=Climb 1, 10=Climb 3
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader2.tmpClimb1 > -20000 && HoTTbinReader2.tmpClimb3 > -90 && HoTTbinReader2.tmpHeight >= -490 && HoTTbinReader2.tmpHeight < 5000)) {
+			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb1, 5=Climb3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
+			//8=Height, 9=Climb1, 10=Climb3
 			//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 			HoTTbinReader2.pointsGPS[14] = DataParser.parse2Short(_buf1, 4) * 1000;
 
@@ -798,7 +814,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			}
 
 			HoTTbinReader2.pointsGPS[8] = HoTTbinReader2.tmpHeight * 1000;
-			HoTTbinReader2.pointsGPS[9] = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000) * 10;
+			HoTTbinReader2.pointsGPS[9] =  HoTTbinReader2.tmpClimb1 * 10;
 			HoTTbinReader2.pointsGPS[10] = HoTTbinReader2.tmpClimb3 * 1000;
 			HoTTbinReader2.pointsGPS[14] = DataParser.parse2Short(_buf1, 4) * 1000;
 			HoTTbinReader2.pointsGPS[15] = DataParser.parse2Short(_buf2, 6) * 1000;
@@ -824,13 +840,13 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 > -50 && HoTTbinReader2.tmpHeight > -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
-				&& Math.abs(HoTTbinReader2.tmpVoltage2) < 600) {
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader2.tmpClimb3 >  -90 && HoTTbinReader2.tmpHeight >= -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
+				&& Math.abs(HoTTbinReader2.tmpVoltage2) < 600)) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader2.pointsGeneral[18] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader2.pointsGeneral[19] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader2.pointsGeneral[20] = HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity < HoTTbinReader2.pointsGeneral[20] / 1000	? HoTTbinReader2.pointsGeneral[20] : HoTTbinReader2.tmpCapacity * 1000;
+			HoTTbinReader2.pointsGeneral[20] = /*HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity < HoTTbinReader2.pointsGeneral[20] / 1000	? HoTTbinReader2.pointsGeneral[20] : */ HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsGeneral[21] = Double.valueOf(HoTTbinReader2.pointsGeneral[18] / 1000.0 * HoTTbinReader2.pointsGeneral[19]).intValue();
 			for (int j = 0; j < 6; j++) {
 				HoTTbinReader2.pointsGeneral[j + 23] = (_buf1[3 + j] & 0xFF) * 1000;
@@ -870,13 +886,13 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpClimb3 >= -120 && HoTTbinReader2.tmpHeight >= -500 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
-				&& Math.abs(HoTTbinReader2.tmpVoltage2) < 600) {
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader2.tmpClimb3 > -90 && HoTTbinReader2.tmpHeight >= -490 && HoTTbinReader2.tmpHeight < 5000 && Math.abs(HoTTbinReader2.tmpVoltage1) < 600
+				&& Math.abs(HoTTbinReader2.tmpVoltage2) < 600)) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader2.pointsElectric[35] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader2.pointsElectric[36] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader2.pointsElectric[37] = HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsElectric[37] / 1000 ? HoTTbinReader2.pointsElectric[37] : HoTTbinReader2.tmpCapacity * 1000;
+			HoTTbinReader2.pointsElectric[37] = /*HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsElectric[37] / 1000 ? HoTTbinReader2.pointsElectric[37] :*/ HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsElectric[38] = Double.valueOf(HoTTbinReader2.pointsElectric[35] / 1000.0 * HoTTbinReader2.pointsElectric[36]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
 				HoTTbinReader2.pointsElectric[j + 40] = (_buf1[3 + j] & 0xFF) * 1000;
@@ -969,7 +985,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		if (channelNumber == 4) {
 			//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage > 0 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000
-					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[80]/1000) {
+					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 /*&& HoTTbinReader2.tmpCapacity < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[80]/1000*/) {
 				HoTTbinReader2.pointsSpeedControl[78] = HoTTbinReader2.tmpVoltage * 1000;
 				HoTTbinReader2.pointsSpeedControl[79] = HoTTbinReader2.tmpCurrent * 1000;
 				HoTTbinReader2.pointsSpeedControl[81] = Double.valueOf(HoTTbinReader2.pointsSpeedControl[78] / 1000.0 * HoTTbinReader2.pointsSpeedControl[79]).intValue();

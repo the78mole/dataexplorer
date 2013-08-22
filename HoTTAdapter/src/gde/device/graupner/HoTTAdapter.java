@@ -107,7 +107,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
 
 	final static int												QUERY_GAP_MS											= 15;
-	final static boolean										isSensorType[]										= { false, false, false, false, false, false };																																			//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
+	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																			//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 

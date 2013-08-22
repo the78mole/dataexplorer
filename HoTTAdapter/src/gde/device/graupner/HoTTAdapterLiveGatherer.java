@@ -241,23 +241,23 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			this.dialog.selectTab(1);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[1]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
 			this.dialog.selectTab(2);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[2]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
 			this.dialog.selectTab(3);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[3]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
 			this.dialog.selectTab(4);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[4]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
 			this.dialog.selectTab(5);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[5]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
 			this.dialog.selectTab(7);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
 		}
