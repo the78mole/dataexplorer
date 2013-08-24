@@ -1,7 +1,8 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.2 - xx yyy 2013
+Version 3.1.2 - 24 Aug 2013
 all devices mainly importing data - write filename after import to record set description
+HoTTAdapter* - fix sensor mash up due to newly introduced sensor scan
 HoTTAdapter* - fix balance calculation while import from bin
 HoTTAdapter* - fix switch off filter capability for current GAM/EAM
 HoTTAdapter* - adapt filter current, allow 255 A max
