@@ -1,17 +1,15 @@
-GNU DataExplorer - News - comes with version 3.1.1
+GNU DataExplorer - News - comes with version 3.1.2
 
-1)  problem while target reference ordinal of cell voltage is not returned from device
-2)  HoTTAdapter* - adapt GPS filter
-3)  HoTTAdapter* - adapt ESC filter
-4)  HoTTAdapter* - updates for HoTTViewer tab
-5)  HoTTAdapter* - add SD Log version 1 which appears after firmware update MX20
-6)  add Junsi iCharger3010B
-7)  enable extended special record data types 
-8)  enable device specific data parser
-9)  add 4D-Akkumonitor 
-10) update SWT to 4.2.2 final stable release
-11) fix import/export of generic CSV data
-12) fix statistics value display if trigger configured but no occurrence
+1)  all devices mainly importing data - write filename after import to record set description
+2)  HoTTAdapter* - fix sensor mash up due to newly introduced sensor scan
+3)  HoTTAdapter* - fix balance calculation while import from bin
+3)  HoTTAdapter* - fix switch off filter capability for current GAM/EAM
+4)  HoTTAdapter* - adapt filter current, allow 255 A max
+5)  HoTTAdapter* - adapt filter
+6)  fix IGC export file error
+7)  JetiAdapter - add import progress display
+8)  add Ultra Duo Plus 80 (Graupner) dual channel 1000W charger
+9)  documentation update
 
 
 
