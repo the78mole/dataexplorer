@@ -1,5 +1,8 @@
 Development history / change log, please read from bottom up
 
+Version 3.1.3 - xx yyy 2013
+add support for Junsi CellLog 8s
+
 Version 3.1.2 - 24 Aug 2013
 all devices mainly importing data - write filename after import to record set description
 HoTTAdapter* - fix sensor mash up due to newly introduced sensor scan
