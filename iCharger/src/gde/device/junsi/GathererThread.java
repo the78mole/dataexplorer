@@ -141,9 +141,10 @@ public class GathererThread extends Thread {
 						measurementCount = 0;
 					}
 
-					// prepare the data for adding to record set
+					if (measurementCount > 0)// prepare the data for adding to record set
+					 recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));//constant time step
+					
 					++measurementCount;
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));//constant time step
 
 					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);

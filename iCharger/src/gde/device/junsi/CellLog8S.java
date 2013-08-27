@@ -96,7 +96,8 @@ public class CellLog8S extends iCharger {
 					break;
 			}
 
-			recordSet.addPoints(convertDataBytes(points, convertBuffer));
+			if ( i > 1) //first measurement seams always contain only zeros as values
+				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			offset += lovDataSize+8;
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
