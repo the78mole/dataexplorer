@@ -84,6 +84,7 @@ public class TimeSteps extends Vector<Long> {
 		}
   	else {
   		this.startTime = toBeClonedTimeSteps.startTime;
+			this.add(toBeClonedTimeSteps.get(0));
   	}
   	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 	}
