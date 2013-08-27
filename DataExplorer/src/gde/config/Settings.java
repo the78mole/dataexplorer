@@ -182,6 +182,7 @@ public class Settings extends Properties {
 	public final static String			AUTO_OPEN_TOOL_BOX						= "auto_open_tool_box";																																					//$NON-NLS-1$
 	public static final String			LOCALE_IN_USE									= "locale_in_use";																																							//$NON-NLS-1$
 	public static final String			LOCALE_CHANGED								= "locale_changed";																																							//$NON-NLS-1$
+	public static final String			TIME_FORMAT_IN_USE						= "time_format_in_use";																																							//$NON-NLS-1$
 	public static final String			IS_DESKTOP_SHORTCUT_CREATED		= "is_desktop_shotcut_created";																																	//$NON-NLS-1$
 	public static final String			IS_APPL_REGISTERED						= "is_GDE_registered";																																					//$NON-NLS-1$
 	public static final String			IS_LOCK_UUCP_HINTED						= "is_lock_uucp_hinted";																																				//$NON-NLS-1$
@@ -564,6 +565,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.AUTO_OPEN_TOOL_BOX, isAutoOpenToolBox())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_IN_USE, getLocale().getLanguage())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_CHANGED, getLocaleChanged())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.TIME_FORMAT_IN_USE, getTimeFormat())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DESKTOP_SHORTCUT_CREATED, this.isDesktopShortcutCreated())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
@@ -1343,6 +1345,22 @@ public class Settings extends Properties {
 			locale = Locale.ENGLISH;
 		}
 		return locale;
+	}
+
+	/**
+	 * set new time format to be used in table, while measurements and at start time while zooming
+	 * @param newTimeFormat
+	 */
+	public void setTimeFormat(String newTimeFormat) {
+		this.setProperty(Settings.TIME_FORMAT_IN_USE, newTimeFormat);
+	}
+
+	/**
+	 * query the time format to be used in table, while measurements and at start time while zooming
+	 * @return used time format as string
+	 */
+	public String getTimeFormat() {
+		return this.getProperty(Settings.TIME_FORMAT_IN_USE, Messages.getString(MessageIds.GDE_MSGT0684));
 	}
 
 	/**

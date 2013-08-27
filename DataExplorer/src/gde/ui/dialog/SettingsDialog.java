@@ -110,9 +110,9 @@ public class SettingsDialog extends Dialog {
 	CLabel															portLabel;
 	CCombo															serialPort;
 	Button															useGlobalSerialPort;
-	CLabel															localLabel;
-	CCombo															localCombo;
-	Group																groupLocale;
+	CLabel															localLabel, timeFormatLabel;
+	CCombo															localCombo, timeFormatCombo;
+	Group																groupLocale, groupTimeFormat;
 	Button															skipBluetoothDevices, doPortAvailabilityCheck;
 	Button															enableBlackListButton, enableWhiteListButton;
 	Text																serialPortBlackList, serialPortWhiteList;
@@ -224,7 +224,7 @@ public class SettingsDialog extends Dialog {
 							FormData groupLocaleLData = new FormData();
 							groupLocaleLData.height = 30;
 							groupLocaleLData.left = new FormAttachment(0, 1000, 12);
-							groupLocaleLData.right = new FormAttachment(1000, 1000, -12);
+							groupLocaleLData.right = new FormAttachment(450, 1000, -6);
 							groupLocaleLData.top = new FormAttachment(0, 1000, 7);
 							this.groupLocale = new Group(this.generalTabComposite, SWT.NONE);
 							this.groupLocale.setLayout(null);
@@ -232,11 +232,18 @@ public class SettingsDialog extends Dialog {
 							this.groupLocale.setLayoutData(groupLocaleLData);
 							this.groupLocale.setText(Messages.getString(MessageIds.GDE_MSGT0305));
 							{
+								this.localLabel = new CLabel(this.groupLocale, SWT.NONE);
+								this.localLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.localLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
+								this.localLabel.setText(Messages.getString(MessageIds.GDE_MSGT0307));
+								this.localLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0308));
+							}
+							{
 								this.localCombo = new CCombo(this.groupLocale, SWT.BORDER);
 								this.localCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.localCombo.setItems(this.supportedLocals);
 								this.localCombo.select(getLocalLanguageIndex());
-								this.localCombo.setBounds(354, GDE.IS_MAC_COCOA ? 8 : 20, 54, GDE.IS_LINUX ? 22 : 20);
+								this.localCombo.setBounds(138, GDE.IS_MAC_COCOA ? 8 : 20, 54, GDE.IS_LINUX ? 22 : 20);
 								this.localCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0306));
 								this.localCombo.setEditable(false);
 								this.localCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -250,12 +257,41 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+						}
+						{
+							FormData groupTimeFormatLData = new FormData();
+							groupTimeFormatLData.height = 30;
+							groupTimeFormatLData.left = new FormAttachment(450, 1000, 6);
+							groupTimeFormatLData.right = new FormAttachment(1000, 1000, -12);
+							groupTimeFormatLData.top = new FormAttachment(0, 1000, 7);
+							this.groupTimeFormat = new Group(this.generalTabComposite, SWT.NONE);
+							this.groupTimeFormat.setLayout(null);
+							this.groupTimeFormat.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.groupTimeFormat.setLayoutData(groupTimeFormatLData);
+							this.groupTimeFormat.setText(Messages.getString(MessageIds.GDE_MSGT0682));
 							{
-								this.localLabel = new CLabel(this.groupLocale, SWT.LEFT);
-								this.localLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.localLabel.setBounds(15, GDE.IS_MAC_COCOA ? 8 : 20, 292, 20);
-								this.localLabel.setText(Messages.getString(MessageIds.GDE_MSGT0307));
-								this.localLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0308));
+								this.timeFormatLabel = new CLabel(this.groupTimeFormat, SWT.NONE);
+								this.timeFormatLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.timeFormatLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 100, 20);
+								this.timeFormatLabel.setText(Messages.getString(MessageIds.GDE_MSGT0682));
+								this.timeFormatLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0683));
+							}
+							{
+								this.timeFormatCombo = new CCombo(this.groupTimeFormat, SWT.BORDER);
+								this.timeFormatCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.timeFormatCombo.setItems(new String[]{Messages.getString(MessageIds.GDE_MSGT0684), Messages.getString(MessageIds.GDE_MSGT0359)});
+								this.timeFormatCombo.select(getTimeFormatIndex());
+								this.timeFormatCombo.setBounds(115, GDE.IS_MAC_COCOA ? 8 : 20, 125, GDE.IS_LINUX ? 22 : 20);
+								this.timeFormatCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0683));
+								this.timeFormatCombo.setEditable(false);
+								this.timeFormatCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
+								this.timeFormatCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "timeFormatCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setTimeFormat(SettingsDialog.this.timeFormatCombo.getItems()[SettingsDialog.this.timeFormatCombo.getSelectionIndex()]);
+									}
+								});
 							}
 						}
 						{ // begin default data path group
@@ -1237,6 +1273,18 @@ public class SettingsDialog extends Dialog {
 		String language = this.settings.getLocale().toString();
 		for (; index < this.supportedLocals.length; index++) {
 			if (this.supportedLocals[index].equals(language)) return index;
+		}
+		return index;
+	}
+
+	/**
+	 * get the index of preferences locale
+	 */
+	private int getTimeFormatIndex() {
+		int index = 0; // relativ
+		String format = this.settings.getTimeFormat().toString().trim();
+		for (; index < this.timeFormatCombo.getItemCount(); index++) {
+			if (this.timeFormatCombo.getItems()[index].trim().equals(format)) return index;
 		}
 		return index;
 	}
