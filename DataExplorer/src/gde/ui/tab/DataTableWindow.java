@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -94,6 +95,7 @@ public class DataTableWindow extends CTabItem {
 	}
 
 	public void create() {
+		this.isAbsoluteDateTime = Settings.getInstance().isTimeFormatAbsolute();
 		this.dataTable = new Table(this.tabFolder, SWT.VIRTUAL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		this.setControl(this.dataTable);
 		this.dataTable.setLinesVisible(true);

@@ -1364,6 +1364,14 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * query the time format is set to absolute 
+	 * @return used time format as string
+	 */
+	public boolean isTimeFormatAbsolute() {
+		return this.getProperty(Settings.TIME_FORMAT_IN_USE, Messages.getString(MessageIds.GDE_MSGT0684)).trim().equals(Messages.getString(MessageIds.GDE_MSGT0359));
+	}
+
+	/**
 	 * get the device dialog alpha value, 50 is a good transparency starting point
 	 * @return the alphablending value
 	 */

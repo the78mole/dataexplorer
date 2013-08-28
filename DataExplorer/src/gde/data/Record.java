@@ -19,6 +19,7 @@
 package gde.data;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.ObjectFactory;
@@ -56,6 +57,8 @@ public class Record extends Vector<Integer> {
 	
 	public static final String DELIMITER 			= "|-|"; 		//$NON-NLS-1$
 	public static final String END_MARKER 		= "|:-:|"; 	//$NON-NLS-1$
+	
+	public static final Settings settings			= Settings.getInstance();
 
 	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 								// used as channelConfigKey
@@ -1227,6 +1230,14 @@ public class Record extends Vector<Integer> {
 	}
 
 	/** 
+	 * query start time in milliseconds from this record
+	 * @return time stamp of the date and time when the record starts
+	 */
+	public long getStartTime() {
+		return this.timeStep_ms == null ? this.parent.timeStep_ms.getStartTime() : this.timeStep_ms.getStartTime();
+	}
+
+	/** 
 	 * query time step time in mills seconds at index
 	 * @return time step in msec
 	 */
@@ -1460,7 +1471,8 @@ public class Record extends Vector<Integer> {
 	* @return string of time value in simple date format HH:ss:mm:SSS
 	*/
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms()); 
+		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + 
+				(Record.settings != null && Record.settings.isTimeFormatAbsolute() ? this.getStartTime() : 0.0)); 
 	}
 
 	/**

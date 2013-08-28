@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import gde.config.Settings;
 import gde.log.Level;
 import java.util.logging.Logger;
 
@@ -182,6 +183,7 @@ public class TabAreaContextMenu {
 			if (type == TYPE_TABLE) {
 				this.dateTimeItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
+				this.dateTimeItem.setSelection(Settings.getInstance().isTimeFormatAbsolute());
 				this.dateTimeItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
