@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -228,12 +229,26 @@ public class LogViewReader {
 				recordSet.setRecordSetDescription(recordSetComment);
 				recordSet.setDeserializedProperties(recordSetProperties);
 				recordSet.setSaved(true);
-//				try {
-//					recordSet.setTimeStep_ms(new Double(recordSetInfo.get(RecordSet.TIME_STEP_MS).trim()).doubleValue());
-//				}
-//				catch (NumberFormatException e) { 
-//					//ignore and use GDE value }
-//				}
+				try {
+					String[] timeStamp = recordSetComment.split(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_COMMA);
+					int index = 0;
+					while (!timeStamp[index].contains(GDE.STRING_DOT))
+						++index;
+					int year = Integer.parseInt(timeStamp[index].substring(6, timeStamp[index].length() == 10 ? 10 : 8));
+					year = timeStamp[index].length() == 10 ? year : year > 50 ? year + 1900 : year + 2000;
+					int month = Integer.parseInt(timeStamp[index].substring(3, 5));
+					int day = Integer.parseInt(timeStamp[index].substring(0, 2));
+					while (!timeStamp[index].contains(GDE.STRING_COLON))
+						++index;
+					int hour = Integer.parseInt(timeStamp[index].substring(0, 2));
+					int minute = Integer.parseInt(timeStamp[index].substring(3, 5));
+					int second = Integer.parseInt(timeStamp[index].substring(6, 8));
+					GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+					recordSet.setStartTimeStamp(calendar.getTimeInMillis());
+				}
+				catch (NumberFormatException e) { 
+					//ignore and use GDE value }
+				}
 				//recordSet.setObjectKey(recordSetInfo.get(GDE.OBJECT_KEY));
 
 				//apply record sets records properties
