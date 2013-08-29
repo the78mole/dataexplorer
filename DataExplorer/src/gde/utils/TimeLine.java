@@ -24,6 +24,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -55,6 +56,10 @@ public class TimeLine {
 
 	String									timeLineText				= Messages.getString(MessageIds.GDE_MSGT0267);
 	boolean									isTimeLinePrepared	= false;
+	final static SimpleDateFormat	timeFormatSeconds		= new SimpleDateFormat("ss.SSS");
+	final static SimpleDateFormat	timeFormatMinutes		= new SimpleDateFormat("mm:ss.SSS");
+	final static SimpleDateFormat	timeFormatHours			= new SimpleDateFormat("HH:mm:ss.SSS");
+
 
 	/**
 	 * calculates the maximum time to be displayed and the scale number factor
@@ -573,22 +578,21 @@ public class TimeLine {
 	 * @param milliSeconds
 	 * @return string of time value in simple date format HH:mm:ss:SSS
 	 */
-	public static String getFomatedTimeWithUnit(double milliSeconds) {
+	public static String getFomatedTimeWithUnit(final double milliSeconds) {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
 			long lSeconds = Double.valueOf(milliSeconds / 1000.0).longValue();
-			milliSeconds %= 1000;
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;
 			long lHours = lMinutes / 60;
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%02d:%03d [ss:SSS]", lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%s [ss:SSS]", timeFormatSeconds.format(Double.valueOf(milliSeconds).longValue())); //$NON-NLS-1$
 			else if (lHours == 0)
-				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%s [mm:ss:SSS]", timeFormatMinutes.format(Double.valueOf(milliSeconds).longValue())); //$NON-NLS-1$
 			else
-				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%s [HH:mm:ss:SSS]", timeFormatHours.format(Double.valueOf(milliSeconds).longValue())); //$NON-NLS-1$
 		}
 		return time;
 	}
@@ -610,11 +614,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%02d:%03d", lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
+				time = timeFormatSeconds.format(Double.valueOf(milliSeconds).longValue()); //$NON-NLS-1$
 			else if (lHours == 0)
-				time = String.format("%02d:%02d:%03d", lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
+				time = timeFormatMinutes.format(Double.valueOf(milliSeconds).longValue()); //$NON-NLS-1$
 			else
-				time = String.format("%02d:%02d:%02d:%03d", lHours, lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
+				time = timeFormatHours.format(Double.valueOf(milliSeconds).longValue()); //$NON-NLS-1$
 		}
 		return time;
 	}
