@@ -98,6 +98,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	boolean												isScopeMode										= false;
 	int														scopeModeOffset; 						// defines the offset in record pixel
 	int														scopeModeSize;							// defines the number of record pixels to be displayed
+	protected   	final 					Settings settings							= Settings.getInstance();
 
 	// measurement
 	String												recordKeyMeasurement;
@@ -1374,10 +1375,10 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public double getStartTime() {
 		double startTime = 0;
 		if (this.isZoomMode) {
-			startTime = this.get(0).zoomTimeOffset;
+			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute()) ? this.timeStep_ms.startTimeStamp_ms + this.get(0).zoomTimeOffset : this.get(0).zoomTimeOffset;
 		}
 		else if (this.isScopeMode) {
-			startTime = this.timeStep_ms.getTime_ms(this.scopeModeOffset+1);
+			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute()) ? this.timeStep_ms.startTimeStamp_ms + this.timeStep_ms.getTime_ms(this.scopeModeOffset+1) : this.timeStep_ms.getTime_ms(this.scopeModeOffset+1);
 		}
 		return startTime;
 	}

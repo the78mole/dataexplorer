@@ -58,7 +58,7 @@ public class Record extends Vector<Integer> {
 	public static final String DELIMITER 			= "|-|"; 		//$NON-NLS-1$
 	public static final String END_MARKER 		= "|:-:|"; 	//$NON-NLS-1$
 	
-	public static final Settings settings			= Settings.getInstance();
+	protected   	final Settings settings			= Settings.getInstance();
 
 	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 								// used as channelConfigKey
@@ -1230,11 +1230,11 @@ public class Record extends Vector<Integer> {
 	}
 
 	/** 
-	 * query start time in milliseconds from this record
+	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of this record (set)
 	 * @return time stamp of the date and time when the record starts
 	 */
-	public long getStartTime() {
-		return this.timeStep_ms == null ? this.parent.timeStep_ms.getStartTime() : this.timeStep_ms.getStartTime();
+	public long getStartTimeStamp() {
+		return this.timeStep_ms == null ? this.parent.timeStep_ms.getStartTimeStamp() : this.timeStep_ms.getStartTimeStamp();
 	}
 
 	/** 
@@ -1472,7 +1472,7 @@ public class Record extends Vector<Integer> {
 	*/
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
 		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + 
-				(Record.settings != null && Record.settings.isTimeFormatAbsolute() ? this.getStartTime() : 0.0)); 
+				(this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 0.0)); 
 	}
 
 	/**

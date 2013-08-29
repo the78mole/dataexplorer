@@ -37,9 +37,7 @@ public class TimeSteps extends Vector<Long> {
 	final boolean						isConstant;				// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
 	final SimpleDateFormat	timeFormat				= new SimpleDateFormat("HH:mm:ss.SSS");
 	final SimpleDateFormat	absoluteTimeFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	long  startTimeStamp 											= 0;
-	long  startTime														= 0;
-
+	long  startTimeStamp_ms 									= 0;
 	
 	/**
 	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
@@ -52,7 +50,7 @@ public class TimeSteps extends Vector<Long> {
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) 
 			super.add((long) (newTimeStep_ms * 10));
-		this.startTimeStamp = new Date().getTime();
+		this.startTimeStamp_ms = new Date().getTime();
 	}
 	
 	/**
@@ -61,7 +59,7 @@ public class TimeSteps extends Vector<Long> {
 	private TimeSteps(TimeSteps toBeClonedTimeSteps) {
   	super(toBeClonedTimeSteps);
   	this.isConstant = toBeClonedTimeSteps.isConstant;
-		this.startTimeStamp = toBeClonedTimeSteps.startTimeStamp;
+		this.startTimeStamp_ms = toBeClonedTimeSteps.startTimeStamp_ms;
 	}
 	
 	/**
@@ -71,7 +69,7 @@ public class TimeSteps extends Vector<Long> {
   	super(toBeClonedTimeSteps);
   	this.clear();
   	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
-			this.startTimeStamp = isFromBegin ? toBeClonedTimeSteps.startTimeStamp + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTimeStamp;
+			this.startTimeStamp_ms = isFromBegin ? toBeClonedTimeSteps.startTimeStamp_ms + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTimeStamp_ms;
 			if (isFromBegin) {
 				long cutOffVal = toBeClonedTimeSteps.get(index);
 				for (int i = index; i < toBeClonedTimeSteps.elementCount; i++) {
@@ -85,7 +83,7 @@ public class TimeSteps extends Vector<Long> {
 			}
 		}
   	else {
-  		this.startTimeStamp = toBeClonedTimeSteps.startTimeStamp;
+  		this.startTimeStamp_ms = toBeClonedTimeSteps.startTimeStamp_ms;
 			this.add(toBeClonedTimeSteps.get(0));
   	}
   	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
@@ -263,26 +261,18 @@ public class TimeSteps extends Vector<Long> {
 	
 	/**
 	 * set absolute start and end time of this record set
-	 * @param startTimeStamp
+	 * @param newStartTimeStamp_ms
 	 */
-	public void setStartTimeStamp(long startTimeStamp) {
-		this.startTimeStamp = startTimeStamp;
+	public void setStartTimeStamp(long newStartTimeStamp_ms) {
+		this.startTimeStamp_ms = newStartTimeStamp_ms;
 	}
 
 	/**
-	 * return the start time stamp
+	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of the dependent record set 
 	 * @return
 	 */
 	public long getStartTimeStamp() {
-		return this.startTimeStamp;
-	}
-	
-	/**
-	 * query the start time without date
-	 * @return
-	 */
-	public long getStartTime() {
-		return this.startTime;
+		return this.startTimeStamp_ms;
 	}
 		
 	/**
@@ -291,6 +281,6 @@ public class TimeSteps extends Vector<Long> {
 	 * @return
 	 */
 	public String getIndexDateTime(int index) {
-			return absoluteTimeFormat.format(this.startTimeStamp + getTime_ms(index));
+			return absoluteTimeFormat.format(this.startTimeStamp_ms + getTime_ms(index));
 	}
 }
