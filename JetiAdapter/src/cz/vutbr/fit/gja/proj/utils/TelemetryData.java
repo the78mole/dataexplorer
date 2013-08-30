@@ -29,6 +29,7 @@ package cz.vutbr.fit.gja.proj.utils;
 import gde.device.jeti.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.TimeLine;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +44,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.swt.SWT;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -846,7 +848,17 @@ public class TelemetryData {
           state = ST_VALUE;
           break;
         case ST_VALUE:
-          long val = Long.parseLong(param);
+				long val = 0;
+				try {
+					val = Long.parseLong(param);
+				}
+				catch (NumberFormatException e) {
+					// String value, for instance an alarm
+					String message = TimeLine.getFomatedTimeWithUnit(timestamp) + " - " + param;
+					log.log(Level.WARNING, message);
+					if (DataExplorer.getInstance().getStatusBar() != null)
+						DataExplorer.getInstance().setStatusMessage(message, SWT.COLOR_RED);
+				}
           //Pokusi se vlozit novy zaznam
           int intval=0;
           if(dataType==TelemetryData.T_DATA16)

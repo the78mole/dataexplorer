@@ -244,7 +244,11 @@ public class JetiDataReader {
 						index = 0;
 						//System.out.println();
 					}
-					if (application.getStatusBar() != null) application.setProgress(100, sThreadId);
+					if (application.getStatusBar() != null) {
+						application.setProgress(100, sThreadId);
+						//if (application.getStatusBar().getMessage().length > 0)
+						//	isAlarmMEssageDisplayed = true;
+					}
 
 					activeChannel.setActiveRecordSet(recordSetName);
 					activeChannel.applyTemplate(recordSetName, true);
@@ -279,11 +283,11 @@ public class JetiDataReader {
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 		}
-		finally {
-			if (application.getStatusBar() != null) {
-				application.setStatusMessage(GDE.STRING_EMPTY);
-			}
-		}
+//		finally {
+//			if (application.getStatusBar() != null) {
+//				application.setStatusMessage(GDE.STRING_EMPTY);
+//			}
+//		}
 
 		return recordSet;
 	}
