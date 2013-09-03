@@ -18,13 +18,12 @@
 ****************************************************************************************/
 package gde.device.junsi;
 
-import java.util.logging.Logger;
-
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -32,6 +31,8 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+
+import java.util.logging.Logger;
 
 
 /**
@@ -88,6 +89,7 @@ public class GathererThread extends Thread {
 		//StringBuilder sb = new StringBuilder();
 		byte[] dataBuffer = null;
 		String processName = GDE.STRING_EMPTY;
+		int minAnswerLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))/3;
 
 		this.isCollectDataStopped = false;
 		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
@@ -102,6 +104,8 @@ public class GathererThread extends Thread {
 				// check if device is ready for data capturing
 				// device sends at the end of transmission $ENDBULK;64
 				try {
+					if (dataBuffer.length > minAnswerLength)
+						continue; //CellLog returns $STARTBULK;69;1000;65 or $ENDBULK;64 or $NEWSECTION;1000;48
 					processName = this.device.getProcessName(dataBuffer);
 					isProgrammExecuting = true;
 					if (GathererThread.log.isLoggable(Level.FINE))
