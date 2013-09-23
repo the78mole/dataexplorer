@@ -4,7 +4,8 @@ Version 3.1.3 - xx yyy 2013
 add support for Junsi CellLog 8s
 fix bug in clone time steps while time step is constant
 add capability to globally configure time format for table, measurement, start time while zooming/oscilloscope 
-JetiAdapter - adapt data parser to tolerate alarm messages 
+JetiAdapter - adapt data parser to tolerate string messages like alarm and signal loss
+LiPoWatch - correct calculation of total voltage 
 
 Version 3.1.2 - 24 Aug 2013
 all devices mainly importing data - write filename after import to record set description
