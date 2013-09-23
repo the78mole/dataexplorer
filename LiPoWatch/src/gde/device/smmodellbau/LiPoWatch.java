@@ -230,13 +230,13 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			tmpValue = ((dataBuffer[2 * i + 16] & 0xFF) << 8) + (dataBuffer[2 * i + 15] & 0xFF);
 			points[i + 5] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
 			if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			totalVotage += points[i + 4];
+			totalVotage += points[i + 5];
 			maxVotage = points[i + 5] > maxVotage ? points[i + 5] : maxVotage;
 			minVotage = points[i + 5] < minVotage ? points[i + 5] : minVotage;
 		}
 		//measurement modus absolute/relative
 		boolean isRelative = ((dataBuffer[9] & 0xF0) >> 4) == 1;
-		points[0] = isRelative ? totalVotage : points[i + 3]; // total battery voltage
+		points[0] = isRelative ? totalVotage : points[i + 4]; // total battery voltage
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.insert(0, "(0)" + points[0] + "; "); //$NON-NLS-1$ //$NON-NLS-2$	
 		
 		points[4] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
