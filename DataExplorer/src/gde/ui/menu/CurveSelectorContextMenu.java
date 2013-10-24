@@ -61,7 +61,7 @@ public class CurveSelectorContextMenu {
 	Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu, measurementMenu;
 	MenuItem											recordName, lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
 	MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
-	MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3, smoothAtCurrentDropItem;
+	MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3, smoothAtCurrentDropItem, smoothVoltageCurveItem;
 	MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
 	MenuItem											axisNumberFormat, axisNumberFormatAuto, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
 	MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
@@ -421,7 +421,22 @@ public class CurveSelectorContextMenu {
 					}
 				}
 			});
-			
+
+			if (true) { //TODO
+				this.smoothVoltageCurveItem = new MenuItem(popupmenu, SWT.CHECK);
+				this.smoothVoltageCurveItem.setText(Messages.getString(MessageIds.GDE_MSGT0685));
+				this.smoothVoltageCurveItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						log.log(Level.FINEST, "smoothVoltageCurveItem selected evt=" + e); //$NON-NLS-1$
+						if (CurveSelectorContextMenu.this.recordSet != null) {
+							boolean checked = CurveSelectorContextMenu.this.smoothVoltageCurveItem.getSelection();
+							CurveSelectorContextMenu.this.recordSet.setSmoothVoltageCurve(checked);
+							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						}
+					}
+				});
+			}
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			this.axisEndValues = new MenuItem(popupmenu, SWT.CASCADE);
