@@ -338,9 +338,12 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(i + Record.IS_START_END_DEFINED, Boolean.valueOf(record.isStartEndDefined()).toString());
 				this.template.setProperty(i + Record.DEFINED_MAX_VALUE, Double.valueOf(record.getMaxScaleValue()).toString());
 				this.template.setProperty(i + Record.DEFINED_MIN_VALUE, Double.valueOf(record.getMinScaleValue()).toString());
-				//smooth current droprecordS
+				//smooth current drop
 				this.template.setProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
 				recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+				//smooth voltage curve
+				this.template.setProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
+				recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
 				// time grid
 				color = recordSet.getColorTimeGrid();
 				rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
@@ -394,6 +397,8 @@ public class Channel extends HashMap<String, RecordSet> {
 						record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
 						//smooth current drop
 						recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+						//smooth voltage curve
+						recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
 						// time grid
 						color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
@@ -431,6 +436,8 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setNumberFormat(lastActiveRecord.numberFormat); //$NON-NLS-1$
 					//smooth current drop
 					recordSet.setSmoothAtCurrentDrop(lastActiveRecord.parent.isSmoothAtCurrentDrop);
+					//smooth voltage curve
+					recordSet.setSmoothVoltageCurve(lastActiveRecord.parent.isSmoothVoltageCurve);
 					// time grid
 					recordSet.setTimeGridColor(lastActiveRecord.parent.timeGridColor);
 					recordSet.setTimeGridLineStyle(lastActiveRecord.parent.timeGridLineStyle);
@@ -481,6 +488,8 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
 					//smooth current drop
 					recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+					//smooth voltage curve
+					recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
 					// time grid
 					color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();

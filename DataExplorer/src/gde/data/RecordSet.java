@@ -108,12 +108,15 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	Vector<Integer[]>							currentDropShadow								= new Vector<Integer[]>(0);
 	public static final String		SMOOTH_AT_CURRENT_DROP					= "RecordSet_smoothAtCurrentDrop";						//$NON-NLS-1$
 
+	boolean												isSmoothVoltageCurve						= false;
+	public static final String		SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";						  //$NON-NLS-1$
+
 	public static final String		DESCRIPTION_TEXT_LEAD					= Messages.getString(MessageIds.GDE_MSGT0129);
 
 	public static final int				MAX_NAME_LENGTH								= 40;
 
 	public static final String		TIME_STEP_MS									= "timeStep_ms";																//$NON-NLS-1$
-	public final static String		START_TIME_STAMP							= "startTimeStamp";														//$NON-NLS-1$
+	public final static String		START_TIME_STAMP							= "startTimeStamp";														  //$NON-NLS-1$
 	public static final String		TIME													= "time";																				//$NON-NLS-1$
 	public static final String		TIME_GRID_TYPE								= "RecordSet_timeGridType";											//$NON-NLS-1$
 	public static final String		TIME_GRID_COLOR								= "RecordSet_timeGridColor";										//$NON-NLS-1$
@@ -1642,6 +1645,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 				.append(GDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
 		
 		sb.append(SMOOTH_AT_CURRENT_DROP).append(GDE.STRING_EQUAL).append(this.isSmoothAtCurrentDrop).append(Record.DELIMITER);
+		sb.append(SMOOTH_VOLTAGE_CURVE).append(GDE.STRING_EQUAL).append(this.isSmoothVoltageCurve).append(Record.DELIMITER);
 		
 		sb.append(VOLTAGE_LIMITS).append(GDE.STRING_EQUAL);
 		for (int value : this.voltageLimits) {
@@ -1730,6 +1734,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 				
 			tmpValue = recordSetProps.get(SMOOTH_AT_CURRENT_DROP);
 			if (tmpValue != null && tmpValue.length() > 0) this.isSmoothAtCurrentDrop = Boolean.valueOf(tmpValue.trim()).booleanValue();
+			tmpValue = recordSetProps.get(SMOOTH_VOLTAGE_CURVE);
+			if (tmpValue != null && tmpValue.length() > 0) this.isSmoothVoltageCurve = Boolean.valueOf(tmpValue.trim()).booleanValue();
 
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {
@@ -2148,6 +2154,21 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public void setSmoothAtCurrentDrop(boolean enable) {
 		this.isSmoothAtCurrentDrop = enable;
+	}
+	
+	/**
+	 * query boolean value to enable curve smoothing due to pulsed voltage curve
+	 */
+	public boolean isSmoothVoltageCurve() {
+		return this.isSmoothVoltageCurve;
+	}
+	
+	/**
+	 * set boolean value to enable curve smoothing due to pulsed voltage curve
+	 * @param enable
+	 */
+	public void setSmoothVoltageCurve(boolean enable) {
+		this.isSmoothVoltageCurve = enable;
 	}
 	
 	/**

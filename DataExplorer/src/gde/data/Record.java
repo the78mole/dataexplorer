@@ -169,6 +169,7 @@ public class Record extends Vector<Integer> {
 
 	//current drop, make curve capable to be smoothed
 	boolean             isCurrentRecord 			= false;
+	boolean             isVoltageRecord 			= false;
 	int             		dropStartIndex 				= 0;
 	int             		dropEndIndex 					= 0;
 	boolean             dropIndexWritten 			= true;
@@ -211,7 +212,9 @@ public class Record extends Vector<Integer> {
 		GPS_ALTITUDE("GPS altitude"),		//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
 		GPS_AZIMUTH("GPS azimuth"),			//GPS azimuth, to be used for live display and positioning of icon if used
 		SPEED("speed"),									//speed, to be used for KMZ export with colors of specified velocity
-		DATE_TIME("date time");					//special data type where no formatting or calculation can be executed, just display
+		DATE_TIME("date time"),					//special data type where no formatting or calculation can be executed, just display
+		CURRENT("current"),							//data type to unique identify current type, mainly used for smoothing current drops
+		VOLTAGE("voltage");							//data type to unique identify voltage type, to smoothing reflex or pulsing voltage values
 		
 		private final String	value;
 
@@ -279,6 +282,7 @@ public class Record extends Vector<Integer> {
 		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
 		
 		this.isCurrentRecord = this.unit.equalsIgnoreCase("A") && this.symbol.toUpperCase().contains("I");
+		this.isVoltageRecord = this.unit.equalsIgnoreCase("V") && this.symbol.equalsIgnoreCase("u");
 	}
 
 	/**
@@ -316,6 +320,7 @@ public class Record extends Vector<Integer> {
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
 		this.isCurrentRecord = record.isCurrentRecord;
+		this.isVoltageRecord = record.isVoltageRecord;
 
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
@@ -367,6 +372,7 @@ public class Record extends Vector<Integer> {
 		this.maxValue = 0;
 		this.minValue = 0;
 		this.isCurrentRecord = record.isCurrentRecord;
+		this.isVoltageRecord = record.isVoltageRecord;
 		this.clear();
 		this.trimToSize();
 		
@@ -999,20 +1005,37 @@ public class Record extends Vector<Integer> {
 			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
 		}
+		int returnValue = super.get(index);
 		//log.log(Level.INFO, "index=" + index);
 		if (elementCount != 0) {
-			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
-				for (Integer[] dropArea :  this.parent.currentDropShadow) {
-					if (dropArea[0] <= index && dropArea[1] >= index) {
-						int dropStartValue = super.get(dropArea[0]);
-						int dropEndValue = super.get(dropArea[1]);
-						double dropDeltaValue = (double)(dropEndValue - dropStartValue) / (dropArea[1] - dropArea[0]);
-						return (int) (dropStartValue + dropDeltaValue * (index - dropArea[0]));
+			if (!this.parent.isCompareSet) {
+				if (this.isVoltageRecord && this.parent.isSmoothVoltageCurve && index > 5 && super.size() > 5) {
+					int[] value = new int[5];
+					int avg = 0;
+					int i = index - 4;
+					for (int j = 0; i <= index; ++i, ++j) {
+						value[j] = super.get(i);
+						avg += super.get(i);
+					}
+					avg /= 5;
+					i = 4;
+					for (; i > 0 && value[i] < avg;) 
+						--i;
+					returnValue = value[i]; //TODO do not return, this skip smooting by current drop
+				}
+				if (this.parent.isSmoothAtCurrentDrop) {
+					for (Integer[] dropArea :  this.parent.currentDropShadow) {
+						if (dropArea[0] <= index && dropArea[1] >= index) {
+							int dropStartValue = super.get(dropArea[0]);
+							int dropEndValue = super.get(dropArea[1]);
+							double dropDeltaValue = (double)(dropEndValue - dropStartValue) / (dropArea[1] - dropArea[0]);
+							returnValue = (int) (dropStartValue + dropDeltaValue * (index - dropArea[0]));
+						}
 					}
 				}
 			}
 
-			return super.get(index);
+			return returnValue;
 		}
 		return 0;
 	}
