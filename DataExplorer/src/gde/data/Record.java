@@ -168,8 +168,11 @@ public class Record extends Vector<Integer> {
 	double							maxDisplayValue;									// max value in device units, correspond to draw area
 
 	//current drop, make curve capable to be smoothed
-	boolean             isCurrentRecord 			= false;
 	boolean             isVoltageRecord 			= false;
+	final int 					voltageValuesSize			= 5;
+	int[] 							voltageValues 				= new int[voltageValuesSize];
+	int 								voltageValuesAvg 			= 0;
+	boolean             isCurrentRecord 			= false;
 	int             		dropStartIndex 				= 0;
 	int             		dropEndIndex 					= 0;
 	boolean             dropIndexWritten 			= true;
@@ -1009,20 +1012,6 @@ public class Record extends Vector<Integer> {
 		//log.log(Level.INFO, "index=" + index);
 		if (elementCount != 0) {
 			if (!this.parent.isCompareSet) {
-				if (this.isVoltageRecord && this.parent.isSmoothVoltageCurve && index > 5 && super.size() > 5) {
-					int[] value = new int[5];
-					int avg = 0;
-					int i = index - 4;
-					for (int j = 0; i <= index; ++i, ++j) {
-						value[j] = super.get(i);
-						avg += super.get(i);
-					}
-					avg /= 5;
-					i = 4;
-					for (; i > 0 && value[i] < avg;) 
-						--i;
-					returnValue = value[i]; //TODO do not return, this skip smooting by current drop
-				}
 				if (this.parent.isSmoothAtCurrentDrop) {
 					for (Integer[] dropArea :  this.parent.currentDropShadow) {
 						if (dropArea[0] <= index && dropArea[1] >= index) {
@@ -1032,6 +1021,20 @@ public class Record extends Vector<Integer> {
 							returnValue = (int) (dropStartValue + dropDeltaValue * (index - dropArea[0]));
 						}
 					}
+				}
+				if (this.isVoltageRecord && this.parent.isSmoothVoltageCurve && index > voltageValuesSize && super.size() > voltageValuesSize) {
+					//this.voltageValues = new int[5];
+					this.voltageValuesAvg = 0;
+					int i = index - voltageValuesSize + 1;
+					for (int j = 0; i <= index; ++i, ++j) {
+						this.voltageValues[j] = super.get(i);
+						this.voltageValuesAvg += super.get(i);
+					}
+					this.voltageValuesAvg /= voltageValuesSize;
+					i = voltageValuesSize - 1;
+					for (; i >= 0 && this.voltageValues[i] > this.voltageValuesAvg;) 
+						--i;
+					returnValue = voltageValues[i];
 				}
 			}
 

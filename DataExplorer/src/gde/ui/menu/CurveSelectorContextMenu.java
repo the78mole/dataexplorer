@@ -83,6 +83,7 @@ public class CurveSelectorContextMenu {
 	Record												actualRecord = null;
 	boolean 											isRecordVisible = false;
 	boolean 											isSmoothAtCurrentDrop = false;
+	boolean 											isSmoothVoltageCurve = false;
 	String 												recordNameKey = null;
 	String 												recordNameMeasurement = GDE.STRING_BLANK;
 	boolean 											isWindowTypeCompare = false;
@@ -122,6 +123,8 @@ public class CurveSelectorContextMenu {
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
 										CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
 										CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
+										CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothVoltageCurve();
+										CurveSelectorContextMenu.this.smoothVoltageCurveItem.setSelection(CurveSelectorContextMenu.this.isSmoothVoltageCurve);
 										// check measurement selections
 										//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
 										//disable all menu items which makes only sense if record is visible
@@ -154,6 +157,7 @@ public class CurveSelectorContextMenu {
 								// compare window has fixed defined scale end values
 								if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
+									CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(false);
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 									CurveSelectorContextMenu.this.axisPosition.setEnabled(false);
 									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
@@ -162,6 +166,7 @@ public class CurveSelectorContextMenu {
 								// utility window
 								if (CurveSelectorContextMenu.this.isWindowTypeUtility) {
 									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
+									CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(false);
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 									CurveSelectorContextMenu.this.measurement.setEnabled(false);
 								}
@@ -422,21 +427,19 @@ public class CurveSelectorContextMenu {
 				}
 			});
 
-			if (true) { //TODO
-				this.smoothVoltageCurveItem = new MenuItem(popupmenu, SWT.CHECK);
-				this.smoothVoltageCurveItem.setText(Messages.getString(MessageIds.GDE_MSGT0685));
-				this.smoothVoltageCurveItem.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event e) {
-						log.log(Level.FINEST, "smoothVoltageCurveItem selected evt=" + e); //$NON-NLS-1$
-						if (CurveSelectorContextMenu.this.recordSet != null) {
-							boolean checked = CurveSelectorContextMenu.this.smoothVoltageCurveItem.getSelection();
-							CurveSelectorContextMenu.this.recordSet.setSmoothVoltageCurve(checked);
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						}
+			this.smoothVoltageCurveItem = new MenuItem(popupmenu, SWT.CHECK);
+			this.smoothVoltageCurveItem.setText(Messages.getString(MessageIds.GDE_MSGT0685));
+			this.smoothVoltageCurveItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "smoothVoltageCurveItem selected evt=" + e); //$NON-NLS-1$
+					if (CurveSelectorContextMenu.this.recordSet != null) {
+						boolean checked = CurveSelectorContextMenu.this.smoothVoltageCurveItem.getSelection();
+						CurveSelectorContextMenu.this.recordSet.setSmoothVoltageCurve(checked);
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
-				});
-			}
+				}
+			});
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			this.axisEndValues = new MenuItem(popupmenu, SWT.CASCADE);
@@ -1183,6 +1186,7 @@ public class CurveSelectorContextMenu {
 		this.lineWidth.setEnabled(enabled);
 		this.lineType.setEnabled(enabled);
 		this.smoothAtCurrentDropItem.setEnabled(enabled); 
+		this.smoothVoltageCurveItem.setEnabled(enabled);
 		this.axisEndValues.setEnabled(enabled);
 		this.axisNumberFormat.setEnabled(enabled);
 		this.axisPosition.setEnabled(enabled);
