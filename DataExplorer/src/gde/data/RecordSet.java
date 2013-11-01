@@ -1877,8 +1877,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 				synchronized (tmpRecord) {
 					if (tmpRecord.isVisible && tmpRecord.isDisplayable) {
 						isAffected = true;
-						int tmpMin = (int) (tmpRecord.getMinValue() * tmpRecord.syncMasterFactor);
-						int tmpMax = (int) (tmpRecord.getMaxValue() * tmpRecord.syncMasterFactor);
+						int tmpMin = Double.valueOf(tmpRecord.getMinValue() * tmpRecord.syncMasterFactor).intValue();
+						int tmpMax = Double.valueOf(tmpRecord.getMaxValue() * tmpRecord.syncMasterFactor).intValue();
 						if (tmpMin != 0 || tmpMax != 0) {
 							if (log.isLoggable(Level.FINE))
 								log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$

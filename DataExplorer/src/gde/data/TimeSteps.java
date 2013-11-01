@@ -49,7 +49,7 @@ public class TimeSteps extends Vector<Long> {
 		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) 
-			super.add((long) (newTimeStep_ms * 10));
+			super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
 		this.startTimeStamp_ms = new Date().getTime();
 	}
 	
@@ -156,7 +156,7 @@ public class TimeSteps extends Vector<Long> {
 	 */
 	public synchronized boolean add(double value) {
 		synchronized (this) {
-			return this.isConstant ? true : super.add((long) (value * 10));
+			return this.isConstant ? true : super.add(Double.valueOf(value * 10).longValue());
 		}
 	}
 	
