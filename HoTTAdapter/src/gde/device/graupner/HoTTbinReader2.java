@@ -108,6 +108,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.buf3 = null;
 		HoTTbinReader2.buf4 = null;
 		int version = -1;
+		HoTTbinReader2.lostPackages.clear();
+		HoTTbinReader2.countLostPackages = 0;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader2.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -168,6 +170,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					switch ((byte) (HoTTbinReader2.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+						log.warning("Vario");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
 							//fill data block 1 to 2
 							if (HoTTbinReader2.buf[33] == 1) {
@@ -188,6 +191,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+						log.warning("GPS");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
 							//fill data block 1 to 3
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -212,6 +216,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+						log.warning("GAM");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
 							//fill data block 1 to 4
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -240,6 +245,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+						log.warning("EAM");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
 							//fill data block 1 to 4
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -268,6 +274,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+						log.warning("ESC");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
 							//fill data block 0 to 4
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -306,12 +313,18 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.timeStep_ms += 10; // add default time step from device of 10 msec
 
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					
+					if (HoTTbinReader2.countLostPackages > 0) {
+						HoTTbinReader2.lostPackages.add(HoTTbinReader2.countLostPackages);
+						HoTTbinReader2.countLostPackages = 0;
+					}
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter2.reverseChannelPackageLossCounter.add(0);
 					HoTTbinReader2.points[0] = HoTTAdapter2.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
+					++HoTTbinReader2.countLostPackages;
 					//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (channelNumber == 4) {
@@ -324,7 +337,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = tmpRecordSet.getRecordDataSize(true) > 0 ? String.format("%.1f", (countPackageLoss / tmpRecordSet.getTime_ms(tmpRecordSet.getRecordDataSize(true)-1) * 1000)) : "0";
-			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage}));
+			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage, HoTTbinReader2.lostPackages.getStatistics()}));
 			HoTTbinReader2.logger.logp(java.util.logging.Level.WARNING, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			
@@ -406,6 +419,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountMotorDriver = 0;
+		HoTTbinReader2.lostPackages.clear();
+		HoTTbinReader2.countLostPackages = 0;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader2.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -571,6 +586,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						//System.out.println("isReceiverData i = " + i);
 						isReceiverData = false;
 					}
+					else if (channelNumber == 4) {
+						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
+					}
 
 					//fill data block 0 to 4
 					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
@@ -592,12 +610,18 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.timeStep_ms += 10;// add default time step from log record of 10 msec
 				
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					
+					if (HoTTbinReader2.countLostPackages > 0) {
+						HoTTbinReader2.lostPackages.add(HoTTbinReader2.countLostPackages);
+						HoTTbinReader2.countLostPackages = 0;
+					}
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter2.reverseChannelPackageLossCounter.add(0);
 					HoTTbinReader2.points[0] = HoTTAdapter2.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
+					++HoTTbinReader2.countLostPackages;
 					//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (channelNumber == 4) {
@@ -610,7 +634,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = tmpRecordSet.getRecordDataSize(true) > 0 ? String.format("%.1f", (countPackageLoss / tmpRecordSet.getTime_ms(tmpRecordSet.getRecordDataSize(true)-1) * 1000)) : "0";
-			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage}));
+			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage, HoTTbinReader2.lostPackages.getStatistics()}));
 			HoTTbinReader2.logger.logp(java.util.logging.Level.WARNING, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			

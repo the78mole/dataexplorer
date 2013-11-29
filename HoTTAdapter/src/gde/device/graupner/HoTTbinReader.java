@@ -81,7 +81,9 @@ public class HoTTbinReader {
 	static int								tmpLongitudeDelta			= 0;
 	static double							longitudeTolerance		= 1;
 	static long								lastLongitudeTimeStep	= 0;
+	static int								countLostPackages			= 0; 
 	
+	static ReverseChannelPackageLossStatistics		lostPackages					= new ReverseChannelPackageLossStatistics();
 	/**
 	 * get data file info data
 	 * @param buffer byte array containing the first 64 byte to analyze the header
@@ -234,6 +236,8 @@ public class HoTTbinReader {
 		HoTTbinReader.buf3 = null;
 		HoTTbinReader.buf4 = null;
 		int version = -1;
+		HoTTbinReader.lostPackages.clear();
+		HoTTbinReader.countLostPackages = 0;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -509,12 +513,18 @@ public class HoTTbinReader {
 					}
 
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					
+					if (HoTTbinReader.countLostPackages > 0) {
+						HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
+						HoTTbinReader.countLostPackages = 0;
+					}
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 					HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
 					++countPackageLoss;	// add up lost packages in telemetry data 
+					++HoTTbinReader.countLostPackages;
 					//HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (HoTTAdapter.isChannelsChannelEnabled) {
@@ -527,7 +537,7 @@ public class HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f", (countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true)-1) * 1000)) : "0";
-			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage}));
+			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics()}));
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -629,6 +639,8 @@ public class HoTTbinReader {
 		HoTTbinReader.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
+		HoTTbinReader.lostPackages.clear();
+		HoTTbinReader.countLostPackages = 0;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -877,12 +889,18 @@ public class HoTTbinReader {
 					}
 
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					
+					if (HoTTbinReader.countLostPackages > 0) {
+						HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
+						HoTTbinReader.countLostPackages = 0;
+					}
 				}
 				else { //tx,rx == 0
 					HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 					HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					
 					++countPackageLoss;	// add up lost packages in telemetry data 
+					++HoTTbinReader.countLostPackages;
 					//HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
 
 					if (HoTTAdapter.isChannelsChannelEnabled) {
@@ -895,7 +913,7 @@ public class HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f", (countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true)-1) * 1000)) : "0";
-			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage}));
+			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics()}));
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
