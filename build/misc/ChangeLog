@@ -7,6 +7,8 @@ add capability to globally configure time format for table, measurement, start t
 JetiAdapter - adapt data parser to tolerate string messages like alarm and signal loss
 LiPoWatch - correct calculation of total voltage 
 add capability to smooth voltage curves if pulsed 
+HoTTAdapter* - add Rx->Tx PLoss statistics
+HottAdapter2 - fix import skipping adding some packages for channel 
 
 Version 3.1.2 - 24 Aug 2013
 all devices mainly importing data - write filename after import to record set description
