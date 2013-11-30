@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarEntry;
@@ -1208,6 +1209,27 @@ public class FileUtils {
 	public static List<File> getFileListing(File rootDirectory, int recursionDepth) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
 		List<File> result = getFileListingNoSort(rootDirectory, recursionDepth);
+		Collections.sort(result);
+		return result;
+	}
+
+	/**
+	  * Recursively walk a directory tree and return a List of all files found.
+	  * @param rootDirectory is a valid directory
+	  * @param recursionDepth specifies the depth of recursion cycles
+	  * @param filter specifies a part of the filename
+	  * @return List<File> sorted using File.compareTo()
+	  * @throws FileNotFoundException
+	  */
+	public static List<File> getFileListing(File rootDirectory, int recursionDepth, String filter) throws FileNotFoundException {
+		validateDirectory(rootDirectory);
+		List<File> result = getFileListingNoSort(rootDirectory, recursionDepth);
+		Iterator<File> itherator = result.iterator();
+		while (itherator.hasNext()) {
+			File file = (File) itherator.next();
+			if (!file.getName().contains(filter))
+				itherator.remove();
+		}
 		Collections.sort(result);
 		return result;
 	}
