@@ -170,7 +170,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					switch ((byte) (HoTTbinReader2.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-						log.warning("Vario");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
 							//fill data block 1 to 2
 							if (HoTTbinReader2.buf[33] == 1) {
@@ -191,7 +190,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-						log.warning("GPS");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
 							//fill data block 1 to 3
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -216,7 +214,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-						log.warning("GAM");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
 							//fill data block 1 to 4
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -245,7 +242,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-						log.warning("EAM");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
 							//fill data block 1 to 4
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -274,7 +270,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-						log.warning("ESC");
 						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
 							//fill data block 0 to 4
 							if (HoTTbinReader2.buf1 == null && HoTTbinReader2.buf[33] == 1) {
@@ -870,7 +865,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader2.pointsGeneral[18] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader2.pointsGeneral[19] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader2.pointsGeneral[20] = /*HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity < HoTTbinReader2.pointsGeneral[20] / 1000	? HoTTbinReader2.pointsGeneral[20] : */ HoTTbinReader2.tmpCapacity * 1000;
+			HoTTbinReader2.pointsGeneral[20] = HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity < HoTTbinReader2.pointsGeneral[20] / 1000	? HoTTbinReader2.pointsGeneral[20] : HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsGeneral[21] = Double.valueOf(HoTTbinReader2.pointsGeneral[18] / 1000.0 * HoTTbinReader2.pointsGeneral[19]).intValue();
 			for (int j = 0; j < 6; j++) {
 				HoTTbinReader2.pointsGeneral[j + 23] = (_buf1[3 + j] & 0xFF) * 1000;
@@ -916,7 +911,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader2.pointsElectric[35] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader2.pointsElectric[36] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader2.pointsElectric[37] = /*HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsElectric[37] / 1000 ? HoTTbinReader2.pointsElectric[37] :*/ HoTTbinReader2.tmpCapacity * 1000;
+			HoTTbinReader2.pointsElectric[37] = HoTTAdapter.isFilterEnabled && HoTTbinReader2.tmpCapacity >= HoTTbinReader2.pointsElectric[37] / 1000 ? HoTTbinReader2.pointsElectric[37] : HoTTbinReader2.tmpCapacity * 1000;
 			HoTTbinReader2.pointsElectric[38] = Double.valueOf(HoTTbinReader2.pointsElectric[35] / 1000.0 * HoTTbinReader2.pointsElectric[36]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
 				HoTTbinReader2.pointsElectric[j + 40] = (_buf1[3 + j] & 0xFF) * 1000;
@@ -1020,7 +1015,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		}
 		else {
 			//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage > 0 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.tmpVoltage >= 0 && HoTTbinReader2.tmpVoltage < 1000 && HoTTbinReader2.tmpCurrent < 1000
 					&& HoTTbinReader2.tmpRevolution > -1 && HoTTbinReader2.tmpRevolution < 2000 && HoTTbinReader2.tmpCapacity < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader.pointsSpeedControl[60]/1000) {
 				HoTTbinReader2.pointsSpeedControl[58] = HoTTbinReader2.tmpVoltage * 1000;
 				HoTTbinReader2.pointsSpeedControl[59] = HoTTbinReader2.tmpCurrent * 1000;
