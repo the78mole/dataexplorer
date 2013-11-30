@@ -649,6 +649,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0680));
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.STRING.value() }, true);
 				break;
+			default:
 			case NONE_SPECIFIED:
 				tmpPropertyType.setType(DataTypes.DOUBLE);
 				tmpPropertyType.setValue(1.0);

@@ -189,6 +189,7 @@ public class MeasurementContextmenu {
 						case DATA_TYPE:
 							MeasurementContextmenu.this.recordDataType.setEnabled(false);
 							break;
+						default:
 						case NONE_SPECIFIED:
 							MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
 							mb.setText(Messages.getString(MessageIds.GDE_MSGW0540));

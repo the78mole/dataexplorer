@@ -77,13 +77,13 @@ public class ObjectDataReaderWriter {
 
 	@SuppressWarnings("unchecked")
 	public void read() {
-
+		ZipFile zipFile = null;
 		String redObjectkey = Messages.getString(MessageIds.GDE_MSGT0279);
 
 		File file = new File(this.filePath);
-		if (file.exists()) {
-			try {
-				ZipFile zipFile = new ZipFile(file);
+		try {
+			if (file.exists()) {
+				zipFile = new ZipFile(file);
 				//this.consolePrinter = new PrintStream(System.out, false, Constants.writeCodePage); 
 				//-Dfile.encoding=UTF-8
 
@@ -161,6 +161,8 @@ public class ObjectDataReaderWriter {
 					}
 				}
 			}
+		}
+
 			catch (Throwable t) {
 				ObjectDataReaderWriter.log.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				if (t instanceof ZipException) {
@@ -188,6 +190,13 @@ public class ObjectDataReaderWriter {
 						GDE.setInitError(msg);
 					}
 				}
+			}
+		finally {
+			if (zipFile != null) try {
+				zipFile.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

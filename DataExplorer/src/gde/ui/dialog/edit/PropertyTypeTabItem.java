@@ -223,9 +223,12 @@ public class PropertyTypeTabItem extends CTabItem {
 			case DO_SUBTRACT_LAST:
 				dataTypeItems = new String[] { DataTypes.BOOLEAN.value() };
 				break;
+			default:
+				dataTypeItems = new String[] { GDE.STRING_EMPTY };
+				break;
 			}
 		}
-		return dataTypeItems == null ? new String[] { GDE.STRING_EMPTY } : dataTypeItems;
+		return dataTypeItems;
 	}
 
 	private void initGUI() {

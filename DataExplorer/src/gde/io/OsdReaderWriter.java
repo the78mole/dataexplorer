@@ -79,16 +79,26 @@ public class OsdReaderWriter {
 	 */
 
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
-		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
-    ZipEntry zip_entry = zip_input.getNextEntry();
-    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
-  		DataInputStream data_in    = new DataInputStream(zip_input);
-  		return readHeader(filePath, data_in);
-    }
-		FileInputStream file_input = new FileInputStream(new File(filePath));
-		DataInputStream data_in    = new DataInputStream(file_input);
-		return readHeader(filePath, data_in);
+		FileInputStream file_input = null;
+		DataInputStream data_in    = null;
+		ZipInputStream zip_input = null;
+		try {
+			filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+	    zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+	    ZipEntry zip_entry = zip_input.getNextEntry();
+	    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+	  		data_in = new DataInputStream(zip_input);
+	  		return readHeader(filePath, data_in);
+	    }
+			file_input = new FileInputStream(new File(filePath));
+			data_in    = new DataInputStream(file_input);
+			return readHeader(filePath, data_in);
+		}
+		finally {
+			if (data_in != null) data_in.close();
+			if (file_input != null) file_input.close();
+			if (zip_input != null) zip_input.close();
+		}
 	}
 
 	/**
@@ -646,6 +656,8 @@ public class OsdReaderWriter {
 	 * @param newObjectKey
 	 */
 	public static void updateObjectKey(String oldObjectKey, String newObjectKey) {
+		DataInputStream data_in = null;
+		DataOutputStream data_out = null;
 		try {
 			//scan all data files for object key
 			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
@@ -684,8 +696,6 @@ public class OsdReaderWriter {
 				String tmpFilePath = FileUtils.renameFile(filePath, GDE.FILE_ENDING_TMP); // rename existing file to *.tmp
 				File tmpFile = new File(tmpFilePath);
 				File updatedFile = new File(filePath);
-				DataInputStream data_in = null;
-				DataOutputStream data_out = null;
 
 				try {
 					long filePointer = 0;
@@ -732,8 +742,6 @@ public class OsdReaderWriter {
 						data_out.write(buffer, 0, len);
 					}
 
-					data_out.close();
-					data_in.close();
 
 					FileUtils.renameFile(tmpFilePath, GDE.FILE_ENDING_BAK); // rename existing file to *.bak
 				}
@@ -756,6 +764,15 @@ public class OsdReaderWriter {
 		catch (FileNotFoundException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] {e.getMessage()}));
+		}
+		finally {
+			try {			
+				if (data_out != null) data_out.close();
+				if (data_in != null) data_in.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

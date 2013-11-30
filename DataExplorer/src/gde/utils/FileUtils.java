@@ -85,9 +85,11 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static void copyFile(File in, File out) throws IOException {
-		FileChannel inChannel = new FileInputStream(in).getChannel();
-		FileChannel outChannel = new FileOutputStream(out).getChannel();
+		FileChannel inChannel = null;
+		FileChannel outChannel = null;
 		try {
+			inChannel = new FileInputStream(in).getChannel();
+			outChannel = new FileOutputStream(out).getChannel();
 			inChannel.transferTo(0, inChannel.size(), outChannel);
 		}
 		catch (IOException e) {
@@ -738,7 +740,8 @@ public class FileUtils {
 		}
 
 		JarInputStream in = new JarInputStream(new FileInputStream(deviceJarPath));
-		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), new JarFile(deviceJarPath).getManifest());
+		JarFile jarFile = new JarFile(deviceJarPath);
+		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), jarFile.getManifest());
 
 		JarEntry inEntry;
 		byte[] buf = new byte[1024];
@@ -766,6 +769,7 @@ public class FileUtils {
 		imageLoader.save(out, SWT.IMAGE_JPEG);
 		out.closeEntry();
 		out.close();
+		jarFile.close();
 
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
@@ -911,7 +915,8 @@ public class FileUtils {
 		}
 
 		JarInputStream in = new JarInputStream(new FileInputStream(deviceJarPath));
-		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), new JarFile(deviceJarPath).getManifest());
+		JarFile jarFile = new JarFile(deviceJarPath);
+		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), jarFile.getManifest());
 
 		JarEntry inEntry;
 		byte[] buf = new byte[1024];
@@ -942,6 +947,7 @@ public class FileUtils {
 		addIn.close();
 		out.closeEntry();
 		out.close();
+		jarFile.close();
 
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
@@ -1226,7 +1232,7 @@ public class FileUtils {
 		List<File> result = getFileListingNoSort(rootDirectory, recursionDepth);
 		Iterator<File> itherator = result.iterator();
 		while (itherator.hasNext()) {
-			File file = (File) itherator.next();
+			File file = itherator.next();
 			if (!file.getName().contains(filter))
 				itherator.remove();
 		}

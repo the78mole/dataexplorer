@@ -207,7 +207,10 @@ public class IGCReaderWriter {
 						int progress = (int) (lineNumber * 100 / approximateLines);
 						if (IGCReaderWriter.application.getStatusBar() != null && progress % 5 == 0) IGCReaderWriter.application.setProgress(progress, sThreadId);
 
-						if (device.getStateType() == null) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
+						if (device.getStateType() == null) {
+							reader.close();
+							throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
+						}
 
 						try {
 							recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
@@ -216,6 +219,7 @@ public class IGCReaderWriter {
 							}
 						}
 						catch (Exception e) {
+							reader.close();
 							throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] { 0, filePath, device.getPropertiesFileName() }));
 						}
 
