@@ -294,6 +294,8 @@ public enum Transmitter {
 				calculateAndWriteCRC(bytes, 0x11f1, 0x11f2);
 				calculateAndWriteCRC(bytes, 0x11f4, 0x11f5);
 				break;
+			default:
+				break;
 			}
 			in.close();
 			in = null;
@@ -319,6 +321,8 @@ public enum Transmitter {
 				case MX_16:
 				case MX_12:
 					DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2401));
+					break;
+				default:
 					break;
 				}
 		}
