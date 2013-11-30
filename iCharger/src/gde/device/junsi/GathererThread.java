@@ -150,20 +150,21 @@ public class GathererThread extends Thread {
 					
 					++measurementCount;
 
-					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						GathererThread.this.application.updateAllTabs(false);
-					}
-
-					if (measurementCount > 0 && measurementCount % 5 == 0) {
-						this.numberBatteryCells = 0;
-						for (int i = numCells; i < recordSet.size(); i++) {
-							Record record = recordSet.get(i);
-							if (record.hasReasonableData()) {
-								this.numberBatteryCells++;
-							}
+					if (recordSet != null) {
+						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+							GathererThread.this.application.updateAllTabs(false);
 						}
+						if (measurementCount > 0 && measurementCount % 5 == 0) {
+							this.numberBatteryCells = 0;
+							for (int i = numCells; i < recordSet.size(); i++) {
+								Record record = recordSet.get(i);
+								if (record.hasReasonableData()) {
+									this.numberBatteryCells++;
+								}
+							}
 
-						this.device.updateVisibilityStatus(recordSet, true);
+							this.device.updateVisibilityStatus(recordSet, true);
+						}
 					}
 				}
 				else { // no iCharge program is executing, wait for 180 seconds max. for actions
