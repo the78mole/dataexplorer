@@ -82,8 +82,9 @@ public class JarInspectAndExportTest extends TestCase {
 		String[] files = sourceDir.list();
 		for (String fileName : files) {
 			if (!fileName.endsWith(".jar")) continue;
+			JarFile jf = null;
 			try {
-				JarFile jf = new JarFile(jarFileDir + "/" + fileName);
+				jf = new JarFile(jarFileDir + "/" + fileName);
 				Manifest m = jf.getManifest();
 				System.out.println("\n" + fileName);
 				for (Object key : m.getMainAttributes().keySet()) {
@@ -92,6 +93,14 @@ public class JarInspectAndExportTest extends TestCase {
 			}
 			catch (IOException e) {
 				failures.put(e.getMessage(), e);
+			}
+			finally {
+				try {
+					if (jf != null) jf.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
