@@ -169,23 +169,20 @@ public class GathererThread extends Thread {
 						startCycleTime = tmpCycleTime;
 					}
  
-					if (this.serialPort.isInterruptedByUser) break;
-					this.parser.parse(new String(dataBuffer), 42);
-					if (this.parser.getValues().length == channelRecordSet.size())
-						channelRecordSet.addPoints(this.parser.getValues(), (tmpCycleTime - startCycleTime));
-					
-					if (log.isLoggable(Level.FINER)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time after add = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
-						
-					if (channelRecordSet.size() > 0 && channelRecordSet.isChildOfActiveChannel() && channelRecordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						GathererThread.this.application.updateAllTabs(false);
-					}
-					
-					if (measurementCount > 0 && measurementCount%10 == 0) {
-						this.activeChannel = this.channels.getActiveChannel();
-						if (activeChannel != null) {
-							this.activeRecordSet = activeChannel.getActiveRecordSet();
-							if (activeRecordSet != null)
-								this.device.updateVisibilityStatus(channelRecordSet, true);
+					if (channelRecordSet != null) {
+						if (this.serialPort.isInterruptedByUser) break;
+						this.parser.parse(new String(dataBuffer), 42);
+						if (this.parser.getValues().length == channelRecordSet.size()) channelRecordSet.addPoints(this.parser.getValues(), (tmpCycleTime - startCycleTime));
+						if (log.isLoggable(Level.FINER)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time after add = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
+						if (channelRecordSet.size() > 0 && channelRecordSet.isChildOfActiveChannel() && channelRecordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+							GathererThread.this.application.updateAllTabs(false);
+						}
+						if (measurementCount > 0 && measurementCount % 10 == 0) {
+							this.activeChannel = this.channels.getActiveChannel();
+							if (activeChannel != null) {
+								this.activeRecordSet = activeChannel.getActiveRecordSet();
+								if (activeRecordSet != null) this.device.updateVisibilityStatus(channelRecordSet, true);
+							}
 						}
 					}
 				}

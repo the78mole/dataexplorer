@@ -139,6 +139,8 @@ public class AkkuMonitorParser extends DataParser {
 							this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
 						}
 						break;
+					default:
+						break;
 					}
 				}
 			}
