@@ -396,6 +396,8 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 								log.log(Level.WARNING, e.getMessage(), e);
 							}
 							break;
+						default:
+							break;
 						}
 					}
 					catch (FileNotFoundException e) {
@@ -572,7 +574,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 		return -1;
 	}
 
-	//TODO - check for other than Ultra Duo Plus devices the listed functions needs to be modified
 	/**
 	 * query the cycle number of the given outlet channel
 	 * @param outletNum

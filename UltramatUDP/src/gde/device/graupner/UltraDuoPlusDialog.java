@@ -341,6 +341,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			UltraDuoPlusDialog.numberMemories = 60;
 			this.channelNumbers = new String[] { "1", "2" }; //$NON-NLS-1$ //$NON-NLS-2$
 			break;
+		default:
+			break;
 		}
 		this.memoryNames = new String[UltraDuoPlusDialog.numberMemories];
 		this.memoryNames[1] = " initial "; //$NON-NLS-1$
@@ -503,6 +505,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										UltraDuoPlusDialog.this.channelValues1[12] = Integer.parseInt(date[0]);
 										UltraDuoPlusDialog.this.channelValues1[13] = Integer.parseInt(date[3]);
 										UltraDuoPlusDialog.this.channelValues1[14] = Integer.parseInt(date[4]);
+										break;
+									default:
 										break;
 									}
 									ChannelData1 value = new ChannelData1();
@@ -1266,10 +1270,16 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 															timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();
 														}
 													}
-
+													//add selected entries to the sorted map, this is what gets displayed in the utility record
+													if (dataSum > 0 && timeStamp > justNowMinus2Year && timeStamp < justNowPlus2Hours) {
+														sortCyclesData.put(timeStamp, points.clone());
+													}
+												}
+												for (Entry<Long, int[]> entry : sortCyclesData.entrySet()) {
 													//display values
 													TableItem item = new TableItem(UltraDuoPlusDialog.this.dataTable, SWT.CENTER);
-													item.setText(new String[] { StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm", timeStamp), //$NON-NLS-1$
+													int[] points = entry.getValue();
+													item.setText(new String[] { StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm", entry.getKey()), //$NON-NLS-1$
 															String.format("%.2f", points[0] / 1000.0), //$NON-NLS-1$
 															String.format("%.2f", points[1] / 1000.0), //$NON-NLS-1$
 															String.format("%.2f", points[2] / 1.0), //$NON-NLS-1$
@@ -1277,10 +1287,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 															String.format("%.2f", points[4] / 10.0), //$NON-NLS-1$
 															String.format("%.2f", points[5] / 10.0), //$NON-NLS-1$
 													});
-													//add selected entries to the sorted map, this is what gets displayed in the utility record
-													if (dataSum > 0 && timeStamp > justNowMinus2Year && timeStamp < justNowPlus2Hours) {
-														sortCyclesData.put(timeStamp, points.clone());
-													}
+
 												}
 
 												//check if time stamp was changed, if yes write back changed data to device
