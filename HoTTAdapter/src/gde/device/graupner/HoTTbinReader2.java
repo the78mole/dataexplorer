@@ -42,9 +42,10 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class HoTTbinReader2 extends HoTTbinReader {
-	final static Logger	logger	= Logger.getLogger(HoTTbinReader2.class.getName());
+	final static Logger	logger					= Logger.getLogger(HoTTbinReader2.class.getName());
 	static int[]				points;
 	static RecordSet		recordSet;
+	static boolean			isJustMigrated	= false;
 
 	/**
 	 * read complete file data and display the first found record set
@@ -387,6 +388,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isMotorDriverData = false;
 		boolean isInitialSwitched = false;
 		HoTTbinReader2.recordSet = null;
+		HoTTbinReader2.isJustMigrated = false;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -581,9 +583,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						//System.out.println("isReceiverData i = " + i);
 						isReceiverData = false;
 					}
-					else if (channelNumber == 4) {
+					else if (channelNumber == 4 && !HoTTbinReader2.isJustMigrated) {
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
 					}
+					HoTTbinReader2.isJustMigrated = false;
 
 					//fill data block 0 to 4
 					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
@@ -719,6 +722,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 		}
 		HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
+		HoTTbinReader2.isJustMigrated = true;
 	}
 
 	/**
