@@ -82,6 +82,7 @@ public class HoTTbinReader {
 	static double							longitudeTolerance		= 1;
 	static long								lastLongitudeTimeStep	= 0;
 	static int								countLostPackages			= 0; 
+	static boolean						isJustParsed					= false;
 	
 	static ReverseChannelPackageLossStatistics		lostPackages					= new ReverseChannelPackageLossStatistics();
 	/**
@@ -238,6 +239,7 @@ public class HoTTbinReader {
 		int version = -1;
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
+		HoTTbinReader.isJustParsed = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -514,9 +516,10 @@ public class HoTTbinReader {
 
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 					
-					if (HoTTbinReader.countLostPackages > 0) {
+					if (HoTTbinReader.isJustParsed && HoTTbinReader.countLostPackages > 0) {
 						HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
 						HoTTbinReader.countLostPackages = 0;
+						HoTTbinReader.isJustParsed = false;
 					}
 				}
 				else { //skip empty block, but add time step
@@ -641,6 +644,7 @@ public class HoTTbinReader {
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
+		HoTTbinReader.isJustParsed = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -890,9 +894,10 @@ public class HoTTbinReader {
 
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 					
-					if (HoTTbinReader.countLostPackages > 0) {
+					if (HoTTbinReader.isJustParsed && HoTTbinReader.countLostPackages > 0) {
 						HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
 						HoTTbinReader.countLostPackages = 0;
+						HoTTbinReader.isJustParsed = false;
 					}
 				}
 				else { //tx,rx == 0
@@ -1065,10 +1070,7 @@ public class HoTTbinReader {
 			}
 			break;
 		}
-		//printByteValues(_timeStep_ms, _buf0);
-		//printShortValues(_timeStep_ms, _buf1);
-		//printShortValues(_timeStep_ms, _buf2);
-		//log.log(Level.FINEST, "");
+		HoTTbinReader.isJustParsed = true;
 		return sdLogVersion;
 	}
 
@@ -1147,6 +1149,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGPS[11] = (_buf0[2] & 0xFF) * 1000;
 
 			HoTTbinReader.recordSetGPS.addPoints(HoTTbinReader.pointsGPS, HoTTbinReader.timeStep_ms);
+			HoTTbinReader.isJustParsed = true;
 		}
 	}
 
@@ -1195,6 +1198,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGeneral[20] = (_buf2[4] & 0xFF) * 1000;
 
 			HoTTbinReader.recordSetGeneral.addPoints(HoTTbinReader.pointsGeneral, HoTTbinReader.timeStep_ms);
+			HoTTbinReader.isJustParsed = true;
 		}
 	}
 
@@ -1249,6 +1253,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsElectric[26] = (_buf3[2] & 0xFF) * 1000;
 
 			HoTTbinReader.recordSetElectric.addPoints(HoTTbinReader.pointsElectric, HoTTbinReader.timeStep_ms);
+			HoTTbinReader.isJustParsed = true;
 		}
 	}
 
@@ -1281,6 +1286,7 @@ public class HoTTbinReader {
 			//HoTTbinReader.pointsSpeedControl[7] = HoTTbinReader.tmpTemperatureExt * 1000;
 		}
 		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
+		HoTTbinReader.isJustParsed = true;
 	}
 
 	static void printByteValues(long millisec, byte[] buffer) {

@@ -298,6 +298,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						break;
 					}
 					
+					if (isSensorData && HoTTbinReader2.countLostPackages > 0) {
+						HoTTbinReader2.lostPackages.add(HoTTbinReader2.countLostPackages);
+						HoTTbinReader2.countLostPackages = 0;
+					}
+					
 					if (isSensorData || isReceiverData) {
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
 						isSensorData = isReceiverData = false;
@@ -308,12 +313,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					
 					HoTTbinReader2.timeStep_ms += 10; // add default time step from device of 10 msec
 
-					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
-					
-					if (HoTTbinReader2.countLostPackages > 0) {
-						HoTTbinReader2.lostPackages.add(HoTTbinReader2.countLostPackages);
-						HoTTbinReader2.countLostPackages = 0;
-					}
+					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);				
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter2.reverseChannelPackageLossCounter.add(0);
@@ -577,6 +577,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 							break;
 						}
 					}
+					
+					if (HoTTbinReader2.isJustMigrated && HoTTbinReader2.countLostPackages > 0) {
+						HoTTbinReader2.lostPackages.add(HoTTbinReader2.countLostPackages);
+						HoTTbinReader2.countLostPackages = 0;
+					}
 
 					if (isReceiverData && (logCountVario > 0 || logCountGPS > 0 || logCountGeneral > 0 || logCountElectric > 0 || logCountMotorDriver > 0)) {
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
@@ -608,11 +613,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.timeStep_ms += 10;// add default time step from log record of 10 msec
 				
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
-					
-					if (HoTTbinReader2.countLostPackages > 0) {
-						HoTTbinReader2.lostPackages.add(HoTTbinReader2.countLostPackages);
-						HoTTbinReader2.countLostPackages = 0;
-					}
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter2.reverseChannelPackageLossCounter.add(0);
