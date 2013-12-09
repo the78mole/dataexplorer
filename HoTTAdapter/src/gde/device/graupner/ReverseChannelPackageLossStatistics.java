@@ -86,6 +86,6 @@ public class ReverseChannelPackageLossStatistics extends Vector<Integer> {
 	 * @return the statistics as formated string
 	 */
 	public String getStatistics() {
-		return String.format(Locale.getDefault(), "min=%.1f sec; max=%.1f sec; avg=%.1f sec; sigma=%.1f sec", this.getMinValue()/10.0, this.getMaxValue()/10.0, this.getAvgValue()/10.0, this.getSigmaValue()/10.0);
+		return String.format(Locale.getDefault(), "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec", this.getMinValue()/100.0, this.getMaxValue()/100.0, this.getAvgValue()/100.0, this.getSigmaValue()/100.0);
 	}
 }
