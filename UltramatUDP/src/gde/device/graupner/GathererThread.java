@@ -19,6 +19,7 @@
 package gde.device.graupner;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -43,7 +44,7 @@ public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
 	final static int					TIME_STEP_DEFAULT						= 1000;
-	final static int					WAIT_TIME_RETRYS						= 180;																											// 180 * 1 sec
+	final static int					WAIT_TIME_RETRYS						= 1800;																											// 180 * 1 sec
 
 	final DataExplorer				application;
 	final UltramatSerialPort	serialPort;
@@ -53,7 +54,7 @@ public class GathererThread extends Thread {
 	String										recordSetKey1								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey2								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey3								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
-	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 180 * 1 sec
+	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													//1800 * 1 sec = 30 Min
 	boolean										isCollectDataStopped				= false;
 
 	boolean										isProgrammExecuting1				= false;
@@ -61,6 +62,7 @@ public class GathererThread extends Thread {
 	boolean										isProgrammExecuting3				= false;
 	boolean[]									isAlerted4Finish						= {false, false, false, false};
 	boolean										isCombinedMode							= false;
+	boolean 									isContinuousRecordSet 			= Settings.getInstance().isContinuousRecordSet();
 
 	/**
 	 * data gatherer thread definition 
@@ -300,7 +302,7 @@ public class GathererThread extends Thread {
 				}
 				else { // no program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2200));
-					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
+					log.logp(java.util.logging.Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
 					
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
@@ -351,6 +353,7 @@ public class GathererThread extends Thread {
 				if (recordSet1 != null) cleanup(recordSet1.getName(), message);
 				if (recordSet2 != null) cleanup(recordSet2.getName(), message);
 				if (recordSet3 != null) cleanup(recordSet3.getName(), message);
+				this.stopDataGatheringThread(false, e);
 			}
 			catch (Throwable e) {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
@@ -408,7 +411,7 @@ public class GathererThread extends Thread {
 		Object[] result = new Object[2];
 		// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 		int processNumber = this.device.getProcessingMode(dataBuffer);
-		String processName = this.device.USAGE_MODE[processNumber];
+		String processName = this.isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2239) : this.device.USAGE_MODE[processNumber];
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "processName = " + processName + " " + processNumber);
 		}
@@ -439,7 +442,7 @@ public class GathererThread extends Thread {
 					}			
 					if (processingType.length() > 3 || cycleNumber > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
 				}
-				recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + extend.toString();
+				recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + (this.isContinuousRecordSet ? processName : processName + extend.toString());
 				recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
@@ -480,6 +483,12 @@ public class GathererThread extends Thread {
 				}
 			}
 
+			if (isContinuousRecordSet && processNumber == 3) {
+				result[0] = recordSet;
+				result[1] = recordSetKey;
+				return result;
+			}
+				
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 
 			GathererThread.this.application.updateAllTabs(false);

@@ -434,6 +434,8 @@ public class UltraDuoPlus60 extends Ultramat {
 				logger.log(java.util.logging.Level.FINE,
 						"operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut1, 16)] : operationModeOut1)); //$NON-NLS-1$
 			}
+			if (this.settings.isReduceChargeDischarge()) 
+				return operationModeOut1 != null && operationModeOut1.length() == 2 && (operationModeOut1.equals("01") || operationModeOut1.equals("02") || (this.settings.isContinuousRecordSet() && operationModeOut1.equals("03")));
 			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
 		else if (outletNum == 2) {
@@ -442,6 +444,8 @@ public class UltraDuoPlus60 extends Ultramat {
 				logger.log(java.util.logging.Level.FINE,
 						"operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut2, 16)] : operationModeOut2)); //$NON-NLS-1$
 			}
+			if (this.settings.isReduceChargeDischarge()) 
+				return operationModeOut2 != null && operationModeOut2.length() == 2 && (operationModeOut2.equals("01") || operationModeOut2.equals("02") || (this.settings.isContinuousRecordSet() && operationModeOut2.equals("03")));
 			return operationModeOut2 != null && operationModeOut2.length() == 2 && !(operationModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
 		else
@@ -484,7 +488,7 @@ public class UltraDuoPlus60 extends Ultramat {
 			type = operationType != null && operationType.length() > 0 ? this.CURRENT_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
 			break;
 		case 6: //error
-			this.application.setStatusMessage(Messages.getString("GDE_MSGT22" + String.format("%02d", Integer.parseInt(operationType, 16))), SWT.COLOR_RED); //$NON-NLS-1$
+			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGE2218) + String.format("%02d", Integer.parseInt(operationType, 16)), SWT.COLOR_RED); //$NON-NLS-1$
 			break;
 		}
 		return type;
@@ -502,7 +506,8 @@ public class UltraDuoPlus60 extends Ultramat {
 		String operationType1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[17], (char) dataBuffer[18]);
 		String operationType2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[81], (char) dataBuffer[82]);
 		return operationMode1.equals(operationMode2) && operationType1.equals(operationType2)
-				&& (operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_CHARGE) || operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_DISCHARGE));
+				&& ((operationMode1.equals("01") && operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_CHARGE)) 
+						|| (operationMode1.equals("02") && operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_DISCHARGE)));
 	}
 	
 	/**

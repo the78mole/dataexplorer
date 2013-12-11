@@ -84,6 +84,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	protected GathererThread											dataGatherThread;
 	protected HashMap<String, CalculationThread>	calculationThreads							= new HashMap<String, CalculationThread>();
 
+	protected final Settings settings = Settings.getInstance();
 	protected final DataExplorer									application;
 	protected final UltramatSerialPort						serialPort;
 	protected final Channels											channels;

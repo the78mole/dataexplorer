@@ -388,6 +388,8 @@ public class UltraDuoPlus80 extends Ultramat {
 				logger.log(Level.FINE,
 						"processingModeOut1 = " + (processingModeOut1 != null && processingModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(processingModeOut1, 16)] : processingModeOut1)); //$NON-NLS-1$
 			}
+			if (this.settings.isReduceChargeDischarge()) 
+				return processingModeOut1 != null && processingModeOut1.length() == 2 && (processingModeOut1.equals("01") || processingModeOut1.equals("02") || (this.settings.isContinuousRecordSet() && processingModeOut1.equals("03")));
 			return processingModeOut1 != null && processingModeOut1.length() == 2 && !(processingModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || processingModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
 		else if (outletNum == 2) {
@@ -396,6 +398,8 @@ public class UltraDuoPlus80 extends Ultramat {
 				logger.log(Level.FINE,
 						"processingModeOut2 = " + (processingModeOut2 != null && processingModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(processingModeOut2, 16)] : processingModeOut2)); //$NON-NLS-1$
 			}
+			if (this.settings.isReduceChargeDischarge()) 
+				return processingModeOut2 != null && processingModeOut2.length() == 2 && (processingModeOut2.equals("01") || processingModeOut2.equals("02") || (this.settings.isContinuousRecordSet() && processingModeOut2.equals("03")));
 			return processingModeOut2 != null && processingModeOut2.length() == 2 && !(processingModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || processingModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
 		else
@@ -438,7 +442,7 @@ public class UltraDuoPlus80 extends Ultramat {
 			type = processingType != null && processingType.length() > 0 ? this.CURRENT_MODE[Integer.parseInt(processingType, 16)] : GDE.STRING_EMPTY;
 			break;
 		case 6: //error
-			this.application.setStatusMessage(Messages.getString("GDE_MSGT22" + String.format("%02d", Integer.parseInt(processingType, 16))), SWT.COLOR_RED); //$NON-NLS-1$
+			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGE2218) + String.format("%02d", Integer.parseInt(processingType, 16)), SWT.COLOR_RED); //$NON-NLS-1$
 			break;
 		}
 		if (log.isLoggable(Level.FINE)) {

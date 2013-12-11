@@ -457,7 +457,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(655, 655);
+				this.dialogShell.setSize(655, GDE.IS_MAC ? 675 : 655);
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
 		      public void handleEvent(Event event) {
 		        switch (event.detail) {
@@ -997,7 +997,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											this.dischargeTabItem.setControl(this.dischargeCycleComposite);
 											{
 												this.dischargeGroup = new Group(this.dischargeCycleComposite, SWT.NONE);
-												RowData dischargeGroupLData = new RowData(630, UltraDuoPlusDialog.this.dischargeSelectHeight);
+												RowData dischargeGroupLData = new RowData(620, UltraDuoPlusDialog.this.dischargeSelectHeight);
 												this.dischargeGroup.setLayoutData(dischargeGroupLData);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.dischargeGroup.setLayout(memoryCompositeLayout);
@@ -1021,7 +1021,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											}
 											{
 												this.cycleGroup = new Group(this.dischargeCycleComposite, SWT.NONE);
-												RowData cycleGroupLData = new RowData(630, UltraDuoPlusDialog.this.cycleSelectHeight);
+												RowData cycleGroupLData = new RowData(625, UltraDuoPlusDialog.this.cycleSelectHeight);
 												this.cycleGroup.setLayoutData(cycleGroupLData);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.cycleGroup.setLayout(memoryCompositeLayout);
@@ -1927,7 +1927,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.chargeGroup.setSize(this.scrolledchargeComposite.getClientArea().width, this.chargeSelectHeight);
 			this.chargeGroup.layout(true);
 			this.scrolledchargeComposite.layout(true);
-			this.dischargeGroup.setLayoutData(new RowData(this.dischargeCycleComposite.getClientArea().width, this.dischargeSelectHeight));
+			this.dischargeGroup.setLayoutData(new RowData(this.dischargeCycleComposite.getClientArea().width-18, this.dischargeSelectHeight));
 			this.dischargeGroup.layout(true);
 			this.dischargeCycleComposite.layout(true);
 
