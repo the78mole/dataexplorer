@@ -154,7 +154,7 @@ public class Settings extends Properties {
 	public final static String			DECIMAL_SEPARATOR							= "decimal_separator";																																					//$NON-NLS-1$
 	public final static String			USE_DATA_FILE_NAME_LEADER			= "use_date_file_name_leader";																																	//$NON-NLS-1$
 	public final static String			USE_OBJECT_KEY_IN_FILE_NAME		= "use_object_key_in_file_name";																																//$NON-NLS-1$
-	public final static String			WRITE_TMP_FILES								= "write_tmp_files";																																//$NON-NLS-1$
+	public final static String			WRITE_TMP_FILES								= "write_tmp_files";																																						//$NON-NLS-1$
 	public static final String			ALPHA_BLENDING_VALUE					= "alpha_blending_value";																																				//$NON-NLS-1$
 	public static final String			APLHA_BLENDING_ENABLED				= "aplha_blending_enabled";																																			//$NON-NLS-1$
 	public static final String			KEEP_IMPORT_DIR_OBJECT_RELATED= "keep_import_dir_object_related";																															//$NON-NLS-1$
@@ -169,6 +169,8 @@ public class Settings extends Properties {
 	public final static String			DEVICE_DIALOG_USE_MODAL				= "device_dialogs_modal";																																				//$NON-NLS-1$
 	public static final String			DEVICE_DIALOG_ON_TOP					= "device_dialogs_on_top";																																			//$NON-NLS-1$
 	public final static String			IS_GLOBAL_LOG_LEVEL						= "is_global_log_level";																																				//$NON-NLS-1$
+	public static final String			IS_REDUCE_CHARGE_DISCHARGE		= "is_reduce_charge_discharge";																																	//$NON-NLS-1$
+	public final static String			IS_ALL_IN_ONE_RECORDSET				= "is_all_in_one_record_set";																																		//$NON-NLS-1$
 	public final static String			GLOBAL_LOG_LEVEL							= "global_log_level";																																						//$NON-NLS-1$
 	public final static String			UI_LOG_LEVEL									= "ui_log_leve";																																								//$NON-NLS-1$
 	public final static String			DEVICE_LOG_LEVEL							= "device_log_level";																																						//$NON-NLS-1$
@@ -570,6 +572,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
+			//charger specials
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", Settings.TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
@@ -963,6 +968,34 @@ public class Settings extends Properties {
 			else if (tmpPort.startsWith(Settings.UNIX_PORT_DEV_TTY)) whiteList.append(tmpPort).append(GDE.STRING_BLANK);
 		}
 		this.setProperty(Settings.PORT_WHITELIST, whiteList.toString());
+	}
+
+	/**
+	 * @return boolean value if data gathering should only add charge and discharge data
+	 */
+	public boolean isReduceChargeDischarge() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_REDUCE_CHARGE_DISCHARGE, "false").trim()); //$NON-NLS-1$
+	}
+
+	/**
+	 * set boolean value if data gathering should only add charge and discharge data
+	 */
+	public void setReduceChargeDischarge(boolean enabled) {
+		this.setProperty(Settings.IS_REDUCE_CHARGE_DISCHARGE, GDE.STRING_EMPTY + enabled);
+	}
+
+	/**
+	 * @return boolean value if data gathering should result in a single recordSet
+	 */
+	public boolean isContinuousRecordSet() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_ALL_IN_ONE_RECORDSET, "false").trim()); //$NON-NLS-1$
+	}
+
+	/**
+	 * set boolean value if data gathering should result in a single recordSet
+	 */
+	public void setContinuousRecordSet(boolean enabled) {
+		this.setProperty(Settings.IS_ALL_IN_ONE_RECORDSET, GDE.STRING_EMPTY + enabled);
 	}
 
 	/**
