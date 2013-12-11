@@ -151,7 +151,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 //	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 	
 	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
-			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, VOLTAGE_LIMITS	};
+			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS	};
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
 

@@ -1022,8 +1022,7 @@ public class Record extends Vector<Integer> {
 						}
 					}
 				}
-				if (this.isVoltageRecord && this.parent.isSmoothVoltageCurve && index > voltageValuesSize && super.size() > voltageValuesSize) {
-					//this.voltageValues = new int[5];
+				if (this.isVoltageRecord && this.parent.isSmoothVoltageCurve && index >= voltageValuesSize && super.size() > voltageValuesSize) {
 					this.voltageValuesAvg = 0;
 					int i = index - voltageValuesSize + 1;
 					for (int j = 0; i <= index; ++i, ++j) {
@@ -1037,7 +1036,6 @@ public class Record extends Vector<Integer> {
 					returnValue = voltageValues[i];
 				}
 			}
-
 			return returnValue;
 		}
 		return 0;
