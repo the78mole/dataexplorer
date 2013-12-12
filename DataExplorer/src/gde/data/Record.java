@@ -169,7 +169,7 @@ public class Record extends Vector<Integer> {
 
 	//current drop, make curve capable to be smoothed
 	boolean             isVoltageRecord 			= false;
-	final int 					voltageValuesSize			= 5;
+	final int 					voltageValuesSize			= 8;
 	int[] 							voltageValues 				= new int[voltageValuesSize];
 	int 								voltageValuesAvg 			= 0;
 	boolean             isCurrentRecord 			= false;
