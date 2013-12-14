@@ -1,20 +1,20 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.3 - xx yyy 2013
-add support for Junsi CellLog 8s
+Version 3.1.3 - 15 Dec 2013
 fix bug in clone time steps while time step is constant
 add capability to globally configure time format for table, measurement, start time while zooming/oscilloscope 
-JetiAdapter - adapt data parser to tolerate string messages like alarm and signal loss
-LiPoWatch - correct calculation of total voltage 
-add capability to smooth voltage curves to be used if pulsed or similar 
-HoTTAdapter* - add Rx->Tx PLoss statistics
-HottAdapter2 - fix import skipping adding some packages for channel 
-UltraDuoPlus* - fix sorting of battery history output
-UltraDuoPlus* - enable blank out pause cycles
-UltraDuoPlus* - enable continuous recording of D-C cycles 
+add capability to smooth voltage curves to be used if pulsed or similar (result depends on frequency and is actual not adjustable) 
+add capability to capture charge cycles in a single record set
+add capability to suppress data collection during pause, balancing if not already done by device
 Scope-Mode - add more entries to enable more flexibility about the view range
 Graphics - enable measurement names in curve color at scale
 Timeline - tick mark correction
+Junsi CellLog 8s - add support
+JetiAdapter - adapt data parser to tolerate string messages like alarm and signal loss (actual written to log)
+LiPoWatch - correct calculation of total voltage 
+HoTTAdapter* - add Rx->Tx PLoss statistics
+HottAdapter2 - fix import skipping adding some packages for channel 
+UltraDuoPlus* - fix sorting of battery history output
 
 Version 3.1.2 - 24 Aug 2013
 all devices mainly importing data - write filename after import to record set description
