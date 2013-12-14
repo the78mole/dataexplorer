@@ -198,6 +198,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 						&& !(file.getPath().toLowerCase().contains("cappuccino") 
 						|| file.getPath().toLowerCase().contains("space pro") 
 						|| file.getPath().toLowerCase().contains("asw")
+						|| file.getPath().toLowerCase().contains("mue")
+						|| file.getPath().toLowerCase().contains("foka")
 						|| file.getPath().toLowerCase().contains("ash"))) {
 					System.out.println("working with : " + file);
 					
