@@ -1,5 +1,7 @@
 package gde.device.graupner;
 
+import gde.GDE;
+
 import java.util.Locale;
 import java.util.Vector;
 
@@ -86,6 +88,8 @@ public class ReverseChannelPackageLossStatistics extends Vector<Integer> {
 	 * @return the statistics as formated string
 	 */
 	public String getStatistics() {
+		if (this.getMinValue() == this.getMaxValue()) 
+			return GDE.STRING_MESSAGE_CONCAT;
 		return String.format(Locale.getDefault(), "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec", this.getMinValue()/100.0, this.getMaxValue()/100.0, this.getAvgValue()/100.0, this.getSigmaValue()/100.0);
 	}
 }
