@@ -193,7 +193,7 @@ public class TimeLine {
 		Point pt = gc.textExtent(timeLineText);
 		int ticklength = pt.y / 2;
 		int gap = pt.y / 3;
-		int miniTicks = 3;
+		int miniTicks = 4;
 
 		drawTickMarks(recordSet, gc, x0, y0, width, startTimeValue, endTimeValue, scaleFactor, timeFormat, deltaTime_ms, ticklength, miniTicks, gap);
 
