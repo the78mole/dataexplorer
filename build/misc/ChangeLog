@@ -14,6 +14,7 @@ UltraDuoPlus* - enable blank out pause cycles
 UltraDuoPlus* - enable continuous recording of D-C cycles 
 Scope-Mode - add more entries to enable more flexibility about the view range
 Graphics - enable measurement names in curve color at scale
+Timeline - tick mark correction
 
 Version 3.1.2 - 24 Aug 2013
 all devices mainly importing data - write filename after import to record set description
