@@ -169,7 +169,7 @@ public class Record extends Vector<Integer> {
 
 	//current drop, make curve capable to be smoothed
 	boolean             isVoltageRecord 			= false;
-	final int 					voltageValuesSize			= 8;
+	int 								voltageValuesSize			= 9;
 	int[] 							voltageValues 				= new int[voltageValuesSize];
 	int 								voltageValuesAvg 			= 0;
 	boolean             isCurrentRecord 			= false;
@@ -2330,5 +2330,21 @@ public class Record extends Vector<Integer> {
 	public void setDataType(Record.DataType newDataType) {
 		this.dataType = newDataType;
 	}
+	
+	/**
+	 * @return the size of voltage values used for smooth operation
+	 */
+	public int getVoltageValuesSize() {
+		return voltageValuesSize;
+	}
+
+	/**
+	 * set a new size of values used for voltage curve smooth operation
+	 * @param newVoltageValuesSize
+	 */
+	public void setVoltageValuesSize(int newVoltageValuesSize) {
+		this.voltageValuesSize = newVoltageValuesSize;
+	}
+
 }
 
