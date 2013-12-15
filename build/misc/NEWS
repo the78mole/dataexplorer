@@ -1,15 +1,19 @@
-GNU DataExplorer - News - comes with version 3.1.2
+GNU DataExplorer - News - comes with version 3.1.3
 
-1)  all devices mainly importing data - write filename after import to record set description
-2)  HoTTAdapter* - fix sensor mash up due to newly introduced sensor scan
-3)  HoTTAdapter* - fix balance calculation while import from bin
-3)  HoTTAdapter* - fix switch off filter capability for current GAM/EAM
-4)  HoTTAdapter* - adapt filter current, allow 255 A max
-5)  HoTTAdapter* - adapt filter
-6)  fix IGC export file error
-7)  JetiAdapter - add import progress display
-8)  add Ultra Duo Plus 80 (Graupner) dual channel 1000W charger
-9)  documentation update
+1)  fix bug in clone time steps while time step is constant
+2)  add capability to globally configure time format for table, measurement, start time while zooming/oscilloscope 
+3)  add capability to smooth voltage curves to be used if pulsed or similar (result depends on frequency and is actual not adjustable) 
+4)  add capability to capture charge cycles in a single record set
+5)  add capability to suppress data collection during pause, balancing if not already done by device
+6)  Scope-Mode - add more entries to enable more flexibility about the view range
+7)  Graphics - enable measurement names in curve color at scale
+8)  Timeline - tick mark correction
+9)  Junsi CellLog 8S - add support
+10) JetiAdapter - adapt data parser to tolerate string messages like alarm and signal loss (actual written to log)
+11) LiPoWatch - correct calculation of total voltage 
+12) HoTTAdapter* - add Rx->Tx PLoss statistics
+13) HottAdapter2 - fix import skipping adding some packages for channel 
+14) UltraDuoPlus* - fix sorting of battery history output
 
 
 
