@@ -1810,24 +1810,26 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 				Record tmpRecord = this.get(i);
 				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
-				if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name);
-					this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
-					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
-					this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
-					this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
-				}
-				if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
-					if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
-						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
-					else
-						//sort while add
-						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
+				if (syncMasterRecordOrdinal >= 0) {
+					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name);
+						this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
+						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
+						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
+						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
+					}
+					if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
+						if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
+							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
+						else
+							//sort while add
+							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
 
-					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
-					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
-					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add " + tmpRecord.name);
+						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
+						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
+						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add " + tmpRecord.name);
+					}
 				}
 			}
 		}
