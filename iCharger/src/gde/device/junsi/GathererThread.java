@@ -104,7 +104,7 @@ public class GathererThread extends Thread {
 				// check if device is ready for data capturing
 				// device sends at the end of transmission $ENDBULK;64
 				try {
-					if (dataBuffer.length > minAnswerLength)
+					if (dataBuffer.length < minAnswerLength)
 						continue; //CellLog returns $STARTBULK;69;1000;65 or $ENDBULK;64 or $NEWSECTION;1000;48
 					processName = this.device.getProcessName(dataBuffer);
 					isProgrammExecuting = true;
