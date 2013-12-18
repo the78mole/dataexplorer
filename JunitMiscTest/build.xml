@@ -43,7 +43,7 @@
 		<echo message="path=../build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar"/>
 		<property name="include.debug.info" value="yes" />
 		<mkdir dir="${module.output}" />
-		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" target="1.6" encoding="UTF-8" debug="true">
+		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" bootclasspath="/Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/jre/lib/rt.jar" source="1.6" target="1.6" encoding="UTF-8" debug="true">
 			<src path="src" />
 		</javac>
 	</target>
