@@ -783,4 +783,16 @@ public class StringHelper {
 		System.out.println();
 	}
 
+	/**
+	 * transfer from char array to string (new String(name.getBytes("ISO-8859-1"), "UTF-8"))
+	 * @param array
+	 * @return
+	 */
+	public static String transfer(String array) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < array.length(); i++) {
+			sb.append(array.charAt(i));			
+		}
+		return sb.toString();
+	}
 }

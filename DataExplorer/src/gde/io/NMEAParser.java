@@ -27,6 +27,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.Checksum;
+import gde.utils.StringHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -314,29 +315,24 @@ public class NMEAParser implements IDataParser {
 				//$SETUP1;Time;;; A:02;;;;;;; A:09; A:10; A:11;
 				//GPGGA	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
 				for (int i = 4, j = 2; i < this.device.getMeasurementNames(channelConfigNumber).length; i++, j++) {
-					if (j < strValues.length) {
-						String name = strValues[j].trim().length() > 0 ? strValues[j].trim() : "-";//$NON-NLS-1$
-						this.device.setMeasurementSymbol(channelConfigNumber, i, name);
+					if (j < strValues.length && strValues[j].trim().length() > 0) {
+						String name = strValues[j].trim();//$NON-NLS-1$
+						this.device.setMeasurementName(channelConfigNumber, i, StringHelper.transfer(new String(name.getBytes("ISO-8859-1"), "UTF-8")));
+					}						
+					else {
+						this.device.setMeasurementName(channelConfigNumber, i, String.format("%d????", i));
 					}
-					else
-						this.device.setMeasurementSymbol(channelConfigNumber, i, "-");//$NON-NLS-1$
-						
 				}
 				break;
 			case SETUP2:// setup Multiplex FlightRecorder
 				//$SETUP2;sec ;;;   °C;;;;;;; km/h;    m;    m;
 				//GPGGA	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
 				for (int i = 4, j = 2; i < this.device.getMeasurementNames(channelConfigNumber).length; i++, j++) {
-					if (j < strValues.length) {
-						String unit = strValues[j].trim().length() > 0 ? strValues[j].trim() : GDE.STRING_EMPTY;
-						this.device.setMeasurementUnit(channelConfigNumber, i, unit);
-						if (this.device.getMeasurementNames(channelConfigNumber)[i].contains("?"))
-							this.device.setMeasurementName(channelConfigNumber, i, i+Messages.getString(MessageIds.GDE_MSGT0191));
-						if (unit.length() == 0) 
-							this.device.setMeasurementName(channelConfigNumber, i, i+Messages.getString(MessageIds.GDE_MSGT0191));
+					if (j < strValues.length &&  strValues[j].trim().length() > 0) {
+						String unit = strValues[j].trim();
+						this.device.setMeasurementUnit(channelConfigNumber, i, StringHelper.transfer(new String(unit.getBytes("ISO-8859-1"), "UTF-8")));
 					}
 					else {
-						this.device.setMeasurementName(channelConfigNumber, i, i+Messages.getString(MessageIds.GDE_MSGT0191));
 						this.device.setMeasurementUnit(channelConfigNumber, i, GDE.STRING_EMPTY);
 					}
 				}
@@ -346,7 +342,7 @@ public class NMEAParser implements IDataParser {
 					for (int i = 0; i < names.length; i++) {
 						sb.append(String.format("\n%s %s", names[i], this.device.getMeasurementUnit(channelConfigNumber, i)));
 					}
-					log.log(Level.FINE, sb.toString());
+					log.log(Level.OFF, sb.toString());
 				}
 				break;
 			case D:// data Multiplex FlightRecorder
