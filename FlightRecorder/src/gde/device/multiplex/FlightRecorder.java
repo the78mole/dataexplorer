@@ -29,6 +29,7 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
@@ -457,12 +458,17 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 						
 						if (fd.getFileName().length() > 4) {
 							try {
-								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : 1;
 								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, 
+								RecordSet recordSet = CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, 
 										new DataParser(FlightRecorder.this.getDataBlockTimeUnitFactor(), 
 												FlightRecorder.this.getDataBlockLeader(), FlightRecorder.this.getDataBlockSeparator().value(), 
 												FlightRecorder.this.getDataBlockCheckSumType(), FlightRecorder.this.getDataBlockSize(InputTypes.FILE_IO)));
+								for (int i = 4; i < recordSet.getRecordNames().length;++i) {
+									MeasurementType measurement = FlightRecorder.this.getMeasurement(recordSet.getChannelConfigNumber(), i);
+									recordSet.get(i).setName(measurement.getName()); 
+									recordSet.get(i).setUnit(measurement.getUnit());
+								}
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
