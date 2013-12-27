@@ -637,18 +637,20 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		short crc16 = Checksum.CRC16CCITT(cmdAll, 3, cmdAll.length - 5);
 		cmdAll[cmdAll.length - 2] = (byte) (crc16 & 0x00FF);
 		cmdAll[cmdAll.length - 1] = (byte) ((crc16 & 0xFF00) >> 8);
-		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
+		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) 
+			HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
 
 		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
-		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE))
-			HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.cmd1, HoTTAdapterSerialPort.cmd1.length));
+		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINER))
+			HoTTAdapterSerialPort.log.log(Level.FINER, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.cmd1, HoTTAdapterSerialPort.cmd1.length));
 		this.write(HoTTAdapterSerialPort.cmd1);
 
 		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 
 		byte[] cmd2 = new byte[data.length + 8 + 2];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
-		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex2CharString(cmd2, cmd2.length));
+		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINER)) 
+			HoTTAdapterSerialPort.log.log(Level.FINER, StringHelper.byte2Hex2CharString(cmd2, cmd2.length));
 		this.write(cmd2);
 	}
 
