@@ -456,7 +456,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 
 	//transmitter SD-Card to PC communication section
 	final static int		CMD_GAP_MS						= 5;
-	final static int		FILE_TRANSFER_SIZE		= 0x0400;
+	final static int		FILE_TRANSFER_SIZE		= 0x0800;
 	final static byte[]	cmd1									= new byte[7];
 	byte								cntUp									= 0x00;
 	byte								cntDown								= (byte) 0xFF;
@@ -502,7 +502,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	private byte[] prepareCmdBytes(byte[] cmd, String body) {
 		byte[] b = new byte[body.length() == 0 ? body.length() + 9 : body.length() + 10];
 		b[0] = 0x00;
-		if (this.cntUp == 0xFF || this.cntDown == 0x00) {
+		if (this.cntUp == 0xFE || this.cntDown == 0x01) {
 			this.cntUp = 0x00;
 			this.cntDown = (byte) 0xFF;
 		}
@@ -621,7 +621,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 
 		//cmd1 part
 		cmdAll[0] = 0x00;
-		if (this.cntUp == 0xFF || this.cntDown == 0x00) {
+		if (this.cntUp == 0xFE || this.cntDown == 0x01) {
 			this.cntUp = 0x00;
 			this.cntDown = (byte) 0xFF;
 		}
@@ -1015,6 +1015,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		int xferDataSize = HoTTAdapterSerialPort.FILE_TRANSFER_SIZE;
 		byte[] XFER_DATA = new byte[HoTTAdapterSerialPort.FILE_TRANSFER_SIZE];
 		byte[] xferSize = new byte[4];
+		long startTime = System.nanoTime() / 1000000;
 
 		try {
 			for (String fileInfo : filesInfo) {
@@ -1091,6 +1092,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				}
 			}
 			parent.updateSdFolder(this.querySdCardSizes(0));
+			HoTTbinReader.log.log(Level.OFF, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		finally {
 			if (data_in != null) data_in.close();
