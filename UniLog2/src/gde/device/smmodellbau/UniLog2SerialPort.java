@@ -36,26 +36,25 @@ import java.util.logging.Logger;
 public class UniLog2SerialPort extends DeviceCommPort {
 	final static Logger					log											= Logger.getLogger(UniLog2SerialPort.class.getName());
 
-	public final static String 		NUMBER_RECORD						= "number_record"; 	//$NON-NLS-1$
-	public final static String 		TIME_MILLI_SEC					= "time_ms"; 				//$NON-NLS-1$
-	public final static String 		A_MODUS_1_2_3						= "aModus_1_2_3"; 	//$NON-NLS-1$
-	
-	final static byte[]		COMMAND_QUERY_STATE				= { 0x74 };		// 't' query UniLog state
-	final static byte[]		COMMAND_RESET							= { 0x1B, 0x5B, 0x44 };	
-	final static byte[]		COMMAND_LIVE_VALUES				= { 0x1B, 0x5B, 0x00, 0x30 };	
-	final static byte[]		COMMAND_START_LOGGING			= { 0x1B, 0x5B, 0x43 };	
-	final static byte[]		COMMAND_STOP_LOGGING			= { 0x1B, 0x5B, 0x44 };
+	public final static String	NUMBER_RECORD					= "number_record";								//$NON-NLS-1$
+	public final static String	TIME_MILLI_SEC				= "time_ms";											//$NON-NLS-1$
+	public final static String	A_MODUS_1_2_3					= "aModus_1_2_3";									//$NON-NLS-1$
 
-	final static byte			DATA_STATE_READY				= 0x47;		// 'G' UniLog ready to receive command
+	final static byte[]					COMMAND_QUERY_STATE		= { 0x74 };												// 't' query UniLog state
+	final static byte[]					COMMAND_RESET					= { 0x1B, 0x5B, 0x44 };
+	final static byte[]					COMMAND_LIVE_VALUES		= { 0x1B, 0x5B, 0x00, 0x30 };
+	final static byte[]					COMMAND_START_LOGGING	= { 0x1B, 0x5B, 0x43 };
+	final static byte[]					COMMAND_STOP_LOGGING	= { 0x1B, 0x5B, 0x44 };
 
-	static int						DATA_LENGTH_BYTES				= 24;			
-	static int						TIME_OUT_MS 						= 2000;
+	final static byte						DATA_STATE_READY			= 0x47;														// 'G' UniLog ready to receive command
 
-	
-	boolean 							isLoggingActive 				= false;
-	boolean 							isTransmitFinished			= false;
-	
-	int 									reveiceErrors 					= 0;
+	static int									DATA_LENGTH_BYTES			= 24;
+	static int									TIME_OUT_MS						= 2000;
+
+	boolean											isLoggingActive				= false;
+	boolean											isTransmitFinished		= false;
+
+	int													reveiceErrors					= 0;
 
 	/**
 	 * constructor of default implementation
