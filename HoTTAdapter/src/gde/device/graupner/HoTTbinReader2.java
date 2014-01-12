@@ -839,7 +839,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsGPS[8] = HoTTbinReader2.tmpHeight * 1000;
 			HoTTbinReader2.pointsGPS[9] =  HoTTbinReader2.tmpClimb1 * 10;
 			HoTTbinReader2.pointsGPS[10] = HoTTbinReader2.tmpClimb3 * 1000;
-			HoTTbinReader2.pointsGPS[14] = DataParser.parse2Short(_buf1, 4) * 1000;
 			HoTTbinReader2.pointsGPS[15] = DataParser.parse2Short(_buf2, 6) * 1000;
 			HoTTbinReader2.pointsGPS[16] = (_buf1[3] & 0xFF) * 1000;
 			HoTTbinReader2.pointsGPS[17] = 0;
@@ -880,10 +879,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			}
 			HoTTbinReader2.pointsGeneral[22] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
 			HoTTbinReader2.pointsGeneral[29] = DataParser.parse2Short(_buf2, 8) * 1000;
+			HoTTbinReader2.pointsGeneral[30] = DataParser.parse2Short(_buf2, 6) * 1000;
 			HoTTbinReader2.pointsGeneral[8] = HoTTbinReader2.tmpHeight * 1000;
 			HoTTbinReader2.pointsGeneral[9] = (DataParser.parse2UnsignedShort(_buf3, 2) - 30000) * 10;
 			HoTTbinReader2.pointsGeneral[10] = HoTTbinReader2.tmpClimb3 * 1000;
-			HoTTbinReader2.pointsGeneral[30] = DataParser.parse2Short(_buf2, 6) * 1000;
 			HoTTbinReader2.pointsGeneral[31] = HoTTbinReader2.tmpVoltage1 * 100;
 			HoTTbinReader2.pointsGeneral[32] = HoTTbinReader2.tmpVoltage2 * 100;
 			HoTTbinReader2.pointsGeneral[33] = ((_buf2[3] & 0xFF) - 20) * 1000;

@@ -275,9 +275,9 @@
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>FuelLevel</name>
+                <name>Fuel</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit>ml</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
@@ -805,9 +805,9 @@
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>FuelLevel</name>
+                <name>Fuel</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit>ml</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
@@ -1333,9 +1333,9 @@
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>FuelLevel</name>
+                <name>Fuel</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit>ml</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
@@ -1865,9 +1865,9 @@
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>FuelLevel</name>
+                <name>Fuel</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit>ml</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
@@ -2548,9 +2548,9 @@
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>FuelLevel</name>
+                <name>Fuel</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit>ml</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
