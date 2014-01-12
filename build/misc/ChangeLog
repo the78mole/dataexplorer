@@ -5,6 +5,7 @@ update build to make sure compiled classes target 1.6
 Junsi iCharger - fix data capture capability
 FlightRecorder - fix using name and unit from setup
 HoTTAdapter* - fix file transfer count down/up signature
+UltraDuoPlus - correct several adjustment parameters 
 
 Version 3.1.3 - 15 Dec 2013
 fix bug in clone time steps while time step is constant
