@@ -318,6 +318,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 					
 				case DATE_TIME:
 					dataTableRow[j + 1] = StringHelper.getFormatedTime(record.getUnit(), record.realGet(rowIndex));
+					dataTableRow[j + 1] =  dataTableRow[j + 1].substring(0, dataTableRow[j + 1].indexOf(GDE.STRING_COMMA) + 2);
 					break;
 
 				default:
