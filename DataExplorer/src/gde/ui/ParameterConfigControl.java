@@ -47,7 +47,7 @@ public class ParameterConfigControl {
 	final Slider				slider;
 
 	final int									controlHeight	= 20;
-	final int									offset;
+	int												offset;
 	final String							format;
 	
 	int									value					= 0;
@@ -407,5 +407,19 @@ public class ParameterConfigControl {
 		this.descriptionLabel.setText(newParameterDescription);
 		this.slider.setMinimum(newMinSliderValue);
 		this.slider.setMaximum(newMaxSliderValue);
+	}
+	
+	/**
+	 * update control description and slider range (cell type change -> charge max capacity)
+	 * @param newParameterDescription
+	 * @param newMinSliderValue
+	 * @param newMaxSliderValue
+	 */
+	public void updateValueRange(String newParameterDescription, int newMinSliderValue, int newMaxSliderValue, int newOffset) {
+		this.descriptionLabel.setText(newParameterDescription);
+		this.offset = newOffset;
+		this.slider.setMinimum(newMinSliderValue + this.offset);
+		this.slider.setMaximum(newMaxSliderValue + this.offset + 10);
+		this.slider.setIncrement((newMaxSliderValue + this.offset) >= 1000 ? 10 : 1);
 	}
 }
