@@ -161,7 +161,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	final static String[]			cellTypeNames							= Messages.getString(MessageIds.GDE_MSGT2246).split(GDE.STRING_COMMA);
 	final static String[]			soundTime									= new String[] { Messages.getString(MessageIds.GDE_MSGT2241), "5sec", "15sec", "1min", Messages.getString(MessageIds.GDE_MSGT2240) }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	final static String[]			powerOnDisplayType				= new String[] { Messages.getString(MessageIds.GDE_MSGT2244), Messages.getString(MessageIds.GDE_MSGT2245) };
-	final static String[]			cycleDirectionTypes				= Messages.getString(MessageIds.GDE_MSGT2292).split(GDE.STRING_COMMA);
+	final static String[]			cycleDirectionTypes				= Messages.getString(MessageIds.GDE_MSGT2292).split(", ");
 	final static String[]			offOnType									= new String[] { Messages.getString(MessageIds.GDE_MSGT2241), Messages.getString(MessageIds.GDE_MSGT2240) };
 	final static String[]			onOffType									= new String[] { Messages.getString(MessageIds.GDE_MSGT2240), Messages.getString(MessageIds.GDE_MSGT2241) };
 	final static String[]			temperatureDegreeType			= new String[] { DeviceConfiguration.UNIT_DEGREE_CELSIUS, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT };
@@ -799,15 +799,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 																if (SWT.YES == UltraDuoPlusDialog.this.application.openYesNoMessageDialog(
 																		UltraDuoPlusDialog.this.dialogShell,
-																		Messages.getString(MessageIds.GDE_MSGI2205, new Object[] { UltraDuoPlusDialog.this.lastMemorySelectionIndex,
+																		Messages.getString(MessageIds.GDE_MSGI2205, new Object[] { UltraDuoPlusDialog.this.lastMemorySelectionIndex+1,
 																				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName(), (actualSelectionIndex + 1),
 																				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName() }))) {
 																	//copy memory name and setup data of lastMemorySelectionIndex to memoryCombo.getSelectionIndex()																
-																	log
-																			.log(
-																					java.util.logging.Level.FINE,
-																					"copy memory: (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName()//$NON-NLS-1$
-																							+ " to (" + (actualSelectionIndex + 1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName()); //$NON-NLS-1$
+																	log.log(java.util.logging.Level.FINE,
+																			"copy memory: (" + (UltraDuoPlusDialog.this.lastMemorySelectionIndex+1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName()//$NON-NLS-1$
+																			+ " to (" + (actualSelectionIndex + 1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName()); //$NON-NLS-1$
 																	if (log.isLoggable(java.util.logging.Level.FINE)) {
 																		StringBuffer sb = new StringBuffer();
 																		for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
@@ -900,7 +898,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											"1 ~ 18", 220, false, 50, 150, 1, 18); //$NON-NLS-1$ 
 									//battery capacity
 									this.memoryParameters[2] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 2, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2259), 175,
-											"100 ~ 50000 mAh", 220, true, 50, 150, 100, 50000, -100); //$NON-NLS-1$ 
+											"100 ~ 65000 mAh", 220, true, 50, 150, 100, 65000, -100); //$NON-NLS-1$ 
 									//year, month, day
 									this.memoryParameters[3] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 3, UltraDuoPlusDialog.STRING_FORMAT_02D,
 											Messages.getString(MessageIds.GDE_MSGT2260), 100, GDE.STRING_EMPTY, 5, false, 30, 70, 0, 99);
@@ -947,7 +945,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.memoryParameters[6] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 6, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2263), 175,
 														"100 ~ 20000 mA", 220, true, 50, 150, 100, 20000, -100); //$NON-NLS-1$ 
 												this.memoryParameters[11] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 11, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2265), 175,
-														Messages.getString(MessageIds.GDE_MSGT2310), 220, true, 50, 150, 10, 155);
+														Messages.getString(MessageIds.GDE_MSGT2310), 220, true, 50, 150, 10, 165);
 												this.memoryParameters[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ||this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus40 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0)//°C
 												? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 10, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2264), 175,
 														"10 ~ 80°C", 220, false, 50, 150, 10, 80) //$NON-NLS-1$ 
@@ -956,11 +954,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.memoryParameters[12] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 12, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2266), 175,
 														"10 ~ 905min (905=off)", 220, false, 50, 150, 10, 905); //$NON-NLS-1$ 
 												this.memoryParameters[14] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2267), 175,
-														"1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000); //$NON-NLS-1$ 
+														"3600 ~ 4200 mV", 220, true, 50, 150, 3600, 4200, -3600); //$NON-NLS-1$ 
 												this.memoryParameters[9] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 9, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2279), 175,
-														Messages.getString(MessageIds.GDE_MSGT2312), 220, false, 50, 150, 0, 500);
+														Messages.getString(MessageIds.GDE_MSGT2312), 220, false, 50, 150, 0, 550);
 												this.memoryParameters[26] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2276), 175,
-														"1000 ~ 4000 mV", 220, true, 50, 150, 1000, 4000, -1000); //$NON-NLS-1$ 
+														"3600 ~ 4000 mV", 220, true, 50, 150, 3600, 4000, -3600); //$NON-NLS-1$ 
 												this.memoryParameters[7] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 7, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2277), 175,
 														"0 ~ 25mV", 220, false, 50, 150, 0, 25); //$NON-NLS-1$ 
 												this.memoryParameters[8] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 8, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2278), 175,
@@ -1008,7 +1006,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.memoryParameters[17] = new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 17, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2268), 175,
 														"100 ~ 10000 mA", 220, true, 50, 150, 100, 10000, -100); //$NON-NLS-1$ 
 												this.memoryParameters[18] = new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 18, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2269), 175,
-														"100 ~ 4200 mV", 220, true, 50, 150, 100, 4200, -100); //$NON-NLS-1$ 
+														"2500 ~ 4200 mV", 220, true, 50, 150, 2500, 4200, -2500); //$NON-NLS-1$ 
 												this.memoryParameters[20] = new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 20, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2271), 175,
 														Messages.getString(MessageIds.GDE_MSGT2311), 220, false, 50, 150, 10, 105, -10);
 												this.memoryParameters[19] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0)//°C
@@ -1867,11 +1865,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			//update memory parameter table to reflect not edit able parameters for selected cell type
 			switch (this.memoryValues[0]) {
 			case 0: //NiCd
-			case 1: //NiMh
 				this.memoryParameters[9] = this.memoryParameters[9] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 9, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2279),
 						175, Messages.getString(MessageIds.GDE_MSGT2312), 220, false, 50, 150, 0, 550) : this.memoryParameters[9];
-				this.memoryParameters[7] = this.memoryParameters[7] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 7, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2277),
-						175, "0 ~ 25mV", 220, false, 50, 150, 0, 25) : this.memoryParameters[7]; //$NON-NLS-1$ 
+				if (this.memoryParameters[7] == null)
+					this.memoryParameters[7] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 7, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2277), 175, "5 ~ 25mV", 220, false, 50, 150, 5, 35);
+				else 
+					this.memoryParameters[7].updateValueRange("5 ~ 25mV", 5, 35); //$NON-NLS-1$ 
 				this.memoryParameters[8] = this.memoryParameters[8] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 8, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2278),
 						175, "1 ~ 20min", 220, false, 50, 150, 1, 20) : this.memoryParameters[8]; //$NON-NLS-1$ 
 				this.memoryParameters[13] = this.memoryParameters[13] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 13, GDE.STRING_EMPTY,
@@ -1882,46 +1881,125 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryParameters[16] = this.memoryParameters[16] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 16, Messages.getString(MessageIds.GDE_MSGT2282), 175,
 						Messages.getString(MessageIds.GDE_MSGT2241) + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT2240), 220, UltraDuoPlusDialog.offOnType, 50, 150)
 						: this.memoryParameters[16];
+				this.memoryParameters[18].updateValueRange("800 ~ 1300 mV", 800, 1300, -800);  //$NON-NLS-1$ 
 				this.memoryParameters[21] = this.memoryParameters[21] == null ? new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 21, GDE.STRING_EMPTY,
 						Messages.getString(MessageIds.GDE_MSGT2283), 175, "1100 ~ 1300 mV", 220, true, 50, 150, 1100, 1300, -1100) : this.memoryParameters[21]; //$NON-NLS-1$ 
 				this.memoryParameters[26] = this.memoryParameters[26] != null ? this.memoryParameters[26].dispose() : null;
 				this.chargeSelectHeight = 10 * this.parameterSelectHeight;
 				this.dischargeSelectHeight = 5 * this.parameterSelectHeight;
-				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 155);
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 165);
+				this.cycleGroup.setVisible(true);
+				break;
+			case 1: //NiMh
+				this.memoryParameters[9] = this.memoryParameters[9] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 9, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2279),
+						175, Messages.getString(MessageIds.GDE_MSGT2312), 220, false, 50, 150, 0, 550) : this.memoryParameters[9];
+				if (this.memoryParameters[7] == null)
+					this.memoryParameters[7] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 7, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2277), 175, "0 ~ 15mV", 220, false, 50, 150, 0, 25);
+				else 
+					this.memoryParameters[7].updateValueRange("0 ~ 15mV", 0, 25); //$NON-NLS-1$ 
+				this.memoryParameters[8] = this.memoryParameters[8] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 8, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2278),
+						175, "1 ~ 20min", 220, false, 50, 150, 1, 20) : this.memoryParameters[8]; //$NON-NLS-1$ 
+				this.memoryParameters[13] = this.memoryParameters[13] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 13, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2280), 175, "1 ~ 5", 220, false, 50, 150, 1, 5) : this.memoryParameters[13]; //$NON-NLS-1$ 
+				this.memoryParameters[14] = this.memoryParameters[14] != null ? this.memoryParameters[14].dispose() : null;
+				this.memoryParameters[15] = this.memoryParameters[15] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 15, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2281), 175, "1 ~ 30min", 220, false, 50, 150, 1, 30) : this.memoryParameters[15]; //$NON-NLS-1$ 
+				this.memoryParameters[16] = this.memoryParameters[16] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 16, Messages.getString(MessageIds.GDE_MSGT2282), 175,
+						Messages.getString(MessageIds.GDE_MSGT2241) + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT2240), 220, UltraDuoPlusDialog.offOnType, 50, 150)
+						: this.memoryParameters[16];
+				this.memoryParameters[18].updateValueRange("800 ~ 1300 mV", 800, 1300, -800);  //$NON-NLS-1$ 
+				this.memoryParameters[21] = this.memoryParameters[21] == null ? new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 21, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2283), 175, "1100 ~ 1300 mV", 220, true, 50, 150, 1100, 1300, -1100) : this.memoryParameters[21]; //$NON-NLS-1$ 
+				this.memoryParameters[26] = this.memoryParameters[26] != null ? this.memoryParameters[26].dispose() : null;
+				this.chargeSelectHeight = 10 * this.parameterSelectHeight;
+				this.dischargeSelectHeight = 5 * this.parameterSelectHeight;
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 165);
+				this.cycleGroup.setVisible(true);
 				break;
 			case 2: //LiIo
+				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
+				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
+				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
+				this.memoryParameters[13] = this.memoryParameters[13] != null ? this.memoryParameters[13].dispose() : null;
+				if (this.memoryParameters[14] == null)
+					this.memoryParameters[14] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2267), 175, "3600 ~ 4200 mV", 220, true, 50, 150, 3600, 4200, -3600); //$NON-NLS-1$ 
+				else this.memoryParameters[14].updateValueRange("3600 ~ 4200 mV", 3600, 4200, -3600);
+				this.memoryParameters[15] = this.memoryParameters[15] != null ? this.memoryParameters[15].dispose() : null;
+				this.memoryParameters[16] = this.memoryParameters[16] != null ? this.memoryParameters[16].dispose() : null;
+				this.memoryParameters[18].updateValueRange("2500 ~ 4100 mV", 2500, 4100, -2500);  //$NON-NLS-1$ 
+				this.memoryParameters[21] = this.memoryParameters[21] != null ? this.memoryParameters[21].dispose() : null;
+				if (this.memoryParameters[26] == null)
+				this.memoryParameters[26] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2276), 175, "3600 ~ 3900 mV", 220, true, 50, 150, 3600, 3900, -3600); //$NON-NLS-1$ 
+				else this.memoryParameters[26].updateValueRange("3600 ~ 3900 mV", 3600, 3900, -3600);
+				this.chargeSelectHeight = 6 * this.parameterSelectHeight + 10;
+				this.dischargeSelectHeight = 4 * this.parameterSelectHeight;
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2314), 10, 135);
+				this.cycleGroup.setVisible(true);
+				break;
 			case 3: //LiPo
+				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
+				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
+				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
+				this.memoryParameters[13] = this.memoryParameters[13] != null ? this.memoryParameters[13].dispose() : null;
+				if (this.memoryParameters[14] == null)
+					this.memoryParameters[14] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2267), 175, "3700 ~ 4300 mV", 220, true, 50, 150, 3700, 4300, -3700); //$NON-NLS-1$ 
+				else this.memoryParameters[14].updateValueRange("3700 ~ 4300 mV", 3700, 4300, -3700);
+				this.memoryParameters[15] = this.memoryParameters[15] != null ? this.memoryParameters[15].dispose() : null;
+				this.memoryParameters[16] = this.memoryParameters[16] != null ? this.memoryParameters[16].dispose() : null;
+				this.memoryParameters[18].updateValueRange("2500 ~ 4200 mV", 2500, 4200, -2500);  //$NON-NLS-1$ 
+				this.memoryParameters[21] = this.memoryParameters[21] != null ? this.memoryParameters[21].dispose() : null;
+				if (this.memoryParameters[26] == null)
+					this.memoryParameters[26] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2276), 175, "3700 ~ 4000 mV", 220, true, 50, 150, 3700, 4000, -3700); //$NON-NLS-1$ 
+				else this.memoryParameters[26].updateValueRange("3700 ~ 4000 mV", 3700, 4000, -3700);
+				this.chargeSelectHeight = 6 * this.parameterSelectHeight + 10;
+				this.dischargeSelectHeight = 4 * this.parameterSelectHeight;
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2314), 10, 135);
+				this.cycleGroup.setVisible(true);
+				break;
 			case 4: //LiFe
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
 				this.memoryParameters[13] = this.memoryParameters[13] != null ? this.memoryParameters[13].dispose() : null;
-				this.memoryParameters[14] = this.memoryParameters[14] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY,
-						Messages.getString(MessageIds.GDE_MSGT2267), 175, "1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000) : this.memoryParameters[14]; //$NON-NLS-1$ 
+				if (this.memoryParameters[14] == null)
+					this.memoryParameters[14] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2267), 175, "3300 ~ 3700 mV", 220, true, 50, 150, 3300, 3700, -3300); //$NON-NLS-1$ 
+				else this.memoryParameters[14].updateValueRange("3300 ~ 3700 mV", 3300, 3700, -3300);
 				this.memoryParameters[15] = this.memoryParameters[15] != null ? this.memoryParameters[15].dispose() : null;
 				this.memoryParameters[16] = this.memoryParameters[16] != null ? this.memoryParameters[16].dispose() : null;
+				this.memoryParameters[18].updateValueRange("2000 ~ 3700 mV", 2000, 3700, -2000);  //$NON-NLS-1$ 
 				this.memoryParameters[21] = this.memoryParameters[21] != null ? this.memoryParameters[21].dispose() : null;
-				this.memoryParameters[26] = this.memoryParameters[26] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, GDE.STRING_EMPTY,
-						Messages.getString(MessageIds.GDE_MSGT2276), 175, "1000 ~ 4000", 220, true, 50, 150, 1000, 4000, -1000) : this.memoryParameters[26]; //$NON-NLS-1$ 
+				if (this.memoryParameters[26] == null)
+					this.memoryParameters[26] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2276), 175, "3300 ~ 3600 mV", 220, true, 50, 150, 3300, 3600, -3300); //$NON-NLS-1$ 
+				else this.memoryParameters[26].updateValueRange("3300 ~ 3600 mV", 3300, 3600, -3300);
 				this.chargeSelectHeight = 6 * this.parameterSelectHeight + 10;
 				this.dischargeSelectHeight = 4 * this.parameterSelectHeight;
-				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2314), 10, 125);
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2314), 10, 135);
+				this.cycleGroup.setVisible(true);
 				break;
 			case 5: //Pb
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
 				this.memoryParameters[13] = this.memoryParameters[13] != null ? this.memoryParameters[13].dispose() : null;
-				this.memoryParameters[14] = this.memoryParameters[14] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY,
-						Messages.getString(MessageIds.GDE_MSGT2267), 175, "1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000) : this.memoryParameters[14]; //$NON-NLS-1$ 
-				this.memoryParameters[15] = this.memoryParameters[15] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 15, GDE.STRING_EMPTY,
-						Messages.getString(MessageIds.GDE_MSGT2281), 175, "1 ~ 30min", 220, false, 50, 150, 1, 30) : this.memoryParameters[15]; //$NON-NLS-1$ 
+				if (this.memoryParameters[14] == null)
+					this.memoryParameters[14] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY,
+						Messages.getString(MessageIds.GDE_MSGT2267), 175, "1800 ~ 2450 mV", 220, true, 50, 150, 1800, 2450, -1800); //$NON-NLS-1$ 
+				else this.memoryParameters[14].updateValueRange("1800 ~ 2450 mV", 1800, 2450, -1800);
+				this.memoryParameters[15] = this.memoryParameters[15] != null ? this.memoryParameters[15].dispose() : null;
 				this.memoryParameters[16] = this.memoryParameters[16] != null ? this.memoryParameters[16].dispose() : null;
+				this.memoryParameters[18].updateValueRange("1500 ~ 2000 mV", 1500, 2000, -1500);  //$NON-NLS-1$ 
 				this.memoryParameters[21] = this.memoryParameters[21] != null ? this.memoryParameters[21].dispose() : null;
 				this.memoryParameters[26] = this.memoryParameters[26] != null ? this.memoryParameters[26].dispose() : null;
-				this.chargeSelectHeight = 6 * this.parameterSelectHeight + 10;
+				this.chargeSelectHeight = 5 * this.parameterSelectHeight + 10;
 				this.dischargeSelectHeight = 4 * this.parameterSelectHeight;
-				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 155);
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 135);
+				this.cycleGroup.setVisible(false);
 				break;
 			}
 			this.chargeGroup.setSize(this.scrolledchargeComposite.getClientArea().width, this.chargeSelectHeight);
@@ -2000,7 +2078,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.memoryValues[9] = 0; //trickleCurrent
 			this.memoryValues[14] = 4200; //chargeVoltage/cell
 			this.memoryValues[26] = 4000; //storeVoltage/cell
-			this.memoryValues[18] = 3000; //dischargeVoltage/cell
+			this.memoryValues[18] = 3100; //dischargeVoltage/cell
 			this.memoryValues[19] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 40 : (9 / 5) * 40 + 32; //dischargeOffTemperature
 			break;
 		case 4: //LiFe

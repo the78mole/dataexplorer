@@ -44,7 +44,7 @@ public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
 	final static int					TIME_STEP_DEFAULT						= 1000;
-	final static int					WAIT_TIME_RETRYS						= 1800;																											// 180 * 1 sec
+	final static int					WAIT_TIME_RETRYS						= 3600;																											// 3600 * 1 sec
 
 	final DataExplorer				application;
 	final UltramatSerialPort	serialPort;
