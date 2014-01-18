@@ -85,19 +85,22 @@
 <DIV ID="Content">
 <H1><A CLASS="an" NAME="introduction"></A>Einleitung</H1>
 <P>Der GNU DataExplorer ist ein Werkzeug zum Aufnehmen, Betrachten und Auswerten von Daten aus Geräten,
-die es erlauben Daten entweder über eine serielle Schnittstelle auszulesen oder ihre Daten auf andere 
-Weise zugänglich machen (CSV-Datei, USB Anschluss). 
-Der GNU DataExplorer ist unter vielen Betriebssystemen mit 32 und 64 Bit lauffähig (GNU/Linux, Windows, Mac OS). 
+die es erlauben Daten entweder über eine serielle Schnittstelle auszulesen oder ihre Daten durch Datenimport zugänglich machen. 
+Der GNU DataExplorer ist unter vielen Betriebssystemen mit 32 und 64 Bit lauffähig (GNU/Linux, Windows, Mac OS X). 
 Sprachenunterstützung ist vorhanden, wobei aktuell Deutsch und Englisch vorhanden sind.
 </P>
 <P>Ein wesentlicher Aspekt für die Entwicklung war der
-systemübergreifende Gedanke. Für nicht Windowsbenutzer soll eine
+systemübergreifende Gedanke. 
+Für alle im Privatgebrauch befindlichen Computer Betriebssysteme soll die Möglichkeit bereit gestellt werden, 
+Messdaten von den verschiedensten Gelegenheiten, grafisch auf zu bereiten. 
+Seien es Strom und Spannungen von Batterie-Ladegeräten,  Daten von Elektromotoren oder Telemetriesdaten aus dem Bereich des Modellbaus.
+Für nicht Windowsbenutzer soll eine
 ähnliche Funktionalität zur Verfügung gestellt werden, wie es LogView
 für Windowsbenutzer heute schon bietet. Deshalb basiert die
 Implementierung auf Java unter Verwendung der freien RXTXcomm
 Bibliothek, für die serielle Anbindung und der eclipse SWT Bibliothek
 für die Benutzeroberfläche. Für beide Basisbibliotheken gibt es die
-native Anbindung für Windows, GNU/Linux und Mac OS. Entwickelt wird mit
+native Anbindung für Windows, GNU/Linux und Mac OS X. Entwickelt wird mit
 einer frei verfügbaren eclipse IDE (integrated development environment)
 und einer Java 6 runtime.</P>
 <P>Wie sind die seriellen Ports auf den verschiedenen
@@ -112,7 +115,7 @@ Das ermöglicht Eingriffe in den Anwendungskerncode, um Fehler zu beseitigen ode
 Es wird möglich weitere Geräte anzubinden, die mir selbst nicht zur Verfügung stehen. 
 </BR>
 Die gerätespezifischen Komponenten sind als Module extra gehalten und
-werden zu Laufzeit des Programms dynamisch geladen (plug-in). Das
+werden zu Laufzeit des Programms dynamisch geladen (Plug-in). Das
 ermöglicht eine Implementierung der Gerätefunktionalität unabhängig von
 der Kernkomponente. Es gibt offene Beispielimplementierungen an die man
 sich halten kann. Um ein Gerät in die Anwendung einzubinden erfordert
@@ -125,7 +128,7 @@ Programmierkenntnisse).</P>
 "Virtual Machine" (VM) läuft, ist die Laufzeitumgebung in erster
 Näherung auf allen Systemplattformen gleich. Deshalb kann ein
 Javaprogramm fast überall laufen. Die VM bestimmt auch den zur Verfügung
-gestellten Speicher. Anders als z.B. ein in C geschriebenes Programm
+gestellten Speicher. Anders als z. B. ein in C geschriebenes Programm
 kann ein Javaprogramm nur auf den Speicher zurückgreifen, der beim Start
 der VM angegeben wurde. Das bedeutet, dass einem Javaprogramm, immer
 beim Starten den Speicherverbrauchsrahmen mitgegeben werden muss
@@ -134,8 +137,8 @@ MByte eingestellt. Nun hört sich VM, wie ein eigenes System an, aus dem
 man nicht ausbrechen kann. Wäre dem so, gäbe es keine serielle
 Kommunikation und keine Grafikbibliothek, zum flotten Anzeigen. Früher
 war dem auch so, deshalb eilt einem Javaprogramm auch immer der Ruf
-voraus, dass Javaprogramme langsam sind. Durch die "just in time" (JIT)
-Übersetzung beim Start ist dieses Manko schon lange ausgeglichen.
+voraus, dass Javaprogramme langsam sind. Durch die "just in time" 
+(JIT)-Übersetzung beim Start ist dieses Manko schon lange ausgeglichen.
 Javaprogramme stehen anderen direkt in Maschinensprache übersetzten
 Programmen in nichts nach. Durch das "Java Native Interface" kann man
 sozusagen in Java auf die Hardware durchgreifen. Hier sind es dann meist
