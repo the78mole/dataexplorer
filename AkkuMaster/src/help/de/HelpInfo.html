@@ -33,20 +33,20 @@
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><A NAME="einleitung"></A><FONT FACE="Arial"><FONT SIZE=4><I>AkkuMaster
+	<H2><A NAME="einleitung"></A><FONT FACE="Arial"><FONT SIZE=4><I>Der AkkuMaster
 	C4 Ger&auml;tedialog Einleitung</I></FONT></FONT></H2>
 </DIV>
-<P>Der AkkuMaster C4 Ger&auml;tedialog dient zum Einstellen und
-Auslesen von Lade-Entladevorg&auml;ngen. Es k&ouml;nnen alle vier
+<P>Der AkkuMaster-C4-Ger&auml;tedialog dient zum Einstellen und
+Auslesen von Lade-bzw. Entladevorg&auml;ngen. Es k&ouml;nnen alle vier
 Ausg&auml;nge einzeln konfiguriert und bedient werden. Eine
-Konfiguration, die das Ger&auml;t &uuml;berlastet ist nicht m&ouml;glich.
+Konfiguration, die das Ger&auml;t &uuml;berlastet, ist nicht m&ouml;glich.
 Der aus den anwendungsspezifischen Einstellungen resultierende
 Gesamtstrom wird jeweils angezeigt. <BR><B>Hinweis : </B>Ist ein
-Auslesevorgang aktiv, kann der Dialog nicht geschlossen werden (Es
-wird ein entsprechender Hinweis in der Statuszeile ausgegeben). Da
-die Anzeige f&uuml;r alle aktiven Ausg&auml;nge laufend aktualisiert
+Auslesevorgang aktiv, kann der Dialog nicht geschlossen werden. 
+Es wird ein entsprechender Hinweis in der Statuszeile ausgegeben. 
+Da die Anzeige f&uuml;r alle aktiven Ausg&auml;nge laufend aktualisiert
 wird, ist eine modales Dialogverhalten nicht ratsam. Sonst ist ein
-Umschalten zwischen den Anzeigen der 4 Kan&auml;le nicht m&ouml;glich.
+Umschalten zwischen den Anzeigen der view Kan&auml;le nicht m&ouml;glich.
 </P>
 <P>Viele Felder sind mit Hilfetexten hinterlegt und sollten diese
 Beschreibung f&uuml;r den weiteren Gebrauch weitestgehend &uuml;berfl&uuml;ssig
@@ -54,11 +54,11 @@ machen. Die Texte werden durch den dar&uuml;ber gehaltenen Mauszeiger
 sichtbar. 
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Versionsinformation</I></FONT></FONT></H2>
-<P>Nachdem der serielle Schnittstelle &uuml;ber den
+<P>Nachdem die serielle Schnittstelle &uuml;ber den
 Ger&auml;teauswahldialog eingestellt ist und der Ger&auml;tedialog
-aufgerufen wird der serielle Port im Hintergrund ge&ouml;ffnet und
+aufgerufen ist, wird der serielle Port im Hintergrund ge&ouml;ffnet und
 die Versionsinformation aktualisiert. Das kann zu einem
-Kommunikationsfehler f&uuml;hren, wenn der Konfigurierte Port nicht
+Kommunikationsfehler f&uuml;hren, wenn der konfigurierte Port nicht
 ge&ouml;ffnet werden kann oder das Ger&auml;t ausgeschaltet ist. Ein
 Dialog mit der aktuellsten EPROM Version des Herstellers ist im Bild
 1 zu sehen. 
@@ -66,9 +66,8 @@ Dialog mit der aktuellsten EPROM Version des Herstellers ist im Bild
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="Bild1" ALT="Bild1" ALIGN=BOTTOM WIDTH=440 HEIGHT=590 BORDER=0>
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Steuerung der Aufnahme</I></FONT></FONT></H2>
-<P>Nach der Anwahl eines Ausgangstabulators sind alle, nicht
-ben&ouml;tigten Kn&ouml;pfe, inaktiv geschaltet. Es bleiben als
-einzige Auswahlm&ouml;glichkeit 
+<P>Nach der Anwahl eines Ausgangstabulators sind alle nicht ben&ouml;tigten Kn&ouml;pfe inaktiv geschaltet. 
+Es bleiben als einzige Auswahlm&ouml;glichkeit 
 </P>
 <UL>
 	<LI>Nur Datenaufnahme 
@@ -83,42 +82,42 @@ einzige Auswahlm&ouml;glichkeit
 <P>Wenn wie gewohnt am Ger&auml;t der Ladevorgang gestartet wird,
 wird durch Auswahl von &quot;Nur Datenaufnahme&quot; die Anzeige im
 unteren Bereich mit den aktuell im Ger&auml;t eingestellten Werten
-aktualisiert. Au&szlig;erdem wird der Start-Knopf aktiviert, um eine
+aktualisiert. Au&szlig;erdem wird der &quot;Start&quot;-Knopf aktiviert, um eine
 Datenaufnahme zu beginnen (Bild 3). 
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_3.png" NAME="Bild2" ALT="Bild3" ALIGN=BOTTOM WIDTH=440 HEIGHT=590 BORDER=0>
 </P>
-<P>Wird der Start-Kopf gedr&uuml;ckt aktualisiert sich die graphische
-Anzeige zyklisch mit den gemessenen Werten. Der Stopp-Kopf wird
+<P>Wird der &quot;Start&quot;-Kopf gedr&uuml;ckt, aktualisiert sich die grafische
+Anzeige zyklisch mit den gemessenen Werten. Der &quot;Stop&quot;-Kopf wird
 aktiviert, um die Datenaufnahme gegebenenfalls abzubrechen. 
 </P>
 <P>Datens&auml;tze werden automatisch beim Wechsel des Programms
 angelegt, entladen -&gt; laden. 
 </P>
 <P>Die Datenaufnahme stoppt automatisch, wenn das Ger&auml;t den
-Lade-Entladevorgang als beendet erkl&auml;rt. 
+Lade- bzw. Entladevorgang als beendet erkl&auml;rt. 
 </P>
-<P><B>Hinweis : </B>Ein stoppen der Datenaufnahme <B>stoppt</B> auch,
-aus Sicherheitsgr&uuml;nden, das laufende Programm im Ger&auml;t ! 
+<P><B>Hinweis: </B>Ein stoppen der Datenaufnahme <B>stoppt</B> auch,
+aus Sicherheitsgr&uuml;nden, das laufende Programm im Ger&auml;t! 
 </P>
 <H3><FONT FACE="Arial"><FONT SIZE=4><I>Selbst konfiguriertes Programm</I></FONT></FONT></H3>
-<P>Wird &quot;Selbst konfiguriertes Programm&quot; angew&auml;hlt
+<P>Wird &quot;Selbst konfiguriertes Programm&quot; angew&auml;hlt,
 aktualisiert sich die Anzeige mit den aktuell im Ger&auml;t
 eingestellten Werten. <BR>Nun kann man nach eigenen Vorgaben die
 Werte &uuml;ber den Dialog ver&auml;ndern. <BR>Da ein Programm, das
-im Ger&auml;t ablaufen soll im EPROM verf&uuml;gbar sein muss wird
+im Ger&auml;t ablaufen soll, im EPROM verf&uuml;gbar sein muss, wird
 das eingestellte Programm in die eingestellte Speicherstelle
 geschrieben. 
 </P>
-<P><B>Hinweis : </B>Leider ist es nicht m&ouml;glich &uuml;ber die
+<P><B>Hinweis : </B>Leider ist es nicht m&ouml;glich, &uuml;ber die
 Kommunikationsschnittstelle eine Speicherstelle auszuw&auml;hlen und
 die dazugeh&ouml;rigen Werte auszulesen. Ich bevorzuge deshalb den
 Weg, das Programm am Ger&auml;t selbst einzustellen und &uuml;ber
 &quot;Nur Datenaufnahme&quot; die auflaufenden Daten aufzunehmen. 
 </P>
-<P>W&auml;hlt man nun einen abweichende Speicherstelle aus, wird zur
+<P>W&auml;hlt man nun eine abweichende Speicherstelle aus, wird zur
 Verdeutlichung der &Auml;nderung die Hintergrundfarbe f&uuml;r dieses
-Feld umgeschaltet. <BR>Bet&auml;tigt man nun den Start-Knopf wird das
+Feld umgeschaltet. <BR>Bet&auml;tigt man nun den &quot;Start&quot;-Knopf wird das
 Programm in die gew&auml;hlte Speicherstelle geschrieben und das
 Programm im Ger&auml;t gestartet. So ist es im nachfolgenden Bild
 zusehen. 
