@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.1.4 - xx yyy 2013
 update build to make sure compiled classes target 1.6
+update height of device properties editor to enable proper display of scroll bar in channel- configuration tabulator
 Junsi iCharger - fix data capture capability
 FlightRecorder - fix using name and unit from setup
 HoTTAdapter* - fix file transfer count down/up signature
