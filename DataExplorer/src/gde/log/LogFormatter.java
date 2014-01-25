@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014 Winfried Bruegmann
 ****************************************************************************************/
 package gde.log;
 
