@@ -852,13 +852,16 @@ public class GraphicsComposite extends Composite {
 
 		// draw each record using sorted record set names
 		long startTime = new Date().getTime();
+		boolean isDrawScaleInRecordColor = this.settings.isDrawScaleInRecordColor();
+		boolean isDrawNameInRecordColor = this.settings.isDrawNameInRecordColor();
+		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
 		recordSet.updateSyncRecordScale();
 		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (log.isLoggable(Level.FINE) && isActualRecordEnabled) 
 				log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (actualRecord.isScaleVisible()) 
-				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
+				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());

@@ -114,6 +114,9 @@ public class Settings extends Properties {
 	final static String							GRAPHICS_AREA_BACKGROUND			= "graphics_area_background";																																		//$NON-NLS-1$
 	final static String							GRAPHICS_SURROUND_BACKGRD			= "graphics_surround_backgrd";																																	//$NON-NLS-1$
 	final static String							GRAPHICS_BORDER_COLOR					= "graphics_border_color";																																			//$NON-NLS-1$
+	final static String							IS_GRAPHICS_SCALE_COLOR				= "is_graphics_scale_color";																																		//$NON-NLS-1$
+	final static String							IS_GRAPHICS_NUMBERS_COLOR			= "is_graphics_number_color";																																		//$NON-NLS-1$
+	final static String							IS_GRAPHICS_NAME_COLOR				= "is_graphics_text_color";																																			//$NON-NLS-1$
 	final static String							COMPARE_AREA_BACKGROUND				= "compare_area_background";																																		//$NON-NLS-1$
 	final static String							COMPARE_SURROUND_BACKGRD			= "compare_surround_backgrd";																																		//$NON-NLS-1$
 	final static String							COMPARE_BORDER_COLOR					= "compare_border_color";																																				//$NON-NLS-1$
@@ -520,6 +523,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_AREA_BACKGROUND, getGraphicsCurveAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_SURROUND_BACKGRD, getGraphicsSurroundingBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_BORDER_COLOR, getGraphicsCurvesBorderColorStr())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_SCALE_COLOR, isDrawScaleInRecordColor())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NAME_COLOR, isDrawNameInRecordColor())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NUMBERS_COLOR, isDrawNumbersInRecordColor())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_AREA_BACKGROUND, getCompareCurveAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_SURROUND_BACKGRD, getCompareSurroundingBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_BORDER_COLOR, getCurveCompareBorderColorStr())); //$NON-NLS-1$
@@ -2036,4 +2042,50 @@ public class Settings extends Properties {
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "newDataFilePath = " + filePath); //$NON-NLS-1$
 		this.setProperty(Settings.OBJECT_IMAGE_FILE_PATH, filePath);
 	}
+	
+	/**
+	 * set boolean value if the scale of the records drawn in graphics should be in same color as the curve
+	 * @param isUseRecordColor
+	 */
+	public void setDrawScaleInRecordColor(boolean isUseRecordColor) {
+		this.setProperty(Settings.IS_GRAPHICS_SCALE_COLOR, GDE.STRING_EMPTY+isUseRecordColor);
+	}
+
+	/**
+	 * @return boolean value of true if the scale of the records drawn in graphics should be in same color as the curve
+	 */
+	public boolean isDrawScaleInRecordColor() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_GRAPHICS_SCALE_COLOR, "true")); //$NON-NLS-1$
+	}
+	
+	/**
+	 * set boolean value if the name of the records drawn in graphics should be in same color as the curve
+	 * @param isUseRecordColor
+	 */
+	public void setDrawNameInRecordColor(boolean isUseRecordColor) {
+		this.setProperty(Settings.IS_GRAPHICS_NAME_COLOR, GDE.STRING_EMPTY+isUseRecordColor);
+	}
+
+	/**
+	 * @return boolean value of true if the name at the scale of the records drawn in graphics should be in same color as the curve
+	 */
+	public boolean isDrawNameInRecordColor() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_GRAPHICS_NAME_COLOR, "true")); //$NON-NLS-1$
+	}
+	
+	/**
+	 * set boolean value if the scale of the records drawn in graphics should be in same color as the curve
+	 * @param isUseRecordColor
+	 */
+	public void setDrawNumbersInRecordColor(boolean isUseRecordColor) {
+		this.setProperty(Settings.IS_GRAPHICS_NUMBERS_COLOR, GDE.STRING_EMPTY+isUseRecordColor);
+	}
+
+	/**
+	 * @return boolean value of true if the number at the scale of the records drawn in graphics should be in same color as the curve
+	 */
+	public boolean isDrawNumbersInRecordColor() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_GRAPHICS_NUMBERS_COLOR, "false")); //$NON-NLS-1$
+	}
+
 }

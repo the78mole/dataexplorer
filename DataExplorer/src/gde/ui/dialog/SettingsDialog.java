@@ -135,6 +135,7 @@ public class SettingsDialog extends Dialog {
 	Button															removeLauncherButton;
 	Button															createLauncherButton;
 	Button															blankChargeDischargeButton, continiousRecordSetButton;
+	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton;
 	Composite														osMiscComposite;
 	Composite														miscComposite;
 	Group																shellMimeType;
@@ -741,24 +742,98 @@ public class SettingsDialog extends Dialog {
 						FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
 						this.miscComposite.setLayout(composite1Layout);
 						{
+							this.graphicsView = new Group(this.miscComposite, SWT.NONE);
+							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
+							chargerSpecialsLayout.center = true;
+							chargerSpecialsLayout.marginTop = 10;
+							chargerSpecialsLayout.marginWidth = 20;
+							chargerSpecialsLayout.spacing = 20;
+							this.graphicsView.setLayout(chargerSpecialsLayout);
+							this.graphicsView.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.graphicsView.setText(Messages.getString(MessageIds.GDE_MSGT0692));
+							{
+								Label label = new Label(this.graphicsView, SWT.LEFT);
+								RowData labelLData = new RowData();
+								labelLData.width = 460;
+								labelLData.height = 20;
+								label.setLayoutData(labelLData);
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setText(Messages.getString(MessageIds.GDE_MSGT0693));
+							}
+							{
+								this.drawScaleInRecordColorButton = new Button(this.graphicsView, SWT.CHECK);
+								this.drawScaleInRecordColorButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.drawScaleInRecordColorButton.setText(Messages.getString(MessageIds.GDE_MSGT0695));
+								this.drawScaleInRecordColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0694));
+								this.drawScaleInRecordColorButton.setSelection(this.settings.isDrawScaleInRecordColor());
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 460;
+								createLauncerButtonLData.height = 30;
+								this.drawScaleInRecordColorButton.setLayoutData(createLauncerButtonLData);
+								this.drawScaleInRecordColorButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "drawScaleInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setDrawScaleInRecordColor(SettingsDialog.this.drawScaleInRecordColorButton.getSelection());
+									}
+								});
+							}
+							{
+								this.drawNameInRecordColorButton = new Button(this.graphicsView, SWT.CHECK);
+								this.drawNameInRecordColorButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.drawNameInRecordColorButton.setText(Messages.getString(MessageIds.GDE_MSGT0696));
+								this.drawNameInRecordColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0694));
+								this.drawNameInRecordColorButton.setSelection(this.settings.isDrawNameInRecordColor());
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 460;
+								createLauncerButtonLData.height = 30;
+								this.drawNameInRecordColorButton.setLayoutData(createLauncerButtonLData);
+								this.drawNameInRecordColorButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "drawNameInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setDrawNameInRecordColor(SettingsDialog.this.drawNameInRecordColorButton.getSelection());
+									}
+								});
+							}
+							{
+								this.drawNumbersInRecordColorButton = new Button(this.graphicsView, SWT.CHECK);
+								this.drawNumbersInRecordColorButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.drawNumbersInRecordColorButton.setText(Messages.getString(MessageIds.GDE_MSGT0697));
+								this.drawNumbersInRecordColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0694));
+								this.drawNumbersInRecordColorButton.setSelection(this.settings.isDrawNumbersInRecordColor());
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 460;
+								createLauncerButtonLData.height = 30;
+								this.drawNumbersInRecordColorButton.setLayoutData(createLauncerButtonLData);
+								this.drawNumbersInRecordColorButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "drawNumbersInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setDrawNumbersInRecordColor(SettingsDialog.this.drawNumbersInRecordColorButton.getSelection());
+									}
+								});
+							}
+						}
+						{
 							this.chargerSpecials = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
-							chargerSpecialsLayout.marginTop = 30;
+							chargerSpecialsLayout.marginTop = 15;
 							chargerSpecialsLayout.marginWidth = 20;
 							chargerSpecialsLayout.spacing = 30;
 							this.chargerSpecials.setLayout(chargerSpecialsLayout);
 							this.chargerSpecials.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargerSpecials.setText(Messages.getString(MessageIds.GDE_MSGT0690));
 							{
-								Label label = new Label(this.chargerSpecials, SWT.CENTER);
+								Label label = new Label(this.chargerSpecials, SWT.LEFT);
 								RowData labelLData = new RowData();
-								labelLData.width = 340;
+								labelLData.width = 400;
 								labelLData.height = 20;
 								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								label.setText("Graupner - Ultra Duo Plus only!");
-								}
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setText(Messages.getString(MessageIds.GDE_MSGT0698));
+							}
 							{
 								this.blankChargeDischargeButton = new Button(this.chargerSpecials, SWT.CHECK);
 								this.blankChargeDischargeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -766,7 +841,7 @@ public class SettingsDialog extends Dialog {
 								this.blankChargeDischargeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0689));
 								this.blankChargeDischargeButton.setSelection(this.settings.isReduceChargeDischarge());
 								RowData createLauncerButtonLData = new RowData();
-								createLauncerButtonLData.width = 340;
+								createLauncerButtonLData.width = 400;
 								createLauncerButtonLData.height = 20;
 								this.blankChargeDischargeButton.setLayoutData(createLauncerButtonLData);
 								this.blankChargeDischargeButton.addSelectionListener(new SelectionAdapter() {
@@ -784,28 +859,17 @@ public class SettingsDialog extends Dialog {
 								this.continiousRecordSetButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0687));
 								this.continiousRecordSetButton.setSelection(this.settings.isContinuousRecordSet());
 								RowData createLauncerButtonLData = new RowData();
-								createLauncerButtonLData.width = 340;
+								createLauncerButtonLData.width = 400;
 								createLauncerButtonLData.height = 30;
 								this.continiousRecordSetButton.setLayoutData(createLauncerButtonLData);
 								this.continiousRecordSetButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "allInOneRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "continiousRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setContinuousRecordSet(SettingsDialog.this.continiousRecordSetButton.getSelection());
 									}
 								});
 							}
-						}
-						{
-							this.graphicsView = new Group(this.miscComposite, SWT.NONE);
-							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
-							chargerSpecialsLayout.center = true;
-							chargerSpecialsLayout.marginTop = 30;
-							chargerSpecialsLayout.marginWidth = 40;
-							chargerSpecialsLayout.spacing = 40;
-							this.graphicsView.setLayout(chargerSpecialsLayout);
-							this.graphicsView.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.graphicsView.setText(Messages.getString(MessageIds.GDE_MSGT0692));
 						}
 					}
 				}

@@ -58,8 +58,11 @@ public class GraphicsUtils {
 	 * @param gap distance between ticks and the number scale
 	 * @param isPositionLeft position of to be drawn scale
 	 * @param numberTickmarks 
+	 * @param isDrawNumbersInRecordColor 
 	 */
-	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks) {
+	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks, boolean isDrawNumbersInRecordColor) {
+
+		gc.setForeground(DataExplorer.COLOR_BLACK);
 
 		int yTop = y0-height+1;
 		double deltaScale = (maxValue - minValue);
@@ -67,6 +70,7 @@ public class GraphicsUtils {
 		int maxNumberTicks = height / 25 >= 2 ? height / 25 : 1;
 		double deltaScaleValue = deltaScale;
 		double minScaleValue, maxScaleValue;
+		
 		if (record.isRoundOut() || record.isStartEndDefined()) {
 			minScaleValue = minValue;
 			maxScaleValue = maxValue;
@@ -132,7 +136,10 @@ public class GraphicsUtils {
 					gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 				}
 				//draw numbers to the scale	
+				if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
+				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				drawTextCentered(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+				gc.setForeground(DataExplorer.COLOR_BLACK);
 			}
 			//draw mini ticks above first main tick
 			double yTickPositionMax = yTickPositionMin - numberTicks * deltaMainTickPixel;
@@ -146,6 +153,8 @@ public class GraphicsUtils {
 		else {
 			int yTickPosition = (int) (y0 - height / 2.0);
 			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
+			if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
+			else gc.setForeground(DataExplorer.COLOR_BLACK);
 			drawTextCentered(df.format((minScaleValue + minScaleValue) /2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 		}

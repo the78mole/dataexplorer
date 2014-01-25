@@ -18,17 +18,17 @@
 ****************************************************************************************/
 package gde.utils;
 
+import gde.GDE;
+import gde.data.Record;
+import gde.device.IDevice;
 import gde.log.Level;
+import gde.ui.DataExplorer;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-
-import gde.GDE;
-import gde.data.Record;
-import gde.device.IDevice;
-import gde.ui.DataExplorer;
 
 /**
  * This class contains utilities to draw curves and vertical scales
@@ -47,8 +47,11 @@ public class CurveUtils {
 	 * @param width
 	 * @param height
 	 * @param scaleWidthSpace
+	 * @param isDrawScalesInRecordColor
+	 * @param isDrawNameInRecordColor
+	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
+	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		final boolean isCompareSet = record.getParent().isCompareSet();
 		int numberTicks = 10, miniticks = 5;
@@ -156,27 +159,28 @@ public class CurveUtils {
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : record.getParent().getAxisPosition(recordName, isPositionLeft);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
-		gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
+		if (isDrawScaleInRecordColor) gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
+		else gc.setForeground(DataExplorer.COLOR_BLACK);
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			gc.setForeground(DataExplorer.COLOR_BLACK);
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
 			if (!isCompareSet) {
-				gc.setForeground(record.getColor());
+				if (isDrawNameInRecordColor) gc.setForeground(record.getColor());
+				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 			}
 		}
 		else {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //yMax
-			gc.setForeground(DataExplorer.COLOR_BLACK);
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
 			if (!isCompareSet) {
-				gc.setForeground(record.getColor());
+				if (isDrawNameInRecordColor) gc.setForeground(record.getColor());
+				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 			}
 		}
