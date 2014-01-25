@@ -330,7 +330,7 @@ public class TestSuperClass extends TestCase {
 		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable() && actualRecord.realSize() > 0;
 			if (actualRecord.isScaleVisible()) 
-				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
+				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, true, false, false);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(recordSet, gc, this.offSetY, width, this.settings.getGridDashStyle());
