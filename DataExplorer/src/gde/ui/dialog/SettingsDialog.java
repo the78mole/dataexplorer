@@ -135,7 +135,7 @@ public class SettingsDialog extends Dialog {
 	Button															removeLauncherButton;
 	Button															createLauncherButton;
 	Button															blankChargeDischargeButton, continiousRecordSetButton;
-	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton;
+	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, addChannelConfigNameCurveCompareButton;
 	Composite														osMiscComposite;
 	Composite														miscComposite;
 	Group																shellMimeType;
@@ -745,9 +745,9 @@ public class SettingsDialog extends Dialog {
 							this.graphicsView = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
-							chargerSpecialsLayout.marginTop = 10;
+							chargerSpecialsLayout.marginTop = 5;
 							chargerSpecialsLayout.marginWidth = 20;
-							chargerSpecialsLayout.spacing = 20;
+							chargerSpecialsLayout.spacing = 5;
 							this.graphicsView.setLayout(chargerSpecialsLayout);
 							this.graphicsView.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.graphicsView.setText(Messages.getString(MessageIds.GDE_MSGT0692));
@@ -768,7 +768,7 @@ public class SettingsDialog extends Dialog {
 								this.drawScaleInRecordColorButton.setSelection(this.settings.isDrawScaleInRecordColor());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 30;
+								createLauncerButtonLData.height = 20;
 								this.drawScaleInRecordColorButton.setLayoutData(createLauncerButtonLData);
 								this.drawScaleInRecordColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -786,7 +786,7 @@ public class SettingsDialog extends Dialog {
 								this.drawNameInRecordColorButton.setSelection(this.settings.isDrawNameInRecordColor());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 30;
+								createLauncerButtonLData.height = 20;
 								this.drawNameInRecordColorButton.setLayoutData(createLauncerButtonLData);
 								this.drawNameInRecordColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -804,13 +804,47 @@ public class SettingsDialog extends Dialog {
 								this.drawNumbersInRecordColorButton.setSelection(this.settings.isDrawNumbersInRecordColor());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 30;
+								createLauncerButtonLData.height = 20;
 								this.drawNumbersInRecordColorButton.setLayoutData(createLauncerButtonLData);
 								this.drawNumbersInRecordColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "drawNumbersInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDrawNumbersInRecordColor(SettingsDialog.this.drawNumbersInRecordColorButton.getSelection());
+									}
+								});
+							}
+							{
+								Label label = new Label(this.graphicsView, SWT.LEFT);
+								RowData labelLData = new RowData();
+								labelLData.width = 460;
+								labelLData.height = 10;
+								label.setLayoutData(labelLData);
+							}
+							{
+								Label label = new Label(this.graphicsView, SWT.LEFT);
+								RowData labelLData = new RowData();
+								labelLData.width = 460;
+								labelLData.height = 20;
+								label.setLayoutData(labelLData);
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setText(Messages.getString(MessageIds.GDE_MSGT0699));
+							}
+							{
+								this.addChannelConfigNameCurveCompareButton = new Button(this.graphicsView, SWT.CHECK);
+								this.addChannelConfigNameCurveCompareButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.addChannelConfigNameCurveCompareButton.setText(Messages.getString(MessageIds.GDE_MSGT0700));
+								this.addChannelConfigNameCurveCompareButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0701));
+								this.addChannelConfigNameCurveCompareButton.setSelection(this.settings.isCurveCompareChannelConfigName());
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 460;
+								createLauncerButtonLData.height = 20;
+								this.addChannelConfigNameCurveCompareButton.setLayoutData(createLauncerButtonLData);
+								this.addChannelConfigNameCurveCompareButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "addChannelConfigNameCurveCompareButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setCurveCompareChannelConfigName(SettingsDialog.this.addChannelConfigNameCurveCompareButton.getSelection());
 									}
 								});
 							}

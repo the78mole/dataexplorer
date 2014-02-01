@@ -120,6 +120,7 @@ public class Settings extends Properties {
 	final static String							COMPARE_AREA_BACKGROUND				= "compare_area_background";																																		//$NON-NLS-1$
 	final static String							COMPARE_SURROUND_BACKGRD			= "compare_surround_backgrd";																																		//$NON-NLS-1$
 	final static String							COMPARE_BORDER_COLOR					= "compare_border_color";																																				//$NON-NLS-1$
+	final static String							IS_COMPARE_CHANNELCONFIG			= "is_compare_channel_config_name";																															//$NON-NLS-1$
 	final static String							UTILITY_AREA_BACKGROUND				= "utility_area_background";																																		//$NON-NLS-1$
 	final static String							UTILITY_SURROUND_BACKGRD			= "utility_surround_backgrd";																																		//$NON-NLS-1$
 	final static String							UTILITY_BORDER_COLOR					= "utility_border_color";																																				//$NON-NLS-1$
@@ -529,6 +530,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_AREA_BACKGROUND, getCompareCurveAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_SURROUND_BACKGRD, getCompareSurroundingBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_BORDER_COLOR, getCurveCompareBorderColorStr())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_COMPARE_CHANNELCONFIG, isCurveCompareChannelConfigName())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_AREA_BACKGROUND, getUtilityCurveAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_SURROUND_BACKGRD, getUtilitySurroundingBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_BORDER_COLOR, getUtilityCurvesBorderColorStr())); //$NON-NLS-1$
@@ -2087,5 +2089,20 @@ public class Settings extends Properties {
 	public boolean isDrawNumbersInRecordColor() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_GRAPHICS_NUMBERS_COLOR, "false")); //$NON-NLS-1$
 	}
+	
+	
+	/**
+	 * set boolean value if the channel/configuration name should be used as leader of record name in curve compare
+	 * @param isUseChannelConfigName
+	 */
+	public void setCurveCompareChannelConfigName(boolean isUseChannelConfigName) {
+		this.setProperty(Settings.IS_COMPARE_CHANNELCONFIG, GDE.STRING_EMPTY+isUseChannelConfigName);
+	}
 
+	/**
+	 * @return boolean value of true if the channel/configuration name should be used as leader of record name in curve compare
+	 */
+	public boolean isCurveCompareChannelConfigName() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_COMPARE_CHANNELCONFIG, "false")); //$NON-NLS-1$
+	}
 }

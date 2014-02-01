@@ -1092,7 +1092,9 @@ public class CurveSelectorContextMenu {
 								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 							}
 							
-							String newRecordkey = copyFromRecord.getChannelConfigKey() +  GDE.STRING_UNDER_BAR + copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
+							String newRecordkey = settings.isCurveCompareChannelConfigName() 
+									? copyFromRecord.getChannelConfigKey() +  GDE.STRING_UNDER_BAR + copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size()
+									: copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
 							Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
 							newRecord.setOrdinal(copyFromRecord.getOrdinal());
 							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
