@@ -2978,10 +2978,12 @@ public class DataExplorer extends Composite {
 										if (url.getFile().endsWith(GDE.FILE_ENDING_DOT_JAR)) {
 												String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
 												installpath = installpath.substring(0, installpath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
-												String command = "cd " + installpath + "\nsudo tar -xzf " + targetFilePath + "\"";
+												String command = "cd " + installpath + "; sudo tar -xzf " + targetFilePath + "\"";
+												log.log(Level.OFF, "command = " + command);
 												MessageBox message = new MessageBox(GDE.shell, SWT.ICON_INFORMATION);
 												message.setText(GDE.NAME_LONG);
 												message.setMessage(Messages.getString(MessageIds.GDE_MSGI0055, new String[] {command}));
+												message.open();
 										}
 									}
 									else {
