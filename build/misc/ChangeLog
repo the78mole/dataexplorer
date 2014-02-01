@@ -4,6 +4,7 @@ Version 3.1.4 - xx yyy 2013
 update build to make sure compiled classes target 1.6
 update height of device properties editor to enable proper display of scroll bar in channel- configuration tabulator
 enable record color usage configuration for scale, scale numbers and record name
+enable configuration of outlet- configuration name usage in curve compare
 Junsi iCharger - fix data capture capability
 FlightRecorder - fix using name and unit from setup
 HoTTAdapter* - fix file transfer count down/up signature
@@ -11,7 +12,7 @@ HoTTAdapter* - fix fuel to ml, was fuel level in % (requires manual replacement 
 HoTTAdapter* - fix Rx->Tx PLoss first value by setting to 0
 HoTTAdapter2 - add evaluation of EAM RPM (as GAM RPM value)
 UltraDuoPlus - correct several adjustment parameters 
-A4-Akkumonitor - correct time calculation, adapt device XML, adapt template XML
+4D-Akkumonitor - correct time calculation, adapt device XML, adapt template XML
 documentation update
 
 
