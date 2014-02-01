@@ -119,6 +119,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader2.application.getMenuToolBar();
+		int progressIndicator = (int) (numberDatablocks/30);
 		if (menuToolBar != null) HoTTbinReader2.application.setProgress(0, sThreadId);
 
 		try {
@@ -313,7 +314,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					
 					HoTTbinReader2.timeStep_ms += 10; // add default time step from device of 10 msec
 
-					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);				
+					if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);				
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter2.reverseChannelPackageLossCounter.add(0);
@@ -338,6 +339,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			if (menuToolBar != null) {
+				HoTTbinReader2.application.setProgress(99, sThreadId);
 				if (!isInitialSwitched) {
 					HoTTbinReader2.channels.switchChannel(channel.getName());
 					channel.switchRecordSet(recordSetName);
@@ -426,6 +428,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader2.application.getMenuToolBar();
+		int progressIndicator = (int) (numberDatablocks/30);
 		if (menuToolBar != null) HoTTbinReader2.application.setProgress(0, sThreadId);
 
 		try {
@@ -612,7 +615,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					HoTTbinReader2.timeStep_ms += 10;// add default time step from log record of 10 msec
 				
-					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
 					HoTTAdapter2.reverseChannelPackageLossCounter.add(0);
@@ -637,6 +640,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			if (menuToolBar != null) {
+				HoTTbinReader2.application.setProgress(99, sThreadId);
 				if (!isInitialSwitched) {
 					HoTTbinReader2.channels.switchChannel(channel.getName());
 					channel.switchRecordSet(recordSetName);
@@ -682,7 +686,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			for (int k = 35; k < 58; k++) {
 				HoTTbinReader2.points[k] = HoTTbinReader2.pointsElectric[k];
 			}
-			HoTTbinReader2.points[29] = HoTTbinReader2.pointsGeneral[29];
+			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()] == false)
+				HoTTbinReader2.points[29] = HoTTbinReader2.pointsGeneral[29];
 		}
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
@@ -940,7 +945,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsElectric[55] = HoTTbinReader2.tmpVoltage2 * 100;
 			HoTTbinReader2.pointsElectric[56] = ((_buf3[1] & 0xFF) - 20) * 1000;
 			HoTTbinReader2.pointsElectric[57] = ((_buf3[2] & 0xFF) - 20) * 1000;
-			HoTTbinReader2.pointsGeneral[29] = DataParser.parse2Short(_buf4, 4) * 1000;
+			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()] == false)
+				HoTTbinReader2.pointsGeneral[29] = DataParser.parse2Short(_buf4, 4) * 1000;
 		}
 	}
 

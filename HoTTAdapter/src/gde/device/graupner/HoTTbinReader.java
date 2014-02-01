@@ -216,14 +216,14 @@ public class HoTTbinReader {
 		boolean isInitialSwitched = false;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
-		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
+		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 		HoTTbinReader.recordSetVario = null; //0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; //0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.recordSetSpeedControl = null; //0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 		HoTTbinReader.pointsReceiver = new int[8];
 		HoTTbinReader.pointsGeneral = new int[21];
-		HoTTbinReader.pointsElectric = new int[27];
+		HoTTbinReader.pointsElectric = new int[27]; //28 with RPM
 		HoTTbinReader.pointsVario = new int[7];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
@@ -248,6 +248,7 @@ public class HoTTbinReader {
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
+		int progressIndicator = (int) (numberDatablocks/30);
 		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
 
 		try {
@@ -514,7 +515,7 @@ public class HoTTbinReader {
 						break;
 					}
 
-					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 					
 					if (HoTTbinReader.isJustParsed && HoTTbinReader.countLostPackages > 0) {
 						HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
@@ -545,6 +546,7 @@ public class HoTTbinReader {
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
+				HoTTbinReader.application.setProgress(100, sThreadId);
 				if (!isInitialSwitched) {
 					HoTTbinReader.channels.switchChannel(channel.getName());
 					channel.switchRecordSet(recordSetName);
@@ -620,14 +622,14 @@ public class HoTTbinReader {
 		boolean isInitialSwitched = false;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
-		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
+		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 		HoTTbinReader.recordSetVario = null; //0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; //0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.recordSetSpeedControl = null; //0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
 		HoTTbinReader.pointsReceiver = new int[8];
 		HoTTbinReader.pointsGeneral = new int[21];
-		HoTTbinReader.pointsElectric = new int[27];
+		HoTTbinReader.pointsElectric = new int[27]; //28 with RPM
 		HoTTbinReader.pointsVario = new int[7];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
@@ -653,6 +655,7 @@ public class HoTTbinReader {
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
+		int progressIndicator = (int) (numberDatablocks/30);
 		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
 
 		try {
@@ -892,7 +895,7 @@ public class HoTTbinReader {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 					}
 
-					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 					
 					if (HoTTbinReader.isJustParsed && HoTTbinReader.countLostPackages > 0) {
 						HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
@@ -923,6 +926,7 @@ public class HoTTbinReader {
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
+				HoTTbinReader2.application.setProgress(99, sThreadId);
 				if (!isInitialSwitched) {
 					HoTTbinReader.channels.switchChannel(channel.getName());
 					channel.switchRecordSet(recordSetName);
@@ -1251,6 +1255,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsElectric[24] = HoTTbinReader.tmpVoltage2 * 1000;
 			HoTTbinReader.pointsElectric[25] = (_buf3[1] & 0xFF) * 1000;
 			HoTTbinReader.pointsElectric[26] = (_buf3[2] & 0xFF) * 1000;
+			//HoTTbinReader.pointsElectric[27] = DataParser.parse2Short(_buf4, 4) * 1000;
 
 			HoTTbinReader.recordSetElectric.addPoints(HoTTbinReader.pointsElectric, HoTTbinReader.timeStep_ms);
 			HoTTbinReader.isJustParsed = true;
