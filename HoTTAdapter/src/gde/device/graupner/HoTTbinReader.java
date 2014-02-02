@@ -237,6 +237,7 @@ public class HoTTbinReader {
 		HoTTbinReader.buf3 = null;
 		HoTTbinReader.buf4 = null;
 		int version = -1;
+		HoTTAdapter.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
@@ -644,6 +645,7 @@ public class HoTTbinReader {
 		HoTTbinReader.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
+		HoTTAdapter.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;

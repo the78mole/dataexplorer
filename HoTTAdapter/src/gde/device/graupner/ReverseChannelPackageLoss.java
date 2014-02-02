@@ -38,7 +38,7 @@ public class ReverseChannelPackageLoss extends Vector<Integer> {
 
 	@Override
 	public synchronized boolean add(Integer value) {
-		boolean ret = super.size() == 0 ? super.add(0) : super.add(value);
+		boolean ret = super.add(value);
 		if (value == 0) ++this.lossCounter;
 		if (this.size() > this.integrationInterval) {
 			if (this.get(0) == 0) --this.lossCounter;

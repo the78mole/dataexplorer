@@ -109,6 +109,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.buf3 = null;
 		HoTTbinReader2.buf4 = null;
 		int version = -1;
+		HoTTAdapter2.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader2.lostPackages.clear();
 		HoTTbinReader2.countLostPackages = 0;
 		int countPackageLoss = 0;
@@ -418,6 +419,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountMotorDriver = 0;
+		HoTTAdapter2.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader2.lostPackages.clear();
 		HoTTbinReader2.countLostPackages = 0;
 		int countPackageLoss = 0;
