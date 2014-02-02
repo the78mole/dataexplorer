@@ -381,7 +381,7 @@
 	</fileset>
 
 	<!-- create internal temporay file structure -->
-	<target name="copy-files" depends="package,create_HoTTGUI_target">
+	<target name="copy-files" depends="package,create_HoTTMdlViewer_lib">
 		<!-- programm directory -->
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
@@ -500,37 +500,37 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/Windows/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/Windows/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.mac32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="${basedir}/HoTTGUI/target/HoTTMdlViewer.jar" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 		</copy>
 
 		<!-- launcher scripts, README -->
@@ -669,11 +669,11 @@
 		<delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip" />
 	</target>
 
-	<target name="create_HoTTGUI_target" unless="${basedir}/HoTTGUI/target">
-		<mkdir dir="${basedir}/HoTTGUI/target" />
+	<target name="create_HoTTMdlViewer_lib" unless="${basedir}/HoTTMdlViewer/lib">
+		<mkdir dir="${basedir}/HoTTMdlViewer/lib" />
 	</target>
 	
-	<target name="source_package" depends="init,create_HoTTGUI_target" description="builds the source distribution package to run configure and make">
+	<target name="source_package" depends="init,create_HoTTMdlViewer_lib" description="builds the source distribution package to run configure and make">
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-src.tar.gz" compression="gzip">
 			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
 				<include name="**/src/**" />
@@ -685,11 +685,12 @@
 				<include name="WindowsHelper/**" />
 				<include name="thirdparty/**" />
 				<include name="DataFilesTestSamples/**" />
-				<include name="**/target/HoTTMdlViewer.jar" />
+				<include name="**/lib/HoTTMdlViewer.jar" />
 				<exclude name="*Decoder/**" />
 				<exclude name="*Config/**" />
-				<exclude name="HoTTGUI/src/**" />
+				<exclude name="HoTT-**/src/**" />
 				<exclude name="parent*/**" />
+				<exclude name="binding*/**" />
 				<exclude name="Test*/**" />
 				<exclude name="web*/**" />
 				<exclude name="lwjgl-2.5/**" />
