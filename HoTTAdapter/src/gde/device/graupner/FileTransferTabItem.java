@@ -367,6 +367,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.pcFoldersTable.setMenu(this.popupmenu);
 					}
 				}
+				updateSelectedPcFolder(null); //Initialize
 				{
 					this.sdCardActionGroup = new Group(this.innerComposite, SWT.NONE);
 					if (!GDE.IS_MAC) this.sdCardActionGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
