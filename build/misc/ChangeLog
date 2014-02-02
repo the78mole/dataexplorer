@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.4 - xx yyy 2013
+Version 3.1.4 - 02 Feb 2014
 update build to make sure compiled classes target 1.6
 update height of device properties editor to enable proper display of scroll bar in channel- configuration tabulator
 enable record color usage configuration for scale, scale numbers and record name
