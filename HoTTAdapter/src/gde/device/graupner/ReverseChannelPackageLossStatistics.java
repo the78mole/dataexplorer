@@ -47,7 +47,7 @@ public class ReverseChannelPackageLossStatistics extends Vector<Integer> {
 						zeroCount++;
 					}
 				}
-				this.avgValue = (this.size() - zeroCount) != 0 ? Long.valueOf(sum / (this.size() - zeroCount)).intValue() : 0;
+				this.avgValue = (this.size() - zeroCount) > 0 ? Long.valueOf(sum / (this.size() - zeroCount)).intValue() : 0;
 			}
 		}
 		return this.avgValue;
