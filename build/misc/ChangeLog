@@ -8,6 +8,7 @@ enable configuration of outlet- configuration name usage in curve compare
 Junsi iCharger - fix data capture capability
 FlightRecorder - fix using name and unit from setup
 HoTTAdapter* - fix file transfer count down/up signature
+HoTTAdapter* - fix file transfer initial PC folder update
 HoTTAdapter* - fix fuel to ml, was fuel level in % (requires manual replacement of device XML if used)
 HoTTAdapter* - fix Rx->Tx PLoss first value by setting to 0
 HoTTAdapter2 - add evaluation of EAM RPM (as GAM RPM value)
