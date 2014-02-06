@@ -682,7 +682,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 		if (isElectricData) {
-			for (int j = 8; j < 11; j++) {
+			if ((HoTTbinReader2.points[8] != 0 && HoTTbinReader2.pointsElectric[8] != 0) || HoTTbinReader2.pointsElectric[8] != 0)
+				HoTTbinReader2.points[8] = HoTTbinReader2.pointsElectric[8];
+			for (int j = 9; j < 11; j++) {
 				HoTTbinReader2.points[j] = HoTTbinReader2.pointsElectric[j];
 			}
 			for (int k = 35; k < 58; k++) {
@@ -694,7 +696,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		if (isGeneralData) {
-			for (int j = 8; j < 11; j++) {
+			if ((HoTTbinReader2.points[8] != 0 && HoTTbinReader2.pointsGeneral[8] != 0) || HoTTbinReader2.pointsGeneral[8] != 0)
+				HoTTbinReader2.points[8] = HoTTbinReader2.pointsGeneral[8];
+			for (int j = 9; j < 11; j++) {
 				HoTTbinReader2.points[j] = HoTTbinReader2.pointsGeneral[j];
 			}
 			for (int k = 18; k < 35; k++) {
