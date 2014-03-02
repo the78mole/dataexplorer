@@ -449,12 +449,12 @@ public class GDE {
 				if (!path.startsWith(GDE.STRING_DOT)) 
 					if (new File(basePath + path + GDE.STRING_WITHIN_ECLIPSE).exists())
 						urls.add(new URL("file:" + basePath + path + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
-					else if (new File(basePath + path + "/target" + GDE.STRING_WITHIN_ECLIPSE).exists()) {
+					else if (new File(basePath + path + "/lib").exists()) {
 						try {
-							List<File> jarFiles = FileUtils.getFileListing(new File(basePath + path + "/target/"), 1);
+							List<File> jarFiles = FileUtils.getFileListing(new File(basePath + path + "/lib/"), 1);
 							for (File jarFile : jarFiles) {
-								if (jarFile.getName().startsWith("HoTTGUI") && jarFile.getName().endsWith(GDE.FILE_ENDING_DOT_JAR))
-									urls.add(new URL("file:" + basePath + path + "/target/" + jarFile.getName())); //$NON-NLS-1$
+								if (jarFile.getName().startsWith("HoTT") && jarFile.getName().endsWith(GDE.FILE_ENDING_DOT_JAR))
+									urls.add(new URL("file:" + basePath + path + "/lib/" + jarFile.getName())); //$NON-NLS-1$
 							}
 						}
 						catch (FileNotFoundException e) {
