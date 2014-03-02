@@ -58,8 +58,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.log.log(Level.FINER, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
 		header = getFileInfo(file);
 
-		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1)
+		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
+			isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
 			readSingle(file);
+		}
 		else
 			readMultiple(file);
 	}
@@ -113,7 +115,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.lostPackages.clear();
 		HoTTbinReader2.countLostPackages = 0;
 		int countPackageLoss = 0;
-		long numberDatablocks = fileSize / HoTTbinReader2.dataBlockSize;
+		long numberDatablocks = fileSize / HoTTbinReader2.dataBlockSize / (isReceiverOnly && channelNumber != 4 ? 10 : 1);
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -167,6 +169,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					//fill data block 0 receiver voltage an temperature
 					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 						System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf0, 0, HoTTbinReader2.buf0.length);
+					}
+					if (isReceiverOnly && channelNumber != 4) { //reduce data rate for receiver to 0.1 sec
+						for (int j = 0; j < 9; j++) {
+							data_in.read(HoTTbinReader.buf);
+							HoTTbinReader.timeStep_ms += 10;
+						}
 					}
 
 					//create and fill sensor specific data record sets 

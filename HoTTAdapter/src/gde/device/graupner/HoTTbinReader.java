@@ -83,6 +83,7 @@ public class HoTTbinReader {
 	static long								lastLongitudeTimeStep	= 0;
 	static int								countLostPackages			= 0; 
 	static boolean						isJustParsed					= false;
+	static boolean 						isReceiverOnly 				= false;
 	
 	static ReverseChannelPackageLossStatistics		lostPackages					= new ReverseChannelPackageLossStatistics();
 	/**
@@ -190,8 +191,10 @@ public class HoTTbinReader {
 
 		header = getFileInfo(file);
 
-		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1)
+		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
+			isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
 			readSingle(file);
+		}
 		else
 			readMultiple(file);
 	}
@@ -242,7 +245,7 @@ public class HoTTbinReader {
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
 		int countPackageLoss = 0;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? 10 : 1);
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -310,6 +313,12 @@ public class HoTTbinReader {
 					}
 					if (HoTTAdapter.isChannelsChannelEnabled) {
 						parseAddChannel(HoTTbinReader.buf);
+					}
+					if (isReceiverOnly) {
+						for (int j = 0; j < 9; j++) {
+							data_in.read(HoTTbinReader.buf);
+							HoTTbinReader.timeStep_ms += 10;
+						}
 					}
 					//fill data block 0 receiver voltage an temperature
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
