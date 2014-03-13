@@ -1,6 +1,7 @@
 Development history / change log, please read from bottom up
 
 Version 3.1.5 - xx yyy 2014
+Update to latest SWT drop due to solved problems reported for Mint-Linux
 HoTTAdapter* - synchronize capacity filter
 HoTTAdapter2 - fix height curve data if overlayed from different sensors
 HoTTAdapter* - optimize import for receiver data only
