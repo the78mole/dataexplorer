@@ -1,0 +1,757 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V22.xsd">
+    <Device>
+        <name implementation="gde.device.smmodellbau.GPSLogger2">GPS-Logger2</name>
+        <manufacturer>SM-Modellbau</manufacturer>
+        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
+        <group>logger</group>
+        <image>GPS-Logger.png</image>
+        <usage>false</usage>
+    </Device>
+    <TimeBase>
+        <name>Time</name>
+        <symbol>t</symbol>
+        <unit>msec</unit>
+        <timeStep>-1.0</timeStep>
+    </TimeBase>
+    <DataBlock>
+        <format inputType="FILE_IO" formatType="VALUE" size="-47"/>
+        <checkSum type="XOR"/>
+        <timeUnit>msec</timeUnit>
+        <separator>comma</separator>
+        <leader>$</leader>
+        <trailer>0D0A</trailer>
+        <preferredFileExtention>*.nmea</preferredFileExtention>
+    </DataBlock>
+    <State>
+        <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
+    </State>
+    <Channels lastUseOrdinal="1">
+        <Channel type="TYPE_CONFIG" name="UniLog">
+            <Measurement>
+                <name>Breitengrad</name>
+                <symbol>B</symbol>
+                <unit>°</unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Längengrad</name>
+                <symbol>L</symbol>
+                <unit>°</unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Satelliten</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>PDOP</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>HDOP</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>VDOP</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Geschwindigkeit</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Double" value="1.4" name="google_earth_velocity_avg_limit_factor"/>
+                <property type="String" value="255,255,0" name="google_earth_within_limits_color"/>
+                <property type="String" value="0,255,0" name="google_earth_lower_limit_color"/>
+                <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ)</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Steigen</name>
+                <symbol>vs</symbol>
+                <unit>m/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>SpannungRx</name>
+                <symbol>Urx</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strecke</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>AbstandStart</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>RichtungStart</name>
+                <symbol>w</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Gleitzahl</name>
+                <symbol></symbol>
+                <unit>m/1</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Beschleunigung X</name>
+                <symbol>x</symbol>
+                <unit>g</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Beschleunigung Y</name>
+                <symbol>y</symbol>
+                <unit>g</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="15" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Beschleunigung Z</name>
+                <symbol>z</symbol>
+                <unit>g</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="15" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ENL</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Impuls</name>
+                <symbol></symbol>
+                <unit>µs</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung_UL</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom_UL</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
+                    <trigger comment="Trigger: Strom &gt; 3 A + &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
+                </statistics>
+                <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
+                <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+            </Measurement>
+            <Measurement>
+                <name>Leistung_UL</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="true" avg="true" max="true" min="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl_UL</name>
+                <symbol>rpm</symbol>
+                <unit>rpm</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="true" avg="true" max="true" min="false"/>
+            </Measurement>
+            <Measurement>
+                <name>SpannungRx_UL</name>
+                <symbol>Urx</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ)_UL</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="21" triggerRefOrdinal="21" sigma="false" avg="false" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Geschwindigkeit_UL</name>
+                <symbol>v</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="true" avg="true" max="true" min="true"/>
+                <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität_UL</name>
+                <symbol>c</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics triggerRefOrdinal="21" sigma="false" avg="true" max="true" min="true"/>
+                <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur_UL</name>
+                <symbol>t</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>SpannungRx_ML</name>
+                <symbol>Urx</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Empfang_ML</name>
+                <symbol>LQI</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>nichts_ML</name>
+                <symbol>x</symbol>
+                <unit>-</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Steigen_ML</name>
+                <symbol>Vs</symbol>
+                <unit>m/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur_ML</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Geschwindigkeit_ML</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Richtung_ML</name>
+                <symbol>w</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ)_ML</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>AbstandStart_ML</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strecke_ML</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom_ML</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung_ML</name>
+                <symbol>V</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl_ML</name>
+                <symbol>r</symbol>
+                <unit>rpm</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität_ML</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ) 2_ML</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+        </Channel>
+        <Channel type="TYPE_CONFIG" name="UniLog2">
+            <Measurement>
+                <name>Breitengrad</name>
+                <symbol>B</symbol>
+                <unit>°</unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Längengrad</name>
+                <symbol>L</symbol>
+                <unit>°</unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Satelliten</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>PDOP</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>HDOP</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>VDOP</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Geschwindigkeit</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Double" value="1.4" name="google_earth_velocity_avg_limit_factor"/>
+                <property type="String" value="255,255,0" name="google_earth_within_limits_color"/>
+                <property type="String" value="0,255,0" name="google_earth_lower_limit_color"/>
+                <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ)</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Steigen</name>
+                <symbol>vs</symbol>
+                <unit>m/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>SpannungRx</name>
+                <symbol>Urx</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strecke</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>AbstandStart</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>RichtungStart</name>
+                <symbol>w</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Gleitzahl</name>
+                <symbol></symbol>
+                <unit>m/1</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Beschleunigung X</name>
+                <symbol>x</symbol>
+                <unit>g</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Beschleunigung Y</name>
+                <symbol>y</symbol>
+                <unit>g</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="15" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Beschleunigung Z</name>
+                <symbol>z</symbol>
+                <unit>g</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="15" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ENL</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Impuls</name>
+                <symbol></symbol>
+                <unit>µs</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>           
+            <Measurement>
+                <name>Spannung_UL</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom_UL</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
+                    <trigger comment="Trigger: Strom &gt; 3 A + &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
+                </statistics>
+                <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
+                <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität_UL</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Leistung_UL</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="true" avg="true" max="true" min="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Energie_UL</name>
+                <symbol>E</symbol>
+                <unit>Wmin</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="true" avg="true" max="true" min="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Balance_UL</name>
+                <symbol></symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 1_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 2_UL</name>
+                <symbol>U2</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="26" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 3_UL</name>
+                <symbol>U3</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="26" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 4_UL</name>
+                <symbol>U4</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="26" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 5_UL</name>
+                <symbol>U5</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="26" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 6_UL</name>
+                <symbol>U6</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="26" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl_UL</name>
+                <symbol>n</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="21" sigma="true" avg="true" max="true" min="false"/>
+            </Measurement>
+            <Measurement>
+                <name>A1-Wert_UL</name>
+                <symbol>A1</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property type="Double" value="0.0" name="offset"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>A2-Wert_UL</name>
+                <symbol>A2</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+                <property type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>A3-Wert_UL</name>
+                <symbol>A3</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property type="Double" value="0.0" name="offset"/>
+                <property type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>TempIntern_UL</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property type="Double" value="0.0" name="offset"/>
+                <property type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>SpannungRx_ML</name>
+                <symbol>Urx</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Empfang_ML</name>
+                <symbol>LQI</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>nichts_ML</name>
+                <symbol>x</symbol>
+                <unit>-</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Steigen_ML</name>
+                <symbol>Vs</symbol>
+                <unit>m/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur_ML</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Geschwindigkeit_ML</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Richtung_ML</name>
+                <symbol>w</symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ)_ML</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>AbstandStart_ML</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strecke_ML</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom_ML</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung_ML</name>
+                <symbol>V</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl_ML</name>
+                <symbol>r</symbol>
+                <unit>rpm</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität_ML</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Höhe (relativ) 2_ML</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+        </Channel>
+    </Channels>
+    <Desktop>
+        <property value="true" name="table_tab"/>
+        <property value="true" name="digital_tab"/>
+        <property value="true" name="analog_tab"/>
+        <property value="false" name="voltage_per_cell_tab"/>
+        <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
+        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
+    </Desktop>
+</DeviceProperties>
