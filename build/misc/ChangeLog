@@ -5,6 +5,8 @@ Update to latest SWT drop due to solved problems reported for Mint-Linux
 HoTTAdapter* - synchronize capacity filter
 HoTTAdapter2 - fix height curve data if overlayed from different sensors
 HoTTAdapter* - optimize import for receiver data only
+HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
+add support for GPS-Logger2 from SM-Modellbau
 
 
 Version 3.1.4 - 02 Feb 2014
