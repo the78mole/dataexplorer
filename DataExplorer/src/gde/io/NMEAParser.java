@@ -82,7 +82,7 @@ public class NMEAParser implements IDataParser {
 		//NMEA sentences
 		GPRMC, GPGSA, GPGGA, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
 		//additional SM-Modellbau GPS-Logger NMEA sentences
-		GPSSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT,
+		GPSSETUP, SETUP, SMGPS, SMGPS2, MLINK, UNILOG, KOMMENTAR, COMMENT,
 		//additional SM-Modellbau UniLog2 sentences
 		UL2SETUP, UL2, 
 		//Multiplex FlightRecorder 
@@ -231,6 +231,9 @@ public class NMEAParser implements IDataParser {
 			case SMGPS:
 				if (this.values.length >=15) parseSMGPS(strValues);
 				break;
+			case SMGPS2:
+				if (this.values.length >=19) parseSMGPS2(strValues);
+				break;
 			case UNILOG:
 				if (this.values.length >=24) parseUNILOG(strValues);
 				break;
@@ -284,7 +287,7 @@ public class NMEAParser implements IDataParser {
 						//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 						//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
-						int[] in2out = { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  17,  18,  19,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
+						int[] in2out = { -1,  -1,  -1,  -1,   1,   2,  15,  16,   4,  13,   0,   3,   5,  17,  18,  19,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
 						parseUNILOG2(strValues, in2out, 6, true);
 					}
 					else if (this.deviceName.equals("GPS-Logger")) {
@@ -300,13 +303,21 @@ public class NMEAParser implements IDataParser {
 							int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
 							parseUNILOG2(strValues, in2out, 20, false);								
 						}
-						else { // fall back to UniLog supported values
+					}
+					else if (this.deviceName.equals("GPS-Logger2")) {
+						if (this.channelConfigNumber == 2) {
+							//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
+							//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern
 							//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-							//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
 							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-							//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-							//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-							parseUL2(strValues); // UniLog values only
+							//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+							//Unilog2 	20=Voltage, 21=Current, 22=Capacity, 23=Power, 24=Energy, 25=CellBalance, 26=CellVoltage1, 27=CellVoltage2, 28=CellVoltage3, 
+							//Unilog2 	29=CellVoltage4, 30=CellVoltage5, 31=CellVoltage6, 32=Revolution, 33=ValueA1, 34=ValueA2, 35=ValueA3, 36=InternTemperature
+							//M-LINK  	37=valAdd00 38=valAdd01 39=valAdd02 40=valAdd03 41=valAdd04 42=valAdd05 43=valAdd06 44=valAdd07 45=valAdd08 46=valAdd09 47=valAdd10 48=valAdd11 49=valAdd12 50=valAdd13 51=valAdd14;
+							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
+						  //int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
+							int[] in2out = { -1,  -1,  -1,  -1,  20,  21,  -1,  -1,  23,  32,  -1,  22,  24,  33,  34,  35,  26,  27,  28,  29,  30,  31,  -1,  36,  -1,  -1};
+							parseUNILOG2(strValues, in2out, 20, false);								
 						}
 					}
 				}
@@ -981,6 +992,52 @@ public class NMEAParser implements IDataParser {
 	}
 
 	/**
+	 * parse SM GPS sentence
+	 * $SMGPS2,+0.31 X,+0.58 Y,+0.79 Z,0 ENL,0 us*4A
+	 * 1: Acceleration X
+	 * 2: Acceleration Y
+	 * 3: Acceleration Z
+	 * 4: ENL
+	 * 4: Impulse
+	 * @param strValues
+	 */
+	void parseSMGPS2(String[] strValues) {
+		for (int i = 0; i < strValues.length && i < 5; i++) {
+			try {
+				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+					this.values[15 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+			}
+			catch (Exception e) {
+				// ignore and leave value unchanged
+			}
+		}
+
+		//GPS 
+		//this.values[0]  = latitude;
+		//this.values[1]  = longitude;
+		//this.values[2]  = altitudeAbs;
+		//this.values[3]  = numSatelites;
+		//this.values[4]  = PDOP (dilution of precision) 
+		//this.values[5]  = HDOP (horizontal dilution of precision) 
+		//this.values[6]  = VDOP (vertical dilution of precision)		
+		//this.values[7]  = velocity;
+		//SMGPS
+		//this.values[8]  = altitudeRel;
+		//this.values[9]  = climb;
+		//this.values[10] = voltageRx;
+		//this.values[11] = distanceTotal;
+		//this.values[12] = distanceStart;
+		//this.values[13] = directionStart;
+		//this.values[14] = glideRatio;
+		//SMGPS2
+		//this.values[15]  = acceleration x;
+		//this.values[16]  = acceleration y;
+		//this.values[17] = acceleration z;
+		//this.values[18] = noise level;
+		//this.values[19] = Impulse;
+	}
+
+	/**
 	 * parse SM UNILOG sentence
 	 * $UNILOG,11.31 V,0.00 A,0.0 W,0 rpm,0.00 VRx,0.9 m,---- °C (A1),1303 mAh (A2),13.9 °C (int)*30
 	 * 1: Spannung
@@ -995,16 +1052,45 @@ public class NMEAParser implements IDataParser {
 	 * @param strValues
 	 */
 	void parseUNILOG(String[] strValues) {
-		for (int i = 0; i < strValues.length && i < 9; i++) {
-			try {
-				String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
-				this.values[15 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
-				if (!this.device.getMeasurement(this.channelConfigNumber, 15 + i).getUnit().equals(tmpValues[1])) {
-					this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
+		if (this.deviceName.equals("GPS-Logger")) {
+			if (this.channelConfigNumber == 1) {
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Height, 21=ValueA1, 22=ValueA2, 23=ValueA3
+				//M-LINK    24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+				for (int i = 0; i < strValues.length && i < 9; i++) {
+					try {
+						String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
+						this.values[15 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 15 + i).getUnit().equals(tmpValues[1])) {
+							this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
+						}
+					}
+					catch (Exception e) {
+						// ignore and leave value unchanged
+					}
 				}
 			}
-			catch (Exception e) {
-				// ignore and leave value unchanged
+		}
+		else if (this.deviceName.equals("GPS-Logger2")) {
+			if (this.channelConfigNumber == 1) {
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Height, 26=ValueA1, 27=ValueA2, 28=ValueA3
+				//M-LINK    29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
+				for (int i = 0; i < strValues.length && i < 9; i++) {
+					try {
+						String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
+						this.values[20 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 20 + i).getUnit().equals(tmpValues[1])) {
+							this.device.getMeasurement(this.channelConfigNumber, 20 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
+						}
+					}
+					catch (Exception e) {
+						// ignore and leave value unchanged
+					}
+				}
 			}
 		}
 
@@ -1281,17 +1367,88 @@ public class NMEAParser implements IDataParser {
 	 * @param strValues
 	 */
 	void parseMLINK(String[] strValues) {
-		for (int i = 1; i < strValues.length && i < 15; i++) {
-			try {
-				String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-				int address = Integer.parseInt(tmpValues[0]);
-				this.values[24 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
-				if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(tmpValues[3])) {
-					this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+		if (this.deviceName.equals("GPS-Logger")) {
+			if (this.channelConfigNumber == 1) { //UniLog
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Height, 21=ValueA1, 22=ValueA2, 23=ValueA3
+				//M-LINK  24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+				for (int i = 1; i < strValues.length && i <= 15; i++) {
+					try {
+						String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+						int address = Integer.parseInt(tmpValues[0]);
+						this.values[24 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(tmpValues[3])) {
+							this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+						}
+					}
+					catch (Exception e) {
+						// ignore and leave value unchanged
+					}
 				}
 			}
-			catch (Exception e) {
-				// ignore and leave value unchanged
+			if (this.channelConfigNumber == 2) { //UniLog2
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
+				//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
+				//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+				for (int i = 1; i < strValues.length && i <= 15; i++) {
+					try {
+						String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+						int address = Integer.parseInt(tmpValues[0]);
+						this.values[32 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 32 + address).getUnit().equals(tmpValues[3])) {
+							this.device.getMeasurement(this.channelConfigNumber, 32 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+						}
+					}
+					catch (Exception e) {
+						// ignore and leave value unchanged
+					}
+				}
+			}
+		}
+		else if (this.deviceName.equals("GPS-Logger2")) {
+			if (this.channelConfigNumber == 1) { //UniLog
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Height, 26=ValueA1, 27=ValueA2, 28=ValueA3
+				//M-LINK  29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
+				for (int i = 1; i < strValues.length && i <= 15; i++) {
+					try {
+						String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+						int address = Integer.parseInt(tmpValues[0]);
+						this.values[29 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 29 + address).getUnit().equals(tmpValues[3])) {
+							this.device.getMeasurement(this.channelConfigNumber, 29 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+						}
+					}
+					catch (Exception e) {
+						// ignore and leave value unchanged
+					}
+				}
+			}
+			if (this.channelConfigNumber == 2) { //UniLog2
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+				//Unilog2 	20=Voltage, 21=Current, 22=Capacity, 23=Power, 24=Energy, 25=CellBalance, 26=CellVoltage1, 27=CellVoltage2, 28=CellVoltage3, 
+				//Unilog2 	29=CellVoltage4, 30=CellVoltage5, 31=CellVoltage6, 32=Revolution, 33=ValueA1, 34=ValueA2, 35=ValueA3, 36=InternTemperature
+				//M-LINK  	37=valAdd00 38=valAdd01 39=valAdd02 40=valAdd03 41=valAdd04 42=valAdd05 43=valAdd06 44=valAdd07 45=valAdd08 46=valAdd09 47=valAdd10 48=valAdd11 49=valAdd12 50=valAdd13 51=valAdd14;
+				for (int i = 1; i < strValues.length && i <= 15; i++) {
+					try {
+						String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+						int address = Integer.parseInt(tmpValues[0]);
+						this.values[37 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 37 + address).getUnit().equals(tmpValues[3])) {
+							this.device.getMeasurement(this.channelConfigNumber, 37 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+						}
+					}
+					catch (Exception e) {
+						// ignore and leave value unchanged
+					}
+				}
 			}
 		}
 		//GPS 
