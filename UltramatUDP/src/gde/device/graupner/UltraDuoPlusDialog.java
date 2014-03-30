@@ -2083,10 +2083,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			switch (this.device.getDeviceTypeIdentifier()) {
 			case UltraDuoPlus50:
 			case UltraDuoPlus60:
-				if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
-				this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
 				if (selectionIndex == 1) { //NiMH
-					if ( this.stepChargeTabItem == null) initStepChargeTab();
+					if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
+					this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
 				}
 				else {
 					if (this.stepChargeTabItem != null && !this.stepChargeTabItem.isDisposed())
