@@ -140,9 +140,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	Button										helpButton;
 	Button										copyButton;
 	CTabFolder								mainTabFolder, chargeTypeTabFolder;
-	CTabItem									setupTabItem, memorySetupTabItem, chargeTabItem, dischargeTabItem, memoryCycleDataTabItem;
+	CTabItem									setupTabItem, memorySetupTabItem, chargeTabItem, dischargeTabItem, stepChargeTabItem, memoryCycleDataTabItem;
 	ScrolledComposite					scrolledchargeComposite;
 	Composite									boundsComposite, deviceComposite, dischargeCycleComposite;
+	StepChargeComposite stepChargeComposite;
 	Group											chargeGroup, dischargeGroup, cycleGroup;
 
 	Composite									memoryBoundsComposite, memorySelectComposite;
@@ -183,12 +184,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	static int								numberMemories						= 60;
 	String[]									memoryNames								= new String[UltraDuoPlusDialog.numberMemories];
 	int[]											memoryValues							= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
-	int[]											memoryValuesNiCd					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
-	int[]											memoryValuesNiMh					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
-	int[]											memoryValuesLiIo					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
-	int[]											memoryValuesLiPo					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
-	int[]											memoryValuesLiFe					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
-	int[]											memoryValuesPb						= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryStepValues					= new int[UltramatSerialPort.SIZE_MEMORY_STEP_CHARGE_SETUP];
 	ParameterConfigControl[]	memoryParameters					= new ParameterConfigControl[UltramatSerialPort.SIZE_MEMORY_SETUP];
 	int												lastMemorySelectionIndex	= -1;
 	int												lastCellSelectionIndex		= -1;
@@ -351,13 +347,26 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			public void handleEvent(Event evt) {
 				if (UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0 && UltraDuoPlusDialog.this.lastMemorySelectionIndex < UltraDuoPlusDialog.numberMemories) {
 					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null) {
-						log
-								.log(
-										java.util.logging.Level.FINE,
-										"memoryComposite.handleEvent, (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName() + " memoryValues[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+						log.log(java.util.logging.Level.FINE,	"memoryComposite.handleEvent, (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName() + " memoryValues[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+
 						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setChanged(true);
-						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData()
-								.setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.memoryValues));
+						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.memoryValues));
+
+						switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
+						case UltraDuoPlus50:
+						case UltraDuoPlus60:
+							if (UltraDuoPlusDialog.this.memoryValues[0] == 1) {
+								UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().setChanged(true);
+								UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData()
+										.setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.memoryStepValues));
+							}
+							else {
+								UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().setChanged(false);
+							}
+							break;
+						default:
+							break;
+						}
 					}
 
 					if (evt.index == 0) {
@@ -457,7 +466,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(655, GDE.IS_MAC ? 675 : 655);
+				this.dialogShell.setSize(655, GDE.IS_MAC ? 685 : 675);
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
 		      public void handleEvent(Event event) {
 		        switch (event.detail) {
@@ -782,16 +791,24 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												try {
 													int actualSelectionIndex = UltraDuoPlusDialog.this.memoryCombo.getSelectionIndex();
 													if (UltraDuoPlusDialog.this.lastMemorySelectionIndex != actualSelectionIndex) {
-														if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null && UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0
-																&& UltraDuoPlusDialog.this.lastMemorySelectionIndex < UltraDuoPlusDialog.numberMemories) {
+														if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null && UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0 && UltraDuoPlusDialog.this.lastMemorySelectionIndex < UltraDuoPlusDialog.numberMemories) {
 															//write memory if setup data has been changed changed (update memory name executed while keyListener)
 															if (UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().isChanged()) {
-																UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData()
-																		.setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.memoryValues));
-																UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_SETUP,
-																		UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue().getBytes(),
-																		UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1);
+																UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.memoryValues));
+																UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_SETUP,	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue().getBytes(),	UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1);
 																UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().changed = null;
+															}
+															switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
+															case UltraDuoPlus50:
+															case UltraDuoPlus60:
+																if (UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().isChanged()) {
+																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.memoryStepValues));
+																	UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_STEP_CHARGE_SETUP,	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().getValue().getBytes(),	UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1);
+																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().changed = null;
+																}
+																break;
+															default:
+																break;
 															}
 															//check for copy selected
 															if (UltraDuoPlusDialog.this.copyButton.getSelection()) {
@@ -813,21 +830,26 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 																		}
 																		log.log(java.util.logging.Level.FINE, sb.toString());
 																	}
-																	UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME,
-																			UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName().getBytes(), actualSelectionIndex + 1);
+																	UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME, UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName().getBytes(), actualSelectionIndex + 1);
 																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).changed = null;
-																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex)
-																			.setName(UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName());
+																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).setName(UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName());
 
-																	UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_SETUP,
-																			UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue().getBytes(),
-																			actualSelectionIndex + 1);
+																	UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_SETUP,	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue().getBytes(),	actualSelectionIndex + 1);
 																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().changed = null;
-																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getSetupData()
-																			.setValue(UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue());
+																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getSetupData().setValue(UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue());
 
-																	String newMemoryName = String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s, actualSelectionIndex + 1,
-																			UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName());
+																	switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
+																	case UltraDuoPlus50:
+																	case UltraDuoPlus60:
+																		UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_STEP_CHARGE_SETUP,	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().getValue().getBytes(),	actualSelectionIndex + 1);
+																		UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().changed = null;
+																		UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getStepChargeData().setValue(UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getStepChargeData().getValue());
+																		break;
+																	default:
+																		break;
+																	}
+
+																	String newMemoryName = String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s, actualSelectionIndex + 1, UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName());
 																	UltraDuoPlusDialog.this.memoryCombo.setText(newMemoryName);
 																	UltraDuoPlusDialog.this.memoryNames[actualSelectionIndex] = (newMemoryName + UltraDuoPlusDialog.STRING_16_BLANK).substring(5, 16 + 5);
 																	UltraDuoPlusDialog.this.memoryCombo.setItem(actualSelectionIndex, newMemoryName);
@@ -922,6 +944,17 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											log.log(java.util.logging.Level.FINEST, "restoreButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UltraDuoPlusDialog.this.lastCellSelectionIndex = -1;
+											switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
+											case UltraDuoPlus50:
+											case UltraDuoPlus60:
+												if (UltraDuoPlusDialog.this.memoryValues[0] == 1) { //NiMH with possible step charge
+													stepChargeComposite.getStepChargeValues(UltraDuoPlusDialog.this.memoryStepValues);
+													stepChargeComposite.notifyListeners(SWT.Selection, new Event());
+												}
+												break;
+											default:
+												break;
+											}
 											updateBatteryMemoryParameter(UltraDuoPlusDialog.this.memoryValues[0]);
 										}
 									});
@@ -938,9 +971,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.chargeGroup = new Group(this.scrolledchargeComposite, SWT.NONE);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.chargeGroup.setLayout(memoryCompositeLayout);
-												this.chargeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-												this.chargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2299));
-												this.chargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+												//this.chargeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+												//this.chargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2299));
+												//this.chargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//charge parameter
 												this.memoryParameters[6] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 6, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2263), 175,
 														"100 ~ 20000 mA", 220, true, 50, 150, 100, 20000, -100); //$NON-NLS-1$ 
@@ -1000,8 +1033,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.dischargeGroup.setLayout(memoryCompositeLayout);
 												this.dischargeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-												this.dischargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2301));
-												this.dischargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+												//this.dischargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2301));
+												//this.dischargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//discharge parameter
 												this.memoryParameters[17] = new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 17, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2268), 175,
 														"100 ~ 10000 mA", 220, true, 50, 150, 100, 10000, -100); //$NON-NLS-1$ 
@@ -1694,6 +1727,20 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		}
 	}
 
+	private void initStepChargeTab() {
+		this.stepChargeTabItem = new CTabItem(this.chargeTypeTabFolder, SWT.NONE, 1);
+		this.stepChargeTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.stepChargeTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2342));
+		{
+			this.stepChargeComposite = new StepChargeComposite(this.chargeTypeTabFolder, SWT.BORDER | SWT.V_SCROLL);
+			FillLayout scrolledMemoryCompositeLayout = new FillLayout();
+			this.stepChargeComposite.setLayout(scrolledMemoryCompositeLayout);
+			this.stepChargeTabItem.setControl(this.stepChargeComposite);
+			if (this.stepChargeTabItem.getListeners(SWT.Selection).length == 0)
+				this.stepChargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		}
+	}
+
 	/**
 	 * create minimal ultra duo plus XML data 
 	 * @param useDeviceIdentifierName
@@ -1790,6 +1837,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dischargeGroup.removeListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.cycleGroup.removeListener(SWT.Selection, this.memoryParameterChangeListener);
 			}
+			if (stepChargeComposite != null && !stepChargeComposite.isDisposed()) {
+				stepChargeComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+			}
 
 			if (this.ultraDuoPlusSetup != null && this.ultraDuoPlusSetup.getMemory() != null) {
 				int i = 0;
@@ -1811,6 +1861,18 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					this.ultraDuoPlusSetup.getMemory().get(memoryNumber).getSetupData().setValue(this.serialPort.readMemorySetup(memoryNumber + 1));
 				}
 				this.memoryValues = this.device.convert2IntArray(this.memoryValues, this.ultraDuoPlusSetup.getMemory().get(memoryNumber).getSetupData().getValue());
+
+				switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
+				case UltraDuoPlus50:
+				case UltraDuoPlus60:
+					if (this.ultraDuoPlusSetup.getMemory().get(memoryNumber).getStepChargeData() != null && !this.ultraDuoPlusSetup.getMemory().get(memoryNumber + 1).getStepChargeData().isSynced()) {
+						this.ultraDuoPlusSetup.getMemory().get(memoryNumber).getStepChargeData().setValue(this.serialPort.readMemoryStepChargeSetup(memoryNumber + 1));
+					}
+					this.memoryStepValues = this.device.convert2IntArray(this.memoryStepValues, this.ultraDuoPlusSetup.getMemory().get(memoryNumber).getStepChargeData().getValue());
+					break;
+				default:
+					break;
+				}
 			}
 			else {
 				for (int i = 0; i < UltraDuoPlusDialog.numberMemories; i++) {
@@ -1846,6 +1908,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.chargeGroup.addListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.dischargeGroup.addListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.cycleGroup.addListener(SWT.Selection, this.memoryParameterChangeListener);
+			}
+			if (stepChargeComposite != null && !stepChargeComposite.isDisposed() && stepChargeComposite.getListeners(SWT.Selection).length == 0) {
+				stepChargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 			}
 		}
 		catch (Throwable e) {
@@ -1915,6 +1980,15 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dischargeSelectHeight = 5 * this.parameterSelectHeight;
 				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 165);
 				this.cycleGroup.setVisible(true);
+//				switch (this.device.getDeviceTypeIdentifier()) {
+//				case UltraDuoPlus50:
+//				case UltraDuoPlus60:
+//					if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
+//					this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
+//					break;
+//				default:
+//					break;
+//				}
 				break;
 			case 2: //LiIo
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
@@ -2005,12 +2079,42 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.chargeGroup.setSize(this.scrolledchargeComposite.getClientArea().width, this.chargeSelectHeight);
 			this.chargeGroup.layout(true);
 			this.scrolledchargeComposite.layout(true);
+			
+			switch (this.device.getDeviceTypeIdentifier()) {
+			case UltraDuoPlus50:
+			case UltraDuoPlus60:
+				if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
+				this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
+				if (selectionIndex == 1) { //NiMH
+					if ( this.stepChargeTabItem == null) initStepChargeTab();
+				}
+				else {
+					if (this.stepChargeTabItem != null && !this.stepChargeTabItem.isDisposed())
+						this.stepChargeTabItem.dispose();
+					this.stepChargeTabItem = null;
+				}
+				break;
+			default:
+				break;
+			}
+			
 			this.dischargeGroup.setLayoutData(new RowData(this.dischargeCycleComposite.getClientArea().width-18, this.dischargeSelectHeight));
 			this.dischargeGroup.layout(true);
 			this.dischargeCycleComposite.layout(true);
 
 			//updateBatteryParameterValues();
 			this.lastCellSelectionIndex = this.memoryValues[0];
+		}
+		else if(this.memoryValues[0] == 1) {
+			switch (this.device.getDeviceTypeIdentifier()) {
+			case UltraDuoPlus50:
+			case UltraDuoPlus60:
+				if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
+				this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
+				break;
+			default:
+				break;
+			}
 		}
 		log.log(java.util.logging.Level.FINEST, GDE.STRING_EXIT);
 	}
@@ -2264,7 +2368,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			}
 			//memory step charge data
 			if (tmpCellMemory.getStepChargeData() == null && cellMemory.getStepChargeData() != null) {
-				cellMemory.setTraceData(null);
+				cellMemory.setStepChargeData(null);
 			}
 			if (tmpCellMemory.getStepChargeData() != null && cellMemory.getStepChargeData() == null) {
 				cellMemory.setStepChargeData(new ObjectFactory().createMemoryTypeStepChargeData());

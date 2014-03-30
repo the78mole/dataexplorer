@@ -129,21 +129,21 @@ public class UltraDuoPlusSychronizer extends Thread {
 				log.log(java.util.logging.Level.FINE, "read memory setup" + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
-			//		//start optional entries, temporary comment out to reduce serial I/O
-			//		//memory step charge data
-			//		iterator = cellMemories.iterator();
-			//		for (int i = 1; iterator.hasNext(); ++i) {
-			//			MemoryType cellMemory = iterator.next();
-			//			if (cellMemory.getStepChargeData() == null || !cellMemory.getStepChargeData().isSynced()) {
-			//				MemoryType.StepChargeData stepChargeData = cellMemory.getStepChargeData();
-			//				stepChargeData = stepChargeData == null ? new ObjectFactory().createMemoryTypeStepChargeData() : stepChargeData;
-			//				stepChargeData.setValue(this.serialPort.readMemoryStepChargeSetup(i));
-			//				cellMemory.setStepChargeData(stepChargeData);
-			//				stepChargeData.setSynced(true);
-			//			}
-			//			log.log(java.util.logging.Level.FINE, "read memory step charge data " + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			//		}
-			//
+			//start optional entries, temporary comment out to reduce serial I/O
+			//memory step charge data
+			iterator = cellMemories.iterator();
+			for (int i = 1; iterator.hasNext(); ++i) {
+				MemoryType cellMemory = iterator.next();
+				if (cellMemory.getStepChargeData() == null || !cellMemory.getStepChargeData().isSynced()) {
+					MemoryType.StepChargeData stepChargeData = cellMemory.getStepChargeData();
+					stepChargeData = stepChargeData == null ? new ObjectFactory().createMemoryTypeStepChargeData() : stepChargeData;
+					stepChargeData.setValue(this.serialPort.readMemoryStepChargeSetup(i));
+					cellMemory.setStepChargeData(stepChargeData);
+					stepChargeData.setSynced(true);
+				}
+				log.log(java.util.logging.Level.FINE, "read memory step charge data " + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+	
 			//		//memory trace data
 			//		iterator = cellMemories.iterator();
 			//		for (int i = 1; iterator.hasNext(); ++i) {
