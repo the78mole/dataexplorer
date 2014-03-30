@@ -1,4 +1,5 @@
 package gde.ui;
+
 /**************************************************************************************
 This file is part of GNU DataExplorer.
 
@@ -19,7 +20,6 @@ Copyright (c) 2011,2012,2013,2014 Winfried Bruegmann
 ****************************************************************************************/
 import gde.GDE;
 import gde.device.DataTypes;
-import gde.log.Level;
 import gde.utils.StringHelper;
 
 import java.util.logging.Logger;
@@ -46,10 +46,10 @@ public class ParameterConfigControl {
 	final Text					text;
 	final Slider				slider;
 
-	final int									controlHeight	= 20;
-	int												offset;
-	final String							format;
-	
+	final int						controlHeight	= 20;
+	int									offset;
+	final String				format;
+
 	int									value					= 0;
 
 	/**
@@ -58,7 +58,7 @@ public class ParameterConfigControl {
 	 * @param valueArray
 	 * @param valueIndex
 	 * @param valueFormat string, if empty no formating like "%d"
-	 * @param parameterName
+	 * @param parameterName	
 	 * @param nameWidth
 	 * @param parameterDescription
 	 * @param descriptionWidth
@@ -70,10 +70,11 @@ public class ParameterConfigControl {
 	 * @param sliderFactor
 	 * @param sliderOffset
 	 */
-	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth, final String parameterDescription,
-			final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue, final int sliderMaxValue, final int sliderOffset) {
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth,
+			final String parameterDescription, final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue,
+			final int sliderMaxValue, final int sliderOffset) {
 		this.value = valueArray[valueIndex];
-		this.format = valueFormat.equals(GDE.STRING_EMPTY) ?  "%d" : valueFormat; //$NON-NLS-1$
+		this.format = valueFormat.equals(GDE.STRING_EMPTY) ? "%d" : valueFormat; //$NON-NLS-1$
 		this.offset = sliderOffset;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -100,23 +101,24 @@ public class ParameterConfigControl {
 			this.text.setBackground(SWTResourceManager.getColor(isTextValueEditable ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 			if (isTextValueEditable) {
 				this.text.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
 				this.text.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 						}
 						if (ParameterConfigControl.this.value > sliderMaxValue) {
 							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
@@ -128,7 +130,7 @@ public class ParameterConfigControl {
 
 					@Override
 					public void keyPressed(KeyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
 					}
 				});
 			}
@@ -155,10 +157,10 @@ public class ParameterConfigControl {
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
-					ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
-					valueArray[valueIndex] = ParameterConfigControl.this.value;
+					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+					valueArray[valueIndex] = ParameterConfigControl.this.value > 100 ? ParameterConfigControl.this.value / 100 * 100 : ParameterConfigControl.this.value;
 					if (evt.data == null) {
 						Event changeEvent = new Event();
 						changeEvent.index = valueIndex;
@@ -184,12 +186,12 @@ public class ParameterConfigControl {
 	 * @param sliderWidth
 	 * @param sliderMinValue
 	 * @param sliderMaxValue
-	 * @param sliderFactor
 	 */
-	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth, final String parameterDescription,
-			final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue, final int sliderMaxValue) {
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth,
+			final String parameterDescription, final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue,
+			final int sliderMaxValue) {
 		this.value = valueArray[valueIndex];
-		this.format = valueFormat.equals(GDE.STRING_EMPTY) ?  "%d" : valueFormat; //$NON-NLS-1$
+		this.format = valueFormat.equals(GDE.STRING_EMPTY) ? "%d" : valueFormat; //$NON-NLS-1$
 		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -216,23 +218,24 @@ public class ParameterConfigControl {
 			this.text.setBackground(SWTResourceManager.getColor(isTextValueEditable ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 			if (isTextValueEditable) {
 				this.text.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
 				this.text.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 						}
 						if (ParameterConfigControl.this.value > sliderMaxValue) {
 							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value);
@@ -244,7 +247,7 @@ public class ParameterConfigControl {
 
 					@Override
 					public void keyPressed(KeyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
 					}
 				});
 			}
@@ -272,9 +275,9 @@ public class ParameterConfigControl {
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
-					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value)); 
+					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
 					if (evt.data == null) {
 						Event changeEvent = new Event();
@@ -349,7 +352,7 @@ public class ParameterConfigControl {
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
 					ParameterConfigControl.this.text.setText(textFiledValues[ParameterConfigControl.this.value]);
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
@@ -376,7 +379,8 @@ public class ParameterConfigControl {
 		this.value = useValue;
 		if (!this.slider.isDisposed()) {
 			this.slider.setSelection(this.value + this.offset);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "slider value = " + this.value + " offset = " + this.offset);
+			if (ParameterConfigControl.log.isLoggable(java.util.logging.Level.FINE))
+				ParameterConfigControl.log.log(java.util.logging.Level.FINE, "slider value = " + this.value + " offset = " + this.offset);
 			Event updateEvent = new Event();
 			updateEvent.data = new Object();
 			this.slider.notifyListeners(SWT.Selection, updateEvent);
@@ -396,7 +400,7 @@ public class ParameterConfigControl {
 	public void redraw() {
 		this.baseComposite.redraw();
 	}
-	
+
 	/**
 	 * update control description and slider range (cell type change -> charge max capacity)
 	 * @param newParameterDescription
@@ -408,7 +412,7 @@ public class ParameterConfigControl {
 		this.slider.setMinimum(newMinSliderValue);
 		this.slider.setMaximum(newMaxSliderValue);
 	}
-	
+
 	/**
 	 * update control description and slider range (cell type change -> charge max capacity)
 	 * @param newParameterDescription
