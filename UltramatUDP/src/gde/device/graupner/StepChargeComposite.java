@@ -860,7 +860,7 @@ public class StepChargeComposite extends ScrolledComposite {
 						spacerLData.height = 20;
 						spacer.setLayoutData(spacerLData);
 
-						this.dischargeCheck = new Button(this.configComposite, SWT.CHECK | SWT.LEFT | SWT.BORDER);
+						this.dischargeCheck = new Button(this.configComposite, SWT.CHECK | SWT.LEFT);
 						RowData dischargeCheckLData = new RowData();
 						dischargeCheckLData.width = 500;
 						dischargeCheckLData.height = 20;
