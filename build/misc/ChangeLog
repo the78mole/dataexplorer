@@ -6,6 +6,7 @@ HoTTAdapter* - synchronize capacity filter
 HoTTAdapter2 - fix height curve data if overlayed from different sensors
 HoTTAdapter* - optimize import for receiver data only
 HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
+UltraDuoPlus50/60 - add step charge configuration tabulator
 add support for GPS-Logger2 from SM-Modellbau
 
 
