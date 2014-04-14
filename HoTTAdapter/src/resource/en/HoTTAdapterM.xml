@@ -35,7 +35,7 @@
         <preferredFileExtention>*.bin</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="data recording"/>
     </State>
     <Channels lastUseOrdinal="2">
         <Channel type="TYPE_CONFIG" name="Receiver">
