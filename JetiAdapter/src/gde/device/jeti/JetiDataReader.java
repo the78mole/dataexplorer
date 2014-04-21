@@ -264,6 +264,8 @@ public class JetiDataReader {
 						activeChannel.get(recordSetName).setRecordSetDescription(
 								device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 					}
+					//write filename after import to record description			
+					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 					if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 				}
