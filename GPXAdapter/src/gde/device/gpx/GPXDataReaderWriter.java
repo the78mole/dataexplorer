@@ -104,6 +104,10 @@ public class GPXDataReaderWriter {
 
 				parseInputXML(filePath, device, activeChannel, recordSetName);
 				channelRecordSet = activeChannel.get(recordSetName);
+				if (channelRecordSet != null) {
+					//write filename after import to record description			
+					channelRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+				}
 				
 				if (menuToolBar != null) GPXDataReaderWriter.application.setProgress(100, sThreadId);
 
