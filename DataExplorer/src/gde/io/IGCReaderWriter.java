@@ -50,6 +50,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -130,10 +131,11 @@ public class IGCReaderWriter {
 		String date = "000000", time; //16 02 40
 		int hour, minute, second;
 		int latitude, longitude, altitude, height;
-		int values[] = new int[] { 0, 0, 0, 0 };
+		int values[] = new int[device.getMeasurementNames(1).length-1];
 		File inputFile = new File(filePath);
 		boolean isGsentence = false;
 		String dllID = "XXX";
+		Vector<IgcExtension> extensions = new Vector<IgcExtension>();
 		if (IGCReaderWriter.application.getStatusBar() != null) IGCReaderWriter.application.setProgress(0, sThreadId);
 
 		try {
@@ -178,6 +180,17 @@ public class IGCReaderWriter {
 						else if (line.startsWith("A")) { // first line contains manufacturer identifier
 							dllID = line.substring(1, 4);
 							log.log(Level.FINE, "IGCDLL iddentifier = " + dllID);
+						}
+						else if (line.startsWith("I")) { // extension specification record
+							try {
+								final int numExtensions = Integer.parseInt(line.substring(1, 3));
+								for (int i = 0; i < numExtensions; i++) {
+									extensions.add(new IgcExtension(Integer.parseInt(line.substring(7 * i + 3, 7 * i + 5))-1, Integer.parseInt(line.substring(7 * i + 5, 7 * i + 7)), line.substring(7 * i + 7, 7 * i + 10)));
+								}
+							}
+							catch (Exception e) {
+								log.log(Level.SEVERE, e.getMessage(), e);
+							}
 						}
 					}
 					++lineNumber;
@@ -233,6 +246,8 @@ public class IGCReaderWriter {
 							String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(actualTimeStamp); //$NON-NLS-1$
 							String description = device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime + GDE.LINE_SEPARATOR + header.toString();
 							recordSet.setRecordSetDescription(description);
+							//write filename after import to record description
+							recordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
 							activeChannel.setFileDescription(dateTime.substring(0, 10) + (activeChannel.getFileDescription().length() < 11 ? "" : activeChannel.getFileDescription().substring(10)));
 
 							activeChannel.put(recordSetName, recordSet);
@@ -240,11 +255,21 @@ public class IGCReaderWriter {
 							activeChannel.get(recordSetName).setStartTimeStamp(actualTimeStamp);
 							activeChannel.setActiveRecordSet(recordSetName);
 							activeChannel.applyTemplate(recordSetName, true);
+							
+							int i=0;
+							for (IgcExtension extension : extensions) {
+							if (!recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
+								recordSet.get(5+i).setName(extension.getThreeLetterCode());
+							++i;
+							}
+
 						}
 
 						if (timeStamp < actualTimeStamp) {
 							//B160240 5407121N 00249342W A 00280 00421
-							//0123456 78901234 567890123 4 56789 01234
+							//I04 36 38 FXA 39 40 SIU 4143TDS 4446ENL
+							//1234567 89012345 678901234 5 67890 12345 678 90 123 456
+							//B114643 4752040N 01109779E A 00522 00555 035 09 227 225
 							try {
 								latitude = Integer.valueOf(line.substring(7, 14)) * 10;
 								latitude = line.substring(14, 15).equalsIgnoreCase("N") ? latitude : -1 * latitude; //$NON-NLS-1$
@@ -275,6 +300,10 @@ public class IGCReaderWriter {
 							values[1] = longitude;
 							values[2] = altitude;
 							values[3] = height;
+
+							for (int i = 0; i < extensions.size(); i++) {
+								values[i + 4] = extensions.get(i).getValue(line);
+							}
 
 							recordSet.addNoneCalculationRecordsPoints(values, actualTimeStamp - startTimeStamp);
 						}
