@@ -262,7 +262,7 @@ public class FileHandler {
 			// check and switch device, if required
 			IDevice activeDevice = this.application.getActiveDevice();
 			if (activeDevice == null || !activeDevice.getName().equals(fileDeviceName)) { // new device in file
-				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+				this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
 			}
 			//only switch object key, if application is object oriented
 			String objectkey = osdHeader.get(GDE.OBJECT_KEY);
@@ -297,7 +297,7 @@ public class FileHandler {
 				channel.clear();
 			}
 			else
-				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+				this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
 
 			try {
 				this.application.enableMenuActions(false);

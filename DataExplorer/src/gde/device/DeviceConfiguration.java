@@ -38,6 +38,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -2258,7 +2259,21 @@ public class DeviceConfiguration {
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-		return recordSet.getRecordNames(); // return unchanged set of measurements as default
+		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //events ...
+				int i = 0;
+				for (; i < fileRecordsProperties.length; ++i) {
+					cleanedRecordNames.add(recordKeys[i]);
+				}
+				//cleanup recordSet
+				for (; i < recordKeys.length; ++i) {
+					recordSet.remove(recordKeys[i]);
+				}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		return recordKeys;
 	}
 	
 	/**

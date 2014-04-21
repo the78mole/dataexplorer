@@ -124,7 +124,7 @@ public class OsdReaderWriter {
 				: line.substring(GDE.LEGACY_FILE_VERSION.length(), GDE.LEGACY_FILE_VERSION.length()+1).trim();
 		int version;
 		try {
-			version = new Integer(sVersion).intValue(); // one digit only
+			version = Integer.valueOf(sVersion).intValue(); // one digit only
 		}
 		catch (NumberFormatException e) {
 			log.log(Level.SEVERE, "can not interprete red version information " + sVersion);
@@ -146,7 +146,7 @@ public class OsdReaderWriter {
 						log.log(Level.FINE, line);
 						header.put(headerKey, line.substring(headerKey.length()));
 						if (line.startsWith(GDE.RECORD_SET_SIZE)) {
-							headerCounter = new Integer(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
+							headerCounter = Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
 							//read record set descriptors
 							int lastReordNumber = headerCounter;
 							while (headerCounter-- > 0) {
@@ -211,7 +211,7 @@ public class OsdReaderWriter {
 		HashMap<String, String> header = getHeader(filePath);
 		ChannelTypes channelType = ChannelTypes.valueOf(header.get(GDE.CHANNEL_CONFIG_TYPE).trim());
 		String objectKey = header.get(GDE.OBJECT_KEY) != null ? header.get(GDE.OBJECT_KEY) : GDE.STRING_EMPTY;
-		int numberRecordSets = new Integer(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
+		int numberRecordSets = Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
 		while(!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
 
@@ -232,13 +232,13 @@ public class OsdReaderWriter {
 				recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
 				recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 				recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
-				recordDataSize = new Long(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
-				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
+				recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
+				//recordSetDataPointer = Long.valueOf(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // 1.st try channelConfiguration not found
 					try { // get channel last digit and use as channel config ordinal
-						channel = channels.get(new Integer(channelConfig.substring(channelConfig.length()-1)));
+						channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length()-1)));
 						channelConfig = channel.getChannelConfigKey();
 						recordSetInfo.put(GDE.CHANNEL_CONFIG_NAME, channelConfig);
 					}
@@ -320,9 +320,9 @@ public class OsdReaderWriter {
 					firstRecordSet[0] = channelConfig;
 					firstRecordSet[1] = recordSetName;
 				}
-				recordDataSize = new Long(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
+				recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordDataSize = " + recordDataSize);
-				recordSetDataPointer = new Long(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER)).longValue();
+				recordSetDataPointer = Long.valueOf(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER)).longValue();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
@@ -720,7 +720,7 @@ public class OsdReaderWriter {
 					
 					int numberRecordSets = 0;
 					if (tmpData.startsWith(GDE.RECORD_SET_SIZE)) {
-						numberRecordSets = new Integer(tmpData.substring(GDE.RECORD_SET_SIZE.length()).trim()).intValue();
+						numberRecordSets = Integer.valueOf(tmpData.substring(GDE.RECORD_SET_SIZE.length()).trim()).intValue();
 					}
 					else {
 						throw new Exception();

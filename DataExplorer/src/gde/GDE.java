@@ -39,8 +39,10 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
@@ -348,6 +350,14 @@ public class GDE {
 	static final String						DEVICES_PLUG_IN_DIR							= "devices/";																																																								//$NON-NLS-1$
 	static final String						JAVA_EXT_DIR										= "java/ext/";																																																								//$NON-NLS-1$
 
+	public final static Map<String,String>					deviceMap = new HashMap<String,String>();
+	static { // initialize device mapping to enable opening files saved on android app
+		GDE.deviceMap.put("HoTTAdapter3", "HoTTAdapter2"); //$NON-NLS-1$ //$NON-NLS-2$
+		GDE.deviceMap.put("GPS-Logger (UL)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
+		GDE.deviceMap.put("GPS-Logger (UL2)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
+		GDE.deviceMap.put("GPS-Logger2 (UL)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
+		GDE.deviceMap.put("GPS-Logger2 (UL2)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 	/**
 	 * main method to start the DataExplorer application
 	 * @param args
