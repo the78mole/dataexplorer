@@ -39,7 +39,6 @@ import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -614,7 +613,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		this.updateVisibilityStatus(recordSet, true);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
@@ -987,32 +986,5 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 		return 14;
-	}
-
-	/**
-	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
-	 * - calculated measurements could be later on added to the device properties XML
-	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
-	 * @param fileRecordsProperties - all the record describing properties stored in the file
-	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
-	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
-	 */
-	@Override
-	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
-		String[] recordKeys = recordSet.getRecordNames();
-		Vector<String> cleanedRecordNames = new Vector<String>();
-		if ((recordKeys.length - fileRecordsProperties.length) > 0 ) { //delta events  //delta motor driver properties
-				int i = 0;
-				for (; i < fileRecordsProperties.length; ++i) {
-					cleanedRecordNames.add(recordKeys[i]);
-				}
-				//cleanup recordSet
-				for (; i < recordKeys.length; ++i) {
-					recordSet.remove(recordKeys[i]);
-				}
-			recordKeys = cleanedRecordNames.toArray(new String[1]);
-		}
-		return recordKeys;
 	}
 }
