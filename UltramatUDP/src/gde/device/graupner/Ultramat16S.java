@@ -214,7 +214,6 @@ public class Ultramat16S extends Ultramat {
 		}
 
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
 

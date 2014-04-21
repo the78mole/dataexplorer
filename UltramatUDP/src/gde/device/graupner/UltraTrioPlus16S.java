@@ -223,7 +223,6 @@ public class UltraTrioPlus16S extends UltraTrioPlus14 {
 		}
 	
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
 

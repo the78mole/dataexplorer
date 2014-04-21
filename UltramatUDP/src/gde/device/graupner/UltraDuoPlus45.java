@@ -255,7 +255,6 @@ public class UltraDuoPlus45 extends Ultramat {
 		}
 		
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
 
