@@ -9,6 +9,7 @@ HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new rece
 UltraDuoPlus50/60 - add step charge configuration tabulator
 add support for GPS-Logger2 from SM-Modellbau
 update IGCAdapter to enable extension data for 4 additional values
+tune auto number formatting 
 enable optimized data sets load of DataExplorer for Android saved osd files
 
 
