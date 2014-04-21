@@ -210,8 +210,8 @@ public class Record extends Vector<Integer> {
 	
 	public enum DataType { //some data types require in some situation special execution algorithm
 		DEFAULT("default"), 						//all normal measurement values which do not require special handling
-		GPS_LATITUDE("GPS latitude"), 	//GPS geo-coordinate require at least 6 decimal digits
-		GPS_LONGITUDE("GPS longitude"), //GPS geo-coordinate require at least 6 decimal digits
+		GPS_LATITUDE("GPS latitude"), 	//GPS geo-coordinate require at least 6 decimal digits [°]
+		GPS_LONGITUDE("GPS longitude"), //GPS geo-coordinate require at least 6 decimal digits [°]
 		GPS_ALTITUDE("GPS altitude"),		//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
 		GPS_AZIMUTH("GPS azimuth"),			//GPS azimuth, to be used for live display and positioning of icon if used
 		SPEED("speed"),									//speed, to be used for KMZ export with colors of specified velocity
@@ -1149,18 +1149,20 @@ public class Record extends Vector<Integer> {
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
 		case -1:
-			double delta = this.maxScaleValue - this.minScaleValue;
-			if (this.maxScaleValue <= 100) {
-				if (delta <= 0.1)
+			final double delta = this.maxScaleValue - this.minScaleValue == 0 ? this.device.translateValue(this, (this.maxValue - this.minValue)/1000) : this.maxScaleValue - this.minScaleValue;
+			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue/1000));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, maxValueAbs, delta));
+			if (maxValueAbs < 100) {
+				if (delta < 0.1)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
 				else if (delta <= 1)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
-				else if (delta <= 100)
+				else if (delta < 100)
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
 			}
-			else if (this.maxScaleValue <= 500) {
+			else if (maxValueAbs < 500) {
 				if (delta <= 0.1)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else if (delta <= 1)
@@ -1920,7 +1922,13 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(DEFINED_MIN_VALUE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  Double.valueOf(tmpValue.trim()).doubleValue();
 		tmpValue = recordProps.get(DATA_TYPE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.dataType =  Record.DataType.fromValue(tmpValue);
+		if (tmpValue!=null && tmpValue.length() > 0) try {
+			this.dataType =  Record.DataType.fromValue(tmpValue);
+		}
+		catch (Exception e) {
+			if (tmpValue.startsWith("GPS") && tmpValue.endsWith("degree"))
+				this.dataType =  Record.DataType.fromValue(tmpValue.substring(0, tmpValue.lastIndexOf(GDE.STRING_BLANK)));
+		}
 
 		tmpValue =  recordProps.get(NAME);
 		if (tmpValue!=null && tmpValue.length() > 0 && !this.name.trim().equalsIgnoreCase(tmpValue.trim())) {
