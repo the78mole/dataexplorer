@@ -205,7 +205,6 @@ public class Picolario2 extends Picolario {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		this.makeInActiveDisplayable(recordSet);
-		this.updateVisibilityStatus(recordSet, true);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
@@ -378,6 +377,7 @@ public class Picolario2 extends Picolario {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
+		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**

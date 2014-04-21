@@ -37,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -70,6 +72,8 @@ public class Picolario2LogReader {
 		RecordSet recordSet = null;
 		DataInputStream data_in = null;
 		int[] points = new int[device.getNumberOfMeasurements(1)];
+		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
+		boolean isOutdated = false;
 		
 		MenuToolBar menuToolBar = Picolario2LogReader.application.getMenuToolBar();
 		if (menuToolBar != null) {
@@ -131,11 +135,27 @@ public class Picolario2LogReader {
 				log.log(Level.FINE, String.format("start pressure = %d; start voltage = %d", startValues[1]/1000, startValues[2]/1000));
 				fileSize -= 4;
 				
-				//activeChannel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
 				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfigNumber, true, true);
 				activeChannel.put(recordSetName, recordSet);
 				recordSet = activeChannel.get(recordSetName);
 				recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format("\nFirmware : %s", firmware));
+				try {
+					isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;
+				}
+				catch (Exception e) {
+					// ignore and state as not outdated
+				}
+				if (!isOutdated) {
+					long startTimeStamp = (long) (new File(filePath).lastModified() - recordSet.getMaxTime_ms());
+					recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
+					recordSet.setStartTimeStamp(startTimeStamp);
+					activeChannel.setFileDescription(application.isObjectoriented() ? dateTime + GDE.STRING_BLANK + application.getObjectKey() : dateTime);
+					//activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
+				}
+				else {
+					recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
+				}
+
 				//TODO recordSet.setStartTimeStamp(startTimeStamp_ms);
 				if (application.getMenuToolBar() != null) {
 					activeChannel.applyTemplate(recordSetName, false);
