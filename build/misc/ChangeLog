@@ -8,6 +8,8 @@ HoTTAdapter* - optimize import for receiver data only
 HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
 UltraDuoPlus50/60 - add step charge configuration tabulator
 add support for GPS-Logger2 from SM-Modellbau
+update IGCAdapter to enable extension data for 4 additional values
+enable optimized data sets load of DataExplorer for Android saved osd files
 
 
 Version 3.1.4 - 02 Feb 2014
