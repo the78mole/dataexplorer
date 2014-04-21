@@ -15,7 +15,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="4" formatType="VALUE" inputType="FILE_IO"/>
+        <format size="-8" formatType="VALUE" inputType="FILE_IO"/>
         <timeUnit>sec</timeUnit>
         <separator></separator>
         <leader>B</leader>
@@ -60,6 +60,34 @@
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 				<property description="regression interval time" type="Integer" value="10" name="regression_interval_sec"/>
 				<property description="Regression calculation type" type="String" value="regression_type_curve" name="regression_type"/>
+			</Measurement>
+			<Measurement>
+				<name>FXA</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true" />
+			</Measurement>
+			<Measurement>
+				<name>SIU</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true" />
+			</Measurement>
+			<Measurement>
+				<name>ENL</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true" />
+			</Measurement>
+			<Measurement>
+				<name>RPM</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 		</Channel>
     </Channels>
