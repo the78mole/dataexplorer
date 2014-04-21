@@ -196,7 +196,6 @@ public class CellLog8S extends iCharger {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
 
