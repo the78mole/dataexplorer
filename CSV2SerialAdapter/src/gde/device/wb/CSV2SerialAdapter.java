@@ -287,7 +287,6 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.updateVisibilityStatus(recordSet, true);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
