@@ -1,3 +1,21 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2014 Winfried Bruegmann
+****************************************************************************************/
 package gde.device.graupner;
 
 import gde.GDE;
@@ -253,11 +271,11 @@ public class StepChargeComposite extends ScrolledComposite {
 	}
 
 	private void initCapacity(final int initialCapacity, int capacityStep1, int capacityStep2, int capacityStep3, int capacityStep4) {
-		int maxCapacityValue = capacityStep4 != 0 ? capacityStep4 : initialCapacity * 110 / 100 * 100;
-		maxCapacityValue = maxCapacityValue != initialCapacity ? initialCapacity / 100 * 110 / 100 * 100 : maxCapacityValue;
+		int maxCapacityValue = 9900; //capacityStep4 != 0 ? capacityStep4 : initialCapacity * 120 / 100 * 100;
+		//maxCapacityValue = maxCapacityValue != initialCapacity ? initialCapacity / 100 * 120 / 100 * 100 : maxCapacityValue;
 
 		if (capacityStep4 == 0) {
-			capacityStep4 = maxCapacityValue;//round modulo 100
+			capacityStep4 = initialCapacity / 100 * 120;//round modulo 100
 			capacityStep1 = capacityStep4 / 10 / 100 * 100;
 			capacityStep2 = capacityStep4 / 100 * 55 / 100 * 100;
 			capacityStep3 = capacityStep4 / 100 * 72 / 100 * 100;

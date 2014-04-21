@@ -1,4 +1,3 @@
-package gde.device.graupner;
 /**************************************************************************************
   	This file is part of GNU DataExplorer.
 
@@ -17,7 +16,7 @@ package gde.device.graupner;
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014 Winfried Bruegmann
 ****************************************************************************************/
-
+package gde.device.graupner;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;

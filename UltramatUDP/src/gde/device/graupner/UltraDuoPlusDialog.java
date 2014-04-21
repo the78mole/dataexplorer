@@ -371,10 +371,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 					if (evt.index == 0) {
 						updateBatteryMemoryParameter(UltraDuoPlusDialog.this.memoryValues[0]);
-						updateBatteryParameterValues();
+						updateBatteryParameterValues(0);
 					}
 					else if (evt.index == 2) { // capacity change
-						updateBatteryParameterValues();
+						updateBatteryParameterValues(2);
+					}
+					else if (evt.index == 6) { // current change
+						updateBatteryParameterValues(6);
 					}
 					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null && log.isLoggable(java.util.logging.Level.FINE)) {
 						StringBuffer sb = new StringBuffer();
@@ -2084,7 +2087,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			case UltraDuoPlus50:
 			case UltraDuoPlus60:
 				if (selectionIndex == 1) { //NiMH
-					if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
+					if (this.stepChargeTabItem == null || this.stepChargeTabItem.isDisposed()) 
+						initStepChargeTab();
 					this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
 				}
 				else {
@@ -2108,7 +2112,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			switch (this.device.getDeviceTypeIdentifier()) {
 			case UltraDuoPlus50:
 			case UltraDuoPlus60:
-				if (this.stepChargeComposite == null || this.stepChargeComposite.isDisposed()) initStepChargeTab();
+				if (this.stepChargeTabItem == null || this.stepChargeTabItem.isDisposed()) initStepChargeTab();
 				this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
 				break;
 			default:
@@ -2122,16 +2126,18 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * update the memory setup parameter values with dependency to cell type, capacity, charge current
 	 * set meaningful initial values
 	 */
-	private void updateBatteryParameterValues() {
+	private void updateBatteryParameterValues(final int updateIndex) {
 		log.log(java.util.logging.Level.FINEST, GDE.STRING_ENTRY);
 		//0=cellType,1=numCells,2=capacity,3=year,4=month,5=day,
 		//6=chargeCurrent,7=deltaPeak,8=preDeltaPeakDelay,9=trickleCurrent,10=chargeOffTemperature,11=chargeMaxCapacity,12=chargeSafetyTimer,13=rePeakCycle,14=chargeVoltage,15=repaekDelay,16=flatLimitCheck,26=storeVoltage
 		//17=dischargeCurrent,18=dischargOffVolage,19=dischargeOffTemp,20=dischargemaxCapacity,21=NiMhMatchVoltage
 		//22=cycleDirection,23=cycleCount,24=chargeEndDelay,25=dischargeEndDelay
-		this.memoryValues[6] = this.memoryValues[2] / 2; //charge current 0.5 C
-		this.memoryValues[17] = this.memoryValues[2]; //discharge current 1.0 C
-		this.memoryValues[12] = this.memoryValues[2] / 30; //chargeSafetyTimer
-		this.memoryValues[12] = this.memoryValues[12] - (this.memoryValues[12] % 10); //chargeSafetyTimer
+		if (updateIndex== 2) { //capacity change
+			this.memoryValues[6] = this.memoryValues[2] / 2; //charge current 0.5 C
+			this.memoryValues[17] = this.memoryValues[2]; //discharge current 1.0 C
+		}
+		//this.memoryValues[12] = this.memoryValues[2] / 30; //chargeSafetyTimer
+		//this.memoryValues[12] = this.memoryValues[12] - (this.memoryValues[12] % 10); //chargeSafetyTimer
 		this.memoryValues[20] = 100; //dischargemaxCapacity
 		this.memoryValues[22] = 1; //cycleDirection D->C
 		this.memoryValues[23] = 1; //cycleCount
@@ -2140,7 +2146,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		case 0: //NiCd
 			this.memoryValues[11] = 120; //chargeMaxCapacity
 			this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 50 : (9 / 5) * 50 + 32; //chargeOffTemperature
-			this.memoryValues[12] = this.memoryValues[12] + 30; //chargeSafetyTimer
+			this.memoryValues[12] = Double.valueOf(90 * (1.0* this.memoryValues[2]/this.memoryValues[6])).intValue(); //chargeSafetyTimer
 			this.memoryValues[9] = this.memoryValues[2] / 10; //trickleCurrent
 			this.memoryValues[7] = 7; //deltaPeak mV
 			this.memoryValues[8] = 3; //preDeltaPeakDelay min
@@ -2153,7 +2159,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		case 1: //NiMh
 			this.memoryValues[11] = 120; //chargeMaxCapacity
 			this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 50 : (9 / 5) * 50 + 32; //chargeOffTemperature
-			this.memoryValues[12] = this.memoryValues[12] + 30; //chargeSafetyTimer
+			this.memoryValues[12] = Double.valueOf(90 * (1.0* this.memoryValues[2]/this.memoryValues[6])).intValue(); //chargeSafetyTimer
 			this.memoryValues[9] = this.memoryValues[2] / 10; //trickleCurrent
 			this.memoryValues[7] = 5; //deltaPeak mV
 			this.memoryValues[8] = 3; //preDeltaPeakDelay min
@@ -2167,7 +2173,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		case 2: //LiIo
 			this.memoryValues[11] = 105; //chargeMaxCapacity
 			this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 45 : (9 / 5) * 45 + 32; //chargeOffTemperature
-			this.memoryValues[12] = this.memoryValues[12] + 60; //chargeSafetyTimer
+			this.memoryValues[12] = Double.valueOf(120 * (1.0* this.memoryValues[2]/this.memoryValues[6])).intValue(); //chargeSafetyTimer
 			this.memoryValues[9] = 0; //trickleCurrent
 			this.memoryValues[14] = 4100; //chargeVoltage/cell
 			this.memoryValues[26] = 3900; //storeVoltage/cell
@@ -2177,7 +2183,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		case 3: //LiPo
 			this.memoryValues[11] = 105; //chargeMaxCapacity
 			this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 45 : (9 / 5) * 45 + 32; //chargeOffTemperature
-			this.memoryValues[12] = this.memoryValues[12] + 60; //chargeSafetyTimer
+			this.memoryValues[12] = Double.valueOf(120 * (1.0* this.memoryValues[2]/this.memoryValues[6])).intValue(); //chargeSafetyTimer
 			this.memoryValues[9] = 0; //trickleCurrent
 			this.memoryValues[14] = 4200; //chargeVoltage/cell
 			this.memoryValues[26] = 4000; //storeVoltage/cell
@@ -2187,7 +2193,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		case 4: //LiFe
 			this.memoryValues[11] = 125; //chargeMaxCapacity
 			this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 45 : (9 / 5) * 45 + 32; //chargeOffTemperature
-			this.memoryValues[12] = this.memoryValues[12] + 60; //chargeSafetyTimer
+			this.memoryValues[12] = Double.valueOf(120 * (1.0* this.memoryValues[2]/this.memoryValues[6])).intValue(); //chargeSafetyTimer
 			this.memoryValues[9] = 0; //trickleCurrent
 			this.memoryValues[14] = 3600; //chargeVoltage/cell
 			this.memoryValues[26] = 3500; //storeVoltage/cell
@@ -2205,7 +2211,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.memoryValues[19] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 50 : (9 / 5) * 50 + 32; //dischargeOffTemperature
 			break;
 		}
-		this.memoryValues[12] = this.memoryValues[12] > 30 ? 30 : this.memoryValues[12];
+		this.memoryValues[12] = this.memoryValues[12] > 905 ? 905 : this.memoryValues[12];
 		//update parameter controls
 		for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
 			if (this.memoryParameters[i] != null) {
