@@ -903,7 +903,7 @@ public class StepChargeComposite extends ScrolledComposite {
 					}
 					{
 						int[] peakSensityValue = new int[] { 5 };
-						this.peakConfigControl = new ParameterConfigControl(this.configComposite, peakSensityValue, 0, "%d", "Peak Empfindlichkeit", 220, "3 - 15 [mV/Z]", 120, false, 50, 150, 3, 15);
+						this.peakConfigControl = new ParameterConfigControl(this.configComposite, peakSensityValue, 0, "%d", "Peak Empfindlichkeit", 220, "0 - 15 [mV/Z]", 120, false, 50, 150, 0, 15);
 						this.peakConfigControl.getSlider().notifyListeners(SWT.Selection, new Event());
 					}
 					{
