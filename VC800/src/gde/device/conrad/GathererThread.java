@@ -58,8 +58,8 @@ public class GathererThread extends Thread {
 	boolean										isSwitchedRecordSet					= false;
 	boolean										isGatheredRecordSetVisible	= true;
 
-	final static int					WAIT_TIME_RETRYS						= 36;
-	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
+	final static int					WAIT_TIME_RETRYS						= 600;
+	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 600 * 1 sec timeout = 600 sec
 	final long								cycleTime_ms;
 	boolean										isCollectDataStopped				= false;
 
@@ -128,7 +128,7 @@ public class GathererThread extends Thread {
 					// check if a record set matching for re-use is available and prepare a new if required
 					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName) || !m_unit.equals(old_unit)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 600 * receive timeout sec timeout  600 sec
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
@@ -180,12 +180,11 @@ public class GathererThread extends Thread {
 				postCleanup();
 			}
 			catch (Throwable e) {
-				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				if (e instanceof TimeOutException) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1500));
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+					log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+						log.log(Level.WARNING, "device activation timeout", e); //$NON-NLS-1$
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1501), SWT.COLOR_RED);
 						stopDataGatheringThread(false);
 					}

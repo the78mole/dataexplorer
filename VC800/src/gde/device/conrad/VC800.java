@@ -320,7 +320,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		String typeSymbol = Messages.getString(MessageIds.GDE_MSGT1500);
 		if 			(unit.endsWith("V")) 		typeSymbol = Messages.getString(MessageIds.GDE_MSGT1501); //$NON-NLS-1$
 		else if (unit.endsWith("A")) 		typeSymbol = Messages.getString(MessageIds.GDE_MSGT1503); //$NON-NLS-1$
-		else if (unit.endsWith("Ohm")) 	typeSymbol = Messages.getString(MessageIds.GDE_MSGT1504); //$NON-NLS-1$
+		else if (unit.endsWith("Ω")) 		typeSymbol = Messages.getString(MessageIds.GDE_MSGT1504); //$NON-NLS-1$
 		else if (unit.endsWith("F")) 		typeSymbol = Messages.getString(MessageIds.GDE_MSGT1505); //$NON-NLS-1$
 		else if (unit.endsWith("Hz")) 	typeSymbol = Messages.getString(MessageIds.GDE_MSGT1506); //$NON-NLS-1$
 		else if (unit.endsWith("°C")) 	typeSymbol = Messages.getString(MessageIds.GDE_MSGT1507); //$NON-NLS-1$
