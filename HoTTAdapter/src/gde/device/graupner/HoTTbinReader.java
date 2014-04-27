@@ -73,6 +73,7 @@ public class HoTTbinReader {
 	static int																	tmpVoltage1						= 0;
 	static int																	tmpVoltage2						= 0;
 	static int																	tmpCapacity						= 0;
+	static int																	tmpVelocity						= 0;
 	static int																	tmpLatitude						= 0;
 	static int																	tmpLatitudeDelta			= 0;
 	static double																latitudeTolerance			= 1;
@@ -135,17 +136,17 @@ public class HoTTbinReader {
 							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
 							break;
 						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GENRAL.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()] = true;
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
 							break;
 						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ELECTRIC.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()] = true;
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
 							break;
 						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()] == false)
-								HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.SPEED_CONTROL.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()] = true;
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false)
+								HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
 							break;
 						}
 					}
@@ -416,15 +417,15 @@ public class HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
 							//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 							if (HoTTbinReader.recordSetGeneral == null) {
 								channel = HoTTbinReader.channels.get(4);
 								channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-								recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
+								recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
 								HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, 4, true, true);
 								channel.put(recordSetName, HoTTbinReader.recordSetGeneral);
-								HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GENRAL.value(), HoTTbinReader.recordSetGeneral);
+								HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(), HoTTbinReader.recordSetGeneral);
 								tmpRecordSet = channel.get(recordSetName);
 								tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 								tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -459,15 +460,15 @@ public class HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
 							//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 							if (HoTTbinReader.recordSetElectric == null) {
 								channel = HoTTbinReader.channels.get(5);
 								channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-								recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
+								recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
 								HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device, 5, true, true);
 								channel.put(recordSetName, HoTTbinReader.recordSetElectric);
-								HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ELECTRIC.value(), HoTTbinReader.recordSetElectric);
+								HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(), HoTTbinReader.recordSetElectric);
 								tmpRecordSet = channel.get(recordSetName);
 								tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 								tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -502,15 +503,15 @@ public class HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
 							//check if recordSetMotorDriver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 							if (HoTTbinReader.recordSetSpeedControl == null) {
 								channel = HoTTbinReader.channels.get(7);
 								channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-								recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
+								recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
 								HoTTbinReader.recordSetSpeedControl = RecordSet.createRecordSet(recordSetName, device, 7, true, true);
 								channel.put(recordSetName, HoTTbinReader.recordSetSpeedControl);
-								HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.SPEED_CONTROL.value(), HoTTbinReader.recordSetSpeedControl);
+								HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), HoTTbinReader.recordSetSpeedControl);
 								tmpRecordSet = channel.get(recordSetName);
 								tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 								tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -803,15 +804,15 @@ public class HoTTbinReader {
 
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
 									//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetGeneral == null) {
 										channel = HoTTbinReader.channels.get(4);
 										channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, 4, true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetGeneral);
-										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GENRAL.value(), HoTTbinReader.recordSetGeneral);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(), HoTTbinReader.recordSetGeneral);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -826,15 +827,15 @@ public class HoTTbinReader {
 
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
 									//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetElectric == null) {
 										channel = HoTTbinReader.channels.get(5);
 										channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device, 5, true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetElectric);
-										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ELECTRIC.value(), HoTTbinReader.recordSetElectric);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(), HoTTbinReader.recordSetElectric);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -849,15 +850,15 @@ public class HoTTbinReader {
 
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
 									//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetSpeedControl == null) {
 										channel = HoTTbinReader.channels.get(7);
 										channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetSpeedControl = RecordSet.createRecordSet(recordSetName, device, 7, true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetSpeedControl);
-										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.SPEED_CONTROL.value(), HoTTbinReader.recordSetSpeedControl);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), HoTTbinReader.recordSetSpeedControl);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -1131,10 +1132,11 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf2, 8);
 		HoTTbinReader.tmpClimb1 = DataParser.parse2UnsignedShort(_buf3, 0);
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF);
+		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
 		HoTTbinReader.pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > 10000 && HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000)) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
-			HoTTbinReader.pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
+			HoTTbinReader.pointsGPS[6] = HoTTAdapter.isFilterEnabled && tmpVelocity > 2000000 ? HoTTbinReader.pointsGPS[6] : tmpVelocity;
 
 			HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			if (!HoTTAdapter.isTolerateSignChangeLatitude) HoTTbinReader.tmpLatitude = _buf1[6] == 1 ? -1 * HoTTbinReader.tmpLatitude : HoTTbinReader.tmpLatitude;

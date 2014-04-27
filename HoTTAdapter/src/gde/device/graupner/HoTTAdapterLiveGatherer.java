@@ -209,26 +209,26 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		pointsGPS = new int[recordSetGPS.size()];
 		//General
 		this.channel = this.channels.get(4);
-		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
+		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
 		recordSetGeneral = RecordSet.createRecordSet(recordSetKey, this.device, 4, true, true);
 		this.channel.put(recordSetKey, recordSetGeneral);
-		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GENRAL.value(), recordSetGeneral);
+		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(), recordSetGeneral);
 		this.channel.applyTemplate(recordSetKey, true);
 		pointsGeneral = new int[recordSetGeneral.size()];
 		//Electric
 		this.channel = this.channels.get(5);
-		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
+		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
 		recordSetElectric = RecordSet.createRecordSet(recordSetKey, this.device, 5, true, true);
 		this.channel.put(recordSetKey, recordSetElectric);
-		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ELECTRIC.value(), recordSetElectric);
+		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(), recordSetElectric);
 		this.channel.applyTemplate(recordSetKey, true);
 		pointsElectric = new int[recordSetElectric.size()];
 		//SpeedControl
 		this.channel = this.channels.get(7);
-		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
+		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
 		recordSetMotorDriver = RecordSet.createRecordSet(recordSetKey, this.device, 7, true, true);
 		this.channel.put(recordSetKey, recordSetMotorDriver);
-		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.SPEED_CONTROL.value(), recordSetElectric);
+		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), recordSetElectric);
 		this.channel.applyTemplate(recordSetKey, true);
 		pointsMotorDriver = new int[recordSetMotorDriver.size()];
 
@@ -249,17 +249,17 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			this.dialog.selectTab(3);
 			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
 			this.dialog.selectTab(4);
-			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
+			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
 			this.dialog.selectTab(5);
-			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
+			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
 		}
-		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+		else if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
 			this.dialog.selectTab(7);
-			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.SPEED_CONTROL.value() + recordSetNameExtend;
+			recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
 		}
 		this.channel.switchRecordSet(recordSetKey);
 		this.application.setStatusMessage(sb.toString(), SWT.COLOR_BLACK);
@@ -291,17 +291,17 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200)) {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
 							recordSetElectric.addPoints(this.device.convertDataBytes(pointsElectric, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
-							switchRecordSetDisplay(HoTTAdapter.Sensor.ELECTRIC, recordSetNumber, recordSetNameExtend);
+							switchRecordSetDisplay(HoTTAdapter.Sensor.EAM, recordSetNumber, recordSetNameExtend);
 						}
 						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_GENERAL_19200)) {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
 							recordSetGeneral.addPoints(this.device.convertDataBytes(pointsGeneral, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
-							switchRecordSetDisplay(HoTTAdapter.Sensor.GENRAL, recordSetNumber, recordSetNameExtend);
+							switchRecordSetDisplay(HoTTAdapter.Sensor.GAM, recordSetNumber, recordSetNameExtend);
 						}
 						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200)) {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 							recordSetMotorDriver.addPoints(this.device.convertDataBytes(pointsMotorDriver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
-							switchRecordSetDisplay(HoTTAdapter.Sensor.SPEED_CONTROL, recordSetNumber, recordSetNameExtend);
+							switchRecordSetDisplay(HoTTAdapter.Sensor.ESC, recordSetNumber, recordSetNameExtend);
 						}
 						else if (checkSignature(this.dataBuffer, HoTTAdapter.SENSOR_TYPE_GPS_19200)) {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);

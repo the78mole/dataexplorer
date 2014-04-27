@@ -111,7 +111,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 	public enum Sensor {
-		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air"), CHANNEL("Channel"), SPEED_CONTROL("MotorDriver");
+		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GAM("General-Air"), EAM("Electric-Air"), CHANNEL("Channel"), ESC("MotorDriver");
 		private final String	value;
 
 		private Sensor(String v) {

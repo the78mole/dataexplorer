@@ -224,7 +224,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
 							//fill data block 1 to 4
 							if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 								HoTTbinReader.buf1 = new byte[30];
@@ -252,7 +252,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
 							//fill data block 1 to 4
 							if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 								HoTTbinReader.buf1 = new byte[30];
@@ -280,7 +280,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
 							//fill data block 0 to 4
 							if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 								HoTTbinReader.buf1 = new byte[30];
@@ -541,7 +541,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()]) {
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
 									if (isGeneralData && isReceiverData) {
 										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
 										//System.out.println("isGeneralData i = " + i);
@@ -554,7 +554,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ELECTRIC.ordinal()]) {
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
 									if (isElectricData && isReceiverData) {
 										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
 										//System.out.println("isElectricData i = " + i);
@@ -567,7 +567,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.SPEED_CONTROL.ordinal()]) {
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
 									if (isMotorDriverData && isReceiverData) {
 										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber);
 										//System.out.println("isElectricData i = " + i);
@@ -723,7 +723,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			for (int k = 35; k < 58; k++) {
 				HoTTbinReader2.points[k] = HoTTbinReader.pointsElectric[k];
 			}
-			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()] == false) HoTTbinReader2.points[29] = HoTTbinReader.pointsGeneral[29];
+			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader2.points[29] = HoTTbinReader.pointsGeneral[29];
 		}
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
@@ -839,11 +839,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
 		HoTTbinReader.tmpClimb1 = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000);
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF) - 120;
+		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > -20000 && HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000)) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb1, 5=Climb3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			//8=Height, 9=Climb1, 10=Climb3
 			//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
-			HoTTbinReader.pointsGPS[14] = DataParser.parse2Short(_buf1, 4) * 1000;
+			HoTTbinReader.pointsGPS[14] = HoTTAdapter.isFilterEnabled && tmpVelocity > 2000000 ? HoTTbinReader.pointsGPS[14] : tmpVelocity;
 
 			HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			if (!HoTTAdapter.isTolerateSignChangeLatitude) HoTTbinReader.tmpLatitude = _buf1[6] == 1 ? -1 * HoTTbinReader.tmpLatitude : HoTTbinReader.tmpLatitude;
@@ -984,7 +985,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader.pointsElectric[55] = HoTTbinReader.tmpVoltage2 * 100;
 			HoTTbinReader.pointsElectric[56] = ((_buf3[1] & 0xFF) - 20) * 1000;
 			HoTTbinReader.pointsElectric[57] = ((_buf3[2] & 0xFF) - 20) * 1000;
-			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GENRAL.ordinal()] == false) HoTTbinReader.pointsGeneral[29] = DataParser.parse2Short(_buf4, 4) * 1000;
+			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.pointsGeneral[29] = DataParser.parse2Short(_buf4, 4) * 1000;
 		}
 	}
 
