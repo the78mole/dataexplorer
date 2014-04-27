@@ -7,7 +7,7 @@ HoTTAdapter2 - fix height curve data if overlayed from different sensors
 HoTTAdapter* - optimize import for receiver data only
 HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
 UltraDuoPlus50/60 - add step charge configuration tabulator
-UltraDuoPlus* - refine charge chargeSafetyTimer depending on capacity as well as on charge current 
+UltraDuoPlus* - refine several default values depending on capacity as well as on charge current 
 VC820/VC840 - fix mapping while resistance measurement
 GPS-Logger2 - add support for GPS-Logger2 extended measurement value set from SM-Modellbau
 IGCAdapter - update to enable extension data for 4 additional values
