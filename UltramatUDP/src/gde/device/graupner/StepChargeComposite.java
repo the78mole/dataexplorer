@@ -238,13 +238,13 @@ public class StepChargeComposite extends ScrolledComposite {
 		return stepValues;
 	}
 
-	private void initCurrent(final int initialCurrenty, int currentStep1, int currentStep2, int currentStep3, int currentStep4) {
+	private void initCurrent(final int initialCurrent, int currentStep1, int currentStep2, int currentStep3, int currentStep4) {
 
 		if (currentStep4 == 0) {
-			currentStep4 = initialCurrenty; //round modulo 100
-			currentStep1 = initialCurrenty / 100 * 60 / 100 * 100;
-			currentStep2 = initialCurrenty / 100 * 120 / 100 * 100;
-			currentStep3 = initialCurrenty / 100 * 140 / 100 * 100;
+			currentStep4 = initialCurrent / 100 * 120; //1.2 C round modulo 100
+			currentStep1 = initialCurrent / 100 * 100; //1.0 C
+			currentStep2 = initialCurrent / 100 * 200; //2.0 C
+			currentStep3 = initialCurrent / 100 * 150; //1.5 C
 		}
 
 		this.valueA1 = currentStep1 / 100;
@@ -270,15 +270,15 @@ public class StepChargeComposite extends ScrolledComposite {
 		this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 	}
 
-	private void initCapacity(final int initialCapacity, int capacityStep1, int capacityStep2, int capacityStep3, int capacityStep4) {
+	public void initCapacity(final int initialCapacity, int capacityStep1, int capacityStep2, int capacityStep3, int capacityStep4) {
 		int maxCapacityValue = 9900; //capacityStep4 != 0 ? capacityStep4 : initialCapacity * 120 / 100 * 100;
 		//maxCapacityValue = maxCapacityValue != initialCapacity ? initialCapacity / 100 * 120 / 100 * 100 : maxCapacityValue;
 
 		if (capacityStep4 == 0) {
-			capacityStep4 = initialCapacity / 100 * 120;//round modulo 100
+			capacityStep4 = initialCapacity / 100 * 110;//round modulo 100
 			capacityStep1 = capacityStep4 / 10 / 100 * 100;
-			capacityStep2 = capacityStep4 / 100 * 55 / 100 * 100;
-			capacityStep3 = capacityStep4 / 100 * 72 / 100 * 100;
+			capacityStep2 = capacityStep4 / 100 * 60 / 100 * 100;
+			capacityStep3 = capacityStep4 / 100 * 80 / 100 * 100;
 		}
 
 		this.valueC1 = capacityStep1 / 100;
