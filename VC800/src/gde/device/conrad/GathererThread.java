@@ -180,9 +180,10 @@ public class GathererThread extends Thread {
 				postCleanup();
 			}
 			catch (Throwable e) {
+				log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				if (e instanceof TimeOutException) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1500));
-					log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+					log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ... " + getRetryCounter()); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.WARNING, "device activation timeout", e); //$NON-NLS-1$
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1501), SWT.COLOR_RED);
