@@ -6,6 +6,7 @@ HoTTAdapter* - synchronize capacity filter
 HoTTAdapter2 - fix height curve data if overlayed from different sensors
 HoTTAdapter* - optimize import for receiver data only
 HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
+HoTTAdapter* - update filter settings speed
 UltraDuoPlus50/60 - add step charge configuration tabulator
 UltraDuoPlus* - refine several default values depending on capacity as well as on charge current 
 VC820/VC840 - fix mapping while resistance measurement
