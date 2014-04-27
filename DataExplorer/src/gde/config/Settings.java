@@ -175,6 +175,7 @@ public class Settings extends Properties {
 	public final static String			IS_GLOBAL_LOG_LEVEL						= "is_global_log_level";																																				//$NON-NLS-1$
 	public static final String			IS_REDUCE_CHARGE_DISCHARGE		= "is_reduce_charge_discharge";																																	//$NON-NLS-1$
 	public final static String			IS_ALL_IN_ONE_RECORDSET				= "is_all_in_one_record_set";																																		//$NON-NLS-1$
+	public final static String			IS_PARTIAL_DATA_TABLE					= "is_partial_data_table";																																		//$NON-NLS-1$
 	public final static String			GLOBAL_LOG_LEVEL							= "global_log_level";																																						//$NON-NLS-1$
 	public final static String			UI_LOG_LEVEL									= "ui_log_leve";																																								//$NON-NLS-1$
 	public final static String			DEVICE_LOG_LEVEL							= "device_log_level";																																						//$NON-NLS-1$
@@ -583,6 +584,7 @@ public class Settings extends Properties {
 			//charger specials
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PARTIAL_DATA_TABLE, this.isPartialDataTable())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", Settings.TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
@@ -1004,6 +1006,20 @@ public class Settings extends Properties {
 	 */
 	public void setContinuousRecordSet(boolean enabled) {
 		this.setProperty(Settings.IS_ALL_IN_ONE_RECORDSET, GDE.STRING_EMPTY + enabled);
+	}
+
+	/**
+	 * @return boolean value if data table display selected records from graphics
+	 */
+	public boolean isPartialDataTable() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_PARTIAL_DATA_TABLE, "false").trim()); //$NON-NLS-1$
+	}
+
+	/**
+	 * set boolean value if data table should show only selected records from curve view
+	 */
+	public void setPartialDataTable(boolean enabled) {
+		this.setProperty(Settings.IS_PARTIAL_DATA_TABLE, GDE.STRING_EMPTY + enabled);
 	}
 
 	/**

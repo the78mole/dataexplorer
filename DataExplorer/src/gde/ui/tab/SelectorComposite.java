@@ -138,7 +138,7 @@ public class SelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					SelectorComposite.this.application.updateAllTabs(false, false);
+					SelectorComposite.this.application.updateAllTabs(true, false);
 				}
 			});
 		}
@@ -178,6 +178,7 @@ public class SelectorComposite extends Composite {
 	 * executes the update of the curve selector table
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
+		SelectorComposite.this.application.updateAllTabs(true, false);
 		int itemWidth = this.initialSelectorHeaderWidth;
 		RecordSet recordSet = null;
 		switch (this.windowType) {
@@ -228,6 +229,7 @@ public class SelectorComposite extends Composite {
 				}				
 				this.selectorColumnWidth = itemWidth;
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+				recordSet.updateVisibleAndDisplayableRecords();
 		}
 		else {
 			this.curveSelectorTable.removeAll();
@@ -302,6 +304,7 @@ public class SelectorComposite extends Composite {
 					item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 				}
 				activeRecord.getParent().syncScaleOfSyncableRecords();
+				activeRecord.getParent().updateVisibleAndDisplayableRecords();
 			}
 		}
 	}

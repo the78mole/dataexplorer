@@ -134,13 +134,13 @@ public class SettingsDialog extends Dialog {
 	Button															assocMimeTypeButton;
 	Button															removeLauncherButton;
 	Button															createLauncherButton;
-	Button															blankChargeDischargeButton, continiousRecordSetButton;
+	Button															partialDataTableButton, blankChargeDischargeButton, continiousRecordSetButton;
 	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, addChannelConfigNameCurveCompareButton;
 	Composite														osMiscComposite;
 	Composite														miscComposite;
 	Group																shellMimeType;
 	Group																desktopLauncher;
-	Group																chargerSpecials, graphicsView;
+	Group																dataTableGroup, chargerSpecials, graphicsView;
 	CTabItem														osMiscTabItem;
 	CTabItem														miscTabItem;
 	CLabel															fileIOLevelLabel;
@@ -745,7 +745,7 @@ public class SettingsDialog extends Dialog {
 							this.graphicsView = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
-							chargerSpecialsLayout.marginTop = 5;
+							chargerSpecialsLayout.marginTop = 2;
 							chargerSpecialsLayout.marginWidth = 20;
 							chargerSpecialsLayout.spacing = 5;
 							this.graphicsView.setLayout(chargerSpecialsLayout);
@@ -755,7 +755,7 @@ public class SettingsDialog extends Dialog {
 								Label label = new Label(this.graphicsView, SWT.LEFT);
 								RowData labelLData = new RowData();
 								labelLData.width = 460;
-								labelLData.height = 20;
+								labelLData.height = 18;
 								label.setLayoutData(labelLData);
 								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0693));
@@ -768,7 +768,7 @@ public class SettingsDialog extends Dialog {
 								this.drawScaleInRecordColorButton.setSelection(this.settings.isDrawScaleInRecordColor());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 20;
+								createLauncerButtonLData.height = 15;
 								this.drawScaleInRecordColorButton.setLayoutData(createLauncerButtonLData);
 								this.drawScaleInRecordColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -786,7 +786,7 @@ public class SettingsDialog extends Dialog {
 								this.drawNameInRecordColorButton.setSelection(this.settings.isDrawNameInRecordColor());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 20;
+								createLauncerButtonLData.height = 15;
 								this.drawNameInRecordColorButton.setLayoutData(createLauncerButtonLData);
 								this.drawNameInRecordColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -804,7 +804,7 @@ public class SettingsDialog extends Dialog {
 								this.drawNumbersInRecordColorButton.setSelection(this.settings.isDrawNumbersInRecordColor());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 20;
+								createLauncerButtonLData.height = 15;
 								this.drawNumbersInRecordColorButton.setLayoutData(createLauncerButtonLData);
 								this.drawNumbersInRecordColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -814,18 +814,18 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+//							{
+//								Label label = new Label(this.graphicsView, SWT.LEFT);
+//								RowData labelLData = new RowData();
+//								labelLData.width = 460;
+//								labelLData.height = 2;
+//								label.setLayoutData(labelLData);
+//							}
 							{
 								Label label = new Label(this.graphicsView, SWT.LEFT);
 								RowData labelLData = new RowData();
 								labelLData.width = 460;
-								labelLData.height = 10;
-								label.setLayoutData(labelLData);
-							}
-							{
-								Label label = new Label(this.graphicsView, SWT.LEFT);
-								RowData labelLData = new RowData();
-								labelLData.width = 460;
-								labelLData.height = 20;
+								labelLData.height = 18;
 								label.setLayoutData(labelLData);
 								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0699));
@@ -838,7 +838,7 @@ public class SettingsDialog extends Dialog {
 								this.addChannelConfigNameCurveCompareButton.setSelection(this.settings.isCurveCompareChannelConfigName());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 460;
-								createLauncerButtonLData.height = 20;
+								createLauncerButtonLData.height = 15;
 								this.addChannelConfigNameCurveCompareButton.setLayoutData(createLauncerButtonLData);
 								this.addChannelConfigNameCurveCompareButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -850,12 +850,50 @@ public class SettingsDialog extends Dialog {
 							}
 						}
 						{
-							this.chargerSpecials = new Group(this.miscComposite, SWT.NONE);
+							this.dataTableGroup = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
 							chargerSpecialsLayout.marginTop = 15;
 							chargerSpecialsLayout.marginWidth = 20;
-							chargerSpecialsLayout.spacing = 30;
+							chargerSpecialsLayout.spacing = 20;
+							this.dataTableGroup.setLayout(chargerSpecialsLayout);
+							this.dataTableGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.dataTableGroup.setText(Messages.getString(MessageIds.GDE_MSGT0702));
+							{
+								Label label = new Label(this.dataTableGroup, SWT.LEFT);
+								RowData labelLData = new RowData();
+								labelLData.width = 400;
+								labelLData.height = 20;
+								label.setLayoutData(labelLData);
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setText(Messages.getString(MessageIds.GDE_MSGT0703));
+							}
+							{
+								this.partialDataTableButton = new Button(this.dataTableGroup, SWT.CHECK);
+								this.partialDataTableButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.partialDataTableButton.setText(Messages.getString(MessageIds.GDE_MSGT0704));
+								this.partialDataTableButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0705));
+								this.partialDataTableButton.setSelection(this.settings.isReduceChargeDischarge());
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 400;
+								createLauncerButtonLData.height = 20;
+								this.partialDataTableButton.setLayoutData(createLauncerButtonLData);
+								this.partialDataTableButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "partialDataTableButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setPartialDataTable(SettingsDialog.this.partialDataTableButton.getSelection());
+									}
+								});
+							}
+						}
+						{
+							this.chargerSpecials = new Group(this.miscComposite, SWT.NONE);
+							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
+							chargerSpecialsLayout.center = true;
+							chargerSpecialsLayout.marginTop = 5;
+							chargerSpecialsLayout.marginWidth = 20;
+							chargerSpecialsLayout.spacing = 15;
 							this.chargerSpecials.setLayout(chargerSpecialsLayout);
 							this.chargerSpecials.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargerSpecials.setText(Messages.getString(MessageIds.GDE_MSGT0690));

@@ -81,6 +81,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	int														xScaleStep										= 0; 																						// steps in x direction to draw the curves, normally 1
 	Rectangle											drawAreaBounds;																																// draw area in display pixel
 
+	//display in data table
+	Vector<Record> 								visibleAndDisplayableRecords 	= new Vector<Record>();													//collection of records visible and displayable
 	// sync enabled records
 	HashMap<Integer,Vector<Record>>	scaleSyncedRecords					= new HashMap<Integer,Vector<Record>>(2);				//collection of record keys where scales might be synchronized
 	
@@ -619,6 +621,23 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		
 		return displayRecords.toArray(new Record[0]);
 	}
+	
+	/**
+	 * update the collection of visible and displayable records in this record set
+	 */
+	public void updateVisibleAndDisplayableRecords() {
+		visibleAndDisplayableRecords.removeAllElements();
+		for (Record record : this.values()) {
+			if (record.isVisible && record.isDisplayable) visibleAndDisplayableRecords.add(record);
+		}
+	}
+	
+	/**
+	 * @return visible and displayable records (p.e. to build the partial data table)
+	 */
+	public Vector<Record> getVisibleAndDisplayableRecords() {		
+		return visibleAndDisplayableRecords;
+	}
 
 	/**
 	 * method to add an new record name 
@@ -1072,7 +1091,6 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-
 	}
 
 	/**
