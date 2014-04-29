@@ -43,7 +43,6 @@ import gde.utils.QuasiLinearRegression;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
