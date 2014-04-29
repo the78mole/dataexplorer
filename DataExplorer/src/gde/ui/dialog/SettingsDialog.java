@@ -873,7 +873,7 @@ public class SettingsDialog extends Dialog {
 								this.partialDataTableButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.partialDataTableButton.setText(Messages.getString(MessageIds.GDE_MSGT0704));
 								this.partialDataTableButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0705));
-								this.partialDataTableButton.setSelection(this.settings.isReduceChargeDischarge());
+								this.partialDataTableButton.setSelection(this.settings.isPartialDataTable());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 400;
 								createLauncerButtonLData.height = 20;
@@ -883,6 +883,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "partialDataTableButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPartialDataTable(SettingsDialog.this.partialDataTableButton.getSelection());
+										SettingsDialog.this.application.updateAllTabs(true, false);
 									}
 								});
 							}

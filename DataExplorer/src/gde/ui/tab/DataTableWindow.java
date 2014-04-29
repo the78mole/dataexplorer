@@ -76,6 +76,7 @@ public class DataTableWindow extends CTabItem {
 
 	final DataExplorer					application;
 	final Channels							channels;
+	final Settings							settings;
 	final CTabFolder						tabFolder;
 	final Menu									popupmenu;
 	final TabAreaContextMenu		contextMenu;
@@ -87,6 +88,7 @@ public class DataTableWindow extends CTabItem {
 		this.tabFolder = dataTab;
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.settings = Settings.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0233));
 
@@ -367,9 +369,18 @@ public class DataTableWindow extends CTabItem {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				for (int i = 0; i < activeRecordSet.size(); i++) {
-					Record record = activeRecordSet.get(i);
-					if (record.isVisible() && record.isDisplayable()) {
+				if (activeRecordSet.isPartialTableSupported() && this.settings.isPartialDataTable()) {
+					for (final Record record : activeRecordSet.getVisibleAndDisplayableRecords()) {
+						StringBuilder sb = new StringBuilder();
+						sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+						column.setWidth(sb.length() * extentFactor);
+						column.setText(sb.toString());
+					}
+				}
+				else {
+					for (int i = 0; i < activeRecordSet.size(); i++) {
+						Record record = activeRecordSet.get(i);
 						StringBuilder sb = new StringBuilder();
 						sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
 						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);

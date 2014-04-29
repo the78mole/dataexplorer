@@ -633,12 +633,19 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 	
 	/**
-	 * @return visible and displayable records (p.e. to build the partial data table)
+	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
 	public Vector<Record> getVisibleAndDisplayableRecords() {		
 		return visibleAndDisplayableRecords;
 	}
 
+	/**
+	 * @return boolean value for the partial data table support 
+	 */
+	public boolean isPartialTableSupported() {
+		return this.device.getName().contains("HoTT");
+	}
+	
 	/**
 	 * method to add an new record name 
 	 */
