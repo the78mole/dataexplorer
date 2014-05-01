@@ -15,6 +15,7 @@ IGCAdapter - update to enable extension data for 4 additional values
 tune auto number formatting 
 enable optimized data sets load of DataExplorer for Android saved osd files
 enable reduced data table by selected records (actually for HoTTAdapter* only)
+prepare release
 
 
 Version 3.1.4 - 02 Feb 2014
