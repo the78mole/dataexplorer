@@ -275,10 +275,10 @@ public class StepChargeComposite extends ScrolledComposite {
 		//maxCapacityValue = maxCapacityValue != initialCapacity ? initialCapacity / 100 * 120 / 100 * 100 : maxCapacityValue;
 
 		if (capacityStep4 == 0) {
-			capacityStep4 = initialCapacity / 100 * 110;//round modulo 100
-			capacityStep1 = capacityStep4 / 10 / 100 * 100;
-			capacityStep2 = capacityStep4 / 100 * 60 / 100 * 100;
-			capacityStep3 = capacityStep4 / 100 * 80 / 100 * 100;
+			capacityStep1 = initialCapacity / 100 * 10;
+			capacityStep2 = initialCapacity / 100 * 60;
+			capacityStep3 = initialCapacity / 100 * 80;
+			capacityStep4 = (initialCapacity+70) * 111 / 100;//round modulo 100
 		}
 
 		this.valueC1 = capacityStep1 / 100;
