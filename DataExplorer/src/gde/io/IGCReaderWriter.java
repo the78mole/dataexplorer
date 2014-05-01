@@ -361,7 +361,8 @@ public class IGCReaderWriter {
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
 			log.log(java.util.logging.Level.WARNING, msg, e);
-			IGCReaderWriter.application.openMessageDialog(msg);
+			if (IGCReaderWriter.application.getStatusBar() != null)
+				IGCReaderWriter.application.openMessageDialog(msg);
 		}
 		finally {
 			if (IGCReaderWriter.application.getStatusBar() != null) {
