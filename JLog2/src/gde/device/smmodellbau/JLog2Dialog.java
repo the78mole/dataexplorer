@@ -107,7 +107,7 @@ public class JLog2Dialog extends DeviceDialog {
 		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		this.isJLog2 = this.device.getClass().getSimpleName().equals("JLog2");
-		this.measurementsCount = this.isJLog2 ? 40 : this.device.getNumberOfMeasurements(Channels.getInstance().getActiveChannelNumber());
+		this.measurementsCount = this.isJLog2 ? 40 : this.device.getNumberOfMeasurements(this.device.getLastChannelNumber());
 	}
 
 	@Override
