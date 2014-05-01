@@ -12,6 +12,7 @@ UltraDuoPlus* - refine several default values depending on capacity as well as o
 VC820/VC840 - fix mapping while resistance measurement
 GPS-Logger2 - add support for GPS-Logger2 extended measurement value set from SM-Modellbau
 IGCAdapter - update to enable extension data for 4 additional values
+Kosmik - fix initialization error
 tune auto number formatting 
 enable optimized data sets load of DataExplorer for Android saved osd files
 enable reduced data table by selected records (actually for HoTTAdapter* only)
