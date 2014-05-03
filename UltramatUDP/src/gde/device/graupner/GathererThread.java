@@ -54,7 +54,7 @@ public class GathererThread extends Thread {
 	String										recordSetKey1								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey2								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey3								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
-	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													//1800 * 1 sec = 30 Min
+	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													//3600 * 1 sec = 60 Min
 	boolean										isCollectDataStopped				= false;
 
 	boolean										isProgrammExecuting1				= false;
