@@ -153,14 +153,22 @@ public class ParameterConfigControl {
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue + this.offset);
 			this.slider.setMaximum(sliderMaxValue + this.offset + 10);
-			this.slider.setIncrement((sliderMaxValue + this.offset) >= 1000 ? 10 : 1);
+			this.slider.setIncrement((sliderMaxValue + this.offset) >= 1000 ? 10 : 10);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
-					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
+					final int selection = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
+					if (selection > 1000 && ParameterConfigControl.this.value != selection && ParameterConfigControl.this.slider.getMaximum() >= 1000) {
+						if (selection > ParameterConfigControl.this.value)
+							ParameterConfigControl.this.value = selection + 90;
+						else if (selection < ParameterConfigControl.this.value) 
+							ParameterConfigControl.this.value = selection - 90;
+					}
+					else 
+						ParameterConfigControl.this.value = selection;
 					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
-					valueArray[valueIndex] = ParameterConfigControl.this.value > 100 ? ParameterConfigControl.this.value / 100 * 100 : ParameterConfigControl.this.value;
+					valueArray[valueIndex] = ParameterConfigControl.this.value > 1000 ? ParameterConfigControl.this.value / 100 * 100 : ParameterConfigControl.this.value / 10 * 10;
 					if (evt.data == null) {
 						Event changeEvent = new Event();
 						changeEvent.index = valueIndex;
