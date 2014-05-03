@@ -374,7 +374,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						updateBatteryParameterValues(0);
 					}
 					else if (evt.index == 1 && UltraDuoPlusDialog.this.memoryValues[0] == 5) { // cell count && pb batterie type
-						UltraDuoPlusDialog.this.memoryValues[1] = UltraDuoPlusDialog.this.memoryValues[1] <= 9 ? 6 : UltraDuoPlusDialog.this.memoryValues[1] > 9 ? 12 : UltraDuoPlusDialog.this.memoryValues[1];
+						UltraDuoPlusDialog.this.memoryValues[1] = UltraDuoPlusDialog.this.memoryValues[1] > 6 && UltraDuoPlusDialog.this.memoryValues[1] <= 9 ? 6 : UltraDuoPlusDialog.this.memoryValues[1] > 9 ? 12 : UltraDuoPlusDialog.this.memoryValues[1];
 						UltraDuoPlusDialog.this.memoryParameters[1].setSliderSelection(UltraDuoPlusDialog.this.memoryValues[1]);
 					}
 					else if (evt.index == 2) { // capacity change
@@ -2164,7 +2164,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.memoryValues[21] = 1200;//NiMhMatchVoltage
 			break;
 		case 1: //NiMh
-			if (updateIndex== 2 && this.stepChargeTabItem != null || !this.stepChargeTabItem.isDisposed()) { //capacity change
+			if (updateIndex== 2 && (this.stepChargeTabItem != null || !this.stepChargeTabItem.isDisposed())) { //capacity change
 				this.memoryStepValues[3] = this.memoryStepValues[7] = 0;
 				this.stepChargeComposite.setStepChargeValues(this.memoryValues[2], this.memoryValues[6], this.memoryStepValues);
 			}
@@ -2212,7 +2212,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.memoryValues[19] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 55 : (9 / 5) * 55 + 32; //dischargeOffTemperature
 			break;
 		case 5: //PB
-			this.memoryValues[6] = this.memoryValues[2] / 10; //charge current 0.1 C
+			if (updateIndex != 6) {
+				this.memoryValues[6] = this.memoryValues[2] / 10; //charge current 0.1 C
+			}
 			this.memoryValues[11] = 155; 	//chargeMaxCapacity
 			this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 50 : (9 / 5) * 50 + 32; //chargeOffTemperature
 			this.memoryValues[12] = 905; 	//chargeSafetyTimer

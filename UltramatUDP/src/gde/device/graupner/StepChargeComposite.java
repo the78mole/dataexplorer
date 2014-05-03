@@ -199,15 +199,15 @@ public class StepChargeComposite extends ScrolledComposite {
 		//8=impulseCharge1, 9=impulseCharge2, 10=impulseCharge3, 11=impulseCharge4, 12=reflexCharge1, 13=reflexCharge2, 14=reflexChareg3, 15=reflexCharge4
 		//16=discharge, 17=trickleCurrent, 18=peakSensitive, 19=cutOffTemperature (20=checksum)
 		//capacity steps
-		stepValues[0] = this.valueC1 * 100;
-		stepValues[1] = this.valueC2 * 100;
-		stepValues[2] = this.valueC3 * 100;
-		stepValues[3] = this.valueC4 * 100;
+		stepValues[0] = this.valueC1 * 10;
+		stepValues[1] = this.valueC2 * 10;
+		stepValues[2] = this.valueC3 * 10;
+		stepValues[3] = this.valueC4 * 10;
 		//current steps
-		stepValues[4] = this.valueA1 * 100;
-		stepValues[5] = this.valueA2 * 100;
-		stepValues[6] = this.valueA3 * 100;
-		stepValues[7] = this.valueA4 * 100;
+		stepValues[4] = this.valueA1 * 10;
+		stepValues[5] = this.valueA2 * 10;
+		stepValues[6] = this.valueA3 * 10;
+		stepValues[7] = this.valueA4 * 10;
 		//impulse charge steps
 		stepValues[8] = this.impulseValue1 && !this.reflexValue1 ? 1 : 0;
 		stepValues[9] = this.impulseValue2 && !this.reflexValue2 ? 1 : 0;
@@ -247,23 +247,23 @@ public class StepChargeComposite extends ScrolledComposite {
 			currentStep3 = initialCurrent / 100 * 150; //1.5 C
 		}
 
-		this.valueA1 = currentStep1 / 100;
-		this.stepSliderA1.setMaximum(200 + 10);
+		this.valueA1 = currentStep1 / 10;
+		//this.stepSliderA1.setMaximum(2000 + 10);
 		this.stepSliderA1.setSelection(this.valueA1);
 		this.stepSliderA1.notifyListeners(SWT.Selection, new Event());
 
-		this.valueA2 = currentStep2 / 100;
-		this.stepSliderA2.setMaximum(200 + 10);
+		this.valueA2 = currentStep2 / 10;
+		//this.stepSliderA2.setMaximum(2000 + 10);
 		this.stepSliderA2.setSelection(this.valueA2);
 		this.stepSliderA2.notifyListeners(SWT.Selection, new Event());
 
-		this.valueA3 = currentStep3 / 100;
-		this.stepSliderA3.setMaximum(200 + 10);
+		this.valueA3 = currentStep3 / 10;
+		//this.stepSliderA3.setMaximum(2000 + 10);
 		this.stepSliderA3.setSelection(this.valueA3);
 		this.stepSliderA3.notifyListeners(SWT.Selection, new Event());
 
-		this.valueA4 = currentStep4 / 100;
-		this.stepSliderA4.setMaximum(200 + 10);
+		this.valueA4 = currentStep4 / 10;
+		//this.stepSliderA4.setMaximum(2000 + 10);
 		this.stepSliderA4.setSelection(this.valueA4);
 		this.stepSliderA4.notifyListeners(SWT.Selection, new Event());
 
@@ -271,33 +271,33 @@ public class StepChargeComposite extends ScrolledComposite {
 	}
 
 	public void initCapacity(final int initialCapacity, int capacityStep1, int capacityStep2, int capacityStep3, int capacityStep4) {
-		int maxCapacityValue = 9900; //capacityStep4 != 0 ? capacityStep4 : initialCapacity * 120 / 100 * 100;
+		//int maxCapacityValue = 9900; //capacityStep4 != 0 ? capacityStep4 : initialCapacity * 120 / 100 * 100;
 		//maxCapacityValue = maxCapacityValue != initialCapacity ? initialCapacity / 100 * 120 / 100 * 100 : maxCapacityValue;
 
 		if (capacityStep4 == 0) {
 			capacityStep1 = initialCapacity / 100 * 10;
 			capacityStep2 = initialCapacity / 100 * 60;
 			capacityStep3 = initialCapacity / 100 * 80;
-			capacityStep4 = (initialCapacity+70) * 111 / 100;//round modulo 100
+			capacityStep4 = (initialCapacity + 70) * 111 / 100;//round modulo 100
 		}
 
-		this.valueC1 = capacityStep1 / 100;
-		this.stepSliderC1.setMaximum(maxCapacityValue / 100 + 10);
+		this.valueC1 = capacityStep1 / 10;
+		//this.stepSliderC1.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC1.setSelection(this.valueC1);
 		this.stepSliderC1.notifyListeners(SWT.Selection, new Event());
 
-		this.valueC2 = capacityStep2 / 100;
-		this.stepSliderC2.setMaximum(maxCapacityValue / 100 + 10);
+		this.valueC2 = capacityStep2 / 10;
+		//this.stepSliderC2.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC2.setSelection(this.valueC2);
 		this.stepSliderC2.notifyListeners(SWT.Selection, new Event());
 
-		this.valueC3 = capacityStep3 / 100;
-		this.stepSliderC3.setMaximum(maxCapacityValue / 100 + 10);
+		this.valueC3 = capacityStep3 / 10;
+		//this.stepSliderC3.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC3.setSelection(this.valueC3);
 		this.stepSliderC3.notifyListeners(SWT.Selection, new Event());
 
-		this.valueC4 = capacityStep4 / 100;
-		this.stepSliderC4.setMaximum(maxCapacityValue / 100 + 10);
+		this.valueC4 = capacityStep4 / 10;
+		//this.stepSliderC4.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC4.setSelection(this.valueC4);
 		this.stepSliderC4.notifyListeners(SWT.Selection, new Event());
 
@@ -338,12 +338,15 @@ public class StepChargeComposite extends ScrolledComposite {
 								canvasImageGC.setFont(SWTResourceManager.getFont("Sans Serife", 16, SWT.BOLD));
 								//cap = 3200; width = 550; -> valueC1 1600 -> 1600*100/3200 = 50
 								canvasImageGC.setBackground(SWTResourceManager.getColor(SWT.COLOR_GREEN));
-								int maxCurrent = StepChargeComposite.this.stepSliderA1.getSelection() > 50 || StepChargeComposite.this.stepSliderA2.getSelection() > 50
-										|| StepChargeComposite.this.stepSliderA3.getSelection() > 50 || StepChargeComposite.this.stepSliderA4.getSelection() > 50 ? StepChargeComposite.this.stepSliderA1.getSelection() > 100
-										|| StepChargeComposite.this.stepSliderA2.getSelection() > 100
-										|| StepChargeComposite.this.stepSliderA3.getSelection() > 100
-										|| StepChargeComposite.this.stepSliderA4.getSelection() > 100 ? 200 : 100
-										: 50;
+								int maxCurrent = StepChargeComposite.this.stepSliderA1.getSelection() > 500 
+										|| StepChargeComposite.this.stepSliderA2.getSelection() > 500
+										|| StepChargeComposite.this.stepSliderA3.getSelection() > 500 
+										|| StepChargeComposite.this.stepSliderA4.getSelection() > 500 
+											? StepChargeComposite.this.stepSliderA1.getSelection() > 1000
+											|| StepChargeComposite.this.stepSliderA2.getSelection() > 1000
+											|| StepChargeComposite.this.stepSliderA3.getSelection() > 1000
+											|| StepChargeComposite.this.stepSliderA4.getSelection() > 1000 
+												? 2000 : 1000	: 500;
 
 								int rightEdge1 = canvasBounds.width * StepChargeComposite.this.stepSliderC1.getSelection()
 										/ (StepChargeComposite.this.stepSliderC4.getSelection() == 0 ? 1 : StepChargeComposite.this.stepSliderC4.getSelection());
@@ -421,15 +424,16 @@ public class StepChargeComposite extends ScrolledComposite {
 						{
 							this.stepSliderC1 = new Slider(this.stepGroup1, SWT.BORDER);
 							this.stepSliderC1.setMinimum(0);
-							this.stepSliderC1.setMaximum(100);
-							this.stepSliderC1.setSelection(15);
+							this.stepSliderC1.setMaximum(9910);
+							this.stepSliderC1.setIncrement(1);
+							this.stepSliderC1.setSelection(150);
 							this.valueC1 = this.stepSliderC1.getSelection();
 							this.stepSliderC1.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderC1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueC1 = StepChargeComposite.this.stepSliderC1.getSelection();
-									StepChargeComposite.this.stepTextC1.setText(String.format("%d", StepChargeComposite.this.valueC1 * 100)); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextC1.setText(String.format("%d", StepChargeComposite.this.valueC1 * 10)); //$NON-NLS-1$
 									if (StepChargeComposite.this.valueC1 > StepChargeComposite.this.valueC2) {
 										StepChargeComposite.this.valueC2 = StepChargeComposite.this.valueC1;
 										StepChargeComposite.this.stepSliderC2.setSelection(StepChargeComposite.this.valueC2);
@@ -459,19 +463,20 @@ public class StepChargeComposite extends ScrolledComposite {
 						{
 							this.stepSliderA1 = new Slider(this.stepGroup1, SWT.BORDER);
 							this.stepSliderA1.setMinimum(1);
-							this.stepSliderA1.setMaximum(100);
-							this.stepSliderA1.setSelection(52);
+							this.stepSliderA1.setMaximum(2000 + 10);
+							this.stepSliderA1.setIncrement(1);
+							this.stepSliderA1.setSelection(520);
 							this.valueA1 = this.stepSliderA1.getSelection();
 							this.stepSliderA1.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA1 = StepChargeComposite.this.stepSliderA1.getSelection();
-									StepChargeComposite.this.stepTextA1.setText(String.format("%.1f", (StepChargeComposite.this.valueA1 / 10.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA1.setText(String.format("%.1f", (StepChargeComposite.this.valueA1 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										Event changeEvent = new Event();
-										changeEvent.index = 2;
+										changeEvent.index = 46;
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 									}
 								}
@@ -486,9 +491,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue1 = StepChargeComposite.this.impulsStep1.getSelection();
-									//if (impulseValue1) reflexStep1.setSelection(false);
+									if (StepChargeComposite.this.impulseValue1) StepChargeComposite.this.reflexStep1.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -502,9 +507,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue1 = StepChargeComposite.this.reflexStep1.getSelection();
-									//if (reflexValue1) impulsStep1.setSelection(false);
+									if (StepChargeComposite.this.reflexValue1) StepChargeComposite.this.impulsStep1.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -533,15 +538,16 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderC2 = new Slider(this.stepGroup2, SWT.BORDER);
 							this.stepSliderC2.setLayoutData(stepSliderLData);
 							this.stepSliderC2.setMinimum(0);
-							this.stepSliderC2.setMaximum(100);
-							this.stepSliderC2.setSelection(15);
+							this.stepSliderC2.setMaximum(9910);
+							this.stepSliderC2.setIncrement(1);
+							this.stepSliderC2.setSelection(150);
 							this.valueC2 = this.stepSliderC2.getSelection();
 							this.stepSliderC2.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderC2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueC2 = StepChargeComposite.this.stepSliderC2.getSelection();
-									StepChargeComposite.this.stepTextC2.setText(String.format("%d", StepChargeComposite.this.valueC2 * 100)); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextC2.setText(String.format("%d", StepChargeComposite.this.valueC2 * 10)); //$NON-NLS-1$
 									if (StepChargeComposite.this.valueC2 < StepChargeComposite.this.valueC1) {
 										StepChargeComposite.this.valueC1 = StepChargeComposite.this.valueC2;
 										StepChargeComposite.this.stepSliderC1.setSelection(StepChargeComposite.this.valueC1);
@@ -578,19 +584,20 @@ public class StepChargeComposite extends ScrolledComposite {
 							RowData stepSliderLData = new RowData();
 							this.stepSliderA2.setLayoutData(stepSliderLData);
 							this.stepSliderA2.setMinimum(1);
-							this.stepSliderA2.setMaximum(100);
-							this.stepSliderA2.setSelection(52);
+							this.stepSliderA2.setMaximum(2000 + 10);
+							this.stepSliderA2.setIncrement(1);
+							this.stepSliderA2.setSelection(520);
 							this.valueA2 = this.stepSliderA2.getSelection();
 							this.stepSliderA2.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA2 = StepChargeComposite.this.stepSliderA2.getSelection();
-									StepChargeComposite.this.stepTextA2.setText(String.format("%.1f", (StepChargeComposite.this.valueA2 / 10.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA2.setText(String.format("%.1f", (StepChargeComposite.this.valueA2 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										Event changeEvent = new Event();
-										changeEvent.index = 2;
+										changeEvent.index = 46;
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 									}
 								}
@@ -605,9 +612,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue2 = StepChargeComposite.this.impulsStep2.getSelection();
-									//if (impulseValue2) reflexStep2.setSelection(false);
+									if (StepChargeComposite.this.impulseValue2) StepChargeComposite.this.reflexStep2.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -621,9 +628,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue2 = StepChargeComposite.this.reflexStep2.getSelection();
-									//if (reflexValue2) impulsStep2.setSelection(false);
+									if (StepChargeComposite.this.reflexValue2) StepChargeComposite.this.impulsStep2.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -652,15 +659,16 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderC3 = new Slider(this.stepGroup3, SWT.BORDER);
 							this.stepSliderC3.setLayoutData(stepSliderLData);
 							this.stepSliderC3.setMinimum(0);
-							this.stepSliderC3.setMaximum(100);
-							this.stepSliderC3.setSelection(15);
+							this.stepSliderC3.setMaximum(9910);
+							this.stepSliderC3.setIncrement(1);
+							this.stepSliderC3.setSelection(150);
 							this.valueC3 = this.stepSliderC3.getSelection();
 							this.stepSliderC3.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderC1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueC3 = StepChargeComposite.this.stepSliderC3.getSelection();
-									StepChargeComposite.this.stepTextC3.setText(String.format("%d", StepChargeComposite.this.valueC3 * 100)); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextC3.setText(String.format("%d", StepChargeComposite.this.valueC3 * 10)); //$NON-NLS-1$
 									if (StepChargeComposite.this.valueC3 < StepChargeComposite.this.valueC2) {
 										StepChargeComposite.this.valueC2 = StepChargeComposite.this.valueC3;
 										StepChargeComposite.this.stepSliderC2.setSelection(StepChargeComposite.this.valueC2);
@@ -692,19 +700,20 @@ public class StepChargeComposite extends ScrolledComposite {
 							RowData stepSliderLData = new RowData();
 							this.stepSliderA3.setLayoutData(stepSliderLData);
 							this.stepSliderA3.setMinimum(1);
-							this.stepSliderA3.setMaximum(100);
-							this.stepSliderA3.setSelection(52);
+							this.stepSliderA3.setMaximum(2000 + 10);
+							this.stepSliderA3.setIncrement(1);
+							this.stepSliderA3.setSelection(520);
 							this.valueA3 = this.stepSliderA3.getSelection();
 							this.stepSliderA3.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA3.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA3 = StepChargeComposite.this.stepSliderA3.getSelection();
-									StepChargeComposite.this.stepTextA3.setText(String.format("%.1f", (StepChargeComposite.this.valueA3 / 10.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA3.setText(String.format("%.1f", (StepChargeComposite.this.valueA3 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										Event changeEvent = new Event();
-										changeEvent.index = 2;
+										changeEvent.index = 46;
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 									}
 								}
@@ -719,9 +728,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep3.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue3 = StepChargeComposite.this.impulsStep3.getSelection();
-									//if (impulseValue3) reflexStep3.setSelection(false);
+									if (StepChargeComposite.this.impulseValue3) StepChargeComposite.this.reflexStep3.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -735,9 +744,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep3.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue3 = StepChargeComposite.this.reflexStep3.getSelection();
-									//if (reflexValue3) impulsStep3.setSelection(false);
+									if (StepChargeComposite.this.reflexValue3) StepChargeComposite.this.impulsStep3.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -766,15 +775,16 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderC4 = new Slider(this.stepGroup4, SWT.BORDER);
 							this.stepSliderC4.setLayoutData(stepSliderLData);
 							this.stepSliderC4.setMinimum(0);
-							this.stepSliderC4.setMaximum(100);
-							this.stepSliderC4.setSelection(90 - 45);
+							this.stepSliderC4.setMaximum(9910);
+							this.stepSliderC4.setIncrement(1);
+							this.stepSliderC4.setSelection(900 - 450);
 							this.valueC4 = this.stepSliderC4.getSelection();
 							this.stepSliderC4.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderC1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueC4 = StepChargeComposite.this.stepSliderC4.getSelection();
-									StepChargeComposite.this.stepTextC4.setText(String.format("%d", StepChargeComposite.this.valueC4 * 100)); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextC4.setText(String.format("%d", StepChargeComposite.this.valueC4 * 10)); //$NON-NLS-1$
 									if (StepChargeComposite.this.valueC4 < StepChargeComposite.this.valueC3) {
 										StepChargeComposite.this.valueC3 = StepChargeComposite.this.valueC4;
 										StepChargeComposite.this.stepSliderC3.setSelection(StepChargeComposite.this.valueC3);
@@ -806,19 +816,20 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderA4 = new Slider(this.stepGroup4, SWT.BORDER);
 							this.stepSliderA4.setLayoutData(stepSliderLData);
 							this.stepSliderA4.setMinimum(1);
-							this.stepSliderA4.setMaximum(100);
-							this.stepSliderA4.setSelection(52);
+							this.stepSliderA4.setMaximum(2000 + 10);
+							this.stepSliderA4.setIncrement(1);
+							this.stepSliderA4.setSelection(520);
 							this.valueA4 = this.stepSliderA4.getSelection();
 							this.stepSliderA4.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA4.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA4 = StepChargeComposite.this.stepSliderA4.getSelection();
-									StepChargeComposite.this.stepTextA4.setText(String.format("%.1f", (StepChargeComposite.this.valueA4 / 10.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA4.setText(String.format("%.1f", (StepChargeComposite.this.valueA4 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										Event changeEvent = new Event();
-										changeEvent.index = 2;
+										changeEvent.index = 46;
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 									}
 								}
@@ -833,9 +844,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep4.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue4 = StepChargeComposite.this.impulsStep4.getSelection();
-									//if (impulseValue4) reflexStep4.setSelection(false);
+									if (StepChargeComposite.this.impulseValue4) StepChargeComposite.this.reflexStep4.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
@@ -849,9 +860,9 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep4.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue4 = StepChargeComposite.this.reflexStep4.getSelection();
-									//if (reflexValue4) impulsStep4.setSelection(false);
+									if (StepChargeComposite.this.reflexValue4) StepChargeComposite.this.impulsStep4.setSelection(false);
 									Event changeEvent = new Event();
-									changeEvent.index = 2;
+									changeEvent.index = 42;
 									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, changeEvent);
 								}
 							});
