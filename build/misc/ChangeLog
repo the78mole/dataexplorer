@@ -16,7 +16,7 @@ Kosmik - fix initialization error
 tune auto number formatting 
 enable optimized data sets load of DataExplorer for Android saved osd files
 enable reduced data table by selected records (actually for HoTTAdapter* only)
-prepare release
+documentation update
 
 
 Version 3.1.4 - 02 Feb 2014
