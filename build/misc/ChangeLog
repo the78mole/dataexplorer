@@ -16,6 +16,7 @@ Kosmik - fix initialization error
 tune auto number formatting 
 enable optimized data sets load of DataExplorer for Android saved osd files
 enable reduced data table by selected records (actually for HoTTAdapter* only)
+remove export capability for IGC files (IGC files must be generated while data creation and secured)
 documentation update
 
 
