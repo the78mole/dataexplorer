@@ -1,19 +1,22 @@
 GNU DataExplorer - News - comes with version 3.1.4
 
-1)  update build to make sure compiled classes target 1.6
-2)  update height of device properties editor to enable proper display of scroll bar in channel- configuration tabulator
-3)  enable record color usage configuration for scale, scale numbers and record name
-4)  enable configuration of outlet- configuration name usage in curve compare
-5)  Junsi iCharger* - fix data capture capability
-6)  FlightRecorder - fix using name and unit from setup
-7)  HoTTAdapter* - fix file transfer count down/up signature
-8)  HoTTAdapter* - fix file transfer initial PC folder update
-9)  HoTTAdapter* - fix fuel to ml, was fuel level in % (requires manual replacement of device XML if used)
-10) HoTTAdapter* - fix Rx->Tx PLoss first value by setting to 0
-11) HoTTAdapter2 - add evaluation of EAM RPM (as GAM RPM value)
-12) UltraDuoPlus - correct several adjustment parameters in viewpoint of range
-13) 4D-Akkumonitor - correct time calculation, adapt device XML, adapt template XML
-14) documentation update
+1)  update to latest SWT drop due to solved problems reported for Mint-Linux
+2)  tune auto number formatting 
+3)  enable optimized data sets load of DataExplorer for Android saved osd files
+4)  enable reduced data table by selected records (actually for HoTTAdapter* only)
+5)  remove export capability for IGC files (IGC files must be generated while data creation and secured)
+6)  HoTTAdapter* - synchronize capacity filter
+7)  HoTTAdapter2 - fix height curve data if overlayed from different sensors
+8)  HoTTAdapter* - optimize import for receiver data only
+9)  HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
+10) HoTTAdapter* - update filter settings speed
+11) UltraDuoPlus50/60 - add step charge configuration tabulator
+12) UltraDuoPlus* - refine several default values depending on capacity as well as on charge current 
+13) VC820/VC840 - fix mapping while resistance measurement
+14) GPS-Logger2 - add support for GPS-Logger2 extended measurement value set from SM-Modellbau
+15) IGCAdapter - update to enable extension data for 4 additional values
+16) Kosmik - fix initialization error
+17) documentation update
 
 
 
