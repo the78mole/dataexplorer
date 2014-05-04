@@ -37,7 +37,6 @@ import gde.io.LogViewReader;
 import gde.io.NMEAParser;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 
@@ -491,7 +490,6 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZ3DAbsoluteItem;
-		MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -523,25 +521,6 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 				public void handleEvent(Event e) {
 					JetiAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
-				}
-			});
-
-			new MenuItem(exportMenue, SWT.SEPARATOR);
-
-			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
-			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					JetiAdapter.log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					Channel activeChannel = JetiAdapter.this.channels.getActiveChannel();
-					if (activeChannel != null) {
-						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-						if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
-							new IgcExportDialog().open(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
-									activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE));
-						}
-					}
 				}
 			});
 		}
