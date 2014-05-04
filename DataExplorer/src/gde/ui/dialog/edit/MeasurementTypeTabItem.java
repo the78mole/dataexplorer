@@ -675,7 +675,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	public StatisticsTypeTabItem createStatisticsTabItem() {
 		StatisticsTypeTabItem tmpStatisticsTypeTabItem = this.statisticsTypeTabItem = new StatisticsTypeTabItem(this.channelConfigMeasurementPropertiesTabFolder, 
 				SWT.CLOSE | SWT.H_SCROLL, Messages.getString(MessageIds.GDE_MSGT0350), this);
-		if (this.channelConfigMeasurementPropertiesTabFolder.isVisible()) {
+		if (this.channelConfigMeasurementPropertiesTabFolder != null) {
 			this.channelConfigMeasurementPropertiesTabFolder.setSelection(tmpStatisticsTypeTabItem);
 		}
 		if (this.measurementType.getStatistics() == null)
