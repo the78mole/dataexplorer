@@ -39,7 +39,6 @@ import gde.io.NMEAReaderWriter;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.LinearRegression;
@@ -529,7 +528,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
-		MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -558,19 +556,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
-				}
-			});
-			
-			new MenuItem(exportMenue, SWT.SEPARATOR);
-
-			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
-			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
-					//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-					new IgcExportDialog().open(1, 0, 2);
 				}
 			});
 		}
