@@ -528,7 +528,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZ3DAbsoluteItem;
-		//MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -559,21 +558,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
-			
-//			new MenuItem(exportMenue, SWT.SEPARATOR);
-//
-//			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
-//			convertIGCItem.addListener(SWT.Selection, new Listener() {
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-//					//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-//					//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-//					//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-//					//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-//					new IgcExportDialog().open(1, 0, 2);
-//				}
-//			});
 		}
 	}
 
@@ -588,18 +572,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2003), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
-
-//	/**
-//	 * exports the actual displayed data set to GPX file format
-//	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
-//	 */
-//	public void export2GPX(int type) {
-//		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-//		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-//		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-//		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2004), 1, 0, 2, 7, 8, type == DeviceConfiguration.HEIGHT_RELATIVE);
-//	}
 
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
