@@ -33,7 +33,6 @@ import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
@@ -854,7 +853,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	public void updateFileExportMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
-		MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -883,17 +881,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				public void handleEvent(Event e) {
 					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
-				}
-			});
-			
-			new MenuItem(exportMenue, SWT.SEPARATOR);
-
-			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
-			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					new IgcExportDialog().open(13, 12, 8);
 				}
 			});
 		}
