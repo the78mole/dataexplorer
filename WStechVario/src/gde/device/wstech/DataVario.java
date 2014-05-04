@@ -39,7 +39,6 @@ import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 
@@ -562,7 +561,6 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem											convertKMZ3DRelativeItem;
 		MenuItem											convertKMZ3DAbsoluteItem;
-		MenuItem											convertIGCItem;
 		
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -591,19 +589,6 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 				public void handleEvent(Event e) {
 					ContextMenu.log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KML3D(DataVario.HEIGHT_CLAMPTOGROUND);
-				}
-			});
-			
-			new MenuItem(exportMenue, SWT.SEPARATOR);
-
-			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
-			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
-					//13=tripLength 14=distance 15=azimuth 16=directionStart
-					new IgcExportDialog().open(7, 8, 9);
 				}
 			});
 		}
