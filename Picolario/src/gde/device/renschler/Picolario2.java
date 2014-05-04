@@ -28,7 +28,6 @@ import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.ui.dialog.IgcExportDialog;
 import gde.utils.CalculationThread;
 import gde.utils.FileUtils;
 import gde.utils.LinearRegression;
@@ -387,7 +386,6 @@ public class Picolario2 extends Picolario {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZ3DAbsoluteItem;
-		MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -419,19 +417,6 @@ public class Picolario2 extends Picolario {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
-				}
-			});
-
-			new MenuItem(exportMenue, SWT.SEPARATOR);
-
-			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
-			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
-					new IgcExportDialog().open(1, 0, 2);
 				}
 			});
 		}
