@@ -1066,7 +1066,7 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static int parseAddVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
-		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
+		//if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
 		switch (sdLogVersion) {
 		case 3:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
