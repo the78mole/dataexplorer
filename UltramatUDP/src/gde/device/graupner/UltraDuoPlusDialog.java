@@ -2118,7 +2118,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			case 5: //Pb
 				this.memoryParameters[1].updateValueRange("1 ~ 6, 12", 1, 12, 0);
-				this.memoryParameters[2].updateValueRange("100 ~ 65000 mAh", 100, 65000, -100); //$NON-NLS-1$ 
+				this.memoryParameters[2].updateValueRange("500 ~ 65000 mAh", 500, 65000, -500); //$NON-NLS-1$ 
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
