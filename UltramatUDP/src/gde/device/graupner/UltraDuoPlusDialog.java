@@ -1981,7 +1981,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			//update memory parameter table to reflect not edit able parameters for selected cell type
 			switch (this.memoryValues[0]) {
 			case 0: //NiCd
-				this.memoryParameters[1].updateValueRange("1 ~ 18", 1, 18, 0);
+				this.memoryParameters[1].updateValueRange("1 ~ 18", 1, 18, 0); //$NON-NLS-1$ 
+				this.memoryParameters[2].updateValueRange("100 ~ 9900 mAh", 100, 9900, -100); //$NON-NLS-1$ 
 				this.memoryParameters[9] = this.memoryParameters[9] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 9, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2279),
 						175, Messages.getString(MessageIds.GDE_MSGT2312), 220, false, 50, 150, 0, 550) : this.memoryParameters[9];
 				if (this.memoryParameters[7] == null)
@@ -2010,6 +2011,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			case 1: //NiMh
 				this.memoryParameters[1].updateValueRange("1 ~ 18", 1, 18, 0);
+				this.memoryParameters[2].updateValueRange("100 ~ 9900 mAh", 100, 9900, -100); //$NON-NLS-1$ 
 				this.memoryParameters[9] = this.memoryParameters[9] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 9, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2279),
 						175, Messages.getString(MessageIds.GDE_MSGT2312), 220, false, 50, 150, 0, 550) : this.memoryParameters[9];
 				if (this.memoryParameters[7] == null)
@@ -2038,6 +2040,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			case 2: //LiIo
 				this.memoryParameters[1].updateValueRange("1 ~ 7", 1, 7, 0);
+				this.memoryParameters[2].updateValueRange("100 ~ 65000 mAh", 100, 65000, -100); //$NON-NLS-1$ 
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
@@ -2063,6 +2066,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			case 3: //LiPo
 				this.memoryParameters[1].updateValueRange("1 ~ 7", 1, 7, 0);
+				this.memoryParameters[2].updateValueRange("100 ~ 65000 mAh", 100, 65000, -100); //$NON-NLS-1$ 
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
@@ -2088,6 +2092,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			case 4: //LiFe
 				this.memoryParameters[1].updateValueRange("1 ~ 7", 1, 7, 0);
+				this.memoryParameters[2].updateValueRange("100 ~ 65000 mAh", 100, 65000, -100); //$NON-NLS-1$ 
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
@@ -2113,6 +2118,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			case 5: //Pb
 				this.memoryParameters[1].updateValueRange("1 ~ 6, 12", 1, 12, 0);
+				this.memoryParameters[2].updateValueRange("100 ~ 65000 mAh", 100, 65000, -100); //$NON-NLS-1$ 
 				this.memoryParameters[7] = this.memoryParameters[7] != null ? this.memoryParameters[7].dispose() : null;
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
