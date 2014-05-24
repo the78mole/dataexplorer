@@ -214,14 +214,14 @@ public class Picolario2 extends Picolario {
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				
 				//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
-				switch (j) { 
+				switch (index) { 
 				case 0: //Höhe/Height
 					PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
@@ -243,7 +243,8 @@ public class Picolario2 extends Picolario {
 					break;
 				}
 				
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
