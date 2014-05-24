@@ -318,7 +318,6 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			Record record;
 			double offset = 0; // != 0 if curve has an defined offset
 			double reduction = 0;
 			double factor = 1; // != 1 if a unit translation is required
@@ -328,13 +327,14 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			//20=ALARM: Temp ext 1, 21=ALARM: Temp ext 2, 22=ALARM: Temp ext 3, 23=ALARM: Temp ext 4, 24=ALARM: Temp ext 5, 
 			//25=Temperatur ext 1, 26=Temperatur ext 2, 27=Temperatur ext 3, 28=Temperatur ext 4, 29=Temperatur ext 5, 
 			//30=Drehzahl ext, 31=Speed GPS, 32=Höhe GPS, 33=Speed, 34=BID:Zellentype, 35=BID:Zellennummer, 36=BID:Kapazität, 37=BID:Ladung, 38=BID:Entladung, 39=BID:MaxDis]
-			for (int j = 0; j < recordSet.size(); j++) {
-				record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				offset = record.getOffset(); // != 0 if curve has an defined offset
 				reduction = record.getReduction();
 				factor = record.getFactor(); // != 1 if a unit translation is required
 
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
