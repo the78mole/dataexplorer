@@ -524,8 +524,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -534,7 +534,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				double numberMotor = 1;
 				PropertyType property = null;
 				
-				switch (j) { 
+				switch (index) { 
 				case 0: //voltageReceiver
 				case 1: //voltage
 					break;
@@ -584,7 +584,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					break;
 				}
 				
-				dataTableRow[j+1] = record.getDecimalFormat().format((offset + (((record.realGet(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor));				
+				dataTableRow[index+1] = record.getDecimalFormat().format((offset + (((record.realGet(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor));				
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
