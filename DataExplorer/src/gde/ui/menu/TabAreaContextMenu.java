@@ -20,6 +20,12 @@ package gde.ui.menu;
 
 import gde.config.Settings;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -30,12 +36,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.tab.GraphicsWindow;
 
 /**
  * @author Winfried Brügmann
@@ -63,6 +63,7 @@ public class TabAreaContextMenu {
 	MenuItem											innerAreaColorItem;
 	MenuItem											borderColorItem;
 	MenuItem											dateTimeItem;
+	MenuItem											partialTableItem;
 	boolean												isCreated = false;
 
 	public TabAreaContextMenu() {
@@ -188,6 +189,16 @@ public class TabAreaContextMenu {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
 						TabAreaContextMenu.this.application.setAbsoluteDateTime(TabAreaContextMenu.this.dateTimeItem.getSelection());
+					}
+				});
+				this.partialTableItem = new MenuItem(popupMenu, SWT.CHECK);
+				this.partialTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0704));
+				this.partialTableItem.setSelection(Settings.getInstance().isPartialDataTable());
+				this.partialTableItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
+						Settings.getInstance().setPartialDataTable(TabAreaContextMenu.this.partialTableItem.getSelection());
+						TabAreaContextMenu.this.application.updateAllTabs(true, false);
 					}
 				});
 			}

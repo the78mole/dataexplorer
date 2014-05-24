@@ -401,9 +401,9 @@ public class CSVReaderWriter {
 			sb = new StringBuffer();
 			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
 			// write the measurements signature
-			for (int i = 0; i < recordSet.size(); i++) {
-				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), i);
-				Record record = recordSet.get(i);
+			int i = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
 				log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				if (isRaw) {
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
@@ -415,6 +415,7 @@ public class CSVReaderWriter {
 					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	 //$NON-NLS-1$
 					log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				}
+				++i;
 			}
 			sb.deleteCharAt(sb.length() - 1).append(lineSep);
 			log.log(Level.FINER, "header line = " + sb.toString()); //$NON-NLS-1$
@@ -425,15 +426,16 @@ public class CSVReaderWriter {
 			int recordEntries = recordSet.getRecordDataSize(true);
 			int progressCycle = 0;
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
-			for (int i = 0; i < recordEntries; i++) {
+			for (i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				String[] row = recordSet.getDataTableRow(i, true);
 
 				// add time entry
 				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
 				// add data entries
-				for (int j = 0; j < recordSet.size(); j++) {
-					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), j);
+				int j = 0;
+				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (recordSet.isRaw())
@@ -444,6 +446,7 @@ public class CSVReaderWriter {
 					else
 						// translate according device and measurement unit
 						sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+					++j;
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				writer.write(sb.toString());

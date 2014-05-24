@@ -369,8 +369,8 @@ public class DataTableWindow extends CTabItem {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				if (activeRecordSet.isPartialTableSupported() && this.settings.isPartialDataTable()) {
-					for (final Record record : activeRecordSet.getVisibleAndDisplayableRecords()) {
+				if (this.settings.isPartialDataTable()) {
+					for (final Record record : activeRecordSet.getVisibleAndDisplayableRecordsForTable()) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
 						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);

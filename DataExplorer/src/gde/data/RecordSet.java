@@ -83,6 +83,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	//display in data table
 	Vector<Record> 								visibleAndDisplayableRecords 	= new Vector<Record>();													//collection of records visible and displayable
+	Vector<Record> 								allRecords 										= new Vector<Record>();													//collection of all records
 	// sync enabled records
 	HashMap<Integer,Vector<Record>>	scaleSyncedRecords					= new HashMap<Integer,Vector<Record>>(2);				//collection of record keys where scales might be synchronized
 	
@@ -609,12 +610,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 				displayRecords.add(record);
 		}
 		//add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
-		for (Record record : this.values()) {
+		for (int i=0; i<this.size(); ++i) {
+			final Record record = this.get(i);
 			if (record.ordinal != this.horizontalGridRecordOrdinal && record.isScaleSyncMaster())
 				displayRecords.add(record);
 		}
 		//add all others
-		for (Record record : this.values()) {
+		for (int i=0; i<this.size(); ++i) {
+			final Record record = this.get(i);
 			if (record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster())
 				displayRecords.add(record);
 		}
@@ -623,27 +626,23 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 	
 	/**
-	 * update the collection of visible and displayable records in this record set
+	 * update the collection of visible and displayable records in this record set for table view
 	 */
-	public void updateVisibleAndDisplayableRecords() {
-		visibleAndDisplayableRecords.removeAllElements();
-		for (Record record : this.values()) {
-			if (record.isVisible && record.isDisplayable) visibleAndDisplayableRecords.add(record);
+	public void updateVisibleAndDisplayableRecordsForTable() {
+		this.visibleAndDisplayableRecords.removeAllElements();
+		this.allRecords.removeAllElements();
+		for (int i=0; i<this.size(); ++i) {
+			final Record record = this.get(i);
+			if (record.isVisible && record.isDisplayable) this.visibleAndDisplayableRecords.add(record);
+			this.allRecords.add(record);
 		}
 	}
 	
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
-	public Vector<Record> getVisibleAndDisplayableRecords() {		
-		return visibleAndDisplayableRecords;
-	}
-
-	/**
-	 * @return boolean value for the partial data table support 
-	 */
-	public boolean isPartialTableSupported() {
-		return this.device.getName().contains("HoTT");
+	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {		
+		return this.settings.isPartialDataTable() ? visibleAndDisplayableRecords : this.allRecords;
 	}
 	
 	/**

@@ -835,7 +835,7 @@ public class DataExplorer extends Composite {
 		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 
 		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
-				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested() && activeRecordSet.checkAllRecordsDisplayable()) {
+				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
 			if (forceClean) {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
