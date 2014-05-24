@@ -56,45 +56,24 @@ public class HoTTAdapterM extends HoTTAdapter {
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			if (this.settings.isPartialDataTable()) {
-				int index = 0;
-				for (final Record record : recordSet.getVisibleAndDisplayableRecords()) {
-					double offset = record.getOffset(); // != 0 if curve has an defined offset
-					double reduction = record.getReduction();
-					double factor = record.getFactor(); // != 1 if a unit translation is required
-					int ordinal = record.getOrdinal();
-					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
-					if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
-						dataTableRow[index + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
-					}
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-					else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { //Receiver
-						dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0));
-					}
-					else {
-						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-					}
-					++index;
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				double offset = record.getOffset(); // != 0 if curve has an defined offset
+				double reduction = record.getReduction();
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				int ordinal = record.getOrdinal();
+				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
+				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
+					dataTableRow[index + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
-			}
-			else { //full data table
-				for (int j = 0; j < recordSet.size(); j++) {
-					Record record = recordSet.get(j);
-					double offset = record.getOffset(); // != 0 if curve has an defined offset
-					double reduction = record.getReduction();
-					double factor = record.getFactor(); // != 1 if a unit translation is required
-					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
-					if ((j == 1 || j == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
-						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
-					}
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-					else if (j >= 0 && j <= 5 && record.getParent().getChannelConfigNumber() == 1){ //Receiver
-						dataTableRow[j + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
-					}
-					else {
-						dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-					}
+				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+				else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { //Receiver
+					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0));
 				}
+				else {
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				}
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
