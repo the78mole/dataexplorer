@@ -201,10 +201,11 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 		try {
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BAtterietemperatur 6=VersorgungsSpg 7=Balance 
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format(((record.realGet(rowIndex) / 1000.0) * factor));
+				dataTableRow[index + 1] = record.getDecimalFormat().format(((record.realGet(rowIndex) / 1000.0) * factor));
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
