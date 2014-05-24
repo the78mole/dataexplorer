@@ -231,9 +231,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
-				dataTableRow[j + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				dataTableRow[index + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
