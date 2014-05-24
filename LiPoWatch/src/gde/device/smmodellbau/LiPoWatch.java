@@ -302,26 +302,27 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		try {
 			double offset = 0.0;
 			double factor = 1.0;
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
-				switch (j) {
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				switch (index) {
 				case 3: //3=temperature analog outlet
 					offset = record.getOffset(); // != 0 if curve has an defined offset
 					factor = record.getFactor(); // != 1 if a unit translation is required
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.realGet(rowIndex) / 1000.0) * factor);
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + record.realGet(rowIndex) / 1000.0) * factor);
 					break;
 				case 4: //4=Balance [mV]
 					offset = record.getOffset();
 					factor = record.getFactor();
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.realGet(rowIndex) / 1000.0) * factor);
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + record.realGet(rowIndex) / 1000.0) * factor);
 					break;
 				default:
-					if(j > 4 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
-						dataTableRow[j + 1] = String.format("%.3f", (record.realGet(rowIndex) / 1000.0));
+					if(index > 4 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
+						dataTableRow[index + 1] = String.format("%.3f", (record.realGet(rowIndex) / 1000.0));
 					else
-						dataTableRow[j + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
+						dataTableRow[index + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
 					break;
 				}
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
