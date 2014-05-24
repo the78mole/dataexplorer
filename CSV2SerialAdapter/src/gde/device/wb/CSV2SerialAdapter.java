@@ -296,8 +296,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -308,23 +308,23 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 					if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
 						int grad = record.realGet(rowIndex) / 1000000;
 						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-						dataTableRow[j + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
+						dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 					}
 					else { // assume degree only
-						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+						dataTableRow[index + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 					}
 					break;
 					
 				case DATE_TIME:
-					dataTableRow[j + 1] = StringHelper.getFormatedTime(record.getUnit(), record.realGet(rowIndex));
-					dataTableRow[j + 1] =  dataTableRow[j + 1].substring(0, dataTableRow[j + 1].indexOf(GDE.STRING_COMMA) + 2);
+					dataTableRow[index + 1] = StringHelper.getFormatedTime(record.getUnit(), record.realGet(rowIndex));
+					dataTableRow[index + 1] =  dataTableRow[index + 1].substring(0, dataTableRow[index + 1].indexOf(GDE.STRING_COMMA) + 2);
 					break;
 
 				default:
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 					break;
 				}
-				
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
