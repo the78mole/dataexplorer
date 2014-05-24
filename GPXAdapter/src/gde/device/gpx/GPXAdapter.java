@@ -345,21 +345,22 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				if (j > 1) {
+				if (index > 1) {
 					if (record.getName().toLowerCase().indexOf("flag") >= 0) //$NON-NLS-1$
-						dataTableRow[j + 1] = String.format("0x%02x", record.realGet(rowIndex) / 1000); //$NON-NLS-1$
+						dataTableRow[index + 1] = String.format("0x%02x", record.realGet(rowIndex) / 1000); //$NON-NLS-1$
 					else
-						dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
-					dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+					dataTableRow[index + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
