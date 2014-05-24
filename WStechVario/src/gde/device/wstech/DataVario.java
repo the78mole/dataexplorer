@@ -431,23 +431,24 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 				//13=tripLength 14=distance 15=azimuth 16=directionStart
-				if (j != 7 && j != 8) { //7=GPS-Länge 8=GPS-Breite
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				if (index != 7 && index != 8) { //7=GPS-Länge 8=GPS-Breite
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
 					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
 					double value = (record.realGet(rowIndex) / 1000000.0);
 					int grad = (int)value;
 					double minuten = (value - grad) * 100;
-					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
 				}
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
