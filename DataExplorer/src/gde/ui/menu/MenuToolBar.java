@@ -642,7 +642,7 @@ public class MenuToolBar {
 					this.cutLeftItem = new ToolItem(this.zoomToolBar, SWT.NONE);
 					this.cutLeftItem.setImage(SWTResourceManager.getImage("gde/resource/CutLeft.gif")); //$NON-NLS-1$
 					this.cutLeftItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0063));
-					this.cutLeftItem.setEnabled(false);
+					//this.cutLeftItem.setEnabled(false);
 					this.cutLeftItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -655,7 +655,7 @@ public class MenuToolBar {
 					this.cutRightItem = new ToolItem(this.zoomToolBar, SWT.NONE);
 					this.cutRightItem.setImage(SWTResourceManager.getImage("gde/resource/CutRight.gif")); //$NON-NLS-1$
 					this.cutRightItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0064));
-					this.cutRightItem.setEnabled(false);
+					//this.cutRightItem.setEnabled(false);
 					this.cutRightItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1442,8 +1442,8 @@ public class MenuToolBar {
 	public void resetZoomToolBar() {
 		this.zoomWindowItem.setEnabled(true);
 		this.panItem.setEnabled(false);
-		this.cutLeftItem.setEnabled(false);
-		this.cutRightItem.setEnabled(false);
+		//this.cutLeftItem.setEnabled(false);
+		//this.cutRightItem.setEnabled(false);
 		this.scopePointsCombo.setEnabled(this.isScopePointsCombo);
 		this.scopePointsCombo.select(0);
 //		Channel activeChannel = this.channels.getActiveChannel();

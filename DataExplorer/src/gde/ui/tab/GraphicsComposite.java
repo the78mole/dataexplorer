@@ -1301,7 +1301,7 @@ public class GraphicsComposite extends Composite {
 			this.rightLast = 0;
 			this.bottomLast = 0;
 			updatePanMenueButton();
-			updateCutModeButtons();
+			//updateCutModeButtons();
 			this.application.getMenuToolBar().resetZoomToolBar();
 			break;
 		}
@@ -1675,7 +1675,7 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 				updatePanMenueButton();
-				updateCutModeButtons();
+				//updateCutModeButtons();
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
