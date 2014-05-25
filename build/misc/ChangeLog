@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.1.6 - xx yyy 2014
 enable reduced data table by selected records for all devices, enablement via context menu
+add 230400 Baud entry in device properties XSD to enable workaround for Junsi charger at UNIX operating systems
 HoTTAdapter* - detect switching into text modus where no readable telemetrie values are available
 
 Version 3.1.5 - 04 May 2014
