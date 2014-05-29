@@ -993,8 +993,9 @@ public class GraphicsComposite extends Composite {
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-			this.application.setStatusMessage(Messages.getString(
-					MessageIds.GDE_MSGT0256, 
+			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+
+			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, 
 					new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }
 			));
 		}
@@ -1164,6 +1165,10 @@ public class GraphicsComposite extends Composite {
 				}
 			}
 			if (isGCset) this.canvasGC.dispose();
+			if (this.recordSetCommentText != null) {
+				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+				this.recordSetComment.setText(this.recordSetCommentText);
+			}
 		}
 		catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
@@ -1431,10 +1436,9 @@ public class GraphicsComposite extends Composite {
 								)); 
 							}
 							else {
+								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
 								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, 
-										new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds),
-										record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }
-								)); 
+										new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds),	record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) })); 
 							}
 						}
 						else if (this.isRightMouseMeasure) {
@@ -1788,11 +1792,15 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = GraphicsComposite.this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
-			if (recordSet != null) {
-				this.isRecordCommentChanged = false;
-				recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
-				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-			}
+			if (recordSet != null)
+				if (this.isRecordCommentChanged) {
+					this.isRecordCommentChanged = false;
+					recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+					recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+				}
+				else {
+					this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
+				}
 		}
 	}
 
@@ -1894,5 +1902,25 @@ public class GraphicsComposite extends Composite {
 			activeChannel.setFileDescription(fileComment);
 			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 		}
+	}
+	
+	private String getSelectedMeasurementsAsTable() {
+		RecordSet activeRecordSet = this.application.getActiveRecordSet();
+		if (activeRecordSet != null) {
+			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE+1, SWT.BOLD));
+			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecordsForTable();
+			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
+			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET))));
+			for (Record record : records) {
+				sb.append(String.format(" |%7s ",(GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET)));
+			}
+			sb.append(" | ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET)-1)));
+			for (Record record : records) {
+				sb.append(String.format(" |%7s ", record.getVerticalDisplayPointAsFormattedScaleValue(record.getVerticalDisplayPointValue(this.xPosMeasure), this.curveAreaBounds)));
+			}
+			return sb.append(" |").toString();
+		}
+		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		return this.recordSetCommentText != null ? this.recordSetCommentText : GDE.STRING_EMPTY;
 	}
 }
