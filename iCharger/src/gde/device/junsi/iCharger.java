@@ -207,6 +207,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 					dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
 				else
 					dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
