@@ -121,7 +121,7 @@ public class iCharger306B extends iCharger {
 			points[2] = values[2];			
 			//3=Ladung 4=Leistung 5=Energie
 			points[3] = values[11] * 1000;
-			points[4] = points[1] * points[2] / 1000; 							// power U*I [W]
+			points[4] = points[1] * points[2] / 100; 							// power U*I [W]
 			points[5] = points[1]/1000 * points[3]/1000;						// energy U*C [mWh]
 			//6=Temp.intern 7=Temp.extern 
 			points[6] = values[9];
@@ -173,7 +173,7 @@ public class iCharger306B extends iCharger {
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
 			//3=Ladung 4=Leistung 5=Energie
 			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 1000).intValue(); 							// power U*I [W]
+			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
 			points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
 			//6=Temp.intern 7=Temp.extern 
 			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));

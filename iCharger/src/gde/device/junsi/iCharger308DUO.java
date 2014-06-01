@@ -19,40 +19,111 @@
 package gde.device.junsi;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
+import gde.config.Settings;
+import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.DataBlockType;
 import gde.device.DeviceConfiguration;
 import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
+import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
 import gde.log.Level;
+import gde.messages.Messages;
+import gde.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 /**
- * Junsi iCharger 208B device class
+ * Junsi iCharger 308DUO device class
  * @author Winfried Brügmann
  */
-public class iCharger208B extends iCharger {
+public class iCharger308DUO extends iCharger {
+
+	protected boolean							isFileIO		= false;
+	protected boolean							isSerialIO	= false;
 
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
 	 */
-	public iCharger208B(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public iCharger308DUO(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
+		if (this.application.getMenuToolBar() != null) {
+			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
+				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
+				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
+			}
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));
+			} else { //InputTypes.FILE_IO
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2603), Messages.getString(MessageIds.GDE_MSGT2603));
+			}
+			if (isFileIO)
+				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+		}
 	}
 
 	/**
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public iCharger208B(DeviceConfiguration deviceConfig) {
+	public iCharger308DUO(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-	}
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
+		if (this.application.getMenuToolBar() != null) {
+			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
+				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
+				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
+			}
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));
+			} else { //InputTypes.FILE_IO
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2603), Messages.getString(MessageIds.GDE_MSGT2603));
+			}
+			if (isFileIO)
+				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+		}
+	}
+	
+	/**
+	 * update the file import menu by adding new entry to import device specific files
+	 * @param importMenue
+	 */
+	public void updateFileImportMenu(Menu importMenue) {
+		MenuItem importDeviceLogItem;
+
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+			new MenuItem(importMenue, SWT.SEPARATOR);
+
+			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2604, GDE.MOD1));
+			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2604));
+			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					if (!isSerialIO) open_closeCommPort();
+					else importDeviceData();
+				}
+			});
+		}
+	}
 
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -113,7 +184,7 @@ public class iCharger208B extends iCharger {
 		byte[] lineBuffer = null;
 				
 		try {
-			setDataLineStartAndLength(dataBuffer, startLength);
+			//setDataLineStartAndLength(dataBuffer, startLength);
 			lineBuffer = new byte[startLength[1]];
 			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
 			data.parse(new String(lineBuffer), 1);
@@ -213,5 +284,142 @@ public class iCharger208B extends iCharger {
 	@Override
 	public int getNumberOfLithiumCells() {
 		return 8;
+	}
+
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 */
+
+	@Override	public void open_closeCommPort() {
+		switch (application.getMenuBar().getSerialPortIconSet()) {
+		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
+			importDeviceData();
+			break;
+			
+		case DeviceCommPort.ICON_SET_START_STOP:
+			this.serialPort.isInterruptedByUser = true;
+			break;
+		}
+	}
+
+	/**
+	 * import device specific *.bin data files
+	 */
+	public void importDeviceData() {
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2600));
+
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
+			@Override
+			public void run() {
+				try {
+					application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+
+						if (fd.getFileName().length() > 4) {
+							try {
+								String recordNameExtend;
+								try {
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									Integer.valueOf(recordNameExtend);
+								}
+								catch (Exception e) {
+									try {
+										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+										Integer.valueOf(recordNameExtend);
+									}
+									catch (Exception e1) {
+										recordNameExtend = GDE.STRING_EMPTY;
+									}
+								}
+								CSVSerialDataReaderWriter.read(selectedImportFile, iCharger308DUO.this, recordNameExtend, 1, 
+										new  DataParserDuo(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, Math.abs(getDataBlockSize(InputTypes.FILE_IO)), getDataBlockFormat(InputTypes.FILE_IO), false, 2)
+//										new DataParserDuo(getDataBlockTimeUnitFactor(), 
+//												getDataBlockLeader(), getDataBlockSeparator().value(), 
+//												getDataBlockCheckSumType(), getDataBlockSize(InputTypes.FILE_IO), 2)
+								);
+							}
+							catch (Throwable e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
+						}
+					}
+				}
+				finally {
+					application.setPortConnected(false);
+				}
+			}
+		};
+		reader.start();
+	}
+
+	/**
+	 * function to calculate values for inactive records, data not readable from device
+	 * if calculation is done during data gathering this can be a loop switching all records to displayable
+	 * for calculation which requires more effort or is time consuming it can call a background thread, 
+	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 */
+	@Override
+	public void makeInActiveDisplayable(RecordSet recordSet) {
+		// since there are live measurement points only the calculation will take place directly after switch all to displayable
+		if (recordSet.isRaw()) {
+			// calculate the values required
+			try {
+				//0=Strom 1=VersorgungsSpg. 2=Spannung 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
+				//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=Widerstand
+				int displayableCounter = 0;
+
+				Record recordCurrent = recordSet.get(0);
+				Record recordVoltage = recordSet.get(2);
+				Record recordCapacity = recordSet.get(3);
+				Record recordPower = recordSet.get(4);
+				Record recordEnergy = recordSet.get(5);
+				Record recordBalance = recordSet.get(8);
+
+				recordPower.clear();
+				recordEnergy.clear();
+				recordBalance.clear();
+
+				for (int i = 0; i < recordCurrent.size(); i++) {
+					//4=Leistung 5=Energie
+					recordPower.add(recordVoltage.get(i) * recordCurrent.get(i) / 100); // power U*I [W]
+					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 100); // energy U*C [mWh]
+
+					int maxVotage = Integer.MIN_VALUE;
+					int minVotage = Integer.MAX_VALUE;
+					for (int j = 0; j < this.getNumberOfLithiumCells(); j++) {
+
+						int value = recordSet.get(j + 9).get(i);
+						if (value > 0) {
+							maxVotage = value > maxVotage ? value : maxVotage;
+							minVotage = value < minVotage ? value : minVotage;
+						}
+					}
+					//8=Balance
+					recordBalance.add(maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+
+				}
+
+				// check if measurements isActive == false and set to isDisplayable == false
+				for (Record record : recordSet.values()) {
+					if (record.isActive() && record.hasReasonableData()) {
+						++displayableCounter;
+					}
+				}
+
+				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+				recordSet.setConfiguredDisplayable(displayableCounter);
+
+				if (this.channels.getActiveChannel().getActiveRecordSet() == null || recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
+					this.application.updateGraphicsWindow();
+				}
+			}
+			catch (RuntimeException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
+		}
 	}
 }

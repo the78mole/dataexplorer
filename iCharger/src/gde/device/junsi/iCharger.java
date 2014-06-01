@@ -56,7 +56,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	public final static String		CONFIG_BATTERY_TYPE					= "battery_type"; //$NON-NLS-1$
 	public final static String		CONFIG_PROCESSING_TIME			= "processing_time"; //$NON-NLS-1$
 
-	protected final DataExplorer				application;
+	protected final DataExplorer									application;
 	protected final iChargerSerialPort						serialPort;
 	protected final Channels											channels;
 	protected       GathererThread								gathererThread;
