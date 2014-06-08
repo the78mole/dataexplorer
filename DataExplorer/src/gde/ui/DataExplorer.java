@@ -2106,6 +2106,27 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * clear measurement pointer
+	 */
+	public void clearMeasurementModes() {
+		boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
+		RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
+		if (recordSet != null) {
+			if (isWindowTypeNormal) {
+				recordSet.clearMeasurementModes();
+					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			}
+			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+				recordSet = DataExplorer.application.getCompareSet();
+				if (recordSet != null) {
+					recordSet.clearMeasurementModes();
+						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+				}
+			}
+		}
+	}
+	
+	/**
 	 * switch application into measurement mode for the visible record set using selected record
 	 * @param recordKey
 	 * @param enabled

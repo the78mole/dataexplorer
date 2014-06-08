@@ -646,6 +646,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 	
 	/**
+	 * @return visible and display able records (p.e. to build the partial data table)
+	 */
+	public Vector<Record> getVisibleAndDisplayableRecordsForMeasurement() {		
+		return visibleAndDisplayableRecords;
+	}
+	
+	/**
 	 * method to add an new record name 
 	 */
 	public void addRecordName(String newRecordName) {
@@ -1266,6 +1273,17 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		}
 	}
 
+	/**
+	 * clear measurement modes if any
+	 */
+	public void clearMeasurementModes() {
+		Record record = this.get(this.recordKeyMeasurement);
+		if (record != null) {
+			record.setMeasurementMode(false);
+			record.setDeltaMeasurementMode(false);
+		}
+	}
+	
 	/**
 	 * @param recordKey the key which record should be measured
 	 * @return the isMeasurementMode
