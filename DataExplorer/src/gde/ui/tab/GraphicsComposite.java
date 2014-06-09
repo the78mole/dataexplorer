@@ -37,6 +37,7 @@ import gde.utils.TimeLine;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -1941,6 +1942,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	private String getSelectedMeasurementsAsTable() {
+		Properties displayProps = this.settings.getMeasurementDisplayProperties(); 
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE + 1, SWT.BOLD));
@@ -1948,10 +1950,14 @@ public class GraphicsComposite extends Composite {
 			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
 			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET))));
 			for (Record record : records) {
-				final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
-				final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length() : record.getName().length());
-				final String format = "|%-" + (10 - unit.length()) + "s%" + unit.length() + "s";
-				sb.append(String.format(format, name, unit));
+				if (displayProps.getProperty(record.getName()) != null)
+					sb.append(String.format("|%-10s", displayProps.getProperty(record.getName())));
+				else {
+					final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
+					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length() : record.getName().length());
+					final String format = "|%-" + (10 - unit.length()) + "s%" + unit.length() + "s";
+					sb.append(String.format(format, name, unit));
+				}
 			}
 			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET) - 1)));
 			for (Record record : records) {

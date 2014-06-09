@@ -164,8 +164,8 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 			}
 			if (this.isConnected) {
 				this.isConnected = false;
-				if (this.application != null) this.application.setPortConnected(false);
 			}
+			if (this.application != null) this.application.setPortConnected(false);
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

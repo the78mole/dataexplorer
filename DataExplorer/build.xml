@@ -78,6 +78,7 @@
 	    	<fileset dir="src" includes="**/*.html"/>
 	    	<fileset dir="src" includes="**/*.css"/>
  	    	<fileset dir="src" includes="**/*.sh"/>
+ 	    	<fileset dir="src" includes="**/*.xml"/>
  	    	<fileset dir="src" includes="**/*.reg"/>
  	    	<fileset dir="src" includes="**/*.desktop"/>
  	    	<fileset dir="src" includes="**/*.directory"/>

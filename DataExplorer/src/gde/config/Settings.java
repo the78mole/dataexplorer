@@ -32,10 +32,12 @@ import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -221,7 +223,8 @@ public class Settings extends Properties {
 	String													cbSizes;
 	String													settingsFilePath;																																																							// full qualified path to settings file
 	String													applHomePath;																																																									// default path to application home directory
-	Comparator<String>							comparator										= new RecordSetNameComparator();																																	//used to sort object key list
+	Comparator<String>							comparator										= new RecordSetNameComparator();																																//used to sort object key list
+	Properties 											measurementProperties 				= new Properties();
 
 	/**
 	 * a singleton needs a static method to get the instance of this calss
@@ -269,7 +272,7 @@ public class Settings extends Properties {
 		else {
 			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGW0001));
 		}
-
+		
 		this.xmlBasePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
 		this.xsdThread = new Thread("xsdValidation") {
 			@Override
@@ -305,6 +308,8 @@ public class Settings extends Properties {
 		else { // execute every time application starts to enable update from added plug-in
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true);
 		}
+
+		this.readMeasurementDiplayProperties();
 
 		this.xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, local switch comes with the same XSD
 
@@ -456,7 +461,39 @@ public class Settings extends Properties {
 			}
 		}
 	}
+	
+	/**
+	 * read special properties to enable configuration to specific GPX extent values
+	 * @throws FileNotFoundException
+	 */
+	private void readMeasurementDiplayProperties() {
+		final String $METHOD_NAME = "readMeasurementDiplayProperties"; //$NON-NLS-1$
+		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
+		try {
+			if (!new File(propertyFilePath).exists()) {
+				File path = new File(this.getApplHomePath() + "/Mapping"); //$NON-NLS-1$
+				if (!path.exists() && !path.isDirectory()) 
+					path.mkdir();
+				//extract initial property files
+				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			//BufferedInputStream stream = new BufferedReader(new InputStreamReader(new FileInputStream(propertyFilePath), "UTF-8")); //$NON-NLS-1$
+			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(propertyFilePath)));
+			measurementProperties.loadFromXML(stream);
+			stream.close();
+		}
+		catch (Exception e) {
+			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage());
+		}
+	}
 
+	/**
+	 * @return the measurement display properties set
+	 */
+	public Properties getMeasurementDisplayProperties() {
+		return this.measurementProperties;
+	}
+	
 	/**
 	 * read the application settings file
 	 */
