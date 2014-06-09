@@ -1765,7 +1765,7 @@ public class GraphicsComposite extends Composite {
 	public void enableRecordSetComment(boolean enabled) {
 		if (enabled) {
 			this.commentGap = 0;
-			this.commentHeight = 35;
+			this.commentHeight = 40;
 		}
 		else {
 			this.commentGap = 0;
