@@ -1239,7 +1239,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
-			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { CTabFolder.class, int.class });
+			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { CTabFolder.class, int.class, int.class });
 			log.log(Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 				
@@ -1254,7 +1254,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				System.setProperty("template.dir", "");//load from classpath //$NON-NLS-1$
 				log.log(Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
 				
-				inst = constructor.newInstance(new Object[] {application.getTabFolder(), SWT.NONE});
+				inst = constructor.newInstance(new Object[] {application.getTabFolder(), SWT.NONE, application.getTabFolder().getItemCount()});
 			}
 		}
 		catch (final Throwable t) {
