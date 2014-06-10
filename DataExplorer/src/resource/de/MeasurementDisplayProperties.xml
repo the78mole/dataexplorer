@@ -52,6 +52,7 @@ der ersetzten Namen sollen mit der Einheit zusammen eine Laenge von 10 Zeichen h
            <entry key="Längengrad">Länge [°']</entry>
       <entry key="Geschwindigkeit">Speed km/h</entry>
    <entry key="Geschwindigkeit_UL">Speed km/h</entry>
+               <entry key="Ladung">Kap  [mAh]</entry>
          <entry key="Kapazität_UL">KapUL[mAh]</entry>
         <entry key="Temperatur_UL">TempUL [°]</entry>
       <entry key="EntfernungStart">Entf.  [m]</entry>
