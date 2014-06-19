@@ -2372,12 +2372,14 @@ public class DataExplorer extends Composite {
 	 */
 	public void checkUpdateRecordSetComment() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (this.graphicsTabItem != null && this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
+			if (this.graphicsTabItem != null && this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) 
+				this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
 		}
 		else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					if (DataExplorer.this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) DataExplorer.this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
+					if (DataExplorer.this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) 
+						DataExplorer.this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
 				}
 			});
 		}

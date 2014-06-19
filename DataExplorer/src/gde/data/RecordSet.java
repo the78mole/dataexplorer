@@ -161,6 +161,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public final static String		UNSAVED_REASON_GRAPHICS				= Messages.getString(MessageIds.GDE_MSGT0130);
 	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.GDE_MSGT0131);
 	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.GDE_MSGT0132);
+	public final static String		UNSAVED_REASON_COMMENT				= Messages.getString(MessageIds.GDE_MSGT0610);
 	Vector<String>								unsaveReasons									= new Vector<String>();
 	int														changeCounter									= 0;																						// indicates change in general
 
@@ -1053,6 +1054,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param newRecordSetDescription the recordSetDescription to set
 	 */
 	public void setRecordSetDescription(String newRecordSetDescription) {
+		this.setUnsaved(RecordSet.UNSAVED_REASON_COMMENT);
 		this.description = newRecordSetDescription;
 	}
 	

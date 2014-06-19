@@ -126,7 +126,7 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (SelectorComposite.log.isLoggable(Level.FINEST)) SelectorComposite.log.log(Level.FINEST, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (SelectorComposite.log.isLoggable(Level.WARNING)) SelectorComposite.log.log(Level.WARNING, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
 					SelectorComposite.this.application.clearMeasurementModes();
 					if (!SelectorComposite.this.curveSelectorHeader.getSelection()) {
 						//use this check button to deselect all selected curves

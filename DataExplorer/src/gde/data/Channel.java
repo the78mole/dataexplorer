@@ -674,6 +674,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	public void setFileDescription(String newFileDescription) {
+		this.setUnsaved(RecordSet.UNSAVED_REASON_COMMENT);
 		this.fileDescription = newFileDescription;
 		this.application.updateGraphicsCaptions();
 	}

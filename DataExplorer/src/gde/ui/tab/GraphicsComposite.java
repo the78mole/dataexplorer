@@ -1191,6 +1191,7 @@ public class GraphicsComposite extends Composite {
 			if (this.recordSetCommentText != null) {
 				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 				this.recordSetComment.setText(this.recordSetCommentText);
+				log.log(Level.WARNING, "recordSetComment.setText " + this.recordSetCommentText);
 			}
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
@@ -1829,14 +1830,18 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = GraphicsComposite.this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
-			if (recordSet != null) if (this.isRecordCommentChanged) {
+			if (recordSet != null) {
+				if (this.isRecordCommentChanged) {
+					recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+					recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+				}
+				else {
+					this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+					this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
+					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", recordSet.getStartTimeStamp()), this.graphicsHeaderText.substring(11)));
+					this.graphicsHeader.redraw();
+				}
 				this.isRecordCommentChanged = false;
-				recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
-				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-			}
-			else {
-				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-				this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
 			}
 		}
 	}

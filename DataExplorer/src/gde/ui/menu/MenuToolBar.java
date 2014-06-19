@@ -37,12 +37,14 @@ import gde.ui.SWTResourceManager;
 import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.GoogleEarthCustomizingDialog;
 import gde.ui.dialog.PrintSelectionDialog;
+import gde.ui.dialog.TimeSetDialog;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
 
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -77,7 +79,7 @@ public class MenuToolBar {
 
 	CoolItem											fileCoolItem;
 	ToolBar												fileToolBar;
-	ToolItem											copyToolItem, printToolItem, newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
+	ToolItem											copyToolItem, printToolItem, timeToolItem, newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
 	
 	CoolItem											deviceObjectCoolItem;
 	ToolBar												deviceObjectToolBar;
@@ -260,6 +262,19 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
+						}
+					});
+				}
+				{
+					this.timeToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.timeToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0074));
+					this.timeToolItem.setImage(SWTResourceManager.getImage("gde/resource/Time.gif")); //$NON-NLS-1$
+					this.timeToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/TimeHot.gif")); //$NON-NLS-1$
+					this.timeToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "timeToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							new TimeSetDialog(GDE.shell, SWT.NULL).open(new Date().getTime());
 						}
 					});
 				}
