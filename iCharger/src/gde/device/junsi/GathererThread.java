@@ -93,6 +93,7 @@ public class GathererThread extends Thread {
 		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		int numCells = this.device.getNumberOfLithiumCells();
+		boolean isCellLog = device.getName().contains("CellLog");
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -102,8 +103,16 @@ public class GathererThread extends Thread {
 				// check if device is ready for data capturing
 				// device sends at the end of transmission $ENDBULK;64
 				try {
-					processName = this.device.getProcessName(dataBuffer);
-					isProgrammExecuting = true;
+					if (isCellLog) {
+						if (new String(dataBuffer).startsWith("$ENDBULK"))
+							this.stopDataGatheringThread(false, null);
+						processName = "Monitoring";
+						isProgrammExecuting = true;
+					}
+					else {
+						processName = this.device.getProcessName(dataBuffer);
+						isProgrammExecuting = true;
+						}
 					if (GathererThread.log.isLoggable(Level.FINE))
 						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
 				}
@@ -237,8 +246,11 @@ public class GathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
 		}
+		log.log(Level.OFF, $METHOD_NAME+" - this.isCollectDataStopped=" + this.isCollectDataStopped);
+		log.log(Level.OFF, $METHOD_NAME+" - this.serialPortisConnected=" + this.serialPort.isConnected());
 
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
+		log.log(Level.OFF, $METHOD_NAME+" - " + (recordSet != null && recordSet.getRecordDataSize(true) > 5));
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
 			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2609));
