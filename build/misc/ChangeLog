@@ -6,6 +6,7 @@ enable reduced data table by selected records for all devices, enablement via co
 add 230400 Baud entry in device properties XSD to enable workaround for Junsi charger at UNIX operating systems
 enable to left cut and right cut permanent
 display selected measurement values in comment area while measuring
+enable to set record set start time stamp manually
 update MdlViewer to 0.8
 HoTTAdapter* - detect switching into text modus where no readable telemetrie values are available
 iCharger*B - fix power calculation
