@@ -298,7 +298,7 @@ public class TimeSetDialog extends Dialog {
 			}
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			this.dialogShell.setSize(320, 115);
+			this.dialogShell.setSize(330, 115);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent evt) {
