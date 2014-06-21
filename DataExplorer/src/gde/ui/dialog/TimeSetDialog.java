@@ -6,6 +6,7 @@ import gde.data.RecordSet;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
 
 import java.util.Calendar;
@@ -78,6 +79,33 @@ public class TimeSetDialog extends Dialog {
 			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
 			this.dialogShell.setLayout(dialogShellLayout);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0712));
+			this.dialogShell.layout();
+			this.dialogShell.pack();
+			this.dialogShell.setSize(330, 115);
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/TimeHot.gif")); //$NON-NLS-1$
+			this.dialogShell.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent evt) {
+					TimeSetDialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					RecordSet activeRecordSet = TimeSetDialog.this.application.getActiveRecordSet();
+					long timeStamp = TimeSetDialog.this.calendar.getTimeInMillis();
+					TimeSetDialog.log.log(Level.FINEST, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp)); //$NON-NLS-1$
+					if (activeRecordSet != null) {
+						String description = activeRecordSet.getRecordSetDescription();
+						description = description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss ", timeStamp) //$NON-NLS-1$
+								+ description.substring(description.indexOf(GDE.STRING_COLON) + 22);
+						activeRecordSet.setRecordSetDescription(description);
+						activeRecordSet.setStartTimeStamp(timeStamp);
+						Channel activeChannel = TimeSetDialog.this.application.getActiveChannel();
+						if (activeChannel != null) {
+							description = activeChannel.getFileDescription();
+							description = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", activeRecordSet.getStartTimeStamp()), description.substring(11)); //$NON-NLS-1$ //$NON-NLS-2$
+							activeChannel.setFileDescription(description);
+						}
+						TimeSetDialog.this.application.updateAllTabs(true, true);
+					}
+				}
+			});
 			{
 				this.compositeDataTime = new Composite(this.dialogShell, SWT.NONE);
 				RowLayout compositeDataTimeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -90,10 +118,12 @@ public class TimeSetDialog extends Dialog {
 					this.compositeYear.setLayout(compositeYearLayout);
 					{
 						this.cLabelYear = new CLabel(this.compositeYear, SWT.CENTER | SWT.EMBEDDED);
-						this.cLabelYear.setText(Messages.getString(MessageIds.GDE_MSGT0706));
+						this.cLabelYear.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.cLabelYear.setText(Messages.getString(MessageIds.GDE_MSGT0706));
 					}
 					{
 						this.cComboYear = new CCombo(this.compositeYear, SWT.BORDER);
+						this.cComboYear.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboYear.setSize(60, 30);
 						this.cComboYear.setEditable(false);
 						this.cComboYear.setBounds(80, 107, 60, 30);
@@ -119,10 +149,12 @@ public class TimeSetDialog extends Dialog {
 					this.compositeMonth.setLayout(compositeMonthLayout);
 					{
 						this.cLabelMonth = new CLabel(this.compositeMonth, SWT.CENTER | SWT.EMBEDDED);
+						this.cLabelMonth.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cLabelMonth.setText(Messages.getString(MessageIds.GDE_MSGT0707));
 					}
 					{
 						this.cComboMonth = new CCombo(this.compositeMonth, SWT.BORDER);
+						this.cComboMonth.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboMonth.setItems(new String[] { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$
 						this.cComboMonth.setSize(60, 30);
 						this.cComboMonth.setEditable(false);
@@ -149,10 +181,12 @@ public class TimeSetDialog extends Dialog {
 					this.compositeDay.setLayout(compositeDayLayout);
 					{
 						this.cLabelDay = new CLabel(this.compositeDay, SWT.CENTER | SWT.EMBEDDED);
+						this.cLabelDay.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cLabelDay.setText(Messages.getString(MessageIds.GDE_MSGT0708));
 					}
 					{
 						this.cComboDay = new CCombo(this.compositeDay, SWT.BORDER);
+						this.cComboDay.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboDay
 								.setItems(new String[] {
 										"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$ //$NON-NLS-20$ //$NON-NLS-21$ //$NON-NLS-22$ //$NON-NLS-23$ //$NON-NLS-24$ //$NON-NLS-25$ //$NON-NLS-26$ //$NON-NLS-27$ //$NON-NLS-28$ //$NON-NLS-29$ //$NON-NLS-30$ //$NON-NLS-31$
@@ -181,10 +215,12 @@ public class TimeSetDialog extends Dialog {
 					this.compositeHour.setLayout(compositeHourLayout);
 					{
 						this.cLabelHour = new CLabel(this.compositeHour, SWT.CENTER | SWT.EMBEDDED);
+						this.cLabelHour.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cLabelHour.setText(Messages.getString(MessageIds.GDE_MSGT0709));
 					}
 					{
 						this.cComboHour = new CCombo(this.compositeHour, SWT.BORDER);
+						this.cComboHour.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboHour.setItems(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$ //$NON-NLS-20$ //$NON-NLS-21$ //$NON-NLS-22$ //$NON-NLS-23$ //$NON-NLS-24$
 						this.cComboHour.select(14);
 						this.cComboHour.setSize(60, 30);
@@ -216,10 +252,12 @@ public class TimeSetDialog extends Dialog {
 					this.compositeMinute.setLayout(compositeMinuteLayout);
 					{
 						this.cLabelMinute = new CLabel(this.compositeMinute, SWT.CENTER | SWT.EMBEDDED);
+						this.cLabelMinute.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cLabelMinute.setText(Messages.getString(MessageIds.GDE_MSGT0710));
 					}
 					{
 						this.cComboMinute = new CCombo(this.compositeMinute, SWT.BORDER);
+						this.cComboMinute.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboMinute.setItems(tmp60.toArray(new String[0]));
 						this.cComboMinute.select(32);
 						this.cComboMinute.setSize(60, 30);
@@ -247,10 +285,12 @@ public class TimeSetDialog extends Dialog {
 					this.compositeSecond.setLayout(compositeSecondLayout);
 					{
 						this.cLabelSecond = new CLabel(this.compositeSecond, SWT.CENTER | SWT.EMBEDDED);
+						this.cLabelSecond.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cLabelSecond.setText(Messages.getString(MessageIds.GDE_MSGT0711));
 					}
 					{
 						this.cComboSecond = new CCombo(this.compositeSecond, SWT.BORDER);
+						this.cComboSecond.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboSecond.setItems(tmp60.toArray(new String[0]));
 						this.cComboSecond.select(0);
 						this.cComboSecond.setSize(60, 30);
@@ -286,6 +326,7 @@ public class TimeSetDialog extends Dialog {
 					buttonOKLData.widthHint = 48;
 					buttonOKLData.grabExcessVerticalSpace = true;
 					this.buttonOK.setLayoutData(buttonOKLData);
+					this.buttonOK.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.buttonOK.setText("OK"); //$NON-NLS-1$
 					this.buttonOK.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -296,33 +337,6 @@ public class TimeSetDialog extends Dialog {
 					});
 				}
 			}
-			this.dialogShell.layout();
-			this.dialogShell.pack();
-			this.dialogShell.setSize(330, 115);
-			this.dialogShell.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent evt) {
-					TimeSetDialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-					RecordSet activeRecordSet = TimeSetDialog.this.application.getActiveRecordSet();
-					long timeStamp = TimeSetDialog.this.calendar.getTimeInMillis();
-					TimeSetDialog.log.log(Level.FINEST, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp)); //$NON-NLS-1$
-					if (activeRecordSet != null) {
-						String description = activeRecordSet.getRecordSetDescription();
-						description = description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss ", timeStamp) //$NON-NLS-1$
-								+ description.substring(description.indexOf(GDE.STRING_COLON) + 22);
-						activeRecordSet.setRecordSetDescription(description);
-						activeRecordSet.setStartTimeStamp(timeStamp);
-						Channel activeChannel = TimeSetDialog.this.application.getActiveChannel();
-						if (activeChannel != null) {
-							description = activeChannel.getFileDescription();
-							description = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", activeRecordSet.getStartTimeStamp()), description.substring(11)); //$NON-NLS-1$ //$NON-NLS-2$
-							activeChannel.setFileDescription(description);
-						}
-						TimeSetDialog.this.application.updateAllTabs(true, true);
-					}
-				}
-			});
-			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 
 			this.calendar = new GregorianCalendar();
 			this.calendar.setTimeInMillis(millis);
@@ -337,6 +351,7 @@ public class TimeSetDialog extends Dialog {
 			this.cComboHour.select(this.calendar.get(Calendar.HOUR_OF_DAY));
 			this.cComboMinute.select(this.calendar.get(Calendar.MINUTE));
 
+			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {

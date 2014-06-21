@@ -267,7 +267,7 @@ public class MenuToolBar {
 				}
 				{
 					this.timeToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.timeToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0074));
+					this.timeToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0712));
 					this.timeToolItem.setImage(SWTResourceManager.getImage("gde/resource/Time.gif")); //$NON-NLS-1$
 					this.timeToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/TimeHot.gif")); //$NON-NLS-1$
 					this.timeToolItem.addSelectionListener(new SelectionAdapter() {
