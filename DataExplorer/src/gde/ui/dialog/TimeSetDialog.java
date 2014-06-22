@@ -81,7 +81,7 @@ public class TimeSetDialog extends Dialog {
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0712));
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			this.dialogShell.setSize(GDE.IS_LINUX ? 410 : 330, 115);
+			this.dialogShell.setSize(GDE.IS_LINUX ? 410 : 340, 115);
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/TimeHot.gif")); //$NON-NLS-1$
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				@Override
