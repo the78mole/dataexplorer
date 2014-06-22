@@ -143,7 +143,7 @@ public class TimeSetDialog extends Dialog {
 				{
 					this.compositeMonth = new Composite(this.compositeDataTime, SWT.NONE);
 					FillLayout compositeMonthLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-					RowData compositeMonth1LData = new RowData(60, 40);
+					RowData compositeMonth1LData = new RowData(GDE.IS_LINUX ? 60 : 50, 40);
 					this.compositeMonth.setLayoutData(compositeMonth1LData);
 					this.compositeMonth.setLayout(compositeMonthLayout);
 					{
@@ -155,7 +155,7 @@ public class TimeSetDialog extends Dialog {
 						this.cComboMonth = new CCombo(this.compositeMonth, SWT.BORDER);
 						this.cComboMonth.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboMonth.setItems(new String[] { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$
-						this.cComboMonth.setSize(60, 30);
+						this.cComboMonth.setSize(GDE.IS_LINUX ? 60 : 50, 30);
 						this.cComboMonth.setEditable(false);
 						this.cComboMonth.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -174,7 +174,7 @@ public class TimeSetDialog extends Dialog {
 				{
 					this.compositeDay = new Composite(this.compositeDataTime, SWT.NONE);
 					FillLayout compositeDayLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-					RowData compositeDay2LData = new RowData(60, 40);
+					RowData compositeDay2LData = new RowData(GDE.IS_LINUX ? 60 : 50, 40);
 					this.compositeDay.setLayoutData(compositeDay2LData);
 					this.compositeDay.setLayout(compositeDayLayout);
 					{
@@ -188,7 +188,7 @@ public class TimeSetDialog extends Dialog {
 						this.cComboDay
 								.setItems(new String[] {
 										"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$ //$NON-NLS-20$ //$NON-NLS-21$ //$NON-NLS-22$ //$NON-NLS-23$ //$NON-NLS-24$ //$NON-NLS-25$ //$NON-NLS-26$ //$NON-NLS-27$ //$NON-NLS-28$ //$NON-NLS-29$ //$NON-NLS-30$ //$NON-NLS-31$
-						this.cComboDay.setSize(60, 30);
+						this.cComboDay.setSize(GDE.IS_LINUX ? 60 : 50, 30);
 						this.cComboDay.setEditable(false);
 						this.cComboDay.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -207,7 +207,7 @@ public class TimeSetDialog extends Dialog {
 				{
 					this.compositeHour = new Composite(this.compositeDataTime, SWT.NONE);
 					FillLayout compositeHourLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-					RowData compositeHour3LData = new RowData(60, 40);
+					RowData compositeHour3LData = new RowData(GDE.IS_LINUX ? 60 : 50, 40);
 					this.compositeHour.setLayoutData(compositeHour3LData);
 					this.compositeHour.setLayout(compositeHourLayout);
 					{
@@ -220,7 +220,7 @@ public class TimeSetDialog extends Dialog {
 						this.cComboHour.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboHour.setItems(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$ //$NON-NLS-20$ //$NON-NLS-21$ //$NON-NLS-22$ //$NON-NLS-23$ //$NON-NLS-24$
 						this.cComboHour.select(14);
-						this.cComboHour.setSize(60, 30);
+						this.cComboHour.setSize(GDE.IS_LINUX ? 60 : 50, 30);
 						this.cComboHour.setEditable(false);
 						this.cComboHour.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -243,7 +243,7 @@ public class TimeSetDialog extends Dialog {
 				{
 					this.compositeMinute = new Composite(this.compositeDataTime, SWT.NONE);
 					FillLayout compositeMinuteLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-					RowData compositeMinute4LData = new RowData(60, 40);
+					RowData compositeMinute4LData = new RowData(GDE.IS_LINUX ? 60 : 50, 40);
 					this.compositeMinute.setLayoutData(compositeMinute4LData);
 					this.compositeMinute.setLayout(compositeMinuteLayout);
 					{
@@ -256,7 +256,7 @@ public class TimeSetDialog extends Dialog {
 						this.cComboMinute.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboMinute.setItems(tmp60.toArray(new String[0]));
 						this.cComboMinute.select(32);
-						this.cComboMinute.setSize(60, 30);
+						this.cComboMinute.setSize(GDE.IS_LINUX ? 60 : 50, 30);
 						this.cComboMinute.setEditable(false);
 						this.cComboMinute.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -275,7 +275,7 @@ public class TimeSetDialog extends Dialog {
 				{
 					this.compositeSecond = new Composite(this.compositeDataTime, SWT.NONE);
 					FillLayout compositeSecondLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-					RowData compositeSecondLData = new RowData(60, 40);
+					RowData compositeSecondLData = new RowData(GDE.IS_LINUX ? 60 : 50, 40);
 					this.compositeSecond.setLayoutData(compositeSecondLData);
 					this.compositeSecond.setLayout(compositeSecondLayout);
 					{
@@ -288,7 +288,7 @@ public class TimeSetDialog extends Dialog {
 						this.cComboSecond.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.cComboSecond.setItems(tmp60.toArray(new String[0]));
 						this.cComboSecond.select(0);
-						this.cComboSecond.setSize(60, 30);
+						this.cComboSecond.setSize(GDE.IS_LINUX ? 60 : 50, 30);
 						this.cComboSecond.setEditable(false);
 						this.cComboSecond.addSelectionListener(new SelectionAdapter() {
 							@Override
