@@ -1191,7 +1191,6 @@ public class GraphicsComposite extends Composite {
 			if (this.recordSetCommentText != null) {
 				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 				this.recordSetComment.setText(this.recordSetCommentText);
-				log.log(Level.WARNING, "recordSetComment.setText " + this.recordSetCommentText);
 			}
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
