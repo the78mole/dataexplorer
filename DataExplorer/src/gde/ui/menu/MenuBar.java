@@ -36,11 +36,13 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
+import gde.ui.dialog.TimeSetDialog;
 import gde.ui.dialog.edit.DevicePropertiesEditor;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -91,7 +93,7 @@ public class MenuBar {
 	MenuItem											activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
 	Menu													editMenu;
 	MenuItem											editMenuItem;
-	MenuItem											printMenuItem;
+	MenuItem											printMenuItem, startTimeMenuItem;
 	MenuItem											exitMenuItem;
 	MenuItem											preferencesFileMenuItem;
 	MenuItem											devicePropertyFileEditMenuItem;
@@ -331,6 +333,18 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
+						}
+					});
+				}
+				{
+					this.startTimeMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.startTimeMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0713));
+					this.startTimeMenuItem.setImage(SWTResourceManager.getImage("gde/resource/TimeHot.gif")); //$NON-NLS-1$
+					this.startTimeMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							new TimeSetDialog(GDE.shell, SWT.NULL).open(new Date().getTime());
 						}
 					});
 				}
