@@ -93,10 +93,27 @@ public class DigitalDisplay extends Composite {
 							if (record != null && record.size() > 0) {
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 								DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
-								DecimalFormat df = record.getDecimalFormat();
-								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
-								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
-								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								String actualValue = "0";
+								String maxValue = "0";
+								String minValue = "0";
+								if (DigitalDisplay.this.device.isGPSCoordinates(record)) {
+									if (record.getUnit().endsWith("'")) {
+										actualValue = String.format("%2d %07.4f", record.lastElement() / 1000000, record.lastElement() % 1000000 / 10000.0);
+										maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + String.format("%2d %07.4f", record.getMaxValue() / 1000000, record.getMaxValue() % 1000000 / 10000.0);
+										minValue = Messages.getString(MessageIds.GDE_MSGT0237) + String.format("%2d %07.4f", record.getMinValue() / 1000000, record.getMinValue() % 1000000 / 10000.0);
+									}
+									else {
+										actualValue = String.format("%8.6f", record.lastElement() / 1000000.0);
+										maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + String.format("%8.6f", record.getMaxValue() / 1000000.0);
+										minValue = Messages.getString(MessageIds.GDE_MSGT0237) + String.format("%8.6f", record.getMinValue() / 1000000.0);
+									}
+								}
+								else {
+									DecimalFormat df = record.getDecimalFormat();
+									actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
+									maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+									minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								}
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue + " maxValue=" + maxValue + " minValue=" + minValue);
 								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
 								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
@@ -148,9 +165,18 @@ public class DigitalDisplay extends Composite {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							String actualValue = "0";
 							if (record != null && record.size() > 0) {
-								DecimalFormat df = record.getDecimalFormat();
-								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
+								if (DigitalDisplay.this.device.isGPSCoordinates(record)) {
+									if (record.getUnit().endsWith("'"))
+										actualValue = String.format("%2d %07.4f", record.lastElement()/1000000, record.lastElement() % 1000000 / 10000.0);
+									else
+										actualValue = String.format("%8.6f", record.lastElement()/1000000.0);									
+								}
+								else {
+									DecimalFormat df = record.getDecimalFormat();
+									actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
+								}
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue);
 								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
 								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
@@ -179,8 +205,19 @@ public class DigitalDisplay extends Composite {
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
-								DecimalFormat df = record.getDecimalFormat();
-								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								String minValue = "0";
+								if (DigitalDisplay.this.device.isGPSCoordinates(record)) {
+									if (record.getUnit().endsWith("'")) {
+										minValue = Messages.getString(MessageIds.GDE_MSGT0237) + String.format("%2d %07.4f", record.getMinValue() / 1000000, record.getMinValue() % 1000000 / 10000.0);
+									}
+									else {
+										minValue = Messages.getString(MessageIds.GDE_MSGT0237) + String.format("%8.6f", record.getMinValue() / 1000000.0);
+									}
+								}
+								else {
+									DecimalFormat df = record.getDecimalFormat();
+									minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								}
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " minValue=" + minValue);
 								DigitalDisplay.this.minDigitalLabel.setText(minValue);
 							}
@@ -203,8 +240,19 @@ public class DigitalDisplay extends Composite {
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
-								DecimalFormat df = record.getDecimalFormat();
-								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+								String maxValue = "0";
+								if (DigitalDisplay.this.device.isGPSCoordinates(record)) {
+									if (record.getUnit().endsWith("'")) {
+										maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + String.format("%2d %07.4f", record.getMaxValue() / 1000000, record.getMaxValue() % 1000000 / 10000.0);
+									}
+									else {
+										maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + String.format("%8.6f", record.getMaxValue() / 1000000.0);
+									}
+								}
+								else {
+									DecimalFormat df = record.getDecimalFormat();
+									maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+								}
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " maxValue=" + maxValue);
 								DigitalDisplay.this.maxDigitalLabel.setText(maxValue);
 							}
