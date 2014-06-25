@@ -229,7 +229,7 @@ public class Kosmik extends JLog2 {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.contains(GDE.STRING_UNDER_BAR) ? selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT)) : selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 								RecordSet redRecordSet = CSVSerialDataReaderWriter.read(selectedImportFile, Kosmik.this, recordNameExtend, channelConfigNumber, 
 										new DataParser(Kosmik.this.getDataBlockTimeUnitFactor(), 
 												Kosmik.this.getDataBlockLeader(), Kosmik.this.getDataBlockSeparator().value(), 
