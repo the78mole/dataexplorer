@@ -15,7 +15,7 @@
         <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="15"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="14"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
@@ -67,7 +67,8 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-            </Measurement>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
+    		</Measurement>
             <Measurement>
                 <name>Leistung</name>
                 <symbol>P</symbol>
@@ -166,14 +167,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>Innenwiderstand</name>
-                <symbol>Ri</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="1000.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
         </Channel>
         <Channel name="Ausgang 2" type="TYPE_OUTLET">
@@ -205,6 +198,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Leistung</name>
@@ -304,14 +298,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>Innenwiderstand</name>
-                <symbol>Ri</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="1000.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
         </Channel>
     </Channels>
