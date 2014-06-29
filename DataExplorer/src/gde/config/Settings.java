@@ -421,6 +421,15 @@ public class Settings extends Properties {
 						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 				}
+				File path = new File(this.getApplHomePath() + "/Mapping"); //$NON-NLS-1$
+				String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
+				if (existCheck) {
+					if (!FileUtils.checkFileExist(propertyFilePath))
+						FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				}
+				else {
+					FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				}
 			}
 		}
 	}
