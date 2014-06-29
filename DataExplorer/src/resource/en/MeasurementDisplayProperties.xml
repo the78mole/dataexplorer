@@ -31,6 +31,8 @@ the abbreviation should have a length of 10 characters together with unit
       <entry key="CellVoltage 10">Cell 10[V]</entry>
       <entry key="CellVoltage 11">Cell 11[V]</entry>
       <entry key="CellVoltage 12">Cell 12[V]</entry>
+      <entry key="CellVoltage 13">Cell 13[V]</entry>
+      <entry key="CellVoltage 14">Cell 14[V]</entry>
              <entry key="Balance">Bal   [mV]</entry>
            <entry key="Balance G">Bal G [mV]</entry>
            <entry key="Balance E">Bal E [mV]</entry>
