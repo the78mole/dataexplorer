@@ -93,13 +93,16 @@ public class TimeSetDialog extends Dialog {
 					if (activeRecordSet != null) {
 						String description = activeRecordSet.getRecordSetDescription();
 						description = description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss ", timeStamp) //$NON-NLS-1$
-								+ description.substring(description.indexOf(GDE.STRING_COLON) + 22);
+								+ description.substring(description.indexOf(GDE.STRING_BLANK, description.indexOf(GDE.STRING_COLON) + 12)+1);
 						activeRecordSet.setRecordSetDescription(description);
 						activeRecordSet.setStartTimeStamp(timeStamp);
 						Channel activeChannel = TimeSetDialog.this.application.getActiveChannel();
 						if (activeChannel != null) {
 							description = activeChannel.getFileDescription();
-							description = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", activeRecordSet.getStartTimeStamp()), description.substring(11)); //$NON-NLS-1$ //$NON-NLS-2$
+							if (description.contains(GDE.STRING_MESSAGE_CONCAT))
+								description = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", activeRecordSet.getStartTimeStamp()), description.substring(11)); //$NON-NLS-1$ //$NON-NLS-2$
+							else
+								description = String.format("%s", StringHelper.getFormatedTime("yyyy-MM-dd", activeRecordSet.getStartTimeStamp())); //$NON-NLS-1$ //$NON-NLS-2$
 							activeChannel.setFileDescription(description);
 						}
 						TimeSetDialog.this.application.updateAllTabs(true, true);
