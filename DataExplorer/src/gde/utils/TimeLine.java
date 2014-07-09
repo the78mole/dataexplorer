@@ -607,7 +607,7 @@ public class TimeLine {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
 			long lSeconds = Double.valueOf(milliSeconds / 1000.0).longValue();
-			milliSeconds %= 1000;
+			//milliSeconds %= 1000;
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;
 			long lHours = lMinutes / 60;
