@@ -7,12 +7,15 @@ add 230400 Baud entry in device properties XSD to enable workaround for Junsi ch
 enable to left cut and right cut permanent
 display selected measurement values in comment area while measuring
 enable to set record set start time stamp manually
-fix digital display for GPS coordinates
+fix display for GPS coordinates in several tabs
+fix time display in statistics
 update MdlViewer to 0.8
 HoTTAdapter* - detect switching into text modus where no readable telemetrie values are available
 iCharger*B - fix power calculation
 iCharger308Duo - add support to import data from device (actually no support for live data)
 Kosmik - fix import problem with modified file name
+add IISI Cockpit V2 support
+
 
 Version 3.1.5 - 04 May 2014
 Update to latest SWT drop due to solved problems reported for Mint-Linux

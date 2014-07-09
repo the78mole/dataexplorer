@@ -188,7 +188,8 @@
 		<ant antfile="build.xml" target="clean" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="GPXAdapter" inheritall="true" />
-		<!-- add new device here -->
+		<ant antfile="build.xml" target="clean" dir="IISI-Cockpit V2" inheritall="true" />
+				<!-- add new device here -->
 	</target>
 
 	<!-- install target -->
@@ -350,7 +351,8 @@
 		<ant antfile="build.xml" target="package" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="GPXAdapter" inheritall="true" />
-		<!-- add new device here -->
+		<ant antfile="build.xml" target="package" dir="IISI-Cockpit V2" inheritall="true" />
+				<!-- add new device here -->
 	</target>
 
 	<fileset dir="${basedir}">
@@ -376,6 +378,7 @@
 			<include name="JetiAdapter/build/*.jar" />
 			<include name="IGCAdapter/build/*.jar" />
 			<include name="GPXAdapter/build/*.jar" />
+			<include name="IISI-Cockpit V2/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
