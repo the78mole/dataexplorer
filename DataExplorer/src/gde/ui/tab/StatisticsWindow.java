@@ -2,7 +2,9 @@ package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
+
 import gde.log.Level;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -269,7 +271,7 @@ public class StatisticsWindow extends CTabItem {
 					sb.append(Messages.getString(MessageIds.GDE_MSGT0359)).append(DELIMITER);
 					sb.append("     0      ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
-					sb.append(TimeLine.getFomatedTime(activeRecordSet.getTime_ms(activeRecordSet.getRecordDataSize(true)-1))).append(" ").append(DELIMITER); //$NON-NLS-1$
+					sb.append(TimeLine.getFomatedTime(activeRecordSet.getMaxTime_ms())).append(" ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
 					if (activeRecordSet.isTimeStepConstant()) {
 						sb.append(Messages.getString(MessageIds.GDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTime_ms(1))).append(Messages.getString(MessageIds.GDE_MSGT0361)); //$NON-NLS-1$
@@ -294,7 +296,16 @@ public class StatisticsWindow extends CTabItem {
 									sb.append(formatOutput(df.format(device.translateValue(record, record.getMinValueTriggered() / 1000.0))));
 								else
 									if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
-										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
+										if (device.isGPSCoordinates(record)) {
+											if (record.getUnit().endsWith("'")) {
+												sb.append(String.format("%2d %07.4f", record.getRealMinValue() / 1000000, record.getRealMinValue() % 1000000 / 10000.0));
+											}
+											else {
+												sb.append(String.format("%8.6f", record.getRealMinValue() / 1000000.0));
+											}
+										}
+										else
+											sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
 									else
 										sb.append(NO_VALUE);
 							}
@@ -306,7 +317,16 @@ public class StatisticsWindow extends CTabItem {
 								if (isTriggerLevel)
 									sb.append(formatOutput(df.format(device.translateValue(record, record.getAvgValueTriggered() / 1000.0))));
 								else
-									sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
+									if (device.isGPSCoordinates(record)) {
+										if (record.getUnit().endsWith("'")) {
+											sb.append(String.format("%2d %07.4f", record.getAvgValue() / 1000000, record.getAvgValue() % 1000000 / 10000.0));
+										}
+										else {
+											sb.append(String.format("%8.6f", record.getAvgValue() / 1000000.0));
+										}
+									}
+									else
+										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
 							else
 								sb.append(NO_VALUE);
 							sb.append(DELIMITER);
@@ -316,7 +336,16 @@ public class StatisticsWindow extends CTabItem {
 									sb.append(formatOutput(df.format(device.translateValue(record, record.getMaxValueTriggered() / 1000.0))));
 								else
 									if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
-										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
+										if (device.isGPSCoordinates(record)) {
+											if (record.getUnit().endsWith("'")) {
+												sb.append(String.format("%2d %07.4f", record.getRealMaxValue() / 1000000, record.getRealMaxValue() % 1000000 / 10000.0));
+											}
+											else {
+												sb.append(String.format("%8.6f", record.getRealMaxValue() / 1000000.0));
+											}
+										}
+										else
+											sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
 									else
 										sb.append(NO_VALUE);
 							}
