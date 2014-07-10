@@ -424,11 +424,13 @@ public class CSVReaderWriter {
 			// write data
 			long startTime = new Date(recordSet.getTime(0)).getTime();
 			int recordEntries = recordSet.getRecordDataSize(true);
+			boolean isTimeFormatAbsolute = Settings.getInstance().isTimeFormatAbsolute();
 			int progressCycle = 0;
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
+			
 			for (i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
-				String[] row = recordSet.getDataTableRow(i, true);
+				String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
 
 				// add time entry
 				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
