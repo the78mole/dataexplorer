@@ -49,6 +49,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -292,8 +293,9 @@ public class CSVReaderWriter {
 					for (String recordKey : recordNames) {
 						recordSet.get(recordKey).setDisplayable(true); // all data available 
 					}
-				Date												date = null;
-				int													year=0, month=0, day=0;
+					Calendar												date = new GregorianCalendar();
+					date.setTime(new Date(recordSet.getStartTimeStamp()));
+				int													year=date.get(Calendar.YEAR), month=date.get(Calendar.MONTH), day=date.get(Calendar.DAY_OF_MONTH);
 				long lastTimeStamp=0;
 
 				// now get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
@@ -309,13 +311,7 @@ public class CSVReaderWriter {
 					}
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
 					String data = dataStr[0].trim().replace(',', '.');
-					if (data.contains(GDE.STRING_BLANK)) {
-						if (date == null) {
-							year = Integer.parseInt(data.substring(0,4));
-							month = Integer.parseInt(data.substring(5, 7));
-							day = Integer.parseInt(data.substring(8, 10));
-						}
-						data = data.split(GDE.STRING_BLANK)[1];
+					if (data.contains(GDE.STRING_COLON)) {
 						int hour = Integer.parseInt(data.substring(0, 2));
 						int minute = Integer.parseInt(data.substring(3, 5));
 						int second = Integer.parseInt(data.substring(6, 8));
@@ -325,7 +321,6 @@ public class CSVReaderWriter {
 						if (lastTimeStamp < timeStamp) {
 							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
 							lastTimeStamp = timeStamp;
-							date = calendar.getTime();
 							if (startTimeStamp == 0) startTimeStamp = timeStamp;
 						}
 						else 
@@ -335,7 +330,13 @@ public class CSVReaderWriter {
 						time_ms = (int) (new Double(data).doubleValue() * 1000);
 					
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
-						data = dataStr[i + 1].trim().replace(',', '.').replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
+						try {
+							data = dataStr[i + 1].trim().replace(',', '.').replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
+						}
+						catch (Exception e) {
+							data = "0";
+							log.log(Level.WARNING, String.format("Check line = %s", line));
+						}
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
