@@ -26,7 +26,7 @@
         <property name="Flugaufzeichnung" value="01" type="Integer" description=""/>
     </State>
     <Channels lastUseOrdinal="0">
-        <Channel name="Konfig_1" type="TYPE_CONFIG">
+        <Channel name="Config_1" type="TYPE_CONFIG">
             <Measurement>
                 <name>0????</name>
                 <symbol>-</symbol>
@@ -306,7 +306,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
         </Channel>
-        <Channel name="Konfig_2" type="TYPE_CONFIG">
+        <Channel name="Config_2" type="TYPE_CONFIG">
             <Measurement>
                 <name>0????</name>
                 <symbol>-</symbol>
