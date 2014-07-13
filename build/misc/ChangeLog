@@ -15,6 +15,7 @@ iCharger*B - fix power calculation
 iCharger308Duo - add support to import data from device (actually no support for live data)
 Kosmik - fix import problem with modified file name
 add IISI Cockpit V2 support
+add FutabaTelemetry support
 
 
 Version 3.1.5 - 04 May 2014
