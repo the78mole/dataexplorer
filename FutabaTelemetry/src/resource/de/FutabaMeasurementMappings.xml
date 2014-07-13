@@ -30,7 +30,7 @@ fehlende Mappings einfach ergaenzen, bitte informieren Sie den Entwickler
   <entry key="CAPACITY">Kapazität [nAh]</entry>
   <entry key="ALTITUDE">Höhe [m]</entry>
   <entry key="VARIOMETER">Vario [m/s]</entry>
-  <entry key="TEMPERATURE">Temperature [°C]</entry>
+  <entry key="TEMPERATURE">Temperatur [°C]</entry>
   <entry key="DISTANCE">Entfernung [m]</entry>
   <entry key="SPEED">Geschwindigkeit [km/h]</entry>
   <entry key="LATITUDE">Breitengrad [°']</entry>
