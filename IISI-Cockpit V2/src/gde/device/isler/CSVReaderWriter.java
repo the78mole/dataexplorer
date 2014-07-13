@@ -240,9 +240,6 @@ public class CSVReaderWriter {
 				}
 				
 				fileHeader = CSVReaderWriter.evaluateType(separator, fileHeader, (DeviceConfiguration)device);			
-//				if (isRaw != fileHeader.get(GDE.CSV_DATA_TYPE).equals(GDE.CSV_DATA_TYPE_RAW)) {
-//					throw new DataTypeException(Messages.getString(MessageIds.GDE_MSGW0014));
-//				}
 				log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
 				
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
@@ -260,7 +257,6 @@ public class CSVReaderWriter {
 				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 				String[] tmpRecordNames	=	fileHeader.get(GDE.CSV_DATA_HEADER_MEASUREMENTS).split(GDE.STRING_SEMICOLON);
 				String[] tmpRecordUnits = fileHeader.get(GDE.CSV_DATA_HEADER_UNITS).split(GDE.STRING_SEMICOLON);
-				//String[] recordNames = isRaw ? device.getMeasurementNames(activeChannel.getNumber()) : new String[tmpRecordNames.length];
 				String[] recordNames = new String[tmpRecordNames.length];
 				String[] recordSymbols = new String[recordNames.length];
 				String[] recordUnits = new String[recordNames.length];
@@ -340,7 +336,7 @@ public class CSVReaderWriter {
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
-							points[i] = Double.valueOf(Double.valueOf(data)*1000000.0).intValue();
+							points[i] = Double.valueOf(data.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue()*10;
 							break;
 
 						default:
