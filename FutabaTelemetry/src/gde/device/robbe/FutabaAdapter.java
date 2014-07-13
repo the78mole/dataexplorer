@@ -84,6 +84,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3303), Messages.getString(MessageIds.GDE_MSGT3303));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 		}
 		readProperties();
 	}
@@ -104,6 +105,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3303), Messages.getString(MessageIds.GDE_MSGT3303));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 		}
 		readProperties();
 	}
@@ -121,6 +123,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3303), Messages.getString(MessageIds.GDE_MSGT3303));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 		}
 		readProperties();
 	}
@@ -165,6 +168,46 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 				public void handleEvent(Event e) {
 					FutabaAdapter.log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					importCsvFiles();
+				}
+			});
+		}
+	}
+
+	/**
+	 * update the file export menu by adding two new entries to export KML/GPX files
+	 * @param exportMenue
+	 */
+	public void updateFileExportMenu(Menu exportMenue) {
+		MenuItem convertKMZ3DRelativeItem;
+		MenuItem convertKMZDAbsoluteItem;
+
+		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+			new MenuItem(exportMenue, SWT.SEPARATOR);
+
+			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT3311));
+			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
+				}
+			});
+
+			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT3312));
+			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+				}
+			});
+
+			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT3313));
+			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
 		}
@@ -583,7 +626,14 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				exportFileName = new FileHandler().exportFileKMZ(
+						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
+						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
+						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
+						findRecordByUnit(activeRecordSet, "km/h"), 
+						findRecordByUnit(activeRecordSet, "m/s"), 
+						findRecordByUnit(activeRecordSet, "km"), 
+						-1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						true, isExportTmpDir);
 			}
 		}
@@ -592,7 +642,16 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
 		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) 
+				return entry.getValue().getOrdinal();
+		}
+		return -1;
+	}
+
+	private int findRecordByType(RecordSet recordSet, Record.DataType dataType) {
+		for (Record record : recordSet.values()) {
+			if (record.getDataType().equals(dataType)) 
+				return record.getOrdinal();
 		}
 		return -1;
 	}
@@ -605,5 +664,23 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public boolean isGPSCoordinates(Record record) {
 		return record.getDataType().value().startsWith("GPS l");
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
+	 */
+	public void export2KMZ3D(int type) {
+		RecordSet activeRecordSet = application.getActiveRecordSet();
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3310), 
+				findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
+				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
+				findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
+				findRecordByUnit(activeRecordSet, "km/h"), 
+				findRecordByUnit(activeRecordSet, "m/s"), 
+				findRecordByUnit(activeRecordSet, "km"), 
+				-1, 
+				type == DeviceConfiguration.HEIGHT_RELATIVE, 
+				type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 }
