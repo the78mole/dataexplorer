@@ -327,7 +327,7 @@ public class CSVReaderWriter {
 							continue;
 					}
 					else // decimal time value
-						time_ms = (int) (new Double(data).doubleValue() * 1000);
+						time_ms = Double.valueOf(Double.valueOf(data).doubleValue() * 1000).intValue();
 					
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
 						try {

@@ -74,7 +74,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3003), Messages.getString(MessageIds.GDE_MSGT3003));
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3203), Messages.getString(MessageIds.GDE_MSGT3203));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
@@ -93,7 +93,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3003), Messages.getString(MessageIds.GDE_MSGT3003));
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3203), Messages.getString(MessageIds.GDE_MSGT3203));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
@@ -109,7 +109,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3003), Messages.getString(MessageIds.GDE_MSGT3003));
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3203), Messages.getString(MessageIds.GDE_MSGT3203));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
@@ -125,8 +125,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
-			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT3004, GDE.MOD1));
-			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT3004));
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT3204, GDE.MOD1));
+			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT3204));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
@@ -429,7 +429,7 @@ importCsvFiles();	}
 	 * import a CSV file, also called "OpenFormat" file
 	 */
 	public void importCsvFiles() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3000));
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3200));
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -442,7 +442,9 @@ importCsvFiles();	}
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								CSVReaderWriter.read(IISICockpitV2.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, IISICockpitV2.this.getRecordSetStemName());
+								RecordSet activeRecordSet = CSVReaderWriter.read(IISICockpitV2.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, IISICockpitV2.this.getRecordSetStemName());
+								IISICockpitV2.this.updateVisibilityStatus(activeRecordSet, true);
+								activeRecordSet.descriptionAppendFilename(selectedImportFile);
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);

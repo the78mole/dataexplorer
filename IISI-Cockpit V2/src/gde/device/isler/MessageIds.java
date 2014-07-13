@@ -24,24 +24,24 @@ package gde.device.isler;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGW3000 = "GDE_MSGW3000";
-	public final static String	GDE_MSGW3001 = "GDE_MSGW3001";
-	public final static String	GDE_MSGI3000 = "GDE_MSGI3000";
-	public final static String	GDE_MSGI3001 = "GDE_MSGI3001";
-	public final static String	GDE_MSGI3002 = "GDE_MSGI3002";
-	public final static String	GDE_MSGI3003 = "GDE_MSGI3003";
-	public final static String	GDE_MSGT3000 = "GDE_MSGT3000";
-	public final static String	GDE_MSGT3001 = "GDE_MSGT3001";
-	public final static String	GDE_MSGT3002 = "GDE_MSGT3002";
-	public final static String	GDE_MSGT3003 = "GDE_MSGT3003";
-	public final static String	GDE_MSGT3004 = "GDE_MSGT3004";
-	public final static String	GDE_MSGT3005 = "GDE_MSGT3005";
-	public final static String	GDE_MSGT3006 = "GDE_MSGT3006";
-	public final static String	GDE_MSGT3008 = "GDE_MSGT3008";
-	public final static String	GDE_MSGT3009 = "GDE_MSGT3009";
-	public final static String	GDE_MSGT3010 = "GDE_MSGT3010";
-	public final static String	GDE_MSGT3011 = "GDE_MSGT3011";
-	public final static String	GDE_MSGT3012 = "GDE_MSGT3012";
-	public final static String	GDE_MSGT3013 = "GDE_MSGT3013";
+	public final static String	GDE_MSGW3200 = "GDE_MSGW3200";
+	public final static String	GDE_MSGW3201 = "GDE_MSGW3201";
+	public final static String	GDE_MSGI3200 = "GDE_MSGI3200";
+	public final static String	GDE_MSGI3201 = "GDE_MSGI3201";
+	public final static String	GDE_MSGI3202 = "GDE_MSGI3202";
+	public final static String	GDE_MSGI3203 = "GDE_MSGI3203";
+	public final static String	GDE_MSGT3200 = "GDE_MSGT3200";
+	public final static String	GDE_MSGT3201 = "GDE_MSGT3201";
+	public final static String	GDE_MSGT3202 = "GDE_MSGT3202";
+	public final static String	GDE_MSGT3203 = "GDE_MSGT3203";
+	public final static String	GDE_MSGT3204 = "GDE_MSGT3204";
+	public final static String	GDE_MSGT3205 = "GDE_MSGT3205";
+	public final static String	GDE_MSGT3206 = "GDE_MSGT3206";
+	public final static String	GDE_MSGT3208 = "GDE_MSGT3208";
+	public final static String	GDE_MSGT3209 = "GDE_MSGT3209";
+	public final static String	GDE_MSGT3210 = "GDE_MSGT3210";
+	public final static String	GDE_MSGT3211 = "GDE_MSGT3211";
+	public final static String	GDE_MSGT3212 = "GDE_MSGT3212";
+	public final static String	GDE_MSGT3213 = "GDE_MSGT3213";
 
  }
