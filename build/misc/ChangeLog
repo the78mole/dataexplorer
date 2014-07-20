@@ -11,6 +11,7 @@ fix display for GPS coordinates in several tabs
 fix time display in statistics
 update MdlViewer to 0.8
 HoTTAdapter* - detect switching into text modus where no readable telemetrie values are available
+HoTTAdapter* - adapt binary log reader to protocol introduced last year to reduce telemetry value errors
 iCharger*B - fix power calculation
 iCharger308Duo - add support to import data from device (actually no support for live data)
 Kosmik - fix import problem with modified file name
