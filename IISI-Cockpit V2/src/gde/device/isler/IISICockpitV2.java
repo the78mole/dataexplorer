@@ -25,6 +25,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
@@ -38,6 +39,7 @@ import gde.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -423,7 +425,23 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
 		Record record;
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
+		String[] measurementNames = recordSet.getRecordNames();
+		
+		//clean sync properties
+		for (int i = 0; i < measurementNames.length; i++) {
+			if (this.getMeasurement(channelConfigNumber, i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null) {
+				Iterator<PropertyType> iterator = this.getMeasurement(channelConfigNumber, i).getProperty().iterator();
+				while (iterator.hasNext()) {
+					PropertyType propertyType = iterator.next();
+					if (propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
+						log.log(Level.OFF, "remove synch from " + measurementNames[i]);
+						iterator.remove();
+						continue;
+					}
+				}
+			}		
+		}
+
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
@@ -443,6 +461,19 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		}
 		if (log.isLoggable(java.util.logging.Level.FINER)) log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
+		
+		for (int i = 0; i < measurementNames.length; i++) {
+			for (int j = i; j < measurementNames.length; j++) {
+				String[] nameParts = measurementNames[j].split(GDE.STRING_BLANK);
+				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j 
+						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null
+						&& recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit()) && recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
+					log.log(Level.OFF, "do synch " + measurementNames[j] + " to " + measurementNames[i]);
+					this.setMeasurementPropertyValue(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, i);
+				}
+			}
+		}
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
