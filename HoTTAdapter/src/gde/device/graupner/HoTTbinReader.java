@@ -113,8 +113,8 @@ public class HoTTbinReader {
 				FileInputStream file_input = new FileInputStream(file);
 				data_in = new DataInputStream(file_input);
 				fileInfo = new HashMap<String, String>();
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
-					HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
+				if (HoTTbinReader.log.isLoggable(Level.FINER))
+					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
 				long position = (file.length() - (120 * 64)) / 2;
 				position = position - position % 64;
 				if (position <= 0) {
@@ -124,8 +124,8 @@ public class HoTTbinReader {
 					data_in.skip(position);
 					for (int i = 0; i < 120; i++) {
 						data_in.read(buffer);
-						if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
-							HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+						if (HoTTbinReader.log.isLoggable(Level.FINER))
+							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 
 						switch (buffer[7]) {
 						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
@@ -159,9 +159,9 @@ public class HoTTbinReader {
 				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
 				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
 
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
-					HoTTbinReader.log.logp(java.util.logging.Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
-					HoTTbinReader.log.log(java.util.logging.Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
+				if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
+					HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
 				}
 			}
 			else {
@@ -308,18 +308,20 @@ public class HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader.buf);
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINE) && i % 10 == 0) {
-					HoTTbinReader.log.logp(java.util.logging.Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-					HoTTbinReader.log.logp(java.util.logging.Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+				if (HoTTbinReader.log.isLoggable(Level.FINE) && i % 10 == 0) {
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
 				if ((HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
-					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 0 to 4, tx,rx
+					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 						//create and fill sensor specific data record sets 
-						if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
-							HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
+						if (HoTTbinReader.log.isLoggable(Level.FINER))
+							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
 									+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
 						//fill receiver data
@@ -455,7 +457,7 @@ public class HoTTbinReader {
 									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 								}
 								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
-									parseAddGeneral(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+									parseAddGAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 								}
 							}
@@ -498,7 +500,7 @@ public class HoTTbinReader {
 									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 								}
 								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
-									parseAddElectric(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+									parseAddEAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 								}
 							}
@@ -533,7 +535,7 @@ public class HoTTbinReader {
 									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
 								}
 								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
-									parseAddSpeedControl(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
+									parseAddESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
 									HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
 								}
 							}
@@ -549,6 +551,8 @@ public class HoTTbinReader {
 						}
 					}
 					else { //skip empty block, but add time step
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
@@ -561,8 +565,8 @@ public class HoTTbinReader {
 						}
 
 						HoTTbinReader.timeStep_ms += 10;
-						//reset buffer to avoid mixing data
-						HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+						//reset buffer to avoid mixing data >> 20 Jul 14, not any longer required due to protocol change requesting next sensor data block
+						//HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 					}
 				}
 				else if (!isTextModusSignaled) {
@@ -575,7 +579,7 @@ public class HoTTbinReader {
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
 					+ HoTTbinReader.sensorSignature);
-			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
+			HoTTbinReader.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
@@ -732,18 +736,20 @@ public class HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader.buf);
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINEST) && i % 10 == 0) {
-					HoTTbinReader.log.logp(java.util.logging.Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-					HoTTbinReader.log.logp(java.util.logging.Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+				if (HoTTbinReader.log.isLoggable(Level.FINEST) && i % 10 == 0) {
+					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
+					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
 				if ((HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
-					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 0 to 4, tx,rx
+					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 						//create and fill sensor specific data record sets 
-						if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINEST))
-							HoTTbinReader.log.logp(java.util.logging.Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
+						if (HoTTbinReader.log.isLoggable(Level.FINEST))
+							HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
 									+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
 						//fill receiver data
@@ -831,7 +837,7 @@ public class HoTTbinReader {
 											}
 										}
 										//recordSetGeneral initialized and ready to add data
-										parseAddGeneral(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+										parseAddGAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									}
 									break;
 
@@ -854,7 +860,7 @@ public class HoTTbinReader {
 											}
 										}
 										//recordSetElectric initialized and ready to add data
-										parseAddElectric(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+										parseAddEAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									}
 									break;
 
@@ -877,14 +883,14 @@ public class HoTTbinReader {
 											}
 										}
 										//recordSetElectric initialized and ready to add data
-										parseAddSpeedControl(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
+										parseAddESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
 									}
 									break;
 								}
 							}
 
-							if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINE))
-								HoTTbinReader.log.logp(java.util.logging.Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS
+							if (HoTTbinReader.log.isLoggable(Level.FINE))
+								HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS
 										+ " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric + " logCountMotorDriver = " + logCountSpeedControl);
 							lastSensor = actualSensor;
 							logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
@@ -939,6 +945,8 @@ public class HoTTbinReader {
 						}
 					}
 					else { //tx,rx == 0
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+						
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
@@ -952,7 +960,7 @@ public class HoTTbinReader {
 
 						HoTTbinReader.timeStep_ms += 10;
 						//reset buffer to avoid mixing data
-						logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
+						//logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
 					}
 				}
 				else if (!isTextModusSignaled) {
@@ -965,7 +973,7 @@ public class HoTTbinReader {
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
 					+ HoTTbinReader.sensorSignature);
-			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
+			HoTTbinReader.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
@@ -1132,8 +1140,8 @@ public class HoTTbinReader {
 	protected static int getSdLogVerion(byte[] _buf1, byte[] _buf2) {
 		//printByteValues(1, _buf1);
 		//printByteValues(2, _buf2);
-		if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
-			HoTTbinReader.log.log(java.util.logging.Level.FINER, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
+		if (HoTTbinReader.log.isLoggable(Level.FINER))
+			HoTTbinReader.log.log(Level.FINER, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
 		return ((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3;
 	}
 
@@ -1167,8 +1175,8 @@ public class HoTTbinReader {
 				HoTTbinReader.pointsGPS[1] = HoTTbinReader.tmpLatitude;
 			}
 			else {
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINE))
-					HoTTbinReader.log.log(java.util.logging.Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", HoTTbinReader.timeStep_ms - GDE.ONE_HOUR_MS) + " Lat " + HoTTbinReader.tmpLatitude + " - "
+				if (HoTTbinReader.log.isLoggable(Level.FINE))
+					HoTTbinReader.log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", HoTTbinReader.timeStep_ms - GDE.ONE_HOUR_MS) + " Lat " + HoTTbinReader.tmpLatitude + " - "
 							+ HoTTbinReader.tmpLatitudeDelta);
 			}
 
@@ -1184,8 +1192,8 @@ public class HoTTbinReader {
 				HoTTbinReader.pointsGPS[2] = HoTTbinReader.tmpLongitude;
 			}
 			else {
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINE))
-					HoTTbinReader.log.log(java.util.logging.Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", HoTTbinReader.timeStep_ms - GDE.ONE_HOUR_MS) + " Long " + HoTTbinReader.tmpLongitude + " - "
+				if (HoTTbinReader.log.isLoggable(Level.FINE))
+					HoTTbinReader.log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", HoTTbinReader.timeStep_ms - GDE.ONE_HOUR_MS) + " Long " + HoTTbinReader.tmpLongitude + " - "
 							+ HoTTbinReader.tmpLongitudeDelta + " - " + HoTTbinReader.longitudeTolerance);
 			}
 
@@ -1212,7 +1220,7 @@ public class HoTTbinReader {
 	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddGeneral(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+	private static void parseAddGAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf3, 0);
 		HoTTbinReader.tmpClimb3 = (_buf3[4] & 0xFF);
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -1262,7 +1270,7 @@ public class HoTTbinReader {
 	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddElectric(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+	private static void parseAddEAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf3, 3);
 		HoTTbinReader.tmpClimb3 = (_buf4[3] & 0xFF);
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
@@ -1319,7 +1327,7 @@ public class HoTTbinReader {
 	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddSpeedControl(byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
+	private static void parseAddESC(byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 		HoTTbinReader.tmpVoltage = DataParser.parse2Short(_buf1, 3);
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf2, 1);
@@ -1329,7 +1337,7 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpTemperatureFet = _buf1[9];
 		//HoTTbinReader.tmpTemperatureExt = _buf2[9];
 		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000 && HoTTbinReader.tmpRevolution > -1
-				&& HoTTbinReader.tmpRevolution < 2000) {
+				&& HoTTbinReader.tmpRevolution < 20000) {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsSpeedControl[4] = Double.valueOf(HoTTbinReader.pointsSpeedControl[1] / 1000.0 * HoTTbinReader.pointsSpeedControl[2]).intValue();
@@ -1348,7 +1356,7 @@ public class HoTTbinReader {
 		for (int i = 0; buffer != null && i < buffer.length; i++) {
 			sb.append("(").append(i).append(")").append(buffer[i]).append(GDE.STRING_BLANK);
 		}
-		HoTTbinReader.log.log(java.util.logging.Level.FINE, sb.toString());
+		HoTTbinReader.log.log(Level.FINE, sb.toString());
 	}
 
 	static void printShortValues(long millisec, byte[] buffer) {
@@ -1356,7 +1364,7 @@ public class HoTTbinReader {
 		for (int i = 0; buffer != null && i < buffer.length - 1; i++) {
 			sb.append("(").append(i).append(")").append(DataParser.parse2Short(buffer, i)).append(GDE.STRING_BLANK);
 		}
-		HoTTbinReader.log.log(java.util.logging.Level.FINE, sb.toString());
+		HoTTbinReader.log.log(Level.FINE, sb.toString());
 	}
 
 	/**
