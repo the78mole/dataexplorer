@@ -472,8 +472,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 						continue;
 					}
 				}
-			}
-			
+			}		
 		}
 		
 		// check if measurements isActive == false and set to isDisplayable == false
