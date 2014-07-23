@@ -261,8 +261,8 @@ public class GPXDataReaderWriter {
 					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("ele").replace(GDE.STRING_DOT, GDE.STRING_EMPTY).trim()); //$NON-NLS-1$
 					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("sat").trim()) * 1000; //$NON-NLS-1$
 
-					if (this.isExtensionFirstCalled != null) {
-						if (this.isExtensionFirstCalled) {
+					if (this.isExtensionFirstCalled != null || this.isExtension == false) {
+						if (this.isExtensionFirstCalled == null || this.isExtensionFirstCalled) {
 							
 							int measurementSize = device.getNumberOfMeasurements(activeChannel.getNumber());
 							if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "measurementSize = " + measurementSize); //$NON-NLS-1$
@@ -401,7 +401,8 @@ public class GPXDataReaderWriter {
 						if (this.startTimeStamp == 0) this.startTimeStamp = this.timeStamp;
 						if (GPXDataReaderWriter.log.isLoggable(Level.FINER)) GPXDataReaderWriter.log.log(Level.FINER, GDE.STRING_EMPTY + (this.timeStamp - this.startTimeStamp) * 1.0);
 						//System.out.println(StringHelper.intArrayToString(this.points));
-						activeRecordSet.addPoints(this.points, (this.timeStamp - this.startTimeStamp) * 1.0);
+						if (activeRecordSet != null)
+							activeRecordSet.addPoints(this.points, (this.timeStamp - this.startTimeStamp) * 1.0);
 					}
 					catch (DataInconsitsentException e) {
 						e.printStackTrace();
