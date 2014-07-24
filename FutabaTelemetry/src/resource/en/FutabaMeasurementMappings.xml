@@ -27,7 +27,7 @@ if this file need more mapping just add the mapping and please provide this info
   <entry key="STATUS">Status [-]</entry>
   <entry key="CURRENT">Current [A]</entry>
   <entry key="VOLTAGE">Voltage [V]</entry>
-  <entry key="CAPACITY">Capacity [nAh]</entry>
+  <entry key="CAPACITY">Capacity [mAh]</entry>
   <entry key="ALTITUDE">Altitude [m]</entry>
   <entry key="VARIOMETER">Vario [m/s]</entry>
   <entry key="TEMPERATURE">Temperature [°C]</entry>

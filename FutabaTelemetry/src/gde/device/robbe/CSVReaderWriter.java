@@ -95,9 +95,9 @@ public class CSVReaderWriter {
 				if (i == 0) header.put(GDE.DEVICE_NAME, headerData[i].split("\\r")[0].trim());
 				if (i == 1) header.put(GDE.CHANNEL_CONFIG_NAME, headerData[i].split(" ")[0].split("\\r")[0].trim());
 			}
-			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME));
-			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CHANNEL_CONFIG_NAME + (header.get(GDE.CHANNEL_CONFIG_NAME) != null ? header.get(GDE.CHANNEL_CONFIG_NAME) : "")); //$NON-NLS-1$
-			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CSV_DATA_HEADER + (header.get(GDE.CSV_DATA_HEADER) != null ? header.get(GDE.CSV_DATA_HEADER) : "")); //$NON-NLS-1$
+			CSVReaderWriter.log.log(Level.FINE, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME));
+			CSVReaderWriter.log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + (header.get(GDE.CHANNEL_CONFIG_NAME) != null ? header.get(GDE.CHANNEL_CONFIG_NAME) : "")); //$NON-NLS-1$
+			CSVReaderWriter.log.log(Level.FINE, GDE.CSV_DATA_HEADER + (header.get(GDE.CSV_DATA_HEADER) != null ? header.get(GDE.CSV_DATA_HEADER) : "")); //$NON-NLS-1$
 
 			while (((line = reader.readLine()) != null) && !(line.startsWith("TIME"))) {
 				// read until TIME;CH1;CH2;CH3;CH4;CH5;CH6;CH7;CH8;CH9;CH10;CH11;CH12;CH13;CH14;CH15;CH16;BATTERY;EXTERNAL BATTERY;STATUS;CURRENT;VOLTAGE;CAPACITY;ALTITUDE;VARIOMETER;TEMPERATURE;DISTANCE;SPEED;ALTITUDE;VARIOMETER;LATITUDE;LONGITUDE;TEMPERATURE;TEMPERATURE;TEMPERATURE;
@@ -105,11 +105,11 @@ public class CSVReaderWriter {
 			header.put(GDE.CSV_DATA_HEADER, line);
 		}
 		catch (FileNotFoundException e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGW0011, new Object[] { filePath }));
 		}
 		catch (IOException e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new IOException(Messages.getString(MessageIds.GDE_MSGW0012, new Object[] { filePath }));
 		}
 		finally {
@@ -138,7 +138,7 @@ public class CSVReaderWriter {
 		// Spannung;Strom;Ladung; < Spannung;Strom;Ladung;Leistung;Energie; 	
 		String[] headerLineArray = headerLine.split(GDE.STRING_EMPTY + separator);
 		header.put(GDE.CSV_DATA_TYPE, GDE.CSV_DATA_TYPE_RAW);
-		CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CSV_DATA_TYPE + header.get(GDE.CSV_DATA_TYPE));
+		CSVReaderWriter.log.log(Level.FINE, GDE.CSV_DATA_TYPE + header.get(GDE.CSV_DATA_TYPE));
 
 		String channelConfig = header.get(GDE.CHANNEL_CONFIG_NAME);
 		int channelNumber = CSVReaderWriter.channels.getChannelNumber(channelConfig);
@@ -152,7 +152,7 @@ public class CSVReaderWriter {
 		}
 		header.put(GDE.CHANNEL_CONFIG_NAME, channelConfig);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, "" + CSVReaderWriter.channels.getActiveChannelNumber());
-		CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CHANNEL_CONFIG_NAME + header.get(GDE.CHANNEL_CONFIG_NUMBER) + " : " + header.get(GDE.CHANNEL_CONFIG_NAME));
+		CSVReaderWriter.log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + header.get(GDE.CHANNEL_CONFIG_NUMBER) + " : " + header.get(GDE.CHANNEL_CONFIG_NAME));
 
 		for (int i = 1; i < headerLineArray.length; i++) {
 			String mappedMeasurement = FutabaAdapter.properties.getProperty(headerLineArray[i]);
@@ -169,7 +169,7 @@ public class CSVReaderWriter {
 					continue;
 				}
 			}
-			CSVReaderWriter.log.log(java.util.logging.Level.OFF, "corrected mappedMeasurement = " + mappedMeasurement);
+			CSVReaderWriter.log.log(Level.FINE, "corrected mappedMeasurement = " + mappedMeasurement);
 
 			String[] inHeaderMeasurement = mappedMeasurement.trim().split("\\[|]"); //$NON-NLS-1$
 			String inMeasurement = inHeaderMeasurement.length >= 1 ? inHeaderMeasurement[0].trim() : Settings.EMPTY;
@@ -213,12 +213,12 @@ public class CSVReaderWriter {
 				// check for device name and channel or configuration in first line
 				if (!CSVReaderWriter.application.getActiveDevice().getName().equals(fileHeader.get(GDE.DEVICE_NAME))) {
 					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] { fileHeader.get(GDE.DEVICE_NAME) })); // mismatch device name 
-					CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 					throw e;
 				}
 
 				fileHeader = CSVReaderWriter.evaluateType(separator, fileHeader, (DeviceConfiguration) device);
-				CSVReaderWriter.log.log(java.util.logging.Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
+				CSVReaderWriter.log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 				while (((line = reader.readLine()) != null) && !(line.startsWith("TIME"))) {
@@ -303,7 +303,7 @@ public class CSVReaderWriter {
 						}
 						catch (Exception e) {
 							data = "0";
-							CSVReaderWriter.log.log(java.util.logging.Level.WARNING, String.format("Check line = %s", line));
+							CSVReaderWriter.log.log(Level.WARNING, String.format("Check line = %s", line));
 						}
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
@@ -339,15 +339,15 @@ public class CSVReaderWriter {
 			}
 		}
 		catch (UnsupportedEncodingException e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new UnsupportedEncodingException(Messages.getString(MessageIds.GDE_MSGW0010));
 		}
 		catch (FileNotFoundException e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGW0011, new Object[] { filePath }));
 		}
 		catch (IOException e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new IOException(Messages.getString(MessageIds.GDE_MSGW0012, new Object[] { filePath }));
 		}
 		finally {
@@ -383,7 +383,7 @@ public class CSVReaderWriter {
 			// write device name , manufacturer, and serial port string
 			CSVReaderWriter.sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(CSVReaderWriter.lineSep);
 			writer.write(CSVReaderWriter.sb.toString());
-			CSVReaderWriter.log.log(java.util.logging.Level.FINE, "written header line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
+			CSVReaderWriter.log.log(Level.FINE, "written header line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
 
 			CSVReaderWriter.sb = new StringBuffer();
 			CSVReaderWriter.sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; 
@@ -391,20 +391,20 @@ public class CSVReaderWriter {
 			for (int i = 0; i < recordSet.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), i);
 				Record record = recordSet.get(i);
-				CSVReaderWriter.log.log(java.util.logging.Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
+				CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				if (isRaw) {
 					if (!measurement.isCalculation()) { // only use active records for writing raw data 
 						CSVReaderWriter.sb.append(record.getName()).append(" [---]").append(separator); //$NON-NLS-1$
-						CSVReaderWriter.log.log(java.util.logging.Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
+						CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					}
 				}
 				else {
 					CSVReaderWriter.sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator); //$NON-NLS-1$
-					CSVReaderWriter.log.log(java.util.logging.Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
+					CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				}
 			}
 			CSVReaderWriter.sb.deleteCharAt(CSVReaderWriter.sb.length() - 1).append(CSVReaderWriter.lineSep);
-			CSVReaderWriter.log.log(java.util.logging.Level.FINER, "header line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
+			CSVReaderWriter.log.log(Level.FINER, "header line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
 			writer.write(CSVReaderWriter.sb.toString());
 
 			// write data
@@ -434,7 +434,7 @@ public class CSVReaderWriter {
 				CSVReaderWriter.sb.deleteCharAt(CSVReaderWriter.sb.length() - 1).append(CSVReaderWriter.lineSep);
 				writer.write(CSVReaderWriter.sb.toString());
 				if (CSVReaderWriter.application.getStatusBar() != null && i % 50 == 0) CSVReaderWriter.application.setProgress(((++progressCycle * 5000) / recordEntries), sThreadId);
-				if (CSVReaderWriter.log.isLoggable(java.util.logging.Level.FINE)) CSVReaderWriter.log.log(java.util.logging.Level.FINE, "data line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
+				if (CSVReaderWriter.log.isLoggable(Level.FINE)) CSVReaderWriter.log.log(Level.FINE, "data line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
 			}
 			CSVReaderWriter.sb = null;
 			CSVReaderWriter.log.log(Level.TIME, "CSV file = " + filePath + " erfolgreich geschieben" //$NON-NLS-1$ //$NON-NLS-2$
@@ -447,11 +447,11 @@ public class CSVReaderWriter {
 			if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setProgress(100, sThreadId);
 		}
 		catch (IOException e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0006, new Object[] { GDE.FILE_ENDING_CSV, filePath, e.getMessage() }));
 		}
 		catch (Exception e) {
-			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 		finally {
