@@ -434,7 +434,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 				while (iterator.hasNext()) {
 					PropertyType propertyType = iterator.next();
 					if (propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
-						log.log(Level.OFF, "remove synch from " + measurementNames[i]);
+						log.log(Level.FINE, "remove synch from " + measurementNames[i]);
 						iterator.remove();
 						continue;
 					}
@@ -468,7 +468,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j 
 						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null
 						&& recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit()) && recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
-					log.log(Level.OFF, "do synch " + measurementNames[j] + " to " + measurementNames[i]);
+					log.log(Level.FINE, "do synch " + measurementNames[j] + " to " + measurementNames[i]);
 					this.setMeasurementPropertyValue(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, i);
 				}
 			}
