@@ -8,43 +8,46 @@ SUN/Oracles Java Runtime.
 
 The GNU DataExplorer read data from serial connected devices or text file import and display this data for a 
 various of further analysis. Actually the following devices are available as plug-in: 
-											 - AkkuMasterC4 (Htronic) 4 outlet battery charger/discharger
-											 - Picolario (Renschler) variometer
-											 - UniLog (SM-Modellbau) multi measurement device
-											 - UniLog2 (SM-Modellbau) multi measurement device
-											 - LiPoWatch (SM-Modellbau) motor driver LiPo saver
-											 - GPS-Logger (SM-Modellbau) GPS, multi measurement device
-											 - HoTTAdapter (Graupner) Receiver-, Vario-, GPS-, General-, Electric-Sensor-Module
-											 - eStation BC6 (Bantam) charger/discharger 
-											 - eStation BC6102 (Bantam) charger/discharger 
-											 - eStation BC8 (Bantam) charger/discharger 
-											 - eStation 902 (Bantam) charger/discharger 
-											 - Pichler P6 (Pichler) charger/discharger 
-											 - Pichler P60 (Pichler) charger/discharger 
-											 - VC820 (Conrad/VoltCraft) multimeter
-											 - VC840 (Conrad/VoltCraft) multimeter
-											 - CSV2SerialAdapter, enables to import CVS files as log data
-											 - DataVario (WStech) variometer, GPS, multi measurement device
-											 - DataVarioDuo (WStech) variometer, GPS, multi measurement device
-											 - LinkVario (WStech) variometer, GPS, multi measurement device
-											 - LinkVarioDuo (WStech) variometer, GPS, multi measurement device
-											 - NMEA-Adapter  GPS
-											 - QC-Copter (tt-tronix) control unit
-											 - Ultramat 12 (Graupner) charger/discharger
-											 - Ultramat 16 (Graupner) charger/discharger
-											 - Ultramat 16S (Graupner) charger/discharger
-											 - Ultramat Trio Plus 14 (Graupner) 3 outlet charger/discharger
-											 - Ultramat Trio Plus 16S (Graupner) 3 outlet charger/discharger
-											 - Ultramat 18 (Graupner) charger/discharger
-											 - Ultra Duo Plus 40 (Graupner) 2 outlet charger/discharger with battery memory
-											 - Ultra Duo Plus 45 (Graupner) 2 outlet charger/discharger with battery memory
-											 - Ultra Duo PLus 50 (Graupner) 2 equivalent outlet charger/discharger with battery memory
-											 - Ultra Duo PLus 60 (Graupner) 2 equivalent outlet charger/discharger with battery memory
-											 - JLog2 (SM-Modellbau) spezial logger for Kontronik Jive motor driver
-											 - FlightRecorder (Multiplex) multi measurement device
-											 - Simulator test plug-in
-											 - JetiAdapter (Jeti, Jeti-Box) multi-sensor-log
-											 - AV4ms (Fritz Mössinger/accu-select)  4 outlet battery charger/discharger	firmware >= 762						 
+
+AkkuMasterC4 (Htronic) - 4 outlet battery charger/discharger
+4D-AkkuMonitor (4D) - battery monitor
+AV4ms (Fritz Mössinger/accu-select) 4 outlet battery charger/discharger firmware >= 762
+CellLog 8S, (Junsi) battery cell monitor
+CSV2SerialAdapter, import of configurable CVS data files
+DataVario, DataVarioDuo (WStech) variometer, GPS, multi measurement device
+eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger
+FlightRecorder (Multiplex) Logger
+Futaba-Telemetry (Robbe/Futaba) multi logger
+GPS-Logger, GPS-Logger2 (SM-Modellbau) - GPS, multi measurement device
+GPXAdapter GPS Exchange Format file analyzer, extensions prepared for Mikrokopter
+HoTTAdapter (Graupner) Receiver-, Vario-, GPS-, General-, Electric-Sensor-Module
+IGCAdapter (OnLine Contest/International Gliding Commission) file analyzer
+iCharger 206B, 208B, 306B, 3010B (Junsi) charger/discharger
+IISI Cockpit (Multiplex) Matthias Isler
+JetiAdapter (Jeti, Jeti-Box) multi-sensor-log
+JLog2 (SM-Modellbau) - Jive/Castle motor driver logger
+Kosmik (Kontronik) - motor driver logger
+LinkVario, LinkVarioDuo (WStech) variometer, GPS, multi measurement device
+LiPoWatch (SM-Modellbau) - LiPo saver, cell voltage measurement
+NMEA-Adapter (diverse) - GPS track analyzer
+Pichler P6 , P60 (Pichler) and other eStation BC6 clones charger/discharger
+Picolario (Renschler) - variometer
+Picolario2 (Renschler) - variometer
+QC-Copter/QuadroControl (tt-tronix) control unit
+Simulator test plug-in
+Ultramat12 (Graupner) charger/discharger
+Ultramat16 (Graupner) charger/discharger
+Ultramat16S (Graupner) charger/discharger
+Ultramat18 (Graupner) charger/discharger
+Ultra Duo Plus 40 (Graupner) charger/discharger
+Ultra Duo Plus 45 (Graupner) charger/discharger
+Ultra Duo Plus 50 (Graupner) charger/discharger
+Ultra Duo Plus 60 (Graupner) charger/discharger
+Ultra Duo Plus 80 (Graupner) charger/discharger
+Ultra Trio Plus 14 (Graupner) charger/discharger
+Ultra Trio Plus 16S (Graupner) charger/discharger
+UniLog, UniLog2 (SM-Modellbau) multi - measurement device
+VC820, VC840 (Conrad/VoltCraft) multimeter
 
 More device are under construction. Help doing this is very welcome.		
 

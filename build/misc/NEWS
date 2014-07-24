@@ -1,22 +1,23 @@
-GNU DataExplorer - News - comes with version 3.1.4
+GNU DataExplorer - News - comes with version 3.1.6
 
-1)  update to latest SWT drop due to solved problems reported for Mint-Linux
-2)  tune auto number formatting 
-3)  enable optimized data sets load of DataExplorer for Android saved osd files
-4)  enable reduced data table by selected records (actually for HoTTAdapter* only)
-5)  remove export capability for IGC files (IGC files must be generated while data creation and secured)
-6)  HoTTAdapter* - synchronize capacity filter
-7)  HoTTAdapter2 - fix height curve data if overlayed from different sensors
-8)  HoTTAdapter* - optimize import for receiver data only
-9)  HoTTAdapter* - update import algorithm to fit log sensor fingerprint of new receivers
-10) HoTTAdapter* - update filter settings speed
-11) UltraDuoPlus50/60 - add step charge configuration tabulator
-12) UltraDuoPlus* - refine several default values depending on capacity as well as on charge current 
-13) VC820/VC840 - fix mapping while resistance measurement
-14) GPS-Logger2 - add support for GPS-Logger2 extended measurement value set from SM-Modellbau
-15) IGCAdapter - update to enable extension data for 4 additional values
-16) Kosmik - fix initialization error
-17) documentation update
+1) Update to latest SWT drop due to problems reported for Linux
+2) enable reduced data table by selected records for all devices, enablement via context menu
+3) add 230400 Baud entry in device properties XSD to enable workaround for Junsi charger at UNIX operating systems
+4) enable always to left cut and right cut permanent
+5) display selected measurement values in comment area while measuring
+6) enable to set record set start time stamp manually
+7) fix display for GPS coordinates in several tabs
+8) fix time display in statistics
+9) update MdlViewer to 0.8
+10) HoTTAdapter* - detect switching into text modus where no readable telemetrie values are available
+11) HoTTAdapter* - adapt binary log reader to protocol introduced last year to reduce telemetry value errors
+12) iCharger*B - fix power calculation
+13) GPXAdapter - fix to tolerate GPX files without extension data
+14) Kosmik - fix import problem with modified file name
+15) add iCharger308Duo support to import data from device (actually no support for live data)
+16) add IISI Cockpit V2 support
+17) add FutabaTelemetry support
+18) documentation update
 
 
 

@@ -1,10 +1,10 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.6 - xx yyy 2014
+Version 3.1.6 - 24 Jul 2014
 Update to latest SWT drop due to problems reported for Linux
 enable reduced data table by selected records for all devices, enablement via context menu
 add 230400 Baud entry in device properties XSD to enable workaround for Junsi charger at UNIX operating systems
-enable to left cut and right cut permanent
+enable always to left cut and right cut permanent
 display selected measurement values in comment area while measuring
 enable to set record set start time stamp manually
 fix display for GPS coordinates in several tabs
@@ -14,8 +14,8 @@ HoTTAdapter* - detect switching into text modus where no readable telemetrie val
 HoTTAdapter* - adapt binary log reader to protocol introduced last year to reduce telemetry value errors
 iCharger*B - fix power calculation
 GPXAdapter - fix to tolerate GPX files without extension data
-iCharger308Duo - add support to import data from device (actually no support for live data)
 Kosmik - fix import problem with modified file name
+add iCharger308Duo support to import data from device (actually no support for live data)
 add IISI Cockpit V2 support
 add FutabaTelemetry support
 

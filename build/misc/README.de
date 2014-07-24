@@ -7,44 +7,47 @@ und MAC OS X möglich. Voraussetzung ist lediglich eine installierte Java Laufzei
 oder der SUN/Oracle Java Runtime.
 
 Der GNU DataExplorer nimmt Daten von seriell angeschlossenen Geräten oder als Textdateiimport entgegen, zeigt diese für verschiedene Auswertungen an. 
-Zur Zeit sind folgende Geräte implementiert: 
-											 - AkkuMasterC4 (Htronic) 4 Ausgänge Lade-/Entlade-gerät
-											 - Picolario (Renschler) Variometer
-											 - UniLog (SM-Modellbau) Mulitmessgerät
-											 - UniLog2 (SM-Modellbau) Mulitmessgerät
-											 - LiPoWatch (SM-Modellbau) Motorsteller LiPo-Saver
-											 - GPS-Logger (SM-Modellbau) GPS, Multimessgerät
-											 - HoTTAdapter (Graupner) Empfänger-, Vario-, GPS-, Universal-, Elektro-Sensormodul
-											 - eStation BC6 (Bantam) Lade-/Entlade-gerät
-											 - eStation BC610 (Bantam) Lade-/Entlade-gerät
-											 - eStation BC8 (Bantam) Lade-/Entlade-gerät
-											 - eStation 902 (Bantam) Lade-/Entlade-gerät
-											 - Pichler P6 (Pichler) Lade-/Entlade-gerät
-											 - Pichler P60 (Pichler) Lade-/Entlade-gerät
-											 - VC820 (Conrad/VoltCraft) Multimeter
-											 - VC840 (Conrad/VoltCraft) Multimeter
-											 - CSV2SerialAdapter, ermöglicht CVS als Log-Daten zu importieren
-											 - DataVario (WStech) Variometer, GPS, Mulitmessgerät
-											 - DataVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
-											 - LinkVario (WStech) Variometer, GPS, Mulitmessgerät
-											 - LinkVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
-											 - NMEA-Adapter  GPS
-											 - QC-Copter (tt-tronix) Kontrolleinheit
-											 - Ultramat 12 (Graupner) Lade-/Entlade-gerät
-											 - Ultramat 16 (Graupner) Lade-/Entlade-gerät
-											 - Ultramat 16S (Graupner) Lade-/Entlade-gerät
-											 - Ultramat Trio Plus 14 (Graupner) Lade-/Entlade-gerät
-											 - Ultramat Trio Plus 16S (Graupner) Lade-/Entlade-gerät
-											 - Ultramat 18 (Graupner) Lade-/Entlade-gerät
-											 - Ultra Duo Plus 40 (Graupner) 2 Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
-											 - Ultra Duo Plus 45 (Graupner) 2 Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
-											 - Ultra Duo PLus 50 (Graupner) 2 gleichwertige Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
-											 - Ultra Duo PLus 60 (Graupner) 2 gleichwertige Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
-											 - JLog2 (SM-Modellbau) Speziallogger für Kontronik Jive Motorsteller
-											 - FlightRecorder (Multiplex) Mulitdatenlogger
-											 - Simulator Test Plug-in
-											 - JetiAdapter (Jeti, Jeti-Box) Multisensorlog
-											 - AV4ms (Fritz Mössinger/accu-select)  4 Ausgänge Lade-/Entlade-gerät Firmware >= 762 							 
+Zur Zeit sind folgende Geräte implementiert:
+ 
+AkkuMasterC4 (Htronic) - 4 Ausgangs- Lade-Entlade-Gerät
+4D-AkkuMonitor (4D) - battery monitor
+AV4ms (Fritz Mössinger/accu-select) 4 Ausgänge Lade-/Entlade-Gerät Firmware >= 762
+CellLog 8S, (Junsi) Zellenspannungsmonitor
+CSV2SerialAdapter, konfigurierbarer Import von CSV Datendateien
+DataVario, DataVarioDuo (WStech) Variometer, GPS, Vielfachmessgerät
+eStation BC6, BC610, BC8, 902 (Bantam) Lade-Entlade-Gerät
+FlightRecorder (Multiplex) Logger
+Futaba-Telemetry (Robbe/Futaba) Vielfachlogger
+GPS-Logger, GPS-Logger2 (SM-Modellbau) - GPS, Vielfachmessgerät
+GPXAdapter GPS Exchange Format Dateianalyse, Erweiterungen vorbereitet für den Mikrokopter
+HoTTAdapter (Graupner) Empänger-, Vario-, GPS-, Universal-, Elektro-Sensormodul
+IGCAdapter (OnLine Contest/International Gliding Commission) Dateianalyse
+iCharger 206B, 208B, 306B, 3010B (Junsi) Lade-Entlade-Gerät
+IISI Cockpit V2 (Matthias Isler) Vielfachlogger
+JetiAdapter (Jeti, Jeti-Box) Multisensorlog
+JLog2 (SM-Modellbau) - Jive Motorsteller Logger
+Kosmik (Kontronik) - Motorsteller Logger
+LinkVario, LinkVarioDuo (WStech) Variometer, GPS, Vielfachmessgerät
+LiPoWatch (SM-Modellbau) - LiPo saver, Einzelzellenmessungen
+NMEA-Adapter (diverse) - GPS Datenauswertung
+Pichler P6 , P60 (Pichler) und andere eStation BC6 Kopien Lade-Entlade-Gerät
+Picolario (Renschler) - Variometer
+Picolario2 (Renschler) - Variometer
+QC-Copter/QuadroControl (tt-tronix) Kontrolleinheit
+Simulator Test plug-in
+Ultramat12 (Graupner) Lade-Entlade-Gerät
+Ultramat16 (Graupner) Lade-Entlade-Gerät
+Ultramat16S (Graupner) Lade-Entlade-Gerät
+Ultramat18 (Graupner) Lade-Entlade-Gerät
+Ultra Duo Plus 40 (Graupner) Lade-Entlade-Gerät
+Ultra Duo Plus 45 (Graupner) Lade-Entlade-Gerät
+Ultra Duo Plus 50 (Graupner) Lade-Entlade-Gerät
+Ultra Duo Plus 60 (Graupner) Lade-Entlade-Gerät
+Ultra Duo Plus 80 (Graupner) Lade-Entlade-Gerät
+Ultra Trio Plus 14 (Graupner) Lade-Entlade-Gerät
+Ultra Trio Plus 16S (Graupner) Lade-Entlade-Gerät
+UniLog, UniLog2 (SM-Modellbau) Vielfachmessgerät
+VC820, VC840 (Conrad/VoltCraft) Multimeter
 											 
 Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
 
