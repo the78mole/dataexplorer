@@ -10,5 +10,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JetiAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GPXAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IGCAdapter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FutabaTelemetry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/IISI-Cockpit V2"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
