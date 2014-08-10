@@ -422,18 +422,18 @@ public class KosmikConfiguration extends Composite {
 									KosmikConfiguration.this.device.setMeasurementUnit(activeChannel.getNumber(), indexTempBEC, "°F"); //$NON-NLS-1$
 								}
 								else {
-									activeRecordSet.get(6).setUnit("°C"); //$NON-NLS-1$
+									activeRecordSet.get(indexTempFET).setUnit("°C"); //$NON-NLS-1$
 									KosmikConfiguration.this.device.setMeasurementUnit(activeChannel.getNumber(), indexTempFET, "°C"); //$NON-NLS-1$
-									activeRecordSet.get(10).setUnit("°C"); //$NON-NLS-1$
+									activeRecordSet.get(indexTempBEC).setUnit("°C"); //$NON-NLS-1$
 									KosmikConfiguration.this.device.setMeasurementUnit(activeChannel.getNumber(), indexTempBEC, "°C"); //$NON-NLS-1$
 								}
-								activeRecordSet.get(6).setFactor(factor);
+								activeRecordSet.get(indexTempFET).setFactor(factor);
 								KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), indexTempFET, factor);
-								activeRecordSet.get(6).setOffset(offset);
+								activeRecordSet.get(indexTempFET).setOffset(offset);
 								KosmikConfiguration.this.device.setMeasurementOffset(activeChannel.getNumber(), indexTempFET, offset);
-								activeRecordSet.get(10).setFactor(factor);
+								activeRecordSet.get(indexTempBEC).setFactor(factor);
 								KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), indexTempBEC, factor);
-								activeRecordSet.get(10).setOffset(offset);
+								activeRecordSet.get(indexTempBEC).setOffset(offset);
 								KosmikConfiguration.this.device.setMeasurementOffset(activeChannel.getNumber(), indexTempBEC, offset);
 
 								KosmikConfiguration.this.device.updateVisibilityStatus(activeRecordSet, false);
