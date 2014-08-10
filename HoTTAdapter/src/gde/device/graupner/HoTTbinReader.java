@@ -87,6 +87,7 @@ public class HoTTbinReader {
 	static boolean															isReceiverOnly				= false;
 	static StringBuilder												sensorSignature;
 	static boolean															isTextModusSignaled		= false;
+	static boolean															isFilterTextModus			= true;
 
 	static ReverseChannelPackageLossStatistics	lostPackages					= new ReverseChannelPackageLossStatistics();
 
@@ -258,6 +259,7 @@ public class HoTTbinReader {
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
+		HoTTbinReader.isFilterTextModus = true; //TODO
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? 10 : 1);
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -313,7 +315,7 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if ((HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
+				if (!HoTTbinReader.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
@@ -575,7 +577,7 @@ public class HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
-					(countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "0";
+					(countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "100";
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
 					+ HoTTbinReader.sensorSignature);
@@ -686,6 +688,7 @@ public class HoTTbinReader {
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
+		HoTTbinReader.isFilterTextModus = true; //TODO
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -741,7 +744,7 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if ((HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
+				if (!HoTTbinReader.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
@@ -969,7 +972,7 @@ public class HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
-					(countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "0";
+					(countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "100";
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
 					+ HoTTbinReader.sensorSignature);
@@ -1277,7 +1280,7 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
-		HoTTbinReader.pointsElectric[0] = (_buf1[4] & 0xFF) * 1000;
+		HoTTbinReader.pointsElectric[0] = (_buf0[4] & 0xFF) * 1000;
 		if (!HoTTAdapter.isFilterEnabled
 				|| (HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600 && Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
 			int maxVotage = Integer.MIN_VALUE;
