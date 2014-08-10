@@ -15,15 +15,15 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="-24" formatType="VALUE" inputType="FILE_IO"/>
-        <timeUnit>sec</timeUnit>
-        <separator>comma</separator>
-        <leader>$</leader>
+        <format inputType="FILE_IO" formatType="VALUE" size="-50"/>
+        <timeUnit>msec</timeUnit>
+        <separator>semicolon</separator>
+        <leader></leader>
         <trailer>0D0A</trailer>
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="FLight Record"/>
     </State>
     <Channels lastUseOrdinal="0">
         <Channel name="Config_1" type="TYPE_CONFIG">
@@ -305,6 +305,76 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
+            <Measurement>
+                <name>40????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>41????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>42????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>43????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>44????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>45????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>46????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>47????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>48????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>49????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
         </Channel>
         <Channel name="Config_2" type="TYPE_CONFIG">
             <Measurement>
@@ -580,6 +650,76 @@
             </Measurement>
             <Measurement>
                 <name>39????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>40????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>41????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>42????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>43????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>44????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>45????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>46????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>47????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>48????</name>
+                <symbol>-</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>49????</name>
                 <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
