@@ -107,11 +107,11 @@ public class CSVReaderWriter {
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGW0011, new Object[] {filePath}));
+			throw new FileNotFoundException(Messages.getString(gde.messages.MessageIds.GDE_MSGW0011, new Object[] {filePath}));
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new IOException(Messages.getString(MessageIds.GDE_MSGW0012, new Object[] {filePath}));
+			throw new IOException(Messages.getString(gde.messages.MessageIds.GDE_MSGW0012, new Object[] {filePath}));
 		}
 		finally {
 			if (reader != null) 		reader.close();
@@ -297,7 +297,9 @@ public class CSVReaderWriter {
 				// now get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
 				String[] updateRecordNames = recordNames;
 				int[] points = new int[updateRecordNames.length];
+				int lineNumber = 1;
 				while ((line = reader.readLine()) != null) {
+					++lineNumber;
 					if(line.startsWith("#")) {
 						if (recordSet.getRecordSetDescription().endsWith(GDE.LINE_SEPARATOR))
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.substring(1) + GDE.LINE_SEPARATOR);
@@ -336,11 +338,23 @@ public class CSVReaderWriter {
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
-							points[i] = Double.valueOf(data.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue()*10;
+							try {
+								points[i] = Double.valueOf(data.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue()*10;
+							}
+							catch (NumberFormatException e) {
+								log.log(Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] {lineNumber, line}));
+								CSVReaderWriter.application.openMessageDialogAsync(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] {lineNumber, line}));
+							}
 							break;
 
 						default:
-							points[i] = Double.valueOf(Double.valueOf(data)*1000.0).intValue();
+							try {
+								points[i] = Double.valueOf(Double.valueOf(data)*1000.0).intValue();
+							}
+							catch (NumberFormatException e) {
+								log.log(Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] {lineNumber, line}));
+								CSVReaderWriter.application.openMessageDialogAsync(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] {lineNumber, line}));
+							}
 							break;
 						}
 					}

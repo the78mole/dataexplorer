@@ -524,7 +524,7 @@ importCsvFiles();	}
 							try {
 								RecordSet activeRecordSet = CSVReaderWriter.read(IISICockpitV2.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, IISICockpitV2.this.getRecordSetStemName());
 								IISICockpitV2.this.updateVisibilityStatus(activeRecordSet, true);
-								activeRecordSet.descriptionAppendFilename(selectedImportFile);
+								activeRecordSet.descriptionAppendFilename(tmpFileName);
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
