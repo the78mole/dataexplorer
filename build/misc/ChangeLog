@@ -1,5 +1,8 @@
 Development history / change log, please read from bottom up
 
+Version 3.1.x - xx yyy 2014
+fix GPXAdapter altitude parsing
+
 Version 3.1.6 - 24 Jul 2014
 Update to latest SWT drop due to problems reported for Linux
 enable reduced data table by selected records for all devices, enablement via context menu
