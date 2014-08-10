@@ -258,7 +258,7 @@ public class GPXDataReaderWriter {
 					this.pointsIndex = 0;
 					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lat").replace(GDE.STRING_PLUS, GDE.STRING_EMPTY).trim()) * 1000000); //$NON-NLS-1$
 					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lon").replace(GDE.STRING_PLUS, GDE.STRING_EMPTY).trim()) * 1000000); //$NON-NLS-1$
-					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("ele").replace(GDE.STRING_DOT, GDE.STRING_EMPTY).trim()); //$NON-NLS-1$
+					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("ele").trim()) * 1000000); //$NON-NLS-1$
 					this.points[this.pointsIndex++] = Integer.valueOf(this.tmpPoints.get("sat").trim()) * 1000; //$NON-NLS-1$
 
 					if (this.isExtensionFirstCalled != null || this.isExtension == false) {
