@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.1.x - xx yyy 2014
 fix GPXAdapter altitude parsing
 fix IISI Cockpit V2 to tolerate empty values and display a warning message
+fix Futaba-Telemetry number of maximum measurements
 
 Version 3.1.6 - 24 Jul 2014
 Update to latest SWT drop due to problems reported for Linux
