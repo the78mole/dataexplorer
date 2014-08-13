@@ -303,6 +303,7 @@ public class Record extends Vector<Integer> {
 		this.drawTimeWidth = record.drawTimeWidth;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
+		this.dataType = record.dataType;
 		this.statistics = record.statistics;
 		this.triggerIsGreater = record.triggerIsGreater;
 		this.triggerLevel = record.triggerLevel;
@@ -367,6 +368,7 @@ public class Record extends Vector<Integer> {
 		this.unit = record.unit;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
+		this.dataType = record.dataType;
 		this.statistics = record.statistics;
 		this.triggerIsGreater = record.triggerIsGreater;
 		this.triggerLevel = record.triggerLevel;
