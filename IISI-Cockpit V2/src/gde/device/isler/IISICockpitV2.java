@@ -306,9 +306,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 				switch (record.getDataType()) {
 				case GPS_LATITUDE:
 				case GPS_LONGITUDE:
-					int grad = record.realGet(rowIndex) / 1000000;
-					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten < 0 ? -1*minuten : minuten); //$NON-NLS-1$
+					dataTableRow[index + 1] = String.format("%02.6f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 					break;
 
 				default:
@@ -355,9 +353,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			int grad = ((int) (value / 1000));
-			double minuten = (value - (grad * 1000.0)) / 10.0;
-			newValue = grad + minuten / 60.0;
+			newValue = value / 1000.0;
 			break;
 
 		default:
@@ -399,9 +395,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+			newValue = value * 1000.0;
 			break;
 
 		default:
@@ -465,7 +459,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < measurementNames.length; i++) {
 			for (int j = i; j < measurementNames.length; j++) {
 				String[] nameParts = measurementNames[j].split(GDE.STRING_BLANK);
-				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j 
+				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j && !nameParts[0].equals("GPS")
 						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null
 						&& recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit()) && recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
 					log.log(Level.FINE, "do synch " + measurementNames[j] + " to " + measurementNames[i]);
@@ -590,7 +584,14 @@ importCsvFiles();	}
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				exportFileName = new FileHandler().exportFileKMZ(
+						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
+						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
+						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
+						findRecordByUnit(activeRecordSet, "km/h"), 	//$NON-NLS-1$
+						findRecordByUnit(activeRecordSet, "m/s"), 	//$NON-NLS-1$
+						findRecordByUnit(activeRecordSet, "km"),		//$NON-NLS-1$
+						findRecordByUnit(activeRecordSet, "*"),		//$NON-NLS-1$
 						true, isExportTmpDir);
 			}
 		}
