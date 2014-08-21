@@ -6,6 +6,7 @@ fix IISI Cockpit V2 to tolerate empty values and display a warning message
 fix IISI Cockpit V2 GPS value handling
 fix Futaba-Telemetry number of maximum measurements
 fix HoTTAdapter EAM RXSQ curve parsing correct buffer
+add Polaron charger support
 
 Version 3.1.6 - 24 Jul 2014
 Update to latest SWT drop due to problems reported for Linux
