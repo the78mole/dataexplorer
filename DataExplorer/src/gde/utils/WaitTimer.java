@@ -30,7 +30,8 @@ public class WaitTimer extends Thread {
 	 */
 	public static void delay(long milliSeconds) {
 		try {
-			Thread.sleep(milliSeconds);
+			if (milliSeconds > 0)
+				Thread.sleep(milliSeconds);
 		}
 		catch (InterruptedException e) {
 			//ignore
