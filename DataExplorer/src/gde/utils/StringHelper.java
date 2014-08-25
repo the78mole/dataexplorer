@@ -625,6 +625,9 @@ public class StringHelper {
 				sb.append(GDE.STRING_OR).append((char) buffer[i]); //$NON-NLS-1$
 			else
 				sb.append((char) buffer[i]);
+			//sb.append(String.format("%X", buffer[i]));
+
+			if (i%4 == 0) sb.append(" ");
 		}
 		return sb.toString();
 	}
