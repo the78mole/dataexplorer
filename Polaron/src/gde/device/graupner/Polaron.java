@@ -61,7 +61,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 
 	protected String[]								PROCESSING_MODE;
 	protected String[]								CHARGE_TYPE;
-	protected String[]								DISCHARGE_TYPEE;
+	protected String[]								DISCHARGE_TYPE;
 	protected String[]								ERROR_TYPE;
 
 	protected static final int			OPERATIONS_MODE_LINK_DISCHARGE	= 4;																																															//$NON-NLS-1$
@@ -84,7 +84,6 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	 */
 	public Polaron(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		// initializing the resource bundle for this device
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.polaron.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.PROCESSING_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT3100), //no operation
@@ -111,7 +110,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3119), //CV-LINK
 				Messages.getString(MessageIds.GDE_MSGT3120), //N-Storage
 				Messages.getString(MessageIds.GDE_MSGT3122) };//QLagern
-		this.DISCHARGE_TYPEE = new String[] { Messages.getString(MessageIds.GDE_MSGT3110), //NiXx Automatic
+		this.DISCHARGE_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3110), //NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT3111), //LiXy Automatic
 				Messages.getString(MessageIds.GDE_MSGT3112), //Normal
 				Messages.getString(MessageIds.GDE_MSGT3113), //Linear
@@ -159,7 +158,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3119), //CV-LINK
 				Messages.getString(MessageIds.GDE_MSGT3120), //N-Storage
 				Messages.getString(MessageIds.GDE_MSGT3122) };//QLagern
-		this.DISCHARGE_TYPEE = new String[] { Messages.getString(MessageIds.GDE_MSGT3110), //NiXx Automatic
+		this.DISCHARGE_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3110), //NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT3111), //LiXy Automatic
 				Messages.getString(MessageIds.GDE_MSGT3112), //Normal
 				Messages.getString(MessageIds.GDE_MSGT3113), //Linear
@@ -394,23 +393,28 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				int minVotage = Integer.MAX_VALUE;
 				Polaron.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
-				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
-				points[1] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
+				//0=VersorgungsSpg1 1=Spannung 2=Spannung1 3=Spannung2 4=Strom 5=Strom1 6=Strom2 7=Ladung 8=Ladung1 9=Ladung2 10=Leistung 11=Leistung1 12=Leistung2 13=Energie 14=Energie1 15=Energie2 16=BatteryTemperature1 17=BatteryTemperature2 18=Balance 
+				points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
+
 				points[2] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
-				points[0] = points[1] + points[2];
-				points[4] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
+				points[3] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
+				points[1] = points[2] + points[3];
+
 				points[5] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
-				points[3] = points[4] + points[5];
-				points[7] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
+				points[6] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
+				points[4] = points[5] + points[6];
+				
 				points[8] = (((convertBuffer[20] & 0xff) << 24) + ((convertBuffer[21] & 0xff) << 16) + ((convertBuffer[22] & 0xff) << 8) + ((convertBuffer[23] & 0xff) << 0));
-				points[6] = points[7] + points[8];
-				points[9] = Double.valueOf(points[0] / 1000.0 * points[3]).intValue(); // power U*I [W]
+				points[9] = (((convertBuffer[24] & 0xff) << 24) + ((convertBuffer[25] & 0xff) << 16) + ((convertBuffer[26] & 0xff) << 8) + ((convertBuffer[27] & 0xff) << 0));
+				points[7] = points[8] + points[9];
+				
 				points[10] = Double.valueOf(points[1] / 1000.0 * points[4]).intValue(); // power U*I [W]
 				points[11] = Double.valueOf(points[2] / 1000.0 * points[5]).intValue(); // power U*I [W]
-				points[12] = Double.valueOf(points[0] / 1000.0 * points[6]).intValue(); // energy U*C [Wh]
-				points[13] = Double.valueOf(points[0] / 1000.0 * points[7]).intValue(); // energy U*C [Wh]
-				points[14] = Double.valueOf(points[0] / 1000.0 * points[8]).intValue(); // energy U*C [Wh]
-				points[15] = (((convertBuffer[24] & 0xff) << 24) + ((convertBuffer[25] & 0xff) << 16) + ((convertBuffer[26] & 0xff) << 8) + ((convertBuffer[27] & 0xff) << 0));
+				points[12] = Double.valueOf(points[3] / 1000.0 * points[6]).intValue(); // power U*I [W]
+				points[13] = Double.valueOf(points[1] / 1000.0 * points[7]).intValue(); // energy U*C [Wh]
+				points[14] = Double.valueOf(points[1] / 1000.0 * points[8]).intValue(); // energy U*C [Wh]
+				points[15] = Double.valueOf(points[1] / 1000.0 * points[9]).intValue(); // energy U*C [Wh]
+				
 				points[16] = (((convertBuffer[28] & 0xff) << 24) + ((convertBuffer[29] & 0xff) << 16) + ((convertBuffer[30] & 0xff) << 8) + ((convertBuffer[31] & 0xff) << 0));
 				points[17] = (((convertBuffer[32] & 0xff) << 24) + ((convertBuffer[33] & 0xff) << 16) + ((convertBuffer[34] & 0xff) << 8) + ((convertBuffer[35] & 0xff) << 0));
 				points[18] = 0;
@@ -451,9 +455,9 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 				points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
 				points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
-				points[3] = Double.valueOf(points[0] / 1000.0 * points[1]).intValue(); // power U*I [W]
-				points[4] = Double.valueOf(points[0] / 1000.0 * points[2]).intValue(); // energy U*C [Wh]
-				points[5] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
+				points[3] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
+				points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W]
+				points[5] = Double.valueOf(points[1] / 1000.0 * points[3]).intValue(); // energy U*C [Wh]
 				points[6] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
 				points[7] = 0;
 
@@ -751,15 +755,15 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 			type = this.CHARGE_TYPE[processingType];
 			break;
 		case 2: //discharge
-			type = this.DISCHARGE_TYPEE[processingType];
+			type = this.DISCHARGE_TYPE[processingType];
 			break;
 		case 6: //error
 			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGE3118) + String.format("%02d", processingType), SWT.COLOR_RED); //$NON-NLS-1$
 			break;
 		}
-		if (Polaron.log.isLoggable(java.util.logging.Level.OFF)) {
+		if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 			//operation: 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
-			Polaron.log.log(java.util.logging.Level.OFF, "processingMode=" + this.PROCESSING_MODE[processingMode] + " processingType=" + type);
+			Polaron.log.log(java.util.logging.Level.FINE, "processingMode=" + this.PROCESSING_MODE[processingMode] + " processingType=" + type);
 		}
 		return type;
 	}
@@ -773,7 +777,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
 		int cycleNumber = DataParser.parse2Short(dataBuffer, 17);
 		if (outletNum == 2) {
-			cycleNumber = DataParser.parse2Short(dataBuffer, 17 + 114);
+			cycleNumber = DataParser.parse2Short(dataBuffer, 131);
 		}
 		return cycleNumber;
 	}
@@ -836,7 +840,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	 * @return 1.337
 	 */
 	public String getFirmwareVersion(byte[] dataBuffer) {
-		return String.format("%d %.3f", DataParser.parse2Short(dataBuffer, 5), DataParser.parse2Short(dataBuffer, 7) / 1000.0);
+		return String.format("%.3f", DataParser.parse2Short(dataBuffer, 7) / 1000.0);
 	}
 
 	/**

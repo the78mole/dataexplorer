@@ -32,6 +32,7 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
 import java.util.logging.Logger;
@@ -97,27 +98,33 @@ public class PolaronGathererThread extends Thread {
 		Object[] ch1, ch2, ch3;
 
 		this.isCollectDataStopped = false;
-		PolaronGathererThread.log.logp(java.util.logging.Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+		PolaronGathererThread.log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		long atualTime_ms = 0;
 		while (!this.isCollectDataStopped) {
 			atualTime_ms = System.currentTimeMillis();
 			try {
-				dataBuffer = this.serialPort.getData(); // get data from device
+				switch (this.device.getDeviceTypeIdentifier()) {
+				case PolaronSports:
+					dataBuffer = this.serialPort.getData(true); // get data from device
+					break;
+
+				default:
+					dataBuffer = this.serialPort.getData(); // get data from device
+					break;
+				}
 
 				switch (this.device.getDeviceTypeIdentifier()) {
-				case PolaronACDC:
-				case PolaronPro:
-				case PolaronEx:
+				default:
 					this.isProgrammExecuting3 = this.device.isLinkedMode(dataBuffer);
 					if (!this.isProgrammExecuting3 && !this.isLinkedMode) { // outlet channel 1+2 combined 
 						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
 						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
 					}
 					break;
-				default:
-					this.isProgrammExecuting1 = false;
-					this.isProgrammExecuting2 = false;
+				case PolaronPro:
+					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+					this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
 					this.isProgrammExecuting3 = false;
 					break;
 				}
@@ -129,6 +136,7 @@ public class PolaronGathererThread extends Thread {
 					case PolaronACDC:
 					case PolaronPro:
 					case PolaronEx:
+					case PolaronSports:
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							this.isLinkedMode = true;
 							ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, dataBuffer, points3);
@@ -142,9 +150,19 @@ public class PolaronGathererThread extends Thread {
 								this.recordSetKey1 = (String) ch1[1];
 							}
 							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
-								System.arraycopy(dataBuffer, buffer.length - 30, buffer, 0, buffer.length);
-								System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
+								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2 + 9];
+								switch (this.device.getDeviceTypeIdentifier()) {
+								case PolaronSports:
+									System.arraycopy(dataBuffer, 0, buffer, 0, 9);//header, application, product code
+									System.arraycopy(dataBuffer, 77, buffer, 9, dataBuffer.length-77);
+									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+									break;
+
+								default:
+									System.arraycopy(dataBuffer, buffer.length - 30, buffer, 0, buffer.length);
+									System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
+									break;
+								}
 								ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
 								recordSet2 = (RecordSet) ch2[0];
 								this.recordSetKey2 = (String) ch2[1];
@@ -176,10 +194,10 @@ public class PolaronGathererThread extends Thread {
 				}
 				else { // no program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3100));
-					PolaronGathererThread.log.logp(java.util.logging.Level.FINER, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
+					PolaronGathererThread.log.logp(Level.FINER, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
 
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						PolaronGathererThread.log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
+						PolaronGathererThread.log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3103));
 						stopDataGatheringThread(false, null);
 					}
@@ -251,9 +269,9 @@ public class PolaronGathererThread extends Thread {
 				// this case will be reached while program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !(this.isProgrammExecuting1 || this.isProgrammExecuting2)) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3100));
-					PolaronGathererThread.log.logp(java.util.logging.Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+					PolaronGathererThread.log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						PolaronGathererThread.log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
+						PolaronGathererThread.log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3100));
 						stopDataGatheringThread(false, null);
 					}
@@ -262,7 +280,7 @@ public class PolaronGathererThread extends Thread {
 				}
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
-					PolaronGathererThread.log.log(java.util.logging.Level.FINE, "program end detected"); //$NON-NLS-1$
+					PolaronGathererThread.log.log(Level.FINE, "program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
@@ -270,7 +288,7 @@ public class PolaronGathererThread extends Thread {
 			WaitTimer.delay(atualTime_ms + 1000 - System.currentTimeMillis());
 		}
 		this.application.setStatusMessage(""); //$NON-NLS-1$
-		PolaronGathererThread.log.logp(java.util.logging.Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		PolaronGathererThread.log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
 	/**
@@ -289,8 +307,8 @@ public class PolaronGathererThread extends Thread {
 		// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 		int processNumber = this.device.getProcessingMode(dataBuffer);
 		String processName = this.isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT3126) : this.device.PROCESSING_MODE[processNumber];
-		if (PolaronGathererThread.log.isLoggable(java.util.logging.Level.FINER)) {
-			PolaronGathererThread.log.log(java.util.logging.Level.FINER, "processName = " + processName + " " + processNumber);
+		if (PolaronGathererThread.log.isLoggable(Level.FINER)) {
+			PolaronGathererThread.log.log(Level.FINER, "processName = " + processName + " " + processNumber);
 		}
 		Channel channel = this.channels.get(number);
 		if (channel != null) {
@@ -324,7 +342,7 @@ public class PolaronGathererThread extends Thread {
 
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 				channel.applyTemplateBasics(recordSetKey);
-				PolaronGathererThread.log.logp(java.util.logging.Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
+				PolaronGathererThread.log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 				recordSet = channel.get(recordSetKey);
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
@@ -375,14 +393,14 @@ public class PolaronGathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			PolaronGathererThread.log.logp(java.util.logging.Level.WARNING, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			PolaronGathererThread.log.logp(Level.WARNING, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
 
 		this.isCollectDataStopped = true;
 
 		if (this.serialPort != null) {
 			if (this.serialPort.getXferErrors() > 0) {
-				PolaronGathererThread.log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+				PolaronGathererThread.log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			this.serialPort.close();
 		}

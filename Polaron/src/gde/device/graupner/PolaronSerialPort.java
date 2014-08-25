@@ -42,7 +42,6 @@ public class PolaronSerialPort extends DeviceCommPort {
 	final static Logger	log														= Logger.getLogger(PolaronSerialPort.$CLASS_NAME);
 
 	final static byte[] QUERY_DATA										= new byte[] {0x00, (byte) 0x99};
-	final static byte[]	RESET_CONFIG									= new byte[] { DeviceSerialPortImpl.FF, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, DeviceSerialPortImpl.CR };	//1000 1111
 	final static byte[]	RESET													= new byte[] { DeviceSerialPortImpl.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceSerialPortImpl.CR };	//1000 1111
 
 	final static int		xferErrorLimit								= 15;
@@ -173,6 +172,72 @@ public class PolaronSerialPort extends DeviceCommPort {
 	}
 
 	/**
+	 * method to gather data from device Polaron Sports (follow old Graupner serial handshake paradigma)
+	 * @return byte array containing gathered data - this can individual specified per device
+	 * @throws IOException
+	 */
+	public synchronized byte[] getData(boolean checkBeginEndSignature) throws Exception {
+		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
+		byte[] data = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
+		byte[] answer = new byte[] { 0x00 };
+
+		try {
+
+			answer = new byte[data.length];
+			answer = this.read(data, 3000);
+			// synchronize received data to DeviceSerialPortImpl.FF of sent data 
+			while (answer[0] != DeviceSerialPortImpl.FF) {
+				this.isInSync = false;
+				for (int i = 1; i < answer.length; i++) {
+					if (answer[i] == DeviceSerialPortImpl.FF) {
+						System.arraycopy(answer, i, data, 0, data.length - i);
+						answer = new byte[i];
+						answer = this.read(answer, 1000);
+						System.arraycopy(answer, 0, data, data.length - i, i);
+						this.isInSync = true;
+						if (log.isLoggable(Level.FINER)) log.logp(java.util.logging.Level.FINER, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						break; //sync
+					}
+				}
+				if (this.isInSync) break;
+
+				this.addXferError();
+				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of transfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(PolaronSerialPort.RESET);
+				answer = new byte[data.length];
+				answer = this.read(answer, 3000);
+			}
+			if (PolaronSerialPort.log.isLoggable(java.util.logging.Level.FINE)) log.logp(java.util.logging.Level.FINE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
+
+			if (checkBeginEndSignature && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
+				this.addXferError();
+				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(PolaronSerialPort.RESET);
+				data = getData(true);
+			}
+
+			if (checkBeginEndSignature && !isChecksumOK(data)) {
+				this.addXferError();
+				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(PolaronSerialPort.RESET);
+				data = getData(true);
+			}
+		}
+		catch (Exception e) {
+			if (!(e instanceof TimeOutException)) {
+				log.logp(java.util.logging.Level.SEVERE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			}
+			throw e;
+		}
+		return data;
+	}
+
+	/**
 	 * query checksum OK
 	 * @param startIndex
 	 * @param bytes
@@ -185,5 +250,34 @@ public class PolaronSerialPort extends DeviceCommPort {
 			PolaronSerialPort.log.logp(Level.FINE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
 					String.format("checksum: %b - %04X", ((checksum & 0xFF00) >> 8) == (bytes[bytes.length - 1] & 0xFF) && (checksum & 0x00FF) == (bytes[bytes.length - 2] & 0xFF), checksum));
 		return ((checksum & 0xFF00) >> 8) == (bytes[bytes.length - 1] & 0xFF) && (checksum & 0x00FF) == (bytes[bytes.length - 2] & 0xFF);
+	}
+
+	/**
+	 * check check sum of data buffer
+	 * @param buffer
+	 * @return true/false
+	 */
+	private synchronized boolean isChecksumOK(byte[] buffer) {
+		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
+		boolean isOK = false;
+		int length = buffer.length;
+		int check_sum = Checksum.ADD(buffer, 1, length - 6);
+		int buffer_check_sum = Integer.parseInt(
+				String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3], (char) buffer[length - 2]), 16);
+		if (check_sum == buffer_check_sum || check_sum == (buffer_check_sum - this.dataCheckSumOffset))
+			isOK = true;
+		else {
+			//some devices has a constant checksum offset by firmware error, calculate this offset first time the mismatch occurs and tolerate the calculated offset afterwards
+			if (!this.isDataMissmatchWarningWritten) {
+				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = " //$NON-NLS-1$ //$NON-NLS-2$
+								+ (buffer_check_sum - check_sum));
+				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+				this.isDataMissmatchWarningWritten = true;
+				this.dataCheckSumOffset = buffer_check_sum - check_sum;
+				isOK = true;
+			}
+		}
+		return isOK;
 	}
 }

@@ -141,6 +141,62 @@
                 <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
             </Measurement>
             <Measurement>
+                <name>ZellenSpannung 8</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 9</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 10</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 11</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 12</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 13</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenSpannung 14</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
                 <name>BatteríeRi</name>
                 <symbol>r</symbol>
                 <unit>mΩ</unit>
@@ -162,7 +218,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -171,7 +227,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -180,7 +236,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -189,7 +245,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -198,7 +254,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -207,9 +263,72 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
+            <Measurement>
+                <name>ZellenRi 8</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenRi 9</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenRi 10</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenRi 11</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenRi 12</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenRi 13</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>ZellenRi 14</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
+                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>    
         </Channel>
         <Channel name="Ausgang 2" type="TYPE_OUTLET">
             <Measurement>
@@ -262,68 +381,6 @@
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
-                <name>Balance</name>
-                <symbol>Bal</symbol>
-                <unit>mV</unit>
-                <statistics min="true" max="true" avg="true" sigma="true"/>
-                <property name="factor" value="1000.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 1</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 2</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 3</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 4</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 5</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 6</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 7</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
-            </Measurement>
-            <Measurement>
                 <name>BatteríeRi</name>
                 <symbol>r</symbol>
                 <unit>mΩ</unit>
@@ -331,449 +388,6 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
-            <Measurement>
-                <name>ZellenRi 1</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 2</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 3</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 4</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 5</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 6</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 7</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="16" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-        </Channel>
-        <Channel type="TYPE_OUTLET" name="Ausgang 1+2">
-            <Measurement>
-                <name>VersorgungsSpannung</name>
-                <symbol>Uin</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Spannung 1+2</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Spannung 1</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Spannung 2</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="2" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Strom 1+2</name>
-                <symbol>I</symbol>
-                <unit>A</unit>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Strom 1</name>
-                <symbol>I</symbol>
-                <unit>A</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Strom 2</name>
-                <symbol>I</symbol>
-                <unit>A</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Ladung 1+2</name>
-                <symbol>C</symbol>
-                <unit>mAh</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Ladung 1</name>
-                <symbol>C</symbol>
-                <unit>mAh</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Ladung 2</name>
-                <symbol>C</symbol>
-                <unit>mAh</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Leistung 1+2</name>
-                <symbol>P</symbol>
-                <unit>W</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Leistung 1</name>
-                <symbol>P</symbol>
-                <unit>W</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Leistung 2</name>
-                <symbol>P</symbol>
-                <unit>W</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Energie 1+2</name>
-                <symbol>E</symbol>
-                <unit>Wh</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Energie 1</name>
-                <symbol>E</symbol>
-                <unit>Wh</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Energie 2</name>
-                <symbol>E</symbol>
-                <unit>Wh</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="14" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>BatterieTemperatur 1</name>
-                <symbol>Tb</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="100.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>BatterieTemperatur 2</name>
-                <symbol>Tb</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="100.0" name="factor"/>
-                <property type="Integer" value="16" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Balance</name>
-                <symbol>Bal</symbol>
-                <unit>mV</unit>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 1</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 2</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 3</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 4</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 5</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 6</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 7</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 8</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 9</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 10</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 11</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 12</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 13</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 14</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>BatteríeRi</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 1</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 2</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 3</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 4</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 5</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 6</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 7</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 8</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 9</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 10</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 11</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 12</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 13</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenRi 14</name>
-                <symbol>r</symbol>
-                <unit>mΩ</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
-                <property name="factor" value="100.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-            </Measurement>    
         </Channel>
     </Channels>
     <Desktop>
