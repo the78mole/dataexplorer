@@ -45,7 +45,7 @@ public class GathererThread extends Thread {
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
 	final static int					TIME_STEP_DEFAULT						= 1250;
 	final static int 					FILTER_TIME_DELTA_MS 				= 800; // definition of the tolerated time delta in msec 
-	final static int					WAIT_TIME_RETRYS						= 36;
+	final static int					WAIT_TIME_RETRYS						= 3600;
 
 
 	final DataExplorer application;
@@ -94,7 +94,6 @@ public class GathererThread extends Thread {
 		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		int waitTime_ms = 0; // dry time
 		boolean isProgrammExecuting = false;
-		boolean isConfigUpdated = false;
 		HashMap<String, String> configData = new HashMap<String, String>();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
@@ -110,7 +109,7 @@ public class GathererThread extends Thread {
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
-		int posCells = this.device.getName().endsWith("BC6") || this.device.getName().endsWith("P6") || this.device.getName().endsWith("P60") ? 7 : 9; //$NON-NLS-1$
+		int posCells = this.device.getName().endsWith("80W") || this.device.getName().endsWith("BC6") || this.device.getName().endsWith("P6") || this.device.getName().endsWith("P60") ? 7 : 9; //$NON-NLS-1$
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -133,22 +132,23 @@ public class GathererThread extends Thread {
 					// check if a record set matching for re-use is available and prepare a new if required
 					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
-						isConfigUpdated = false;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						waitTime_ms = new Integer(configData.get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
 						// record set does not exist or is outdated, build a new name and create
-						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
+						this.recordSetKey = this.device.getName().endsWith("80W") 
+								? this.channel.getNextRecordSetNumber() + ") " + processName
+								: this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						this.channel.applyTemplateBasics(this.recordSetKey);
+						recordSet.setAllDisplayable();
 						// switch the active record set if the current record set is child of active channel
 						// for eStation its always the case since we have only one channel
-						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
-							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
-						}
+						this.channels.switchChannel(channel.getNumber(), recordSetKey);
+						channel.switchRecordSet(recordSetKey);
 						measurementCount = 0;
 						startCycleTime = 0;
 					}
@@ -171,20 +171,11 @@ public class GathererThread extends Thread {
 						}
 					}
 
-					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						GathererThread.this.application.updateAllTabs(false);
-					}
+					GathererThread.this.application.updateAllTabs(false);
 					
-					//switch off single cell voltage lines if no cell voltages is available
-					for (int i = posCells + this.numberBatteryCells - 1; !isConfigUpdated && i < points.length; i++) {
-						Record tmpRecord = recordSet.get(i);
-						tmpRecord.setActive(false);
-						tmpRecord.setDisplayable(false);
-						tmpRecord.setVisible(false);
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "switch off record = " + tmpRecord.getName()); //$NON-NLS-1$
+					if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
+						this.device.updateVisibilityStatus(recordSet, true);
 					}
-					isConfigUpdated = true;
-					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);
 				}
 				else { // no eStation program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1400));

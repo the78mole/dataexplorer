@@ -20,10 +20,12 @@ package gde.device.bantam;
 
 import gde.comm.DeviceCommPort;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
+import gde.utils.StringHelper;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -54,59 +56,37 @@ public class EStationSerialPort extends DeviceCommPort {
 	 */
 	public synchronized byte[] getData() throws Exception {
 		final String $METHOD_NAME = "getData";
-		byte[] data = new byte[76];
+		byte[] data = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
 		byte[] answer = new byte[] {0x00};
 
 		try {
-			
-			answer = new byte[13];
-			answer = this.read(answer, 3000);
-			// synchronize received data to begin of sent data 
+			answer = new byte[data.length];
+			answer = this.read(data, 3000);
+			// synchronize received data to DeviceSerialPortImpl.FF of sent data 
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
-					if(answer[i] == 0x7b){
-						System.arraycopy(answer, i, data, 0, 13-i);
+					if (answer[i] == 0x7b) {
+						System.arraycopy(answer, i, data, 0, data.length - i);
 						answer = new byte[i];
 						answer = this.read(answer, 1000);
-						System.arraycopy(answer, 0, data, 13-i, i);
+						System.arraycopy(answer, 0, data, data.length - i, i);
 						this.isInSync = true;
-						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.logp(java.util.logging.Level.FINE, EStationSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
-				if(this.isInSync)
-					break;
-				answer = new byte[13];
-				answer = this.read(answer, 1000);
+				if (this.isInSync) break;
+				answer = new byte[data.length];
+				answer = this.read(answer, 3000);
 			}
-			if (answer[0] == 0x7b) {
-				System.arraycopy(answer, 0, data, 0, 13);
-			}
-			
-			answer = new byte[12];
-			answer = this.read(answer, 1000);
-			System.arraycopy(answer, 0, data, 13, 12);
-			answer = new byte[12];
-			answer = this.read(answer, 1000);
-			System.arraycopy(answer, 0, data, 25, 12);
-			answer = new byte[12];
-			answer = this.read(answer, 1000);
-			System.arraycopy(answer, 0, data, 37, 12);
-			answer = new byte[12];
-			answer = this.read(answer, 1000);
-			System.arraycopy(answer, 0, data, 49, 12);
-			answer = new byte[15];
-			answer = this.read(answer, 1000);
-			System.arraycopy(answer, 0, data, 61, 15);
-
 			StringBuilder sb;
-			if (log.isLoggable(Level.FINER)) {
+			if (log.isLoggable(Level.FINE)) {
 				sb = new StringBuilder();
 				for (byte b : data) {
-					sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
+					sb.append(String.format("0x%02x, ", b)); //$NON-NLS-1$
 				}
-				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			
 			if (!isChecksumOK(data)) {
@@ -114,6 +94,7 @@ public class EStationSerialPort extends DeviceCommPort {
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				data = getData();
 			}
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data, (byte) 0x80, 1, data.length-4));
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
@@ -132,9 +113,19 @@ public class EStationSerialPort extends DeviceCommPort {
 	private boolean isChecksumOK(byte[] buffer) {
 		final String $METHOD_NAME = "isChecksumOK";
 		boolean isOK = false;
-		int check_sum = Checksum.ADD(buffer, 1, 72);
-		if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[73]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[74]&0xFF))
-			isOK = true;
+		switch (buffer.length) {
+		default:
+		case 76:
+			int check_sum = Checksum.ADD(buffer, 1, 72);
+			if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[73]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[74]&0xFF))
+				isOK = true;
+			break;
+		case 112:
+			check_sum = Checksum.ADD(buffer, 1, buffer.length-4);
+			if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[buffer.length-3]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[buffer.length-2]&0xFF))
+				isOK = true;
+			break;
+		}
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
 	}
