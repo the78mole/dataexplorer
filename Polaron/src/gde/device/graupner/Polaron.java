@@ -775,11 +775,11 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		int cycleNumber = DataParser.parse2Short(dataBuffer, 17);
-		if (outletNum == 2) {
-			cycleNumber = DataParser.parse2Short(dataBuffer, 131);
-		}
-		return cycleNumber;
+//		int cycleNumber = DataParser.parse2Short(dataBuffer, 17);
+//		if (outletNum == 2) {
+//			cycleNumber = DataParser.parse2Short(dataBuffer, 131);
+//		}
+		return DataParser.parse2Short(dataBuffer, 17);
 	}
 
 	/**

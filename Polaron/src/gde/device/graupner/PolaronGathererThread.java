@@ -159,8 +159,10 @@ public class PolaronGathererThread extends Thread {
 									break;
 
 								default:
-									System.arraycopy(dataBuffer, buffer.length - 30, buffer, 0, buffer.length);
+									System.arraycopy(dataBuffer, buffer.length - 9 - 30, buffer, 0, buffer.length);
 									System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
+									//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+									//log.log(Level.OFF, StringHelper.byte2Hex2CharString(buffer, buffer.length));
 									break;
 								}
 								ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);

@@ -150,7 +150,7 @@ public class PolaronSerialPort extends DeviceCommPort {
 			
 			answer = new byte[data.length];
 			answer = this.read(data, 2000);
-			if (PolaronSerialPort.log.isLoggable(Level.FINER)) log.logp(java.util.logging.Level.FINER, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
+			if (PolaronSerialPort.log.isLoggable(Level.FINER)) log.logp(Level.FINER, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
 
 			if (answer.length == 0 || answer[answer.length-1] == 0x00 && answer[answer.length-2] == 0x00) {
 				throw new TimeOutException("no data");
@@ -158,13 +158,13 @@ public class PolaronSerialPort extends DeviceCommPort {
 			
 			if (!isCheckSumOK(3, data)) {
 				this.addXferError();
-				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
 			}
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
-				log.logp(java.util.logging.Level.SEVERE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
 		}
@@ -195,25 +195,25 @@ public class PolaronSerialPort extends DeviceCommPort {
 						answer = this.read(answer, 1000);
 						System.arraycopy(answer, 0, data, data.length - i, i);
 						this.isInSync = true;
-						if (log.isLoggable(Level.FINER)) log.logp(java.util.logging.Level.FINER, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
 				if (this.isInSync) break;
 
 				this.addXferError();
-				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of transfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
 				this.write(PolaronSerialPort.RESET);
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
-			if (PolaronSerialPort.log.isLoggable(java.util.logging.Level.FINE)) log.logp(java.util.logging.Level.FINE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
+			if (PolaronSerialPort.log.isLoggable(Level.FINE)) log.logp(Level.FINE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 
 			if (checkBeginEndSignature && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
 				this.addXferError();
-				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
 				this.write(PolaronSerialPort.RESET);
@@ -222,7 +222,7 @@ public class PolaronSerialPort extends DeviceCommPort {
 
 			if (checkBeginEndSignature && !isChecksumOK(data)) {
 				this.addXferError();
-				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PolaronSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PolaronSerialPort.xferErrorLimit); //$NON-NLS-1$
 				this.write(PolaronSerialPort.RESET);
 				data = getData(true);
@@ -230,7 +230,7 @@ public class PolaronSerialPort extends DeviceCommPort {
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
-				log.logp(java.util.logging.Level.SEVERE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
 		}
@@ -269,10 +269,10 @@ public class PolaronSerialPort extends DeviceCommPort {
 		else {
 			//some devices has a constant checksum offset by firmware error, calculate this offset first time the mismatch occurs and tolerate the calculated offset afterwards
 			if (!this.isDataMissmatchWarningWritten) {
-				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = " //$NON-NLS-1$ //$NON-NLS-2$
 								+ (buffer_check_sum - check_sum));
-				log.logp(java.util.logging.Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
 				this.isDataMissmatchWarningWritten = true;
 				this.dataCheckSumOffset = buffer_check_sum - check_sum;
 				isOK = true;
