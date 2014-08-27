@@ -7,6 +7,7 @@ fix IISI Cockpit V2 GPS value handling
 fix Futaba-Telemetry number of maximum measurements
 fix HoTTAdapter EAM RXSQ curve parsing correct buffer
 add Polaron charger support
+add eStation BC6 80W (BC6dx) support
 
 Version 3.1.6 - 24 Jul 2014
 Update to latest SWT drop due to problems reported for Linux
