@@ -63,7 +63,7 @@ public class EStationSerialPort extends DeviceCommPort {
 			answer = new byte[data.length];
 			answer = this.read(data, 3000);
 			// synchronize received data to DeviceSerialPortImpl.FF of sent data 
-			while (answer[0] != 0x7b) {
+			while (answer.length > 0 && answer[0] != 0x7b) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
 					if (answer[i] == 0x7b) {
@@ -89,7 +89,7 @@ public class EStationSerialPort extends DeviceCommPort {
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			
-			if (!isChecksumOK(data)) {
+			if (data.length > 0 && !isChecksumOK(data)) {
 				this.addXferError();
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				data = getData();

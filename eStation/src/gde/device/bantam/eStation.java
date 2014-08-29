@@ -51,7 +51,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(eStation.class.getName());
 	
 	public final	String[]	USAGE_MODE;
-	public final	String[]	ACCU_TYPES;
+	public	      String[]	ACCU_TYPES;
 
 	public final static String		CONFIG_EXT_TEMP_CUT_OFF			= "ext_temp_cut_off"; //$NON-NLS-1$
 	public final static String		CONFIG_WAIT_TIME						= "wait_time"; //$NON-NLS-1$

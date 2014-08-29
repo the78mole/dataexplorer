@@ -19,7 +19,9 @@
 package gde.device.bantam;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBException;
 
@@ -31,6 +33,7 @@ import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.io.LogViewReader;
 import gde.log.Level;
+import gde.messages.Messages;
 import gde.utils.StringHelper;
 
 /**
@@ -47,6 +50,15 @@ public class eStationBC680W extends eStation {
 	public eStationBC680W(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		this.dialog = new EStationDialog(this.application.getShell(), this);
+		this.ACCU_TYPES = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT1403), //0=Lithium
+				GDE.STRING_EMPTY,
+				GDE.STRING_EMPTY,
+				GDE.STRING_EMPTY,
+				Messages.getString(MessageIds.GDE_MSGT1404), //4=NiMH
+				Messages.getString(MessageIds.GDE_MSGT1405), //5=NiCd 
+				Messages.getString(MessageIds.GDE_MSGT1406), //6=Pb
+				"Save","Load"};
 	}
 
 	/**
@@ -56,6 +68,39 @@ public class eStationBC680W extends eStation {
 	public eStationBC680W(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.dialog = new EStationDialog(this.application.getShell(), this);
+		this.ACCU_TYPES = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT1403), //0=Lithium
+				GDE.STRING_EMPTY,
+				GDE.STRING_EMPTY,
+				GDE.STRING_EMPTY,
+				Messages.getString(MessageIds.GDE_MSGT1404), //4=NiMH
+				Messages.getString(MessageIds.GDE_MSGT1405), //5=NiCd 
+				Messages.getString(MessageIds.GDE_MSGT1406), //6=Pb
+				"Save","Load"};
+	}
+
+	/**
+	 * get global device configuration values
+	 * @param configData
+	 * @param dataBuffer
+	 */
+	@Override
+	public HashMap<String, String> getConfigurationValues(HashMap<String, String> configData, byte[] dataBuffer) {
+		configData.put(eStation.CONFIG_EXT_TEMP_CUT_OFF, "0");
+		configData.put(eStation.CONFIG_WAIT_TIME, "0");
+		configData.put(eStation.CONFIG_IN_VOLTAGE_CUT_OFF, "0");
+		configData.put(eStation.CONFIG_SAFETY_TIME, "0");
+		configData.put(eStation.CONFIG_SET_CAPASITY, "0");
+		if(getProcessingMode(dataBuffer) != 0) {
+			configData.put(eStation.CONFIG_BATTERY_TYPE, this.ACCU_TYPES[this.getAccuCellType(dataBuffer)]);
+			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[9] & 0xFF - 0x80)*100 + (dataBuffer[10] & 0xFF - 0x80))); //$NON-NLS-1$
+		}
+		if (log.isLoggable(Level.FINE)) {
+			for (Entry<String, String> entry : configData.entrySet()) {
+				log.log(Level.FINE, entry.getKey() + " = " + entry.getValue()); //$NON-NLS-1$
+			}
+		}
+		return configData;
 	}
 
 	/**
@@ -273,37 +318,16 @@ public class eStationBC680W extends eStation {
 	 */
 	@Override
 	public int getNumberOfCycle(byte[] dataBuffer) {
-		int cycleCount = 0;
-		int accuCellType = getAccuCellType(dataBuffer);
-		
-		if 			(accuCellType == 2) {
-			cycleCount = (dataBuffer[16] & 0xFF)- 0x80;
-			//log.info("NiMh D<C " + ((dataBuffer[15] & 0xFF)- 0x80));
-		}
-		else if (accuCellType == 3) {
-			cycleCount = (dataBuffer[12] & 0xFF)- 0x80;
-			//log.info("NiCd D<C " + ((dataBuffer[11] & 0xFF)- 0x80));
-		}
-		
-		return cycleCount;
+		return 0;
 	}
 
 	/**
 	 * @param dataBuffer
-	 * @return cell count (0=auto, 1=1cell, 12=12cells)
-	 */
-	@Override
-	public int getNumberOfLithiumXCells(byte[] dataBuffer) {
-		return (dataBuffer[18] & 0xFF)- 0x80;// cell count (0=auto, 1=1cell, 12=12cells)
-	}
-
-	/**
-	 * @param dataBuffer
-	 * @return for Lithium=1, NiMH=2, NiCd=3, Pb=4
+	 * @return for 0= LiPo, 4=NiMH, 5=NiCd, 6=Pb, 7=Save, 8=Load
 	 */
 	@Override
 	public int getAccuCellType(byte[] dataBuffer) {
-		return (dataBuffer[23] & 0xFF)- 0x80; //Lithium=1, NiMH=2, NiCd=3, Pb=4
+		return (dataBuffer[2] & 0xFF)- 0x80; //0= LiPo, 4=NiMH, 5=NiCd, 6=Pb, 7=Save, 8=Load
 	}
 
 	/**
@@ -329,21 +353,12 @@ public class eStationBC680W extends eStation {
 	}
 
 	/**
-	 * @param dataBuffer [lenght 76 bytes]
+	 * @param dataBuffer [length 112 bytes]
 	 * @return processing time in seconds
 	 */
 	@Override
 	public int getProcessingTime(byte[] dataBuffer) {
-		return  ((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80));
-	}
-
-	/**
-	 * @param dataBuffer [lenght 76 bytes]
-	 * @return processing current
-	 */
-	@Override
-	public int getFeedBackCurrent(byte[] dataBuffer) {
-		return  (((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10;
+		return  ((dataBuffer[9] & 0xFF - 0x80)*100 + (dataBuffer[10] & 0xFF - 0x80));
 	}
 
 	/**
