@@ -98,11 +98,13 @@ public class LogViewReader {
 		deviceMap.put("picolario", "Picolario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station 902", "eStation902"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc6", "eStationBC6"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("e-station bc6dx", "eStationBC6 80W"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc610", "eStationBC610"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc8", "eStationBC8"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("pichler p6", "PichlerP6"); //$NON-NLS-1$ //$NON-NLS-2$		
 		deviceMap.put("pichler p60", "PichlerP60 50W"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("pichler p60 80w 220v", "PichlerP60W80"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("pichler p6 80w", "PichlerP60 W80"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("pichler p60 80w 220v", "PichlerP60 W80"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario duo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech linkvario", "LinkaVario"); //$NON-NLS-1$ //$NON-NLS-2$
