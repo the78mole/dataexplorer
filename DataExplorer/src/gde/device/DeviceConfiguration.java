@@ -2235,6 +2235,7 @@ public class DeviceConfiguration {
 	public boolean isFilterEnabled() {
 		return false;
 	}
+	
 	/**
 	 * get the curve point device individual filtered if required
 	 */
