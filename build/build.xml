@@ -190,7 +190,9 @@
 		<ant antfile="build.xml" target="clean" dir="GPXAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="IISI-Cockpit V2" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="FutabaTelemetry" inheritall="true" />
-						<!-- add new device here -->
+		<!-- ant antfile="build.xml" target="clean" dir="PowerLab" inheritall="true" / -->
+		<ant antfile="build.xml" target="clean" dir="Polaron" inheritall="true" />
+		<!-- add new device here -->
 	</target>
 
 	<!-- install target -->
@@ -354,7 +356,9 @@
 		<ant antfile="build.xml" target="package" dir="GPXAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="IISI-Cockpit V2" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="FutabaTelemetry" inheritall="true" />
-						<!-- add new device here -->
+		<!-- ant antfile="build.xml" target="package" dir="PowerLab" inheritall="true" / -->
+		<ant antfile="build.xml" target="package" dir="Polaron" inheritall="true" />
+		<!-- add new device here -->
 	</target>
 
 	<fileset dir="${basedir}">
@@ -382,7 +386,9 @@
 			<include name="GPXAdapter/build/*.jar" />
 			<include name="IISI-Cockpit V2/build/*.jar" />
 			<include name="FutabaTelemetry/build/*.jar" />
-						<!-- add new device here -->
+			<!-- include name="PowerLab/build/*.jar" / -->
+			<include name="Polaron/build/*.jar" />
+			<!-- add new device here -->
 		</patternset>
 	</fileset>
 
