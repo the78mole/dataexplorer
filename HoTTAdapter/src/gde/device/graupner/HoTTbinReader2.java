@@ -115,7 +115,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isTextModusSignaled = false;
-		HoTTbinReader.isFilterTextModus = true; //TODO
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && channelNumber != 4 ? 10 : 1);
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -152,7 +151,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if (!HoTTbinReader.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
+				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx		
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
@@ -445,7 +444,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isTextModusSignaled = false;
-		HoTTbinReader.isFilterTextModus = true; //TODO
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -480,7 +478,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if (!HoTTbinReader.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
+				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) != 1) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 

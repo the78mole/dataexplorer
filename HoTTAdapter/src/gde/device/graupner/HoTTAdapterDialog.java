@@ -68,7 +68,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	CCombo											protocolTypesCombo;
 	Button											inputFileButton;
 	Button											startLifeDataCapturing, stopLifeDataCapturing;
-	Button											enableChannelRecords, enableFilter, tolrateSignLatitude, tolerateSignLongitude;
+	Button											enableChannelRecords, enableFilter, enableTextModusFilter, tolrateSignLatitude, tolerateSignLongitude;
 	CLabel											filterFactorLatitudeLabel, filterFactorLongitudeLabel;
 	CCombo											filterFactorLatitudeCombo, filterFactorLongitudeCombo;
 
@@ -223,8 +223,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.enableChannelRecords = new Button(this.dialogShell, SWT.CHECK);
 						FormData enableFilterLData = new FormData();
 						enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
-						enableFilterLData.left = new FormAttachment(0, 1000, 12);
-						enableFilterLData.width = 78;
+						enableFilterLData.left = new FormAttachment(0, 1000, 5);
+						enableFilterLData.width = 60;
 						enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 						this.enableChannelRecords.setLayoutData(enableFilterLData);
 						this.enableChannelRecords.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -245,8 +245,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.enableFilter = new Button(this.dialogShell, SWT.CHECK);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 90 : 15);
-					enableFilterLData.width = this.isHoTTAdapter ? 90 : 100;
+					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 75 : 15);
+					enableFilterLData.width = this.isHoTTAdapter ? 60 : 80;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.enableFilter.setLayoutData(enableFilterLData);
 					this.enableFilter.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -265,11 +265,32 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					});
 				}
 				{
+					this.enableTextModusFilter = new Button(this.dialogShell, SWT.CHECK);
+					FormData enableTextModusFilterLData = new FormData();
+					enableTextModusFilterLData.height = GDE.IS_MAC ? 22 : 20;
+					enableTextModusFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 132 : 100);
+					enableTextModusFilterLData.width = this.isHoTTAdapter ? 95 : 95;
+					enableTextModusFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
+					this.enableTextModusFilter.setLayoutData(enableTextModusFilterLData);
+					this.enableTextModusFilter.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.enableTextModusFilter.setText(Messages.getString(MessageIds.GDE_MSGT2438));
+					this.enableTextModusFilter.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2439));
+					this.enableTextModusFilter.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "enableTextModusFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
+							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableTextModusFilter.getSelection());
+							HoTTAdapter.setTextModusFilter(HoTTAdapterDialog.this.enableTextModusFilter.getSelection());
+							HoTTAdapterDialog.this.enableSaveButton(true);
+						}
+					});
+				}
+				{
 					this.filterFactorLatitudeLabel = new CLabel(this.dialogShell, SWT.RIGHT);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22: 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 175 : 110);
-					enableFilterLData.width = this.isHoTTAdapter ? 110 : 140;
+					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 225 : 175);
+					enableFilterLData.width = this.isHoTTAdapter ? 105 : 140;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.filterFactorLatitudeLabel.setLayoutData(enableFilterLData);
 					this.filterFactorLatitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -280,8 +301,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLatitudeCombo = new CCombo(this.dialogShell, SWT.BORDER);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 285 : 250);
-					enableFilterLData.width = 55;
+					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 330 : 320);
+					enableFilterLData.width = 42;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
 					this.filterFactorLatitudeCombo.setLayoutData(enableFilterLData);
 					this.filterFactorLatitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -305,8 +326,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.tolrateSignLatitude = new Button(this.dialogShell, SWT.CHECK);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 345 : 315);
-					enableFilterLData.width = 40;
+					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 375 : 365);
+					enableFilterLData.width = 45;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
 					this.tolrateSignLatitude.setLayoutData(enableFilterLData);
 					this.tolrateSignLatitude.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
@@ -328,8 +349,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLongitudeLabel = new CLabel(this.dialogShell, SWT.RIGHT);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22: 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 390 : 360);
-					enableFilterLData.width = this.isHoTTAdapter ? 110 : 140;
+					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 420 : 380);
+					enableFilterLData.width = this.isHoTTAdapter ? 105 : 140;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.filterFactorLongitudeLabel.setLayoutData(enableFilterLData);
 					this.filterFactorLongitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -340,8 +361,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLongitudeCombo = new CCombo(this.dialogShell, SWT.BORDER);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
-					enableFilterLData.left = new FormAttachment(0, 1000, 505);
-					enableFilterLData.width = 55;
+					enableFilterLData.left = new FormAttachment(0, 1000, 525);
+					enableFilterLData.width = 42;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
 					this.filterFactorLongitudeCombo.setLayoutData(enableFilterLData);
 					this.filterFactorLongitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -365,8 +386,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.tolerateSignLongitude = new Button(this.dialogShell, SWT.CHECK);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, 565);
-					enableFilterLData.width = 40;
+					enableFilterLData.left = new FormAttachment(0, 1000, 570);
+					enableFilterLData.width = 45;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
 					this.tolerateSignLongitude.setLayoutData(enableFilterLData);
 					this.tolerateSignLongitude.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
@@ -592,6 +613,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			if (this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != null)
 				this.enableChannelRecords.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()));
 			this.enableFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()));
+			this.enableTextModusFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue() : "true"));
 			if (isHoTTAdapter) {
 				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
 				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);

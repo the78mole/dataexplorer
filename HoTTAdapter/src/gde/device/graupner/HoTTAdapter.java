@@ -170,6 +170,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 	static boolean							isChannelsChannelEnabled 			= false;
 	static boolean							isFilterEnabled								= true;
+	static boolean							isFilterTextModus							= true;
 	static boolean							isTolerateSignChangeLatitude	= false;
 	static boolean							isTolerateSignChangeLongitude	= false;
 	static double								latitudeToleranceFactor				= 90.0;
@@ -199,6 +200,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
 		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" 
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED) != null && this.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue() != "" 
+				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue()) : true;
 		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
 		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
 		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
@@ -1180,6 +1183,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		HoTTAdapter.isTolerateSignChangeLongitude	= isTolerateSignChangeLongitude;
 		HoTTAdapter.latitudeToleranceFactor				= latitudeTolranceFactor;
 		HoTTAdapter.longitudeToleranceFactor			= longitudeTolranceFactor;
+	}
+
+	/**
+	 * @param isTextModusFilterEnabled the isTextModusFilterEnabled to set
+	 */
+	public static synchronized void setTextModusFilter(boolean isTextModusFilterEnabled) {
+		HoTTAdapter.isFilterTextModus = isTextModusFilterEnabled;
 	}
 
 	/**
