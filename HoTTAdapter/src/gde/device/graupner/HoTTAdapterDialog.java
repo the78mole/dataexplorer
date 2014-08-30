@@ -246,7 +246,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
 					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 75 : 15);
-					enableFilterLData.width = this.isHoTTAdapter ? 60 : 80;
+					enableFilterLData.width = this.isHoTTAdapter ? 55 : 70;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.enableFilter.setLayoutData(enableFilterLData);
 					this.enableFilter.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
