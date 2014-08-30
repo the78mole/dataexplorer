@@ -6,6 +6,7 @@ fix IISI Cockpit V2 to tolerate empty values and display a warning message
 fix IISI Cockpit V2 GPS value handling
 fix Futaba-Telemetry number of maximum measurements
 fix HoTTAdapter EAM RXSQ curve parsing correct buffer
+enable HoTTAdapter* text modus filter configuration
 add Polaron charger support
 add eStation BC6 80W (BC6dx/Pichler P60 80W) support
 
