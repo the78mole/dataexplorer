@@ -61,7 +61,7 @@ public class EStationSerialPort extends DeviceCommPort {
 
 		try {
 			answer = new byte[data.length];
-			answer = this.read(data, 3000);
+			answer = this.read(data, 5000);
 			// synchronize received data to DeviceSerialPortImpl.FF of sent data 
 			while (answer.length > 0 && answer[0] != 0x7b) {
 				this.isInSync = false;
@@ -69,7 +69,7 @@ public class EStationSerialPort extends DeviceCommPort {
 					if (answer[i] == 0x7b) {
 						System.arraycopy(answer, i, data, 0, data.length - i);
 						answer = new byte[i];
-						answer = this.read(answer, 1000);
+						answer = this.read(answer, 3000);
 						System.arraycopy(answer, 0, data, data.length - i, i);
 						this.isInSync = true;
 						if (log.isLoggable(Level.FINE)) log.logp(java.util.logging.Level.FINE, EStationSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
