@@ -34,8 +34,16 @@ public enum ChannelPropertyTypes {
 
 	  @XmlEnumValue("enable_filter")
 	  ENABLE_FILTER("enable_filter"),
+	  @XmlEnumValue("text_mode")
+	  TEXT_MODE("text_mode"),
 	  @XmlEnumValue("enable_channel")
 	  ENABLE_CHANNEL("enable_channel"),
+    @XmlEnumValue("number_poles")
+    NUMBER_POLES("number_poles"),
+    @XmlEnumValue("pinion_gear")
+    PINION_GEAR("pinion_gear"),
+    @XmlEnumValue("main_gear")
+    MAIN_GEAR("main_gear"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;
