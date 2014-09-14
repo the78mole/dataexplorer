@@ -210,7 +210,7 @@ public class KosmikConfiguration extends Composite {
 							KosmikConfiguration.this.setPoleFactor();
 							break;
 						}
-						KosmikConfiguration.this.device.setChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED, DataTypes.INTEGER, GDE.STRING_EMPTY + (KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex()+1)*2);
+						KosmikConfiguration.this.device.setChannelProperty(ChannelPropertyTypes.NUMBER_POLES, DataTypes.INTEGER, GDE.STRING_EMPTY + (KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex()+1)*2);
 					}
 				});
 			}
@@ -246,7 +246,7 @@ public class KosmikConfiguration extends Composite {
 						else { //Propeller/Rotor
 							KosmikConfiguration.this.setGearFactor();
 						}
-						KosmikConfiguration.this.device.setChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED, DataTypes.INTEGER, GDE.STRING_EMPTY + (KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex()+1)*2);
+						KosmikConfiguration.this.device.setChannelProperty(ChannelPropertyTypes.NUMBER_POLES, DataTypes.INTEGER, GDE.STRING_EMPTY + (KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex()+1)*2);
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
 				});
@@ -526,30 +526,30 @@ public class KosmikConfiguration extends Composite {
 				this.motorRotorRpmCombo.select(1);
 				int numMotorPoles;
 				try {
-					numMotorPoles = Integer.valueOf(KosmikConfiguration.this.device.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue());
+					numMotorPoles = Integer.valueOf(KosmikConfiguration.this.device.getChannelProperty(ChannelPropertyTypes.NUMBER_POLES).getValue());
 				}
 				catch (NumberFormatException e) {
 					numMotorPoles = 2;
 				}
 				this.numMotorPolsCombo.select((numMotorPoles / 2) - 1);
-				final double ratio = this.device.getMeasurementFactor(activeChannel.getNumber(), 0);
-				final double gearFactor = ratio * this.numMotorPolsCombo.getSelectionIndex() * 2;
-				int pinion = 40;
-				int main = 30;
-				while ((1.0*pinion/main - gearFactor) > 0.009) {
-					++main;
-					if (main > 269) {
-						--pinion;
-						if (pinion < 11) {
-							break;
-						}
-						main = 30;
-					}				
+				Integer pinion;
+				try {
+					pinion = Integer.valueOf(KosmikConfiguration.this.device.getChannelProperty(ChannelPropertyTypes.PINION_GEAR).getValue());
+				}
+				catch (NumberFormatException e) {
+					pinion = 10;
 				}
 				this.motorPinionText.setText(GDE.STRING_EMPTY + pinion); //$NON-NLS-1$
-				this.motorPinionSlider.setSelection(pinion + this.motorPinionSlider.getMinimum());
+				this.motorPinionSlider.setSelection(pinion - this.motorPinionSlider.getMinimum());
+				Integer main;
+				try {
+					main = Integer.valueOf(KosmikConfiguration.this.device.getChannelProperty(ChannelPropertyTypes.MAIN_GEAR).getValue());
+				}
+				catch (NumberFormatException e) {
+					main = 40;
+				}
 				this.mainGearToothCountText.setText(GDE.STRING_EMPTY + main);
-				this.mainGearToothCountSlider.setSelection(main + this.mainGearToothCountSlider.getMinimum());				
+				this.mainGearToothCountSlider.setSelection(main - this.mainGearToothCountSlider.getMinimum());				
 			}
 			this.updateMotorRotor(this.motorRotorRpmCombo.getSelectionIndex());
 
@@ -565,6 +565,8 @@ public class KosmikConfiguration extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
+			this.device.setChannelProperty(ChannelPropertyTypes.MAIN_GEAR, DataTypes.INTEGER, GDE.STRING_EMPTY + KosmikConfiguration.this.mainGearToothCountText.getText().trim());
+			this.device.setChannelProperty(ChannelPropertyTypes.PINION_GEAR, DataTypes.INTEGER, GDE.STRING_EMPTY + KosmikConfiguration.this.motorPinionText.getText().trim());
 			double gearFactor = Integer.valueOf(KosmikConfiguration.this.mainGearToothCountText.getText().trim()) / Integer.valueOf(KosmikConfiguration.this.motorPinionText.getText().trim());
 			factor /= gearFactor;
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
