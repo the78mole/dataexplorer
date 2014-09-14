@@ -2193,7 +2193,7 @@ public class DeviceConfiguration {
 	 * @return
 	 */
 	public List<ChannelPropertyType> getChannelProperties() {
-		return this.deviceProps.getChannels().property;
+		return this.deviceProps.getChannels().getProperty();
 	}
 	
 	/**
