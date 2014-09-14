@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V24.xsd">
     <Device>
-        <name implementation="gde.device.graupner.HoTTAdapter">HoTTAdapter</name>
+        <name implementation="gde.device.graupner.HoTTAdapterD">HoTTAdapterD</name>
         <manufacturer>Graupner</manufacturer>
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>logger</group>
-        <image>HoTTAdapter.png</image>
+        <image>HoTTAdapter2.png</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
@@ -37,8 +37,8 @@
     <State>
         <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
     </State>
-    <Channels lastUseOrdinal="2">
-        <Channel type="TYPE_CONFIG" name="Receiver">
+    <Channels lastUseOrdinal="0">
+        <Channel type="TYPE_CONFIG" name="Development">
             <Measurement>
                 <name>Rx->Tx-PLoss</name>
                 <symbol></symbol>
@@ -82,91 +82,51 @@
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="4" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>SpannungRx</name>
-                <symbol>Urx</symbol>
+                <name>Spannung Rx</name>
+                <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>TemperaturRx</name>
-                <symbol>Trx</symbol>
+                <name>Temperatur Rx</name>
+                <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-            </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="Vario">
-            <Measurement>
-                <name>RXSQ</name>
-                <symbol></symbol>
-                <unit>%</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Höhe (relativ)</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Ermittelt im Steigungstriggerbereich" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
+                <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="9" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="~ Motorlaufzeit" countTriggerText="Anzahl gewerteter Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="false">
+                <statistics sumTriggerTimeText="~ Motorlaufzeit" countTriggerText="Anzahl gewerteter Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
                     <trigger comment="Trigger: Steigrate &gt; 1.5 m/sec &gt; 10 sec" minTimeSec="10" isGreater="true" level="1500"/>
                 </statistics>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 3</name>
-                <symbol>vs</symbol>
+                <symbol>vh</symbol>
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 10</name>
-                <symbol>vs</symbol>
+                <symbol>vh</symbol>
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>SpannungRx</name>
-                <symbol>Urx</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>TemperaturRx</name>
-                <symbol>Trx</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-            </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="GPS">
-            <Measurement>
-                <name>RXSQ</name>
-                <symbol></symbol>
-                <unit>%</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Breitengrad</name>
@@ -183,33 +143,6 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Höhe (relativ)</name>
-                <symbol>h</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics countTriggerText="Ermittelt im Steigungstriggerbereich" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="4" sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
-            </Measurement>
-            <Measurement>
-                <name>Steigen 1</name>
-                <symbol>vh</symbol>
-                <unit>m/sec</unit>
-                <active>true</active>
-                <statistics sumTriggerTimeText="~ Motorlaufzeit" countTriggerText="Anzahl gewerteter Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="false">
-                    <trigger comment="Trigger: Steigrate &gt; 1.5 m/sec &gt; 10 sec" minTimeSec="10" isGreater="true" level="1500"/>
-                </statistics>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Steigen 3</name>
-                <symbol>vh</symbol>
-                <unit>m/3sec</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="120.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -241,66 +174,116 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>SpannungRx</name>
-                <symbol>Urx</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>TemperaturRx</name>
-                <symbol>Trx</symbol>
-                <unit>°C</unit>
+                <name>GPS.Satelites</name>
+                <symbol></symbol>
+                <unit>#</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="Universal">
             <Measurement>
-                <name>RXSQ</name>
+                <name>GPS.Fix</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung</name>
+                <name>HomeDirection</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>North velocity</name>
+                <symbol></symbol>
+                <unit>mm/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed accuracy</name>
+                <symbol></symbol>
+                <unit>cm/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>GPS.time</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>East velocity</name>
+                <symbol></symbol>
+                <unit>mm/s</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Horizontal accuracy</name>
+                <symbol></symbol>
+                <unit>dm</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Altitude</name>
+                <symbol></symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>GPS.Fix2</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Version</name>
+                <symbol></symbol>
+                <unit>#</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung G</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Strom</name>
+                <name>Strom G</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit:" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Strom &gt; 3 A über &gt; 5 Sekunden" minTimeSec="5" isGreater="true" level="3000"/>
-                </statistics>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität</name>
+                <name>Kapazität G</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Leistung</name>
+                <name>Leistung G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Balance</name>
+                <name>Balance G</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
@@ -308,7 +291,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="2.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 1</name>
+                <name>ZellenSpannung G1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -316,82 +299,57 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 2</name>
+                <name>ZellenSpannung G2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 3</name>
+                <name>ZellenSpannung G3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 4</name>
+                <name>ZellenSpannung G4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 5</name>
+                <name>ZellenSpannung G5</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 6</name>
+                <name>ZellenSpannung G6</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Drehzahl</name>
+                <name>Drehzahl G</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Höhe (relativ)</name>
-                <symbol>h</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="3" sumTriggerText="Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
-            </Measurement>
-            <Measurement>
-                <name>Steigen 1</name>
-                <symbol>vh</symbol>
-                <unit>m/sec</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Steigen 3</name>
-                <symbol>vh</symbol>
-                <unit>m/3sec</unit>
-                <active>false</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="120.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Kraftstoff</name>
@@ -401,297 +359,298 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S1</name>
-                <symbol>U1</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Spannung S2</name>
-                <symbol>U2</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="17" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Temperatur 1</name>
-                <symbol>T1</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-            </Measurement>
-            <Measurement>
-                <name>Temperatur 2</name>
-                <symbol>T2</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="Elektro">
-            <Measurement>
-                <name>RXSQ</name>
-                <symbol></symbol>
-                <unit>%</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Spannung</name>
+                <name>Spannung GS1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Strom</name>
+                <name>Spannung GS2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="42" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur G1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur G2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung E</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="29" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom E</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit:" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Strom &gt; 3 A über &gt; 5 Sekunden" minTimeSec="5" isGreater="true" level="3000"/>
-                </statistics>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität</name>
+                <name>Kapazität E</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Leistung</name>
+                <name>Leistung E</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="32" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Balance</name>
+                <name>Balance E</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="2.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="33" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 1</name>
+                <name>ZellenSpannung E1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 2</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 3</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 4</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>ZellenSpannung 5</name>
+                <name>ZellenSpannung E2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 6</name>
+                <name>ZellenSpannung E3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 7</name>
+                <name>ZellenSpannung E4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 8</name>
+                <name>ZellenSpannung E5</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 9</name>
+                <name>ZellenSpannung E6</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 10</name>
+                <name>ZellenSpannung E7</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 11</name>
+                <name>ZellenSpannung E8</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 12</name>
+                <name>ZellenSpannung E9</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 13</name>
+                <name>ZellenSpannung E10</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ZellenSpannung 14</name>
+                <name>ZellenSpannung E11</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Höhe (relativ)</name>
-                <symbol>h</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="3" sumTriggerText="Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
-            </Measurement>
-            <Measurement>
-                <name>Steigen 1</name>
-                <symbol>vh</symbol>
-                <unit>m/sec</unit>
+                <name>ZellenSpannung E12</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Steigen 3</name>
-                <symbol>vh</symbol>
-                <unit>m/3sec</unit>
+                <name>ZellenSpannung E13</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="120.0" name="reduction"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S1</name>
+                <name>ZellenSpannung E14</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl E</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung ES1</name>
                 <symbol>U1</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="42" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S2</name>
+                <name>Spannung ES2</name>
                 <symbol>U2</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="42" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur E1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur E2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="29" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperatur 1</name>
-                <symbol>T1</symbol>
+                <name>Strom M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Leistung M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="40" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur M</name>
+                <symbol></symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-            </Measurement>
-            <Measurement>
-                <name>Temperatur 2</name>
-                <symbol>T2</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="25" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="Kanäle">
-            <Measurement>
-                <name>FreqCh</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Tx</name>
-                <symbol></symbol>
-                <unit>dBm</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>Rx</name>
-                <symbol></symbol>
-                <unit>dBm</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="1" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 1</name>
@@ -706,7 +665,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
@@ -714,7 +673,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
@@ -722,7 +681,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
@@ -730,7 +689,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
@@ -738,7 +697,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
@@ -746,7 +705,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
@@ -754,15 +713,15 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
@@ -770,7 +729,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
@@ -778,7 +737,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
@@ -786,7 +745,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
@@ -794,7 +753,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
@@ -802,7 +761,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
@@ -810,7 +769,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
@@ -818,7 +777,7 @@
                 <unit>msec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="76" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Power Off</name>
@@ -848,63 +807,96 @@
                 <active>false</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
-        </Channel>
-        <Channel type="TYPE_CONFIG" name="Regler">
             <Measurement>
-                <name>RXSQ</name>
+                <name>Test 00</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Strom</name>
-                <symbol>I</symbol>
-                <unit>A</unit>
-                <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit:" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Strom &gt; 3 A über &gt; 5 Sekunden" minTimeSec="5" isGreater="true" level="3000"/>
-                </statistics>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Kapazität</name>
-                <symbol>C</symbol>
-                <unit>mAh</unit>
-                <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Leistung</name>
-                <symbol>P</symbol>
-                <unit>W</unit>
-                <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Drehzahl</name>
-                <symbol>rpm</symbol>
-                <unit>1/min</unit>
-                <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Temperatur</name>
+                <name>Test 01</name>
                 <symbol></symbol>
-                <unit>°C</unit>
+                <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 02</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 03</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 04</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 05</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 06</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 07</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 08</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 09</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 10</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 11</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Test 12</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
         </Channel>
         <property type="Boolean" value="true" name="enable_filter"/>
