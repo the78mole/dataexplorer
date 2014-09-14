@@ -26,6 +26,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.device.MeasurementType;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -197,6 +198,8 @@ public class CSVReaderWriter {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
+		long inputFileSize = new File(filePath).length();
+		int progressLineLength = Math.abs(CSVReaderWriter.application.getActiveDevice().getDataBlockSize(InputTypes.FILE_IO));
 		BufferedReader reader; // to read the data
 		IDevice device = CSVReaderWriter.application.getActiveDevice();
 		Channel activeChannel = null;
@@ -207,7 +210,10 @@ public class CSVReaderWriter {
 			activeChannel = activeChannel == null ? CSVReaderWriter.channels.getActiveChannel() : activeChannel;
 
 			if (activeChannel != null) {
-				if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
+				if (CSVReaderWriter.application.getStatusBar() != null) {
+					CSVReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
+					application.setProgress(0, sThreadId);
+				}
 				int time_ms = 0;
 
 				// check for device name and channel or configuration in first line
@@ -268,7 +274,9 @@ public class CSVReaderWriter {
 				// now get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
 				String[] updateRecordNames = recordSet.getRecordNames();
 				int[] points = new int[updateRecordNames.length];
+				int lineNumber = 0;
 				while ((line = reader.readLine()) != null) {
+					++lineNumber;
 					if (line.startsWith("#")) {
 						if (recordSet.getRecordSetDescription().endsWith(GDE.LINE_SEPARATOR))
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.substring(1) + GDE.LINE_SEPARATOR);
@@ -324,6 +332,18 @@ public class CSVReaderWriter {
 						}
 					}
 					recordSet.addPoints(points, time_ms);
+					
+					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
+					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
+					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+						application.setProgress(progress, sThreadId);
+						try {
+							Thread.sleep(2);
+						}
+						catch (Exception e) {
+							// ignore
+						}
+					}
 				}
 
 				recordSet.setSaved(true);
