@@ -230,32 +230,10 @@ public class KosmikConfiguration extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						if (KosmikConfiguration.log.isLoggable(Level.FINEST)) KosmikConfiguration.log.log(Level.FINEST, "numMotorPolsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (KosmikConfiguration.this.motorRotorRpmCombo.getSelectionIndex() == 0) { //motor RPM
-							Channel activeChannel = Channels.getInstance().getActiveChannel();
-							if (activeChannel != null) {
-								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-								double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
-								if (activeRecordSet != null) {
-									activeRecordSet.get(0).setFactor(factor);
-									KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
-									KosmikConfiguration.this.device.updateVisibilityStatus(activeRecordSet, false);
-								}
-								KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
-							}
+							KosmikConfiguration.this.setPoleFactor();
 						}
 						else { //Propeller/Rotor
-							Channel activeChannel = Channels.getInstance().getActiveChannel();
-							if (activeChannel != null) {
-								double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
-								double gearFactor = Integer.valueOf(KosmikConfiguration.this.mainGearToothCountText.getText().trim()) / Integer.valueOf(KosmikConfiguration.this.motorPinionText.getText().trim());
-								factor /= gearFactor;
-								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-								if (activeRecordSet != null) {
-									activeRecordSet.get(0).setFactor(factor);
-									KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
-									KosmikConfiguration.this.device.updateVisibilityStatus(activeRecordSet, false);
-								}
-								KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
-							}
+							KosmikConfiguration.this.setGearFactor();
 						}
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
@@ -288,6 +266,7 @@ public class KosmikConfiguration extends Composite {
 						if (KosmikConfiguration.log.isLoggable(Level.FINEST)) KosmikConfiguration.log.log(Level.FINEST, "motorPinionText.keyPressed, event=" + evt); //$NON-NLS-1$
 						KosmikConfiguration.this.motorPinionSlider.setSelection(Integer.valueOf(KosmikConfiguration.this.motorPinionText.getText().trim())
 								+ KosmikConfiguration.this.motorPinionSlider.getMinimum());
+						KosmikConfiguration.this.setGearFactor();
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
 				});
@@ -315,6 +294,7 @@ public class KosmikConfiguration extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						if (KosmikConfiguration.log.isLoggable(Level.FINEST)) KosmikConfiguration.log.log(Level.FINEST, "motorPinionSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 						KosmikConfiguration.this.motorPinionText.setText(GDE.STRING_EMPTY + KosmikConfiguration.this.motorPinionSlider.getSelection());
+						KosmikConfiguration.this.setGearFactor();
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
 				});
@@ -347,6 +327,7 @@ public class KosmikConfiguration extends Composite {
 						if (KosmikConfiguration.log.isLoggable(Level.FINEST)) KosmikConfiguration.log.log(Level.FINEST, "mainGearToothCountText.keyPressed, event=" + evt); //$NON-NLS-1$
 						KosmikConfiguration.this.mainGearToothCountSlider.setSelection(Integer.valueOf(KosmikConfiguration.this.mainGearToothCountText.getText().trim())
 								+ KosmikConfiguration.this.mainGearToothCountSlider.getMinimum());
+						KosmikConfiguration.this.setGearFactor();
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
 				});
@@ -374,6 +355,7 @@ public class KosmikConfiguration extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						if (KosmikConfiguration.log.isLoggable(Level.FINEST)) KosmikConfiguration.log.log(Level.FINEST, "mainGearToothCountSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 						KosmikConfiguration.this.mainGearToothCountText.setText(GDE.STRING_EMPTY + KosmikConfiguration.this.mainGearToothCountSlider.getSelection());
+						KosmikConfiguration.this.setGearFactor();
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
 				});
@@ -515,18 +497,93 @@ public class KosmikConfiguration extends Composite {
 	}
 
 	protected void updateGUI() {
-		this.updateMotorRotor(this.motorRotorRpmCombo.getSelectionIndex());
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			this.numMotorPolsCombo.select((int)(2 / (device.getMeasurementFactor(activeChannel.getNumber(), 0) * 2) - 1));
-			this.motorPinionText.setText("10"); //$NON-NLS-1$
-			this.motorPinionSlider.setSelection(10);
-			double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
-			int selectIndex = (int) (2 / factor * 2);
-			this.mainGearToothCountText.setText(GDE.STRING_EMPTY + (selectIndex*10)) ;
-			this.mainGearToothCountSlider.setSelection(selectIndex);
-			this.temperatureUnitCombo.select(device.getMeasurementUnit(activeChannel.getNumber(), KosmikConfiguration.this.isVersion32 ? 6 : 5).contains("C") ? 0 : 1);
+			//detect if gear configuration
+			if (this.device.getMeasurementFactor(activeChannel.getNumber(), 0) > 0.10) { // motor poles only
+				this.motorRotorRpmCombo.select(0);
+				this.numMotorPolsCombo.select((int) (2 / (this.device.getMeasurementFactor(activeChannel.getNumber(), 0) * 2) - 1));
+				this.motorPinionText.setText("10"); //$NON-NLS-1$
+				this.motorPinionSlider.setSelection(10);
+				double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
+				int selectIndex = (int) (2 / factor * 2);
+				this.mainGearToothCountText.setText(GDE.STRING_EMPTY + (selectIndex * 10));
+				this.mainGearToothCountSlider.setSelection(selectIndex);
+			}
+			else {
+				this.motorRotorRpmCombo.select(1);
+				final double ratio = this.device.getMeasurementFactor(activeChannel.getNumber(), 0);
+				int pinion = 40;
+				int main = 30;
+				while (ratio*1.0*pinion/main > 0.007) {
+					++main;
+					if (main > 269) {
+						--pinion;
+						if (pinion < 11) {
+							break;
+						}
+						main = 30;
+					}				
+				}
+				this.numMotorPolsCombo.select((int) (2 / (ratio*main/pinion * 2) / 2 - 1));
+				double gearFactor = ratio * this.numMotorPolsCombo.getSelectionIndex() * 2;
+				pinion = 40;
+				main = 30;
+				while ((1.0*pinion/main - gearFactor) > 0.009) {
+					++main;
+					if (main > 269) {
+						--pinion;
+						if (pinion < 11) {
+							break;
+						}
+						main = 30;
+					}				
+				}
+				this.motorPinionText.setText(GDE.STRING_EMPTY + pinion); //$NON-NLS-1$
+				this.motorPinionSlider.setSelection(pinion + this.motorPinionSlider.getMinimum());
+				this.mainGearToothCountText.setText(GDE.STRING_EMPTY + main);
+				this.mainGearToothCountSlider.setSelection(main + this.mainGearToothCountSlider.getMinimum());				
+			}
+			this.updateMotorRotor(this.motorRotorRpmCombo.getSelectionIndex());
+
+			this.temperatureUnitCombo.select(this.device.getMeasurementUnit(activeChannel.getNumber(), KosmikConfiguration.this.isVersion32 ? 6 : 5).contains("C") ? 0 : 1);
 		}
 		this.kosmikVersionCombo.select(this.channles.getActiveChannelNumber() - 1);
+	}
+
+	/**
+	 * set the factor to be used to calculate RPM based on motor poles and related gear tooth counts
+	 */
+	private void setGearFactor() {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
+			double gearFactor = Integer.valueOf(KosmikConfiguration.this.mainGearToothCountText.getText().trim()) / Integer.valueOf(KosmikConfiguration.this.motorPinionText.getText().trim());
+			factor /= gearFactor;
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				activeRecordSet.get(0).setFactor(factor);
+				KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
+				KosmikConfiguration.this.device.updateVisibilityStatus(activeRecordSet, false);
+			}
+			KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
+		}
+	}
+
+	/**
+	 * set the factor to be used to calculate RPM by selected motor poles only
+	 */
+	private void setPoleFactor() {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
+			if (activeRecordSet != null) {
+				activeRecordSet.get(0).setFactor(factor);
+				KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
+				KosmikConfiguration.this.device.updateVisibilityStatus(activeRecordSet, false);
+			}
+			KosmikConfiguration.this.device.setMeasurementFactor(activeChannel.getNumber(), 0, factor);
+		}
 	}
 }
