@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.ChannelPropertyTypes;
 import gde.device.DataTypes;
 import gde.device.smmodellbau.JLog2Configuration;
 import gde.device.smmodellbau.JLog2Dialog;
@@ -200,6 +201,16 @@ public class KosmikConfiguration extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						if (KosmikConfiguration.log.isLoggable(Level.FINEST)) KosmikConfiguration.log.log(Level.FINEST, "motorRotorRpmCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						updateMotorRotor(KosmikConfiguration.this.motorRotorRpmCombo.getSelectionIndex());
+						switch (KosmikConfiguration.this.motorRotorRpmCombo.getSelectionIndex()) {
+						case 1:
+							KosmikConfiguration.this.setGearFactor();
+							break;
+
+						default:
+							KosmikConfiguration.this.setPoleFactor();
+							break;
+						}
+						KosmikConfiguration.this.device.setChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED, DataTypes.INTEGER, GDE.STRING_EMPTY + (KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex()+1)*2);
 					}
 				});
 			}
@@ -235,6 +246,7 @@ public class KosmikConfiguration extends Composite {
 						else { //Propeller/Rotor
 							KosmikConfiguration.this.setGearFactor();
 						}
+						KosmikConfiguration.this.device.setChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED, DataTypes.INTEGER, GDE.STRING_EMPTY + (KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex()+1)*2);
 						KosmikConfiguration.this.dialog.enableSaveButton(true);
 					}
 				});
@@ -512,23 +524,18 @@ public class KosmikConfiguration extends Composite {
 			}
 			else {
 				this.motorRotorRpmCombo.select(1);
+				int numMotorPoles;
+				try {
+					numMotorPoles = Integer.valueOf(KosmikConfiguration.this.device.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue());
+				}
+				catch (NumberFormatException e) {
+					numMotorPoles = 2;
+				}
+				this.numMotorPolsCombo.select((numMotorPoles / 2) - 1);
 				final double ratio = this.device.getMeasurementFactor(activeChannel.getNumber(), 0);
+				final double gearFactor = ratio * this.numMotorPolsCombo.getSelectionIndex() * 2;
 				int pinion = 40;
 				int main = 30;
-				while (ratio*1.0*pinion/main > 0.007) {
-					++main;
-					if (main > 269) {
-						--pinion;
-						if (pinion < 11) {
-							break;
-						}
-						main = 30;
-					}				
-				}
-				this.numMotorPolsCombo.select((int) (2 / (ratio*main/pinion * 2) / 2 - 1));
-				double gearFactor = ratio * this.numMotorPolsCombo.getSelectionIndex() * 2;
-				pinion = 40;
-				main = 30;
 				while ((1.0*pinion/main - gearFactor) > 0.009) {
 					++main;
 					if (main > 269) {
