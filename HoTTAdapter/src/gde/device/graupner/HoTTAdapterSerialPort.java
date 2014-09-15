@@ -572,6 +572,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
+
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 	}
 
 	/**
@@ -590,6 +592,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
+
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 	}
 
 	/**
@@ -608,6 +612,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
+
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 	}
 
 	/**
@@ -703,18 +709,22 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		try {
 			//prepare transmitter for data interaction
 			sendCmd(HoTTAdapterSerialPort.PREPARE_FILE_TRANSFER);
+			WaitTimer.delay(30);
 			this.ANSWER_DATA = this.read(new byte[9], HoTTAdapterSerialPort.READ_TIMEOUT_MS);
 			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE))
 				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 
 			sendCmd(HoTTAdapterSerialPort.SELECT_SD_CARD);
+			WaitTimer.delay(30);
 			this.ANSWER_DATA = this.read(new byte[10], HoTTAdapterSerialPort.READ_TIMEOUT_MS);
 			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE))
 				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 		}
 		catch (Exception e) {
-			HoTTAdapterSerialPort.log.log(Level.WARNING, e.getMessage(), e);
-			if (retryCount < 3) prepareSdCard(++retryCount);
+			if (retryCount < 10) {
+				HoTTAdapterSerialPort.log.log(Level.WARNING, e.getMessage());
+				prepareSdCard(++retryCount);
+			}
 			throw e;
 		}
 	}

@@ -1034,7 +1034,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		//8=Height, 9=Climb 1, 10=Climb 3
-		//46=VoltageE, 47=CurrentE, 48=CapacityE, 49=PowerE, 50=BalanceE, 51=CellVoltageE 1, 52=CellVoltageE 2 .... 64=CellVoltageE 14, 65=Revolution, 66=VoltageE 1, 67=VoltageE 2, 68=TemperatureE 1, 69=TemperatureE 2
+		//46=VoltageE, 47=CurrentE, 48=CapacityE, 49=PowerE, 50=BalanceE, 51=CellVoltageE 1, 52=CellVoltageE 2 .... 64=CellVoltageE 14, 65=Revolution, 66=VoltageE 1, 67=VoltageE 2, 68=TemperatureE 1, 69=TemperatureE 2 70=revolution
 		if (!HoTTAdapter.isFilterEnabled
 				|| (HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600 && Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
 			int maxVotage = Integer.MIN_VALUE;
