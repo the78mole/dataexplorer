@@ -280,6 +280,7 @@ public class CSVReaderWriter {
 					++lineNumber;
 					isParsingErrorLine = false;
 					if (line.startsWith("#")) {
+						line = line.replaceAll(GDE.STRING_SEMICOLON, GDE.STRING_EMPTY);
 						if (recordSet.getRecordSetDescription().endsWith(GDE.LINE_SEPARATOR))
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.substring(1) + GDE.LINE_SEPARATOR);
 						else
