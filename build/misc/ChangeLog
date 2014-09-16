@@ -9,6 +9,8 @@ fix HoTTAdapter EAM RXSQ curve parsing correct buffer
 fix Kosmik, missing gear ratio related configuration update 
 enable HoTTAdapter* text modus filter configuration
 add Polaron charger support
+add Ultra Quick 70 charger support
+add Ultramat Ac/Dc EQ charger support
 add eStation BC6 80W (BC6dx/Pichler P60 80W) support
 
 Version 3.1.6 - 24 Jul 2014
