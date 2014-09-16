@@ -62,7 +62,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 	public enum GraupnerDeviceType {
 		//0=Ultramat50, 1=UltraDuoPlus40, 2=UltramatTrio14, 3=Ultramat18 4=Ultramat45, 5=Ultramat60, 6=UltramatTrioPlus16S ?=Ultramat12 ?=Ultramat16 ?=Ultramat16S
-		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, /*unknown*/Ultramat16S, UltraDuoPlus80
+		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, Ultramat16S, UltraDuoPlus80, UltraQuick70, UltraAcDcEq
 	};
 
 	protected String[]														USAGE_MODE;
@@ -375,6 +375,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 						//load cached memory configurations to enable memory name to object key match
 						switch (this.getDeviceTypeIdentifier()) {
 						case UltraDuoPlus45:
+						case UltraDuoPlus50:
 						case UltraDuoPlus60:
 							try {
 								if (!(this.isProcessing(1, dataBuffer) || this.isProcessing(2, dataBuffer))) {

@@ -104,9 +104,10 @@ public class GathererThread extends Thread {
 				dataBuffer = this.serialPort.getData(true); // get data from device
 
 				switch (this.device.getDeviceTypeIdentifier()) {
-
+				default:
 				case Ultramat16S:
 				case Ultramat18:
+				case UltraQuick70:
 					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
 					this.isProgrammExecuting2 = this.isProgrammExecuting3 = false;
 					break;
@@ -140,9 +141,10 @@ public class GathererThread extends Thread {
 				// else wait for 180 seconds max. for actions
 				if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3) {
 					switch (this.device.getDeviceTypeIdentifier()) {
-
+					default:
 					case Ultramat16S:
 					case Ultramat18:
+					case UltraQuick70:
 						ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
 						recordSet1 = (RecordSet) ch1[0];
 						this.recordSetKey1 = (String) ch1[1];
