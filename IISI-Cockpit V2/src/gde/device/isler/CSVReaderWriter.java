@@ -320,7 +320,9 @@ public class CSVReaderWriter {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
 							try {
-								points[i] = Double.valueOf(Double.valueOf(data) * 1000000.0).intValue();
+								if (data.length() > 0) {
+									points[i] = Double.valueOf(Double.valueOf(data) * 1000000.0).intValue();
+								}
 							}
 							catch (NumberFormatException e) {
 								if (!isParsingErrorLine) CSVReaderWriter.log.log(java.util.logging.Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }));
@@ -331,7 +333,9 @@ public class CSVReaderWriter {
 
 						default:
 							try {
-								points[i] = Double.valueOf(Double.valueOf(data) * 1000.0).intValue();
+								if (data.length() > 0) {
+									points[i] = Double.valueOf(Double.valueOf(data) * 1000.0).intValue();
+								}
 							}
 							catch (NumberFormatException e) {
 								if (!isParsingErrorLine) CSVReaderWriter.log.log(java.util.logging.Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }));
