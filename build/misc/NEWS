@@ -1,23 +1,17 @@
-GNU DataExplorer - News - comes with version 3.1.6
+GNU DataExplorer - News - comes with version 3.1.7
 
-1) Update to latest SWT drop due to problems reported for Linux
-2) enable reduced data table by selected records for all devices, enablement via context menu
-3) add 230400 Baud entry in device properties XSD to enable workaround for Junsi charger at UNIX operating systems
-4) enable always to left cut and right cut permanent
-5) display selected measurement values in comment area while measuring
-6) enable to set record set start time stamp manually
-7) fix display for GPS coordinates in several tabs
-8) fix time display in statistics
-9) update MdlViewer to 0.8
-10) HoTTAdapter* - detect switching into text modus where no readable telemetrie values are available
-11) HoTTAdapter* - adapt binary log reader to protocol introduced last year to reduce telemetry value errors
-12) iCharger*B - fix power calculation
-13) GPXAdapter - fix to tolerate GPX files without extension data
-14) Kosmik - fix import problem with modified file name
-15) add iCharger308Duo support to import data from device (actually no support for live data)
-16) add IISI Cockpit V2 support
-17) add FutabaTelemetry support
-18) documentation update
+1)  fix GPXAdapter altitude parsing
+2)  fix IISI Cockpit V2 to tolerate empty values and display a warning message
+3)  fix IISI Cockpit V2 GPS value handling
+4)  fix Futaba-Telemetry number of maximum measurements
+5)  fix HoTTAdapter EAM RXSQ curve parsing correct buffer
+6)  fix Kosmik, missing gear ratio related configuration update 
+7)  enable HoTTAdapter* text modus filter configuration
+8)  add Polaron charger support
+9)  add Ultra Quick 70 charger support
+10) add Ultramat Ac/Dc EQ charger support
+11) add eStation BC6 80W (BC6dx/Pichler P60 80W) support
+12) documentation update
 
 
 
