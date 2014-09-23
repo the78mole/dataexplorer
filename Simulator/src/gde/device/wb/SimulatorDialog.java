@@ -362,7 +362,7 @@ public class SimulatorDialog extends DeviceDialog {
 					descriptionLabelLData.top = new FormAttachment(0, 1000, 12);
 					descriptionLabelLData.right = new FormAttachment(1000, 1000, -12);
 					this.descriptionLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.WRAP | SWT.EMBEDDED);
-					this.descriptionLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.NORMAL));
+					this.descriptionLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 4, SWT.NORMAL));
 					this.descriptionLabel.setLayoutData(descriptionLabelLData);
 					this.descriptionLabel.setText(Messages.getString(MessageIds.GDE_MSGT1057));
 					// enable fade in for big areas inside the dialog while fast mouse move
