@@ -110,7 +110,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				infoTextLData.top =  new FormAttachment(0, 1000, 90);
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.infoText = new Label(this.dialogShell, SWT.LEFT | SWT.WRAP);
-				this.infoText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.infoText.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.infoText.setLayoutData(infoTextLData);
 				this.infoText.setText(Messages.getString(MessageIds.GDE_MSGT0147)
 						+ System.getProperty("line.separator") 
@@ -131,7 +131,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				versionLData.top =  new FormAttachment(0, 1000, 50);
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
 				this.version = new Label(this.dialogShell, SWT.CENTER);
-				this.version.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.version.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
 				this.version.setText(GDE.VERSION);
 				this.version.setBackground(DataExplorer.COLOR_LIGHT_GREY);
@@ -144,7 +144,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				okLData.bottom =  new FormAttachment(1000, 1000, -12);
 				okLData.right =  new FormAttachment(1000, 1000, -154);
 				this.ok = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.ok.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.ok.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.ok.setLayoutData(okLData);
 				this.ok.setText("OK"); //$NON-NLS-1$
 				this.ok.addSelectionListener(new SelectionAdapter() {
@@ -164,7 +164,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.aboutText = new Label(this.dialogShell, SWT.CENTER);
 				this.aboutText.setLayoutData(aboutTextLData);
-				this.aboutText.setFont(SWTResourceManager.getFont(this.application, 18, 2));
+				this.aboutText.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, 2));
 				this.aboutText.setText("DataExplorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(DataExplorer.getInstance().getClass().getSimpleName());

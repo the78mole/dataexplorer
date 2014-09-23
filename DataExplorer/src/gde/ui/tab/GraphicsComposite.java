@@ -1731,7 +1731,7 @@ public class GraphicsComposite extends Composite {
 	public void enableGraphicsHeader(boolean enabled) {
 		if (enabled) {
 			this.headerGap = 5;
-			this.headerHeight = 20;
+			this.headerHeight = 3 * (GDE.WIDGET_FONT_SIZE + 3);
 		}
 		else {
 			this.headerGap = 0;

@@ -98,7 +98,7 @@ public class StatusBar {
 				{
 					this.conText = new Label(this.comComposite, SWT.LEFT);
 					this.conText.setText("CON"); //$NON-NLS-1$
-					this.conText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
+					this.conText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), GDE.WIDGET_FONT_SIZE-2, SWT.NORMAL)); //$NON-NLS-1$
 					this.conText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
@@ -110,7 +110,7 @@ public class StatusBar {
 				{
 					this.rxText = new Label(this.comComposite, SWT.LEFT);
 					this.rxText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.rxText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
+					this.rxText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), GDE.WIDGET_FONT_SIZE-2, SWT.NORMAL)); //$NON-NLS-1$
 					this.rxText.setText("RX"); //$NON-NLS-1$
 				}
 				{
@@ -122,7 +122,7 @@ public class StatusBar {
 				{
 					this.txText = new Label(this.comComposite, SWT.LEFT);
 					this.txText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.txText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
+					this.txText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), GDE.WIDGET_FONT_SIZE-2, SWT.NORMAL)); //$NON-NLS-1$
 					this.txText.setText("TX"); //$NON-NLS-1$
 				}
 				this.comComposite.pack();

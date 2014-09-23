@@ -514,7 +514,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY()); // set the origin to 0,0 for the top left corner
 			g2d.setPaint(Color.black);
-			g2d.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 10)); //$NON-NLS-1$
+			g2d.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, GDE.WIDGET_FONT_SIZE)); //$NON-NLS-1$
 			String date = StringHelper.getDate();
 			Rectangle2D rectDate = g2d.getFontMetrics().getStringBounds(date, g2d);
 

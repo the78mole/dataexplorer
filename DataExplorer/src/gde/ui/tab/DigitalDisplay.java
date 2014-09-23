@@ -19,6 +19,8 @@
 package gde.ui.tab;
 
 import java.text.DecimalFormat;
+
+import gde.GDE;
 import gde.log.Level;
 import java.util.logging.Logger;
 
@@ -131,7 +133,7 @@ public class DigitalDisplay extends Composite {
 				}
 			});
 			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.textDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD));
+			this.textDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 4, SWT.BOLD));
 			this.textDigitalLabel.setBackground(this.backgroundColor);
 			this.textDigitalLabel.setMenu(this.popupmenu);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
@@ -155,7 +157,7 @@ public class DigitalDisplay extends Composite {
 			this.actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.actualDigitalLabel.setBackground(this.backgroundColor);
 			this.actualDigitalLabel.setText("00,00"); //$NON-NLS-1$
-			this.actualDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 72, SWT.NORMAL));
+			this.actualDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 62, SWT.NORMAL));
 			this.actualDigitalLabel.setMenu(this.popupmenu);
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
@@ -193,7 +195,7 @@ public class DigitalDisplay extends Composite {
 
 			this.minDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.minDigitalLabel.setText("MIN : 00,00"); //$NON-NLS-1$
-			this.minDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD)); 
+			this.minDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD)); 
 			this.minDigitalLabel.setBackground(this.backgroundColor);
 			this.minDigitalLabel.setMenu(this.popupmenu);
 			this.minDigitalLabel.addPaintListener(new PaintListener() {
@@ -228,7 +230,7 @@ public class DigitalDisplay extends Composite {
 
 			this.maxDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.maxDigitalLabel.setText("MAX : 00,00"); //$NON-NLS-1$
-			this.maxDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+			this.maxDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
 			this.maxDigitalLabel.setBackground(this.backgroundColor);
 			this.maxDigitalLabel.setMenu(this.popupmenu);
 			this.maxDigitalLabel.addPaintListener(new PaintListener() {

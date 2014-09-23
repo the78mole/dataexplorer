@@ -272,7 +272,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			{
 				this.objectNameLabel = new CLabel(this.headerComposite, SWT.NONE);
 				this.objectNameLabel.setText(Messages.getString(MessageIds.GDE_MSGT0404));
-				this.objectNameLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.NORMAL));
+				this.objectNameLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 				RowData cLabel1LData = new RowData();
 				cLabel1LData.width = 130;
 				cLabel1LData.height = 26;
@@ -282,7 +282,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			}
 			{
 				this.objectName = new CLabel(this.headerComposite, SWT.NONE);
-				this.objectName.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+				this.objectName.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
 				RowData cLabel1LData = new RowData();
 				cLabel1LData.width = 300;
 				cLabel1LData.height = 26;

@@ -364,28 +364,28 @@ public class CellVoltageWindow extends CTabItem {
 				this.voltageValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageValue.setText("00.00"); //$NON-NLS-1$
 				this.voltageValue.setBackground(this.surroundingBackground);
-				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, 25, SWT.NORMAL)); //$NON-NLS-1$
+				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); //$NON-NLS-1$
 				this.voltageValue.setMenu(this.popupmenu);
 			}
 			{
 				this.voltageUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageUnit.setText("[V]"); //$NON-NLS-1$
 				this.voltageUnit.setBackground(this.surroundingBackground);
-				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, 18, SWT.NORMAL)); //$NON-NLS-1$
+				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); //$NON-NLS-1$
 				this.voltageUnit.setMenu(this.popupmenu);
 			}
 			{
 				this.capacitiyValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacitiyValue.setText("0000"); //$NON-NLS-1$
 				this.capacitiyValue.setBackground(this.surroundingBackground);
-				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, 25, SWT.NORMAL)); //$NON-NLS-1$
+				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); //$NON-NLS-1$
 				this.capacitiyValue.setMenu(this.popupmenu);
 			}
 			{
 				this.capacityUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacityUnit.setText("[mAh]"); //$NON-NLS-1$
 				this.capacityUnit.setBackground(this.surroundingBackground);
-				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, 18, SWT.NORMAL)); //$NON-NLS-1$
+				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); //$NON-NLS-1$
 				this.capacityUnit.setMenu(this.popupmenu);
 			}
 		}

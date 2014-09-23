@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import gde.GDE;
 import gde.log.Level;
 import java.util.logging.Logger;
 
@@ -126,7 +127,7 @@ public class CellVoltageDisplay extends Composite {
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.cellTextLabel.setBackground(this.backgroundColor);
 			this.cellTextLabel.setText(this.displayHeaderText);
 			this.cellTextLabel.setMenu(this.popupmenu);
@@ -139,7 +140,7 @@ public class CellVoltageDisplay extends Composite {
 			this.cellVoltageDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.cellVoltageDigitalLabel.setBackground(this.backgroundColor);
 			this.cellVoltageDigitalLabel.setMenu(this.popupmenu);
-			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 32, SWT.NORMAL));
+			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 22, SWT.NORMAL));
 			this.cellVoltageDigitalLabel.setText("0,00"); //$NON-NLS-1$
 			GridData actualDigitalLabelLData = new GridData();
 			actualDigitalLabelLData.horizontalAlignment = GridData.FILL;
@@ -166,11 +167,11 @@ public class CellVoltageDisplay extends Composite {
 				this.fillLeft.setEnabled(false);
 				this.fillLeft.setBackground(this.backgroundColor);
 				this.upperVoltage = new Label(this.fillLeft, SWT.NONE);
-				this.upperVoltage.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.upperVoltage.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.middleVoltage = new Label(this.fillLeft, SWT.NONE);
-				this.middleVoltage.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.middleVoltage.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.lowerVoltage = new Label(this.fillLeft, SWT.NONE);
-				this.lowerVoltage.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.lowerVoltage.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			}
 			{
 				this.cellCanvas = new Canvas(this.cellComposite, SWT.NONE);

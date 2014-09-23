@@ -147,7 +147,7 @@ public class AnalogDisplay extends Composite {
 			}
 		});
 		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
-		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD)); //$NON-NLS-1$
+		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD)); //$NON-NLS-1$
 		this.textAnalogLabel.setBackground(this.backgroundColor);
 		this.textAnalogLabel.setForeground(DataExplorer.COLOR_BLACK);
 		this.textAnalogLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);

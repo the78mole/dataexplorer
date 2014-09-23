@@ -159,7 +159,7 @@ public class FileCommentWindow extends CTabItem {
 		{
 			this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
 			this.infoLabel.setText(Messages.getString(MessageIds.GDE_MSGT0240));
-			this.infoLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+			this.infoLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
 			this.infoLabel.setBackground(this.surroundingBackground);
 			this.infoLabel.setMenu(this.popupmenu);
 			this.infoLabel.setBounds(50, 10, 500, 26);
