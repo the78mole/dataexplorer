@@ -27,6 +27,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.ParameterConfigControl;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.LogLevelSelectionContextMenu;
 import gde.utils.ObjectKeyScanner;
@@ -136,11 +137,13 @@ public class SettingsDialog extends Dialog {
 	Button															createLauncherButton;
 	Button															partialDataTableButton, blankChargeDischargeButton, continiousRecordSetButton;
 	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, addChannelConfigNameCurveCompareButton;
+	ParameterConfigControl							fontSizeCorrectionSlider;
+	int[]                               fontCorrection = new int[1];
 	Composite														osMiscComposite;
 	Composite														miscComposite;
 	Group																shellMimeType;
 	Group																desktopLauncher;
-	Group																dataTableGroup, chargerSpecials, graphicsView;
+	Group																fontSizeGroup, dataTableGroup, chargerSpecials, graphicsView;
 	CTabItem														osMiscTabItem;
 	CTabItem														miscTabItem;
 	CLabel															fileIOLevelLabel;
@@ -739,8 +742,43 @@ public class SettingsDialog extends Dialog {
 					{
 						this.miscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
 						this.miscTabItem.setControl(this.miscComposite);
-						FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
+						RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
 						this.miscComposite.setLayout(composite1Layout);
+						{
+							this.fontSizeGroup = new Group(this.miscComposite, SWT.NONE);
+							RowLayout fontSizeGroupLayout = new RowLayout(SWT.HORIZONTAL);
+							fontSizeGroupLayout.center = true;
+							fontSizeGroupLayout.marginTop = 2;
+							fontSizeGroupLayout.marginWidth = 20;
+							fontSizeGroupLayout.spacing = 5;
+							this.fontSizeGroup.setLayout(fontSizeGroupLayout);
+							RowData fontSizeGroupLData = new RowData();
+							fontSizeGroupLData.width = 478;
+							fontSizeGroupLData.height = 70;
+							this.fontSizeGroup.setLayoutData(fontSizeGroupLData);
+							this.fontSizeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.fontSizeGroup.setText("Font Size");
+							{
+								Label label = new Label(this.fontSizeGroup, SWT.LEFT);
+								RowData labelLData = new RowData();
+								labelLData.width = 400;
+								labelLData.height = 18;
+								label.setLayoutData(labelLData);
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setText("Font Size Correction Factor");
+								label.setToolTipText("This factor enable adjustment of the overall font size. Initial correction factor is 1.0. A factor of 2.0 will result in double font sizes which may result that some text can not be read anymore due to lack of nessecary space.");
+							}
+							{
+								this.fontSizeCorrectionSlider = new ParameterConfigControl(this.fontSizeGroup, this.fontCorrection, 0, GDE.STRING_EMPTY, "Correction value / 10", 140, GDE.STRING_EMPTY, 0, true, 30, 250, 10, 30);
+								this.fontSizeCorrectionSlider.setSliderSelection((int)(this.settings.getFontDisplayDensityAdaptionFactor() * 10));
+								this.fontSizeGroup.addListener(SWT.Selection, new Listener() {
+									@Override
+									public void handleEvent(Event evt) {
+										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(fontCorrection[0]/10.0);
+									}
+								});
+							}
+						}
 						{
 							this.graphicsView = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
@@ -749,6 +787,10 @@ public class SettingsDialog extends Dialog {
 							chargerSpecialsLayout.marginWidth = 20;
 							chargerSpecialsLayout.spacing = 5;
 							this.graphicsView.setLayout(chargerSpecialsLayout);
+							RowData graphicsViewLData = new RowData();
+							graphicsViewLData.width = 478;
+							graphicsViewLData.height = 130;
+							this.graphicsView.setLayoutData(graphicsViewLData);
 							this.graphicsView.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.graphicsView.setText(Messages.getString(MessageIds.GDE_MSGT0692));
 							{
@@ -853,17 +895,21 @@ public class SettingsDialog extends Dialog {
 							this.dataTableGroup = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
-							chargerSpecialsLayout.marginTop = 15;
+							chargerSpecialsLayout.marginTop = 2;
 							chargerSpecialsLayout.marginWidth = 20;
-							chargerSpecialsLayout.spacing = 20;
+							chargerSpecialsLayout.spacing = 5;
 							this.dataTableGroup.setLayout(chargerSpecialsLayout);
+							RowData dataTableGroupLData = new RowData();
+							dataTableGroupLData.width = 478;
+							dataTableGroupLData.height = 70;
+							this.dataTableGroup.setLayoutData(dataTableGroupLData);
 							this.dataTableGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dataTableGroup.setText(Messages.getString(MessageIds.GDE_MSGT0702));
 							{
 								Label label = new Label(this.dataTableGroup, SWT.LEFT);
 								RowData labelLData = new RowData();
 								labelLData.width = 400;
-								labelLData.height = 20;
+								labelLData.height = 18;
 								label.setLayoutData(labelLData);
 								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0703));
@@ -876,7 +922,7 @@ public class SettingsDialog extends Dialog {
 								this.partialDataTableButton.setSelection(this.settings.isPartialDataTable());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 400;
-								createLauncerButtonLData.height = 20;
+								createLauncerButtonLData.height = 15;
 								this.partialDataTableButton.setLayoutData(createLauncerButtonLData);
 								this.partialDataTableButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -892,10 +938,14 @@ public class SettingsDialog extends Dialog {
 							this.chargerSpecials = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
-							chargerSpecialsLayout.marginTop = 5;
+							chargerSpecialsLayout.marginTop = 2;
 							chargerSpecialsLayout.marginWidth = 20;
-							chargerSpecialsLayout.spacing = 15;
+							chargerSpecialsLayout.spacing = 5;
 							this.chargerSpecials.setLayout(chargerSpecialsLayout);
+							RowData chargerSpecialsLData = new RowData();
+							chargerSpecialsLData.width = 478;
+							chargerSpecialsLData.height = 70;
+							this.chargerSpecials.setLayoutData(chargerSpecialsLData);
 							this.chargerSpecials.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargerSpecials.setText(Messages.getString(MessageIds.GDE_MSGT0690));
 							{
@@ -915,7 +965,7 @@ public class SettingsDialog extends Dialog {
 								this.blankChargeDischargeButton.setSelection(this.settings.isReduceChargeDischarge());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 400;
-								createLauncerButtonLData.height = 20;
+								createLauncerButtonLData.height = 15;
 								this.blankChargeDischargeButton.setLayoutData(createLauncerButtonLData);
 								this.blankChargeDischargeButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -933,7 +983,7 @@ public class SettingsDialog extends Dialog {
 								this.continiousRecordSetButton.setSelection(this.settings.isContinuousRecordSet());
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 400;
-								createLauncerButtonLData.height = 30;
+								createLauncerButtonLData.height = 15;
 								this.continiousRecordSetButton.setLayoutData(createLauncerButtonLData);
 								this.continiousRecordSetButton.addSelectionListener(new SelectionAdapter() {
 									@Override

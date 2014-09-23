@@ -98,8 +98,6 @@ public class GDE {
 	public static final boolean		IS_ARCH_DATA_MODEL_64						= System.getProperty("sun.arch.data.model").equals("64");																																			//$NON-NLS-1$ //$NON-NLS-2$
 
 	public static final String		STRING_BASE_PACKAGE							= "gde";																																																											//$NON-NLS-1$
-	public final static int				WIDGET_FONT_SIZE								= (int) ((GDE.IS_LINUX ? 8 : 9) * 96.0 / Display.getDefault().getDPI().y);
-	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
 
 	public static final String		BIT_MODE												= System.getProperty("sun.arch.data.model") != null //$NON-NLS-1$
 																																? System.getProperty("sun.arch.data.model") //$NON-NLS-1$
@@ -237,7 +235,10 @@ public class GDE {
 	public static final String[] 	MOD1 														= new String[] {GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl"};
 	public static final String[] 	MOD2 														= new String[] {Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift"};
 	public static final String[] 	MOD3 														= new String[] {"Alt"};
-	
+
+	public final static int				WIDGET_FONT_SIZE								= (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);
+	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
+
 	// number ranges for message IDs 
 	public static final int				NUMBER_RANGE_MIN_GDE							= 0;
 	public static final int				NUMBER_RANGE_MAX_GDE							= 1000;

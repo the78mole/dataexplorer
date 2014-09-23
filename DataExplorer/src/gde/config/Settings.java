@@ -138,6 +138,7 @@ public class Settings extends Properties {
 	final static String							FILE_COMMENT_SURROUND_BACKGRD	= "file_comment_surround_backgrd";																															//$NON-NLS-1$
 	final static String							OBJECT_DESC_INNER_BACKGROUND	= "object_desciption_inner_background";																													//$NON-NLS-1$
 	final static String							OBJECT_DESC_SURROUND_BACKGRD	= "object_desciption_surround_backgrd";																													//$NON-NLS-1$
+	final static String							DISPLAY_DENSITY_FONT_CORRECT	= "display_density_font_correction";																													//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK						= "#[File-History-List]";																																				//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN						= "history_file_";																																							//$NON-NLS-1$
@@ -570,6 +571,7 @@ public class Settings extends Properties {
 
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RECORD_COMMENT_VISIBLE, isRecordCommentVisible())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_HEADER_VISIBLE, isGraphicsHeaderVisible())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DISPLAY_DENSITY_FONT_CORRECT, getFontDisplayDensityAdaptionFactor())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_DASH_STYLE, getGridDashStyleAsString())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_HOR_TYPE, getGridCompareWindowHorizontalType())); //$NON-NLS-1$
@@ -2175,5 +2177,19 @@ public class Settings extends Properties {
 	 */
 	public boolean isCurveCompareChannelConfigName() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_COMPARE_CHANNELCONFIG, "false")); //$NON-NLS-1$
+	}
+	
+	/**
+	 * set double value of display density font correction value
+	 */
+	public void setFontDisplayDensityAdaptionFactor(double newCorrectionValue) {
+		this.setProperty(Settings.DISPLAY_DENSITY_FONT_CORRECT, GDE.STRING_EMPTY+newCorrectionValue);
+	}
+	
+	/**
+	 * @return double value of display density font correction value
+	 */
+	public double getFontDisplayDensityAdaptionFactor() {
+		return Double.valueOf(this.getProperty(Settings.DISPLAY_DENSITY_FONT_CORRECT, "1.0")); //$NON-NLS-1$;
 	}
 }
