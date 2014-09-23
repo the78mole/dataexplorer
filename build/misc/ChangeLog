@@ -1,6 +1,9 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.7 - xx yyy 2014
+Version 3.1.8 - xx yyy 2014
+fix Kosmik rounding issue
+
+Version 3.1.7 - 18 Sep 2014
 fix GPXAdapter altitude parsing
 fix IISI Cockpit V2 to tolerate empty values and display a warning message
 fix IISI Cockpit V2 GPS value handling
