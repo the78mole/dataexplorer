@@ -332,7 +332,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								canvasImageGC.setBackground(SWTResourceManager.getColor(250, 249, 230));
 								canvasImageGC.fillRectangle(canvasBounds);
 								canvasImageGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-								canvasImageGC.setFont(SWTResourceManager.getFont("Sans Serife", 16, SWT.BOLD));
+								canvasImageGC.setFont(SWTResourceManager.getFont("Sans Serife", GDE.WIDGET_FONT_SIZE + 6, SWT.BOLD));
 								//cap = 3200; width = 550; -> valueC1 1600 -> 1600*100/3200 = 50
 								canvasImageGC.setBackground(SWTResourceManager.getColor(SWT.COLOR_GREEN));
 								int maxCurrent = StepChargeComposite.this.stepSliderA1.getSelection() > 500 
