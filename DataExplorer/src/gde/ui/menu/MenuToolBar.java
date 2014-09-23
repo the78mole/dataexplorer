@@ -87,7 +87,7 @@ public class MenuToolBar {
 	ToolItem											prevDeviceToolItem, nextDeviceToolItem;
 	Composite											objectSelectComposite;
 	CCombo												objectSelectCombo;
-	Point													objectSelectSize = new Point(200, GDE.IS_LINUX ? 22 : 20);
+	Point													objectSelectSize = new Point(200, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 	ToolItem											newObject, deleteObject, editObject;
 	String												oldObjectKey = null;
 	boolean												isObjectoriented = false;
@@ -97,7 +97,7 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite											scopePointsComposite;
 	CCombo 												scopePointsCombo;
-	Point													scopePointsComboSize = new Point(70, GDE.IS_LINUX ? 22 : 20);
+	Point													scopePointsComboSize = new Point(70, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 	static final int							leadFill	= 4+(GDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(GDE.IS_WINDOWS == true ? 0 : 3);
 	boolean												isScopePointsCombo = true;
@@ -115,8 +115,8 @@ public class MenuToolBar {
 	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite											channelSelectComposite, recordSelectComposite;
 	CCombo												channelSelectCombo, recordSelectCombo;
-	Point													channelSelectSize = new Point(180, GDE.IS_LINUX ? 22 : 20);
-	Point													recordSelectSize = new Point(260, GDE.IS_LINUX ? 22 : 20);
+	Point													channelSelectSize = new Point(180, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
+	Point													recordSelectSize = new Point(260, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 
 	CoolItem											helpCoolItem;
 	ToolBar												helpToolBar;
