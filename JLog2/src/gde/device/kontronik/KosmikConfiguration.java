@@ -567,7 +567,7 @@ public class KosmikConfiguration extends Composite {
 			double factor = 2.0 / ((KosmikConfiguration.this.numMotorPolsCombo.getSelectionIndex() + 1) * 2);
 			this.device.setChannelProperty(ChannelPropertyTypes.MAIN_GEAR, DataTypes.INTEGER, GDE.STRING_EMPTY + KosmikConfiguration.this.mainGearToothCountText.getText().trim());
 			this.device.setChannelProperty(ChannelPropertyTypes.PINION_GEAR, DataTypes.INTEGER, GDE.STRING_EMPTY + KosmikConfiguration.this.motorPinionText.getText().trim());
-			double gearFactor = Integer.valueOf(KosmikConfiguration.this.mainGearToothCountText.getText().trim()) / Integer.valueOf(KosmikConfiguration.this.motorPinionText.getText().trim());
+			double gearFactor = 1.0 * Integer.valueOf(KosmikConfiguration.this.mainGearToothCountText.getText().trim()) / Integer.valueOf(KosmikConfiguration.this.motorPinionText.getText().trim());
 			factor /= gearFactor;
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
