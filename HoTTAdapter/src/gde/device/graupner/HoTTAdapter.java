@@ -37,6 +37,7 @@ import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
@@ -1273,6 +1274,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		if (log.isLoggable(Level.OFF) && inst != null) 
 			log.log(Level.OFF, "loading TabItem " + ((CTabItem)inst).getText()); //$NON-NLS-1$
 
+		if (inst != null) ((CTabItem)inst).setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		return (CTabItem)inst;
 	}
 }
