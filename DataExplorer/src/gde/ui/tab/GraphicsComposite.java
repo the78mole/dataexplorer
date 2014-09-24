@@ -1731,7 +1731,11 @@ public class GraphicsComposite extends Composite {
 	public void enableGraphicsHeader(boolean enabled) {
 		if (enabled) {
 			this.headerGap = 5;
-			this.headerHeight = 3 * (GDE.WIDGET_FONT_SIZE + 3);
+			GC gc = new GC(this.graphicsHeader);
+	    int stringHeight = gc.stringExtent(this.graphicsHeader.getText()).y;
+			this.headerGap = 5;
+			this.headerHeight = stringHeight;
+			gc.dispose();
 		}
 		else {
 			this.headerGap = 0;
@@ -1746,7 +1750,10 @@ public class GraphicsComposite extends Composite {
 	public void enableRecordSetComment(boolean enabled) {
 		if (enabled) {
 			this.commentGap = 0;
-			this.commentHeight = 40;
+			GC gc = new GC(this.recordSetComment);
+	    int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
+			this.commentHeight = stringHeight*2 + 10;
+			gc.dispose();
 		}
 		else {
 			this.commentGap = 0;
