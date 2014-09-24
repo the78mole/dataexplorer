@@ -1752,7 +1752,7 @@ public class GraphicsComposite extends Composite {
 			this.commentGap = 0;
 			GC gc = new GC(this.recordSetComment);
 	    int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
-			this.commentHeight = stringHeight*2 + 10;
+			this.commentHeight = stringHeight*2 + 8;
 			gc.dispose();
 		}
 		else {
