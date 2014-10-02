@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.utils;
 
+import gde.GDE;
 import gde.data.RecordSet;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -617,8 +618,11 @@ public class TimeLine {
 				time = timeFormatSeconds.format(Double.valueOf(milliSeconds).longValue()); //$NON-NLS-1$
 			else if (lHours == 0)
 				time = timeFormatMinutes.format(Double.valueOf(milliSeconds).longValue()); //$NON-NLS-1$
-			else
+			else {
 				time = timeFormatHours.format(Double.valueOf(milliSeconds).longValue()); //$NON-NLS-1$
+				if (Integer.parseInt(time.substring(0, time.indexOf(GDE.STRING_COLON))) != lHours) 
+					time = String.format("%02d%s", lHours, time.substring(time.indexOf(GDE.STRING_COLON)));
+			}
 		}
 		return time;
 	}
