@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package cz.vutbr.fit.gja.proj.utils;
 
+import gde.GDE;
 import gde.device.jeti.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -713,7 +714,7 @@ public class TelemetryData {
       //Read File Line By Line
       while ((strLine = br.readLine()) != null) {
         line++;
-        strLine = strLine.trim();
+        //strLine = strLine.trim();
         //Prvni znak - komentar?
         if (strLine.startsWith("#")) { //$NON-NLS-1$
           this.modelName = strLine.substring(1).trim();
@@ -798,7 +799,7 @@ public class TelemetryData {
     if (params == null) {
       return;
     }
-    if (log.isLoggable(Level.FINE)) log.log(Level.FINE, params[params.length -1]);
+    if (log.isLoggable(Level.OFF)) log.log(Level.OFF, params[params.length -2] + GDE.STRING_COLON + params[params.length -1]);
     for (String param : params) {
       switch (state) {
         case ST_TIME:
