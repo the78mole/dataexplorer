@@ -187,6 +187,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 									JetiAdapterDialog.this.device.storeDeviceProperties();
 								}
 							}
+							JetiAdapterDialog.this.dispose();
 							JetiAdapterDialog.this.device.open_closeCommPort();
 						}
 					});
