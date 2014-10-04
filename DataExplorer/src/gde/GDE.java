@@ -236,7 +236,7 @@ public class GDE {
 	public static final String[] 	MOD2 														= new String[] {Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift"};
 	public static final String[] 	MOD3 														= new String[] {"Alt"};
 
-	public final static int				WIDGET_FONT_SIZE								= (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);
+	public static int							WIDGET_FONT_SIZE;
 	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
 
 	// number ranges for message IDs 
@@ -369,6 +369,7 @@ public class GDE {
 		try {
 			Display.setAppName(GDE.NAME_LONG);
 			Display.setAppVersion(GDE.VERSION);
+			GDE.WIDGET_FONT_SIZE = (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);
 			
 			Settings.getInstance();
 			//DeviceData	data = new DeviceData();
