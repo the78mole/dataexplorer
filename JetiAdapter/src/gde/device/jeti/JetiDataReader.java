@@ -192,10 +192,14 @@ public class JetiDataReader {
 							else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
 								mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
 							}
-							else if (isActualgps && (dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName()
-											.toLowerCase().contains("alt")) && dataVar.getUnit().equals("m")) //dataVar.getParam()==4
+							else if ((dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName()
+									.toLowerCase().contains("alt")) && dataVar.getUnit().equals("m")) //dataVar.getParam()==4
 							{
 								mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
+							}
+									else if (dataVar.getName().toLowerCase().contains("speed") && dataVar.getUnit().equals("km/h"))
+							{
+								mapRecordType.put(index, Record.DataType.SPEED);
 							}
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "param = " + dataVar.getParam());
 							++index;
