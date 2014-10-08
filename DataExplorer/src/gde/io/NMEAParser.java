@@ -214,7 +214,7 @@ public class NMEAParser implements IDataParser {
 				parseGSA(strValues);
 				break;
 			case GPVTG: // Velocity made good (VTG)
-				if(!deviceName.equals("GPS-Logger")) parseVTG(strValues);
+				if(!deviceName.startsWith("GPS-Logger")) parseVTG(strValues);
 				break;
 			case GPGSV: // Satellites in view (GSV)
 				parseGSV(strValues);
