@@ -26,7 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package cz.vutbr.fit.gja.proj.utils;
 
-import gde.GDE;
 import gde.device.jeti.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -38,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,6 +73,13 @@ public class TelemetryData {
   public static final int T_GPS = 9;
   /** Typ dat - 37 bitu */
   public static final int T_DATA37 = 12;
+  /** Typ dat - event */
+  public static final int T_EVENT = 16;
+
+  /** start time stamp of the very first telemetryVar.TelemetryItem entry */
+  long startTimeStamp = 0;
+  
+  public static Map<Integer, Integer> idMap = new HashMap<Integer, Integer>();
 
   /**
    * Vrati priznak, jestli jsou data naplnena
@@ -97,6 +105,13 @@ public class TelemetryData {
      */
     public String getName() {
       return this.name;
+    }
+
+    /**
+     * @return sensor identifier (Tx == 0)
+     */
+    public long getId() {
+      return this.id;
     }
 
     /**
@@ -203,6 +218,14 @@ public class TelemetryData {
     }
 
     /**
+     * Prida novou polozku do casosbernych dat
+     * @param i data
+     */
+    public void addItem(final int index, final TelemetryItem i) {
+      data.add(index, new TelemetryItem(i));
+    }
+
+    /**
      * @return Jednotka promenne
      */
     public String getUnit() {
@@ -248,14 +271,15 @@ public class TelemetryData {
       double min = Double.POSITIVE_INFINITY;
       double max = Double.NEGATIVE_INFINITY;
       Collections.sort(data);
-      long timeOffset = 0;
+      long timeFINEset = 0;
       if (data.size() > 0) {
-        timeOffset = data.get(0).getTimestamp();
+      	//System.out.println(name);
+        timeFINEset = data.get(0).getTimestamp();
         for (TelemetryItem row : data) {
           double val = row.getDouble();
           min = Math.min(val, min);
           max = Math.max(val, max);
-          row.setTimestamp(row.getTimestamp() - timeOffset);
+          row.setTimestamp(row.getTimestamp() - timeFINEset);
         }
         maxValue = max;
         minValue = min;
@@ -427,7 +451,7 @@ public class TelemetryData {
      * @param _value hodnota
      * @param _timestamp casove razitko
      */
-    TelemetryItem(int type, int dec, int _value, long _timestamp) {
+    public TelemetryItem(int type, int dec, int _value, long _timestamp) {
       dataType = type;
       decimals = dec;
       value = _value;
@@ -500,7 +524,7 @@ public class TelemetryData {
      *
      * @return casove razitko  vsekundach
      */
-    private long getTimestamp() {
+    public long getTimestamp() {
       return this.timestamp;
     }
 
@@ -572,6 +596,7 @@ public class TelemetryData {
    * @param file
    */
   public boolean loadData(String file) {
+  	TelemetryData.idMap.clear();
     maxTimestamp = 0.0;
     int mid = file.lastIndexOf("."); //$NON-NLS-1$
     String ext = file.substring(mid + 1, file.length());
@@ -799,7 +824,6 @@ public class TelemetryData {
     if (params == null) {
       return;
     }
-    if (log.isLoggable(Level.OFF)) log.log(Level.OFF, params[params.length -2] + GDE.STRING_COLON + params[params.length -1]);
     for (String param : params) {
       switch (state) {
         case ST_TIME:
@@ -835,7 +859,7 @@ public class TelemetryData {
           TelemetryVar var = new TelemetryVar(paramId, label, unit);
           TelemetrySensor s = this.getSensor(deviceId);
           if (s != null) {
-          	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add variable " + var.name);
+          	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("add variable %s[%s]", var.name, unit));
             s.addVariable(var);
           }
           //Vypadne z funkce
@@ -854,11 +878,45 @@ public class TelemetryData {
 					val = Long.parseLong(param);
 				}
 				catch (NumberFormatException e) {
-					// String value, for instance an alarm
-					String message = TimeLine.getFomatedTimeWithUnit(timestamp) + " - " + param;
-					log.log(Level.WARNING, message);
-					if (DataExplorer.getInstance().getStatusBar() != null)
-						DataExplorer.getInstance().setStatusMessage(message, SWT.COLOR_RED);
+					if (param.length() > 3 && startTimeStamp > 0) {
+						// String value, for instance an alarm
+						String message = TimeLine.getFomatedTimeWithUnit(timestamp) + " - " + param;
+						log.log(Level.WARNING, message);
+						if (DataExplorer.getInstance().getStatusBar() != null) DataExplorer.getInstance().setStatusMessage(message, SWT.COLOR_RED);
+						// Alarm:  Capacity
+						deviceId = 0; //force this even if there is a real Tx ID to enable sort in JetiDataReader
+						TelemetrySensor sensor = this.getSensor(deviceId);
+						if (sensor == null) {
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "adding sensor " + label);
+							sensor = new TelemetrySensor(deviceId, label);
+							this.data.add(sensor);
+						}
+						label = param;
+						paramId = getParameterIdByName(sensor, label);
+						dataType = TelemetryData.T_DATA8;
+						if (log.isLoggable(Level.FINE))
+							log.log(Level.FINE, "deviceId = " + deviceId + ", paramId = " + paramId + ", untit = " + unit + ", dataType = " + dataType + ", state = " + state + ", decimals = " + decimals);
+						TelemetryVar par = sensor.getVar(paramId);
+						if (par == null) {
+							par = new TelemetryVar(paramId, label, unit);
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add variable " + par.name);
+							sensor.addVariable(par);
+							TelemetryItem item = new TelemetryItem(dataType, decimals, 0, startTimeStamp);
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add sensor variable value " + par.getName() + "=" + item.getInt());
+							par = sensor.getVar(paramId); //read again since copy constructor was used during addVariable
+							par.addItem(item);
+						}
+
+						//add old value, just before new event value in respect of time
+						par.addItem(new TelemetryItem(dataType, decimals, par.getItems().get(par.getItems().size() - 1).getInt(), timestamp - 5));
+						par.addItem(new TelemetryItem(dataType, decimals, (int) (par.maxValue += 1), timestamp));
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "add sensor variable value " + par.getName() + "=" + par.getItems().get(par.getItems().size() - 1).getInt());
+							log.log(Level.FINE, "add sensor variable value count " + par.getItems().size());
+						}
+					}
+					state = ST_PARAM_NUM;
+					break;
 				}
           //Pokusi se vlozit novy zaznam
           int intval=0;
@@ -868,13 +926,18 @@ public class TelemetryData {
             intval=(byte)val;
           else
             intval=(int)val;
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "deviceId = " + deviceId + ", paramId = " + paramId + ", untit = " + unit + ", dataType = " + dataType + ", state = " + state + ", decimals = " + decimals);
           TelemetryItem item = new TelemetryItem(dataType, decimals,  intval, timestamp);
           TelemetrySensor sen = this.getSensor(deviceId);
           if (sen != null) {
             TelemetryVar par = sen.getVar(paramId);
             if (par != null) {
-            	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add sensor variable " + par.name);
+            	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add sensor variable value " + par.name + "=" + item.value);
               par.addItem(item);
+              if (startTimeStamp == 0) {
+              	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "set startTimeStamp = " + timestamp);
+              	startTimeStamp = timestamp;
+              }
             }
           }
           state = ST_PARAM_NUM;
@@ -882,4 +945,16 @@ public class TelemetryData {
       }
     }
   }
+
+	public static int getParameterIdByName(final TelemetrySensor sensor, final String label) {
+		int labelParamId = 0;
+		for (int i = 0; i < label.length(); i++) {
+			labelParamId += label.charAt(i);
+		}
+		if (TelemetryData.idMap.get(labelParamId) == null) {
+		int newPartamId = sensor.getVariables().size() + 1;
+		TelemetryData.idMap.put(labelParamId, newPartamId);
+		}
+		return TelemetryData.idMap.get(labelParamId);
+	}
 }

@@ -31,7 +31,6 @@ import gde.exception.DevicePropertiesInconsistenceException;
 import gde.exception.MissMatchDeviceException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.CSVSerialDataReaderWriter;
-import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -94,21 +93,21 @@ public class JetiDataReader {
 
 		try {
 			if (channelConfigNumber == null)
-				activeChannel = channels.getActiveChannel();
+				activeChannel = JetiDataReader.channels.getActiveChannel();
 			else
-				activeChannel = channels.get(channelConfigNumber);
+				activeChannel = JetiDataReader.channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (application.getStatusBar() != null) {
-					application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
-					application.setProgress(0, sThreadId);
+				if (JetiDataReader.application.getStatusBar() != null) {
+					JetiDataReader.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+					JetiDataReader.application.setProgress(0, sThreadId);
 				}
 				activeChannelConfigNumber = activeChannel.getNumber();
 
-				if (application.getStatusBar() != null) {
-					channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
-					application.getMenuToolBar().updateChannelSelector();
-					activeChannel = channels.getActiveChannel();
+				if (JetiDataReader.application.getStatusBar() != null) {
+					JetiDataReader.channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
+					JetiDataReader.application.getMenuToolBar().updateChannelSelector();
+					activeChannel = JetiDataReader.channels.getActiveChannel();
 				}
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 
@@ -116,19 +115,22 @@ public class JetiDataReader {
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation			
-				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
+				JetiDataReader.log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < Math.abs(dataBlockSize)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] { filePath }));
 
 				TelemetryData data = new TelemetryData();
 				if (data.loadData(filePath)) {
 					TreeSet<TelemetrySensor> recordSetData = data.getData();
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "Modell name = " + data.getModelName());
-					if (application.getMenuBar() != null) device.matchModelNameObjectKey(data.getModelName());
+					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "Modell name = " + data.getModelName());
+					if (JetiDataReader.application.getMenuBar() != null) device.matchModelNameObjectKey(data.getModelName());
 
+					//find best fit number of values to time step
 					int maxHit = 0, numValues = 0;
 					Map<Integer, Integer> valuesMap = new HashMap<Integer, Integer>();
 					for (TelemetrySensor telemetrySensor : recordSetData) {
+						//System.out.println(telemetrySensor.getName() + " - ");
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+							//System.out.println(dataVar.getName());
 							if (dataVar.getItems().size() > 0) {
 								if (valuesMap.containsKey(dataVar.getItems().size())) {
 									valuesMap.put(dataVar.getItems().size(), valuesMap.get(dataVar.getItems().size()) + 1);
@@ -137,7 +139,7 @@ public class JetiDataReader {
 								else
 									valuesMap.put(dataVar.getItems().size(), 1);
 							}
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
+							if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
 						}
 					}
 					Integer[] occurrence = valuesMap.values().toArray(new Integer[1]);
@@ -148,14 +150,14 @@ public class JetiDataReader {
 							break;
 						}
 					}
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "best fit # values = " + numValues);
-					timeStep_ms = data.getMaxTimestamp() * 1000 / numValues;
+					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "best fit # values = " + numValues);
+					timeStep_ms = data.getMaxTimestamp() * 1000.0 / numValues;
+					if (JetiDataReader.log.isLoggable(java.util.logging.Level.OFF)) JetiDataReader.log.log(java.util.logging.Level.OFF, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
 
 					try {
-
 						recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
 						if (recordNameExtend.length() > 0) {
-								recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
+							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
 					}
 					catch (Exception e) {
@@ -170,39 +172,61 @@ public class JetiDataReader {
 					int index = 0;
 					Vector<String> vecRecordNames = new Vector<String>();
 					Map<Integer, Record.DataType> mapRecordType = new HashMap<Integer, Record.DataType>();
+					//add record exclude Tx 
 					for (TelemetrySensor telemetrySensor : recordSetData) {
-						boolean isActualgps = false;
-						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-							String newRecordName = dataVar.getName();
-							while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
-								newRecordName = newRecordName + "'";
+						if (telemetrySensor.getId() != 0) {
+							boolean isActualgps = false;
+							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+								String newRecordName = dataVar.getName();
+								while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
+									newRecordName = newRecordName + "'";
+								}
+								vecRecordNames.add(newRecordName);
+								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "add new record name = " + newRecordName);
+
+								device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
+								device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
+								if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 0) {
+									isActualgps = true;
+									mapRecordType.put(index, Record.DataType.GPS_LATITUDE);
+								}
+								else if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 1) {
+									isActualgps = true;
+									mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
+								}
+								else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
+									mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
+								}
+								else if ((dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar
+										.getName().toLowerCase().contains("alt"))
+										&& dataVar.getUnit().equals("m")) //dataVar.getParam()==4
+								{
+									mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
+								}
+								else if (dataVar.getName().toLowerCase().contains("speed") && dataVar.getUnit().equals("km/h")) {
+									mapRecordType.put(index, Record.DataType.SPEED);
+								}
+								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "param = " + dataVar.getParam());
+								++index;
 							}
-							vecRecordNames.add(newRecordName);
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add new record name = " + newRecordName);
-							device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
-							device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
-							if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 0) {
-								isActualgps = true;
-								mapRecordType.put(index, Record.DataType.GPS_LATITUDE);
+						}
+					}
+					//append Tx, alarms and events 
+					for (TelemetrySensor telemetrySensor : recordSetData) {
+						if (telemetrySensor.getId() == 0) {
+							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+								String newRecordName = dataVar.getName();
+								while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
+									newRecordName = newRecordName + "'";
+								}
+								vecRecordNames.add(newRecordName);
+								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "add new record name = " + newRecordName);
+
+								device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
+								device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
+
+								++index;
 							}
-							else if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 1) {
-								isActualgps = true;
-								mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
-							}
-							else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
-								mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
-							}
-							else if ((dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName()
-									.toLowerCase().contains("alt")) && dataVar.getUnit().equals("m")) //dataVar.getParam()==4
-							{
-								mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
-							}
-									else if (dataVar.getName().toLowerCase().contains("speed") && dataVar.getUnit().equals("km/h"))
-							{
-								mapRecordType.put(index, Record.DataType.SPEED);
-							}
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "param = " + dataVar.getParam());
-							++index;
 						}
 					}
 
@@ -233,14 +257,26 @@ public class JetiDataReader {
 					activeChannel.put(recordSetName, recordSet);
 
 					index = 0;
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getMeasurementNames(activeChannelConfigNumber).length + " - " + recordSet.size());
+					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE))
+						JetiDataReader.log.log(java.util.logging.Level.FINE, device.getMeasurementNames(activeChannelConfigNumber).length + " - " + recordSet.size());
 					int[] points = new int[recordNames.length];
 					for (int i = 0; i < numValues; i++) {
 						for (TelemetrySensor telemetrySensor : recordSetData) {
-							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-								//System.out.print(String.format("%s ", dataVar.getName()));
-								points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * (dataVar.getType() == TelemetryData.T_GPS ? 1000000 : 1000));
-								//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
+							if (telemetrySensor.getId() != 0) {
+								for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+									//System.out.print(String.format("%s ", dataVar.getName()));
+									points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * (dataVar.getType() == TelemetryData.T_GPS ? 1000000 : 1000));
+									//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
+								}
+							}
+						}
+						for (TelemetrySensor telemetrySensor : recordSetData) {
+							if (telemetrySensor.getId() == 0) {
+								for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+									//System.out.print(String.format("%s ", dataVar.getName()));
+									points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * (dataVar.getType() == TelemetryData.T_GPS ? 1000000 : 1000));
+									//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
+								}
 							}
 						}
 						recordSet.addPoints(points, time_ms);
@@ -248,8 +284,8 @@ public class JetiDataReader {
 						index = 0;
 						//System.out.println();
 					}
-					if (application.getStatusBar() != null) {
-						application.setProgress(100, sThreadId);
+					if (JetiDataReader.application.getStatusBar() != null) {
+						JetiDataReader.application.setProgress(100, sThreadId);
 						//if (application.getStatusBar().getMessage().length > 0)
 						//	isAlarmMEssageDisplayed = true;
 					}
@@ -269,9 +305,9 @@ public class JetiDataReader {
 								device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 					}
 					//write filename after import to record description			
-					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
 					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-					if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+					if (JetiDataReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 				}
 			}
 		}
@@ -282,18 +318,18 @@ public class JetiDataReader {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (JetiDataReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
-			log.log(Level.WARNING, msg, e);
-			application.openMessageDialog(msg);
+			JetiDataReader.log.log(java.util.logging.Level.WARNING, msg, e);
+			JetiDataReader.application.openMessageDialog(msg);
 		}
-//		finally {
-//			if (application.getStatusBar() != null) {
-//				application.setStatusMessage(GDE.STRING_EMPTY);
-//			}
-//		}
+		//		finally {
+		//			if (application.getStatusBar() != null) {
+		//				application.setStatusMessage(GDE.STRING_EMPTY);
+		//			}
+		//		}
 
 		return recordSet;
 	}
