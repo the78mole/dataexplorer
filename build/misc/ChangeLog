@@ -7,6 +7,7 @@ fix JetiAdapter missed parsing data from sensor without unit
 fix JetiAdapter GPS-Altitude and GPS-Speed detection
 fix time formating in statistics window
 fix GPS-Logger2 speed parsing from SMGPS instead VTG sentence
+JetiAdapter - display events as a curve, repeating events add up the counter
 
 Version 3.1.7 - 18 Sep 2014
 fix GPXAdapter altitude parsing
