@@ -790,6 +790,11 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ GPS");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
+//						int dataLength = 0, dataLengthLast = 0;
+//						while (dataLengthLast != (dataLength = this.serialPort.getDataSize())) {
+//							System.out.println("dataLength = " + dataLength);							
+//							dataLengthLast = dataLength;
+//						}
 						this.serialPort.getData(false);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						this.serialPort.getData(true);

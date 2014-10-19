@@ -365,6 +365,11 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 2) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
+//							int dataLength = 0, dataLengthLast = 0;
+//							while (dataLengthLast != (dataLength = this.serialPort.getDataSize())) {
+//								System.out.println("dataLength = " + dataLength);							
+//								dataLengthLast = dataLength;
+//							}
 							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}

@@ -226,6 +226,17 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		System.arraycopy(query, 7, cmd2, 0, query.length - 7);
 		this.write(cmd2);
 	}
+	
+	/**
+	 * method to get stable byte count size to enable different firmware versions for sensors which may return different result set sizes
+	 * return size of returned byte array
+	 * @throws IOException 
+	 * @throws TimeOutException 
+	 */
+	public synchronized int getDataSize() throws IOException, TimeOutException {
+		this.sendCmd(this.QUERY_SENSOR_TYPE);
+		return this.read(new byte[this.ANSWER_DATA.length], HoTTAdapterSerialPort.READ_TIMEOUT_MS, 5, this.ANSWER_DATA.length).length;
+	}
 
 	/**
 	 * method to gather data from device, implementation is individual for device
