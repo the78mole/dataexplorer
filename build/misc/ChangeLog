@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.1.8 - xx yyy 2014
+Version 3.1.8 - 19 Okt 2014
 fix Kosmik rounding issue
 fix HoTTAdapter* text mode initialization
 fix JetiAdapter missed parsing data from sensor without unit
