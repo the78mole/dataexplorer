@@ -165,7 +165,7 @@ public class UniLogDialog extends DeviceDialog {
 	Group													channleConfigGroup;
 	Button												stopLiveGatherButton;
 	Button												editConfigButton;
-	Text													memoryDeleteInfo;
+	CLabel												memoryDeleteInfo;
 	
 	CTabItem											telemetryTabItem;
 	UniLogTelemetryTab						telemetryTab;
@@ -1337,12 +1337,12 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.memoryDeleteInfo = new Text(this.clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
+									this.memoryDeleteInfo = new CLabel(this.clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
 									this.memoryDeleteInfo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memoryDeleteInfo.setBounds(12, GDE.IS_MAC_COCOA ? 7 : 22, 256, 34);
 									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.GDE_MSGI1301));
 									this.memoryDeleteInfo.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-									this.memoryDeleteInfo.setEditable(false);
+									//this.memoryDeleteInfo.setEditable(false);
 								}
 							} // end clearDataBufferGroup
 						}
