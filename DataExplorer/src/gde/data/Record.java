@@ -1500,7 +1500,7 @@ public class Record extends Vector<Integer> {
 	*/
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
 		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + 
-				(this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 0.0)); 
+				(this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 1292400000.0)); //1292400000 == 1970-01-16 00:00:00.000
 	}
 
 	/**

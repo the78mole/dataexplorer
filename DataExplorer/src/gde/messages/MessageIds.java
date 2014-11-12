@@ -866,5 +866,17 @@ public class MessageIds {
 	public final static String	GDE_MSGT0711 = "GDE_MSGT0711";
 	public final static String	GDE_MSGT0712 = "GDE_MSGT0712";
 	public final static String	GDE_MSGT0713 = "GDE_MSGT0713";
+	public final static String	GDE_MSGT0714 = "GDE_MSGT0714";
+	public final static String	GDE_MSGT0715 = "GDE_MSGT0715";
+	public final static String	GDE_MSGT0716 = "GDE_MSGT0716";
+	public final static String	GDE_MSGT0717 = "GDE_MSGT0717";
+	public final static String	GDE_MSGT0718 = "GDE_MSGT0718";
+	public final static String	GDE_MSGT0719 = "GDE_MSGT0719";
+	public final static String	GDE_MSGT0720 = "GDE_MSGT0720";
+	public final static String	GDE_MSGT0721 = "GDE_MSGT0721";
+	public final static String	GDE_MSGT0722 = "GDE_MSGT0722";
+	public final static String	GDE_MSGT0723 = "GDE_MSGT0723";
+	public final static String	GDE_MSGT0724 = "GDE_MSGT0724";
+	public final static String	GDE_MSGT0725 = "GDE_MSGT0725";
 
  }
