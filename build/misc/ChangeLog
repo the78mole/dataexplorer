@@ -1,5 +1,9 @@
 Development history / change log, please read from bottom up
 
+Version 3.1.9 - xx yyy 2014
+enable absolute time for graphics time line
+update HoTTMdlViewer to latest 0.8 snapshot
+
 Version 3.1.8 - 19 Okt 2014
 fix Kosmik rounding issue
 fix HoTTAdapter* text mode initialization
