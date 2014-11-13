@@ -436,8 +436,12 @@ public class TimeLine {
 			case TimeLine.TIME_LINE_SEC_MIN * 10:
 			case TimeLine.TIME_LINE_MIN_HRS * 10:
 				if (timeDeltaValue >= 0 && timeDeltaValue <= 30) {
-					numberTicks = isAbsoluteTime ? timeDelta / 6.0 : timeDelta / 2.5; // every 2.5 th units one tick
+					numberTicks = isAbsoluteTime ? timeDelta / 3.0 : timeDelta / 1.0; // every 2.5 th units one tick
 					scaleFactor = scaleFactor * 4.0;
+				}
+				else if (timeDeltaValue > width / 50 && timeDeltaValue <= width / 25) {
+					numberTicks = isAbsoluteTime ? timeDelta / 6.0 : timeDelta / 2.5; // every 5 th units one tick
+					scaleFactor = scaleFactor * 1.0;
 				}
 				else if (timeDeltaValue > width / 25 && timeDeltaValue <= width / 8) {
 					numberTicks = isAbsoluteTime ? timeDelta / 12.0 : timeDelta / 5.0; // every 5 th units one tick
@@ -456,7 +460,7 @@ public class TimeLine {
 					scaleFactor = scaleFactor / 4.0;
 				}
 				else {
-					numberTicks = isAbsoluteTime ? timeDelta / 200.0 : timeDelta / 80.0; // every 20 th units one tick
+					numberTicks = isAbsoluteTime ? timeDelta / 150.0 : timeDelta / 80.0; // every 20 th units one tick
 					scaleFactor = scaleFactor / 8.0;
 				}
 				break;
