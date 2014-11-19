@@ -32,12 +32,14 @@
                 <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>1????</name>
                 <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>2????</name>
@@ -312,12 +314,14 @@
                 <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
+                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>1????</name>
                 <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>2????</name>
