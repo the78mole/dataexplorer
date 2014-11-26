@@ -132,7 +132,7 @@ public class JetiDataReader {
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 							//System.out.println(dataVar.getName());
 							if (dataVar.getItems().size() > 0) {
-								if (valuesMap.containsKey(dataVar.getItems().size())) {
+								if (valuesMap.containsKey(dataVar.getItems().size()) && dataVar.getItems().size() > 1) {
 									valuesMap.put(dataVar.getItems().size(), valuesMap.get(dataVar.getItems().size()) + 1);
 									maxHit = Math.max(maxHit, valuesMap.get(dataVar.getItems().size()));
 								}
