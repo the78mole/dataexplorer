@@ -706,7 +706,8 @@ public class GraphicsComposite extends Composite {
 		this.canvasBounds = this.graphicCanvas.getClientArea();
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
 
-		this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
+		if (this.canvasImage != null) this.canvasImage.dispose();
+		this.canvasImage = new Image(GDE.display, this.canvasBounds);
 		this.canvasImageGC = new GC(this.canvasImage); //SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
@@ -753,6 +754,7 @@ public class GraphicsComposite extends Composite {
 
 		this.canvasGC.dispose();
 		this.canvasImageGC.dispose();
+		//this.canvasImage.dispose(); //zooming, marking, ... needs a reference to canvasImage
 	}
 
 	/**

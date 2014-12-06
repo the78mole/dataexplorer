@@ -24,6 +24,7 @@ import gde.data.RecordSet;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.text.SimpleDateFormat;
@@ -86,7 +87,9 @@ public class TimeLine {
 					"totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec + " - " + Integer.MAX_VALUE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int maxTimeNumberFormated; // the biggest number in the scale to be displayed
 
-		boolean isTimeFormatAbsolute = Settings.getInstance().isTimeFormatAbsolute();
+		boolean isTimeFormatAbsolute = Settings.getInstance().isTimeFormatAbsolute() 
+				&& !DataExplorer.getInstance().getActiveRecordSet().isCompareSet()
+				&& !DataExplorer.getInstance().getActiveRecordSet().isZoomMode();
 
 		if (totalTime_year > 5) {
 			maxTimeNumberFormated = (int) totalTime_year;
@@ -228,7 +231,7 @@ public class TimeLine {
 	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, double scaleFactor, int timeFormat, long deltaTime_ms, int ticklength,
 			int miniticks, int gap) {
 		Double numberTicks, timeDelta;
-		boolean isAbsoluteTime = Settings.getInstance().isTimeFormatAbsolute();
+		boolean isAbsoluteTime = Settings.getInstance().isTimeFormatAbsolute() && !recordSet.isCompareSet() && !recordSet.isZoomMode();
 		long startTimeStamp = recordSet.getStartTimeStamp();
 		long offset = 0;
 		int timeDeltaValue = endTimeValue - startTimeValue;

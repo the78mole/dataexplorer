@@ -41,6 +41,7 @@ import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -1422,10 +1423,10 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public double getStartTime() {
 		double startTime = 0;
 		if (this.isZoomMode) {
-			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute()) ? this.timeStep_ms.startTimeStamp_ms + this.get(0).zoomTimeOffset : this.get(0).zoomTimeOffset;
+			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute() && this.timeStep_ms != null) ? this.timeStep_ms.startTimeStamp_ms + this.get(0).zoomTimeOffset : this.get(0).zoomTimeOffset;
 		}
 		else if (this.isScopeMode) {
-			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute()) ? this.timeStep_ms.startTimeStamp_ms + this.timeStep_ms.getTime_ms(this.scopeModeOffset+1) : this.timeStep_ms.getTime_ms(this.scopeModeOffset+1);
+			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute() && this.timeStep_ms != null) ? this.timeStep_ms.startTimeStamp_ms + this.timeStep_ms.getTime_ms(this.scopeModeOffset+1) : this.timeStep_ms.getTime_ms(this.scopeModeOffset+1);
 		}
 		return startTime;
 	}
@@ -1850,10 +1851,10 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public void syncScaleOfSyncableRecords() {
 		this.scaleSyncedRecords.clear(); //	= new HashMap<Integer,Vector<Record>>(1);
 		for (int i = 0; i < this.size() && !this.isCompareSet; i++) {
-			PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) : this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+			final PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) : this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
-				Record tmpRecord = this.get(i);
-				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
+				final Record tmpRecord = this.get(i);
+				final int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
 				if (syncMasterRecordOrdinal >= 0) {
 					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name);
@@ -1862,7 +1863,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
 						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 					}
-					if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
+					if (!this.isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
 							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 						else
@@ -2234,7 +2235,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @return
 	 */
 	public long getStartTimeStamp() {
-		return this.timeStep_ms.getStartTimeStamp();
+		return this.timeStep_ms != null ? this.timeStep_ms.getStartTimeStamp() : new Date().getTime();
 	}
 	
 	/**
