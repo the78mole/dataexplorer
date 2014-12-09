@@ -1348,18 +1348,16 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsSpeedControl[0] = (_buf0[4] & 0xFF) * 1000;
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf1, 7);
 		HoTTbinReader.tmpRevolution = DataParser.parse2Short(_buf2, 5);
-		HoTTbinReader.tmpTemperatureFet = _buf1[9];
-		//HoTTbinReader.tmpTemperatureExt = _buf2[9];
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000 && HoTTbinReader.tmpRevolution > -1
-				&& HoTTbinReader.tmpRevolution < 20000) {
+		HoTTbinReader.tmpTemperatureFet = _buf1[9] - 20;
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
+				&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[6] != 0 && HoTTbinReader.pointsSpeedControl[6]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsSpeedControl[4] = Double.valueOf(HoTTbinReader.pointsSpeedControl[1] / 1000.0 * HoTTbinReader.pointsSpeedControl[2]).intValue();
 			HoTTbinReader.pointsSpeedControl[3] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[3] / 1000 ? HoTTbinReader.pointsSpeedControl[3]
 					: HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader.pointsSpeedControl[5] = HoTTbinReader.tmpRevolution * 1000;
-			HoTTbinReader.pointsSpeedControl[6] = (HoTTbinReader.tmpTemperatureFet - 20) * 1000;
-			//HoTTbinReader.pointsSpeedControl[7] = HoTTbinReader.tmpTemperatureExt * 1000;
+			HoTTbinReader.pointsSpeedControl[6] = HoTTbinReader.tmpTemperatureFet * 1000;
 		}
 		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
 		HoTTbinReader.isJustParsed = true;
