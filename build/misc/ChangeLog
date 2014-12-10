@@ -2,10 +2,11 @@ Development history / change log, please read from bottom up
 
 Version 3.1.9 - xx yyy 2014
 enable absolute time for graphics time line
-update HoTTMdlViewer to latest 0.8 snapshot
+fix caching algorithm to enable scale text color updated by color change 
+HoTTAdapter* - update HoTTMdlViewer to latest 0.8 snapshot
 add Teranis OpenTx telemetrie support
 IISI-Cockpit V2 - add statistics definition 
-fix JetiAdapter time step calculation for very short logs in respect of time
+JetiAdapter - fix time step calculation for very short logs in respect of time
 HoTTAdapter* - fine tune some more filter settings
 
 Version 3.1.8 - 19 Okt 2014
