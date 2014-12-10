@@ -178,8 +178,11 @@ public class JetiDataReader {
 							boolean isActualgps = false;
 							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 								String newRecordName = dataVar.getName();
+								if (telemetrySensor.getName().startsWith("Rx")) {
+									newRecordName = String.format("%s %s", newRecordName.split(" Rx")[0], telemetrySensor.getName());
+								}
 								while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
-									newRecordName = newRecordName + "'";
+									newRecordName = String.format("%s %s", newRecordName, telemetrySensor.getName());
 								}
 								vecRecordNames.add(newRecordName);
 								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "add new record name = " + newRecordName);
