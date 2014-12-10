@@ -190,7 +190,7 @@ public class GraphicsUtils {
 			gc.drawImage(stringImage, x - pt.x / 2, y - pt.y / 2);
 		}
 		else { // draw the image vertically onto the original GC	
-			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, string+(gc.getBackground().getRGB().toString()));
+			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, String.format("%s_%s_%s", string, (gc.getBackground().toString()), (gc.getForeground().toString())));
 		}
 		stringGc.dispose();
 	}
