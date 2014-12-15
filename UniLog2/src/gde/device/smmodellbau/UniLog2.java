@@ -227,7 +227,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * @param stringBuffer the data to be parsed
 	 */
 	public int[] convertLiveData(int[] points, String stringBuffer) {
-		String[] dataArray = StringHelper.splitString(stringBuffer, "<CR>", "\n");
+		String[] dataArray = StringHelper.splitString(stringBuffer, "\r", "\n");
 		for (int i=2; i < dataArray.length; i++) {
 			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
 			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,

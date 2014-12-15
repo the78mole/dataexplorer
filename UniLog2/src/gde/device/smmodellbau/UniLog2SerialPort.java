@@ -89,7 +89,7 @@ public class UniLog2SerialPort extends DeviceCommPort {
 				System.arraycopy(readBufferTmp, 0, readBuffer, 114, 38);
 
 				//log.log(Level.FINE, StringHelper.byte2Hex2CharString(readBuffer));
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.convert2CharString(readBuffer));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(readBuffer, readBuffer.length));
 			}
 			catch (Exception e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -99,7 +99,7 @@ public class UniLog2SerialPort extends DeviceCommPort {
 		else
 			throw new Exception(Messages.getString(gde.messages.MessageIds.GDE_MSGE0031));
 
-		return StringHelper.convert2CharString(readBuffer);
+		return StringHelper.byte2CharString(readBuffer, readBuffer.length);
 	}
 	
 	/**

@@ -145,7 +145,8 @@ public class UniLog2LiveGatherer extends Thread {
 					liveAnswers = new String[3];
 					while (liveAnswers[0] == null || liveAnswers[1] == null || liveAnswers[2] == null) {
 						String liveAnswer = UniLog2LiveGatherer.this.serialPort.queryLiveData();
-						if(liveAnswer.length() < 100) break;
+						if(liveAnswer.length() < 100) 
+							break;
 						if (liveAnswer.contains("rpm") && liveAnswer.contains("VRx")) {
 							liveAnswers[0] = liveAnswer;
 						}
@@ -155,6 +156,8 @@ public class UniLog2LiveGatherer extends Thread {
 						else if (liveAnswer.contains("hPa") && liveAnswer.contains("intern")) {
 							liveAnswers[2] = liveAnswer;
 						}
+						else if (this.serialPort.isInterruptedByUser)
+							break;
 					}
 
 					tmpCycleTime = System.nanoTime()/1000000;
