@@ -24,9 +24,11 @@ import gde.data.Channel;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
+import gde.device.ChannelType;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
@@ -38,6 +40,8 @@ import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -612,7 +616,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
-		int[] points = new int[recordSet.size()];
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 1;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -628,7 +632,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
 
-			recordSet.addPoints(points, 
+			recordSet.addNoneCalculationRecordsPoints(points, 
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -658,8 +662,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 				//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 				//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-
-				if (ordinal == 13 || ordinal == 14) { //13=Latitude, 14=Longitude 
+				final int latOrdinal = 13, lonOrdinal = 14;
+				if (ordinal == latOrdinal || ordinal == lonOrdinal) { //13=Latitude, 14=Longitude 
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
@@ -687,7 +691,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	@Override
 	public boolean isGPSCoordinates(Record record) {
 		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
-		return record.getOrdinal() == 13 || record.getOrdinal() == 14;
+		final int latOrdinal = 13, lonOrdinal = 14;
+		return record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal;
 	}
 
 	/**
@@ -707,8 +712,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-
-		if (record.getOrdinal() == 13 || record.getOrdinal() == 14) { //13=Latitude, 14=Longitude
+		final int latOrdinal = 13, lonOrdinal = 14;
+		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { //13=Latitude, 14=Longitude
 			int grad = ((int) (value / 1000));
 			double minuten = (value - (grad * 1000.0)) / 10.0;
 			newValue = grad + minuten / 60.0;
@@ -744,8 +749,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-
-		if (record.getOrdinal() == 13 || record.getOrdinal() == 14) { // 13=Latitude, 14=Longitude
+		final int latOrdinal = 13, lonOrdinal = 14;
+		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { // 13=Latitude, 14=Longitude
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
@@ -775,14 +780,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-
-		Record recordLatitude = recordSet.get(13);
-		Record recordLongitude = recordSet.get(14);
-		Record recordAlitude = recordSet.get(9);
+		final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9, distOrdinal = 16, tripOrdinal = 18;
+		Record recordLatitude = recordSet.get(latOrdinal);
+		Record recordLongitude = recordSet.get(lonOrdinal);
+		Record recordAlitude = recordSet.get(altOrdinal);
 		
 		if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 13=Latitude, 14=Longitude 9=Height
 			int recordSize = recordLatitude.realSize();
-			int startAltitude = recordAlitude.get(9); // using this as start point might be sense less if the GPS data has no 3D-fix
+			int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
 			//check GPS latitude and longitude				
 			int indexGPS = 0;
 			int i = 0;
@@ -795,7 +800,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			}
 			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
-			GPSHelper.calculateTripLength(this, recordSet, 13, 14, 9, startAltitude, 16, 18);
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
 			this.application.updateStatisticsData(true);
 			this.updateVisibilityStatus(recordSet, true);
 		}
@@ -924,7 +929,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), 14, 13, 9, 15, 10, 18, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9, climbOrdinal = 10, speedOrdinal = 15, tripOrdinal = 18;
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 		
 	/**
@@ -940,9 +946,10 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-		Record recordLatitude = recordSet.get(13);
-		Record recordLongitude = recordSet.get(14);
-		Record gpsAlitude = recordSet.get(9);
+		final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9;
+		Record recordLatitude = recordSet.get(latOrdinal);
+		Record recordLongitude = recordSet.get(lonOrdinal);
+		Record gpsAlitude = recordSet.get(altOrdinal);
 		
 		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", 																																														//$NON-NLS-1$
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
@@ -969,7 +976,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 				//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 				//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-				containsGPSdata = activeRecordSet.get(13).hasReasonableData() && activeRecordSet.get(14).hasReasonableData();
+				final int latOrdinal = 13, lonOrdinal = 14;
+				containsGPSdata = activeRecordSet.get(latOrdinal).hasReasonableData() && activeRecordSet.get(lonOrdinal).hasReasonableData();
 			}
 		}
 		return containsGPSdata;
@@ -994,7 +1002,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 				//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 				//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-				exportFileName = new FileHandler().exportFileKMZ(14, 13, 9, 15, 10, 18, -1, true, isExport2TmpDir);
+				final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9, climbOrdinal = 10, speedOrdinal = 15, tripOrdinal = 18;
+				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
@@ -1014,5 +1023,45 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 		return 15;
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //added VoltageRx_min, Revolution E
+			for (int i = 0; i < recordKeys.length; i++) {
+				if (i != 8 && i != 59)
+					cleanedRecordNames.add(recordKeys[i]);
+			}
+			//recordSet.remove(recordKeys[9]); //VoltageRx_min
+			//recordSet.remove(recordKeys[59]); //Revolution E
+			ChannelType channel = this.getChannel(recordSet.getChannelConfigNumber());
+			if (channel != null) {
+				List<MeasurementType> measurement = channel.getMeasurement();
+				measurement.get(8).setActive(null); //VoltageRx_min
+				measurement.get(59).setActive(null);//Revolution E
+			}
+
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		else {
+			ChannelType channel = this.getChannel(recordSet.getChannelConfigNumber());
+			if (channel != null) {
+				List<MeasurementType> measurement = channel.getMeasurement();
+				measurement.get(8).setActive(true); //VoltageRx_min
+				measurement.get(59).setActive(true);//Revolution E
+			}
+		}
+		return recordKeys;
 	}
 }
