@@ -9,6 +9,7 @@ JetiAdapter - fix time step calculation for very short logs in respect of time
 JetiAdapter - fix record naming while repeating measurement names with different sensors
 HoTTAdapter* - update HoTTMdlViewer to latest 0.8 snapshot
 HoTTAdapter* - fine tune some more filter settings
+HoTTAdapter* - add measurement voltage Rx min and make EAM rpm to an extra measurement
 UniLog2 - fix live data gathering capability
 
 Version 3.1.8 - 19 Okt 2014
