@@ -1006,7 +1006,7 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
-		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null ? this.dataBlock.getPreferredDataLocation() : GDE.STRING_BLANK) : GDE.STRING_BLANK;
+		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null && this.dataBlock.getPreferredDataLocation().length() != 0 ? this.dataBlock.getPreferredDataLocation() : this.settings.getDataFilePath()) : this.settings.getDataFilePath();
 	}
 
 	public void setDataBlockPreferredDataLocation(String value) {
