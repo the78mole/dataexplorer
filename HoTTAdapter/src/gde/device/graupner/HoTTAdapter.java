@@ -415,7 +415,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx, 8=VoltageRxMin
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
 					tmpVoltageRx = (dataBuffer[6] & 0xFF);
 					tmpTemperatureRx = (dataBuffer[7] & 0xFF);
@@ -428,13 +428,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[5] = (dataBuffer[8] & 0xFF) * 1000;
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
+						points[8] = (dataBuffer[10] & 0xFF) * 1000;
 					}
 				}
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 57) {
-					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+					//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 16);
 					if (!HoTTAdapter.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
@@ -520,7 +521,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 				if (dataBuffer.length == 57) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
+					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 40);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 36);
@@ -552,6 +553,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[24] = tmpVoltage2 * 1000;
 						points[25] = (dataBuffer[34] & 0xFF) * 1000;
 						points[26] = (dataBuffer[35] & 0xFF) * 1000;
+						points[27] = DataParser.parse2Short(dataBuffer, 58) * 1000;
 					}
 				}
 				break;
@@ -594,6 +596,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[5] = (dataBuffer[4] & 0xFF) * 1000;
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
+						points[8] = (dataBuffer[10] & 0xFF) * 1000;
 					}
 				}
 				break;
@@ -718,6 +721,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[24] = tmpVoltage2 * 1000;
 						points[25] = (DataParser.parse2Short(dataBuffer, 42) + 20) * 1000;
 						points[26] = (DataParser.parse2Short(dataBuffer, 44) + 20) * 1000;
+						points[27] = DataParser.parse2Short(dataBuffer, 58) * 1000;
 					}
 				}
 				break;

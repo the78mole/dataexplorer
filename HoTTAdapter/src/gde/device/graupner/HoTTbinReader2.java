@@ -90,16 +90,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
 		HoTTbinReader2.recordSet = null;
-		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
-		//18=VoltageG, 19=CurrentG, 20=CapacityG, 21=PowerG, 22=BalanceG, 23=CellVoltageG 1, 24=CellVoltageG 2 .... 28=CellVoltageG 6, 29=Revolution, 30=FuelLevel, 31=VoltageG 1, 32=VoltageG 2, 33=TemperatureG 1, 34=TemperatureG 2
-		//35=VoltageE, 36=CurrentE, 37=CapacityE, 38=PowerE, 39=BalanceE, 40=CellVoltageE 1, 41=CellVoltageE 2 .... 53=CellVoltageE 14, 54=VoltageE 1, 55=VoltageE 2, 56=TemperatureE 1, 57=TemperatureE 2
-		//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-		//channelConfig 4 -> Channel
-		//58=Ch 1, 59=Ch 2 , 60=Ch 3 .. 73=Ch 16
-		//74=PowerOff, 75=BattLow, 76=Reset, 77=reserved
-		//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
+		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
+		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
+		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader2.points[2] = 0;
 		HoTTbinReader.pointsGeneral = HoTTbinReader.pointsElectric = HoTTbinReader.pointsSpeedControl = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReader2.points;
@@ -413,16 +411,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isInitialSwitched = false;
 		HoTTbinReader2.recordSet = null;
 		HoTTbinReader2.isJustMigrated = false;
-		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
-		//18=VoltageG, 19=CurrentG, 20=CapacityG, 21=PowerG, 22=BalanceG, 23=CellVoltageG 1, 24=CellVoltageG 2 .... 28=CellVoltageG 6, 29=Revolution, 30=FuelLevel, 31=VoltageG 1, 32=VoltageG 2, 33=TemperatureG 1, 34=TemperatureG 2
-		//35=VoltageE, 36=CurrentE, 37=CapacityE, 38=PowerE, 39=BalanceE, 40=CellVoltageE 1, 41=CellVoltageE 2 .... 53=CellVoltageE 14, 54=VoltageE 1, 55=VoltageE 2, 56=TemperatureE 1, 57=TemperatureE 2
-		//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-		//channelConfig 4 -> Channel
-		//58=Ch 1, 59=Ch 2 , 60=Ch 3 .. 73=Ch 16
-		//74=PowerOff, 75=BattLow, 76=Reset, 77=reserved
-		//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
+		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
+		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
+		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader.pointsGeneral = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.pointsElectric = new int[HoTTbinReader2.points.length];
@@ -746,55 +742,63 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 */
 	public static void migrateAddPoints(boolean isVarioData, boolean isGPSData, boolean isGeneralData, boolean isElectricData, boolean isMotorDriverData, int channelNumber)
 			throws DataInconsitsentException {
-		//receiver data gets integrated each cycle 0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-		//8=Height, 9=Climb 1, 10=Climb 3
-		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+		//receiver data gets integrated each cycle 
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
+		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
+		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
+		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
+
+		//9=Height, 10=Climb 1, 11=Climb 3
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
 		if (isElectricData) {
-			if ((HoTTbinReader2.points[8] != 0 && HoTTbinReader.pointsElectric[8] != 0) || HoTTbinReader.pointsElectric[8] != 0) HoTTbinReader2.points[8] = HoTTbinReader.pointsElectric[8];
-			for (int j = 9; j < 11; j++) {
+			if ((HoTTbinReader2.points[9] != 0 && HoTTbinReader.pointsElectric[9] != 0) || HoTTbinReader.pointsElectric[9] != 0) HoTTbinReader2.points[9] = HoTTbinReader.pointsElectric[9];
+			for (int j = 9; j < 12; j++) {
 				HoTTbinReader2.points[j] = HoTTbinReader.pointsElectric[j];
 			}
-			for (int k = 35; k < 58; k++) {
+			for (int k = 36; k < 60; k++) {
 				HoTTbinReader2.points[k] = HoTTbinReader.pointsElectric[k];
 			}
-			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader2.points[29] = HoTTbinReader.pointsGeneral[29];
 		}
-		//8=Height, 9=Climb 1, 10=Climb 3
-		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//9=Height, 10=Climb 1, 11=Climb 3
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
 		if (isGeneralData) {
-			if ((HoTTbinReader2.points[8] != 0 && HoTTbinReader.pointsGeneral[8] != 0) || HoTTbinReader.pointsGeneral[8] != 0) HoTTbinReader2.points[8] = HoTTbinReader.pointsGeneral[8];
-			for (int j = 9; j < 11; j++) {
+			if ((HoTTbinReader2.points[9] != 0 && HoTTbinReader.pointsGeneral[9] != 0) || HoTTbinReader.pointsGeneral[9] != 0) HoTTbinReader2.points[9] = HoTTbinReader.pointsGeneral[9];
+			for (int j = 9; j < 12; j++) {
 				HoTTbinReader2.points[j] = HoTTbinReader.pointsGeneral[j];
 			}
-			for (int k = 18; k < 35; k++) {
+			for (int k = 19; k < 36; k++) {
 				HoTTbinReader2.points[k] = HoTTbinReader.pointsGeneral[k];
 			}
 		}
-		//8=Height, 9=Climb 1, 10=Climb 3
-		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//9=Height, 10=Climb 1, 11=Climb 3
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
 		if (isGPSData) {
-			for (int j = 8; j < 11; j++) {
+			for (int j = 9; j < 12; j++) {
 				HoTTbinReader2.points[j] = HoTTbinReader.pointsGPS[j];
 			}
-			for (int k = 12; k < 18; k++) {
+			for (int k = 13; k < 19; k++) {
 				HoTTbinReader2.points[k] = HoTTbinReader.pointsGPS[k];
 			}
 		}
-		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-		if (isVarioData && (HoTTbinReader.pointsVario[8] != 0 || HoTTbinReader.pointsVario[9] != 0 || HoTTbinReader.pointsVario[10] != 0 || HoTTbinReader.pointsVario[11] != 0)) {
-			for (int j = 8; j < 12; j++) {
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		if (isVarioData && (HoTTbinReader.pointsVario[9] != 0 || HoTTbinReader.pointsVario[10] != 0 || HoTTbinReader.pointsVario[11] != 0 || HoTTbinReader.pointsVario[12] != 0)) {
+			for (int j = 9; j < 13; j++) {
 				HoTTbinReader2.points[j] = HoTTbinReader.pointsVario[j];
 			}
 		}
 		if (isMotorDriverData) {
 			if (channelNumber == 4)
-				//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
-				for (int j = 78; j < 78 + 6 && j < HoTTbinReader2.points.length; j++) {
+				//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
+				for (int j = 80; j < 86 && j < HoTTbinReader2.points.length; j++) {
 					HoTTbinReader2.points[j] = HoTTbinReader.pointsSpeedControl[j];
 				}
 			else
-				//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-				for (int j = 58; j < 58 + 6 && j < HoTTbinReader2.points.length; j++) {
+				//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
+				for (int j = 60; j < 66 && j < HoTTbinReader2.points.length; j++) {
 					HoTTbinReader2.points[j] = HoTTbinReader.pointsSpeedControl[j];
 				}
 		}
@@ -807,7 +811,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf
 	 */
 	private static void parseReceiver(byte[] _buf) {
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 		HoTTbinReader.tmpVoltageRx = (_buf[35] & 0xFF);
 		HoTTbinReader.tmpTemperatureRx = (_buf[36] & 0xFF);
 		HoTTbinReader2.points[1] = (_buf[38] & 0xFF) * 1000;
@@ -818,6 +822,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.points[5] = (_buf[4] & 0xFF) * -1000;
 			HoTTbinReader2.points[6] = (_buf[35] & 0xFF) * 1000;
 			HoTTbinReader2.points[7] = ((_buf[36] & 0xFF) - 20) * 1000;
+			HoTTbinReader2.points[8] = (_buf[39] & 0xFF) * 1000;
 		}
 	}
 
@@ -829,33 +834,19 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf2
 	 */
 	private static int parseVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) {
-//		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
-//		switch (sdLogVersion) {
-//		case 3:
-//			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-//			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-//			HoTTbinReader.pointsVario[8] = (DataParser.parse2Short(_buf1, 3) - 500) * 1000;
-//			//pointsVario[0]max = DataParser.parse2Short(_buf1, 5) * 1000;
-//			//pointsVario[0]min = DataParser.parse2Short(_buf1, 7) * 1000;
-//			HoTTbinReader.pointsVario[9] = (DataParser.parse2UnsignedShort(_buf1[9], _buf2[0]) - 30000) * 10;
-//			HoTTbinReader.pointsVario[10] = (DataParser.parse2UnsignedShort(_buf1[1], _buf2[2]) - 30000) * 10;
-//			HoTTbinReader.pointsVario[11] = (DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) * 10;
-//			break;
-//		default:
-//		case 4:
-			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+			//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+			//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
 			HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf1, 2) - 500;
 			if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000)) {
-				HoTTbinReader.pointsVario[8] = HoTTbinReader.tmpHeight * 1000;
+				HoTTbinReader.pointsVario[9] = HoTTbinReader.tmpHeight * 1000;
 				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
 				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
-				HoTTbinReader.pointsVario[9] = (DataParser.parse2UnsignedShort(_buf1, 8) - 30000) * 10;
+				HoTTbinReader.pointsVario[10] = (DataParser.parse2UnsignedShort(_buf1, 8) - 30000) * 10;
 			}
 			HoTTbinReader.tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2) - 30000;
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpClimb10 > -10000 && HoTTbinReader.tmpClimb10 < 10000) {
-				HoTTbinReader.pointsVario[10] = (DataParser.parse2UnsignedShort(_buf2, 0) - 30000) * 10;
-				HoTTbinReader.pointsVario[11] = HoTTbinReader.tmpClimb10 * 10;
+				HoTTbinReader.pointsVario[11] = (DataParser.parse2UnsignedShort(_buf2, 0) - 30000) * 10;
+				HoTTbinReader.pointsVario[12] = HoTTbinReader.tmpClimb10 * 10;
 			}
 //			break;
 //		}
@@ -870,26 +861,26 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf3
 	 */
 	private static void parseGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
 		HoTTbinReader.tmpClimb1 = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000);
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF) - 120;
 		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > -20000 && HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000)) {
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb1, 5=Climb3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
-			//8=Height, 9=Climb1, 10=Climb3
-			//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
-			HoTTbinReader.pointsGPS[14] = HoTTAdapter.isFilterEnabled && tmpVelocity > 500000 ? HoTTbinReader.pointsGPS[14] : tmpVelocity;
+			HoTTbinReader.pointsGPS[15] = HoTTAdapter.isFilterEnabled && tmpVelocity > 500000 ? HoTTbinReader.pointsGPS[15] : tmpVelocity;
 
 			HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			if (!HoTTAdapter.isTolerateSignChangeLatitude) HoTTbinReader.tmpLatitude = _buf1[6] == 1 ? -1 * HoTTbinReader.tmpLatitude : HoTTbinReader.tmpLatitude;
-			HoTTbinReader.tmpLatitudeDelta = Math.abs(HoTTbinReader.tmpLatitude - HoTTbinReader.pointsGPS[12]);
+			HoTTbinReader.tmpLatitudeDelta = Math.abs(HoTTbinReader.tmpLatitude - HoTTbinReader.pointsGPS[13]);
 			HoTTbinReader.tmpLatitudeDelta = HoTTbinReader.tmpLatitudeDelta > 400000 ? HoTTbinReader.tmpLatitudeDelta - 400000 : HoTTbinReader.tmpLatitudeDelta;
-			HoTTbinReader.latitudeTolerance = (HoTTbinReader.pointsGPS[14] / 1000.0) * (HoTTbinReader.timeStep_ms - HoTTbinReader.lastLatitudeTimeStep) / HoTTAdapter.latitudeToleranceFactor;
+			HoTTbinReader.latitudeTolerance = (HoTTbinReader.pointsGPS[15] / 1000.0) * (HoTTbinReader.timeStep_ms - HoTTbinReader.lastLatitudeTimeStep) / HoTTAdapter.latitudeToleranceFactor;
 			HoTTbinReader.latitudeTolerance = HoTTbinReader.latitudeTolerance > 0 ? HoTTbinReader.latitudeTolerance : 5;
 
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.pointsGPS[12] == 0 || HoTTbinReader.tmpLatitudeDelta <= HoTTbinReader.latitudeTolerance) {
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.pointsGPS[13] == 0 || HoTTbinReader.tmpLatitudeDelta <= HoTTbinReader.latitudeTolerance) {
 				HoTTbinReader.lastLatitudeTimeStep = HoTTbinReader.timeStep_ms;
-				HoTTbinReader.pointsGPS[12] = HoTTbinReader.tmpLatitude;
+				HoTTbinReader.pointsGPS[13] = HoTTbinReader.tmpLatitude;
 			}
 			else {
 				if (HoTTbinReader.log.isLoggable(Level.FINE))
@@ -899,14 +890,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 			HoTTbinReader.tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
 			if (!HoTTAdapter.isTolerateSignChangeLongitude) HoTTbinReader.tmpLongitude = _buf2[1] == 1 ? -1 * HoTTbinReader.tmpLongitude : HoTTbinReader.tmpLongitude;
-			HoTTbinReader.tmpLongitudeDelta = Math.abs(HoTTbinReader.tmpLongitude - HoTTbinReader.pointsGPS[13]);
+			HoTTbinReader.tmpLongitudeDelta = Math.abs(HoTTbinReader.tmpLongitude - HoTTbinReader.pointsGPS[14]);
 			HoTTbinReader.tmpLongitudeDelta = HoTTbinReader.tmpLongitudeDelta > 400000 ? HoTTbinReader.tmpLongitudeDelta - 400000 : HoTTbinReader.tmpLongitudeDelta;
-			HoTTbinReader.longitudeTolerance = (HoTTbinReader.pointsGPS[14] / 1000.0) * (HoTTbinReader.timeStep_ms - HoTTbinReader.lastLongitudeTimeStep) / HoTTAdapter.longitudeToleranceFactor;
+			HoTTbinReader.longitudeTolerance = (HoTTbinReader.pointsGPS[15] / 1000.0) * (HoTTbinReader.timeStep_ms - HoTTbinReader.lastLongitudeTimeStep) / HoTTAdapter.longitudeToleranceFactor;
 			HoTTbinReader.longitudeTolerance = HoTTbinReader.longitudeTolerance > 0 ? HoTTbinReader.longitudeTolerance : 5;
 
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.pointsGPS[13] == 0 || HoTTbinReader.tmpLongitudeDelta <= HoTTbinReader.longitudeTolerance) {
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.pointsGPS[14] == 0 || HoTTbinReader.tmpLongitudeDelta <= HoTTbinReader.longitudeTolerance) {
 				HoTTbinReader.lastLongitudeTimeStep = HoTTbinReader.timeStep_ms;
-				HoTTbinReader.pointsGPS[13] = HoTTbinReader.tmpLongitude;
+				HoTTbinReader.pointsGPS[14] = HoTTbinReader.tmpLongitude;
 			}
 			else {
 				if (HoTTbinReader.log.isLoggable(Level.FINE))
@@ -914,12 +905,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 							+ HoTTbinReader.tmpLongitudeDelta);
 			}
 
-			HoTTbinReader.pointsGPS[8] = HoTTbinReader.tmpHeight * 1000;
-			HoTTbinReader.pointsGPS[9] = HoTTbinReader.tmpClimb1 * 10;
-			HoTTbinReader.pointsGPS[10] = HoTTbinReader.tmpClimb3 * 1000;
-			HoTTbinReader.pointsGPS[15] = DataParser.parse2Short(_buf2, 6) * 1000;
-			HoTTbinReader.pointsGPS[16] = (_buf1[3] & 0xFF) * 1000;
-			HoTTbinReader.pointsGPS[17] = 0;
+			HoTTbinReader.pointsGPS[9] = HoTTbinReader.tmpHeight * 1000;
+			HoTTbinReader.pointsGPS[10] = HoTTbinReader.tmpClimb1 * 10;
+			HoTTbinReader.pointsGPS[11] = HoTTbinReader.tmpClimb3 * 1000;
+			HoTTbinReader.pointsGPS[16] = DataParser.parse2Short(_buf2, 6) * 1000;
+			HoTTbinReader.pointsGPS[17] = (_buf1[3] & 0xFF) * 1000;
+			HoTTbinReader.pointsGPS[18] = 0;
 		}
 	}
 
@@ -937,40 +928,41 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
 		HoTTbinReader.tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
-		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-		//8=Height, 9=Climb 1, 10=Climb 3
-		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
 		if (!HoTTAdapter.isFilterEnabled
 				|| (HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600 && Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			HoTTbinReader.pointsGeneral[18] = DataParser.parse2Short(_buf3, 7) * 1000;
-			HoTTbinReader.pointsGeneral[19] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader.pointsGeneral[20] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsGeneral[20] / 1000 ? HoTTbinReader.pointsGeneral[20]
+			HoTTbinReader.pointsGeneral[19] = DataParser.parse2Short(_buf3, 7) * 1000;
+			HoTTbinReader.pointsGeneral[20] = DataParser.parse2Short(_buf3, 5) * 1000;
+			HoTTbinReader.pointsGeneral[21] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsGeneral[21] / 1000 ? HoTTbinReader.pointsGeneral[21]
 					: HoTTbinReader.tmpCapacity * 1000;
-			HoTTbinReader.pointsGeneral[21] = Double.valueOf(HoTTbinReader.pointsGeneral[18] / 1000.0 * HoTTbinReader.pointsGeneral[19]).intValue();
+			HoTTbinReader.pointsGeneral[22] = Double.valueOf(HoTTbinReader.pointsGeneral[19] / 1000.0 * HoTTbinReader.pointsGeneral[20]).intValue();
 			for (int j = 0; j < 6; j++) {
-				HoTTbinReader.pointsGeneral[j + 23] = (_buf1[3 + j] & 0xFF) * 1000;
-				if (HoTTbinReader.pointsGeneral[j + 23] > 0) {
-					maxVotage = HoTTbinReader.pointsGeneral[j + 23] > maxVotage ? HoTTbinReader.pointsGeneral[j + 23] : maxVotage;
-					minVotage = HoTTbinReader.pointsGeneral[j + 23] < minVotage ? HoTTbinReader.pointsGeneral[j + 23] : minVotage;
+				HoTTbinReader.pointsGeneral[j + 24] = (_buf1[3 + j] & 0xFF) * 1000;
+				if (HoTTbinReader.pointsGeneral[j + 24] > 0) {
+					maxVotage = HoTTbinReader.pointsGeneral[j + 24] > maxVotage ? HoTTbinReader.pointsGeneral[j + 24] : maxVotage;
+					minVotage = HoTTbinReader.pointsGeneral[j + 24] < minVotage ? HoTTbinReader.pointsGeneral[j + 24] : minVotage;
 				}
 			}
-			HoTTbinReader.pointsGeneral[22] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
-			HoTTbinReader.pointsGeneral[29] = DataParser.parse2Short(_buf2, 8) * 1000;
-			HoTTbinReader.pointsGeneral[30] = DataParser.parse2Short(_buf2, 6) * 1000;
-			HoTTbinReader.pointsGeneral[8] = HoTTbinReader.tmpHeight * 1000;
-			HoTTbinReader.pointsGeneral[9] = (DataParser.parse2UnsignedShort(_buf3, 2) - 30000) * 10;
-			HoTTbinReader.pointsGeneral[10] = HoTTbinReader.tmpClimb3 * 1000;
-			HoTTbinReader.pointsGeneral[31] = HoTTbinReader.tmpVoltage1 * 100;
-			HoTTbinReader.pointsGeneral[32] = HoTTbinReader.tmpVoltage2 * 100;
-			HoTTbinReader.pointsGeneral[33] = ((_buf2[3] & 0xFF) - 20) * 1000;
-			HoTTbinReader.pointsGeneral[34] = ((_buf2[4] & 0xFF) - 20) * 1000;
+			HoTTbinReader.pointsGeneral[23] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
+			HoTTbinReader.pointsGeneral[30] = DataParser.parse2Short(_buf2, 8) * 1000;
+			HoTTbinReader.pointsGeneral[31] = DataParser.parse2Short(_buf2, 6) * 1000;
+			HoTTbinReader.pointsGeneral[9] = HoTTbinReader.tmpHeight * 1000;
+			HoTTbinReader.pointsGeneral[10] = (DataParser.parse2UnsignedShort(_buf3, 2) - 30000) * 10;
+			HoTTbinReader.pointsGeneral[11] = HoTTbinReader.tmpClimb3 * 1000;
+			HoTTbinReader.pointsGeneral[32] = HoTTbinReader.tmpVoltage1 * 100;
+			HoTTbinReader.pointsGeneral[33] = HoTTbinReader.tmpVoltage2 * 100;
+			HoTTbinReader.pointsGeneral[34] = ((_buf2[3] & 0xFF) - 20) * 1000;
+			HoTTbinReader.pointsGeneral[35] = ((_buf2[4] & 0xFF) - 20) * 1000;
 		}
 	}
 
 	/**
-		 * parse the buffered data from buffer 0 to 4 and add points to record set
+	 * parse the buffered data from buffer 0 to 4 and add points to record set
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -979,47 +971,49 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseEAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf3, 3) - 500;
 		HoTTbinReader.tmpClimb3 = (_buf4[3] & 0xFF) - 120;
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
 		HoTTbinReader.tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
-		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
-		//8=Height, 9=Climb 1, 10=Climb 3
-		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 		if (!HoTTAdapter.isFilterEnabled
 				|| (HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600 && Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			HoTTbinReader.pointsElectric[35] = DataParser.parse2Short(_buf3, 7) * 1000;
-			HoTTbinReader.pointsElectric[36] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader.pointsElectric[37] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsElectric[37] / 1000 ? HoTTbinReader.pointsElectric[37]
+			HoTTbinReader.pointsElectric[36] = DataParser.parse2Short(_buf3, 7) * 1000;
+			HoTTbinReader.pointsElectric[37] = DataParser.parse2Short(_buf3, 5) * 1000;
+			HoTTbinReader.pointsElectric[38] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsElectric[38] / 1000 ? HoTTbinReader.pointsElectric[38]
 					: HoTTbinReader.tmpCapacity * 1000;
-			HoTTbinReader.pointsElectric[38] = Double.valueOf(HoTTbinReader.pointsElectric[35] / 1000.0 * HoTTbinReader.pointsElectric[36]).intValue(); // power U*I [W];
+			HoTTbinReader.pointsElectric[39] = Double.valueOf(HoTTbinReader.pointsElectric[36] / 1000.0 * HoTTbinReader.pointsElectric[37]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
-				HoTTbinReader.pointsElectric[j + 40] = (_buf1[3 + j] & 0xFF) * 1000;
-				if (HoTTbinReader.pointsElectric[j + 40] > 0) {
-					maxVotage = HoTTbinReader.pointsElectric[j + 40] > maxVotage ? HoTTbinReader.pointsElectric[j + 40] : maxVotage;
-					minVotage = HoTTbinReader.pointsElectric[j + 40] < minVotage ? HoTTbinReader.pointsElectric[j + 40] : minVotage;
+				HoTTbinReader.pointsElectric[j + 41] = (_buf1[3 + j] & 0xFF) * 1000;
+				if (HoTTbinReader.pointsElectric[j + 41] > 0) {
+					maxVotage = HoTTbinReader.pointsElectric[j + 41] > maxVotage ? HoTTbinReader.pointsElectric[j + 41] : maxVotage;
+					minVotage = HoTTbinReader.pointsElectric[j + 41] < minVotage ? HoTTbinReader.pointsElectric[j + 41] : minVotage;
 				}
 			}
 			for (int j = 0; j < 7; j++) {
-				HoTTbinReader.pointsElectric[j + 47] = (_buf2[j] & 0xFF) * 1000;
-				if (HoTTbinReader.pointsElectric[j + 47] > 0) {
-					maxVotage = HoTTbinReader.pointsElectric[j + 47] > maxVotage ? HoTTbinReader.pointsElectric[j + 47] : maxVotage;
-					minVotage = HoTTbinReader.pointsElectric[j + 47] < minVotage ? HoTTbinReader.pointsElectric[j + 47] : minVotage;
+				HoTTbinReader.pointsElectric[j + 48] = (_buf2[j] & 0xFF) * 1000;
+				if (HoTTbinReader.pointsElectric[j + 48] > 0) {
+					maxVotage = HoTTbinReader.pointsElectric[j + 48] > maxVotage ? HoTTbinReader.pointsElectric[j + 48] : maxVotage;
+					minVotage = HoTTbinReader.pointsElectric[j + 48] < minVotage ? HoTTbinReader.pointsElectric[j + 48] : minVotage;
 				}
 			}
 			//calculate balance on the fly
-			HoTTbinReader.pointsElectric[39] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
-			HoTTbinReader.pointsElectric[8] = HoTTbinReader.tmpHeight * 1000;
-			HoTTbinReader.pointsElectric[9] = (DataParser.parse2UnsignedShort(_buf4, 1) - 30000) * 10;
-			HoTTbinReader.pointsElectric[10] = HoTTbinReader.tmpClimb3 * 1000;
-			HoTTbinReader.pointsElectric[54] = HoTTbinReader.tmpVoltage1 * 100;
-			HoTTbinReader.pointsElectric[55] = HoTTbinReader.tmpVoltage2 * 100;
-			HoTTbinReader.pointsElectric[56] = ((_buf3[1] & 0xFF) - 20) * 1000;
-			HoTTbinReader.pointsElectric[57] = ((_buf3[2] & 0xFF) - 20) * 1000;
-			if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.pointsGeneral[29] = DataParser.parse2Short(_buf4, 4) * 1000;
+			HoTTbinReader.pointsElectric[40] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
+			HoTTbinReader.pointsElectric[9] = HoTTbinReader.tmpHeight * 1000;
+			HoTTbinReader.pointsElectric[10] = (DataParser.parse2UnsignedShort(_buf4, 1) - 30000) * 10;
+			HoTTbinReader.pointsElectric[11] = HoTTbinReader.tmpClimb3 * 1000;
+			HoTTbinReader.pointsElectric[55] = HoTTbinReader.tmpVoltage1 * 100;
+			HoTTbinReader.pointsElectric[56] = HoTTbinReader.tmpVoltage2 * 100;
+			HoTTbinReader.pointsElectric[57] = ((_buf3[1] & 0xFF) - 20) * 1000;
+			HoTTbinReader.pointsElectric[58] = ((_buf3[2] & 0xFF) - 20) * 1000;
+			HoTTbinReader.pointsElectric[59] = DataParser.parse2Short(_buf4, 4) * 1000;
 		}
 	}
 
@@ -1028,45 +1022,51 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf
 	 */
 	private static void parseChannel(byte[] _buf) {
-		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
+		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		HoTTbinReader2.points[4] = (_buf[3] & 0xFF) * -1000;
 		HoTTbinReader2.points[5] = (_buf[4] & 0xFF) * -1000;
-		//58=Ch 1, 59=Ch 2 , 50=Ch 3 .. 73=Ch 16
-		HoTTbinReader2.points[58] = (DataParser.parse2UnsignedShort(_buf, 8) / 2) * 1000; //1197
-		HoTTbinReader2.points[59] = (DataParser.parse2UnsignedShort(_buf, 10) / 2) * 1000; //
-		HoTTbinReader2.points[60] = (DataParser.parse2UnsignedShort(_buf, 12) / 2) * 1000;
-		HoTTbinReader2.points[61] = (DataParser.parse2UnsignedShort(_buf, 14) / 2) * 1000;
-		HoTTbinReader2.points[62] = (DataParser.parse2UnsignedShort(_buf, 16) / 2) * 1000;
-		HoTTbinReader2.points[63] = (DataParser.parse2UnsignedShort(_buf, 18) / 2) * 1000;
-		HoTTbinReader2.points[64] = (DataParser.parse2UnsignedShort(_buf, 20) / 2) * 1000;
-		HoTTbinReader2.points[65] = (DataParser.parse2UnsignedShort(_buf, 22) / 2) * 1000;
-		HoTTbinReader2.points[74] = (_buf[50] & 0x01) * 100000;
-		HoTTbinReader2.points[75] = (_buf[50] & 0x02) * 50000;
-		HoTTbinReader2.points[76] = (_buf[50] & 0x04) * 25000;
-		HoTTbinReader2.points[77] = (_buf[50] & 0x00) * 1000; //reserved for future use
+		
+		HoTTbinReader2.points[60] = (DataParser.parse2UnsignedShort(_buf, 8) / 2) * 1000; //1197
+		HoTTbinReader2.points[61] = (DataParser.parse2UnsignedShort(_buf, 10) / 2) * 1000; //
+		HoTTbinReader2.points[62] = (DataParser.parse2UnsignedShort(_buf, 12) / 2) * 1000;
+		HoTTbinReader2.points[63] = (DataParser.parse2UnsignedShort(_buf, 14) / 2) * 1000;
+		HoTTbinReader2.points[64] = (DataParser.parse2UnsignedShort(_buf, 16) / 2) * 1000;
+		HoTTbinReader2.points[65] = (DataParser.parse2UnsignedShort(_buf, 18) / 2) * 1000;
+		HoTTbinReader2.points[66] = (DataParser.parse2UnsignedShort(_buf, 20) / 2) * 1000;
+		HoTTbinReader2.points[67] = (DataParser.parse2UnsignedShort(_buf, 22) / 2) * 1000;
+		//events
+		HoTTbinReader2.points[76] = (_buf[50] & 0x01) * 100000;
+		HoTTbinReader2.points[77] = (_buf[50] & 0x02) * 50000;
+		HoTTbinReader2.points[78] = (_buf[50] & 0x04) * 25000;
+		HoTTbinReader2.points[79] = (_buf[50] & 0x00) * 1000; //reserved for future use
 
 		if (_buf[5] == 0x00) { //channel 9-12
-			HoTTbinReader2.points[66] = (DataParser.parse2UnsignedShort(_buf, 24) / 2) * 1000;
-			HoTTbinReader2.points[67] = (DataParser.parse2UnsignedShort(_buf, 26) / 2) * 1000;
-			HoTTbinReader2.points[68] = (DataParser.parse2UnsignedShort(_buf, 28) / 2) * 1000;
-			HoTTbinReader2.points[69] = (DataParser.parse2UnsignedShort(_buf, 30) / 2) * 1000;
-			if (HoTTbinReader2.points[70] == 0) {
-				HoTTbinReader2.points[70] = 1500 * 1000;
-				HoTTbinReader2.points[71] = 1500 * 1000;
+			HoTTbinReader2.points[68] = (DataParser.parse2UnsignedShort(_buf, 24) / 2) * 1000;
+			HoTTbinReader2.points[69] = (DataParser.parse2UnsignedShort(_buf, 26) / 2) * 1000;
+			HoTTbinReader2.points[70] = (DataParser.parse2UnsignedShort(_buf, 28) / 2) * 1000;
+			HoTTbinReader2.points[71] = (DataParser.parse2UnsignedShort(_buf, 30) / 2) * 1000;
+			if (HoTTbinReader2.points[72] == 0) {
 				HoTTbinReader2.points[72] = 1500 * 1000;
 				HoTTbinReader2.points[73] = 1500 * 1000;
+				HoTTbinReader2.points[74] = 1500 * 1000;
+				HoTTbinReader2.points[75] = 1500 * 1000;
 			}
 		}
 		else { //channel 13-16
-			HoTTbinReader2.points[70] = (DataParser.parse2UnsignedShort(_buf, 24) / 2) * 1000;
-			HoTTbinReader2.points[71] = (DataParser.parse2UnsignedShort(_buf, 26) / 2) * 1000;
-			HoTTbinReader2.points[72] = (DataParser.parse2UnsignedShort(_buf, 28) / 2) * 1000;
-			HoTTbinReader2.points[73] = (DataParser.parse2UnsignedShort(_buf, 30) / 2) * 1000;
-			if (HoTTbinReader2.points[66] == 0) {
-				HoTTbinReader2.points[66] = 1500 * 1000;
-				HoTTbinReader2.points[67] = 1500 * 1000;
+			HoTTbinReader2.points[72] = (DataParser.parse2UnsignedShort(_buf, 24) / 2) * 1000;
+			HoTTbinReader2.points[73] = (DataParser.parse2UnsignedShort(_buf, 26) / 2) * 1000;
+			HoTTbinReader2.points[74] = (DataParser.parse2UnsignedShort(_buf, 28) / 2) * 1000;
+			HoTTbinReader2.points[75] = (DataParser.parse2UnsignedShort(_buf, 30) / 2) * 1000;
+			if (HoTTbinReader2.points[68] == 0) {
 				HoTTbinReader2.points[68] = 1500 * 1000;
 				HoTTbinReader2.points[69] = 1500 * 1000;
+				HoTTbinReader2.points[70] = 1500 * 1000;
+				HoTTbinReader2.points[71] = 1500 * 1000;
 			}
 		}
 	}
@@ -1080,35 +1080,43 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseESC(byte[] _buf0, byte[] _buf1, byte[] _buf2, int channelNumber) throws DataInconsitsentException {
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
+		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
+		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
+		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 		HoTTbinReader.tmpVoltage = DataParser.parse2Short(_buf1, 3);
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf2, 1);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf1, 7);
 		HoTTbinReader.tmpRevolution = DataParser.parse2Short(_buf2, 5);
 		HoTTbinReader.tmpTemperatureFet = _buf1[9] - 20;
 		if (channelNumber == 4) {
-			//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
+			//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
-					&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[83] != 0 && HoTTbinReader.pointsSpeedControl[83]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
-				HoTTbinReader.pointsSpeedControl[78] = HoTTbinReader.tmpVoltage * 1000;
-				HoTTbinReader.pointsSpeedControl[79] = HoTTbinReader.tmpCurrent * 1000;
-				HoTTbinReader.pointsSpeedControl[81] = Double.valueOf(HoTTbinReader.pointsSpeedControl[78] / 1000.0 * HoTTbinReader.pointsSpeedControl[79]).intValue();
-				HoTTbinReader.pointsSpeedControl[80] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[80] / 1000 ? HoTTbinReader.pointsSpeedControl[80]
+					&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[85] != 0 && HoTTbinReader.pointsSpeedControl[85]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
+				HoTTbinReader.pointsSpeedControl[80] = HoTTbinReader.tmpVoltage * 1000;
+				HoTTbinReader.pointsSpeedControl[81] = HoTTbinReader.tmpCurrent * 1000;
+				HoTTbinReader.pointsSpeedControl[83] = Double.valueOf(HoTTbinReader.pointsSpeedControl[80] / 1000.0 * HoTTbinReader.pointsSpeedControl[81]).intValue();
+				HoTTbinReader.pointsSpeedControl[82] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[82] / 1000 ? HoTTbinReader.pointsSpeedControl[82]
 						: HoTTbinReader.tmpCapacity * 1000;
-				HoTTbinReader.pointsSpeedControl[82] = HoTTbinReader.tmpRevolution * 1000;
-				HoTTbinReader.pointsSpeedControl[83] = HoTTbinReader.tmpTemperatureFet * 1000;
+				HoTTbinReader.pointsSpeedControl[84] = HoTTbinReader.tmpRevolution * 1000;
+				HoTTbinReader.pointsSpeedControl[85] = HoTTbinReader.tmpTemperatureFet * 1000;
 			}
 		}
 		else {
-			//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
+			//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
-					&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[63] != 0 && HoTTbinReader.pointsSpeedControl[63]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
-				HoTTbinReader.pointsSpeedControl[58] = HoTTbinReader.tmpVoltage * 1000;
-				HoTTbinReader.pointsSpeedControl[59] = HoTTbinReader.tmpCurrent * 1000;
-				HoTTbinReader.pointsSpeedControl[61] = Double.valueOf(HoTTbinReader.pointsSpeedControl[58] / 1000.0 * HoTTbinReader.pointsSpeedControl[59]).intValue();
-				HoTTbinReader.pointsSpeedControl[60] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[60] / 1000 ? HoTTbinReader.pointsSpeedControl[60]
+					&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[65] != 0 && HoTTbinReader.pointsSpeedControl[65]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
+				HoTTbinReader.pointsSpeedControl[60] = HoTTbinReader.tmpVoltage * 1000;
+				HoTTbinReader.pointsSpeedControl[61] = HoTTbinReader.tmpCurrent * 1000;
+				HoTTbinReader.pointsSpeedControl[63] = Double.valueOf(HoTTbinReader.pointsSpeedControl[60] / 1000.0 * HoTTbinReader.pointsSpeedControl[61]).intValue();
+				HoTTbinReader.pointsSpeedControl[62] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[62] / 1000 ? HoTTbinReader.pointsSpeedControl[62]
 						: HoTTbinReader.tmpCapacity * 1000;
-				HoTTbinReader.pointsSpeedControl[62] = HoTTbinReader.tmpRevolution * 1000;
-				HoTTbinReader.pointsSpeedControl[63] = HoTTbinReader.tmpTemperatureFet * 1000;
+				HoTTbinReader.pointsSpeedControl[64] = HoTTbinReader.tmpRevolution * 1000;
+				HoTTbinReader.pointsSpeedControl[65] = HoTTbinReader.tmpTemperatureFet * 1000;
 			}
 		}
 	}

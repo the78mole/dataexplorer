@@ -97,7 +97,16 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
-        </Channel>
+            <Measurement>
+                <name>VoltageRx_min</name>
+                <symbol>Umin</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            </Channel>
         <Channel type="TYPE_CONFIG" name="Vario">
             <Measurement>
                 <name>RXSQ</name>
@@ -668,7 +677,15 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="25" name="scale_sync_ref_ordinal"/>
+            <Measurement>
+                <name>Revolution</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
+                </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Channels">
             <Measurement>
