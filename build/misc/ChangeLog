@@ -3,7 +3,6 @@ Development history / change log, please read from bottom up
 Version 3.1.9 - xx yyy 2014
 enable absolute time for graphics time line
 fix caching algorithm to enable scale text color updated by color change 
-add Teranis OpenTx telemetrie support
 IISI-Cockpit V2 - add statistics definition 
 JetiAdapter - fix time step calculation for very short logs in respect of time
 JetiAdapter - fix record naming while repeating measurement names with different sensors
@@ -11,6 +10,8 @@ HoTTAdapter* - update HoTTMdlViewer to latest 0.8 snapshot
 HoTTAdapter* - fine tune some more filter settings
 HoTTAdapter* - add measurement voltage Rx min and make EAM rpm to an extra measurement
 UniLog2 - fix live data gathering capability
+Futaba-Telemetry - fix english device properties file
+OpenTx-Telemetry - add telemetry data support
 
 Version 3.1.8 - 19 Okt 2014
 fix Kosmik rounding issue
