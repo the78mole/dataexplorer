@@ -192,6 +192,7 @@
 		<ant antfile="build.xml" target="clean" dir="FutabaTelemetry" inheritall="true" />
 		<!-- ant antfile="build.xml" target="clean" dir="PowerLab" inheritall="true" / -->
 		<ant antfile="build.xml" target="clean" dir="Polaron" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="OpenTxTelemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -358,6 +359,7 @@
 		<ant antfile="build.xml" target="package" dir="FutabaTelemetry" inheritall="true" />
 		<!-- ant antfile="build.xml" target="package" dir="PowerLab" inheritall="true" / -->
 		<ant antfile="build.xml" target="package" dir="Polaron" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="OpenTxTelemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -388,6 +390,7 @@
 			<include name="FutabaTelemetry/build/*.jar" />
 			<!-- include name="PowerLab/build/*.jar" / -->
 			<include name="Polaron/build/*.jar" />
+			<include name="OpenTxTelemetry/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
