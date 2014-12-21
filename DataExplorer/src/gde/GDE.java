@@ -339,6 +339,7 @@ public class GDE {
 	public static final String		CSV_DATA_TYPE										= "CSV_data_type : ";																																																				//$NON-NLS-1$
 	public static final String		CSV_DATA_TYPE_RAW								= "raw";																																																											//$NON-NLS-1$
 	public static final String		CSV_DATA_TYPE_ABS								= "abs";																																																											//$NON-NLS-1$
+	public static final String		CSV_DATA_IGNORE_INDEX						= "CSV_data_ignore_index : ";																																																				//$NON-NLS-1$
 	// begin CSV file format
 
 	final static Logger						log															= Logger.getLogger(GDE.class.getName());
