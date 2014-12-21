@@ -184,7 +184,7 @@ public class MeasurementType implements Cloneable {
 	 *     {@link Boolean }
 	 *     
 	 */
-	public void setActive(boolean value) {
+	public void setActive(Boolean value) {
 		this.active = value;
 	}
 
