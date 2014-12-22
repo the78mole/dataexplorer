@@ -10,7 +10,23 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JetiAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GPXAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IGCAdapter"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/FutabaTelemetry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenTxTelemetry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IISI-Cockpit V2"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/AkkuMaster"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CSV2SerialAdapter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/eStation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FlightRecorder"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FutabaTelemetry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GPS-Logger"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/iCharger"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JLog2"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LiPoWatch"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Picolario"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Polaron"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/QC-Copter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UltramatUDP"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UniLog"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UniLog2"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/VC800"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

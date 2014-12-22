@@ -82,6 +82,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 								|| file.getPath().toLowerCase().contains("av4ms")
 								|| file.getPath().toLowerCase().contains("futaba")
 								|| file.getPath().toLowerCase().contains("iisi")
+								|| file.getPath().toLowerCase().contains("opentx")
 								|| file.getPath().toLowerCase().contains("akkumonitor")
 								|| file.getPath().toLowerCase().contains("flightrecorder"))) {
 					System.out.println("working with : " + file);
@@ -217,6 +218,75 @@ public class TestFileReaderWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 
 						RecordSet recordSet = gde.device.robbe.CSVReaderWriter.read(';', file.getAbsolutePath(), "csv test");
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading CSV Futaba Telemetry files from device directory and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testOpenTxCsvReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getPath().toLowerCase().contains("opentx")) {
+					System.out.println("working with : " + file);
+
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = "OpenTx-Telemetry";
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+						activeChannel.setSaved(true);
+
+						RecordSet recordSet = gde.device.opentx.CSVReaderWriter.read(',', file.getAbsolutePath(), "csv test");
 
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
@@ -562,9 +632,9 @@ public class TestFileReaderWriter extends TestSuperClass {
 				if (filePath.toLowerCase().endsWith(".osd")) {
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
-							System.out.println("working with : " + file);
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+							System.out.println(fileDeviceName + " working with : " + file);
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
 							this.application.setActiveDeviceWoutUI(device);
@@ -654,7 +724,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 							activeChannel.setFileName(file.getAbsolutePath());
 							activeChannel.setFileDescription(fileHeader.get(GDE.FILE_COMMENT));
 							activeChannel.setSaved(true);
-							//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
+							activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 
 							for (String recordSetName : activeChannel.getRecordSetNames()) {
 								RecordSet recordSet = activeChannel.get(recordSetName);
@@ -707,11 +777,13 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".lov")
-						&& !(file.getPath().toLowerCase().contains("spektrum")) ) {
+						&& !(file.getPath().toLowerCase().contains("spektrum"))
+						&& !(file.getPath().toLowerCase().contains("duo"))) {
 					System.out.println("working with : " + file);
 					try {
 						HashMap<String, String> fileHeader = LogViewReader.getHeader(file.getAbsolutePath());
 						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+						System.out.println("working with deviceName = " + fileDeviceName);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
@@ -1276,7 +1348,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			this.setDataPath(); //set the dataPath variable
-			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/JetiAdapter/"), 1);
+			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/JetiAdapter/"), 0);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG) || file.getAbsolutePath().toLowerCase().endsWith(GDE.FILE_ENDING_DOT_JML)) {
@@ -1474,6 +1546,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 					try {
 						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+						System.out.println("working with file from device : " + fileDeviceName);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
