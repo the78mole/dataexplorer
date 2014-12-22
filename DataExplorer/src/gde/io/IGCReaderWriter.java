@@ -258,7 +258,7 @@ public class IGCReaderWriter {
 							
 							int i=0;
 							for (IgcExtension extension : extensions) {
-							if (!recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
+							if (recordSet.realSize() < 5+i && !recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
 								recordSet.get(5+i).setName(extension.getThreeLetterCode());
 							++i;
 							}
@@ -301,7 +301,7 @@ public class IGCReaderWriter {
 							values[2] = altitude;
 							values[3] = height;
 
-							for (int i = 0; i < extensions.size(); i++) {
+							for (int i = 0; i < extensions.size() && i+4 < values.length; i++) {
 								values[i + 4] = extensions.get(i).getValue(line);
 							}
 

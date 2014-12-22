@@ -87,7 +87,7 @@ public class TimeLine {
 					"totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec + " - " + Integer.MAX_VALUE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int maxTimeNumberFormated; // the biggest number in the scale to be displayed
 
-		boolean isTimeFormatAbsolute = Settings.getInstance().isTimeFormatAbsolute() 
+		boolean isTimeFormatAbsolute = DataExplorer.getInstance().getActiveRecordSet() != null && Settings.getInstance().isTimeFormatAbsolute() 
 				&& !DataExplorer.getInstance().getActiveRecordSet().isCompareSet()
 				&& !DataExplorer.getInstance().getActiveRecordSet().isZoomMode();
 
