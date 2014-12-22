@@ -98,14 +98,14 @@ public class CSVReaderWriter {
 				if (i == 0) header.put(GDE.DEVICE_NAME, headerData[i].split("\\r")[0].trim());
 				if (i == 1) header.put(GDE.CHANNEL_CONFIG_NAME, headerData[i].split(" ")[0].split("\\r")[0].trim());
 			}
-			CSVReaderWriter.log.log(Level.OFF, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME));
-			CSVReaderWriter.log.log(Level.OFF, GDE.CHANNEL_CONFIG_NAME + (header.get(GDE.CHANNEL_CONFIG_NAME) != null ? header.get(GDE.CHANNEL_CONFIG_NAME) : "")); //$NON-NLS-1$
+			CSVReaderWriter.log.log(Level.FINE, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME));
+			CSVReaderWriter.log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + (header.get(GDE.CHANNEL_CONFIG_NAME) != null ? header.get(GDE.CHANNEL_CONFIG_NAME) : "")); //$NON-NLS-1$
 
 			while (!(line.startsWith("Date,Time")) && ((line = reader.readLine()) != null)) {
 				// read until Date,Time,SWR,RSSI,A1,A2,A3,A4,GPS Date,GPS Time,Long,Lat,Course,GPS Speed(kts),GPS Alt,Baro Alt(m),Vertical Speed,Air Speed(kts),Temp1,Temp2,RPM,Fuel,Cell volts,Cell 1,Cell 2,Cell 3,Cell 4,Cell 5,Cell 6,Cell 7,Cell 8,Cell 9,Cell 10,Cell 11,Cell 12,Current,Consumption,Vfas,AccelX,AccelY,AccelZ,Rud,Ele,Thr,Ail,S1,S2,S3,LS,RS,SA,SB,SC,SD,SE,SF,SG,SH
 			}
 			header.put(GDE.CSV_DATA_HEADER, line);
-			CSVReaderWriter.log.log(Level.OFF, GDE.CSV_DATA_HEADER + (header.get(GDE.CSV_DATA_HEADER) != null ? header.get(GDE.CSV_DATA_HEADER) : "")); //$NON-NLS-1$
+			CSVReaderWriter.log.log(Level.FINE, GDE.CSV_DATA_HEADER + (header.get(GDE.CSV_DATA_HEADER) != null ? header.get(GDE.CSV_DATA_HEADER) : "")); //$NON-NLS-1$
 		}
 		catch (FileNotFoundException e) {
 			CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
@@ -178,7 +178,7 @@ public class CSVReaderWriter {
 					continue;
 				}
 			}
-			CSVReaderWriter.log.log(Level.OFF, "corrected mappedMeasurement = " + mappedMeasurement);
+			CSVReaderWriter.log.log(Level.FINE, "corrected mappedMeasurement = " + mappedMeasurement);
 
 			String[] inHeaderMeasurement = mappedMeasurement.trim().split("\\[|]"); //$NON-NLS-1$
 			String inMeasurement = inHeaderMeasurement.length >= 1 ? inHeaderMeasurement[0].trim() : Settings.EMPTY;
