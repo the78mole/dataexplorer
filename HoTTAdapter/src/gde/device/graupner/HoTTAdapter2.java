@@ -1041,7 +1041,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		ChannelType channel = this.getChannel(recordSet.getChannelConfigNumber());
 		if (channel != null) {
 			List<MeasurementType> measurement = channel.getMeasurement();
-			measurement.get(8).setActive(true);  //8=VoltageRx_min
+			measurement.get(8).setActive(true); //8=VoltageRx_min
 			measurement.get(23).setActive(true); //23=Balance G, 
 			measurement.get(24).setActive(true); //24=CellVoltage G1 
 			measurement.get(25).setActive(true); //25=CellVoltage G2
@@ -1064,14 +1064,18 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			measurement.get(63).setActive(true); //63=Power M, 
 			measurement.get(64).setActive(true); //64=Revolution M, 
 		}
-		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
+		int noneCalculationRecords = 0;
+		for (String fileRecord : fileRecordsProperties) {
+			if (fileRecord.contains("_isActive=true")) ++noneCalculationRecords;
+		}
+		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
 			if (channel != null) {
 				List<MeasurementType> measurement = channel.getMeasurement();
 				switch (fileRecordsProperties.length) {
 				case 44: //Android HoTTAdapter3
 					for (int i = 0; i < recordKeys.length; i++) {
 						switch (i) {
-						case 8:  //8=VoltageRxMin
+						case 8: //8=VoltageRxMin
 						case 23: //23=Balance G, 
 						case 24: //24=CellVoltage G1 
 						case 25: //25=CellVoltage G2
@@ -1093,8 +1097,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						case 62: //62=Capacity M, 
 						case 63: //63=Power M, 
 						case 64: //64=Revolution M, 
-							 measurement.get(i).setActive(null);
-							 break;
+							measurement.get(i).setActive(null);
+							break;
 						default:
 							cleanedRecordNames.add(recordKeys[i]);
 							break;
@@ -1106,14 +1110,67 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				case 84: //HoTTAdapter2 with channels prior to 3.1.9
 				default:
 					for (int i = 0; i < recordKeys.length; i++) {
-						if (i != 8 && i != 59) cleanedRecordNames.add(recordKeys[i]);
-						else measurement.get(i).setActive(null);
+						if (i != 8 && i != 59)
+							cleanedRecordNames.add(recordKeys[i]);
+						else
+							measurement.get(i).setActive(null);
 					}
 					break;
 				}
 			}
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}
+		else if ((recordKeys.length - noneCalculationRecords) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
+			//load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
+			if (channel != null) {
+				List<MeasurementType> measurement = channel.getMeasurement();
+				switch (fileRecordsProperties.length) {
+				case 44: //Android HoTTAdapter3
+					for (int i = 0; i < recordKeys.length; i++) {
+						switch (i) {
+						case 8: //8=VoltageRxMin
+						case 23: //23=Balance G, 
+						case 24: //24=CellVoltage G1 
+						case 25: //25=CellVoltage G2
+						case 26: //25=CellVoltage G3 
+						case 27: //25=CellVoltage G4
+						case 28: //25=CellVoltage G5
+						case 29: //29=CellVoltage G6
+						case 32: //32=Voltage G1, 
+						case 33: //33=Voltage G2, 
+						case 34: //34=Temperature G1, 
+						case 35: //35=Temperature G2
+						case 36: //36=Voltage E, 
+						case 37: //37=Current E, 
+						case 38: //38=Capacity E, 
+						case 39: //39=Power E, 
+						case 59: //59=Revolution E
+						case 60: //60=Voltage M, 
+						case 61: //61=Current M, 
+						case 62: //62=Capacity M, 
+						case 63: //63=Power M, 
+						case 64: //64=Revolution M, 
+							measurement.get(i).setActive(null);
+							break;
+						default:
+							break;
+						}
+					}
+					break;
+
+				case 64: //HoTTAdapter2 without channels prior to 3.1.9
+				case 84: //HoTTAdapter2 with channels prior to 3.1.9
+				default:
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i == 8 || i == 59) 
+							measurement.get(i).setActive(null);
+					}
+					break;
+				}
+			}
+			//recordKeys = recordKeys; keeps unchanged
+		}
+
 		return recordKeys;
 	}
 }
