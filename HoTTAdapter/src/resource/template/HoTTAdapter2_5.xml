@@ -719,7 +719,7 @@
 <entry key="64_lineStyle">1</entry>
 <entry key="64_lineWidth">1</entry>
 <entry key="64_numberFormat">-1</entry>
-<entry key="65_color">0,0,0</entry>
+<entry key="65_color">1,1,1</entry>
 <entry key="65_defMaxValue">72.0</entry>
 <entry key="65_defMinValue">0.0</entry>
 <entry key="65_isPositionLeft">false</entry>
