@@ -59,9 +59,9 @@ public class PrepareTranslation {
 			List<File> files = FileUtils.getFileListing(new File(basePath), 5, "properties");
 			String line;
 			BufferedReader reader;
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(GDE.JAVA_IO_TMPDIR+"all_messages.po"), "UTF-8")); //$NON-NLS-1$
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(GDE.JAVA_IO_TMPDIR+"all_messages_de.po"), "UTF-8")); //$NON-NLS-1$
 			for (File path : files) {
-				if (path.getAbsolutePath().contains("src") && path.getName().contains("messages.")) {
+				if (path.getAbsolutePath().contains("src") && path.getName().contains("messages_de.")) {
 					log.log(Level.INFO, "working with : " + path.getAbsolutePath()); //$NON-NLS-1$
 					reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8")); //$NON-NLS-1$
 					while ((line = reader.readLine()) != null) {
