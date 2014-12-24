@@ -49,6 +49,7 @@ public class TabAreaContextMenu {
 	public final static int	TYPE_UTILITY	= GraphicsWindow.TYPE_UTIL;
 	public final static int	TYPE_SIMPLE		= 3;														//only referenced in not specified else clause
 	public final static int	TYPE_TABLE		= 4;														
+	public final static int	TYPE_DIGITAL	= 5;														
 	
 	final DataExplorer						application;
 
@@ -64,6 +65,7 @@ public class TabAreaContextMenu {
 	MenuItem											borderColorItem;
 	MenuItem											dateTimeItem;
 	MenuItem											partialTableItem;
+	MenuItem											setDigitalFontItem;
 	boolean												isCreated = false;
 
 	public TabAreaContextMenu() {
@@ -73,6 +75,7 @@ public class TabAreaContextMenu {
 	public void createMenu(Menu popupMenu, int type) {
 		popupMenu.addMenuListener(new MenuListener() {
 			public void menuShown(MenuEvent e) {
+				TabAreaContextMenu.log.log(Level.FINEST, "menuShown action " + e); //$NON-NLS-1$
 				int tabSelectionIndex = TabAreaContextMenu.this.application.getTabSelectionIndex();
 				if (tabSelectionIndex == 0) {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
@@ -199,6 +202,19 @@ public class TabAreaContextMenu {
 						TabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
 						Settings.getInstance().setPartialDataTable(TabAreaContextMenu.this.partialTableItem.getSelection());
 						TabAreaContextMenu.this.application.updateAllTabs(true, false);
+					}
+				});
+			}
+
+			if (type == TYPE_DIGITAL) {
+				this.setDigitalFontItem = new MenuItem(popupMenu, SWT.PUSH);
+				this.setDigitalFontItem.setText(Messages.getString(MessageIds.GDE_MSGT0726));
+				this.setDigitalFontItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "setDigitalFontItem action performed! " + e); //$NON-NLS-1$
+						int selectedFontSize = TabAreaContextMenu.this.application.openFontSizeDialog();
+						if (selectedFontSize != 0)
+							TabAreaContextMenu.this.application.setTabFontSize(TabAreaContextMenu.this.application.getTabSelectionIndex(), selectedFontSize);
 					}
 				});
 			}

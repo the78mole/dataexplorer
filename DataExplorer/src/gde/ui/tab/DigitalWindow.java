@@ -18,8 +18,18 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import java.util.HashMap;
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,18 +45,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Display window parent of digital displays
@@ -62,11 +60,9 @@ public class DigitalWindow extends CTabItem {
 
 	Color														surroundingBackground;
 
-	final DataExplorer		application;
+	final DataExplorer							application;
 	final Channels									channels;
 	final CTabFolder								displayTab;
-	final Menu											popupmenu;
-	final TabAreaContextMenu				contextMenu;
 	
 	RecordSet												oldRecordSet;
 	Channel													oldChannel;
@@ -81,8 +77,6 @@ public class DigitalWindow extends CTabItem {
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0238));
 			
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new TabAreaContextMenu();
 		this.surroundingBackground = Settings.getInstance().getDigitalSurroundingAreaBackground();
 		
 		this.displays = new HashMap<String, DigitalDisplay>(3);
@@ -90,7 +84,6 @@ public class DigitalWindow extends CTabItem {
 		this.displayTab.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-				DigitalWindow.this.contextMenu.createMenu(DigitalWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 				update(false);
 			}
 		});
@@ -102,7 +95,6 @@ public class DigitalWindow extends CTabItem {
 			this.setControl(this.digitalMainComposite);
 			this.digitalMainComposite.setBackground(this.surroundingBackground);
 			this.digitalMainComposite.setLayout(null);
-			this.digitalMainComposite.setMenu(this.popupmenu);
 			this.digitalMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "digitalMainComposite.helpRequested " + evt); //$NON-NLS-1$
@@ -202,6 +194,25 @@ public class DigitalWindow extends CTabItem {
 	 * @param newInnerAreaBackground the innerAreaBackground to set
 	 */
 	public void setInnerAreaBackground(Color newInnerAreaBackground) {
+		this.update(true);
+	}
+
+	/**
+	 * @param newInnerAreaBackground the innerAreaBackground to set
+	 */
+	public void setDigitalDisplayFontSize(int newSize) {
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null && this.digitalMainComposite.isVisible()) {
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_BLANK);
+			RecordSet recordSet = activeChannel.getActiveRecordSet();
+			// check if just created  or device switched or disabled
+			if (recordSet != null && recordSet.getDevice().isDigitalTabRequested()) {
+				String[] recordsToDisplay = recordSet.getDisplayableAndVisibleRecordNames();
+					for (String recordKey : recordsToDisplay) {
+						this.displays.get(recordKey).setFontSize(newSize);
+					}
+				}
+			}
 		this.update(true);
 	}
 

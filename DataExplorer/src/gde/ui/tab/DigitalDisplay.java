@@ -57,6 +57,8 @@ public class DigitalDisplay extends Composite {
 	CLabel					textDigitalLabel;
 	CLabel					actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
 	Composite				minMaxComposite;
+	
+	static int			fontSize = 50;
 
 	final DataExplorer	application;
 	final Channels								channels;
@@ -79,7 +81,7 @@ public class DigitalDisplay extends Composite {
 		this.backgroundColor = Settings.getInstance().getDigitalInnerAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_DIGITAL);
 	}
 
 	public void create() {
@@ -157,7 +159,7 @@ public class DigitalDisplay extends Composite {
 			this.actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.actualDigitalLabel.setBackground(this.backgroundColor);
 			this.actualDigitalLabel.setText("00,00"); //$NON-NLS-1$
-			this.actualDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 62, SWT.NORMAL));
+			this.actualDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + fontSize, SWT.NORMAL));
 			this.actualDigitalLabel.setMenu(this.popupmenu);
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
@@ -272,5 +274,13 @@ public class DigitalDisplay extends Composite {
 		this.actualDigitalLabel.redraw();
 		this.minDigitalLabel.redraw();
 		this.maxDigitalLabel.redraw();
+	}
+	
+	/**
+	 * enable font size adaption
+	 * @param fontSize
+	 */
+	public void setFontSize(int newFontSize) {
+		DigitalDisplay.fontSize = newFontSize;
 	}
 }

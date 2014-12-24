@@ -35,6 +35,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.dialog.AboutDialog;
 import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.FontSizeDialog;
 import gde.ui.dialog.HelpInfoDialog;
 import gde.ui.dialog.SettingsDialog;
 import gde.ui.menu.MenuBar;
@@ -1765,6 +1766,12 @@ public class DataExplorer extends Composite {
 		return colorDialog.open();
 	}
 
+	public int openFontSizeDialog() {
+		FontSizeDialog fontSizeDialog = new FontSizeDialog(GDE.shell, SWT.NORMAL);
+		fontSizeDialog.setText(this.getClass().getSimpleName() + Messages.getString(MessageIds.GDE_MSGT0145));
+		return fontSizeDialog.open(new String[]{"20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70"}, 6);
+	}
+
 	/**
 	 * update all visualization windows
 	 */
@@ -2602,6 +2609,23 @@ public class DataExplorer extends Composite {
 				this.settings.setUtilityCurvesBorderColor(borderColor);
 				this.utilGraphicsTabItem.setCurveAreaBorderColor(borderColor);
 			}
+	}
+
+	/**
+	 * set the tabulator specific font size, actually enabled for digital tab only
+	 * @param newFonSize in dots added to standard widget font size
+	 */
+	public void setTabFontSize(int tabSelectionIndex, int newFonSize) {
+		if (tabSelectionIndex == 0) {
+			//actual no special font size adaption enabled
+		}
+		else if (tabSelectionIndex > 0) {
+			if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
+				//this.settings.setDigitalDisplayFontSize(newFonSize); actual no pesistens enabled
+				this.digitalTabItem.setDigitalDisplayFontSize(newFonSize);
+				this.updateDigitalWindowChilds();
+			}
+		}
 	}
 
 	/**
