@@ -37,6 +37,9 @@ public class IgcExtension {
 		try {
 			return Integer.parseInt(fRecord.substring(this.start, this.end)) * 1000;
 		}
+		catch (StringIndexOutOfBoundsException e) {
+			return Integer.parseInt(fRecord.substring(this.start, this.end-1)) * 1000;
+		}
 		catch (NumberFormatException e) {
 			return 0;
 		}
