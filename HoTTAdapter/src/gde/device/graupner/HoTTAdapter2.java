@@ -59,6 +59,8 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	final static Logger									logger														= Logger.getLogger(HoTTAdapter2.class.getName());
+	
+	static ChannelType									recordSetParent = null;
 
 	/**
 	 * constructor using properties file
@@ -1039,30 +1041,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		ChannelType channel = this.getChannel(recordSet.getChannelConfigNumber());
-		if (channel != null) {
+		if (channel != null && !channel.equals(recordSetParent)) {
 			List<MeasurementType> measurement = channel.getMeasurement();
-			measurement.get(8).setActive(true); //8=VoltageRx_min
-			measurement.get(23).setActive(true); //23=Balance G, 
-			measurement.get(24).setActive(true); //24=CellVoltage G1 
-			measurement.get(25).setActive(true); //25=CellVoltage G2
-			measurement.get(26).setActive(true); //25=CellVoltage G3 
-			measurement.get(27).setActive(true); //25=CellVoltage G4
-			measurement.get(28).setActive(true); //25=CellVoltage G5
-			measurement.get(29).setActive(true); //29=CellVoltage G6
-			measurement.get(32).setActive(true); //32=Voltage G1, 
-			measurement.get(33).setActive(true); //33=Voltage G2, 
-			measurement.get(34).setActive(true); //34=Temperature G1, 
-			measurement.get(35).setActive(true); //35=Temperature G2
-			measurement.get(36).setActive(true); //36=Voltage E, 
-			measurement.get(37).setActive(true); //37=Current E, 
-			measurement.get(38).setActive(true); //38=Capacity E, 
-			measurement.get(39).setActive(true); //39=Power E, 
-			measurement.get(59).setActive(true); //59=Revolution E
-			measurement.get(60).setActive(true); //60=Voltage M, 
-			measurement.get(61).setActive(true); //61=Current M, 
-			measurement.get(62).setActive(true); //62=Capacity M, 
-			measurement.get(63).setActive(true); //63=Power M, 
-			measurement.get(64).setActive(true); //64=Revolution M, 
+			for (MeasurementType measurementType : measurement) {
+				measurementType.setActive(true);
+			}
+			recordSetParent = channel;
 		}
 		int noneCalculationRecords = 0;
 		for (String fileRecord : fileRecordsProperties) {
@@ -1106,6 +1090,24 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					break;
 
+				case 58: //HoTTAdapter2 without channels prior to 3.0.8
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i != 8 && i <= 58)
+							cleanedRecordNames.add(recordKeys[i]);
+						else
+							measurement.get(i).setActive(null);
+					}
+					break;
+
+				case 74: //HoTTAdapter2 with channels prior to 3.0.8
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i != 8 && i != 59 && i <= 75)
+							cleanedRecordNames.add(recordKeys[i]);
+						else
+							measurement.get(i).setActive(null);
+					}
+					break;
+
 				case 64: //HoTTAdapter2 without channels prior to 3.1.9
 				case 84: //HoTTAdapter2 with channels prior to 3.1.9
 				default:
@@ -1124,7 +1126,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			//load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
 			if (channel != null) {
 				List<MeasurementType> measurement = channel.getMeasurement();
-				switch (fileRecordsProperties.length) {
+				switch (noneCalculationRecords) {
 				case 44: //Android HoTTAdapter3
 					for (int i = 0; i < recordKeys.length; i++) {
 						switch (i) {
@@ -1155,6 +1157,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						default:
 							break;
 						}
+					}
+					break;
+
+				case 58: //HoTTAdapter2 without channels prior to 3.0.8
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i == 8 || i > 58) 
+							measurement.get(i).setActive(null);
+					}
+					break;
+
+				case 74: //HoTTAdapter2 with channels prior to 3.0.8
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i == 8 || i == 59 || i > 75) 
+							measurement.get(i).setActive(null);
 					}
 					break;
 
