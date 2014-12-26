@@ -907,6 +907,11 @@ public interface IDevice {
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet);
 	
 	/**
+	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
+	 */
+	public void resetMeasurements();
+	
+	/**
 	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
 	 * @return true if curve point should be filtered
 	 */

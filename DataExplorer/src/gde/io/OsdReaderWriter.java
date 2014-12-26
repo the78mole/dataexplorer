@@ -224,6 +224,9 @@ public class OsdReaderWriter {
 			recordSetsInfo.add(getRecordSetProperties(line));
 		}
 
+		//reset, previous manipulated channel types measurements (p.e. set active = null as calculation)
+		device.resetMeasurements();
+		
 		try { // build the data structure
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
