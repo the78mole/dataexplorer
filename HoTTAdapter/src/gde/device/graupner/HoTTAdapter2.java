@@ -60,8 +60,6 @@ import org.eclipse.swt.widgets.MenuItem;
 public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	final static Logger									logger														= Logger.getLogger(HoTTAdapter2.class.getName());
 	
-	static ChannelType									recordSetParent = null;
-
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -803,9 +801,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
 			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
-			this.application.updateStatisticsData(true);
-			this.updateVisibilityStatus(recordSet, true);
 		}
+		this.application.updateStatisticsData(true);
+		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**
@@ -1026,6 +1024,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 		return 15;
 	}
+	
+	/**
+	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
+	 */
+	@Override
+	public void resetMeasurements() {
+		for (int i = 1; i <= this.getChannelCount(); i++) {
+			ChannelType channel = this.getChannel(i);
+				List<MeasurementType> measurement = channel.getMeasurement();
+				for (MeasurementType measurementType : measurement) {
+					measurementType.setActive(true);
+				}			
+		}
+	}
 
 	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
@@ -1041,20 +1053,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		ChannelType channel = this.getChannel(recordSet.getChannelConfigNumber());
-		if (channel != null && !channel.equals(recordSetParent)) {
-			List<MeasurementType> measurement = channel.getMeasurement();
-			for (MeasurementType measurementType : measurement) {
-				measurementType.setActive(true);
-			}
-			recordSetParent = channel;
-		}
 		int noneCalculationRecords = 0;
 		for (String fileRecord : fileRecordsProperties) {
 			if (fileRecord.contains("_isActive=true")) ++noneCalculationRecords;
 		}
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
 			if (channel != null) {
-				List<MeasurementType> measurement = channel.getMeasurement();
+				List<MeasurementType> measurements = channel.getMeasurement();
 				switch (fileRecordsProperties.length) {
 				case 44: //Android HoTTAdapter3
 					for (int i = 0; i < recordKeys.length; i++) {
@@ -1081,7 +1086,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						case 62: //62=Capacity M, 
 						case 63: //63=Power M, 
 						case 64: //64=Revolution M, 
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
 							break;
 						default:
 							cleanedRecordNames.add(recordKeys[i]);
@@ -1095,7 +1100,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						if (i != 8 && i <= 58)
 							cleanedRecordNames.add(recordKeys[i]);
 						else
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
+					}
+					if (cleanedRecordNames.size() != noneCalculationRecords) {
+						int j = 0;
+						for (String fileRecord : fileRecordsProperties) {
+							if (fileRecord.contains("_isActive=false")) 
+								measurements.get(j).setActive(false);
+						}
 					}
 					break;
 
@@ -1104,7 +1116,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						if (i != 8 && i != 59 && i <= 75)
 							cleanedRecordNames.add(recordKeys[i]);
 						else
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
 					}
 					break;
 
@@ -1115,7 +1127,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						if (i != 8 && i != 59)
 							cleanedRecordNames.add(recordKeys[i]);
 						else
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
 					}
 					break;
 				}
@@ -1125,7 +1137,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		else if ((recordKeys.length - noneCalculationRecords) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
 			//load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
 			if (channel != null) {
-				List<MeasurementType> measurement = channel.getMeasurement();
+				List<MeasurementType> measurements = channel.getMeasurement();
 				switch (noneCalculationRecords) {
 				case 44: //Android HoTTAdapter3
 					for (int i = 0; i < recordKeys.length; i++) {
@@ -1152,7 +1164,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						case 62: //62=Capacity M, 
 						case 63: //63=Power M, 
 						case 64: //64=Revolution M, 
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
 							break;
 						default:
 							break;
@@ -1160,17 +1172,35 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					break;
 
+				case 57: //HoTTAdapter2 without channels prior to 3.0.8
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i == 0) 
+							measurements.get(i).setActive(false);
+						else if (i == 8 || i > 58) 
+							measurements.get(i).setActive(null);
+					}
+					break;
+
 				case 58: //HoTTAdapter2 without channels prior to 3.0.8
 					for (int i = 0; i < recordKeys.length; i++) {
 						if (i == 8 || i > 58) 
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
+					}
+					break;
+
+				case 73: //HoTTAdapter2 with channels prior to 3.0.8
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (i == 0) 
+							measurements.get(i).setActive(false);
+						else if (i == 8 || i == 59 || i > 74) 
+							measurements.get(i).setActive(null);
 					}
 					break;
 
 				case 74: //HoTTAdapter2 with channels prior to 3.0.8
 					for (int i = 0; i < recordKeys.length; i++) {
-						if (i == 8 || i == 59 || i > 75) 
-							measurement.get(i).setActive(null);
+						if (i == 8 || i == 59 || i > 74) 
+							measurements.get(i).setActive(null);
 					}
 					break;
 
@@ -1179,7 +1209,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				default:
 					for (int i = 0; i < recordKeys.length; i++) {
 						if (i == 8 || i == 59) 
-							measurement.get(i).setActive(null);
+							measurements.get(i).setActive(null);
 					}
 					break;
 				}
