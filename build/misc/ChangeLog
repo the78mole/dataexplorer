@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.1.9 - xx yyy 2014
 enable absolute time for graphics time line
 enable to set the font size of measurement values on digital display
+several processing optimizations
 fix caching algorithm to enable scale text color updated by color change 
 IISI-Cockpit V2 - add statistics definition 
 JetiAdapter - fix time step calculation for very short logs in respect of time
@@ -10,6 +11,7 @@ JetiAdapter - fix record naming while repeating measurement names with different
 HoTTAdapter* - update HoTTMdlViewer to latest 0.8 snapshot
 HoTTAdapter* - fine tune some more filter settings
 HoTTAdapter* - add measurement voltage Rx min and make EAM rpm to an extra measurement
+HoTTAdapter2 - fix missing update visibility status while switching record sets in display
 UniLog2 - fix live data gathering capability
 Futaba-Telemetry - fix english device properties file
 OpenTx-Telemetry - add telemetry data support
