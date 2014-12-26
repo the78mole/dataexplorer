@@ -2308,7 +2308,7 @@ public class Record extends Vector<Integer> {
 	 * @return true if the record contained reasonable date which can be displayed
 	 */
 	public boolean hasReasonableData() {
-		return this.minValue != this.maxValue || device.translateValue(this, this.maxValue/1000.0) != 0.0;
+		return this.realSize() > 0 && (this.minValue != this.maxValue || device.translateValue(this, this.maxValue/1000.0) != 0.0);
 	}
 
 	/**
