@@ -80,7 +80,7 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="build" />
+		<delete dir="build/*.jar" />
 		<delete dir="bin" />
 		<delete dir="classes" />
 	</target>
