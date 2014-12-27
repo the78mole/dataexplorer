@@ -126,6 +126,8 @@ public class TestSuperClass extends TestCase {
 	 */
 	public void initialize() throws FileNotFoundException {
 
+		this.settings.setPartialDataTable(false);
+		this.settings.setTimeFormat("relativ");
 		File file = new File(this.settings.getDevicesPath());
 		if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
 		String[] files = file.list();

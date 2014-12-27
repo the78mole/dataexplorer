@@ -657,6 +657,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 									drawCurves(recordSet, 1024, 768);
 								}
 							}
+							activeChannel.getActiveRecordSet().updateVisibleAndDisplayableRecordsForTable();
 
 							String absolutFilePath = tmpDir1 + file.getName();
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
@@ -707,7 +708,6 @@ public class TestFileReaderWriter extends TestSuperClass {
 				if (filePath.toLowerCase().endsWith(".osd") && !filePath.contains("Av4ms_FV_x69")) {
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
-							System.out.println("working with : " + file);
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
 							if(this.legacyDeviceNames.get(fileDeviceName) != null) 
@@ -715,6 +715,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
 							this.application.setActiveDeviceWoutUI(device);
+							System.out.println(fileDeviceName + ": working with : " + file);
 
 							setupDataChannels(device);
 
@@ -959,13 +960,13 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getName().toLowerCase().startsWith("log")) {
-					System.out.println("working with : " + file);
 					try {
 						HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(';',file.getAbsolutePath());
 						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
+						System.out.println(fileDeviceName + ": working with : " + file);
 
 						setupDataChannels(device);
 
@@ -1542,14 +1543,13 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
-					System.out.println("working with : " + file);
 					try {
 						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
-						System.out.println("working with file from device : " + fileDeviceName);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
+						System.out.println(fileDeviceName + ": working with : " + file);
 
 						setupDataChannels(device);
 
