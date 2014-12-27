@@ -186,9 +186,7 @@ public class PolaronPro extends Polaron {
 						maxVotage = points[j + 8] > maxVotage ? points[j + 8] : maxVotage;
 						minVotage = points[j + 8] < minVotage ? points[j + 8] : minVotage;
 					}
-					System.out.println(k+23);
 				}
-				System.out.println();
 				//calculate balance on the fly
 				points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
