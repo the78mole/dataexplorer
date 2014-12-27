@@ -328,9 +328,8 @@ public class TestSuperClass extends TestCase {
 		// draw each record using sorted record set names
 		recordSet.updateSyncRecordScale();
 		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
-			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable() && actualRecord.realSize() > 0;
-			if (actualRecord.isScaleVisible()) 
-				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, true, false, false);
+			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			if (actualRecord.isScaleVisible()) CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, true, true, true);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(recordSet, gc, this.offSetY, width, this.settings.getGridDashStyle());
@@ -338,7 +337,7 @@ public class TestSuperClass extends TestCase {
 			if (isActualRecordEnabled) {
 				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				//gc.drawRectangle(x0, y0-height, width, height);
-				gc.setClipping(x0-1, y0-height-1, width+2, height+2);
+				gc.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
 				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
 				gc.setClipping(bounds);
 			}
