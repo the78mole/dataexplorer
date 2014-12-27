@@ -1566,7 +1566,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 							RecordSet recordSet = activeChannel.get(recordSetName);
 							if (recordSet != null) {
 								activeChannel.setActiveRecordSet(recordSet);
-								//device.makeInActiveDisplayable(recordSet);
+								if (fileDeviceName.startsWith("HoTT"))
+									device.makeInActiveDisplayable(recordSet);
 								drawCurves(recordSet, 1024, 768);
 							}
 						}
