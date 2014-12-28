@@ -24,7 +24,6 @@ import gde.data.Channel;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
-import gde.device.ChannelType;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
@@ -1031,11 +1030,10 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	@Override
 	public void resetMeasurements() {
 		for (int i = 1; i <= this.getChannelCount(); i++) {
-			ChannelType channel = this.getChannel(i);
-				List<MeasurementType> measurement = channel.getMeasurement();
-				for (MeasurementType measurementType : measurement) {
-					measurementType.setActive(true);
-				}			
+			List<MeasurementType> measurement = this.getChannelMeasuremts(i);
+			for (MeasurementType measurementType : measurement) {
+				measurementType.setActive(true);
+			}
 		}
 	}
 
@@ -1052,167 +1050,164 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
-		ChannelType channel = this.getChannel(recordSet.getChannelConfigNumber());
 		int noneCalculationRecords = 0;
 		for (String fileRecord : fileRecordsProperties) {
 			if (fileRecord.contains("_isActive=true")) ++noneCalculationRecords;
 		}
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
-			if (channel != null) {
-				List<MeasurementType> measurements = channel.getMeasurement();
-				switch (fileRecordsProperties.length) {
-				case 44: //Android HoTTAdapter3
-					for (int i = 0; i < recordKeys.length; i++) {
-						switch (i) {
-						case 8: //8=VoltageRxMin
-						case 23: //23=Balance G, 
-						case 24: //24=CellVoltage G1 
-						case 25: //25=CellVoltage G2
-						case 26: //25=CellVoltage G3 
-						case 27: //25=CellVoltage G4
-						case 28: //25=CellVoltage G5
-						case 29: //29=CellVoltage G6
-						case 32: //32=Voltage G1, 
-						case 33: //33=Voltage G2, 
-						case 34: //34=Temperature G1, 
-						case 35: //35=Temperature G2
-						case 36: //36=Voltage E, 
-						case 37: //37=Current E, 
-						case 38: //38=Capacity E, 
-						case 39: //39=Power E, 
-						case 59: //59=Revolution E
-						case 60: //60=Voltage M, 
-						case 61: //61=Current M, 
-						case 62: //62=Capacity M, 
-						case 63: //63=Power M, 
-						case 64: //64=Revolution M, 
-							measurements.get(i).setActive(null);
-							break;
-						default:
-							cleanedRecordNames.add(recordKeys[i]);
-							break;
-						}
+			List<MeasurementType> measurements = this.getChannelMeasuremts(recordSet.getChannelConfigNumber());
+			switch (fileRecordsProperties.length) {
+			case 44: //Android HoTTAdapter3
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) {
+					case 8: //8=VoltageRxMin
+					case 23: //23=Balance G, 
+					case 24: //24=CellVoltage G1 
+					case 25: //25=CellVoltage G2
+					case 26: //25=CellVoltage G3 
+					case 27: //25=CellVoltage G4
+					case 28: //25=CellVoltage G5
+					case 29: //29=CellVoltage G6
+					case 32: //32=Voltage G1, 
+					case 33: //33=Voltage G2, 
+					case 34: //34=Temperature G1, 
+					case 35: //35=Temperature G2
+					case 36: //36=Voltage E, 
+					case 37: //37=Current E, 
+					case 38: //38=Capacity E, 
+					case 39: //39=Power E, 
+					case 59: //59=Revolution E
+					case 60: //60=Voltage M, 
+					case 61: //61=Current M, 
+					case 62: //62=Capacity M, 
+					case 63: //63=Power M, 
+					case 64: //64=Revolution M, 
+						measurements.get(i).setActive(null);
+						break;
+					default:
+						cleanedRecordNames.add(recordKeys[i]);
+						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+						break;
 					}
-					break;
-
-				case 58: //HoTTAdapter2 without channels prior to 3.0.8
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i != 8 && i <= 58)
-							cleanedRecordNames.add(recordKeys[i]);
-						else
-							measurements.get(i).setActive(null);
-					}
-					if (cleanedRecordNames.size() != noneCalculationRecords) {
-						int j = 0;
-						for (String fileRecord : fileRecordsProperties) {
-							if (fileRecord.contains("_isActive=false")) 
-								measurements.get(j).setActive(false);
-						}
-					}
-					break;
-
-				case 74: //HoTTAdapter2 with channels prior to 3.0.8
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i != 8 && i != 59 && i <= 75)
-							cleanedRecordNames.add(recordKeys[i]);
-						else
-							measurements.get(i).setActive(null);
-					}
-					break;
-
-				case 64: //HoTTAdapter2 without channels prior to 3.1.9
-				case 84: //HoTTAdapter2 with channels prior to 3.1.9
-				default:
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i != 8 && i != 59)
-							cleanedRecordNames.add(recordKeys[i]);
-						else
-							measurements.get(i).setActive(null);
-					}
-					break;
 				}
+				break;
+
+			case 58: //HoTTAdapter2 without channels prior to 3.0.8
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					if (i != 8 && i <= 58) {
+						cleanedRecordNames.add(recordKeys[i]);
+						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+					}
+					else
+						measurements.get(i).setActive(null);
+				}
+				break;
+
+			case 74: //HoTTAdapter2 with channels prior to 3.0.8
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					if (i != 8 && i != 59 && i <= 75) {
+						cleanedRecordNames.add(recordKeys[i]);
+						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+					}
+					else
+						measurements.get(i).setActive(null);
+				}
+				break;
+
+			case 64: //HoTTAdapter2 without channels prior to 3.1.9
+			case 84: //HoTTAdapter2 with channels prior to 3.1.9
+			default:
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					if (i != 8 && i != 59) {
+						cleanedRecordNames.add(recordKeys[i]);
+						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+					}
+					else
+						measurements.get(i).setActive(null);
+				}
+				break;
 			}
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}
 		else if ((recordKeys.length - noneCalculationRecords) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
 			//load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
-			if (channel != null) {
-				List<MeasurementType> measurements = channel.getMeasurement();
-				switch (noneCalculationRecords) {
-				case 44: //Android HoTTAdapter3
-					for (int i = 0; i < recordKeys.length; i++) {
-						switch (i) {
-						case 8: //8=VoltageRxMin
-						case 23: //23=Balance G, 
-						case 24: //24=CellVoltage G1 
-						case 25: //25=CellVoltage G2
-						case 26: //25=CellVoltage G3 
-						case 27: //25=CellVoltage G4
-						case 28: //25=CellVoltage G5
-						case 29: //29=CellVoltage G6
-						case 32: //32=Voltage G1, 
-						case 33: //33=Voltage G2, 
-						case 34: //34=Temperature G1, 
-						case 35: //35=Temperature G2
-						case 36: //36=Voltage E, 
-						case 37: //37=Current E, 
-						case 38: //38=Capacity E, 
-						case 39: //39=Power E, 
-						case 59: //59=Revolution E
-						case 60: //60=Voltage M, 
-						case 61: //61=Current M, 
-						case 62: //62=Capacity M, 
-						case 63: //63=Power M, 
-						case 64: //64=Revolution M, 
-							measurements.get(i).setActive(null);
-							break;
-						default:
-							break;
-						}
+			List<MeasurementType> measurements = this.getChannelMeasuremts(recordSet.getChannelConfigNumber());
+			switch (noneCalculationRecords) {
+			case 44: //Android HoTTAdapter3
+				for (int i = 0; i < recordKeys.length; i++) {
+					switch (i) {
+					case 8: //8=VoltageRxMin
+					case 23: //23=Balance G, 
+					case 24: //24=CellVoltage G1 
+					case 25: //25=CellVoltage G2
+					case 26: //25=CellVoltage G3 
+					case 27: //25=CellVoltage G4
+					case 28: //25=CellVoltage G5
+					case 29: //29=CellVoltage G6
+					case 32: //32=Voltage G1, 
+					case 33: //33=Voltage G2, 
+					case 34: //34=Temperature G1, 
+					case 35: //35=Temperature G2
+					case 36: //36=Voltage E, 
+					case 37: //37=Current E, 
+					case 38: //38=Capacity E, 
+					case 39: //39=Power E, 
+					case 59: //59=Revolution E
+					case 60: //60=Voltage M, 
+					case 61: //61=Current M, 
+					case 62: //62=Capacity M, 
+					case 63: //63=Power M, 
+					case 64: //64=Revolution M, 
+						measurements.get(i).setActive(null);
+						break;
+					default:
+						if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						break;
 					}
-					break;
-
-				case 57: //HoTTAdapter2 without channels prior to 3.0.8
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i == 0) 
-							measurements.get(i).setActive(false);
-						else if (i == 8 || i > 58) 
-							measurements.get(i).setActive(null);
-					}
-					break;
-
-				case 58: //HoTTAdapter2 without channels prior to 3.0.8
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i == 8 || i > 58) 
-							measurements.get(i).setActive(null);
-					}
-					break;
-
-				case 73: //HoTTAdapter2 with channels prior to 3.0.8
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i == 0) 
-							measurements.get(i).setActive(false);
-						else if (i == 8 || i == 59 || i > 74) 
-							measurements.get(i).setActive(null);
-					}
-					break;
-
-				case 74: //HoTTAdapter2 with channels prior to 3.0.8
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i == 8 || i == 59 || i > 74) 
-							measurements.get(i).setActive(null);
-					}
-					break;
-
-				case 64: //HoTTAdapter2 without channels prior to 3.1.9
-				case 84: //HoTTAdapter2 with channels prior to 3.1.9
-				default:
-					for (int i = 0; i < recordKeys.length; i++) {
-						if (i == 8 || i == 59) 
-							measurements.get(i).setActive(null);
-					}
-					break;
 				}
+				break;
+
+			case 57: //HoTTAdapter2 without channels prior to 3.0.8
+				for (int i = 0; i < recordKeys.length; i++) {
+					if (i == 8 || i > 58)
+						measurements.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+				}
+				break;
+
+			case 58: //HoTTAdapter2 without channels prior to 3.0.8
+				for (int i = 0; i < recordKeys.length; i++) {
+					if (i == 8 || i > 58)
+						measurements.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+				}
+				break;
+
+			case 73: //HoTTAdapter2 with channels prior to 3.0.8
+				for (int i = 0; i < recordKeys.length; i++) {
+					if (i == 8 || i == 59 || i > 74)
+						measurements.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+				}
+				break;
+
+			case 74: //HoTTAdapter2 with channels prior to 3.0.8
+				for (int i = 0; i < recordKeys.length; i++) {
+					if (i == 8 || i == 59 || i > 74)
+						measurements.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+				}
+				break;
+
+			case 64: //HoTTAdapter2 without channels prior to 3.1.9
+			case 84: //HoTTAdapter2 with channels prior to 3.1.9
+			default:
+				for (int i = 0; i < recordKeys.length; i++) {
+					if (i == 8 || i == 59)
+						measurements.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+				}
+				break;
 			}
 			//recordKeys = recordKeys; keeps unchanged
 		}
