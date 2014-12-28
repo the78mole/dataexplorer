@@ -218,7 +218,8 @@ public class TestSuperClass extends TestCase {
 			// buildup new structure  - set up the channels
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 				Channel newChannel = new Channel(activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
-				this.channels.put(i, newChannel);
+				newChannel.setObjectKey(this.application.getObjectKey());
+				this.channels.put(Integer.valueOf(i), newChannel);
 				channelNames[i - 1] = i + " : " + activeDevice.getChannelName(i);
 			}
 			this.channels.setChannelNames(channelNames);

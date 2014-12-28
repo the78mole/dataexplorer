@@ -211,6 +211,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						this.application.setActiveDeviceWoutUI(device);
 
 						setupDataChannels(device);
+
 						this.channels.setActiveChannelNumber(1);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
@@ -280,6 +281,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						this.application.setActiveDeviceWoutUI(device);
 
 						setupDataChannels(device);
+
 						this.channels.setActiveChannelNumber(1);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
@@ -349,6 +351,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						this.application.setActiveDeviceWoutUI(device);
 
 						setupDataChannels(device);
+						
 						this.channels.setActiveChannelNumber(1);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
@@ -706,12 +709,16 @@ public class TestFileReaderWriter extends TestSuperClass {
 			for (File file : files) {
 				String filePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 				if (filePath.toLowerCase().endsWith(".osd") && !filePath.contains("Av4ms_FV_x69")) {
+//					if (!filePath.contains("2013-04-13_Cappuccino_BT_Vergleich_PLoss"))
+//						continue;
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
 							if(this.legacyDeviceNames.get(fileDeviceName) != null) 
 								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName); 
+//							if (!fileDeviceName.contains("HoTTAdapter2"))
+//								continue;
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
 							this.application.setActiveDeviceWoutUI(device);
@@ -732,8 +739,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 								if (recordSet != null) {
 									if (!recordSet.hasDisplayableData()) recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
 									activeChannel.setActiveRecordSet(recordSet);
-									if (fileDeviceName.startsWith("HoTT"))
-											device.makeInActiveDisplayable(recordSet);
+									if (fileDeviceName.startsWith("HoTTAdapter2")) {
+										device.makeInActiveDisplayable(recordSet);
+										System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
+									}
 									drawCurves(recordSet, 1024, 768);
 								}
 							}
@@ -1052,6 +1061,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 							this.application.setActiveDeviceWoutUI(device);
 
 							setupDataChannels(device);
+							
 							fileHeader = CSVReaderWriter.evaluateType(';', fileHeader, deviceConfig);
 
 							int channelConfigNumber = this.channels.getChannelNumber(fileHeader.get(GDE.CHANNEL_CONFIG_NAME));
@@ -1240,7 +1250,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
 							activeChannel.applyTemplate(recordSet.getName(), true);
-							//device.makeInActiveDisplayable(recordSet);
+							device.makeInActiveDisplayable(recordSet);
 							drawCurves(recordSet, 1024, 768);
 						}
 
@@ -1310,7 +1320,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
 							activeChannel.applyTemplate(recordSet.getName(), true);
-							//device.makeInActiveDisplayable(recordSet);
+							device.makeInActiveDisplayable(recordSet);
 							drawCurves(recordSet, 1024, 768);
 						}
 
@@ -1544,9 +1554,13 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
+//					if (!file.getAbsolutePath().contains("2013-04-13_Cappuccino_BT_Vergleich_PLoss"))
+//						continue;
 					try {
 						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+//						if (!fileDeviceName.contains("HoTTAdapter2"))
+//							continue;
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
@@ -1566,8 +1580,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 							RecordSet recordSet = activeChannel.get(recordSetName);
 							if (recordSet != null) {
 								activeChannel.setActiveRecordSet(recordSet);
-								if (fileDeviceName.startsWith("HoTT"))
+								if (fileDeviceName.startsWith("HoTTAdapter2")) {
 									device.makeInActiveDisplayable(recordSet);
+									System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
+								}
 								drawCurves(recordSet, 1024, 768);
 							}
 						}
