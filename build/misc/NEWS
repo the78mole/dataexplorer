@@ -1,12 +1,20 @@
-GNU DataExplorer - News - comes with version 3.1.8
+GNU DataExplorer - News - comes with version 3.1.9
 
-1)  fix Kosmik rounding issue
-2)  fix HoTTAdapter* text mode initialization
-3)  fix JetiAdapter missed parsing data from sensor without unit
-4)  fix JetiAdapter GPS-Altitude and GPS-Speed detection
-5)  fix time formating in statistics window
-6)  fix GPS-Logger2 speed parsing from SMGPS instead VTG sentence
-7)  JetiAdapter - display events as a curve, repeating events add up the counter
+1)  enable absolute time for graphics time line
+2)  enable to set the font size of measurement values on digital display
+3)  several processing optimizations
+4)  fix caching algorithm to enable scale text color updated by color change 
+5)  IISI-Cockpit V2 - add statistics definition 
+6)  JetiAdapter - fix time step calculation for very short logs in respect of time
+7)  JetiAdapter - fix record naming while repeating measurement names with different sensors
+8)  HoTTAdapter* - update HoTTMdlViewer to latest 0.8 snapshot
+9)  HoTTAdapter* - fine tune some more filter settings
+10) HoTTAdapter* - add measurement voltage Rx min and make EAM rpm to an extra measurement
+11) HoTTAdapter2 - fix missing update visibility status while switching record sets in display
+12) UniLog2 - fix live data gathering capability
+13) Futaba-Telemetry - fix english device properties file
+14) OpenTx-Telemetry - add telemetry data support
+
 
 
 
