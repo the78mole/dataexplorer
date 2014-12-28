@@ -677,6 +677,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="25" name="scale_sync_ref_ordinal"/>
+            </Measurement>
             <Measurement>
                 <name>Revolution</name>
                 <symbol>rpm</symbol>
