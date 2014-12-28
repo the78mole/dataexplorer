@@ -1252,7 +1252,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void setActiveDeviceWoutUI(IDevice device) {
 		if (device != null) {
-			if (this.activeDevice == null || !this.activeDevice.getName().equals(device.getName())) this.activeDevice = device;
+			this.activeDevice = device;
 		}
 	}
 
