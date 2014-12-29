@@ -342,7 +342,7 @@ public class Settings extends Properties {
 									if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_DOT_XML)) {
 										DeviceConfiguration oldConfig = new DeviceConfiguration(file.getAbsolutePath(), tmpUnmarshaller);
 										DeviceConfiguration newConfig = actualConfigurations.get(oldConfig.getName());
-										if (oldConfig.isUsed()) {
+										if (oldConfig.isUsed() && newConfig != null) {
 											newConfig.setUsed(true);
 											if (oldConfig.getPort().length() > 1) newConfig.setPort(oldConfig.getPort());
 											if (oldConfig.getDataBlockPreferredDataLocation().length() > 1) newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
