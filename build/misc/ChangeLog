@@ -5,6 +5,7 @@ enable absolute time for graphics time line
 enable to set the font size of measurement values on digital display
 several processing optimizations
 fix caching algorithm to enable scale text color updated by color change 
+fix Linux GTK3 incompatibility by exporting SWT_GTK3=0 in start scripts
 IISI-Cockpit V2 - add statistics definition 
 JetiAdapter - fix time step calculation for very short logs in respect of time
 JetiAdapter - fix record naming while repeating measurement names with different sensors
