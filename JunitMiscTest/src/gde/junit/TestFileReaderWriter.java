@@ -656,11 +656,11 @@ public class TestFileReaderWriter extends TestSuperClass {
 								RecordSet recordSet = activeChannel.get(recordSetName);
 								if (recordSet != null) {
 									activeChannel.setActiveRecordSet(recordSet);
+									activeChannel.getActiveRecordSet().updateVisibleAndDisplayableRecordsForTable();
 									//device.makeInActiveDisplayable(recordSet);
 									drawCurves(recordSet, 1024, 768);
 								}
 							}
-							activeChannel.getActiveRecordSet().updateVisibleAndDisplayableRecordsForTable();
 
 							String absolutFilePath = tmpDir1 + file.getName();
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
@@ -741,7 +741,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 									activeChannel.setActiveRecordSet(recordSet);
 									if (fileDeviceName.startsWith("HoTTAdapter2")) {
 										device.makeInActiveDisplayable(recordSet);
-										System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
+										if (recordSet.get("SpannungRx_min") != null)
+											System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
 									}
 									drawCurves(recordSet, 1024, 768);
 								}
@@ -1582,7 +1583,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 								activeChannel.setActiveRecordSet(recordSet);
 								if (fileDeviceName.startsWith("HoTTAdapter2")) {
 									device.makeInActiveDisplayable(recordSet);
-									System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
+									if (recordSet.get("SpannungRx_min") != null)
+										System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
 								}
 								drawCurves(recordSet, 1024, 768);
 							}
