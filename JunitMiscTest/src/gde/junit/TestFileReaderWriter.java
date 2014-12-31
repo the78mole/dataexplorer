@@ -741,8 +741,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 									activeChannel.setActiveRecordSet(recordSet);
 									if (fileDeviceName.startsWith("HoTTAdapter2")) {
 										device.makeInActiveDisplayable(recordSet);
-										if (recordSet.get("SpannungRx_min") != null)
-											System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
+										if (recordSet.get(8) != null) //8=VoltageRxMin
+											System.out.println(recordSet.get(8).getName() + " isActive = " + recordSet.get(8).isActive());
 									}
 									drawCurves(recordSet, 1024, 768);
 								}
@@ -1583,8 +1583,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 								activeChannel.setActiveRecordSet(recordSet);
 								if (fileDeviceName.startsWith("HoTTAdapter2")) {
 									device.makeInActiveDisplayable(recordSet);
-									if (recordSet.get("SpannungRx_min") != null)
-										System.out.println("SpannungRx_min isActive = " + recordSet.get("SpannungRx_min").isActive());
+									if (recordSet.get(8) != null) //8=VoltageRxMin
+										System.out.println(recordSet.get(8).getName() + " isActive = " + recordSet.get(8).isActive());
 								}
 								drawCurves(recordSet, 1024, 768);
 							}
