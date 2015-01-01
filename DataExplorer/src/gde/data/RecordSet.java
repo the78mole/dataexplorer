@@ -1854,8 +1854,6 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			final PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) : this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 				final Record tmpRecord = this.get(i);
-				if (!tmpRecord.hasReasonableData())
-					continue;
 				final int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
 				if (syncMasterRecordOrdinal >= 0) {
 					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
