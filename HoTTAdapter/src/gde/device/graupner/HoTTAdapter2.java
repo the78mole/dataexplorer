@@ -801,6 +801,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 
 			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
 		}
+		recordSet.syncScaleOfSyncableRecords();
 		this.application.updateStatisticsData(true);
 		this.updateVisibilityStatus(recordSet, true);
 	}

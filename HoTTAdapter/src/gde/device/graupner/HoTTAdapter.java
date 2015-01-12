@@ -950,10 +950,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
 				GPSHelper.calculateTripLength(this, recordSet, 1, 2, 3, startAltitude, 7, 9);
-				this.application.updateStatisticsData(true);
-				this.updateVisibilityStatus(recordSet, true);
 			}
 		}
+		recordSet.syncScaleOfSyncableRecords();
+		this.application.updateStatisticsData(true);
+		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**

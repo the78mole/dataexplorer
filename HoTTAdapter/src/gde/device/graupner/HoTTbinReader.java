@@ -333,7 +333,7 @@ public class HoTTbinReader {
 						if (HoTTAdapter.isChannelsChannelEnabled) {
 							parseAddChannel(HoTTbinReader.buf);
 						}
-						if (HoTTbinReader.isReceiverOnly) {
+						if (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled) {
 							for (int j = 0; j < 9; j++) {
 								data_in.read(HoTTbinReader.buf);
 								HoTTbinReader.timeStep_ms += 10;
