@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.2.0 - xx yyy 2015
 fix initial synchronization of measurements
 fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds
+fix problem while copy graphics into clip board several time in sequence
 hoTTAdapter - fix receiver only with channels times 10 error 
 add Junsi iCharger 4010 Duo support
 
