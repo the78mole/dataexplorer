@@ -1886,7 +1886,8 @@ public class GraphicsComposite extends Composite {
 			if (activeChannel != null) {
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet != null) {
-					this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
+					if (this.canvasImage != null) this.canvasImage.dispose();
+					this.canvasImage = new Image(GDE.display, this.canvasBounds);
 					this.canvasImageGC = new GC(this.canvasImage); //SWTResourceManager.getGC(this.canvasImage);
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
