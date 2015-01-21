@@ -1902,7 +1902,7 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
-		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
+		if (tmpValue!=null && tmpValue.length() >= 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
 		tmpValue = recordProps.get(LINE_WITH);
 		if (tmpValue!=null && tmpValue.length() > 0) this.lineWidth =  Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(LINE_STYLE);
