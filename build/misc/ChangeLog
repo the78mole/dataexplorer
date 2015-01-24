@@ -5,6 +5,7 @@ fix initial synchronization of measurements
 fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds
 fix problem while copy graphics into clip board several time in sequence
 fix JLog2 context help page selection 
+fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button
 fix error not loading color from OSD file some colors (1,1,1)
 hoTTAdapter - fix receiver only with channels times 10 error 
 add Junsi iCharger 4010 Duo support
