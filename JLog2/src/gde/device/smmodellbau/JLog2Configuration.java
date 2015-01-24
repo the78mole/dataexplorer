@@ -1048,10 +1048,10 @@ public class JLog2Configuration extends Composite {
 					this.jlogFirmwareCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					this.jlogFirmwareCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.jlogFirmwareCombo.setItems(this.jlogFirmware);
-					this.jlogFirmwareCombo.select(1);
 					this.jlogFirmwareCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					this.jlogFirmwareCombo.setLayoutData(new RowData(60, 17));
 					this.jlogFirmwareCombo.setEditable(false);
+					this.jlogFirmwareCombo.select(1);
 					this.jlogFirmwareCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1065,10 +1065,10 @@ public class JLog2Configuration extends Composite {
 					this.jlogConfigurationCombo.setLayoutData(new RowData(420, 17));
 					this.jlogConfigurationCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.jlogConfigurationCombo.setItems(this.jlogConfigurations400);
-					this.jlogConfigurationCombo.select(0);
 					this.jlogConfigurationCombo.setVisibleItemCount(10);
 					this.jlogConfigurationCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					this.jlogConfigurationCombo.setEditable(false);
+					this.jlogConfigurationCombo.select(0);
 					this.jlogConfigurationCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1108,8 +1108,9 @@ public class JLog2Configuration extends Composite {
 					this.baudrateCombo.setLayoutData(baudrateComboLData);
 					this.baudrateCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.baudrateCombo.setItems(this.baudrates);
-					this.baudrateCombo.select(0);
+					this.baudrateCombo.setEditable(false);
 					this.baudrateCombo.setVisibleItemCount(10);
+					this.baudrateCombo.select(0);
 					this.baudrateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1152,6 +1153,7 @@ public class JLog2Configuration extends Composite {
 					this.sysModeCombo.setLayoutData(sysModeComboLData);
 					this.sysModeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.sysModeCombo.setItems(this.sysModes);
+					this.sysModeCombo.setEditable(false);
 					this.sysModeCombo.select(0);
 					this.sysModeCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
@@ -1211,8 +1213,9 @@ public class JLog2Configuration extends Composite {
 					this.directGearRatioMajorCombo.setLayoutData(directRatioComboLData);
 					this.directGearRatioMajorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.directGearRatioMajorCombo.setItems(this.oneTo50);
-					this.directGearRatioMajorCombo.select(0);
 					this.directGearRatioMajorCombo.setVisibleItemCount(10);
+					this.directGearRatioMajorCombo.setEditable(false);
+					this.directGearRatioMajorCombo.select(0);
 					this.directGearRatioMajorCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1246,8 +1249,9 @@ public class JLog2Configuration extends Composite {
 					this.directGearRatioDecimalsCombo.setLayoutData(gearRatioMinorComboLData);
 					this.directGearRatioDecimalsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.directGearRatioDecimalsCombo.setItems(this.zeroTo99);
-					this.directGearRatioDecimalsCombo.select(0);
 					this.directGearRatioDecimalsCombo.setVisibleItemCount(10);
+					this.directGearRatioDecimalsCombo.setEditable(false);
+					this.directGearRatioDecimalsCombo.select(0);
 					this.directGearRatioDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1284,6 +1288,7 @@ public class JLog2Configuration extends Composite {
 					this.logModeCombo.setLayoutData(logModeComboLData);
 					this.logModeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.logModeCombo.setItems(this.logModes);
+					this.logModeCombo.setEditable(false);
 					this.logModeCombo.select(0);
 					this.logModeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -1351,9 +1356,10 @@ public class JLog2Configuration extends Composite {
 					this.gearPinionWheelCombo.setLayoutData(pinionComboLData);
 					this.gearPinionWheelCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.gearPinionWheelCombo.setItems(this.eightTo30);
-					this.gearPinionWheelCombo.select(2);
 					this.gearPinionWheelCombo.setVisibleItemCount(10);
 					this.gearPinionWheelCombo.setEnabled(false);
+					this.gearPinionWheelCombo.setEditable(false);
+					this.gearPinionWheelCombo.select(2);
 					this.gearPinionWheelCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1384,13 +1390,14 @@ public class JLog2Configuration extends Composite {
 					this.gearMainWheelCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					this.gearMainWheelCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.gearMainWheelCombo.setItems(this.eightTo255);
-					this.gearMainWheelCombo.select(2);
 					this.gearMainWheelCombo.setVisibleItemCount(10);
 					RowData mainGearComboLData = new RowData();
 					mainGearComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					mainGearComboLData.height = 17;
 					this.gearMainWheelCombo.setLayoutData(mainGearComboLData);
 					this.gearMainWheelCombo.setEnabled(false);
+					this.gearMainWheelCombo.setEditable(false);
+					this.gearMainWheelCombo.select(2);
 					this.gearMainWheelCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1418,13 +1425,14 @@ public class JLog2Configuration extends Composite {
 					this.gearMainWheelDecimalsCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					this.gearMainWheelDecimalsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.gearMainWheelDecimalsCombo.setItems(this.zeroTo99);
-					this.gearMainWheelDecimalsCombo.select(0);
 					this.gearMainWheelDecimalsCombo.setVisibleItemCount(10);
 					RowData secondgearComboLData = new RowData();
 					secondgearComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					secondgearComboLData.height = 17;
 					this.gearMainWheelDecimalsCombo.setLayoutData(secondgearComboLData);
 					this.gearMainWheelDecimalsCombo.setEnabled(false);
+					this.gearMainWheelDecimalsCombo.setEditable(false);
+					this.gearMainWheelDecimalsCombo.select(0);
 					this.gearMainWheelDecimalsCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1462,8 +1470,9 @@ public class JLog2Configuration extends Composite {
 					this.motorPolsCombo.setLayoutData(motorPolsComboLData);
 					this.motorPolsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.motorPolsCombo.setItems(this.motorPols);
-					this.motorPolsCombo.select(6);
 					this.motorPolsCombo.setVisibleItemCount(10);
+					this.motorPolsCombo.setEditable(false);
+					this.motorPolsCombo.select(6);
 					this.motorPolsCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1497,8 +1506,9 @@ public class JLog2Configuration extends Composite {
 					this.motorShuntCombo.setLayoutData(motorShuntComboLData);
 					this.motorShuntCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.motorShuntCombo.setItems(this.currentShuntAdjust);
-					this.motorShuntCombo.select(60);
 					this.motorShuntCombo.setVisibleItemCount(10);
+					this.motorShuntCombo.setEditable(false);
+					this.motorShuntCombo.select(60);
 					this.motorShuntCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1729,8 +1739,9 @@ public class JLog2Configuration extends Composite {
 					this.capacityAlarmCombo.setLayoutData(capacityAlarmComboLData);
 					this.capacityAlarmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityAlarmCombo.setItems(this.zeroTo25500);
-					this.capacityAlarmCombo.select(0);
 					this.capacityAlarmCombo.setVisibleItemCount(10);
+					this.capacityAlarmCombo.setEditable(false);
+					this.capacityAlarmCombo.select(0);
 					this.capacityAlarmCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1775,8 +1786,9 @@ public class JLog2Configuration extends Composite {
 					this.voltageBatteryAlarmCombo.setLayoutData(voltagebatteryMinCombo1LData);
 					this.voltageBatteryAlarmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageBatteryAlarmCombo.setItems(this.zeroTo50);
-					this.voltageBatteryAlarmCombo.select(0);
 					this.voltageBatteryAlarmCombo.setVisibleItemCount(10);
+					this.voltageBatteryAlarmCombo.setEditable(false);
+					this.voltageBatteryAlarmCombo.select(0);
 					this.voltageBatteryAlarmCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1812,8 +1824,9 @@ public class JLog2Configuration extends Composite {
 					this.voltageBatteryAlarmDecimalsCombo.setLayoutData(voltagebatteryAlarmMaxCombo2LData);
 					this.voltageBatteryAlarmDecimalsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageBatteryAlarmDecimalsCombo.setItems(this.zeroTo9);
-					this.voltageBatteryAlarmDecimalsCombo.select(0);
 					this.voltageBatteryAlarmDecimalsCombo.setVisibleItemCount(10);
+					this.voltageBatteryAlarmDecimalsCombo.setEditable(false);
+					this.voltageBatteryAlarmDecimalsCombo.select(0);
 					this.voltageBatteryAlarmDecimalsCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1858,8 +1871,9 @@ public class JLog2Configuration extends Composite {
 					this.fetTempMaxCombo.setLayoutData(paTempMaxComboLData);
 					this.fetTempMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.fetTempMaxCombo.setItems(this.zeroTo127);
-					this.fetTempMaxCombo.select(0);
 					this.fetTempMaxCombo.setVisibleItemCount(10);
+					this.fetTempMaxCombo.setEditable(false);
+					this.fetTempMaxCombo.select(0);
 					this.fetTempMaxCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -1904,9 +1918,10 @@ public class JLog2Configuration extends Composite {
 					this.extern1Combo.setLayoutData(extern1ComboLData);
 					this.extern1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.extern1Combo.setItems(this.zeroTo127);
-					this.extern1Combo.select(0);
 					this.extern1Combo.setVisibleItemCount(10);
 					this.extern1Combo.setEnabled(false);
+					this.extern1Combo.setEditable(false);
+					this.extern1Combo.select(0);
 					this.extern1Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1980,9 +1995,10 @@ public class JLog2Configuration extends Composite {
 					this.extern2Combo.setLayoutData(extern2ComboLData);
 					this.extern2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.extern2Combo.setItems(this.zeroTo127);
-					this.extern2Combo.select(0);
 					this.extern2Combo.setVisibleItemCount(10);
 					this.extern2Combo.setEnabled(false);
+					this.extern2Combo.setEditable(false);
+					this.extern2Combo.select(0);
 					this.extern2Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -2055,9 +2071,10 @@ public class JLog2Configuration extends Composite {
 					this.extern3Combo.setLayoutData(extern3ComboLData);
 					this.extern3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.extern3Combo.setItems(this.zeroTo127);
-					this.extern3Combo.select(0);
 					this.extern3Combo.setVisibleItemCount(10);
 					this.extern3Combo.setEnabled(false);
+					this.extern3Combo.setEditable(false);
+					this.extern3Combo.select(0);
 					this.extern3Combo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -2130,9 +2147,10 @@ public class JLog2Configuration extends Composite {
 					this.extern4Combo.setLayoutData(extern4ComboLData);
 					this.extern4Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.extern4Combo.setItems(this.zeroTo127);
-					this.extern4Combo.select(0);
 					this.extern4Combo.setVisibleItemCount(10);
 					this.extern4Combo.setEnabled(false);
+					this.extern4Combo.setEditable(false);
+					this.extern4Combo.select(0);
 					this.extern4Combo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
 						public void mouseMove(MouseEvent evt) {
@@ -2205,9 +2223,10 @@ public class JLog2Configuration extends Composite {
 					this.extern5Combo.setLayoutData(extern5ComboLData);
 					this.extern5Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.extern5Combo.setItems(this.zeroTo127);
-					this.extern5Combo.select(0);
 					this.extern5Combo.setVisibleItemCount(10);
 					this.extern5Combo.setEnabled(false);
+					this.extern5Combo.setEditable(false);
+					this.extern5Combo.select(0);
 					this.extern5Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -2293,6 +2312,7 @@ public class JLog2Configuration extends Composite {
 					this.alarmLinesCombo.setLayoutData(alarmLinesComboLData);
 					this.alarmLinesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.alarmLinesCombo.setItems(this.zeroAlarms);
+					this.alarmLinesCombo.setEditable(false);
 					this.alarmLinesCombo.select(0);
 					this.alarmLinesCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -2334,6 +2354,7 @@ public class JLog2Configuration extends Composite {
 					this.line1signalTypeCombo.setLayoutData(line1signalComboLData);
 					this.line1signalTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.line1signalTypeCombo.setItems(new String[] { "switched", "flash", "interval", "Morse" }); //$NON-NLS-1$
+					this.line1signalTypeCombo.setEditable(false);
 					this.line1signalTypeCombo.select(0);
 					this.line1signalTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -2402,6 +2423,7 @@ public class JLog2Configuration extends Composite {
 					this.tempSensorTypeCombo.setLayoutData(tempSensorTypeComboLData);
 					this.tempSensorTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tempSensorTypeCombo.setItems(new String[] { " --- ", "analog", "digital" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					this.tempSensorTypeCombo.setEditable(false);
 					this.tempSensorTypeCombo.select(0);
 					this.tempSensorTypeCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
@@ -2438,6 +2460,7 @@ public class JLog2Configuration extends Composite {
 					this.pulsPerRevolutionSensorCombo.setLayoutData(rpmSensorComboLData);
 					this.pulsPerRevolutionSensorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.pulsPerRevolutionSensorCombo.setItems(this.zeroTo127);
+					this.pulsPerRevolutionSensorCombo.setEditable(false);
 					this.pulsPerRevolutionSensorCombo.select(0);
 					this.pulsPerRevolutionSensorCombo.setVisibleItemCount(10);
 					this.pulsPerRevolutionSensorCombo.addSelectionListener(new SelectionAdapter() {
@@ -2568,6 +2591,7 @@ public class JLog2Configuration extends Composite {
 					this.telemetryCombo.setLayoutData(telemetryComboLData);
 					this.telemetryCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.telemetryCombo.setItems(this.comOutputString.split(GDE.STRING_COMMA));
+					this.telemetryCombo.setEditable(false);
 					this.telemetryCombo.select(0);
 					this.telemetryCombo.addMouseMoveListener(new MouseMoveListener() {
 						@Override
@@ -2647,9 +2671,10 @@ public class JLog2Configuration extends Composite {
 						this.hv2BecCombo = new CCombo(this.optionalStuff, SWT.BORDER);
 						this.hv2BecCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.hv2BecCombo.setItems(new String[] { "6.0", "6.5", "7.0", "7.5", "8.0", "8.5" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-						this.hv2BecCombo.select(0);
 						this.hv2BecCombo.setLayoutData(new RowData((GDE.IS_LINUX ? 70 : 60), 17));
 						this.hv2BecCombo.setVisible(false);
+						this.hv2BecCombo.setEditable(false);
+						this.hv2BecCombo.select(0);
 						this.hv2BecCombo.addMouseWheelListener(new MouseWheelListener() {
 							@Override
 							public void mouseScrolled(MouseEvent evt) {
@@ -2816,8 +2841,10 @@ public class JLog2Configuration extends Composite {
 			this.rpmSensorLabel.setForeground(DataExplorer.COLOR_RED);
 		}
 		else {
+			int selectionIndex = this.pulsPerRevolutionSensorCombo.getSelectionIndex();
 			this.pulsPerRevolutionSensorCombo.setItems(this.zeroTo127);
-			if (this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) this.pulsPerRevolutionSensorCombo.select(1);
+			if (selectionIndex > 0) this.pulsPerRevolutionSensorCombo.select(1);
+			else this.pulsPerRevolutionSensorCombo.select(0);
 			this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGI2875));
 			this.rpmSensorLabel.setForeground(DataExplorer.COLOR_BLACK);
 		}
@@ -3014,11 +3041,11 @@ public class JLog2Configuration extends Composite {
 		int numAlarms = 0;
 		boolean isTemperatureSensorType = this.tempSensorTypeCombo.getSelectionIndex() > 0;
 
-		if (this.uBecDipDetectButton.getSelection()) ++numAlarms;
-		if (this.capacityAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
-		if (this.voltageBatteryAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
-		if (this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0) ++numAlarms;
-		if (this.fetTempMaxCombo.getSelectionIndex() > 0) ++numAlarms;
+//		if (this.uBecDipDetectButton.getSelection()) ++numAlarms;
+//		if (this.capacityAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
+//		if (this.voltageBatteryAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
+//		if (this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0) ++numAlarms;
+//		if (this.fetTempMaxCombo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.extern1Combo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.ext1smallerButton.getSelection()) ++numAlarms;
 		if (this.extern2Combo.getSelectionIndex() > 0) ++numAlarms;
@@ -3030,22 +3057,27 @@ public class JLog2Configuration extends Composite {
 		if (this.extern5Combo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.ext5smallerButton.getSelection()) ++numAlarms;
 
+		int selectionIndex = this.alarmLinesCombo.getSelectionIndex();
 		if (numAlarms == 1) {
-			if (this.alarmLinesCombo.getSelectionIndex() > 1) {
-				this.alarmLinesCombo.select(1);
+			this.alarmLinesCombo.setItems(this.oneAlarms);
+			if (selectionIndex > 1) {
+				selectionIndex = 1;
 				this.configuration.setNumberAlarmLines(1);
 			}
-			this.alarmLinesCombo.setItems(this.oneAlarms);
+			this.alarmLinesCombo.select(selectionIndex);
 		}
 		else if (isTemperatureSensorType && numAlarms > 1) {
-			if (this.alarmLinesCombo.getSelectionIndex() > 1) {
-				this.alarmLinesCombo.select(1);
+			this.alarmLinesCombo.setItems(this.oneAlarms);
+			if (selectionIndex > 1) {
+				selectionIndex = 1;
 				this.configuration.setNumberAlarmLines(1);
 			}
-			this.alarmLinesCombo.setItems(this.oneAlarms);
+			this.alarmLinesCombo.select(selectionIndex);
 		}
-		else if (numAlarms > 1)
+		else if (numAlarms > 1) {
 			this.alarmLinesCombo.setItems(this.greaterOneAlarms);
+			this.alarmLinesCombo.select(2);
+		}
 		else {
 			this.alarmLinesCombo.setItems(this.zeroAlarms);
 			this.alarmLinesCombo.select(0);
@@ -3145,6 +3177,7 @@ public class JLog2Configuration extends Composite {
 		this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGT2874));
 		this.temperaure1Label.setText("[°C]"); //$NON-NLS-1$
 		this.alarmLinesCombo.setItems(this.zeroAlarms);
+		this.alarmLinesCombo.select(0);
 		this.hv2BecLabel.setVisible(false);
 		this.hv2BecCombo.setVisible(false);
 		this.speedSensorLabel.setVisible(false);
