@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015 Winfried Bruegmann
 ****************************************************************************************/
 package gde.data;
 
@@ -771,13 +771,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getNoneCalculationRecordNames() {
-		Vector<String> tmpCalculationRecords = new Vector<String>();
-		String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
+		final Vector<String> tmpCalculationRecords = new Vector<String>();
+		final String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
 		int deviceDataBlockSize = Math.abs(this.device.getDataBlockSize(FormatTypes.VALUE));
 		deviceDataBlockSize = this.device.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
 		// record names may not match device measurements, but device measurements might be more then existing records
 		for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) {
-			MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
+			final MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
 			if (!measurement.isCalculation()) { // active or inactive 
 				tmpCalculationRecords.add(this.recordNames[i]);
 			}
