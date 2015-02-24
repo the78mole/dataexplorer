@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011,2012,2013,2014 Winfried Bruegmann
+    Copyright (c) 2010,2011,2012,2013,2014,2015 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -529,6 +529,8 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZ3DAbsoluteItem;
+		MenuItem convertGPXItem;
+		MenuItem convertGPXGarminItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -559,6 +561,26 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
+
+			convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
+			convertGPXItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
+					export2GPX(false);
+				}
+			});
+
+			if (this.getName().endsWith("2")) { //GPS-Logger2
+				convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
+				convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
+				convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
+						export2GPX(true);
+					}
+				});
+			}
 		}
 	}
 
@@ -572,6 +594,22 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2003), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
+	 */
+	public void export2GPX(final boolean isGarminExtension) {
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+		//SMGPS2 15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 
+		//Unilog 19=voltageUniLog 20=currentUniLog 21=powerUniLog 22=revolutionUniLog 23=voltageRxUniLog 24=heightUniLog 25=a1UniLog 26=a2UniLog 27=a3UniLog;
+		//M-LINK 28=valAdd00 29=valAdd01 30=valAdd02 31=valAdd03 32=valAdd04 33=valAdd05 34=valAdd06 35=valAdd07 36=valAdd08 37=valAdd09 38=valAdd10 39=valAdd11 40=valAdd12 41=valAdd13 42=valAdd14;
+		if (isGarminExtension)
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	0, 1, 2, 7, 3, 5, 6, 4, new int[] {15,16,17});
+		else
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	0, 1, 2, 7, 3, 5, 6, 4, new int[0]);
 	}
 
 	/**
