@@ -1041,6 +1041,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileExportMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
+//		MenuItem convertGPXItem;
+//		MenuItem convertGPXGarminItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -1071,6 +1073,24 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
+
+//			convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
+//			convertGPXItem.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(false);
+//				}
+//			});
+//
+//			convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
+//			convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(true);
+//				}
+//			});
 		}
 	}
 
@@ -1103,6 +1123,18 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void export2KMZ3D(int type) {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), 2, 1, 3, 6, 5, 9, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
+	 */
+	public void export2GPX(final boolean isGarminExtension) {
+		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		if (isGarminExtension)
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	1, 2, 3, 6, -1, -1, -1, -1, new int[] {-1,-1,-1});
+		else
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	1, 2, 3, 6, -1, -1, -1, -1, new int[0]);
 	}
 	
 	/**

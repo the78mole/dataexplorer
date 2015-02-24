@@ -1249,8 +1249,12 @@ public class HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsGeneral[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGeneral[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader.pointsGeneral[3] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsGeneral[3] / 1000 ? HoTTbinReader.pointsGeneral[3]
-					: HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetGeneral.getRecordDataSize(true) == 0 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGeneral[3] / 1000 + HoTTbinReader.pointsGeneral[1] / 1000 * HoTTbinReader.pointsGeneral[2] / 1000 / 2500 + 2)) {
+				HoTTbinReader.pointsGeneral[3] =  HoTTbinReader.tmpCapacity * 1000;
+			}
+			else {
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsGeneral[3] / 1000) + " + " + (HoTTbinReader.pointsGeneral[1] / 1000 * HoTTbinReader.pointsGeneral[2] / 1000 / 2500 + 2));
+			}
 			HoTTbinReader.pointsGeneral[4] = Double.valueOf(HoTTbinReader.pointsGeneral[1] / 1000.0 * HoTTbinReader.pointsGeneral[2]).intValue();
 			HoTTbinReader.pointsGeneral[5] = 0;
 			for (int j = 0; j < 6; j++) {
@@ -1299,8 +1303,12 @@ public class HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsElectric[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsElectric[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader.pointsElectric[3] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsElectric[3] / 1000 ? HoTTbinReader.pointsElectric[3]
-					: HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetElectric.getRecordDataSize(true) == 0 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsElectric[3] / 1000 + HoTTbinReader.pointsElectric[1] / 1000 * HoTTbinReader.pointsElectric[2] / 1000 / 2500 + 2)) {
+				HoTTbinReader.pointsElectric[3] =  HoTTbinReader.tmpCapacity * 1000;
+			}
+			else {
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsElectric[3] / 1000) + " + " + (HoTTbinReader.pointsElectric[1] / 1000 * HoTTbinReader.pointsElectric[2] / 1000 / 2500 + 2));
+			}
 			HoTTbinReader.pointsElectric[4] = Double.valueOf(HoTTbinReader.pointsElectric[1] / 1000.0 * HoTTbinReader.pointsElectric[2]).intValue(); // power U*I [W];
 			HoTTbinReader.pointsElectric[5] = 0; //5=Balance
 			for (int j = 0; j < 7; j++) {
@@ -1338,8 +1346,6 @@ public class HoTTbinReader {
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
-	 * @param _buf3
-	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddESC(byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
@@ -1355,8 +1361,12 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsSpeedControl[4] = Double.valueOf(HoTTbinReader.pointsSpeedControl[1] / 1000.0 * HoTTbinReader.pointsSpeedControl[2]).intValue();
-			HoTTbinReader.pointsSpeedControl[3] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[3] / 1000 ? HoTTbinReader.pointsSpeedControl[3]
-					: HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetSpeedControl.getRecordDataSize(true) == 0 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[3] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2)) {
+				HoTTbinReader.pointsSpeedControl[3] =  HoTTbinReader.tmpCapacity * 1000;
+			}
+			else {
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsSpeedControl[3] / 1000) + " + " + (HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2));
+			}
 			HoTTbinReader.pointsSpeedControl[5] = HoTTbinReader.tmpRevolution * 1000;
 			HoTTbinReader.pointsSpeedControl[6] = HoTTbinReader.tmpTemperatureFet * 1000;
 		}

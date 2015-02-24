@@ -859,6 +859,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	public void updateFileExportMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
+//		MenuItem convertGPXItem;
+//		MenuItem convertGPXGarminItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -889,6 +891,24 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
+
+//			convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
+//			convertGPXItem.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(false);
+//				}
+//			});
+//
+//			convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
+//			convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(true);
+//				}
+//			});
 		}
 	}
 
@@ -931,6 +951,26 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
 		final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9, climbOrdinal = 10, speedOrdinal = 15, tripOrdinal = 18;
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
+	 */
+	@Override
+	public void export2GPX(final boolean isGarminExtension) {
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
+		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
+		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
+		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
+		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
+		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
+		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
+		if (isGarminExtension)
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	13, 14, 9, 15, -1, -1, -1, -1, new int[] {-1,-1,-1});
+		else
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	13, 14, 9, 15, -1, -1, -1, -1, new int[0]);
 	}
 		
 	/**
