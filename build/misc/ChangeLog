@@ -7,7 +7,8 @@ fix problem while copy graphics into clip board several time in sequence
 fix JLog2 context help page selection 
 fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button
 fix error not loading color from OSD file some colors (1,1,1)
-hoTTAdapter - fix receiver only with channels times 10 error 
+HoTTAdapter - fix receiver only with channels times 10 error 
+HoTTAdapter* - adapt capacity filter according actual power
 add Junsi iCharger 4010 Duo support
 
 Version 3.1.9 - 31 Dec 2014
