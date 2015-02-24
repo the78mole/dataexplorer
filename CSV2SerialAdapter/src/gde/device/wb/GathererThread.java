@@ -24,8 +24,10 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.InputTypes;
+import gde.device.PropertyType;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
+import gde.exception.DevicePropertiesInconsistenceException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.io.DataParser;
@@ -128,12 +130,21 @@ public class GathererThread extends Thread {
 							continue; //skip data if not configured
 						this.channel = this.channels.get(this.channelNumber);
 	
-						processName = this.device.getStateProperty(this.stateNumber).getName();
+						PropertyType stateProperty = this.device.getStateProperty(this.stateNumber);
+						if (stateProperty != null) 
+							processName = this.device.getStateProperty(this.stateNumber).getName();
+						else 
+							throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGW1702, new Object[] {this.stateNumber}));
+						
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME,	"processing mode = " + processName ); //$NON-NLS-1$
 						channelRecordSet = this.channel.get(this.channel.getLastActiveRecordSetName());
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
+						if (e instanceof DevicePropertiesInconsistenceException) {
+							this.application.openMessageDialogAsync(e.getMessage());
+							throw e;
+						}
 						break;
 					}
 
@@ -187,7 +198,7 @@ public class GathererThread extends Thread {
 					}
 				}
 				if (deviceTimeStep_ms > 0) { //time step is constant
-					delayTime = 997 - (tmpCycleTime - lastTmpCycleTime);
+					delayTime = (long) ((deviceTimeStep_ms - 3) - (tmpCycleTime - lastTmpCycleTime));
 					if (delayTime > 0) {
 						WaitTimer.delay(delayTime);
 					}
