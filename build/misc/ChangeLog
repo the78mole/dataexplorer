@@ -11,7 +11,8 @@ CSV2SerialAdapter - add error handling of missing status
 HoTTAdapter - fix receiver only with channels times 10 error 
 HoTTAdapter* - adapt capacity filter according actual power
 GPS-Logger* - enable GPX export (Garmin Virb)
-add Junsi iCharger 4010 Duo support
+add Junsi iCharger 4010 Duo support (read log from SD storage)
+add port enumeration ttyACM* Linux CDC ACM devices
 
 Version 3.1.9 - 31 Dec 2014
 enable absolute time for graphics time line
