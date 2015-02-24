@@ -9,6 +9,7 @@ fix JLog2 configuration dialog - set drop downs to editable false since this eve
 fix error not loading color from OSD file some colors (1,1,1)
 HoTTAdapter - fix receiver only with channels times 10 error 
 HoTTAdapter* - adapt capacity filter according actual power
+GPS-Logger* - enable GPX export (Garmin Virb)
 add Junsi iCharger 4010 Duo support
 
 Version 3.1.9 - 31 Dec 2014
