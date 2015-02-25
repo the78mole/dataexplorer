@@ -10,6 +10,7 @@ fix error not loading color from OSD file some colors (1,1,1)
 CSV2SerialAdapter - add error handling of missing status 
 HoTTAdapter - fix receiver only with channels times 10 error 
 HoTTAdapter* - adapt capacity filter according actual power
+HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl
 GPS-Logger* - enable GPX export (Garmin Virb)
 add Junsi iCharger 4010 Duo support (read log from SD storage)
 add port enumeration ttyACM* Linux CDC ACM devices
