@@ -1771,7 +1771,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="10" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Climb 10</name>
@@ -1779,7 +1779,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="10" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Latitude</name>
@@ -2472,7 +2472,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="10" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Climb 10</name>
@@ -2480,7 +2480,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="10" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Latitude</name>

@@ -1771,7 +1771,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="scale_sync_ref_ordinal" value="10" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 10</name>
@@ -1779,7 +1779,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="scale_sync_ref_ordinal" value="10" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Breitengrad</name>
@@ -2472,7 +2472,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="scale_sync_ref_ordinal" value="10" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 10</name>
@@ -2480,7 +2480,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="scale_sync_ref_ordinal" value="10" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Breitengrad</name>
