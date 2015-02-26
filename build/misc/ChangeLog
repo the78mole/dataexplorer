@@ -7,9 +7,10 @@ fix problem while copy graphics into clip board several time in sequence
 fix JLog2 context help page selection 
 fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button
 fix error not loading color from OSD file some colors (1,1,1)
-CSV2SerialAdapter - add error handling of missing status 
+CSV2SerialAdapter - fix error handling of missing status 
 HoTTAdapter - fix receiver only with channels times 10 error 
 HoTTAdapter* - adapt capacity filter according actual power
+HoTTAdapter* - adapt current filter
 HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl
 GPS-Logger* - enable GPX export (Garmin Virb)
 UniLog2 - fix missing parsing of M-Link data
