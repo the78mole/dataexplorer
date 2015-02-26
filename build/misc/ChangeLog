@@ -12,6 +12,8 @@ HoTTAdapter - fix receiver only with channels times 10 error
 HoTTAdapter* - adapt capacity filter according actual power
 HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl
 GPS-Logger* - enable GPX export (Garmin Virb)
+UniLog2 - fix missing parsing of M-Link data
+UniLog2 - fix configuration of symbol and unit for M-Link measurements
 add Junsi iCharger 4010 Duo support (read log from SD storage)
 add port enumeration ttyACM* Linux CDC ACM devices
 
