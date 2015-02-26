@@ -781,6 +781,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			if (!measurement.isCalculation()) { // active or inactive 
 				tmpCalculationRecords.add(this.recordNames[i]);
 			}
+			else
+				System.out.println(measurement.getName());
 		}
 		//assume attached records are calculations like DataVario
 		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
@@ -866,7 +868,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
-			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added record for " + recordNames[i] + " - " + newRecordSet.size()); //$NON-NLS-1$
 		}
 		
 		// check and update object key

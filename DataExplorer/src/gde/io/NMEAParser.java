@@ -1451,6 +1451,25 @@ public class NMEAParser implements IDataParser {
 				}
 			}
 		}
+		else if (this.deviceName.equals("UniLog2")) {
+			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+			for (int i = 1; i < strValues.length && i <= 15; i++) {
+				try {
+					String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+					int address = Integer.parseInt(tmpValues[0]);
+					this.values[24 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+					if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(tmpValues[3])) {
+						this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+					}
+				}
+				catch (Exception e) {
+					// ignore and leave value unchanged
+				}
+			}
+		}
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;

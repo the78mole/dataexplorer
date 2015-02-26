@@ -243,7 +243,7 @@ public class MeasurementControlConfigurable extends Composite {
 				break;
 			}
 		}
-		this.measurementType.setSymbol(newSymbol + this.filterExtend);
+		this.measurementType.setSymbol(newSymbol);
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			activeRecordSet.get(this.ordinal).setSymbol(newSymbol + this.filterExtend);
@@ -264,7 +264,7 @@ public class MeasurementControlConfigurable extends Composite {
 				break;
 			}
 		}
-		this.measurementType.setUnit(newUnit + this.filterExtend);
+		this.measurementType.setUnit(newUnit);
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			activeRecordSet.get(this.ordinal).setUnit(newUnit + this.filterExtend);
