@@ -1356,7 +1356,7 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf1, 7);
 		HoTTbinReader.tmpRevolution = DataParser.parse2Short(_buf2, 5);
 		HoTTbinReader.tmpTemperatureFet = _buf1[9] - 20;
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
 				&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[6] != 0 && HoTTbinReader.pointsSpeedControl[6]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
@@ -1370,6 +1370,12 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsSpeedControl[5] = HoTTbinReader.tmpRevolution * 1000;
 			HoTTbinReader.pointsSpeedControl[6] = HoTTbinReader.tmpTemperatureFet * 1000;
 		}
+//		else {
+//			System.out.println(StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) 
+//					+ " - " + HoTTbinReader.pointsSpeedControl[1]/1000 + "; " + HoTTbinReader.tmpVoltage
+//					+ " - " + HoTTbinReader.pointsSpeedControl[2]/1000 + "; " + HoTTbinReader.tmpCurrent
+//					+ " - " + HoTTbinReader.pointsSpeedControl[3]/1000 + "; " + HoTTbinReader.tmpCapacity);
+//		}
 		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
 		HoTTbinReader.isJustParsed = true;
 	}
