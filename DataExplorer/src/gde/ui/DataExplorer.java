@@ -60,6 +60,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -434,7 +435,8 @@ public class DataExplorer extends Composite {
 				}
 			});
 
-			if (!this.settings.isUpdateChecked()) {
+			//if (!this.settings.isUpdateChecked()) {
+			if (true) {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						check4update();
@@ -2993,10 +2995,47 @@ public class DataExplorer extends Composite {
 	 */
 	public void check4update() {
 		final String[] versionCheck = FileUtils.isUpdateAvailable();
-		if (new Boolean(versionCheck[0])) {
-			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
+		//if (new Boolean(versionCheck[0])) {
+		if (true) {
+			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 			messageDialog.setText(GDE.NAME_LONG);
-			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052));
+			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052) + Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN) 
+				? new String[] {
+					"1)  Korrektur der initiale messwert-Synchronisation\n",
+					"2)  Korrektur vom Junsi iCharger 206, 208, 306, 3010 konstanten Zeitschritt auf 2 Sekunden\n",
+					"3)  Korrektur des Problems bei mehrfachen kopieren der Grafik in die Zwischenablage\n",
+					"4)  Korrektur der JLog2 Kontext sensitiven Hilfeseite Auswahl\n",
+					"5)  Korrektur des JLog2 Konfigurationsdialoges - Sicherungsknopf wurde nicht aktiviert\n",
+					"6)  Korrektur des Fehlers beim Laden der Farben von der OSD-Datei\n",
+					"7)  CSV2SerialAdapter - Fehlender Status wird jetzt als Fehler erkannt\n",
+					"8)  HoTTAdapter - Korrektur der Einlesealgorithmus bei ausgewählter Kanalinformation und Empfänger\n",
+					"9)  HoTTAdapter* - Anpassung der Käpazitätsfilter an die aktuelle Leistung (ESC, GAM, EAM)\n",
+					"10) HoTTAdapter* - Anpassung des Stromfilters beim ESC",
+					"11) HoTTAdapter2* - Korrektur der Skalensynchronisationsreferenz in der Konfiguration Kanäle und MotorControl\n",
+					"12) GPS-Logger* - GPX export möglich z.B. Garmin Virb\n",
+					"13) UniLog2 - Korrektur fehlender M-Link Werte aus der Logdatei\n",
+					"14) UniLog2 - Korrektur des Vehaltens beim verändern der Symbole und Einheiten bei M-Link Werten\n",
+					"15) Junsi iCharger 4010 Duo Unterstützung hinzugefügt (lesen von der SD-Karte)\n",
+					"16) Linux CDC ACM Geräte als ttyACM* serieller Port hinzugefügt\n"
+			}
+			: new String[] {
+					"1)  fix initial synchronization of measurements\n",
+					"2)  fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds\n",
+					"3)  fix problem while copy graphics into clip board several time in sequence\n",
+					"4)  fix JLog2 context help page selection\n",
+					"5)  fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button\n",
+					"6)  fix error not loading color from OSD file some colors (1,1,1)\n",
+					"7)  CSV2SerialAdapter - fix error handling of missing status\n",
+					"8)  HoTTAdapter - fix receiver only with channels times 10 error\n",
+					"9)  HoTTAdapter* - adapt capacity filter according actual power\n",
+					"10) HoTTAdapter* - adapt current filter\n",
+					"11) HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl\n",
+					"12) GPS-Logger* - enable GPX export (Garmin Virb)\n",
+					"13) UniLog2 - fix missing parsing of M-Link data\n",
+					"14) UniLog2 - fix configuration of symbol and unit for M-Link measurements\n",
+					"15) add Junsi iCharger 4010 Duo support (read log from SD storage)\n",
+					"16) add port enumeration ttyACM* Linux CDC ACM devices\n" 
+			}));
 			if (SWT.YES == messageDialog.open()) {
 				new Thread("Download") {
 					@Override
