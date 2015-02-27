@@ -781,8 +781,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			if (!measurement.isCalculation()) { // active or inactive 
 				tmpCalculationRecords.add(this.recordNames[i]);
 			}
-			else
-				System.out.println(measurement.getName());
+			//else
+			//	System.out.println(measurement.getName());
 		}
 		//assume attached records are calculations like DataVario
 		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
