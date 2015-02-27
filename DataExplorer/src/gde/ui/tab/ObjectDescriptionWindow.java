@@ -443,15 +443,17 @@ public class ObjectDescriptionWindow extends CTabItem {
 			{
 				this.imageCanvas = new Canvas(this.mainObjectCharacterisitcsGroup, SWT.BORDER);
 				GridData imageCanvasLData = new GridData();
-				imageCanvasLData.minimumWidth = 400;
-				imageCanvasLData.minimumHeight = 300;
+				imageCanvasLData.minimumWidth = 402;
+				imageCanvasLData.minimumHeight = 302;
 				imageCanvasLData.verticalAlignment = GridData.END;
-				imageCanvasLData.grabExcessHorizontalSpace = true;
-				imageCanvasLData.widthHint = 400;
+				//imageCanvasLData.grabExcessHorizontalSpace = true;
+				imageCanvasLData.widthHint = 402;
+				imageCanvasLData.heightHint = 302;
 				this.imageCanvas.setLayoutData(imageCanvasLData);
 				this.imageCanvas.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0413));
 				if (!GDE.IS_MAC) this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-				this.imageCanvas.setSize(400, 300);
+				this.imageCanvas.setSize(402, 302);
+				this.imageCanvas.getClientArea();
 
 				this.imageContextMenu.createMenu(this.imagePopupMenu);
 				this.imageCanvas.setMenu(this.imagePopupMenu);
@@ -490,11 +492,14 @@ public class ObjectDescriptionWindow extends CTabItem {
 							ObjectDescriptionWindow.this.imagePopupMenu.setData("OBJECT_IMAGE_CHANGED", false);
 							ObjectDescriptionWindow.this.isObjectDataSaved = false;
 						}
-						ObjectDescriptionWindow.this.imageCanvas.setSize(400, 300);
+						//ObjectDescriptionWindow.this.imageCanvas.setSize(402, 302);
+						//ObjectDescriptionWindow.this.imageCanvas.getClientArea();
 						if (ObjectDescriptionWindow.this.image != null) {
-							Rectangle imgBounds = ObjectDescriptionWindow.this.image.getBounds();
-							evt.gc.setClipping(0, 0, 400, 300);
-							evt.gc.drawImage(ObjectDescriptionWindow.this.image, 0, 0, imgBounds.width, imgBounds.height, 0, 0, 400, 300);
+							//Rectangle imgBounds = ObjectDescriptionWindow.this.image.getBounds();
+							//evt.gc.setClipping(ObjectDescriptionWindow.this.imageCanvas.getClientArea());
+							//evt.gc.getClipping();
+							evt.gc.drawImage(ObjectDescriptionWindow.this.image, 0, 0);
+							//evt.gc.drawImage(ObjectDescriptionWindow.this.image, 0, 0, imgBounds.width, imgBounds.height, 0, 0, 400, 300);
 						}
 					}
 				});
