@@ -1,20 +1,21 @@
-GNU DataExplorer - News - comes with version 3.1.9
+GNU DataExplorer - News - comes with version 3.2.0
 
-1)  enable absolute time for graphics time line
-2)  enable to set the font size of measurement values on digital display
-3)  several processing optimizations
-4)  fix caching algorithm to enable scale text color updated by color change 
-5)  fix Linux GTK3 incompatibility by exporting SWT_GTK3=0 in start scripts
-6)  IISI-Cockpit V2 - add statistics definition 
-7)  JetiAdapter - fix time step calculation for very short logs in respect of time
-8)  JetiAdapter - fix record naming while repeating measurement names with different sensors
-9)  HoTTAdapter* - update HoTTMdlViewer to latest 0.8 snapshot
-10) HoTTAdapter* - fine tune some more filter settings
-11) HoTTAdapter* - add measurement voltage Rx min and make EAM rpm to an extra measurement
-12) HoTTAdapter2 - fix missing update visibility status while switching record sets in display
-13) UniLog2 - fix live data gathering capability
-14) Futaba-Telemetry - fix english device properties file
-15) OpenTx-Telemetry - add telemetry data support
+1)  fix initial synchronization of measurements
+2)  fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds
+3)  fix problem while copy graphics into clip board several time in sequence
+4)  fix JLog2 context help page selection 
+5)  fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button
+6)  fix error not loading color from OSD file some colors (1,1,1)
+7)  CSV2SerialAdapter - fix error handling of missing status 
+8)  HoTTAdapter - fix receiver only with channels times 10 error 
+9)  HoTTAdapter* - adapt capacity filter according actual power
+10) HoTTAdapter* - adapt current filter
+11) HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl
+12) GPS-Logger* - enable GPX export (Garmin Virb)
+13) UniLog2 - fix missing parsing of M-Link data
+14) UniLog2 - fix configuration of symbol and unit for M-Link measurements
+15) add Junsi iCharger 4010 Duo support (read log from SD storage)
+16) add port enumeration ttyACM* Linux CDC ACM devices
 
 
 
