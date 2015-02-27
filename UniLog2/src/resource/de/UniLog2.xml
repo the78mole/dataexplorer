@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V25.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V26.xsd">
     <Device>
         <name implementation="gde.device.smmodellbau.UniLog2">UniLog2</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -31,7 +31,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="39"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="40"/>
         <checkSum type="XOR"/>
         <timeUnit>msec</timeUnit>
         <separator>comma</separator>
@@ -242,7 +242,7 @@
             </Measurement>
             <Measurement>
                 <name>Empfang_ML</name>
-                <symbol>LQI</symbol>
+                <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -337,6 +337,13 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>LQI_ML</name>
+                <symbol>q</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Motor">
@@ -540,7 +547,7 @@
             </Measurement>
             <Measurement>
                 <name>Empfang_ML</name>
-                <symbol>LQI</symbol>
+                <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -635,6 +642,13 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>LQI_ML</name>
+                <symbol>q</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
         </Channel>
     </Channels>
