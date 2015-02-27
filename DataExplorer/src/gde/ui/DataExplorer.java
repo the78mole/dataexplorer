@@ -3001,7 +3001,7 @@ public class DataExplorer extends Composite {
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052) + Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN) 
 				? new String[] {
-					"1)  Korrektur der initiale messwert-Synchronisation\n",
+					"1)  Korrektur der initialen Messwert-Synchronisation\n",
 					"2)  Korrektur vom Junsi iCharger 206, 208, 306, 3010 konstanten Zeitschritt auf 2 Sekunden\n",
 					"3)  Korrektur des Problems bei mehrfachen kopieren der Grafik in die Zwischenablage\n",
 					"4)  Korrektur der JLog2 Kontext sensitiven Hilfeseite Auswahl\n",
@@ -3012,9 +3012,9 @@ public class DataExplorer extends Composite {
 					"9)  HoTTAdapter* - Anpassung der Käpazitätsfilter an die aktuelle Leistung (ESC, GAM, EAM)\n",
 					"10) HoTTAdapter* - Anpassung des Stromfilters beim ESC",
 					"11) HoTTAdapter2* - Korrektur der Skalensynchronisationsreferenz in der Konfiguration Kanäle und MotorControl\n",
-					"12) GPS-Logger* - GPX export möglich z.B. Garmin Virb\n",
+					"12) GPS-Logger* - GPX-Export ermöglicht z.B. Garmin Virb\n",
 					"13) UniLog2 - Korrektur fehlender M-Link Werte aus der Logdatei\n",
-					"14) UniLog2 - Korrektur des Vehaltens beim verändern der Symbole und Einheiten bei M-Link Werten\n",
+					"14) UniLog2 - Korrektur des Vehaltens bei Veränderung der Symbole und Einheiten bei M-Link Werten\n",
 					"15) Junsi iCharger 4010 Duo Unterstützung hinzugefügt (lesen von der SD-Karte)\n",
 					"16) Linux CDC ACM Geräte als ttyACM* serieller Port hinzugefügt\n"
 			}
