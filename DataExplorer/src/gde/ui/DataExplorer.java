@@ -435,8 +435,7 @@ public class DataExplorer extends Composite {
 				}
 			});
 
-			//if (!this.settings.isUpdateChecked()) {
-			if (true) {
+			if (!this.settings.isUpdateChecked()) {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						check4update();
@@ -2995,8 +2994,8 @@ public class DataExplorer extends Composite {
 	 */
 	public void check4update() {
 		final String[] versionCheck = FileUtils.isUpdateAvailable();
-		//if (new Boolean(versionCheck[0])) {
-		if (true) {
+		if (new Boolean(versionCheck[0])) {
+		//if (true) {
 			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052) + Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN) 
