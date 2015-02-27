@@ -82,10 +82,10 @@ public class GDE {
 
 
 	// ****** begin global constants section *******
-	public static final String		VERSION													= "Version 3.1.9";																																																						//$NON-NLS-1$
+	public static final String		VERSION													= "Version 3.2.0";																																																						//$NON-NLS-1$
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V25";																																																										//$NON-NLS-1$
+	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V26";																																																										//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V08";																																																										//$NON-NLS-1$
 	public final static String		CLEAN_SETTINGS_WHILE_SHUTDOWN 	= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 	public final static String		TEMP_FILE_STEM 									= "~TempFile";
@@ -93,7 +93,6 @@ public class GDE {
 	public static final boolean		IS_WINDOWS											= System.getProperty("os.name").toLowerCase().startsWith("windows");																													//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_LINUX												= System.getProperty("os.name").toLowerCase().startsWith("linux");																														//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_MAC													= System.getProperty("os.name").toLowerCase().startsWith("mac");																															//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean		IS_MAC_MOUNTAIN_LION						= System.getProperty("os.version").toLowerCase().startsWith("10.8");	//Mountain Lion																					//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_MAC_COCOA										= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");				//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_ARCH_DATA_MODEL_64						= System.getProperty("sun.arch.data.model").equals("64");																																			//$NON-NLS-1$ //$NON-NLS-2$
 
