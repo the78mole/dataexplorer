@@ -40,6 +40,8 @@ import gde.utils.WaitTimer;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+
 /**
  * Thread implementation to gather data from eStation device
  * @author Winfied Brügmann
@@ -183,7 +185,11 @@ public class GathererThread extends Thread {
 					if (channelRecordSet != null) {
 						if (this.serialPort.isInterruptedByUser) break;
 						this.parser.parse(new String(dataBuffer), 42);
-						if (this.parser.getValues().length == channelRecordSet.size()) channelRecordSet.addPoints(this.parser.getValues(), (tmpCycleTime - startCycleTime));
+						if (this.parser.getValues().length == channelRecordSet.size()) 
+							channelRecordSet.addPoints(this.parser.getValues(), (tmpCycleTime - startCycleTime));
+						else
+							this.application.setStatusMessage(String.format("Miss match record set size = %d to parsed values length = %d, please correct!", channelRecordSet.size(), this.parser.getValues().length), SWT.COLOR_RED);
+							
 						if (log.isLoggable(Level.FINER)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time after add = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 						if (channelRecordSet.size() > 0 && channelRecordSet.isChildOfActiveChannel() && channelRecordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
