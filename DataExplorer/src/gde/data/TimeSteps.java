@@ -186,8 +186,6 @@ public class TimeSteps extends Vector<Long> {
 	public double getMaxTime_ms() {
 		double maxTime = 0.0;
 		if (isConstant) {
-			if (this.size() < 1)
-				System.out.println();
 			maxTime = this.get(0)/10.0; 
 		}
 		else {
