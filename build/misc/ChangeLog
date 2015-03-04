@@ -1,6 +1,9 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.0 - xx yyy 2015
+Version 3.2.1 - xx yyy 2015
+HoTTAdapter* - refine sensor detection - to rise chance not in text-modus segment
+
+Version 3.2.0 - 01 Mar 2015
 fix initial synchronization of measurements
 fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds
 fix problem while copy graphics into clip board several time in sequence
