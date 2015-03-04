@@ -109,13 +109,13 @@ public class HoTTbinReader {
 		HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
 
 		try {
-			if (numberLogs > 240) {
+			fileInfo = new HashMap<String, String>();
+			if (numberLogs > 3130) {
 				for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
 					HoTTAdapter.isSensorType[i] = false;
 				}
 				FileInputStream file_input = new FileInputStream(file);
 				data_in = new DataInputStream(file_input);
-				fileInfo = new HashMap<String, String>();
 				if (HoTTbinReader.log.isLoggable(Level.FINER))
 					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
 				long position = (file.length() / 2) - ((120 * 64) / 2);
@@ -124,6 +124,10 @@ public class HoTTbinReader {
 					sensorCount = 1;
 				}
 				else {
+					if (position > 64 * 3000) {
+						//64 byte = 0.01 seconds for 30 seconds maximum sensor scan time (30 / 0.01 = 3000)
+						position = 64 * 3000;
+					}
 					data_in.skip(position);
 					for (int i = 0; i < 120; i++) {
 						data_in.read(buffer);
@@ -168,7 +172,15 @@ public class HoTTbinReader {
 				}
 			}
 			else {
-				throw new IOException("file size to small");
+				if (numberLogs > 240) {
+					fileInfo.put(HoTTAdapter.SENSOR_COUNT, "0");
+					fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
+					application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
+				}
+				else {
+					application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+					throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+				}
 			}
 		}
 		finally {

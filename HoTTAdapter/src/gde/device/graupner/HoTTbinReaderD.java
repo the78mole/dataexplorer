@@ -61,10 +61,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.log.log(Level.FINER, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
 		header = getFileInfo(file);
 
-		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) 
 			readSingle(file);
-		}
 		else
 			readMultiple(file);
 	}
@@ -120,7 +118,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.oldProtocolCount = 0;
 		HoTTbinReader.blockSequenceCheck = new Vector<Byte>();
 		int countPackageLoss = 0;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && channelNumber != 4 ? 10 : 1);
+		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -176,12 +174,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						//fill data block 0 receiver voltage an temperature
 						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
-						if (HoTTbinReader.isReceiverOnly && channelNumber != 4) { //reduce data rate for receiver to 0.1 sec
-							for (int j = 0; j < 9; j++) {
-								data_in.read(HoTTbinReader.buf);
-								HoTTbinReader.timeStep_ms += 10;
-							}
 						}
 
 						//create and fill sensor specific data record sets 
@@ -994,8 +986,12 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsGeneral[29] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGeneral[30] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader.pointsGeneral[31] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsGeneral[31] / 1000 ? HoTTbinReader.pointsGeneral[31]
-					: HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 1 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGeneral[31] / 1000 + HoTTbinReader.pointsGeneral[29] / 1000 * HoTTbinReader.pointsGeneral[30] / 1000 / 2500 + 2)) {
+				HoTTbinReader.pointsGeneral[31] =  HoTTbinReader.tmpCapacity * 1000;
+			}
+			else {
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsGeneral[31] / 1000) + " + " + (HoTTbinReader.pointsGeneral[29] / 1000 * HoTTbinReader.pointsGeneral[30] / 1000 / 2500 + 2));
+			}
 			HoTTbinReader.pointsGeneral[32] = Double.valueOf(HoTTbinReader.pointsGeneral[29] / 1000.0 * HoTTbinReader.pointsGeneral[30]).intValue();
 			for (int j = 0; j < 6; j++) {
 				HoTTbinReader.pointsGeneral[j + 34] = (_buf1[3 + j] & 0xFF) * 1000;
@@ -1041,8 +1037,12 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsElectric[46] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsElectric[47] = DataParser.parse2Short(_buf3, 5) * 1000;
-			HoTTbinReader.pointsElectric[48] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsElectric[48] / 1000 ? HoTTbinReader.pointsElectric[48]
-					: HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReaderD.recordSet.getRecordDataSize(true) <= 1 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsElectric[48] / 1000 + HoTTbinReader.pointsElectric[46] / 1000 * HoTTbinReader.pointsElectric[47] / 1000 / 2500 + 2)) {
+				HoTTbinReader.pointsElectric[48] =  HoTTbinReader.tmpCapacity * 1000;
+			}
+			else {
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsElectric[48] / 1000) + " + " + (HoTTbinReader.pointsElectric[46] / 1000 * HoTTbinReader.pointsElectric[47] / 1000 / 2500 + 2));
+			}
 			HoTTbinReader.pointsElectric[49] = Double.valueOf(HoTTbinReader.pointsElectric[46] / 1000.0 * HoTTbinReader.pointsElectric[47]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
 				HoTTbinReader.pointsElectric[j + 51] = (_buf1[3 + j] & 0xFF) * 1000;
@@ -1139,8 +1139,12 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				&& HoTTbinReader.tmpRevolution < 20000) {
 			HoTTbinReader.pointsSpeedControl[70] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[71] = HoTTbinReader.tmpCurrent * 1000;
-			HoTTbinReader.pointsSpeedControl[72] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpCapacity < HoTTbinReader.pointsSpeedControl[72] / 1000 ? HoTTbinReader.pointsSpeedControl[72]
-					: HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 1 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[72] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2)) {
+				HoTTbinReader.pointsSpeedControl[72] =  HoTTbinReader.tmpCapacity * 1000;
+			}
+			else {
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsSpeedControl[72] / 1000) + " + " + (HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2));
+			}
 			HoTTbinReader.pointsSpeedControl[73] = Double.valueOf(HoTTbinReader.pointsSpeedControl[70] / 1000.0 * HoTTbinReader.pointsSpeedControl[71]).intValue();
 			HoTTbinReader.pointsSpeedControl[74] = HoTTbinReader.tmpRevolution * 1000;
 			HoTTbinReader.pointsSpeedControl[75] = (HoTTbinReader.tmpTemperatureFet - 20) * 1000;
