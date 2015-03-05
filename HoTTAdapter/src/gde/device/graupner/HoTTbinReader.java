@@ -152,8 +152,7 @@ public class HoTTbinReader {
 							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
 							break;
 						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false)
-								HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
 							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
 							break;
 						}
@@ -175,10 +174,10 @@ public class HoTTbinReader {
 				if (numberLogs > 240) {
 					fileInfo.put(HoTTAdapter.SENSOR_COUNT, "0");
 					fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
-					application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
 				}
 				else {
-					application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
 					throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
 				}
 			}
@@ -329,7 +328,8 @@ public class HoTTbinReader {
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+							HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -583,9 +583,9 @@ public class HoTTbinReader {
 						//HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 					}
 				}
-				else if (!isTextModusSignaled) {
-					isTextModusSignaled = true; 
-					application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
+				else if (!HoTTbinReader.isTextModusSignaled) {
+					HoTTbinReader.isTextModusSignaled = true;
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 				}
 			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
@@ -700,8 +700,8 @@ public class HoTTbinReader {
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
-//		HoTTbinReader.oldProtocolCount = 0;
-//		HoTTbinReader.blockSequenceCheck		= new Vector<Byte>();
+		//		HoTTbinReader.oldProtocolCount = 0;
+		//		HoTTbinReader.blockSequenceCheck		= new Vector<Byte>();
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -759,7 +759,8 @@ public class HoTTbinReader {
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+							HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -951,13 +952,13 @@ public class HoTTbinReader {
 						else if (HoTTbinReader.buf[33] == 4) {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 						}
-						
-//						if (HoTTbinReader.blockSequenceCheck.size() > 1) {
-//							if(HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4)
-//								++HoTTbinReader.oldProtocolCount;
-//							HoTTbinReader.blockSequenceCheck.remove(0);
-//						}
-//						HoTTbinReader.blockSequenceCheck.add(HoTTbinReader.buf[33]);
+
+						//						if (HoTTbinReader.blockSequenceCheck.size() > 1) {
+						//							if(HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4)
+						//								++HoTTbinReader.oldProtocolCount;
+						//							HoTTbinReader.blockSequenceCheck.remove(0);
+						//						}
+						//						HoTTbinReader.blockSequenceCheck.add(HoTTbinReader.buf[33]);
 
 						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 
@@ -969,7 +970,7 @@ public class HoTTbinReader {
 					}
 					else { //tx,rx == 0
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
-						
+
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
@@ -986,14 +987,14 @@ public class HoTTbinReader {
 						//logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
 					}
 				}
-				else if (!isTextModusSignaled) {
-						isTextModusSignaled = true; 
-						application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
+				else if (!HoTTbinReader.isTextModusSignaled) {
+					HoTTbinReader.isTextModusSignaled = true;
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 				}
 			}
-//			if (HoTTbinReader.oldProtocolCount > 2) {
-//				application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2405, new Object[] { HoTTbinReader.oldProtocolCount }));
-//			}
+			//			if (HoTTbinReader.oldProtocolCount > 2) {
+			//				application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2405, new Object[] { HoTTbinReader.oldProtocolCount }));
+			//			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
 					(countPackageLoss / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "100";
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
@@ -1118,42 +1119,42 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static int parseAddVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
-//		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
-//		switch (sdLogVersion) {
-//		case 3:
-//			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-//			HoTTbinReader.pointsVario[0] = (_buf1[0] & 0xFF) * 1000;
-//			HoTTbinReader.pointsVario[1] = DataParser.parse2Short(_buf1, 3) * 1000;
-//			//pointsVario[0]max = DataParser.parse2Short(_buf1, 5) * 1000;
-//			//pointsVario[0]min = DataParser.parse2Short(_buf1, 7) * 1000;
-//			HoTTbinReader.pointsVario[2] = DataParser.parse2UnsignedShort(_buf1[9], _buf2[0]) * 1000;
-//			HoTTbinReader.pointsVario[3] = DataParser.parse2UnsignedShort(_buf1[1], _buf2[2]) * 1000;
-//			HoTTbinReader.pointsVario[4] = DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) * 1000;
-//			HoTTbinReader.pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
-//			HoTTbinReader.pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
-//
-//			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
-//			break;
-//		default:
-//		case 4:
-			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-			HoTTbinReader.pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
-			HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf1, 2);
-			HoTTbinReader.tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2);
-			if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && HoTTbinReader.tmpClimb10 < 40000 && HoTTbinReader.tmpClimb10 > 20000)) {
-				HoTTbinReader.pointsVario[1] = HoTTbinReader.tmpHeight * 1000;
-				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
-				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
-				HoTTbinReader.pointsVario[2] = DataParser.parse2UnsignedShort(_buf1, 8) * 1000;
-				HoTTbinReader.pointsVario[3] = DataParser.parse2UnsignedShort(_buf2, 0) * 1000;
-				HoTTbinReader.pointsVario[4] = HoTTbinReader.tmpClimb10 * 1000;
-				HoTTbinReader.pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
-				HoTTbinReader.pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
+		//		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
+		//		switch (sdLogVersion) {
+		//		case 3:
+		//			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+		//			HoTTbinReader.pointsVario[0] = (_buf1[0] & 0xFF) * 1000;
+		//			HoTTbinReader.pointsVario[1] = DataParser.parse2Short(_buf1, 3) * 1000;
+		//			//pointsVario[0]max = DataParser.parse2Short(_buf1, 5) * 1000;
+		//			//pointsVario[0]min = DataParser.parse2Short(_buf1, 7) * 1000;
+		//			HoTTbinReader.pointsVario[2] = DataParser.parse2UnsignedShort(_buf1[9], _buf2[0]) * 1000;
+		//			HoTTbinReader.pointsVario[3] = DataParser.parse2UnsignedShort(_buf1[1], _buf2[2]) * 1000;
+		//			HoTTbinReader.pointsVario[4] = DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) * 1000;
+		//			HoTTbinReader.pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
+		//			HoTTbinReader.pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
+		//
+		//			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
+		//			break;
+		//		default:
+		//		case 4:
+		//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+		HoTTbinReader.pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
+		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf1, 2);
+		HoTTbinReader.tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2);
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && HoTTbinReader.tmpClimb10 < 40000 && HoTTbinReader.tmpClimb10 > 20000)) {
+			HoTTbinReader.pointsVario[1] = HoTTbinReader.tmpHeight * 1000;
+			//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
+			//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
+			HoTTbinReader.pointsVario[2] = DataParser.parse2UnsignedShort(_buf1, 8) * 1000;
+			HoTTbinReader.pointsVario[3] = DataParser.parse2UnsignedShort(_buf2, 0) * 1000;
+			HoTTbinReader.pointsVario[4] = HoTTbinReader.tmpClimb10 * 1000;
+			HoTTbinReader.pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
+			HoTTbinReader.pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
 
-				HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
-			}
-//			break;
-//		}
+			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
+		}
+		//			break;
+		//		}
 		HoTTbinReader.isJustParsed = true;
 		return sdLogVersion;
 	}
@@ -1188,7 +1189,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > 10000 && HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000)) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
-			HoTTbinReader.pointsGPS[6] = HoTTAdapter.isFilterEnabled && tmpVelocity > 2000000 ? HoTTbinReader.pointsGPS[6] : tmpVelocity;
+			HoTTbinReader.pointsGPS[6] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpVelocity > 2000000 ? HoTTbinReader.pointsGPS[6] : HoTTbinReader.tmpVelocity;
 
 			HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			if (!HoTTAdapter.isTolerateSignChangeLatitude) HoTTbinReader.tmpLatitude = _buf1[6] == 1 ? -1 * HoTTbinReader.tmpLatitude : HoTTbinReader.tmpLatitude;
@@ -1261,11 +1262,13 @@ public class HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsGeneral[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGeneral[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetGeneral.getRecordDataSize(true) == 0 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGeneral[3] / 1000 + HoTTbinReader.pointsGeneral[1] / 1000 * HoTTbinReader.pointsGeneral[2] / 1000 / 2500 + 2)) {
-				HoTTbinReader.pointsGeneral[3] =  HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetGeneral.getRecordDataSize(true) == 0
+					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGeneral[3] / 1000 + HoTTbinReader.pointsGeneral[1] / 1000 * HoTTbinReader.pointsGeneral[2] / 1000 / 2500 + 2)) {
+				HoTTbinReader.pointsGeneral[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsGeneral[3] / 1000) + " + " + (HoTTbinReader.pointsGeneral[1] / 1000 * HoTTbinReader.pointsGeneral[2] / 1000 / 2500 + 2));
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
+						+ (HoTTbinReader.pointsGeneral[3] / 1000) + " + " + (HoTTbinReader.pointsGeneral[1] / 1000 * HoTTbinReader.pointsGeneral[2] / 1000 / 2500 + 2));
 			}
 			HoTTbinReader.pointsGeneral[4] = Double.valueOf(HoTTbinReader.pointsGeneral[1] / 1000.0 * HoTTbinReader.pointsGeneral[2]).intValue();
 			HoTTbinReader.pointsGeneral[5] = 0;
@@ -1315,11 +1318,13 @@ public class HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsElectric[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsElectric[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetElectric.getRecordDataSize(true) == 0 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsElectric[3] / 1000 + HoTTbinReader.pointsElectric[1] / 1000 * HoTTbinReader.pointsElectric[2] / 1000 / 2500 + 2)) {
-				HoTTbinReader.pointsElectric[3] =  HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetElectric.getRecordDataSize(true) == 0
+					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsElectric[3] / 1000 + HoTTbinReader.pointsElectric[1] / 1000 * HoTTbinReader.pointsElectric[2] / 1000 / 2500 + 2)) {
+				HoTTbinReader.pointsElectric[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsElectric[3] / 1000) + " + " + (HoTTbinReader.pointsElectric[1] / 1000 * HoTTbinReader.pointsElectric[2] / 1000 / 2500 + 2));
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
+						+ (HoTTbinReader.pointsElectric[3] / 1000) + " + " + (HoTTbinReader.pointsElectric[1] / 1000 * HoTTbinReader.pointsElectric[2] / 1000 / 2500 + 2));
 			}
 			HoTTbinReader.pointsElectric[4] = Double.valueOf(HoTTbinReader.pointsElectric[1] / 1000.0 * HoTTbinReader.pointsElectric[2]).intValue(); // power U*I [W];
 			HoTTbinReader.pointsElectric[5] = 0; //5=Balance
@@ -1368,26 +1373,29 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf1, 7);
 		HoTTbinReader.tmpRevolution = DataParser.parse2Short(_buf2, 5);
 		HoTTbinReader.tmpTemperatureFet = _buf1[9] - 20;
-		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
-				&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsSpeedControl[6] != 0 && HoTTbinReader.pointsSpeedControl[6]/1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10
+				&& HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 20000
+				&& !(HoTTbinReader.pointsSpeedControl[6] != 0 && HoTTbinReader.pointsSpeedControl[6] / 1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsSpeedControl[4] = Double.valueOf(HoTTbinReader.pointsSpeedControl[1] / 1000.0 * HoTTbinReader.pointsSpeedControl[2]).intValue();
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetSpeedControl.getRecordDataSize(true) == 0 || Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[3] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2)) {
-				HoTTbinReader.pointsSpeedControl[3] =  HoTTbinReader.tmpCapacity * 1000;
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetSpeedControl.getRecordDataSize(true) == 0
+					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[3] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2)) {
+				HoTTbinReader.pointsSpeedControl[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsSpeedControl[3] / 1000) + " + " + (HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2));
+				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
+						+ (HoTTbinReader.pointsSpeedControl[3] / 1000) + " + " + (HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2));
 			}
 			HoTTbinReader.pointsSpeedControl[5] = HoTTbinReader.tmpRevolution * 1000;
 			HoTTbinReader.pointsSpeedControl[6] = HoTTbinReader.tmpTemperatureFet * 1000;
 		}
-//		else {
-//			System.out.println(StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) 
-//					+ " - " + HoTTbinReader.pointsSpeedControl[1]/1000 + "; " + HoTTbinReader.tmpVoltage
-//					+ " - " + HoTTbinReader.pointsSpeedControl[2]/1000 + "; " + HoTTbinReader.tmpCurrent
-//					+ " - " + HoTTbinReader.pointsSpeedControl[3]/1000 + "; " + HoTTbinReader.tmpCapacity);
-//		}
+		//		else {
+		//			System.out.println(StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) 
+		//					+ " - " + HoTTbinReader.pointsSpeedControl[1]/1000 + "; " + HoTTbinReader.tmpVoltage
+		//					+ " - " + HoTTbinReader.pointsSpeedControl[2]/1000 + "; " + HoTTbinReader.tmpCurrent
+		//					+ " - " + HoTTbinReader.pointsSpeedControl[3]/1000 + "; " + HoTTbinReader.tmpCapacity);
+		//		}
 		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
 		HoTTbinReader.isJustParsed = true;
 	}
