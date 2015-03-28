@@ -145,7 +145,7 @@ public class GathererThread extends Thread {
 							startCycleTime1 = this.device.getProcessingTime(dataBuffer);
 							recordSet.setAllDisplayable();
 							this.channels.switchChannel(channel.getName());
-							this.channel.switchRecordSet(this.recordSetKey2);
+							this.channel.switchRecordSet(this.recordSetKey1);
 						}
 
 						// prepare the data for adding to record set
