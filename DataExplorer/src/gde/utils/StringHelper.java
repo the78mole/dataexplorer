@@ -621,13 +621,15 @@ public class StringHelper {
 				sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
 			else if (buffer[i] == DeviceSerialPortImpl.NAK)
 				sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+			else if (buffer[i] == -1)
+				sb.append('|'); //$NON-NLS-1$
 			else if (i == buffer.length - 6)
 				sb.append(GDE.STRING_OR).append((char) buffer[i]); //$NON-NLS-1$
 			else
 				sb.append((char) buffer[i]);
 			//sb.append(String.format("%X", buffer[i]));
 
-			if (i%4 == 0) sb.append(" ");
+			//if (i%4 == 0) sb.append(" ");
 		}
 		return sb.toString();
 	}

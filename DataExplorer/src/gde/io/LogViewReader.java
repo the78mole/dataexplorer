@@ -95,6 +95,7 @@ public class LogViewReader {
 	// fill device Map with 
 	static {
 		deviceMap.put("htronic akkumaster c4", "AkkuMasterC4"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("akkumatik", "Akkumatik"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("picolario", "Picolario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station 902", "eStation902"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc6", "eStationBC6"); //$NON-NLS-1$ //$NON-NLS-2$
