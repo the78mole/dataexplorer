@@ -77,7 +77,7 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "0123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789");
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 			}
-			if (!((data[0] == 49 || data[0] == 50) && data[1] == -1 && data[data.length - 1] == 0x0A && data[data.length - 2] == 0x0D)) {
+			if (data.length < 69 && !((data[0] == 49 || data[0] == 50) && data[1] == -1 && data[data.length - 1] == 0x0A && data[data.length - 2] == 0x0D)) {
 				++this.retryCount;
 				if (this.retryCount > this.maxRetryCount) {
 					final String msg = "Errors during serial communication, maximum of retries exceeded!";
