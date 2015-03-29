@@ -39,7 +39,7 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 
 	final int						timeout;
 	final int						stableIndex;
-	final int						maxRetryCount = 10;
+	final int						maxRetryCount = 25;
 	int									retryCount;
 
 	/**
@@ -84,7 +84,8 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 					final String msg = "Errors during serial communication, maximum of retries exceeded!";
 					retryCount = 0;
 					throw new SerialPortException(msg);
-				}
+				}				
+				this.cleanInputStream();
 				data = getData();
 			}
 		}

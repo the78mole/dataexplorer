@@ -232,25 +232,26 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] / 1000 * points[2] / 1000.0).intValue(); // energy U*C [mWh]
 		points[5] = ((dataBuffer[31]-48)*10000 + (dataBuffer[32]-48)*1000 + (dataBuffer[33]-48)*100 + (dataBuffer[34]-48)*10 + (dataBuffer[35]-48));
-		points[6] = ((dataBuffer[37]-48)*100 + (dataBuffer[38]-48)*10 + (dataBuffer[39]-48));
+		points[6] = ((dataBuffer[37]-48)*100 + (dataBuffer[38]-48)*10 + (dataBuffer[39]-48)) * 1000;
 		points[7] = ((dataBuffer[41]-48)*10 + (dataBuffer[42]-48)) * 1000;
 		points[8] = ((dataBuffer[64]-48)*10 + (dataBuffer[65]-48)) * 1000;
 		points[9] = 0;
 
-		final int numCells = this.getNumberOfLithiumCells(dataBuffer);
-		if (numCells > 0) {
-			// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 16=CellVoltage7 17=CellVoltage8
-			for (int i = 0, j = 0; i < numCells; ++i, j+=4) {
-				points[i + 10] = ((dataBuffer[i + j + 67]-48)*1000 + (dataBuffer[i + j + 68]-48)*100 + (dataBuffer[i + j + 69]-48)*10 + (dataBuffer[i + j + 70]-48));
-				if (points[i + 10] > 0) {
-					maxVotage = points[i + 10] > maxVotage ? points[i + 10] : maxVotage;
-					minVotage = points[i + 10] < minVotage ? points[i + 10] : minVotage;
+		if (dataBuffer.length > 69) {
+			final int numCells = this.getNumberOfLithiumCells(dataBuffer);
+			if (numCells > 0 && dataBuffer.length >= 69+numCells*5) {
+				// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 16=CellVoltage7 17=CellVoltage8
+				for (int i = 0, j = 0; i < numCells; ++i, j += 4) {
+					points[i + 10] = ((dataBuffer[i + j + 67] - 48) * 1000 + (dataBuffer[i + j + 68] - 48) * 100 + (dataBuffer[i + j + 69] - 48) * 10 + (dataBuffer[i + j + 70] - 48));
+					if (points[i + 10] > 0) {
+						maxVotage = points[i + 10] > maxVotage ? points[i + 10] : maxVotage;
+						minVotage = points[i + 10] < minVotage ? points[i + 10] : minVotage;
+					}
 				}
+				//calculate balance on the fly
+				points[9] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
 			}
-			//calculate balance on the fly
-			points[9] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;	
 		}
-
 		return points;
 	}
 
