@@ -25,6 +25,7 @@ package gde.device.estner;
 public class MessageIds { 
 
 	public final static String	GDE_MSGW3400 = "GDE_MSGW3400";
+	public final static String	GDE_MSGW3401 = "GDE_MSGW3401";
 	public final static String	GDE_MSGI3400 = "GDE_MSGI3400";
 	public final static String	GDE_MSGI3401 = "GDE_MSGI3401";
 	public final static String	GDE_MSGT3400 = "GDE_MSGT3400";

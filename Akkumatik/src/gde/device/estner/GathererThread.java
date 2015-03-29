@@ -46,7 +46,7 @@ public class GathererThread extends Thread {
 	final AkkumatikSerialPort	serialPort;
 	final Akkumatik						device;
 	final Channels						channels;
-	 			Channel							channel;
+	Channel										channel;
 	final int									channelNumber;
 
 	String										recordSetKey1								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
@@ -103,34 +103,30 @@ public class GathererThread extends Thread {
 				// check if device is ready for data capturing, discharge or charge allowed only
 				// else wait for 180 seconds max. for actions
 				final String processName = this.device.PROCESS_MODE[this.device.getProcessingMode(dataBuffer)];
-				final String processType = this.device.getProcessingPhase(dataBuffer) == 10 
-						? Messages.getString(MessageIds.GDE_MSGT3420)
-						: this.device.PROCESS_TYPE[this.device.getProcessingType(dataBuffer)];
-				
-				switch (dataBuffer[0]-48) {
+				final String processType = this.device.getProcessingPhase(dataBuffer) == 10 ? Messages.getString(MessageIds.GDE_MSGT3420) : this.device.PROCESS_TYPE[this.device.getProcessingType(dataBuffer)];
+
+				switch (dataBuffer[0] - 48) {
 				case 1:
 					this.numberBatteryCells1 = this.device.getNumberOfLithiumCells(dataBuffer);
 					isProgrammExecuting1 = this.device.isProcessing(dataBuffer);
 					isCycleMode1 = this.device.isCycleMode(dataBuffer);
-					cycleCount1 = GDE.STRING_EMPTY + (isCycleMode1 ? "#"+this.device.getNumberOfCycle(dataBuffer) : GDE.STRING_BLANK); 
+					cycleCount1 = GDE.STRING_EMPTY + (isCycleMode1 ? "#" + this.device.getNumberOfCycle(dataBuffer) : GDE.STRING_BLANK);
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME,
-							String.format("1: isProcessing = %b process mode = %s isCycleMode = %b(%s) process type = %s",
-							isProgrammExecuting1, processName, isCycleMode1, cycleCount1, processType)); //$NON-NLS-1$
+							String.format("1: isProcessing = %b process mode = %s isCycleMode = %b(%s) process type = %s", isProgrammExecuting1, processName, isCycleMode1, cycleCount1, processType));
 
 					if (isProgrammExecuting1) {
-						this.channel = channels.get(1);
+						this.channel = this.channels.get(1);
 						// check state change waiting to discharge to charge
 						// check if a record set matching for re-use is available and prepare a new if required
-						if (this.channel.size() == 0 || recordSet == null || !(this.recordSetKey1.contains(processName) && (cycleCount1.length() > 0 ? this.recordSetKey1.contains(cycleCount1) : true) && this.recordSetKey1.endsWith(processType))) {
+						if (this.channel.size() == 0 || recordSet == null
+								|| !(this.recordSetKey1.contains(processName) && (cycleCount1.length() > 0 ? this.recordSetKey1.contains(cycleCount1) : true) && this.recordSetKey1.endsWith(processType))) {
 							this.application.setStatusMessage(""); //$NON-NLS-1$
 							// record set does not exist or is outdated, build a new name and create
 							int akkuType = this.device.getAccuCellType(dataBuffer);
-							this.recordSetKey1 = this.channel.getNextRecordSetNumber()
-									+ GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + GDE.STRING_BLANK_LEFT_BRACKET + this.device.ACCU_TYPES[akkuType];
-							if (isCycleMode1) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] {cycleCount1});
+							this.recordSetKey1 = this.channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + GDE.STRING_BLANK_LEFT_BRACKET + this.device.ACCU_TYPES[akkuType];
+							if (isCycleMode1) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] { cycleCount1 });
 							this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_RIGHT_BRACKET;
-							if (processType.length() > 0 )
-								this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_MESSAGE_CONCAT + processType;
+							if (processType.length() > 0) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_MESSAGE_CONCAT + processType;
 							System.out.println(this.recordSetKey1);
 							this.channel.put(this.recordSetKey1, RecordSet.createRecordSet(this.recordSetKey1, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey1 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
@@ -144,7 +140,7 @@ public class GathererThread extends Thread {
 							}
 							startCycleTime1 = this.device.getProcessingTime(dataBuffer);
 							recordSet.setAllDisplayable();
-							this.channels.switchChannel(channel.getName());
+							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey1);
 						}
 
@@ -167,25 +163,23 @@ public class GathererThread extends Thread {
 					this.numberBatteryCells2 = this.device.getNumberOfLithiumCells(dataBuffer);
 					isProgrammExecuting2 = this.device.isProcessing(dataBuffer);
 					isCycleMode2 = this.device.isCycleMode(dataBuffer);
-					cycleCount2 = GDE.STRING_EMPTY + (isCycleMode2 ? "#"+this.device.getNumberOfCycle(dataBuffer) : GDE.STRING_BLANK); 
+					cycleCount2 = GDE.STRING_EMPTY + (isCycleMode2 ? "#" + this.device.getNumberOfCycle(dataBuffer) : GDE.STRING_BLANK);
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME,
-							String.format("2: isProcessing = %b process mode = %s isCycleMode = %b(%s) process type = %s",
-							isProgrammExecuting2, processName, isCycleMode2, cycleCount2, processType)); //$NON-NLS-1$
+							String.format("2: isProcessing = %b process mode = %s isCycleMode = %b(%s) process type = %s", isProgrammExecuting2, processName, isCycleMode2, cycleCount2, processType));
 
 					if (isProgrammExecuting2) {
-						this.channel = channels.get(2);
+						this.channel = this.channels.get(2);
 						// check state change waiting to discharge to charge
 						// check if a record set matching for re-use is available and prepare a new if required
-						if (this.channel.size() == 0 || recordSet == null || !(this.recordSetKey2.contains(processName) && (cycleCount2.length() > 0 ? this.recordSetKey2.contains(cycleCount2) : true) && this.recordSetKey2.endsWith(processType))) {
+						if (this.channel.size() == 0 || recordSet == null
+								|| !(this.recordSetKey2.contains(processName) && (cycleCount2.length() > 0 ? this.recordSetKey2.contains(cycleCount2) : true) && this.recordSetKey2.endsWith(processType))) {
 							this.application.setStatusMessage(""); //$NON-NLS-1$
 							// record set does not exist or is outdated, build a new name and create
 							int akkuType = this.device.getAccuCellType(dataBuffer);
-							this.recordSetKey2 = this.channel.getNextRecordSetNumber()
-									+ GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + GDE.STRING_BLANK_LEFT_BRACKET + this.device.ACCU_TYPES[akkuType];
-							if (isCycleMode2) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] {cycleCount2});
+							this.recordSetKey2 = this.channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + GDE.STRING_BLANK_LEFT_BRACKET + this.device.ACCU_TYPES[akkuType];
+							if (isCycleMode2) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] { cycleCount2 });
 							this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_RIGHT_BRACKET;
-							if (processType.length() > 0 )
-								this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_MESSAGE_CONCAT + processType;
+							if (processType.length() > 0) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_MESSAGE_CONCAT + processType;
 							System.out.println(this.recordSetKey2);
 							this.channel.put(this.recordSetKey2, RecordSet.createRecordSet(this.recordSetKey2, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey2 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
@@ -199,7 +193,7 @@ public class GathererThread extends Thread {
 							}
 							startCycleTime2 = this.device.getProcessingTime(dataBuffer);
 							recordSet.setAllDisplayable();
-							this.channels.switchChannel(channel.getName());
+							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey2);
 						}
 
@@ -222,7 +216,7 @@ public class GathererThread extends Thread {
 					System.out.println("nothing executing ?");
 					break;
 				}
-					
+
 				if (!isProgrammExecuting1 && !isProgrammExecuting2) { // no Akkumatik program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3400));
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for Akkumatik activation"); //$NON-NLS-1$
@@ -295,14 +289,14 @@ public class GathererThread extends Thread {
 		RecordSet recordSet = this.channel.get(this.recordSetKey1);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) this.application.openMessageDialog("Datenaufnahme beendet");
+			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW3401));
 		}
 		else {
 			if (throwable != null) {
 				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }) + "Datenaufnahme beendet");
 			}
 			else {
-				if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + "Datenaufnahme beendet");
+				if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + Messages.getString(MessageIds.GDE_MSGW3401));
 			}
 		}
 	}

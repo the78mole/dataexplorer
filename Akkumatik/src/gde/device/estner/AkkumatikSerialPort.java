@@ -21,7 +21,6 @@ package gde.device.estner;
 import gde.comm.DeviceCommPort;
 import gde.device.IDevice;
 import gde.device.InputTypes;
-import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
@@ -34,12 +33,12 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class AkkumatikSerialPort extends DeviceCommPort {
-	final static String	$CLASS_NAME											= AkkumatikSerialPort.class.getName();
-	final static Logger	log															= Logger.getLogger(AkkumatikSerialPort.$CLASS_NAME);
+	final static String	$CLASS_NAME		= AkkumatikSerialPort.class.getName();
+	final static Logger	log						= Logger.getLogger(AkkumatikSerialPort.$CLASS_NAME);
 
 	final int						timeout;
 	final int						stableIndex;
-	final int						maxRetryCount = 25;
+	final int						maxRetryCount	= 25;
 	int									retryCount;
 
 	/**
@@ -78,13 +77,13 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "0123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789");
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 			}
-			if (!((data[0] == 49 || data[0] == 50) && data[1] == -1 && data[data.length-1] == 0x0A && data[data.length-2] == 0x0D)) {
-				++retryCount;
-				if (retryCount > maxRetryCount) {
+			if (!((data[0] == 49 || data[0] == 50) && data[1] == -1 && data[data.length - 1] == 0x0A && data[data.length - 2] == 0x0D)) {
+				++this.retryCount;
+				if (this.retryCount > this.maxRetryCount) {
 					final String msg = "Errors during serial communication, maximum of retries exceeded!";
-					retryCount = 0;
-					throw new SerialPortException(msg);
-				}				
+					this.retryCount = 0;
+					AkkumatikSerialPort.log.logp(java.util.logging.Level.WARNING, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, msg);
+				}
 				this.cleanInputStream();
 				data = getData();
 			}

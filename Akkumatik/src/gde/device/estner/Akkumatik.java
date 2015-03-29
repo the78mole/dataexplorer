@@ -47,16 +47,16 @@ import javax.xml.bind.JAXBException;
  * @author Winfried Brügmann
  */
 public class Akkumatik extends DeviceConfiguration implements IDevice {
-	final static Logger														log												= Logger.getLogger(Akkumatik.class.getName());
+	final static Logger									log								= Logger.getLogger(Akkumatik.class.getName());
 
-	public final String[]													PROCESS_MODE;
-	public final String[]													ACCU_TYPES;
-	public final String[]													PROCESS_TYPE;
+	public final String[]								PROCESS_MODE;
+	public final String[]								ACCU_TYPES;
+	public final String[]								PROCESS_TYPE;
 
-	protected final DataExplorer									application;
-	protected final AkkumatikSerialPort						serialPort;
-	protected final Channels											channels;
-	protected				GathererThread 								dataGatherThread = null;
+	protected final DataExplorer				application;
+	protected final AkkumatikSerialPort	serialPort;
+	protected final Channels						channels;
+	protected GathererThread						dataGatherThread	= null;
 
 	/**
 	 * constructor using properties file
@@ -67,15 +67,13 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.estner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.PROCESS_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT3400), Messages.getString(MessageIds.GDE_MSGT3401), 
-				Messages.getString(MessageIds.GDE_MSGT3402), Messages.getString(MessageIds.GDE_MSGT3403), 
-				Messages.getString(MessageIds.GDE_MSGT3404), Messages.getString(MessageIds.GDE_MSGT3405), Messages.getString(MessageIds.GDE_MSGT3406) };
-		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT3430), Messages.getString(MessageIds.GDE_MSGT3431), 
-				Messages.getString(MessageIds.GDE_MSGT3432), Messages.getString(MessageIds.GDE_MSGT3433),
-				Messages.getString(MessageIds.GDE_MSGT3434), Messages.getString(MessageIds.GDE_MSGT3435), 
-				Messages.getString(MessageIds.GDE_MSGT3436), Messages.getString(MessageIds.GDE_MSGT3437) };
-		this.PROCESS_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3410), Messages.getString(MessageIds.GDE_MSGT3411), 
-				Messages.getString(MessageIds.GDE_MSGT3412), Messages.getString(MessageIds.GDE_MSGT3413)};
+		this.PROCESS_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT3400), Messages.getString(MessageIds.GDE_MSGT3401), Messages.getString(MessageIds.GDE_MSGT3402),
+				Messages.getString(MessageIds.GDE_MSGT3403), Messages.getString(MessageIds.GDE_MSGT3404), Messages.getString(MessageIds.GDE_MSGT3405), Messages.getString(MessageIds.GDE_MSGT3406) };
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT3430), Messages.getString(MessageIds.GDE_MSGT3431), Messages.getString(MessageIds.GDE_MSGT3432),
+				Messages.getString(MessageIds.GDE_MSGT3433), Messages.getString(MessageIds.GDE_MSGT3434), Messages.getString(MessageIds.GDE_MSGT3435), Messages.getString(MessageIds.GDE_MSGT3436),
+				Messages.getString(MessageIds.GDE_MSGT3437) };
+		this.PROCESS_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3410), Messages.getString(MessageIds.GDE_MSGT3411), Messages.getString(MessageIds.GDE_MSGT3412),
+				Messages.getString(MessageIds.GDE_MSGT3413) };
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new AkkumatikSerialPort(this, this.application);
@@ -91,15 +89,13 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.estner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.PROCESS_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT3400), Messages.getString(MessageIds.GDE_MSGT3401), 
-				Messages.getString(MessageIds.GDE_MSGT3402), Messages.getString(MessageIds.GDE_MSGT3403), 
-				Messages.getString(MessageIds.GDE_MSGT3404), Messages.getString(MessageIds.GDE_MSGT3405), Messages.getString(MessageIds.GDE_MSGT3406) };
-		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT3430), Messages.getString(MessageIds.GDE_MSGT3431), 
-				Messages.getString(MessageIds.GDE_MSGT3432), Messages.getString(MessageIds.GDE_MSGT3433),
-				Messages.getString(MessageIds.GDE_MSGT3434), Messages.getString(MessageIds.GDE_MSGT3435), 
-				Messages.getString(MessageIds.GDE_MSGT3436), Messages.getString(MessageIds.GDE_MSGT3437) };
-		this.PROCESS_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3410), Messages.getString(MessageIds.GDE_MSGT3411), 
-				Messages.getString(MessageIds.GDE_MSGT3412), Messages.getString(MessageIds.GDE_MSGT3413)};
+		this.PROCESS_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT3400), Messages.getString(MessageIds.GDE_MSGT3401), Messages.getString(MessageIds.GDE_MSGT3402),
+				Messages.getString(MessageIds.GDE_MSGT3403), Messages.getString(MessageIds.GDE_MSGT3404), Messages.getString(MessageIds.GDE_MSGT3405), Messages.getString(MessageIds.GDE_MSGT3406) };
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT3430), Messages.getString(MessageIds.GDE_MSGT3431), Messages.getString(MessageIds.GDE_MSGT3432),
+				Messages.getString(MessageIds.GDE_MSGT3433), Messages.getString(MessageIds.GDE_MSGT3434), Messages.getString(MessageIds.GDE_MSGT3435), Messages.getString(MessageIds.GDE_MSGT3436),
+				Messages.getString(MessageIds.GDE_MSGT3437) };
+		this.PROCESS_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3410), Messages.getString(MessageIds.GDE_MSGT3411), Messages.getString(MessageIds.GDE_MSGT3412),
+				Messages.getString(MessageIds.GDE_MSGT3413) };
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new AkkumatikSerialPort(this, this.application);
@@ -226,20 +222,21 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		int minVotage = Integer.MAX_VALUE;
 
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		points[0] = ((dataBuffer[11]-48)*10000 + (dataBuffer[12]-48)*1000 + (dataBuffer[13]-48)*100 + (dataBuffer[14]-48)*10 + (dataBuffer[15]-48));
-		points[1] = (dataBuffer[17]=='-' ? -1 : 1) * ((dataBuffer[18]-48)*10000 + (dataBuffer[19]-48)*1000 + (dataBuffer[20]-48)*100 + (dataBuffer[21]-48)*10 + (dataBuffer[22]-48));
-		points[2] = (dataBuffer[24]=='-' ? -1 : 1) * ((dataBuffer[25]-48)*10000 + (dataBuffer[26]-48)*1000 + (dataBuffer[27]-48)*100 + (dataBuffer[28]-48)*10 + (dataBuffer[29]-48)) * 1000;
+		points[0] = ((dataBuffer[11] - 48) * 10000 + (dataBuffer[12] - 48) * 1000 + (dataBuffer[13] - 48) * 100 + (dataBuffer[14] - 48) * 10 + (dataBuffer[15] - 48));
+		points[1] = (dataBuffer[17] == '-' ? -1 : 1) * ((dataBuffer[18] - 48) * 10000 + (dataBuffer[19] - 48) * 1000 + (dataBuffer[20] - 48) * 100 + (dataBuffer[21] - 48) * 10 + (dataBuffer[22] - 48));
+		points[2] = (dataBuffer[24] == '-' ? -1 : 1) * ((dataBuffer[25] - 48) * 10000 + (dataBuffer[26] - 48) * 1000 + (dataBuffer[27] - 48) * 100 + (dataBuffer[28] - 48) * 10 + (dataBuffer[29] - 48))
+				* 1000;
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] / 1000 * points[2] / 1000.0).intValue(); // energy U*C [mWh]
-		points[5] = ((dataBuffer[31]-48)*10000 + (dataBuffer[32]-48)*1000 + (dataBuffer[33]-48)*100 + (dataBuffer[34]-48)*10 + (dataBuffer[35]-48));
-		points[6] = ((dataBuffer[37]-48)*100 + (dataBuffer[38]-48)*10 + (dataBuffer[39]-48)) * 1000;
-		points[7] = ((dataBuffer[41]-48)*10 + (dataBuffer[42]-48)) * 1000;
-		points[8] = ((dataBuffer[64]-48)*10 + (dataBuffer[65]-48)) * 1000;
+		points[5] = ((dataBuffer[31] - 48) * 10000 + (dataBuffer[32] - 48) * 1000 + (dataBuffer[33] - 48) * 100 + (dataBuffer[34] - 48) * 10 + (dataBuffer[35] - 48));
+		points[6] = ((dataBuffer[37] - 48) * 100 + (dataBuffer[38] - 48) * 10 + (dataBuffer[39] - 48)) * 1000;
+		points[7] = ((dataBuffer[41] - 48) * 10 + (dataBuffer[42] - 48)) * 1000;
+		points[8] = ((dataBuffer[64] - 48) * 10 + (dataBuffer[65] - 48)) * 1000;
 		points[9] = 0;
 
 		if (dataBuffer.length > 69) {
 			final int numCells = this.getNumberOfLithiumCells(dataBuffer);
-			if (numCells > 0 && dataBuffer.length >= 69+numCells*5) {
+			if (numCells > 0 && dataBuffer.length >= 69 + numCells * 5) {
 				// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 16=CellVoltage7 17=CellVoltage8
 				for (int i = 0, j = 0; i < numCells; ++i, j += 4) {
 					points[i + 10] = ((dataBuffer[i + j + 67] - 48) * 1000 + (dataBuffer[i + j + 68] - 48) * 100 + (dataBuffer[i + j + 69] - 48) * 10 + (dataBuffer[i + j + 70] - 48));
@@ -260,7 +257,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * Programm (0= LADE, 1= ENTL, 2= E+L, 3= L+E, 4= (L)E+L, 5= (E)L+E, 6= SENDER
 	 */
 	boolean isCycleMode(byte[] dataBuffer) {
-		return this.getProcessingMode(dataBuffer) >=2 && this.getProcessingMode(dataBuffer) <=5;
+		return this.getProcessingMode(dataBuffer) >= 2 && this.getProcessingMode(dataBuffer) <= 5;
 	}
 
 	/**
@@ -270,7 +267,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return cycle count
 	 */
 	public int getNumberOfCycle(byte[] dataBuffer) {
-		return dataBuffer[50]-48;
+		return dataBuffer[50] - 48;
 	}
 
 	/**
@@ -280,8 +277,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public int getNumberOfLithiumCells(Object dataBuffer) {
-		byte[] buffer = ((byte[])dataBuffer);
-		return this.getAccuCellType(buffer) >= 4 && this.getAccuCellType(buffer) <= 6 ? (buffer[44]-48)*10 + (buffer[45]-48) : 0;
+		byte[] buffer = ((byte[]) dataBuffer);
+		return this.getAccuCellType(buffer) >= 4 && this.getAccuCellType(buffer) <= 6 ? (buffer[44] - 48) * 10 + (buffer[45] - 48) : 0;
 	}
 
 	/**
@@ -290,7 +287,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return Akkutype (0=NICD, 1=NIMH, 2=BLEI, 3=BGEL, 4=LIIO, 5=LIPO, 6=LiFe, 7=IUxx)
 	 */
 	public int getAccuCellType(byte[] dataBuffer) {
-		return dataBuffer[54]-48;
+		return dataBuffer[54] - 48;
 	}
 
 	/**
@@ -310,7 +307,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public int getProcessingMode(byte[] dataBuffer) {
-		return dataBuffer[56]-48;
+		return dataBuffer[56] - 48;
 	}
 
 	/**
@@ -320,7 +317,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public int getProcessingPhase(byte[] dataBuffer) {
-		return (dataBuffer[47]-48)*10 + (dataBuffer[48]-48);
+		return (dataBuffer[47] - 48) * 10 + (dataBuffer[48] - 48);
 	}
 
 	/**
@@ -330,7 +327,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public int getProcessingType(byte[] dataBuffer) {
-		return dataBuffer[58]-48;
+		return dataBuffer[58] - 48;
 	}
 
 	/**
@@ -340,7 +337,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public long getProcessingTime(byte[] dataBuffer) {
-		return (((dataBuffer[2]-48)*10 + (dataBuffer[3]-48))*3600 + ((dataBuffer[5]-48)*10 + (dataBuffer[6]-48))*60 + ((dataBuffer[8]-48)*10 + (dataBuffer[9]-48))) * 1000;
+		return (((dataBuffer[2] - 48) * 10 + (dataBuffer[3] - 48)) * 3600 + ((dataBuffer[5] - 48) * 10 + (dataBuffer[6] - 48)) * 60 + ((dataBuffer[8] - 48) * 10 + (dataBuffer[9] - 48))) * 1000;
 	}
 
 	/**
@@ -597,10 +594,10 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 				try {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						dataGatherThread = new GathererThread(this.application, this, this.serialPort, activChannel.getNumber());
+						this.dataGatherThread = new GathererThread(this.application, this, this.serialPort, activChannel.getNumber());
 						try {
 							if (this.serialPort.isConnected()) {
-								dataGatherThread.start();
+								this.dataGatherThread.start();
 							}
 						}
 						catch (RuntimeException e) {
@@ -625,10 +622,10 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else {
-				if (dataGatherThread != null) {
+				if (this.dataGatherThread != null) {
 					try {
-						dataGatherThread.stopDataGatheringThread(false, null);
-						dataGatherThread = null;
+						this.dataGatherThread.stopDataGatheringThread(false, null);
+						this.dataGatherThread = null;
 					}
 					catch (Exception e) {
 						// ignore, while stopping no exception will be thrown
