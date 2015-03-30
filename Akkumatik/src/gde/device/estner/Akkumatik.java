@@ -214,32 +214,30 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
-	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param dataBuffer string array with the data to be converted
 	 */
-	@Override
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
+	public int[] convertDataBytes(int[] points, String[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		points[0] = ((dataBuffer[11] - 48) * 10000 + (dataBuffer[12] - 48) * 1000 + (dataBuffer[13] - 48) * 100 + (dataBuffer[14] - 48) * 10 + (dataBuffer[15] - 48));
-		points[1] = (dataBuffer[17] == '-' ? -1 : 1) * ((dataBuffer[18] - 48) * 10000 + (dataBuffer[19] - 48) * 1000 + (dataBuffer[20] - 48) * 100 + (dataBuffer[21] - 48) * 10 + (dataBuffer[22] - 48));
-		points[2] = (dataBuffer[24] == '-' ? -1 : 1) * ((dataBuffer[25] - 48) * 10000 + (dataBuffer[26] - 48) * 1000 + (dataBuffer[27] - 48) * 100 + (dataBuffer[28] - 48) * 10 + (dataBuffer[29] - 48))
-				* 1000;
+		points[0] = Integer.valueOf(dataBuffer[2]);
+		points[1] = Integer.valueOf(dataBuffer[3]);
+		points[2] = Integer.valueOf(dataBuffer[4]) * 1000;
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] / 1000 * points[2] / 1000.0).intValue(); // energy U*C [mWh]
-		points[5] = ((dataBuffer[31] - 48) * 10000 + (dataBuffer[32] - 48) * 1000 + (dataBuffer[33] - 48) * 100 + (dataBuffer[34] - 48) * 10 + (dataBuffer[35] - 48));
-		points[6] = ((dataBuffer[37] - 48) * 100 + (dataBuffer[38] - 48) * 10 + (dataBuffer[39] - 48)) * 1000;
-		points[7] = ((dataBuffer[41] - 48) * 10 + (dataBuffer[42] - 48)) * 1000;
-		points[8] = ((dataBuffer[64] - 48) * 10 + (dataBuffer[65] - 48)) * 1000;
+		points[5] = Integer.valueOf(dataBuffer[5]);
+		points[6] = Integer.valueOf(dataBuffer[6]) * 1000;
+		points[7] = Integer.valueOf(dataBuffer[7]) * 1000;
+		points[8] = Integer.valueOf(dataBuffer[17]) * 1000;
 		points[9] = 0;
 
-		if (dataBuffer.length > 69) {
+		if (dataBuffer.length > 8) { //data contains Lithium cells
 			final int numCells = this.getNumberOfLithiumCells(dataBuffer);
-			if (numCells > 0 && dataBuffer.length >= 69 + numCells * 5) {
+			if (numCells > 0 && dataBuffer.length > (8 + numCells)) {
 				// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 16=CellVoltage7 17=CellVoltage8
-				for (int i = 0, j = 0; i < numCells; ++i, j += 4) {
-					points[i + 10] = ((dataBuffer[i + j + 67] - 48) * 1000 + (dataBuffer[i + j + 68] - 48) * 100 + (dataBuffer[i + j + 69] - 48) * 10 + (dataBuffer[i + j + 70] - 48));
+				for (int i = 0; i < numCells; ++i) {
+					points[i + 10] = Integer.valueOf(dataBuffer[i + 18]);
 					if (points[i + 10] > 0) {
 						maxVotage = points[i + 10] > maxVotage ? points[i + 10] : maxVotage;
 						minVotage = points[i + 10] < minVotage ? points[i + 10] : minVotage;
@@ -254,9 +252,9 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * query if the PowerLab8 executes discharge > charge > discharge cycles
-	 * Programm (0= LADE, 1= ENTL, 2= E+L, 3= L+E, 4= (L)E+L, 5= (E)L+E, 6= SENDER
+	 * Program (0= LADE, 1= ENTL, 2= E+L, 3= L+E, 4= (L)E+L, 5= (E)L+E, 6= SENDER
 	 */
-	boolean isCycleMode(byte[] dataBuffer) {
+	boolean isCycleMode(String[] dataBuffer) {
 		return this.getProcessingMode(dataBuffer) >= 2 && this.getProcessingMode(dataBuffer) <= 5;
 	}
 
@@ -266,8 +264,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return cycle count
 	 */
-	public int getNumberOfCycle(byte[] dataBuffer) {
-		return dataBuffer[50] - 48;
+	public int getNumberOfCycle(String[] dataBuffer) {
+		return Integer.valueOf(dataBuffer[10]); //dataBuffer[50] - 48;
 	}
 
 	/**
@@ -275,10 +273,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param specificData
 	 * @return cell count if any
 	 */
-	@Override
-	public int getNumberOfLithiumCells(Object dataBuffer) {
-		byte[] buffer = ((byte[]) dataBuffer);
-		return this.getAccuCellType(buffer) >= 4 && this.getAccuCellType(buffer) <= 6 ? (buffer[44] - 48) * 10 + (buffer[45] - 48) : 0;
+	public int getNumberOfLithiumCells(String[] dataBuffer) {
+		return Integer.valueOf(dataBuffer[8]); //this.getAccuCellType(buffer) >= 4 && this.getAccuCellType(buffer) <= 6 ? (buffer[44] - 48) * 10 + (buffer[45] - 48) : 0;
 	}
 
 	/**
@@ -286,8 +282,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return Akkutype (0=NICD, 1=NIMH, 2=BLEI, 3=BGEL, 4=LIIO, 5=LIPO, 6=LiFe, 7=IUxx)
 	 */
-	public int getAccuCellType(byte[] dataBuffer) {
-		return dataBuffer[54] - 48;
+	public int getAccuCellType(String[] dataBuffer) {
+		return Integer.valueOf(dataBuffer[12]);// dataBuffer[54] - 48;
 	}
 
 	/**
@@ -296,7 +292,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return
 	 */
-	public boolean isProcessing(byte[] dataBuffer) {
+	public boolean isProcessing(String[] dataBuffer) {
 		return this.getProcessingPhase(dataBuffer) != 0;
 	}
 
@@ -306,8 +302,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return
 	 */
-	public int getProcessingMode(byte[] dataBuffer) {
-		return dataBuffer[56] - 48;
+	public int getProcessingMode(String[] dataBuffer) {
+		return Integer.valueOf(dataBuffer[13]); //dataBuffer[56] - 48;
 	}
 
 	/**
@@ -316,8 +312,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return
 	 */
-	public int getProcessingPhase(byte[] dataBuffer) {
-		return (dataBuffer[47] - 48) * 10 + (dataBuffer[48] - 48);
+	public int getProcessingPhase(String[] dataBuffer) {
+		return Integer.valueOf(dataBuffer[9]); //(dataBuffer[47] - 48) * 10 + (dataBuffer[48] - 48);
 	}
 
 	/**
@@ -326,8 +322,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return
 	 */
-	public int getProcessingType(byte[] dataBuffer) {
-		return dataBuffer[58] - 48;
+	public int getProcessingType(String[] dataBuffer) {
+		return Integer.valueOf(dataBuffer[14]); //dataBuffer[58] - 48;
 	}
 
 	/**
@@ -336,8 +332,10 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return
 	 */
-	public long getProcessingTime(byte[] dataBuffer) {
-		return (((dataBuffer[2] - 48) * 10 + (dataBuffer[3] - 48)) * 3600 + ((dataBuffer[5] - 48) * 10 + (dataBuffer[6] - 48)) * 60 + ((dataBuffer[8] - 48) * 10 + (dataBuffer[9] - 48))) * 1000;
+	public long getProcessingTime(String[] dataBuffer) {
+		final String[] time = dataBuffer[1].split(":");
+		return (Integer.valueOf(time[0]) * 3600 + Integer.valueOf(time[1]) * 60 + Integer.valueOf(time[2])) * 1000;
+		//(((dataBuffer[2] - 48) * 10 + (dataBuffer[3] - 48)) * 3600 + ((dataBuffer[5] - 48) * 10 + (dataBuffer[6] - 48)) * 60 + ((dataBuffer[8] - 48) * 10 + (dataBuffer[9] - 48))) * 1000;
 	}
 
 	/**
@@ -646,5 +644,10 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
 		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
 		return new int[] { 0, 2 };
+	}
+
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

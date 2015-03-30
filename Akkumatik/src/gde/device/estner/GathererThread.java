@@ -88,7 +88,7 @@ public class GathererThread extends Thread {
 		long startCycleTime1 = 0, startCycleTime2 = 0;
 		boolean isCycleMode1 = false, isCycleMode2 = false;
 		String cycleCount1 = GDE.STRING_EMPTY, cycleCount2 = GDE.STRING_EMPTY;
-		byte[] dataBuffer = null;
+		String[] data = null;
 
 		this.isCollectDataStopped = false;
 		GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
@@ -98,19 +98,18 @@ public class GathererThread extends Thread {
 			//atualTime_ms = System.currentTimeMillis();
 			try {
 				// get data from device
-				dataBuffer = this.serialPort.getData();
+				data = this.serialPort.getDataArray(this.serialPort.getData());
 
 				// check if device is ready for data capturing, discharge or charge allowed only
-				// else wait for 180 seconds max. for actions
-				final String processName = this.device.PROCESS_MODE[this.device.getProcessingMode(dataBuffer)];
-				final String processType = this.device.getProcessingPhase(dataBuffer) == 10 ? Messages.getString(MessageIds.GDE_MSGT3420) : this.device.PROCESS_TYPE[this.device.getProcessingType(dataBuffer)];
+				final String processName = this.device.PROCESS_MODE[this.device.getProcessingMode(data)];
+				final String processType = this.device.getProcessingPhase(data) == 10 ? Messages.getString(MessageIds.GDE_MSGT3420) : this.device.PROCESS_TYPE[this.device.getProcessingType(data)];
 
-				switch (dataBuffer[0] - 48) {
+				switch (Integer.valueOf(data[0])) { // device outlet 1 or 2
 				case 1:
-					this.numberBatteryCells1 = this.device.getNumberOfLithiumCells(dataBuffer);
-					isProgrammExecuting1 = this.device.isProcessing(dataBuffer);
-					isCycleMode1 = this.device.isCycleMode(dataBuffer);
-					cycleCount1 = GDE.STRING_EMPTY + (isCycleMode1 ? "#" + this.device.getNumberOfCycle(dataBuffer) : GDE.STRING_BLANK);
+					this.numberBatteryCells1 = this.device.getNumberOfLithiumCells(data);
+					isProgrammExecuting1 = this.device.isProcessing(data);
+					isCycleMode1 = this.device.isCycleMode(data);
+					cycleCount1 = GDE.STRING_EMPTY + (isCycleMode1 ? "#" + this.device.getNumberOfCycle(data) : GDE.STRING_BLANK);
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME,
 							String.format("1: isProcessing = %b process mode = %s isCycleMode = %b(%s) process type = %s", isProgrammExecuting1, processName, isCycleMode1, cycleCount1, processType));
 
@@ -122,7 +121,7 @@ public class GathererThread extends Thread {
 								|| !(this.recordSetKey1.contains(processName) && (cycleCount1.length() > 0 ? this.recordSetKey1.contains(cycleCount1) : true) && this.recordSetKey1.endsWith(processType))) {
 							this.application.setStatusMessage(""); //$NON-NLS-1$
 							// record set does not exist or is outdated, build a new name and create
-							int akkuType = this.device.getAccuCellType(dataBuffer);
+							int akkuType = this.device.getAccuCellType(data);
 							this.recordSetKey1 = this.channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + GDE.STRING_BLANK_LEFT_BRACKET + this.device.ACCU_TYPES[akkuType];
 							if (isCycleMode1) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] { cycleCount1 });
 							this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_RIGHT_BRACKET;
@@ -138,7 +137,7 @@ public class GathererThread extends Thread {
 							if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 								this.channels.getActiveChannel().switchRecordSet(this.recordSetKey1);
 							}
-							startCycleTime1 = this.device.getProcessingTime(dataBuffer);
+							startCycleTime1 = this.device.getProcessingTime(data);
 							recordSet.setAllDisplayable();
 							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey1);
@@ -147,8 +146,8 @@ public class GathererThread extends Thread {
 						// prepare the data for adding to record set
 						recordSet = this.channel.get(this.recordSetKey1);
 
-						recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), this.device.getProcessingTime(dataBuffer) - startCycleTime1);
-						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(dataBuffer))); //$NON-NLS-1$
+						recordSet.addPoints(this.device.convertDataBytes(points, data), this.device.getProcessingTime(data) - startCycleTime1);
+						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 
 						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
@@ -160,10 +159,10 @@ public class GathererThread extends Thread {
 					break;
 
 				case 2:
-					this.numberBatteryCells2 = this.device.getNumberOfLithiumCells(dataBuffer);
-					isProgrammExecuting2 = this.device.isProcessing(dataBuffer);
-					isCycleMode2 = this.device.isCycleMode(dataBuffer);
-					cycleCount2 = GDE.STRING_EMPTY + (isCycleMode2 ? "#" + this.device.getNumberOfCycle(dataBuffer) : GDE.STRING_BLANK);
+					this.numberBatteryCells2 = this.device.getNumberOfLithiumCells(data);
+					isProgrammExecuting2 = this.device.isProcessing(data);
+					isCycleMode2 = this.device.isCycleMode(data);
+					cycleCount2 = GDE.STRING_EMPTY + (isCycleMode2 ? "#" + this.device.getNumberOfCycle(data) : GDE.STRING_BLANK);
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME,
 							String.format("2: isProcessing = %b process mode = %s isCycleMode = %b(%s) process type = %s", isProgrammExecuting2, processName, isCycleMode2, cycleCount2, processType));
 
@@ -175,7 +174,7 @@ public class GathererThread extends Thread {
 								|| !(this.recordSetKey2.contains(processName) && (cycleCount2.length() > 0 ? this.recordSetKey2.contains(cycleCount2) : true) && this.recordSetKey2.endsWith(processType))) {
 							this.application.setStatusMessage(""); //$NON-NLS-1$
 							// record set does not exist or is outdated, build a new name and create
-							int akkuType = this.device.getAccuCellType(dataBuffer);
+							int akkuType = this.device.getAccuCellType(data);
 							this.recordSetKey2 = this.channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + GDE.STRING_BLANK_LEFT_BRACKET + this.device.ACCU_TYPES[akkuType];
 							if (isCycleMode2) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] { cycleCount2 });
 							this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_RIGHT_BRACKET;
@@ -191,7 +190,7 @@ public class GathererThread extends Thread {
 							if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 								this.channels.getActiveChannel().switchRecordSet(this.recordSetKey2);
 							}
-							startCycleTime2 = this.device.getProcessingTime(dataBuffer);
+							startCycleTime2 = this.device.getProcessingTime(data);
 							recordSet.setAllDisplayable();
 							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey2);
@@ -200,8 +199,8 @@ public class GathererThread extends Thread {
 						// prepare the data for adding to record set
 						recordSet = this.channel.get(this.recordSetKey2);
 
-						recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), this.device.getProcessingTime(dataBuffer) - startCycleTime2);
-						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime2 + this.device.getProcessingTime(dataBuffer))); //$NON-NLS-1$
+						recordSet.addPoints(this.device.convertDataBytes(points, data), this.device.getProcessingTime(data) - startCycleTime2);
+						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime2 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 
 						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);

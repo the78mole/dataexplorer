@@ -23,7 +23,6 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.TimeOutException;
 import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -74,16 +73,18 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 			data = this.read(data, this.timeout, this.stableIndex);
 
 			if (AkkumatikSerialPort.log.isLoggable(java.util.logging.Level.FINE)) {
-				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "0123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789");
-				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
+				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINER, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "0123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789");
+				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, new String(data));
 			}
 			if (data.length < 69 && !((data[0] == 49 || data[0] == 50) && data[1] == -1 && data[data.length - 1] == 0x0A && data[data.length - 2] == 0x0D)) {
+				AkkumatikSerialPort.log.logp(java.util.logging.Level.WARNING, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "Serial comm error, data = " + new String(data));
 				++this.retryCount;
 				if (this.retryCount > this.maxRetryCount) {
 					final String msg = "Errors during serial communication, maximum of retries exceeded!";
 					this.retryCount = 0;
 					AkkumatikSerialPort.log.logp(java.util.logging.Level.WARNING, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, msg);
 				}
+				
 				this.cleanInputStream();
 				data = getData();
 			}
@@ -97,4 +98,12 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 		return data;
 	}
 
+	/**
+	 * converts the data byte buffer in a String array with mostly readable content
+	 * @param buffer
+	 * @return
+	 */
+	public String[] getDataArray(byte[] buffer) {
+		return new String(buffer).split("�");
+	}
 }
