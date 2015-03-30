@@ -57,6 +57,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	protected final AkkumatikSerialPort	serialPort;
 	protected final Channels						channels;
 	protected GathererThread						dataGatherThread	= null;
+	protected final Settings 						settings = Settings.getInstance();
 
 	/**
 	 * constructor using properties file
@@ -294,6 +295,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public boolean isProcessing(String[] dataBuffer) {
+		if (this.settings.isReduceChargeDischarge())
+			return this.getProcessingPhase(dataBuffer) != 0 && this.getProcessingPhase(dataBuffer) != 10;
 		return this.getProcessingPhase(dataBuffer) != 0;
 	}
 
@@ -407,7 +410,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 				}
 			}
 			//calculate balance on the fly
-			points[9] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			points[9] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
 
 			if (recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
