@@ -83,7 +83,8 @@ public class GathererThread extends Thread {
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 		RecordSet recordSet = null;
-		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
+		int[] points1 = new int[this.device.getMeasurementNames(this.channelNumber).length];
+		int[] points2 = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		boolean isProgrammExecuting1 = false, isProgrammExecuting2 = false;
 		long startCycleTime1 = 0, startCycleTime2 = 0;
 		boolean isCycleMode1 = false, isCycleMode2 = false;
@@ -126,7 +127,7 @@ public class GathererThread extends Thread {
 							if (isCycleMode1) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] { cycleCount1 });
 							this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_RIGHT_BRACKET;
 							if (processType.length() > 0) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_MESSAGE_CONCAT + processType;
-							System.out.println(this.recordSetKey1);
+							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "Create record set with name = " + this.recordSetKey1);
 							this.channel.put(this.recordSetKey1, RecordSet.createRecordSet(this.recordSetKey1, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey1 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 							if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey1);
@@ -146,7 +147,7 @@ public class GathererThread extends Thread {
 						// prepare the data for adding to record set
 						recordSet = this.channel.get(this.recordSetKey1);
 
-						recordSet.addPoints(this.device.convertDataBytes(points, data), this.device.getProcessingTime(data) - startCycleTime1);
+						recordSet.addPoints(this.device.convertDataBytes(points1, data), this.device.getProcessingTime(data) - startCycleTime1);
 						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 
 						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -179,7 +180,7 @@ public class GathererThread extends Thread {
 							if (isCycleMode2) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT3421, new Object[] { cycleCount2 });
 							this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_RIGHT_BRACKET;
 							if (processType.length() > 0) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_MESSAGE_CONCAT + processType;
-							System.out.println(this.recordSetKey2);
+							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "Create record set with name = " + this.recordSetKey2);
 							this.channel.put(this.recordSetKey2, RecordSet.createRecordSet(this.recordSetKey2, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey2 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 							if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey2);
@@ -199,7 +200,7 @@ public class GathererThread extends Thread {
 						// prepare the data for adding to record set
 						recordSet = this.channel.get(this.recordSetKey2);
 
-						recordSet.addPoints(this.device.convertDataBytes(points, data), this.device.getProcessingTime(data) - startCycleTime2);
+						recordSet.addPoints(this.device.convertDataBytes(points2, data), this.device.getProcessingTime(data) - startCycleTime2);
 						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime2 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 
 						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -212,7 +213,7 @@ public class GathererThread extends Thread {
 					break;
 
 				default:
-					System.out.println("nothing executing ?");
+					GathererThread.log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "Create record set with name = nothing executing ?");
 					break;
 				}
 
