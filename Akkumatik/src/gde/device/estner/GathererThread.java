@@ -82,7 +82,7 @@ public class GathererThread extends Thread {
 	@Override
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
-		RecordSet recordSet = null;
+		RecordSet recordSet1 = null, recordSet2 = null;
 		int[] points1 = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		int[] points2 = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		boolean isProgrammExecuting1 = false, isProgrammExecuting2 = false;
@@ -118,7 +118,7 @@ public class GathererThread extends Thread {
 						this.channel = this.channels.get(1);
 						// check state change waiting to discharge to charge
 						// check if a record set matching for re-use is available and prepare a new if required
-						if (this.channel.size() == 0 || recordSet == null
+						if (this.channel.size() == 0 || recordSet1 == null
 								|| !(this.recordSetKey1.contains(processName) && (cycleCount1.length() > 0 ? this.recordSetKey1.contains(cycleCount1) : true) && this.recordSetKey1.endsWith(processType))) {
 							this.application.setStatusMessage(""); //$NON-NLS-1$
 							// record set does not exist or is outdated, build a new name and create
@@ -131,7 +131,7 @@ public class GathererThread extends Thread {
 							this.channel.put(this.recordSetKey1, RecordSet.createRecordSet(this.recordSetKey1, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey1 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 							if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey1);
-							recordSet = this.channel.get(this.recordSetKey1);
+							recordSet1 = this.channel.get(this.recordSetKey1);
 							this.channel.applyTemplateBasics(this.recordSetKey1);
 							// switch the active record set if the current record set is child of active channel
 							// for Akkumatik its always the case since we have only one channel
@@ -139,22 +139,22 @@ public class GathererThread extends Thread {
 								this.channels.getActiveChannel().switchRecordSet(this.recordSetKey1);
 							}
 							startCycleTime1 = this.device.getProcessingTime(data);
-							recordSet.setAllDisplayable();
+							recordSet1.setAllDisplayable();
 							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey1);
 						}
 
 						// prepare the data for adding to record set
-						recordSet = this.channel.get(this.recordSetKey1);
+						recordSet1 = this.channel.get(this.recordSetKey1);
 
-						recordSet.addPoints(this.device.convertDataBytes(points1, data), this.device.getProcessingTime(data) - startCycleTime1);
+						recordSet1.addPoints(this.device.convertDataBytes(points1, data), this.device.getProcessingTime(data) - startCycleTime1);
 						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 
-						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+						if (recordSet1.size() > 0 && recordSet1.isChildOfActiveChannel() && recordSet1.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
 						}
-						if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
-							this.device.updateVisibilityStatus(recordSet, true);
+						if (recordSet1.get(0).realSize() < 3 || recordSet1.get(0).realSize() % 10 == 0) {
+							this.device.updateVisibilityStatus(recordSet1, true);
 						}
 					}
 					break;
@@ -171,7 +171,7 @@ public class GathererThread extends Thread {
 						this.channel = this.channels.get(2);
 						// check state change waiting to discharge to charge
 						// check if a record set matching for re-use is available and prepare a new if required
-						if (this.channel.size() == 0 || recordSet == null
+						if (this.channel.size() == 0 || recordSet2 == null
 								|| !(this.recordSetKey2.contains(processName) && (cycleCount2.length() > 0 ? this.recordSetKey2.contains(cycleCount2) : true) && this.recordSetKey2.endsWith(processType))) {
 							this.application.setStatusMessage(""); //$NON-NLS-1$
 							// record set does not exist or is outdated, build a new name and create
@@ -184,7 +184,7 @@ public class GathererThread extends Thread {
 							this.channel.put(this.recordSetKey2, RecordSet.createRecordSet(this.recordSetKey2, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey2 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 							if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey2);
-							recordSet = this.channel.get(this.recordSetKey2);
+							recordSet2 = this.channel.get(this.recordSetKey2);
 							this.channel.applyTemplateBasics(this.recordSetKey2);
 							// switch the active record set if the current record set is child of active channel
 							// for Akkumatik its always the case since we have only one channel
@@ -192,22 +192,22 @@ public class GathererThread extends Thread {
 								this.channels.getActiveChannel().switchRecordSet(this.recordSetKey2);
 							}
 							startCycleTime2 = this.device.getProcessingTime(data);
-							recordSet.setAllDisplayable();
+							recordSet2.setAllDisplayable();
 							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey2);
 						}
 
 						// prepare the data for adding to record set
-						recordSet = this.channel.get(this.recordSetKey2);
+						recordSet2 = this.channel.get(this.recordSetKey2);
 
-						recordSet.addPoints(this.device.convertDataBytes(points2, data), this.device.getProcessingTime(data) - startCycleTime2);
+						recordSet2.addPoints(this.device.convertDataBytes(points2, data), this.device.getProcessingTime(data) - startCycleTime2);
 						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime2 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 
-						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+						if (recordSet2.size() > 0 && recordSet2.isChildOfActiveChannel() && recordSet2.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
 						}
-						if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
-							this.device.updateVisibilityStatus(recordSet, true);
+						if (recordSet2.get(0).realSize() < 3 || recordSet2.get(0).realSize() % 10 == 0) {
+							this.device.updateVisibilityStatus(recordSet2, true);
 						}
 					}
 					break;
@@ -221,10 +221,15 @@ public class GathererThread extends Thread {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3400));
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for Akkumatik activation"); //$NON-NLS-1$
 
-					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+					if (recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
 						isProgrammExecuting1 = isProgrammExecuting2 = false;
-						recordSet = null;
+						recordSet1 = null;
+					}
+					if (recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(false);
+						isProgrammExecuting1 = isProgrammExecuting2 = false;
+						recordSet2 = null;
 					}
 				}
 			}
@@ -238,7 +243,7 @@ public class GathererThread extends Thread {
 					finalizeRecordSet(false);
 					GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3401));
-					recordSet = null;
+					recordSet1 = recordSet2 = null;
 					//--dryTimeCycleCount;
 				}
 				// this case will be reached while Akkumatik program is started, checked and the check not asap committed, stop pressed
@@ -285,9 +290,9 @@ public class GathererThread extends Thread {
 			this.serialPort.close();
 		}
 
-		//TODO recordSet 2
-		RecordSet recordSet = this.channel.get(this.recordSetKey1);
-		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
+		RecordSet recordSet1 = this.channel.get(this.recordSetKey1);
+		RecordSet recordSet2 = this.channel.get(this.recordSetKey2);
+		if ((recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) || (recordSet1 != null && recordSet1.getRecordDataSize(true) > 5)) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
 			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW3401));
 		}

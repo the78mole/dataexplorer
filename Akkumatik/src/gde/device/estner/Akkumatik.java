@@ -433,14 +433,15 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
 		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if (j > 5 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
-					dataTableRow[j + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				if (record.getOrdinal() > 8 && record.getUnit().equals("V")) //cell voltage 
+					dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				else
-					dataTableRow[j + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
