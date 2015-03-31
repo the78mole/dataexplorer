@@ -19,7 +19,7 @@
     Copyright (c) 2014,2015 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="PowerLab" default="compile">
+<project name="Akkumatik" default="compile">
 
 	<property name="build.properties" location="../build/build.properties" />
 

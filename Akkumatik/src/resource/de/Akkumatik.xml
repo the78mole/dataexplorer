@@ -32,7 +32,7 @@
         <avarage_timeStep>1000.0</avarage_timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="-127"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="-129"/>
         <checkSum format="BINARY" type="XOR"/>
     </DataBlock>
     <Channels lastUseOrdinal="0">
