@@ -223,8 +223,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
 		points[0] = Integer.valueOf(dataBuffer[2]);
-		points[1] = Integer.valueOf(dataBuffer[3]);
-		points[2] = Integer.valueOf(dataBuffer[4]) * 1000;
+		points[1] = Integer.valueOf(dataBuffer[3].replace(GDE.STRING_PLUS, GDE.STRING_BLANK));
+		points[2] = Integer.valueOf(dataBuffer[4].replace(GDE.STRING_PLUS, GDE.STRING_BLANK)) * 1000;
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] / 1000 * points[2] / 1000.0).intValue(); // energy U*C [mWh]
 		points[5] = Integer.valueOf(dataBuffer[5]);
