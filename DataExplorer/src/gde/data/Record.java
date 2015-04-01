@@ -175,7 +175,6 @@ public class Record extends Vector<Integer> {
 	boolean             isCurrentRecord 			= false;
 	int             		dropStartIndex 				= 0;
 	int             		dropEndIndex 					= 0;
-	boolean             dropIndexWritten 			= true;
 
 	// measurement
 	boolean							isMeasurementMode				= false;
@@ -550,22 +549,14 @@ public class Record extends Vector<Integer> {
 			if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
 				if (this.dropStartIndex == 0) {
 					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
-				}
-				else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
 					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, index-2});
-					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement					
-					this.dropIndexWritten = true;
 				}
-				this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
+				this.dropEndIndex = index + ((index - this.dropStartIndex) * 4 + 1);
 			}
 			else { // normal data point
 				if (index > this.dropEndIndex && this.dropStartIndex != 0) {
 					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex});
 					this.dropStartIndex = 0;
-					this.dropIndexWritten = true;
-				}
-				else if (this.dropStartIndex != 0) {
-					this.dropIndexWritten = false;
 				}
 			}
 		}
@@ -1053,7 +1044,7 @@ public class Record extends Vector<Integer> {
 		try {
 			return super.size() != 0 ? super.get(index) : 0;
 		}
-		catch (Exception e) {
+		catch (ArrayIndexOutOfBoundsException e) {
 			log.log(Level.WARNING, String.format("%s - %20s: size = %d - indesx = %d", this.parent.name, this.name, this.size(), index));
 			return super.size() != 0 ? super.get(index-1) : 0;
 		}
