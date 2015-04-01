@@ -1,6 +1,7 @@
 Development history / change log, please read from bottom up
 
 Version 3.2.1 - xx yyy 2015
+refine current/voltage smoothing algorithm to be used for very short drop peaks
 HoTTAdapter* - refine sensor detection - to rise chance not in text-modus segment
 Akkumatik - add support
 
