@@ -31,6 +31,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.TimeLine;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -93,7 +94,13 @@ public class GathererThread extends Thread {
 
 		this.isCollectDataStopped = false;
 		GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
-
+		try {
+			this.serialPort.cleanInputStream();
+		}
+		catch (IOException e1) {
+			// ignore
+		}
+		
 		//long atualTime_ms = 0;
 		while (!this.isCollectDataStopped) {
 			//atualTime_ms = System.currentTimeMillis();
