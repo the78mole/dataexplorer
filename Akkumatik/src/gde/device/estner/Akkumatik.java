@@ -435,12 +435,11 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				if (record.getOrdinal() > 8 && record.getUnit().equals("V")) //cell voltage 
-					dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = String.format("%.3f", ((record.realGet(rowIndex) / 1000.0) * factor));
 				else
-					dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = record.getDecimalFormat().format(((record.realGet(rowIndex) / 1000.0) * factor));
 				++index;
 			}
 		}
