@@ -391,6 +391,7 @@
 			<include name="IISI-Cockpit V2/build/*.jar" />
 			<include name="FutabaTelemetry/build/*.jar" />
 			<!-- include name="PowerLab/build/*.jar" / -->
+			<include name="OpenTxTelemetry/build/*.jar" />
 			<include name="Polaron/build/*.jar" />
 			<include name="Akkumatik/build/*.jar" />
 			<!-- add new device here -->
