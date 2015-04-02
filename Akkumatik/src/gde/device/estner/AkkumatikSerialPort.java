@@ -76,7 +76,8 @@ public class AkkumatikSerialPort extends DeviceCommPort {
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINER, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "0123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789");
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.FINE, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, new String(data));
 			}
-			if ((data.length < 69 || data.length > 129) && !((data[0] == 49 || data[0] == 50) && data[1] == -1 && data[data.length - 1] == 0x0A && data[data.length - 2] == 0x0D)) {
+			if ((data.length < 69 || data.length > 129) || data[4] != 58 || data[7] != 58
+					|| !(data[0] == 49 || data[0] == 50) || data[1] != -1 || data[data.length - 1] != 0x0A || data[data.length - 2] != 0x0D) {
 				AkkumatikSerialPort.log.logp(java.util.logging.Level.WARNING, AkkumatikSerialPort.$CLASS_NAME, $METHOD_NAME, "Serial comm error, data = " + new String(data));
 				++this.retryCount;
 				if (this.retryCount > this.maxRetryCount) {

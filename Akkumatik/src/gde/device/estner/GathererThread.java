@@ -88,6 +88,8 @@ public class GathererThread extends Thread {
 		int[] points2 = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		boolean isProgrammExecuting1 = false, isProgrammExecuting2 = false;
 		long startCycleTime1 = 0, startCycleTime2 = 0;
+		long timeStep1 = 0, timeStep2 = 0;
+		long lastCycleTime1 = 0, lastCycleTime2 = 0;
 		boolean isCycleMode1 = false, isCycleMode2 = false;
 		String cycleCount1 = GDE.STRING_EMPTY, cycleCount2 = GDE.STRING_EMPTY;
 		String[] data = null;
@@ -151,14 +153,18 @@ public class GathererThread extends Thread {
 							recordSet1.setAllDisplayable();
 							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey1);
+							lastCycleTime1 = 0;
 						}
 
 						// prepare the data for adding to record set
 						recordSet1 = this.channel.get(this.recordSetKey1);
 
-						recordSet1.addPoints(this.device.convertDataBytes(points1, data), this.device.getProcessingTime(data) - startCycleTime1);
-						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(data))); //$NON-NLS-1$
-
+						timeStep1 = this.device.getProcessingTime(data) - startCycleTime1;
+						if (lastCycleTime1 < timeStep1 ) {
+							recordSet1.addPoints(this.device.convertDataBytes(points1, data), timeStep1);
+							if (log.isLoggable(Level.TIME)) GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(data))); //$NON-NLS-1$
+							lastCycleTime1 = timeStep1;
+						}
 						if (recordSet1.size() > 0 && recordSet1.isChildOfActiveChannel() && recordSet1.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
 						}
@@ -204,13 +210,18 @@ public class GathererThread extends Thread {
 							recordSet2.setAllDisplayable();
 							this.channels.switchChannel(this.channel.getName());
 							this.channel.switchRecordSet(this.recordSetKey2);
+							lastCycleTime2 = 0;
 						}
 
 						// prepare the data for adding to record set
 						recordSet2 = this.channel.get(this.recordSetKey2);
 
-						recordSet2.addPoints(this.device.convertDataBytes(points2, data), this.device.getProcessingTime(data) - startCycleTime2);
-						GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime2 + this.device.getProcessingTime(data))); //$NON-NLS-1$
+						timeStep2 = this.device.getProcessingTime(data) - startCycleTime2;
+						if (lastCycleTime2 < timeStep2 ) {
+							recordSet2.addPoints(this.device.convertDataBytes(points2, data), timeStep2);
+							if (log.isLoggable(Level.TIME)) GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime2 + this.device.getProcessingTime(data))); //$NON-NLS-1$
+							lastCycleTime2 = timeStep2;
+						}
 
 						if (recordSet2.size() > 0 && recordSet2.isChildOfActiveChannel() && recordSet2.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
