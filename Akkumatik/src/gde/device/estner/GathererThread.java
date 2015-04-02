@@ -109,7 +109,9 @@ public class GathererThread extends Thread {
 				data = this.serialPort.getDataArray(this.serialPort.getData());
 
 				// check if device is ready for data capturing, discharge or charge allowed only
-				final String processName = this.device.PROCESS_MODE[this.device.getProcessingMode(data)];
+				final String processName = this.device.isCycleMode(data) 
+						? data[4].startsWith(GDE.STRING_MINUS) ?  Messages.getString(MessageIds.GDE_MSGT3401) :  Messages.getString(MessageIds.GDE_MSGT3400)
+						: this.device.PROCESS_MODE[this.device.getProcessingMode(data)];
 				final String processType = this.device.getProcessingPhase(data) == 10 ? Messages.getString(MessageIds.GDE_MSGT3420) : this.device.PROCESS_TYPE[this.device.getProcessingType(data)];
 
 				switch (Integer.valueOf(data[0])) { // device outlet 1 or 2
