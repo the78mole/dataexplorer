@@ -28,6 +28,7 @@ import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -150,62 +151,37 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = 76; // const.
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
+		long startCycleTime = 0, timeStep = 0, lastCycleTime = -1;
 
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
 		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
 		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
-		if (dataBuffer[0] == 0x7B) {
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+		// none constant time steps
+		byte[] sizeBuffer = new byte[4];
+		byte[] convertBuffer = new byte[deviceDataBufferSize];
 
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+		for (int i = 0; i < recordDataSize-1; i++) {
+			System.arraycopy(dataBuffer, offset, sizeBuffer, 0, sizeBuffer.length);
+			lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
+			System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, lovDataSize);
+			String [] data = new String(convertBuffer).split("�");
+			if (startCycleTime == 0) startCycleTime = this.getProcessingTime(data);
+			timeStep = this.getProcessingTime(data) - startCycleTime;
+			if (lastCycleTime < timeStep) {
+				recordSet.addPoints(convertDataBytes(points, data), timeStep);
+				lastCycleTime = timeStep;
 			}
+			offset += lovDataSize;
 
-			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
-		else { // none constant time steps
-			byte[] sizeBuffer = new byte[4];
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
 
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
-				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
-				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-				offset += lovDataSize;
-
-				StringBuilder sb = new StringBuilder();
-				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
-				//sb.append(timeBuffer.length).append(" - ");
-				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length - 8) + "0000000000";
-				long dateTime = new Long(timeStamp.substring(6, 17));
-				Akkumatik.log.log(java.util.logging.Level.FINEST, timeStamp + " " + timeStamp.substring(6, 17) + " " + dateTime);
-				sb.append(dateTime);
-				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
-				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
-				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime) / 1000 - 217; // value 217 is a compromis manual selected
-				sb.append(" - ").append(deltaTime);
-				sb.append(" - ").append(sumTimeDelta += deltaTime);
-				Akkumatik.log.log(java.util.logging.Level.FINER, sb.toString());
-				lastDateTime = dateTime;
-
-				recordSet.addTimeStep_ms(sumTimeDelta);
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
@@ -340,6 +316,16 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		final String[] time = dataBuffer[1].split(":");
 		return (Integer.valueOf(time[0]) * 3600 + Integer.valueOf(time[1]) * 60 + Integer.valueOf(time[2])) * 1000;
 		//(((dataBuffer[2] - 48) * 10 + (dataBuffer[3] - 48)) * 3600 + ((dataBuffer[5] - 48) * 10 + (dataBuffer[6] - 48)) * 60 + ((dataBuffer[8] - 48) * 10 + (dataBuffer[9] - 48))) * 1000;
+	}
+
+	/**
+	 * get processing time 
+	 * (00:00:11)
+	 * @param dataBuffer
+	 * @return
+	 */
+	public long getProcessingTime(byte[] dataBuffer) {
+		return (((dataBuffer[2] - 48) * 10 + (dataBuffer[3] - 48)) * 3600 + ((dataBuffer[5] - 48) * 10 + (dataBuffer[6] - 48)) * 60 + ((dataBuffer[8] - 48) * 10 + (dataBuffer[9] - 48))) * 1000;
 	}
 
 	/**

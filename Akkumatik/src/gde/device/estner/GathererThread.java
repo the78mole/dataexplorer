@@ -165,10 +165,10 @@ public class GathererThread extends Thread {
 							if (log.isLoggable(Level.TIME)) GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(startCycleTime1 + this.device.getProcessingTime(data))); //$NON-NLS-1$
 							lastCycleTime1 = timeStep1;
 						}
-						if (recordSet1.size() > 0 && recordSet1.isChildOfActiveChannel() && recordSet1.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+						if (recordSet1 != null && recordSet1.size() > 0 && recordSet1.isChildOfActiveChannel() && recordSet1.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
 						}
-						if (recordSet1.get(0).realSize() < 3 || recordSet1.get(0).realSize() % 10 == 0) {
+						if (recordSet1 != null && recordSet1.get(0).realSize() < 3 || recordSet1 != null && recordSet1.get(0).realSize() % 10 == 0) {
 							this.device.updateVisibilityStatus(recordSet1, true);
 						}
 					}
@@ -223,10 +223,10 @@ public class GathererThread extends Thread {
 							lastCycleTime2 = timeStep2;
 						}
 
-						if (recordSet2.size() > 0 && recordSet2.isChildOfActiveChannel() && recordSet2.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+						if (recordSet2 != null && recordSet2.size() > 0 && recordSet2.isChildOfActiveChannel() && recordSet2.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							GathererThread.this.application.updateAllTabs(false);
 						}
-						if (recordSet2.get(0).realSize() < 3 || recordSet2.get(0).realSize() % 10 == 0) {
+						if (recordSet2 != null && recordSet2.get(0).realSize() < 3 || recordSet2 != null && recordSet2.get(0).realSize() % 10 == 0) {
 							this.device.updateVisibilityStatus(recordSet2, true);
 						}
 					}
