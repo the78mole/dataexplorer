@@ -640,4 +640,15 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/**
+	 * query device for specific smoothing index
+	 * 0 do nothing at all
+	 * 1 current drops just a single peak
+	 * 2 current drop more or equal than 2 measurements 
+	 */
+	@Override
+	public int	getCurrentSmoothIndex() {
+		return 1;
+	}
 }
