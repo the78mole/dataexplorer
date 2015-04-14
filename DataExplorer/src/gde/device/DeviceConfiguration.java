@@ -2320,4 +2320,14 @@ public class DeviceConfiguration {
 	public boolean recordSetNumberFollowChannel() {
 		return this.getChannelTypes(1) == ChannelTypes.TYPE_OUTLET;
 	}
+	
+	/**
+	 * query device for specific smoothing index
+	 * 0 do nothing at all
+	 * 1 current drops just a single peak
+	 * 2 current drop more or equal than 2 measurements 
+	 */
+	public int	getCurrentSmoothIndex() {
+		return 0;
+	}
 }

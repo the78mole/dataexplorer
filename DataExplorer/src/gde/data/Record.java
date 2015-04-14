@@ -175,6 +175,7 @@ public class Record extends Vector<Integer> {
 	boolean             isCurrentRecord 			= false;
 	int             		dropStartIndex 				= 0;
 	int             		dropEndIndex 					= 0;
+	boolean             dropIndexWritten 			= true;
 
 	// measurement
 	boolean							isMeasurementMode				= false;
@@ -542,23 +543,55 @@ public class Record extends Vector<Integer> {
 		if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
 		if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		//add shadow data points to detect current drops to nearly zero
-		if (this.isCurrentRecord && super.size() > 5 ) {
-			int index = super.size();
-			//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
-			if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
-				if (this.dropStartIndex == 0) {
-					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
-					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, index-2});
+		switch (this.device.getCurrentSmoothIndex()) {
+		case 1:
+			//add shadow data points to detect current drops to nearly zero
+			if (this.isCurrentRecord && super.size() > 5 ) {
+				int index = super.size();
+				//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
+					if (this.dropStartIndex == 0) {
+						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+						this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, index-2});
+					}
+					this.dropEndIndex = index + ((index - this.dropStartIndex) + 1);
 				}
-				this.dropEndIndex = index + ((index - this.dropStartIndex) * 4 + 1);
-			}
-			else { // normal data point
-				if (index > this.dropEndIndex && this.dropStartIndex != 0) {
-					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex});
-					this.dropStartIndex = 0;
+				else { // normal data point
+					if (index >= this.dropEndIndex && this.dropStartIndex != 0) {
+						this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex});
+						this.dropStartIndex = 0;
+					}
 				}
 			}
+			break;
+		case 2:
+			//add shadow data points to detect current drops to nearly zero
+			if (this.isCurrentRecord && super.size() > 5 ) {
+				int index = super.size();
+				//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
+					if (this.dropStartIndex == 0) {
+						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+					}
+					else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
+						this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, index-2});
+						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement					
+						this.dropIndexWritten = true;
+					}
+					this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
+				}
+				else { // normal data point
+					if (index > this.dropEndIndex && this.dropStartIndex != 0) {
+						this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex});
+						this.dropStartIndex = 0;
+						this.dropIndexWritten = true;
+					}
+					else if (this.dropStartIndex != 0) {
+						this.dropIndexWritten = false;
+					}
+				}
+			}
+			break;
 		}
 		return super.add(point);
 	}

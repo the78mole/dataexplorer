@@ -951,4 +951,12 @@ public interface IDevice {
 	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
 	 */
 	public boolean recordSetNumberFollowChannel();
+	
+	/**
+	 * query device for specific smoothing index
+	 * 0 do nothing at all
+	 * 1 current drops just a single peak
+	 * 2 current drop more or equal than 2 measurements 
+	 */
+	public int	getCurrentSmoothIndex();
 }
