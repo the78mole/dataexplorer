@@ -862,4 +862,15 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	public int getBatteryMemoryNumber(int outletNum, byte[] dataBuffer) {
 		return -1;
 	}
+
+	/**
+	 * query device for specific smoothing index
+	 * 0 do nothing at all
+	 * 1 current drops just a single peak
+	 * 2 current drop more or equal than 2 measurements 
+	 */
+	@Override
+	public int	getCurrentSmoothIndex() {
+		return 2;
+	}
 }
