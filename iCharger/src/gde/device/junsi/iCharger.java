@@ -398,5 +398,16 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public abstract int getNumberOfLithiumCells();
+
+	/**
+	 * query device for specific smoothing index
+	 * 0 do nothing at all
+	 * 1 current drops just a single peak
+	 * 2 current drop more or equal than 2 measurements 
+	 */
+	@Override
+	public int	getCurrentSmoothIndex() {
+		return 2;
+	}
 }
 
