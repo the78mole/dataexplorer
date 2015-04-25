@@ -56,7 +56,7 @@ public class HoTTbinReader {
 
 	static int																	dataBlockSize					= 64;
 	static byte[]																buf;
-	static byte[]																buf0, buf1, buf2, buf3, buf4;
+	static byte[]																buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf7, buf8, buf9, bufA, bufB, bufC, bufD;
 	static long																	timeStep_ms;
 	static int[]																pointsReceiver, pointsGeneral, pointsElectric, pointsVario, pointsGPS, pointsChannel, pointsSpeedControl;
 	static RecordSet														recordSetReceiver, recordSetGeneral, recordSetElectric, recordSetVario, recordSetGPS, recordSetChannel, recordSetSpeedControl;

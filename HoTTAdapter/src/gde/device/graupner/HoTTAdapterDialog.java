@@ -79,6 +79,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	HoTTAdapterLiveGatherer			lifeGatherer;
 	boolean											isVisibilityChanged		= false;
 	boolean											isHoTTAdapter 				= false;
+	boolean											isHoTTAdapter2 				= false;
+	boolean											isHoTTAdapterX 				= false;
 
 	int													measurementsCount			= 0;
 	int 												protocolTypeOrdinal		= 0;
@@ -106,7 +108,9 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		try {
-			this.isHoTTAdapter = this.device != null && this.device.getName().equals("HoTTAdapter"); //$NON-NLS-1$
+			this.isHoTTAdapter = this.device != null && (this.device.getName().equals("HoTTAdapter") || this.device.getName().equals("HoTTAdapterM")); //$NON-NLS-1$
+			this.isHoTTAdapter2 = this.device != null && this.device.getName().startsWith("HoTTAdapter2"); //$NON-NLS-1$
+			this.isHoTTAdapterX = this.device != null && this.device.getName().equals("HoTTAdapterX"); //$NON-NLS-1$
 
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
@@ -193,13 +197,29 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								HoTTAdapterDialog.this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) HoTTAdapterDialog.this.device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
 								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 							}
-							else { //HoTTAdapter2
+							else if (isHoTTAdapter2){ 
 								HoTTAdapterDialog.this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
 								HoTTAdapterDialog.this.tolrateSignLatitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 								HoTTAdapterDialog.this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
 								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 							}
-							if (isHoTTAdapter && channelNumber == 3 || !isHoTTAdapter) { //GPS
+							if (isHoTTAdapterX) {
+								HoTTAdapterDialog.this.enableFilter.setVisible(false);
+								HoTTAdapterDialog.this.enableTextModusFilter.setVisible(false);
+								
+								HoTTAdapterDialog.this.filterFactorLatitudeLabel.setVisible(false);
+								HoTTAdapterDialog.this.filterFactorLatitudeCombo.setVisible(false);
+								HoTTAdapterDialog.this.tolrateSignLatitude.setVisible(false);
+								HoTTAdapterDialog.this.filterFactorLongitudeLabel.setVisible(false);
+								HoTTAdapterDialog.this.filterFactorLongitudeCombo.setVisible(false);
+								HoTTAdapterDialog.this.tolerateSignLongitude.setVisible(false);
+								HoTTAdapterDialog.this.startLifeDataCapturing.setVisible(false);
+								HoTTAdapterDialog.this.stopLifeDataCapturing.setVisible(false);
+								HoTTAdapterDialog.this.protocolTypesLabel.setVisible(false);
+								HoTTAdapterDialog.this.protocolTypesCombo.setVisible(false);
+								HoTTAdapterDialog.this.protocolTypesUnitLabel.setVisible(false);
+							}
+							else if (isHoTTAdapter && channelNumber == 3 || !isHoTTAdapter) { //GPS
 								HoTTAdapterDialog.this.filterFactorLatitudeLabel.setEnabled(true);
 								HoTTAdapterDialog.this.filterFactorLatitudeCombo.setEnabled(true);
 								HoTTAdapterDialog.this.tolrateSignLatitude.setEnabled(true);
@@ -620,7 +640,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) this.device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
 				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 			}
-			else { //HoTTAdapre2
+			else if (isHoTTAdapter2) { 
 				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
 				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
