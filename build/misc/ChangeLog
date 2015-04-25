@@ -5,6 +5,7 @@ add current/voltage smoothing algorithm to be used for very short drop peaks
 enhance device interface for charger to adapt curve smoothing according device needs 
 HoTTAdapter* - refine sensor detection - to rise chance not in text-modus segment
 Akkumatik - add support
+HoTTAdapterX - add support (X-N8, X-4S)
 
 Version 3.2.0 - 01 Mar 2015
 fix initial synchronization of measurements
