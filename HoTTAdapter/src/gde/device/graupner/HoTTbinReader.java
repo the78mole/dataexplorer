@@ -110,76 +110,72 @@ public class HoTTbinReader {
 
 		try {
 			fileInfo = new HashMap<String, String>();
-			if (numberLogs > 3130) {
-				for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
-					HoTTAdapter.isSensorType[i] = false;
-				}
-				FileInputStream file_input = new FileInputStream(file);
-				data_in = new DataInputStream(file_input);
-				if (HoTTbinReader.log.isLoggable(Level.FINER))
-					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
-				long position = (file.length() / 2) - ((120 * 64) / 2);
-				position = position - position % 64;
-				if (position <= 0) {
-					sensorCount = 1;
-				}
-				else {
-					if (position > 64 * 3000) {
-						//64 byte = 0.01 seconds for 30 seconds maximum sensor scan time (30 / 0.01 = 3000)
-						position = 64 * 3000;
-					}
-					data_in.skip(position);
-					for (int i = 0; i < 120; i++) {
-						data_in.read(buffer);
-						if (HoTTbinReader.log.isLoggable(Level.FINER))
-							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+			if (numberLogs < 3130) {
+				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
+			}
+			else if (numberLogs < 500) {
+				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+				throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+			}
 
-						switch (buffer[7]) {
-						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GPS.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
-							break;
-						}
-					}
-					for (boolean element : HoTTAdapter.isSensorType) {
-						if (element == true) ++sensorCount;
-					}
-				}
-				HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
-				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
-				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
-
-				if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
-					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
-					HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
-				}
+			
+			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
+				HoTTAdapter.isSensorType[i] = false;
+			}
+			FileInputStream file_input = new FileInputStream(file);
+			data_in = new DataInputStream(file_input);
+			if (HoTTbinReader.log.isLoggable(Level.FINER))
+				HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
+			long position = (file.length() / 2) - ((120 * 64) / 2);
+			position = position - position % 64;
+			if (position <= 0) {
+				sensorCount = 1;
 			}
 			else {
-				if (numberLogs > 240) {
-					fileInfo.put(HoTTAdapter.SENSOR_COUNT, "0");
-					fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
-					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
+				if (position > 64 * 3000) {
+					//64 byte = 0.01 seconds for 30 seconds maximum sensor scan time (30 / 0.01 = 3000)
+					position = 64 * 3000;
 				}
-				else {
-					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
-					throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+				data_in.skip(position);
+				for (int i = 0; i < 120; i++) {
+					data_in.read(buffer);
+					if (HoTTbinReader.log.isLoggable(Level.FINER))
+						HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+
+					switch (buffer[7]) {
+					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
+						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GPS.name()).append(GDE.STRING_COMMA);
+						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
+						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
+						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
+						break;
+					}
 				}
+				for (boolean element : HoTTAdapter.isSensorType) {
+					if (element == true) ++sensorCount;
+				}
+			}
+			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
+			fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
+			fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
+
+			if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
+				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
+				HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
 			}
 		}
 		finally {
