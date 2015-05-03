@@ -2180,14 +2180,14 @@
             <Measurement>
                 <name>Ch 1</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Ch 2</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2195,7 +2195,7 @@
             <Measurement>
                 <name>Ch 3</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2203,7 +2203,7 @@
             <Measurement>
                 <name>Ch 4</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2211,7 +2211,7 @@
             <Measurement>
                 <name>Ch 5</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2219,7 +2219,7 @@
             <Measurement>
                 <name>Ch 6</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2227,7 +2227,7 @@
             <Measurement>
                 <name>Ch 7</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2235,7 +2235,7 @@
             <Measurement>
                 <name>Ch 8</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2243,7 +2243,7 @@
             <Measurement>
                 <name>Ch 9</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2251,7 +2251,7 @@
             <Measurement>
                 <name>Ch 10</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2259,7 +2259,7 @@
             <Measurement>
                 <name>Ch 11</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2267,7 +2267,7 @@
             <Measurement>
                 <name>Ch 12</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2275,7 +2275,7 @@
             <Measurement>
                 <name>Ch 13</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2283,7 +2283,7 @@
             <Measurement>
                 <name>Ch 14</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2291,7 +2291,7 @@
             <Measurement>
                 <name>Ch 15</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
@@ -2299,7 +2299,7 @@
             <Measurement>
                 <name>Ch 16</name>
                 <symbol></symbol>
-                <unit>msec</unit>
+                <unit>µsec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="60" name="scale_sync_ref_ordinal"/>
