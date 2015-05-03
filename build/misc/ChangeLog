@@ -4,6 +4,7 @@ Version 3.2.1 - xx yyy 2015
 add current/voltage smoothing algorithm to be used for very short drop peaks
 enhance device interface for charger to adapt curve smoothing according device needs 
 HoTTAdapter* - refine sensor detection - to increase chance not in text-modus segment
+HoTTAdapter* - correct channel time unit to µsec
 Akkumatik - add support
 HoTTAdapterX - add support (X-N8, X-4S)
 
