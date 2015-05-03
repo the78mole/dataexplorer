@@ -202,7 +202,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		points[1] = Integer.valueOf(dataBuffer[3].replace(GDE.STRING_PLUS, GDE.STRING_EMPTY));
 		points[2] = Integer.valueOf(dataBuffer[4].replace(GDE.STRING_PLUS, GDE.STRING_EMPTY)) * 1000;
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-		points[4] = Double.valueOf(points[0] / 1000 * points[2] / 1000.0).intValue(); // energy U*C [mWh]
+		points[4] = Double.valueOf(points[0] / 1000.0 * points[2] / 1000.0).intValue(); // energy U*C [mWh]
 		points[5] = Integer.valueOf(dataBuffer[5]);
 		points[6] = Integer.valueOf(dataBuffer[6]) * 1000;
 		points[7] = Integer.valueOf(dataBuffer[7]) * 1000;
