@@ -191,16 +191,17 @@ public class CellVoltageWindow extends CTabItem {
 			});
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liPoLimits));
+					final String $METHOD_NAME1 = "paintControl";
+					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.FINER, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liPoLimits));
 					CellVoltageWindow.this.liPoButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.liPoLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liIoLimits));
+					log.logp(Level.FINER, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liIoLimits));
 					CellVoltageWindow.this.liIoButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.liIoLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liFeLimits));
+					log.logp(Level.FINER, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liFeLimits));
 					CellVoltageWindow.this.liFeButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.liFeLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.niMhLimits));
+					log.logp(Level.FINER, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.niMhLimits));
 					CellVoltageWindow.this.niMhButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.niMhLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
+					log.logp(Level.FINER, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, GDE.STRING_EMPTY+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
 					CellVoltageWindow.this.individualButton.setSelection(!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection() || CellVoltageWindow.this.niMhButton.getSelection()));
 				}
 			});
@@ -227,7 +228,7 @@ public class CellVoltageWindow extends CTabItem {
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
-						update(true);
+						update(true, true);
 					}
 				});
 			}
@@ -254,7 +255,7 @@ public class CellVoltageWindow extends CTabItem {
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
-						update(true);
+						update(true, true);
 					}
 				});
 			}
@@ -281,7 +282,7 @@ public class CellVoltageWindow extends CTabItem {
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
-						update(true);
+						update(true, true);
 					}
 				});
 			}
@@ -308,7 +309,7 @@ public class CellVoltageWindow extends CTabItem {
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
-						update(true);
+						update(true, true);
 					}
 				});
 			}
@@ -335,7 +336,7 @@ public class CellVoltageWindow extends CTabItem {
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
-						update(true);
+						update(true, true);
 					}
 				});
 			}
@@ -389,6 +390,8 @@ public class CellVoltageWindow extends CTabItem {
 				this.capacityUnit.setMenu(this.popupmenu);
 			}
 		}
+		this.cellVoltageMainComposite.layout();
+		this.coverComposite.layout();
 	}
 
 	/**
@@ -401,9 +404,11 @@ public class CellVoltageWindow extends CTabItem {
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
-				this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
-				this.displays.get(i).voltagePaintControl();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
+				if (this.displays.get(i).getVoltage() != this.voltageVector.get(i).getVoltage()) {
+					this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
+					this.displays.get(i).voltagePaintControl();
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 		}
 		else if (this.coverComposite.isVisible()) {
@@ -414,21 +419,21 @@ public class CellVoltageWindow extends CTabItem {
 	/**
 	 * method to update cellVoltage window by adding removing cellVoltage displays
 	 */
-	public void update(boolean forceUpdate) {
+	public void update(boolean needUpdate, boolean forceClean) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && !this.voltageVector.isEmpty()) {
 
-				updateCellVoltageVector();
+				
 
 				// if recordSet name signature changed new displays need to be created
-				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
+				boolean isCleanRequired = forceClean || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
 						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size();
 
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
-				if (isUpdateRequired) {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isCleanRequired = " + isCleanRequired); //$NON-NLS-1$
+				if (isCleanRequired) {
 					// cleanup
 					for (CellVoltageDisplay display : this.displays) {
 						if (display != null) {
@@ -451,6 +456,12 @@ public class CellVoltageWindow extends CTabItem {
 					this.oldRecordSet = recordSet;
 					this.oldChannel = activeChannel;
 					this.updateChilds();
+					this.cellVoltageMainComposite.layout();
+					this.coverComposite.layout();
+				}
+				else if (needUpdate) {
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "updateCellVoltageVector = true"); //$NON-NLS-1$
+					this.updateChilds();
 				}
 			}
 			else { // clean up after device switched
@@ -463,9 +474,9 @@ public class CellVoltageWindow extends CTabItem {
 					}
 				}
 				this.displays.removeAllElements();
+				this.cellVoltageMainComposite.layout();
+				this.coverComposite.layout();
 			}
-			this.cellVoltageMainComposite.layout();
-			this.coverComposite.layout();
 		}
 	}
 
@@ -591,7 +602,7 @@ public class CellVoltageWindow extends CTabItem {
 			CellVoltageWindow.this.coverComposite.setSize(0, 0);
 			clearVoltageAndCapacity();
 		}
-		update(isSomeVoltagechanged);
+		update(isSomeVoltagechanged, false);
 	}
 
 	/**
@@ -685,7 +696,7 @@ public class CellVoltageWindow extends CTabItem {
 	 * @param newInnerAreaBackground the innerAreaBackground to set
 	 */
 	public void setInnerAreaBackground(Color newInnerAreaBackground) {
-		this.update(true);
+		this.update(true, true);
 	}
 
 	/**

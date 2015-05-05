@@ -76,7 +76,7 @@ public class CellVoltageDisplay extends Composite {
 	final Menu										popupmenu;
 	final TabAreaContextMenu			contextMenu;
 
-	int									voltage;
+	int									voltage = 0;
 	int 								lastTop = 0;
 	int 								lastVoltageLevel = 0;
 	
@@ -193,11 +193,15 @@ public class CellVoltageDisplay extends Composite {
 		this.layout();
 	}
 
+	public int getVoltage() {
+		return this.voltage;
+	}
+	
 	/**
 	 * @param newVoltage the voltage to set
 	 */
 	public void setVoltage(int newVoltage) {
-		this.layout(true);
+		//this.layout(true);
 		if (this.voltage != newVoltage) {
 			this.voltage = newVoltage;
 			String valueText = String.format("%.3f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
@@ -212,13 +216,13 @@ public class CellVoltageDisplay extends Composite {
 			else if (this.lastTop < topHeight.x) {
 				int top = this.lastTop-1 < 0 ? 0 : this.lastTop-1;
 				int height = topHeight.x+1 > rect.height-1 ? rect.height-1 : topHeight.x+1;
-				this.cellCanvas.redraw(0, top, rect.width-1, height, true);
+				this.cellCanvas.redraw(0, top, rect.width-1, height, false);
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else {
 				int top = topHeight.x-1 < 0 ? 0 : topHeight.x-1;
 				int height = this.lastTop+1 > rect.height-1 ? rect.height-1 : this.lastTop+1;
-				this.cellCanvas.redraw(0, top, rect.width-1, height, true); 
+				this.cellCanvas.redraw(0, top, rect.width-1, height, false); 
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -234,21 +238,18 @@ public class CellVoltageDisplay extends Composite {
 
 		Rectangle rect = this.cellCanvas.getClientArea();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellCanvas.getBounds = " + rect); //$NON-NLS-1$
-		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
-		GC gc = new GC(this.cellCanvas); //SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
 		
-		if(this.lastTop != topHeight.x)
+		//if (this.lastTop != topHeight.x) {
 		this.upperVoltage.setLocation(10, rect.x);
 		this.upperVoltage.setText(String.format("%.1f", upperLimitVoltage/1000.0));
 		this.middleVoltage.setLocation(10, 200);
 		this.middleVoltage.setText(String.format("%.1f", (lowerLimitVoltage+(upperLimitVoltage-lowerLimitVoltage)/2)/1000.0));
 		this.lowerVoltage.setLocation(10, 300);
 		this.lowerVoltage.setText(String.format("%.1f", lowerLimitVoltage/1000.0));
-		this.lastTop = topHeight.x;
+		GC gc = new GC(this.cellCanvas); 
 
 		this.lastVoltageLevel = checkVoltageLevel();
 		switch (this.lastVoltageLevel) {
@@ -265,10 +266,16 @@ public class CellVoltageDisplay extends Composite {
 		}
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "fillRectangle = " + rect); //$NON-NLS-1$
+		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		gc.drawLine(1, this.lastTop, rect.width-1, this.lastTop);
+		this.lastTop = topHeight.x;
 		gc.fillRectangle(1, topHeight.x, rect.width-1, topHeight.y);
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);
-		gc.drawRectangle(0, 0, rect.width, rect.height+topHeight.x);
+		gc.drawLine(0, 0, rect.width, 0);
+		gc.drawLine(rect.width, 0, rect.width, rect.height+topHeight.x);
+		gc.drawLine(0, 0, 0, rect.height+topHeight.x);
+		//gc.drawRectangle(0, 0, rect.width, rect.height+topHeight.x);
 		
 		gc.dispose();
 	}
