@@ -116,7 +116,7 @@ public class GathererThread extends Thread {
 						: this.device.PROCESS_MODE[this.device.getProcessingMode(data)];
 				final String processType = this.device.getProcessingPhase(data) == 10 ? Messages.getString(MessageIds.GDE_MSGT3420) : this.device.PROCESS_TYPE[this.device.getProcessingType(data)];
 
-				switch (Integer.valueOf(data[0])) { // device outlet 1 or 2
+				switch (data != null ? Integer.valueOf(data[0]) : 0) { // device outlet 1 or 2
 				case 1:
 					this.numberBatteryCells1 = this.device.getNumberOfLithiumCells(data);
 					isProgrammExecuting1 = this.device.isProcessing(data);
