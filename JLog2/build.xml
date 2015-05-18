@@ -65,6 +65,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for JLog2 with CSV as input data, by file and serial"/>
+    		<!--  attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik, gde.device.kontronik.JivePro"/ -->
     		<attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik"/>
     		<!-- attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik, gde.device.kontronik.JivePro"/ -->
     	</manifest>
