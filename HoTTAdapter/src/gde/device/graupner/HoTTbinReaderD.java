@@ -992,7 +992,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsGeneral[29] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGeneral[30] = DataParser.parse2Short(_buf3, 5) * 1000;
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 1
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReaderD.recordSet.getRecordDataSize(true) <= 1
 					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGeneral[31] / 1000 + HoTTbinReader.pointsGeneral[29] / 1000 * HoTTbinReader.pointsGeneral[30] / 1000 / 2500 + 2)) {
 				HoTTbinReader.pointsGeneral[31] = HoTTbinReader.tmpCapacity * 1000;
 			}
