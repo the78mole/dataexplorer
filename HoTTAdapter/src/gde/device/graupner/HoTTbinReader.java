@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -98,8 +99,9 @@ public class HoTTbinReader {
 	 * @param buffer byte array containing the first 64 byte to analyze the header
 	 * @return hash map containing header data as string accessible by public header keys
 	 * @throws IOException 
+	 * @throws DataTypeException 
 	 */
-	public static HashMap<String, String> getFileInfo(File file) throws IOException {
+	public static HashMap<String, String> getFileInfo(File file) throws IOException, DataTypeException {
 		final String $METHOD_NAME = "getFileInfo";
 		DataInputStream data_in = null;
 		byte[] buffer = new byte[64];
@@ -136,7 +138,12 @@ public class HoTTbinReader {
 					//64 byte = 0.01 seconds for 30 seconds maximum sensor scan time (30 / 0.01 = 3000)
 					position = 64 * 3000;
 				}
-				data_in.skip(position);
+				data_in.read(buffer);
+				if (new String(buffer).startsWith("GRAUPNER SD LOG8")) {
+					DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
+					throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
+				}
+				data_in.skip(position - 64);
 				for (int i = 0; i < 120; i++) {
 					data_in.read(buffer);
 					if (HoTTbinReader.log.isLoggable(Level.FINER))
@@ -1375,12 +1382,13 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsSpeedControl[1] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReader.pointsSpeedControl[2] = HoTTbinReader.tmpCurrent * 1000;
 			HoTTbinReader.pointsSpeedControl[4] = Double.valueOf(HoTTbinReader.pointsSpeedControl[1] / 1000.0 * HoTTbinReader.pointsSpeedControl[2]).intValue();
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetSpeedControl.getRecordDataSize(true) == 0
-					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[3] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2)) {
+			if (!HoTTAdapter.isFilterEnabled
+					|| (HoTTbinReader.tmpCapacity != 0 && Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[3] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2))) {
 				HoTTbinReader.pointsSpeedControl[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
+				if (HoTTbinReader.tmpCapacity != 0)
+					HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
 						+ (HoTTbinReader.pointsSpeedControl[3] / 1000) + " + " + (HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2));
 			}
 			HoTTbinReader.pointsSpeedControl[5] = HoTTbinReader.tmpRevolution * 1000;
