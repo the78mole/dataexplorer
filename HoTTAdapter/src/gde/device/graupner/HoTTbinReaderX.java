@@ -22,10 +22,12 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.FileUtils;
 import gde.utils.StringHelper;
@@ -67,7 +69,21 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 * @throws Exception 
 	 */
 	public static synchronized void read(String filePath) throws Exception {
-		readSingle(new File(filePath));
+		File inputFile = new File(filePath);
+		if (inputFile.exists()) {
+			FileInputStream file_input = new FileInputStream(inputFile);
+			DataInputStream data_in = new DataInputStream(file_input);
+			byte[] buffer = new byte[23];
+			data_in.read(buffer);
+			data_in.close();
+			if (new String(buffer).startsWith("GRAUPNER SD LOG8"))
+				readSingle(inputFile);
+			else {
+				DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+				throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+			}
+		}
+		else throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2409));
 	}
 
 	/**
