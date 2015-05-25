@@ -98,7 +98,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
-		HoTTAdapter device = (HoTTAdapter) HoTTbinReaderX.application.getActiveDevice();
+		HoTTAdapterX device = (HoTTAdapterX) HoTTbinReaderX.application.getActiveDevice();
 		int recordSetNumber = HoTTbinReaderX.channels.get(1).maxSize() + 1;
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
@@ -109,7 +109,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		HoTTbinReaderX.pointsReceiver = new int[9];
 		HoTTbinReaderX.pointsChannel = new int[15];
 		HoTTbinReaderX.timeStep_ms = 0;
-		HoTTbinReaderX.dataBlockSize = 23;
+		HoTTbinReaderX.dataBlockSize = 23; //device.getDataBlockSize(InputTypes.FILE_IO);
 		HoTTbinReaderX.buf = new byte[HoTTbinReaderX.dataBlockSize];
 		HoTTbinReaderX.buf1 = null;
 		HoTTbinReaderX.buf2 = null;
@@ -131,7 +131,10 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		HoTTAdapter.isChannelsChannelEnabled = false;
 		int lastCounter = 0x00;
 		int countPackageLoss = 0;
-		long numberDatablocks = fileSize / HoTTbinReaderX.dataBlockSize;
+		int headerSize = 27;
+		int footerSize = 323;
+		int lapTimes = 99;
+		long numberDatablocks = (fileSize - headerSize - footerSize) / HoTTbinReaderX.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -175,7 +178,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			}
 			//recordSetReceiver initialized and ready to add data
 
-			data_in.skip(27);
+			data_in.skip(27); //header with constant length
 
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
@@ -276,7 +279,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 						}
 					}
 					else { //skip empty block, but add time step
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+						if (HoTTbinReaderX.logx.isLoggable(Level.FINE)) HoTTbinReaderX.logx.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReaderX.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -296,7 +299,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 					lastCounter = buf[0] & 0xFF;
 				}
 				else {
-					System.out.println(new String(buf));
+					HoTTbinReaderX.logx.log(Level.WARNING, new String(HoTTbinReaderX.buf));
 				}
 			}
 			String packageLossPercentage = HoTTbinReaderX.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
@@ -305,6 +308,26 @@ public class HoTTbinReaderX extends HoTTbinReader {
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReaderX.lostPackages.getStatistics() }));
 //					+ HoTTbinReaderX.sensorSignature);
 			HoTTbinReaderX.logx.logp(Level.WARNING, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
+			HoTTbinReaderX.buf = new byte[footerSize];
+			HoTTbinReaderX.buf0 = new byte[lapTimes]; //min
+			HoTTbinReaderX.buf1 = new byte[lapTimes]; //sec
+			HoTTbinReaderX.buf2 = new byte[lapTimes]; //1/100secs
+			data_in.read(HoTTbinReaderX.buf);
+			System.arraycopy(HoTTbinReaderX.buf, 19, HoTTbinReaderX.buf0, 0, HoTTbinReaderX.buf0.length);
+			System.arraycopy(HoTTbinReaderX.buf, 19+lapTimes, HoTTbinReaderX.buf1, 0, HoTTbinReaderX.buf1.length);
+			System.arraycopy(HoTTbinReaderX.buf, 19+2*lapTimes, HoTTbinReaderX.buf2, 0, HoTTbinReaderX.buf2.length);
+			int numLaps = HoTTbinReaderX.buf[HoTTbinReaderX.buf.length-1];
+			StringBuilder sb = new StringBuilder().append(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2406));
+			for (int j=0; j < numLaps && !(HoTTbinReaderX.buf0[j] == 0 && HoTTbinReaderX.buf1[j] == 0 && HoTTbinReaderX.buf2[j] == 0); j++) {
+				sb.append(String.format("%2d: %2dm %02ds %03d\n", (j+1), HoTTbinReaderX.buf0[j], HoTTbinReaderX.buf1[j], HoTTbinReaderX.buf2[j]));
+			}
+			if (numLaps >= 1) {
+				HoTTbinReaderX.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
+						+ Messages.getString(	gde.device.graupner.hott.MessageIds.GDE_MSGI2405,
+								new Object[] {	numLaps,
+										String.format("%2dm %02ds %03d", HoTTbinReaderX.buf[HoTTbinReaderX.buf.length - 7], HoTTbinReaderX.buf[HoTTbinReaderX.buf.length - 6], HoTTbinReaderX.buf[HoTTbinReaderX.buf.length - 5]),
+										String.format("%2dm %02ds %03d", HoTTbinReaderX.buf[HoTTbinReaderX.buf.length - 4], HoTTbinReaderX.buf[HoTTbinReaderX.buf.length - 3], HoTTbinReaderX.buf[HoTTbinReaderX.buf.length - 2]) }) + sb.toString());
+			}
 			HoTTbinReaderX.logx.logp(Level.TIME, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
