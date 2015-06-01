@@ -16,7 +16,7 @@
         <UTCdelta>0</UTCdelta>
     </TimeBase>
     <DataBlock>
-        <format size="64" formatType="BYTE" inputType="FILE_IO"/>
+        <format size="23" formatType="BYTE" inputType="FILE_IO"/>
         <timeUnit>msec</timeUnit>
         <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.bin</preferredFileExtention>
@@ -25,7 +25,7 @@
         <property description="" type="Integer" value="01" name="data recording"/>
     </State>
     <Channels>
-        <Channel type="TYPE_CONFIG" name="Receiver">
+        <Channel type="TYPE_CONFIG" name="Receiver_ESC">
             <Measurement>
                 <name>Rx->Tx-PLoss</name>
                 <symbol></symbol>
@@ -93,7 +93,125 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
-        </Channel>
+            <Measurement>
+                <name>VoltageM</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>VoltageM_min</name>
+                <symbol>Umin</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CurrentM</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>CurrentM_max</name>
+                <symbol>Amax</symbol>
+                <unit>I</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="11" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CapacityM</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>PowerM</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>RevolutionM</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>RevolutionM_max</name>
+                <symbol>rpmmax</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="15" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_max</name>
+                <symbol>rpmmax</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="17" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM</name>
+                <symbol>TM</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM_max</name>
+                <symbol>TMmax</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed</name>
+                <symbol>V</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed_max</name>
+                <symbol>Vmax</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            </Channel>
         <Channel type="TYPE_CONFIG" name="Channels">
             <Measurement>
                 <name>FreqCh</name>
