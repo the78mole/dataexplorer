@@ -71,6 +71,10 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 * @throws Exception 
 	 */
 	public static synchronized void read(String filePath) throws Exception {
+		HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
+		for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
+			HoTTAdapter.isSensorType[i] = false;
+		}
 		File inputFile = new File(filePath);
 		if (inputFile.exists()) {
 			FileInputStream file_input = new FileInputStream(inputFile);
@@ -129,7 +133,6 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		HoTTAdapter.reverseChannelPackageLossCounter.clear();
 		HoTTbinReaderX.lostPackages.clear();
 		HoTTbinReaderX.countLostPackages = 0;
-		HoTTbinReaderX.isJustParsed = false;
 		HoTTAdapter.isChannelsChannelEnabled = false;
 		int lastCounter = 0x00;
 		int countPackageLoss = 0;
@@ -179,6 +182,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 				channel.applyTemplate(recordSetName, false);
 			}
 			//recordSetReceiver initialized and ready to add data
+			HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
 
 			data_in.skip(27); //header with constant length
 
@@ -266,25 +270,28 @@ public class HoTTbinReaderX extends HoTTbinReader {
 						if (HoTTbinReaderX.buf1 != null && HoTTbinReaderX.buf2 != null && HoTTbinReaderX.buf3 != null && HoTTbinReaderX.buf4 != null && HoTTbinReaderX.buf5 != null && HoTTbinReaderX.buf6 != null
 								&& HoTTbinReaderX.buf7 != null && HoTTbinReaderX.buf8 != null && HoTTbinReaderX.buf9 != null && HoTTbinReaderX.bufA != null && HoTTbinReaderX.bufB != null
 								&& HoTTbinReaderX.bufC != null && HoTTbinReaderX.bufD != null) {
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf1);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf2);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf3);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf4);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf5);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf6);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf7);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf8);
-							printByteValues(timeStep_ms, HoTTbinReaderX.buf9);
-							printByteValues(timeStep_ms, HoTTbinReaderX.bufA);
-							printByteValues(timeStep_ms, HoTTbinReaderX.bufB);
-							printByteValues(timeStep_ms, HoTTbinReaderX.bufC);
-							printByteValues(timeStep_ms, HoTTbinReaderX.bufD);
-							HoTTbinReaderX.logx.logp(Level.OFF, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.STRING_BLANK);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf1);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf2);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf3);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf4);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf5);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf6);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf7);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf8);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.buf9);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.bufA);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.bufB);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.bufC);
+//							printByteValues(timeStep_ms, HoTTbinReaderX.bufD);
+//							HoTTbinReaderX.logx.logp(Level.OFF, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.STRING_BLANK);
 							switch (HoTTbinReaderX.buf[7]) {
 							case 00: //receiver 1
 								parseAddReceiver(HoTTbinReaderX.buf1, HoTTbinReaderX.buf2, HoTTbinReaderX.bufD);
 								break;
 							case 02: //ESC 1
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) 
+									HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+								HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
 								parseESC(HoTTbinReaderX.buf3, HoTTbinReaderX.buf4, HoTTbinReaderX.buf5, HoTTbinReaderX.buf6, HoTTbinReaderX.buf7, HoTTbinReaderX.buf8, HoTTbinReaderX.buf9, HoTTbinReaderX.bufA);
 								break;
 							}
@@ -295,10 +302,9 @@ public class HoTTbinReaderX extends HoTTbinReader {
 
 						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReaderX.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 
-						if (HoTTbinReaderX.isJustParsed && HoTTbinReaderX.countLostPackages > 0) {
+						if (HoTTbinReaderX.countLostPackages > 0) {
 							HoTTbinReaderX.lostPackages.add(HoTTbinReaderX.countLostPackages);
 							HoTTbinReaderX.countLostPackages = 0;
-							HoTTbinReaderX.isJustParsed = false;
 						}
 					}
 					else { //skip empty block, but add time step
@@ -327,9 +333,10 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			}
 			String packageLossPercentage = HoTTbinReaderX.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
 					(countPackageLoss / HoTTbinReaderX.recordSetReceiver.getTime_ms(HoTTbinReaderX.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "100";
+			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
 			HoTTbinReaderX.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
-					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReaderX.lostPackages.getStatistics() }));
-//					+ HoTTbinReaderX.sensorSignature);
+					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReaderX.lostPackages.getStatistics() })
+					+ HoTTbinReaderX.sensorSignature);
 			HoTTbinReaderX.logx.logp(Level.WARNING, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReaderX.buf = new byte[footerSize];
 			HoTTbinReaderX.buf0 = new byte[lapTimes]; //min
