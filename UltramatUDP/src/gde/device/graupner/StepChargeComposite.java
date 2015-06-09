@@ -467,7 +467,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA1 = StepChargeComposite.this.stepSliderA1.getSelection();
-									StepChargeComposite.this.stepTextA1.setText(String.format("%.1f", (StepChargeComposite.this.valueA1 / 100.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA1.setText(String.format("%.2f", (StepChargeComposite.this.valueA1 / 10 * 10 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
@@ -580,7 +580,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA2 = StepChargeComposite.this.stepSliderA2.getSelection();
-									StepChargeComposite.this.stepTextA2.setText(String.format("%.1f", (StepChargeComposite.this.valueA2 / 100.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA2.setText(String.format("%.2f", (StepChargeComposite.this.valueA2 / 10 * 10 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
@@ -688,7 +688,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA3.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA3 = StepChargeComposite.this.stepSliderA3.getSelection();
-									StepChargeComposite.this.stepTextA3.setText(String.format("%.1f", (StepChargeComposite.this.valueA3 / 100.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA3.setText(String.format("%.2f", (StepChargeComposite.this.valueA3 / 10 * 10 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
@@ -796,7 +796,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderA4.widgetSelected, event=" + evt);
 									StepChargeComposite.this.valueA4 = StepChargeComposite.this.stepSliderA4.getSelection();
-									StepChargeComposite.this.stepTextA4.setText(String.format("%.1f", (StepChargeComposite.this.valueA4 / 100.0))); //$NON-NLS-1$
+									StepChargeComposite.this.stepTextA4.setText(String.format("%.2f", (StepChargeComposite.this.valueA4 / 10 * 10 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
 										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
 										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
