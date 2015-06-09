@@ -6,6 +6,7 @@ enhance device interface for charger to adapt curve smoothing according device n
 HoTTAdapter* - refine sensor detection - to increase chance not in text-modus segment
 HoTTAdapter* - correct channel time unit to µsec
 HoTTAdapter* - adapt ESC Capacity filter
+GraupnerUDP* - some adaptations to device internal behavior
 Akkumatik - add support
 HoTTAdapterX - add support (X-N8, X-4S)
 
