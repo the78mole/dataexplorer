@@ -142,7 +142,7 @@ public class UltraDuoPlusType {
 		if (is24hour) {
 			String tmp = value.getValue();
 			tmp = String.format("%s%02x%s", tmp.substring(0, 54), 12+Integer.valueOf(value.getValue().substring(54, 56)), tmp.substring(56, tmp.length()));
-			System.out.println(tmp);
+			//System.out.println(tmp);
 			this.channelData1.setValue(tmp);
 		}
 		else
