@@ -72,7 +72,7 @@ public class ParameterConfigControl {
 	 */
 	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth,
 			final String parameterDescription, final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue,
-			final int sliderMaxValue, final int sliderOffset) {
+			final int sliderMaxValue, final int sliderOffset, final boolean isRounding) {
 		this.value = valueArray[valueIndex];
 		this.format = valueFormat.equals(GDE.STRING_EMPTY) ? "%d" : valueFormat; //$NON-NLS-1$
 		this.offset = sliderOffset;
@@ -153,22 +153,18 @@ public class ParameterConfigControl {
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue + this.offset);
 			this.slider.setMaximum(sliderMaxValue + this.offset + 10);
-			this.slider.setIncrement((sliderMaxValue + this.offset) >= 1000 ? 10 : 10);
+			this.slider.setIncrement(1);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
-					final int selection = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
-					if (selection > 1000 && ParameterConfigControl.this.value != selection && ParameterConfigControl.this.slider.getMaximum() >= 1000) {
-						if (selection > ParameterConfigControl.this.value)
-							ParameterConfigControl.this.value = selection + 90;
-						else if (selection < ParameterConfigControl.this.value) 
-							ParameterConfigControl.this.value = selection - 90;
-					}
-					else 
-						ParameterConfigControl.this.value = selection;
+					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
+					if (isRounding)
+						valueArray[valueIndex] = ParameterConfigControl.this.value > 1000 ? (valueArray[valueIndex] <= ParameterConfigControl.this.value ? ParameterConfigControl.this.value + 40
+								: ParameterConfigControl.this.value - 40) / 50 * 50 : ParameterConfigControl.this.value / 10 * 10;
+					else
+						valueArray[valueIndex] = ParameterConfigControl.this.value;
 					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
-					valueArray[valueIndex] = ParameterConfigControl.this.value > 1000 ? ParameterConfigControl.this.value / 100 * 100 : ParameterConfigControl.this.value / 10 * 10;
 					if (evt.data == null) {
 						Event changeEvent = new Event();
 						changeEvent.index = valueIndex;
@@ -278,7 +274,7 @@ public class ParameterConfigControl {
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue);
 			this.slider.setMaximum(sliderMaxValue + 10);
-			this.slider.setIncrement(sliderMaxValue >= 1000 ? 10 : 1);
+			this.slider.setIncrement(1);
 			this.slider.setSelection(this.value);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -432,6 +428,6 @@ public class ParameterConfigControl {
 		this.offset = newOffset;
 		this.slider.setMinimum(newMinSliderValue + this.offset);
 		this.slider.setMaximum(newMaxSliderValue + this.offset + 10);
-		this.slider.setIncrement((newMaxSliderValue + this.offset) >= 1000 ? 10 : 1);
+		this.slider.setIncrement(1);
 	}
 }
