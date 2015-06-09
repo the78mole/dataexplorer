@@ -177,6 +177,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								data_in.read(HoTTbinReader.buf);
 								HoTTbinReader.timeStep_ms += 10;
 							}
+							isSensorData = true;
 						}
 
 						//create and fill sensor specific data record sets 
