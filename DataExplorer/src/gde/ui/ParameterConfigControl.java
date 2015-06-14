@@ -421,6 +421,8 @@ public class ParameterConfigControl {
 		this.descriptionLabel.setText(newParameterDescription);
 		this.slider.setMinimum(newMinSliderValue);
 		this.slider.setMaximum(newMaxSliderValue);
+		this.slider.setIncrement(1);
+		this.slider.setSelection(100);
 	}
 
 	/**
