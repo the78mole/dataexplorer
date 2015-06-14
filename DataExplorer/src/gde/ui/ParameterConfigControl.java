@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.device.DataTypes;
 import gde.utils.StringHelper;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -103,14 +104,14 @@ public class ParameterConfigControl {
 				this.text.addVerifyListener(new VerifyListener() {
 					@Override
 					public void verifyText(VerifyEvent evt) {
-						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
+						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
 				this.text.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
@@ -130,7 +131,7 @@ public class ParameterConfigControl {
 
 					@Override
 					public void keyPressed(KeyEvent evt) {
-						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
+						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
 					}
 				});
 			}
@@ -157,11 +158,16 @@ public class ParameterConfigControl {
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
 					if (isRounding)
-						valueArray[valueIndex] = ParameterConfigControl.this.value > 1000 ? (valueArray[valueIndex] <= ParameterConfigControl.this.value ? ParameterConfigControl.this.value + 40
-								: ParameterConfigControl.this.value - 40) / 50 * 50 : ParameterConfigControl.this.value / 10 * 10;
+						valueArray[valueIndex] = ParameterConfigControl.this.value > 1000 
+						? (valueArray[valueIndex] <= ParameterConfigControl.this.value 
+							? ParameterConfigControl.this.value + 49
+							: ParameterConfigControl.this.value - 40) / 50 * 50 
+						: (valueArray[valueIndex] <= ParameterConfigControl.this.value 
+							? ParameterConfigControl.this.value + 9
+							: ParameterConfigControl.this.value - 5) / 10 * 10;
 					else
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
@@ -224,14 +230,14 @@ public class ParameterConfigControl {
 				this.text.addVerifyListener(new VerifyListener() {
 					@Override
 					public void verifyText(VerifyEvent evt) {
-						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
+						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
 				this.text.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
@@ -251,7 +257,7 @@ public class ParameterConfigControl {
 
 					@Override
 					public void keyPressed(KeyEvent evt) {
-						ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
+						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
 					}
 				});
 			}
@@ -279,7 +285,7 @@ public class ParameterConfigControl {
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
 					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
@@ -356,7 +362,7 @@ public class ParameterConfigControl {
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					ParameterConfigControl.log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
 					ParameterConfigControl.this.text.setText(textFiledValues[ParameterConfigControl.this.value]);
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
