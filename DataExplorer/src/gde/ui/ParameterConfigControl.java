@@ -421,8 +421,6 @@ public class ParameterConfigControl {
 		this.descriptionLabel.setText(newParameterDescription);
 		this.slider.setMinimum(newMinSliderValue);
 		this.slider.setMaximum(newMaxSliderValue);
-		this.slider.setIncrement(1);
-		this.slider.setSelection(100);
 	}
 
 	/**
@@ -436,6 +434,5 @@ public class ParameterConfigControl {
 		this.offset = newOffset;
 		this.slider.setMinimum(newMinSliderValue + this.offset);
 		this.slider.setMaximum(newMaxSliderValue + this.offset + 10);
-		this.slider.setIncrement(1);
 	}
 }
