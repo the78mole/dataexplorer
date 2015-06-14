@@ -141,8 +141,10 @@ public class StepChargeComposite extends ScrolledComposite {
 
 	public void setStepChargeValues(final int capacity, final int current, final int[] stepValues) {
 		if (!this.isDisposed()) {
-			//0=capacityStep1, 1=capacityStep2, 2=capacityStep3, 3=capacityStep4, 4=currentStep1, 5=currentStep2, 6=currentStep3, 7=currentStep4
-			//8=impulseCharge1, 9=impulseCharge2, 10=impulseCharge3, 11=impulseCharge4, 12=reflexCharge1, 13=reflexCharge2, 14=reflexChareg3, 15=reflexCharge4
+			//0=capacityStep1, 1=capacityStep2, 2=capacityStep3, 3=capacityStep4, 
+			//4=currentStep1, 5=currentStep2, 6=currentStep3, 7=currentStep4
+			//8=impulseCharge1, 9=impulseCharge2, 10=impulseCharge3, 11=impulseCharge4, 
+			//12=reflexCharge1, 13=reflexCharge2, 14=reflexChareg3, 15=reflexCharge4
 			//16=discharge, 17=trickleCurrent, 18=peakSensitive, 19=cutOffTemperature, 20=checksum
 			if (StepChargeComposite.log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder("setStepChargeValues - Step values = ");

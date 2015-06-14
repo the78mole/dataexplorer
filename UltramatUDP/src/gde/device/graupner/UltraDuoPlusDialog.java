@@ -348,9 +348,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			public void handleEvent(Event evt) {
 				if (UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0 && UltraDuoPlusDialog.this.lastMemorySelectionIndex < UltraDuoPlusDialog.numberMemories) {
 					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null) {
-						UltraDuoPlusDialog.log
-								.log(
-										java.util.logging.Level.FINE,
+						if (UltraDuoPlusDialog.log.isLoggable(Level.FINE))
+							UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE,
 										"memoryComposite.handleEvent, (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName() + " memoryValues[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
 
 						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setChanged(true);
@@ -984,7 +983,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											case UltraDuoPlus60:
 												if (UltraDuoPlusDialog.this.memoryValues[0] == 1) { //NiMH with possible step charge
 													UltraDuoPlusDialog.this.stepChargeComposite.getStepChargeValues(UltraDuoPlusDialog.this.memoryStepValues);
-													//UltraDuoPlusDialog.this.chargeGroup.notifyListeners(SWT.Selection, new Event());
+													Event changeEvent = new Event();
+													changeEvent.index = -1;
+													UltraDuoPlusDialog.this.chargeGroup.notifyListeners(SWT.Selection, changeEvent);
 												}
 												break;
 											default:
@@ -2135,7 +2136,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryParameters[26] = this.memoryParameters[26] != null ? this.memoryParameters[26].dispose() : null;
 				this.chargeSelectHeight = 5 * this.parameterSelectHeight + 10;
 				this.dischargeSelectHeight = 4 * this.parameterSelectHeight;
-				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 135);
+				this.memoryParameters[11].updateValueRange(Messages.getString(MessageIds.GDE_MSGT2310), 10, 165);
 				this.cycleGroup.setVisible(false);
 				break;
 			}
@@ -2259,7 +2260,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryValues[19] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 55 : (9 / 5) * 55 + 32; //dischargeOffTemperature
 				break;
 			case 4: //LiFe
-				this.memoryValues[11] = 125; //chargeMaxCapacity
+				this.memoryValues[11] = 105; //chargeMaxCapacity
 				this.memoryValues[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0) ? 45 : (9 / 5) * 45 + 32; //chargeOffTemperature
 				this.memoryValues[12] = Double.valueOf(120 * (1.0 * this.memoryValues[2] / this.memoryValues[6])).intValue(); //chargeSafetyTimer
 				this.memoryValues[9] = 0; //trickleCurrent
