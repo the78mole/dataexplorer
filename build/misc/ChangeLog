@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.1 - xx yyy 2015
+Version 3.2.1 - 21 Jun 2015
 add current/voltage smoothing algorithm to be used for very short drop peaks
 enhance device interface for charger to adapt curve smoothing according device needs 
 HoTTAdapter* - refine sensor detection - to increase chance not in text-modus segment
@@ -9,7 +9,7 @@ HoTTAdapter* - adapt ESC Capacity filter
 HoTTAdapter2* - fix problem missing receiver data not using Channel configuration
 GraupnerUDP* - some adaptations to device internal behavior
 Akkumatik - add support
-HoTTAdapterX - add support (X-N8, X-4S)
+HoTTAdapterX - add support with receiver and ESC data, rounds statistics (X-N8, X-4S)
 
 Version 3.2.0 - 01 Mar 2015
 fix initial synchronization of measurements
