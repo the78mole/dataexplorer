@@ -134,9 +134,9 @@ public class HoTTbinReader {
 				sensorCount = 1;
 			}
 			else {
-				if (position > 64 * 3000) {
-					//64 byte = 0.01 seconds for 30 seconds maximum sensor scan time (30 / 0.01 = 3000)
-					position = 64 * 3000;
+				if (position > 64 * 4000) {
+					//64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 4000)
+					position = 64 * 4000;
 				}
 				data_in.read(buffer);
 				if (new String(buffer).startsWith("GRAUPNER SD LOG8")) {
