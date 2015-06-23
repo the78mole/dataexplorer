@@ -68,7 +68,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	static final Logger						log													= Logger.getLogger(LiPoWatchDialog.class.getName());
 
 	public final static int				MAX_DATA_RECORDS						= 25920;
-	public final static int				FLASH_SIZE									= 524288;
+	public final static int				FLASH_SIZE									= 524288*2;
 	public final static int				FLASH_POSITION_DATA_BEGIN		= 0x100;
 	public final static int				MAX_DATA_VALUES							= LiPoWatchDialog.FLASH_SIZE - 0x100;
 

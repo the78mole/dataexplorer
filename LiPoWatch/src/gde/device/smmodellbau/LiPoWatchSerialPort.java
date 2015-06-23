@@ -431,7 +431,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 					byte[] readBuffer = new byte[1];
 					readBuffer = this.read(readBuffer, 5000);
 					if (readBuffer[0] == DATA_STATE_OK) success = true;
-					this.write(COMMAND_END_XFER);
+					//this.write(COMMAND_END_XFER);
 					
 				}
 				else
@@ -486,7 +486,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 			throw e;
 		}
 		finally {
-			if (this.isConnected()) this.write(COMMAND_END_XFER);
+			//if (this.isConnected()) this.write(COMMAND_END_XFER);
 			if(isPortOpenedByMe) this.close();
 		}
 		return readBuffer;
