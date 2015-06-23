@@ -1,5 +1,8 @@
 Development history / change log, please read from bottom up
 
+Version 3.2.2 - xx yyy 2015
+LiPoWatch - small correction of the serial communication to keep LEDs off
+
 Version 3.2.1 - 21 Jun 2015
 add current/voltage smoothing algorithm to be used for very short drop peaks
 enhance device interface for charger to adapt curve smoothing according device needs 
