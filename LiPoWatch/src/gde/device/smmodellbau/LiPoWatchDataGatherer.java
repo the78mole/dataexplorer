@@ -81,7 +81,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			if(!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				isPortOpenedByMe = true;
-				WaitTimer.delay(3000);
+				WaitTimer.delay(100);
 			}
 			
 			//update the config display of the dialog to enable comment enichments

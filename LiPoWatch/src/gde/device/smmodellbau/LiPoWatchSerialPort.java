@@ -467,8 +467,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 			// check device connected
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
-				if (this.checkDataReady()) {
-					this.waitDataReady();
+				if (this.waitDataReady()) {
 					
 					this.write(COMMAND_QUERY_CONFIG);				
 					this.read(readBuffer, 4000);
@@ -544,7 +543,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 	public boolean waitDataReady() throws Exception {
 		boolean isReady = false;
 		
-		isReady = this.checkConnectionStatus();
+		//isReady = this.checkConnectionStatus();
 		isReady = this.checkDataReady();
 
 		return isReady;

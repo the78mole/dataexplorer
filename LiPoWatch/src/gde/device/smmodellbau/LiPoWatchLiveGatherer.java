@@ -93,7 +93,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 			if (!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				this.isPortOpenedByLiveGatherer = true;
-				WaitTimer.delay(3000);
+				WaitTimer.delay(100);
 			}
 
 			// get LiPoWatch configuration for timeStep info
