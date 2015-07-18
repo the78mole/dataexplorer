@@ -378,6 +378,7 @@ public class Record extends Vector<Integer> {
 		this.minValue = 0;
 		this.isCurrentRecord = record.isCurrentRecord;
 		this.isVoltageRecord = record.isVoltageRecord;
+		this.device = record.device; // reference to device
 		this.clear();
 		this.trimToSize();
 		
@@ -420,7 +421,6 @@ public class Record extends Vector<Integer> {
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
-		this.device = record.device; // reference to device
 	}
 
 	/**
