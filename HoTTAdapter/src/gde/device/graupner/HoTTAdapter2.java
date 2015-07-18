@@ -1093,7 +1093,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		int noneCalculationRecords = 0;
 		for (String fileRecord : fileRecordsProperties) {
-			if (fileRecord.contains("_isActive=true")) ++noneCalculationRecords;
+			if (fileRecord.contains("_isActive=true") || fileRecord.contains("_name=Ch ")) ++noneCalculationRecords;
 		}
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
 			List<MeasurementType> measurements = this.getChannelMeasuremts(recordSet.getChannelConfigNumber());
