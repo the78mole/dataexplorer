@@ -1,21 +1,9 @@
-GNU DataExplorer - News - comes with version 3.2.0
+GNU DataExplorer - News - comes with version 3.2.2
 
-1)  fix initial synchronization of measurements
-2)  fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds
-3)  fix problem while copy graphics into clip board several time in sequence
-4)  fix JLog2 context help page selection 
-5)  fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button
-6)  fix error not loading color from OSD file some colors (1,1,1)
-7)  CSV2SerialAdapter - fix error handling of missing status 
-8)  HoTTAdapter - fix receiver only with channels times 10 error 
-9)  HoTTAdapter* - adapt capacity filter according actual power
-10) HoTTAdapter* - adapt current filter
-11) HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl
-12) GPS-Logger* - enable GPX export (Garmin Virb)
-13) UniLog2 - fix missing parsing of M-Link data
-14) UniLog2 - fix configuration of symbol and unit for M-Link measurements
-15) add Junsi iCharger 4010 Duo support (read log from SD storage)
-16) add port enumeration ttyACM* Linux CDC ACM devices
+1) fix exception while record clone operation (cut)
+2) fix minor errors in automated test
+3) LiPoWatch - small correction of the serial communication to keep LEDs off
+4) HoTTAdapter* - fix error while opening OSD file with channels from earlier release
 
 
 

@@ -2,7 +2,9 @@ Development history / change log, please read from bottom up
 
 Version 3.2.2 - 19 Jul 2015
 fix exception while record clone operation (cut)
+fix minor errors in automated test
 LiPoWatch - small correction of the serial communication to keep LEDs off
+HoTTAdapter* - fix error while opening OSD file with channels from earlier release
 
 Version 3.2.1 - 21 Jun 2015
 add current/voltage smoothing algorithm to be used for very short drop peaks
