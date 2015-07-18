@@ -409,6 +409,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".nmea")
 						&& !(file.getPath().toLowerCase().contains("cappuccino") 
+						|| file.getPath().toLowerCase().contains("t-rex") 
 						|| file.getPath().toLowerCase().contains("space pro") 
 						|| file.getPath().toLowerCase().contains("asw")
 						|| file.getPath().toLowerCase().contains("mue")
@@ -1242,7 +1243,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						this.channels.setActiveChannelNumber(1);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from NMEA file");
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from bin log file");
 						activeChannel.setSaved(true);
 
 						HoTTbinReader.read(file.getAbsolutePath());
@@ -1312,7 +1313,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						this.channels.setActiveChannelNumber(1);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from NMEA file");
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from bin log file");
 						activeChannel.setSaved(true);
 
 						HoTTbinReader2.read(file.getAbsolutePath());
@@ -1449,7 +1450,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						deviceName = deviceName.contains(GDE.STRING_UNDER_BAR) ? deviceName.substring(1+deviceName.lastIndexOf(GDE.STRING_UNDER_BAR)) : deviceName;
 						//System.out.println("deviceName = " + deviceName);
 						if (deviceName.startsWith("NMEA") || deviceName.startsWith("GPS") || deviceName.startsWith("DataVario") || deviceName.startsWith("LinkVario") 
-								|| deviceName.startsWith("HoTT")) {
+								|| (deviceName.startsWith("HoTT") && deviceName.endsWith("X"))) {
 						
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
 							if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
