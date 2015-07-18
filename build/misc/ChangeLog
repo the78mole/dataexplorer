@@ -1,6 +1,7 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.2 - xx yyy 2015
+Version 3.2.2 - 19 Jul 2015
+fix exception while record clone operation (cut)
 LiPoWatch - small correction of the serial communication to keep LEDs off
 
 Version 3.2.1 - 21 Jun 2015
