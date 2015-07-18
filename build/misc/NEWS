@@ -3,7 +3,7 @@ GNU DataExplorer - News - comes with version 3.2.2
 1) fix exception while record clone operation (cut)
 2) fix minor errors in automated test
 3) LiPoWatch - small correction of the serial communication to keep LEDs off
-4) HoTTAdapter* - fix error while opening OSD file with channels from earlier release
+4) HoTTAdapter2* - fix error while opening OSD file with channels from earlier release
 
 
 
