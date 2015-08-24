@@ -354,6 +354,7 @@ public class GDE {
 
 	public final static Map<String,String>					deviceMap = new HashMap<String,String>();
 	static { // initialize device mapping to enable opening files saved on android app
+		GDE.deviceMap.put("HoTTViewerAdapter", "HoTTViewer"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("HoTTAdapter3", "HoTTAdapter2"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger (UL)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger (UL2)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
