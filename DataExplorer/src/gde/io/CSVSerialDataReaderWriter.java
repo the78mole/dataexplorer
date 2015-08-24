@@ -116,6 +116,10 @@ public class CSVSerialDataReaderWriter {
 //					application.getMenuToolBar().updateChannelSelector();
 //					activeChannel = channels.getActiveChannel();
 //				}
+				if (device.recordSetNumberFollowChannel() && activeChannel.size() != 0) {
+					application.getDeviceSelectionDialog().setupDataChannels(device);
+				}
+
 				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 
 				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
@@ -293,7 +297,7 @@ public class CSVSerialDataReaderWriter {
 					if (createdRecordSets.size() == 1) {
 						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.firstElement().getName());
 					}
-					else if (createdRecordSets.size() > 1) {
+					else if (createdRecordSets.size() > 1 && !device.recordSetNumberFollowChannel()) {
 						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.lastElement().getName());
 					}
 					else {
