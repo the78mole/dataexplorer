@@ -773,14 +773,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Vario");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
+						this.serialPort.getData(false);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						HoTTAdapter.isSensorType[1] = (this.serialPort.getData(true)[15] == HoTTAdapter.ANSWER_SENSOR_VARIO_19200);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 					}
 					catch (Exception e) {
 						//ignore and go ahead detecting sensors
@@ -847,13 +847,13 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 						this.serialPort.getData(false);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-						HoTTAdapter.isSensorType[5] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
+						HoTTAdapter.isSensorType[5] = (this.serialPort.getData(true)[15] == HoTTAdapter.ANSWER_SENSOR_MOTOR_DRIVER_19200);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 					}
 					catch (Exception e) {
 						//ignore and go ahead detecting sensors
@@ -866,13 +866,13 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
 						this.serialPort.getData(false);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						this.serialPort.getData(true);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						HoTTAdapter.isSensorType[0] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
-						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 					}
 					catch (Exception e) {
 						//ignore and go ahead detecting sensors

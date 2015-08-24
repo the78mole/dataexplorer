@@ -812,91 +812,91 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 01</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 02</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 03</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 04</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 05</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 06</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 07</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 08</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 09</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 10</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 11</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Test 12</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
         </Channel>
         <property type="Boolean" value="true" name="enable_filter"/>
