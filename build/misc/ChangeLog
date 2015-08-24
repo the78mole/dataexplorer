@@ -1,5 +1,9 @@
 Development history / change log, please read from bottom up
 
+Version 3.2.3 - xx yyy 2015
+HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
+Herkules III Telemetry - add support
+
 Version 3.2.2 - 19 Jul 2015
 fix exception while record clone operation (cut)
 fix minor errors in automated test
