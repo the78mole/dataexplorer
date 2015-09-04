@@ -122,6 +122,13 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
+                <name>Baro_Temperature</name>
+                <symbol>Temp_B</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
                 <name>Baro_Altitude</name>
                 <symbol>Alt_B</symbol>
                 <unit>m</unit>
@@ -148,7 +155,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+                <property name="scale_sync_ref_ordinal" value="16" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
                 <name>Lowest_Battery_Number</name>
@@ -178,14 +185,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="15" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Baro_Altetude_Max</name>
-                <symbol>hm</symbol>
-                <unit>m</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="13" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
         <Channel name="Status" type="TYPE_CONFIG">
@@ -711,14 +710,14 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 01</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 02</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -726,7 +725,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 03</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -734,7 +733,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 04</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -742,7 +741,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 05</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -750,7 +749,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 06</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -758,7 +757,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 07</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -766,7 +765,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku01_Cell 08</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -774,14 +773,14 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 01</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 02</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -789,7 +788,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 03</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -797,7 +796,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 04</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -805,7 +804,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 05</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -813,7 +812,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 06</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -821,7 +820,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 07</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -829,7 +828,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku02_Cell 08</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -860,14 +859,14 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 01</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 02</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -875,7 +874,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 03</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -883,7 +882,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 04</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -891,7 +890,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 05</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -899,7 +898,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 06</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -907,7 +906,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 07</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -915,7 +914,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku03_Cell 08</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -923,7 +922,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 01</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -931,7 +930,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 02</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -939,7 +938,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 03</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -947,7 +946,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 04</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -955,7 +954,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 05</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -963,7 +962,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 06</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -971,7 +970,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 07</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
@@ -979,7 +978,7 @@
             </Measurement>
             <Measurement>
                 <name>Akku04_Cell 08</name>
-                <symbol>ac1</symbol>
+                <symbol>ac</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
