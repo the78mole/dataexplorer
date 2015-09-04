@@ -444,7 +444,7 @@ public class TimeLine {
 				}
 				else if (timeDeltaValue > width / 50 && timeDeltaValue <= width / 25) {
 					numberTicks = isAbsoluteTime ? timeDelta / 6.0 : timeDelta / 2.5; // every 5 th units one tick
-					scaleFactor = scaleFactor * 1.0;
+					scaleFactor = scaleFactor * 4.0;
 				}
 				else if (timeDeltaValue > width / 25 && timeDeltaValue <= width / 8) {
 					numberTicks = isAbsoluteTime ? timeDelta / 12.0 : timeDelta / 5.0; // every 5 th units one tick
