@@ -5,6 +5,7 @@ HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ Ho
 HoTTAdapterD - enable live log for test 01-12 fields
 Herkules III Telemetry - add support
 fix - clean data model while importing CSV where record set number follow channel number 
+HoTTAdapter* - adapt filter GPS data parsing for import bin log data
 fix - scale number calculation error while display area is greater than 1500 pixels.
 
 Version 3.2.2 - 19 Jul 2015
