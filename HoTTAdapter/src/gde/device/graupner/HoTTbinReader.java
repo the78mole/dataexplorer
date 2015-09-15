@@ -1190,7 +1190,7 @@ public class HoTTbinReader {
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF);
 		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
 		HoTTbinReader.pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
-		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > 10000 && HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000)) {
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > 10000 && HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 4500)) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			HoTTbinReader.pointsGPS[6] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpVelocity > 2000000 ? HoTTbinReader.pointsGPS[6] : HoTTbinReader.tmpVelocity;
 

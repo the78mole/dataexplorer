@@ -875,7 +875,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.tmpClimb1 = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000);
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF) - 120;
 		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
-		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > -20000 && HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 5000)) {
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > -20000 && HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 4500)) {
 			HoTTbinReader.pointsGPS[15] = HoTTAdapter.isFilterEnabled && HoTTbinReader.tmpVelocity > 500000 ? HoTTbinReader.pointsGPS[15] : HoTTbinReader.tmpVelocity;
 
 			HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
