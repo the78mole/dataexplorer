@@ -554,18 +554,18 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		if (isAbsolute) {
 			return this.timeStep_ms.getFormattedTime("yyyy-mm-dd HH:mm:ss.SSS", index, isAbsolute);
 		}
-		String fromatString = "HH:mm:ss.SSS";
+		String formatString = "HH:mm:ss.SSS";
 		if (this.getMaxTime_ms() <= 1000 * 60 * 60)
-			fromatString = "mm:ss.SSS";
+			formatString = "mm:ss.SSS";
 		else if (this.getMaxTime_ms() <= 1000 * 60 * 60 * 60)
-			fromatString = "HH:mm:ss.SSS";
+			formatString = "HH:mm:ss.SSS";
 		else if (this.getMaxTime_ms() > 1000 * 60 * 60 * 60)
-			fromatString = "dd HH:mm:ss.SSS";
+			formatString = "dd HH:mm:ss.SSS";
 		else if (this.getMaxTime_ms() > 1000 * 60 * 60 * 60 * 24)
-			fromatString = "mm:dd HH:mm:ss.SSS";
+			formatString = "mm:dd HH:mm:ss.SSS";
 		else
-			fromatString = "yyyy-mm-dd HH:mm:ss.SSS";
-		return this.timeStep_ms.getFormattedTime(fromatString, index, isAbsolute);
+			formatString = "yyyy-mm-dd HH:mm:ss.SSS";
+		return this.timeStep_ms.getFormattedTime(formatString, index, isAbsolute);
 	}
 
 	/**
