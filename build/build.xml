@@ -197,7 +197,8 @@
 		<ant antfile="build.xml" target="clean" dir="Polaron" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="OpenTxTelemetry" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Akkumatik" inheritall="true" />
-				<!-- add new device here -->
+		<ant antfile="build.xml" target="clean" dir="GigaLogger" inheritall="true" />
+		<!-- add new device here -->
 	</target>
 
 	<!-- install target -->
@@ -371,7 +372,8 @@
 		<ant antfile="build.xml" target="package" dir="Polaron" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="OpenTxTelemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Akkumatik" inheritall="true" />
-				<!-- add new device here -->
+		<ant antfile="build.xml" target="package" dir="GigaLogger" inheritall="true" />
+		<!-- add new device here -->
 	</target>
 
 	<fileset dir="${basedir}">
@@ -403,6 +405,7 @@
 			<include name="OpenTxTelemetry/build/*.jar" />
 			<include name="Polaron/build/*.jar" />
 			<include name="Akkumatik/build/*.jar" />
+			<include name="GigaLogger/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
