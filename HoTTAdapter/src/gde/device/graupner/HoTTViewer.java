@@ -352,6 +352,9 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		this.application.updateStatisticsData(true);
 		this.updateVisibilityStatus(recordSet, true);
 		this.application.getActiveChannel().setFileDescription(recordSet.getFormatedTime_sec(0, true).trim().split(GDE.STRING_BLANK)[0]);
+		
+		//GPSHelper.calculateLabs(this, recordSet, 22, 23, 20, -1, 7);
+
 	}
 
 }
