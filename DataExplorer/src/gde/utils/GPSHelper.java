@@ -496,7 +496,7 @@ public class GPSHelper {
 				lapStartTrip = recordTrip != null ? recordTrip.get(i) : 0;
 				
 				//calculate index delta for 12 sec filter time
-				filterIndexCount = (int) (20*1.8); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
+				filterIndexCount = (int) (3); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
 
 			
 				//create the start line between start point and next nearest point.
@@ -506,8 +506,10 @@ public class GPSHelper {
 //				double deltaLongitude = tmpMinPoint.getLongitude()-tmpStartPoint.getLongitude();
 //				final LatLong startPoint = new LatLong(tmpStartPoint.getLatitude() - deltaLatitude * 2, tmpStartPoint.getLongitude() - deltaLongitude * 2);
 //				final LatLong endPoint = new LatLong(tmpStartPoint.getLatitude() + deltaLatitude * 3, tmpStartPoint.getLongitude() + deltaLongitude * 3);
-				final LatLong startPoint = new LatLong(48.630878451126456, 8.974716626107693);
-				final LatLong endPoint = new LatLong(48.631116656063156, 8.975400254130363);
+//				final LatLong startPoint = new LatLong(48.63880287032757,8.982284478843212);
+//				final LatLong endPoint = new LatLong(48.63902685860762,8.982386738061905);
+				final LatLong startPoint = new LatLong(48.66252392767569,9.435019567608833);
+				final LatLong endPoint = new LatLong(48.66231266631209,9.435081593692303);
 //				log.log(Level.OFF, "startLine - startPoint = " + startPoint.toString() + " endPoint = " + endPoint);
 				double deltaLatitude = Math.abs(endPoint.getLatitude()-startPoint.getLatitude());
 				double deltaLongitude = Math.abs(endPoint.getLongitude()-startPoint.getLongitude());
