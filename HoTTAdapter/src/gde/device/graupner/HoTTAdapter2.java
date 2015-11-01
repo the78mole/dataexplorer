@@ -428,7 +428,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						points[5] = (dataBuffer[4] & 0xFF) * 1000;
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
-						points[8] = (dataBuffer[10] & 0xFF) * 1000;
+						points[8] = (dataBuffer[18] & 0xFF) * 1000;
 					}
 				}
 				break;

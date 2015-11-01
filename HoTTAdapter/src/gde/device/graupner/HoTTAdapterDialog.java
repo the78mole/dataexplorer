@@ -686,10 +686,12 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			this.dialogShell.getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
-					HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
-					HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
-					HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
-					HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+					if (!HoTTAdapterDialog.this.isDisposed()) {
+						HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
+						HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
+						HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+						HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+					}
 				}
 			});
 		}
