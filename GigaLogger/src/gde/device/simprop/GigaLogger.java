@@ -74,7 +74,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	public GigaLogger(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.multiplex.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.simprop.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -93,7 +93,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	public GigaLogger(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.multiplex.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.simprop.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -315,16 +315,8 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			reduction = 0;
 		}
 
-		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = ((int)(value / 1000));
-			double minuten = (value - (grad*1000.0))/10.0;
-			newValue = grad + minuten/60.0;
-		}
-		else {
-			newValue = (value - reduction) * factor + offset;
-		}
+		double	newValue = (value - reduction) * factor + offset;
+
 		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -355,16 +347,8 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			reduction = 0;
 		}
 
-		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = (int)value;
-			double minuten =  (value - grad*1.0) * 60.0;
-			newValue = (grad + minuten/100.0)*1000.0;
-		}
-		else {
-			newValue = (value - offset) / factor + reduction;
-		}
+		double newValue = (value - offset) / factor + reduction;
+
 		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}

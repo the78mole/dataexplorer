@@ -29,28 +29,28 @@
         <Channel type="TYPE_CONFIG" name="Config_1">
 			<Measurement>
 				<name>MSB A00</name>
-				<symbol></symbol>
+				<symbol>-</symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>MSB A00 E</name>
-				<symbol></symbol>
+				<symbol>-</symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>MSB A01</name>
-				<symbol></symbol>
+				<symbol>-</symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>MSB A01 E</name>
-                <symbol></symbol>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -58,7 +58,7 @@
             <Measurement>
                 <name>MSB A02</name>
                 <symbol>-</symbol>
-                <unit></unit>
+                <unit>-</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
@@ -276,21 +276,21 @@
 			</Measurement>
 			<Measurement>
 				<name>MSB A00 E</name>
-				<symbol></symbol>
+				<symbol>-</symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>MSB A01</name>
-				<symbol></symbol>
+				<symbol>-</symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>MSB A01 E</name>
-                <symbol></symbol>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>

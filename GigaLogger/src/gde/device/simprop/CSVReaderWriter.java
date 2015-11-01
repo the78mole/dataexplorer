@@ -82,6 +82,7 @@ public class CSVReaderWriter {
 		String line = GDE.STRING_STAR;
 		BufferedReader reader = null; // to read the data
 		HashMap<String, String> header = new HashMap<String, String>();
+		IDevice device = CSVReaderWriter.application.getActiveDevice();
 
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
@@ -92,10 +93,18 @@ public class CSVReaderWriter {
 			String[] headerDataMeasurements = line.split(GDE.STRING_EMPTY + separator);
 
 			StringBuilder sb = new StringBuilder();
-			for (int i = 1; i < headerDataMeasurements.length; i++) {
+			String[] measurements = device.getMeasurementNames(application.getActiveChannelNumber());
+			for (int i = 1, j = 0; i < headerDataMeasurements.length; i++) {
 				if (headerDataMeasurements[i].trim().length() > 3) {
-					sb.append(headerDataMeasurements[i].trim()).append(separator);
-					sb.append(headerDataMeasurements[i].trim() + "_alarm").append(separator);
+					if (!headerDataMeasurements[i].trim().equals(measurements[j]) && headerDataMeasurements[i].startsWith("MSB")) {
+						sb.append(measurements[j]).append(separator);
+						sb.append(measurements[j] + "_alarm").append(separator);
+					}
+					else {
+						sb.append(headerDataMeasurements[i].trim()).append(separator);
+						sb.append(headerDataMeasurements[i].trim() + "_alarm").append(separator);
+					}
+					j+=2;
 				}
 			}
 			header.put(GDE.CSV_DATA_HEADER_MEASUREMENTS, sb.toString());

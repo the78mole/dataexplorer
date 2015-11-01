@@ -20,10 +20,11 @@ package gde.device.simprop;
 
 import gde.GDE;
 import gde.data.Channels;
+import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.MeasurementControl;
 import gde.ui.MeasurementControlConfigurable;
 import gde.ui.SWTResourceManager;
 
@@ -62,7 +63,7 @@ public class VisualizationControl extends Composite {
 	final IDevice								device;																																								// get device specific things, get serial port, ...
 	final DataExplorer					application;																																					// interaction with application instance
 	final Channels							channels;																																							// interaction with channels, source of all records
-	final GigaLoggerDialog				dialog;
+	final GigaLoggerDialog			dialog;
 	final int										channelConfigNumber;
 	final String								typeName;
 	final int										measurementCount;
@@ -110,15 +111,13 @@ public class VisualizationControl extends Composite {
 			mainTabCompositeLayout.numColumns = 2;
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
 			
+			RecordSet activeRecordSet = this.application.getActiveChannel().getActiveRecordSet();
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
-				if (i > 3) {
-					this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
-							this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
-				}
-				else {
-					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
-				}
+				MeasurementType recordMeasurement = this.device.getChannelMeasuremts(this.channelConfigNumber).get(i);
+				if (activeRecordSet != null)
+					recordMeasurement.setUnit(activeRecordSet.get(i).getUnit());
+				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, recordMeasurement,
+							this.device, 1, GDE.STRING_BLANK + i, ""));
 			}
 		}
 	}

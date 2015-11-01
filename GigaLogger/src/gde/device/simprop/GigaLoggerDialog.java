@@ -161,7 +161,7 @@ public class GigaLoggerDialog extends DeviceDialog {
 					this.tabFolder.setSimple(false);
 					{
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, 24);
+							createVisualizationTabItem(i, this.device.getNumberOfMeasurements(i));
 						}
 					}
 					FormData tabFolderLData = new FormData();
