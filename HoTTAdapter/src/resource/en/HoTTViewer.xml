@@ -8,16 +8,6 @@
         <image>HoTTViewer.png</image>
         <usage>false</usage>
     </Device>
-    <SerialPort>
-        <port></port>
-        <baudeRate>115200</baudeRate>
-        <dataBits>DATABITS_8</dataBits>
-        <stopBits>STOPBITS_1</stopBits>
-        <parity>PARITY_NONE</parity>
-        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
-        <isRTS>false</isRTS>
-        <isDTR>false</isDTR>
-    </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
@@ -26,7 +16,6 @@
         <UTCdelta>0</UTCdelta>
     </TimeBase>
     <DataBlock>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="57"/>
         <format inputType="FILE_IO" formatType="BYTE" size="64"/>
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
