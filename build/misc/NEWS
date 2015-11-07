@@ -1,9 +1,12 @@
-GNU DataExplorer - News - comes with version 3.2.2
+GNU DataExplorer - News - comes with version 3.2.3
 
-1) fix exception while record clone operation (cut)
-2) fix minor errors in automated test
-3) LiPoWatch - small correction of the serial communication to keep LEDs off
-4) HoTTAdapter2* - fix error while opening OSD file with channels from earlier release
+1) HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
+2) GigaLogger - add support
+3) Herkules III Telemetry - add support
+4) HoTTAdapterX - enable live logging (needs device XML to be replaced)
+5) fix - clean data model while importing CSV where record set number follow channel number 
+6) HoTTAdapter* - adapt filter GPS data parsing for import bin log data
+6) fix - scale number calculation error while display area is greater than 1500 pixels.
 
 
 
