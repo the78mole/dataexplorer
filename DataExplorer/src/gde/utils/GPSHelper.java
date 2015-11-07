@@ -508,8 +508,8 @@ public class GPSHelper {
 //				final LatLong endPoint = new LatLong(tmpStartPoint.getLatitude() + deltaLatitude * 3, tmpStartPoint.getLongitude() + deltaLongitude * 3);
 //				final LatLong startPoint = new LatLong(48.63880287032757,8.982284478843212);
 //				final LatLong endPoint = new LatLong(48.63902685860762,8.982386738061905);
-				final LatLong startPoint = new LatLong(48.66252392767569,9.435019567608833);
-				final LatLong endPoint = new LatLong(48.66231266631209,9.435081593692303);
+				final LatLong startPoint = new LatLong(48.66253588583959,9.435037337243557);
+				final LatLong endPoint = new LatLong(48.66224158131457,9.435062482953072);
 //				log.log(Level.OFF, "startLine - startPoint = " + startPoint.toString() + " endPoint = " + endPoint);
 				double deltaLatitude = Math.abs(endPoint.getLatitude()-startPoint.getLatitude());
 				double deltaLongitude = Math.abs(endPoint.getLongitude()-startPoint.getLongitude());
@@ -552,7 +552,7 @@ public class GPSHelper {
 					final int speedFactor = 1 + recordSpeed.get(i)/ 1000 / 15; 
 					if (isLatitude) {
 						if (startLine.get(lastLatLong.getFormattedLatitude()) != null && startLine.get(latLong.getFormattedLatitude()) != null) { //startLine hit found
-							if (Math.abs(startLine.get(lastLatLong.getFormattedLatitude()) - lastLatLong.getLongitude()) <= 0.00006*speedFactor) {
+							if (Math.abs(startLine.get(lastLatLong.getFormattedLatitude()) - lastLatLong.getLongitude()) <= 0.00008*speedFactor) {
 //								log.log(Level.OFF, String.format(Locale.ENGLISH, "%03.7f", Math.abs(Double.valueOf(startLine.get(lastLatLong.getFormattedLatitude())) - lastLatLong.getLongitude())) 
 //								+ " - " + String.format(Locale.ENGLISH, "%03.7f", Math.abs(Double.valueOf(startLine.get(latLong.getFormattedLatitude())) - latLong.getLongitude())));
 								if (Math.abs(startLine.get(latLong.getFormattedLatitude()) - latLong.getLongitude()) > 0.00002/speedFactor) {
@@ -575,7 +575,7 @@ public class GPSHelper {
 					}
 					else {
 						if (startLine.get(lastLatLong.getFormattedLongitude()) != null && startLine.get(latLong.getFormattedLongitude()) != null) { //startLine hit found
-							if (Math.abs(startLine.get(lastLatLong.getFormattedLongitude()) - lastLatLong.getLatitude()) <= 0.00006*speedFactor) {
+							if (Math.abs(startLine.get(lastLatLong.getFormattedLongitude()) - lastLatLong.getLatitude()) <= 0.00008*speedFactor) {
 //								log.log(Level.OFF, String.format(Locale.ENGLISH, "%03.7f", Math.abs(Double.valueOf(startLine.get(lastLatLong.getFormattedLongitude())) - lastLatLong.getLatitude())) 
 //										+ " - " + String.format(Locale.ENGLISH, "%03.7f", Math.abs(Double.valueOf(startLine.get(latLong.getFormattedLongitude())) - latLong.getLatitude())));
 								if (Math.abs(startLine.get(latLong.getFormattedLongitude()) - latLong.getLatitude()) > 0.00002/speedFactor) {
