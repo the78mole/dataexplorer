@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.2.4 - xx yyy 2015
 JetiAdapter - increase number of initial supported measurements to 50
+iCharger - implemented checksum checking for serial communication 
 
 Version 3.2.3 - 09 Nov 2015
 HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
