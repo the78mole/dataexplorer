@@ -116,6 +116,11 @@ public class iCharger208B extends iCharger {
 			setDataLineStartAndLength(dataBuffer, startLength);
 			lineBuffer = new byte[startLength[1]];
 			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
+			//System.out.println(new String(lineBuffer) +  "  " + Checksum.XOR(lineBuffer, lineBuffer.length-2));
+			//byte[] 							tmpChkSum 			= new byte[2];
+			//System.arraycopy(lineBuffer, lineBuffer.length-2, tmpChkSum, 0, 2);
+			//if (!(Integer.valueOf(new String(tmpChkSum)) == Checksum.XOR(lineBuffer, lineBuffer.length-2)))
+			//	System.out.println("Checksum = false");
 			data.parse(new String(lineBuffer), 1);
 			int[] values = data.getValues();
 			
