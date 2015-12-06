@@ -27,6 +27,7 @@ import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
@@ -982,5 +983,55 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 		return 14;
+	}
+
+	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	@Override
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
+		int channelConfigNumber = recordSet.getChannelConfigNumber();
+		int displayableCounter = 0;
+		boolean configChanged = this.isChangePropery();
+		Record record;
+
+		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
+		// check if measurements isActive == false and set to isDisplayable == false
+		for (int i = 0; i < recordSet.size(); ++i) {
+			// since actual record names can differ from device configuration measurement names, match by ordinal
+			record = recordSet.get(i);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+
+			// update active state and displayable state if configuration switched with other names
+			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
+			if (record.isActive() != measurement.isActive()) {
+				record.setActive(measurement.isActive());
+				record.setVisible(measurement.isActive());
+				record.setDisplayable(measurement.isActive());
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (includeReasonableDataCheck) {
+				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+			}
+
+			if (record.isActive() && record.isDisplayable()) {
+				++displayableCounter;
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+			}
+		}
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		recordSet.setConfiguredDisplayable(displayableCounter);
+		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
 }

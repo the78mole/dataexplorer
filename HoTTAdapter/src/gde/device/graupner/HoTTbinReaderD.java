@@ -155,8 +155,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx		
-						if (HoTTbinReaderD.logger.isLoggable(Level.OFF))
-							HoTTbinReaderD.logger.log(Level.OFF, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReaderD.logger.isLoggable(Level.FINER))
+							HoTTbinReaderD.logger.log(Level.FINER, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReaderD.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -343,7 +343,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 					}
 					else { //skip empty block, but add time step
-						if (HoTTbinReaderD.logger.isLoggable(Level.OFF)) HoTTbinReaderD.logger.log(Level.OFF, "-->> Found tx=rx=0 dBm");
+						if (HoTTbinReaderD.logger.isLoggable(Level.FINE)) HoTTbinReaderD.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReaderD.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -619,7 +619,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 							}
 
 							if (HoTTbinReaderD.logger.isLoggable(Level.FINE))
-								HoTTbinReaderD.logger.logp(Level.OFF, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS
+								HoTTbinReaderD.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS
 										+ " logCountGeneral = " + logCountGAM + " logCountElectric = " + logCountEAM);
 							lastSensor = actualSensor;
 							logCountVario = logCountGPS = logCountGAM = logCountEAM = logCountESC = 0;
@@ -800,10 +800,12 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			for (int j = 8; j < 12; j++) {
 				HoTTbinReaderD.points[j] = HoTTbinReader.pointsVario[j];
 			}
-			for (int j = 96; j < 96 + 13; j++) {
-				HoTTbinReaderD.points[j] = HoTTbinReader.pointsVario[j];
-			}
 		}
+		//special test data of FBL receivers
+		for (int j = 96; j < 96 + 13; j++) {
+			HoTTbinReaderD.points[j] = HoTTbinReader.pointsVario[j];
+		}
+			
 		if (isMotorDriverData) {
 			//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
 			for (int j = 70; j < 70 + 6 && j < HoTTbinReaderD.points.length; j++) {
@@ -937,7 +939,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[22] = (_buf3[8] & 0xFF) * 1000;
 			if (!HoTTbinReaderD.isGpsStartTimeSet) {
 				HoTTbinReaderD.gpsStartTime = getStartTime(_buf3[9], _buf4[0], _buf4[1], _buf4[2]);
-				HoTTbinReader.log.log(Level.OFF, String.format("%02d:%02d:%02d.%03d", (_buf3[9] & 0xFF), (_buf4[0] & 0xFF), (_buf4[1] & 0xFF), (_buf4[2] & 0xFF)));
+				HoTTbinReader.log.log(Level.FINE, String.format("%02d:%02d:%02d.%03d", (_buf3[9] & 0xFF), (_buf4[0] & 0xFF), (_buf4[1] & 0xFF), (_buf4[2] & 0xFF)));
 				HoTTbinReaderD.isGpsStartTimeSet = true;
 				final RecordSet activeRecordSet = HoTTbinReader.application.getActiveRecordSet();
 				if (activeRecordSet != null) {
