@@ -15,7 +15,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/AkkuMaster"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CSV2SerialAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/eStation"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/FlightRecorder"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GigaLogger"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/FutabaTelemetry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GPS-Logger"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/iCharger"/>
@@ -23,7 +23,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/LiPoWatch"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Picolario"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Polaron"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/QC-Copter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SKYRC"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UltramatUDP"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UniLog"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UniLog2"/>
