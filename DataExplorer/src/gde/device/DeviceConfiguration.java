@@ -73,6 +73,7 @@ public class DeviceConfiguration {
 	private DevicePropertiesType							deviceProps;
 	private DeviceType												device;
 	private SerialPortType										serialPort;
+	private UsbPortType												usbPort;
 	private DataBlockType											dataBlock;
 	private StateType													state;
 	private TimeBaseType											timeBase;
@@ -168,6 +169,7 @@ public class DeviceConfiguration {
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
+		this.usbPort = this.deviceProps.getUsbPort();
 		this.dataBlock = this.deviceProps.getDataBlock();
 		this.state = this.deviceProps.getState();
 		this.timeBase = this.deviceProps.getTimeBase();
@@ -194,6 +196,7 @@ public class DeviceConfiguration {
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
+		this.usbPort = this.deviceProps.getUsbPort();
 		this.dataBlock = this.deviceProps.getDataBlock();
 		this.state = this.deviceProps.getState();
 		this.timeBase = this.deviceProps.getTimeBase();
@@ -215,6 +218,7 @@ public class DeviceConfiguration {
 		this.deviceProps = deviceConfig.deviceProps;
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
+		this.usbPort = this.deviceProps.getUsbPort();
 		this.dataBlock = deviceProps.dataBlock;
 		this.state = deviceProps.state;
 		this.timeBase = deviceConfig.timeBase;	
@@ -281,6 +285,21 @@ public class DeviceConfiguration {
 	public void removeSerialPortType() {
 		this.isChangePropery = true;
 		this.serialPort = this.deviceProps.serialPort = null;
+	}
+
+	/**
+	 * @return the serialPort
+	 */
+	public UsbPortType getUsbPortType() {
+		return this.usbPort;
+	}
+	
+	/**
+	 * remove the serialPort of the active device configuration
+	 */
+	public void removeUsbPortType() {
+		this.isChangePropery = true;
+		this.usbPort = this.deviceProps.usbPort = null;
 	}
 
 	/**
@@ -436,7 +455,8 @@ public class DeviceConfiguration {
 	 */
 	public String getPort() {
 		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() 
-				: this.serialPort != null ? this.serialPort.getPort() : GDE.STRING_EMPTY;
+				: this.serialPort != null ? this.serialPort.getPort() 
+						: this.getUsbPortType() != null ? "USB" : GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -612,6 +632,46 @@ public class DeviceConfiguration {
 		}
 	}
 
+	public UsbInterfaceType getUsbInterfaceType() {
+		return this.usbPort.getUsbInterface();
+	}
+	
+	/**
+	 * @return the vendor ID of the USB port to be used for device communication
+	 */
+	public short getUsbVendorId() {
+		return Short.valueOf(this.usbPort.getVendorId().substring(2), 16);
+	}
+	
+	/**
+	 * @return the product ID of the device to be used for communication
+	 */
+	public short getUsbProductId() {
+		return Short.valueOf(this.usbPort.getProductId().substring(2), 16);
+	}
+	
+	/**
+	 * @return the interface address to be used for communication
+	 */
+	public byte getUsbInterface() {
+		return Byte.valueOf(this.usbPort.getUsbInterface().getInterface().getValue().substring(2), 16);
+	}
+	
+	/**
+	 * @return the end point address of the interface to be used for write communication 
+	 */
+	public byte getUsbEndpointIn() {
+		return Byte.valueOf(this.usbPort.getUsbInterface().getEndPointIn().substring(2), 16);
+	}
+	
+	/**
+	 * @return the end point address of the interface to be used for read communication
+	 */
+	public byte getUsbEndpointOut() {
+		return Short.valueOf(this.usbPort.getUsbInterface().getEndPointOut().substring(2), 16).byteValue();
+	}
+
+	
 	/**
 	 * set a new desktop type
 	 * @param newDesktopType
@@ -2330,4 +2390,6 @@ public class DeviceConfiguration {
 	public int	getCurrentSmoothIndex() {
 		return 0;
 	}
+	
+
 }

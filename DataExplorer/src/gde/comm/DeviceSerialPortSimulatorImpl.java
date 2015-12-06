@@ -50,6 +50,15 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.usb.UsbClaimException;
+import javax.usb.UsbDevice;
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
+import javax.usb.UsbHub;
+import javax.usb.UsbInterface;
+import javax.usb.UsbNotActiveException;
+import javax.usb.UsbNotClaimedException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 
@@ -631,4 +640,89 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex, int minCount) throws InterruptedException, TimeOutException, IOException {
 		return 0;
 	}
+	/////// USB interface starts here
+  /**
+   * find USB device to be identified by vendor ID and product ID
+   * @param vendorId
+   * @param productId
+   * @return
+   * @throws UsbException
+   */
+	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException {
+		return null;
+	}
+
+	/**
+	 * find USB device starting from hub (root hub)
+	 * @param hub
+	 * @param vendorId
+	 * @param productId
+	 * @return
+	 */
+	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
+		return null;
+	}
+
+	/**
+	 * dump required information for a USB device with known product ID and
+	 * vendor ID
+	 * @param vendorId
+	 * @param productId
+	 * @throws UsbException
+	 */
+	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException {
+		//no explicit return result
+	}
+	
+	/**
+	 * claim USB interface with given number which correlates to open a USB port
+	 * @param IDevice the actual device in use
+	 * @return
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException {
+		return null;
+	}
+
+	/**
+	 * release or close the given interface
+	 * @param usbInterface
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public void closeUsbPort(UsbInterface usbInterface) throws UsbClaimException, UsbException {
+		//no explicit return result
+	}
+	
+	/**
+	 * write a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data
+	 * @return number of bytes sent
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int write(final UsbInterface iface, final byte endpointAddress, final byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+		return 0;
+	}
+
+	/**
+	 * read a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data receive buffer
+	 * @return number of bytes received
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+		return 0;
+	}
+
 }

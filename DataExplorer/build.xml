@@ -34,7 +34,12 @@
 
 	<path id="compile.classpath">
 		<pathelement location="../build/lib/RXTXcomm.jar" />
+		<pathelement location="../build/lib/usb4java-1.2.0.jar" />
+		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
+		<pathelement location="../build/lib/usb4java-javax-1.2.0.jar" />
+		<pathelement location="../build/lib/build/lib/commons-lang3-3.2.1.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java-1.2.0.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">

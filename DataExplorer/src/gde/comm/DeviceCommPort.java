@@ -31,6 +31,15 @@ import gnu.io.SerialPort;
 import java.io.IOException;
 import java.util.Vector;
 
+import javax.usb.UsbClaimException;
+import javax.usb.UsbDevice;
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
+import javax.usb.UsbHub;
+import javax.usb.UsbInterface;
+import javax.usb.UsbNotActiveException;
+import javax.usb.UsbNotClaimedException;
+
 /**
  * @author brueg
  *
@@ -65,9 +74,13 @@ public class DeviceCommPort implements IDeviceCommPort {
 						? (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : 100) 
 						: (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : (int)this.device.getTimeStep_ms())));
 		}
-		else {
+		else  if (this.deviceConfig.getSerialPortType() != null) {
 			this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
 		}
+		else if (this.deviceConfig.getUsbPortType() != null) { // USB device
+			this.port = new DeviceUsbPortImpl(this.deviceConfig, this.application);
+		}
+		else this.port = null;
 	}
 	
 	/**
@@ -85,9 +98,13 @@ public class DeviceCommPort implements IDeviceCommPort {
 						? (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : 100) 
 						: (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : (int)this.deviceConfig.getTimeStep_ms())));
 		}
-		else {
+		else  if (this.deviceConfig.getSerialPortType() != null) {
 			this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
 		}
+		else if (this.deviceConfig.getUsbPortType() != null) { // USB device
+			this.port = new DeviceUsbPortImpl(this.deviceConfig, this.application);
+		}
+		else this.port = null;
 	}
 
 	/* (non-Javadoc)
@@ -249,4 +266,90 @@ public class DeviceCommPort implements IDeviceCommPort {
 	public synchronized void setInterruptedByUser(boolean setInterruptedByUser) {
 		this.isInterruptedByUser = setInterruptedByUser;
 	}
+	
+	/////// USB interface starts here
+  /**
+   * find USB device to be identified by vendor ID and product ID
+   * @param vendorId
+   * @param productId
+   * @return
+   * @throws UsbException
+   */
+	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException {
+		return this.port.findUsbDevice(vendorId, productId);
+	}
+
+	/**
+	 * find USB device starting from hub (root hub)
+	 * @param hub
+	 * @param vendorId
+	 * @param productId
+	 * @return
+	 */
+	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
+		return this.port.findDevice(hub, vendorId, productId);
+	}
+
+	/**
+	 * dump required information for a USB device with known product ID and
+	 * vendor ID
+	 * @param vendorId
+	 * @param productId
+	 * @throws UsbException
+	 */
+	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException {
+		this.port.dumpUsbDevice(vendorId, productId);
+	}
+	
+	/**
+	 * claim USB interface with given number which correlates to open a USB port
+	 * @param IDevice the actual device in use
+	 * @return
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException {
+		return this.port.openUsbPort(activeDevice);
+	}
+
+	/**
+	 * release or close the given interface
+	 * @param usbInterface
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public void closeUsbPort(final UsbInterface usbInterface) throws UsbClaimException, UsbException {
+		this.port.closeUsbPort(usbInterface);
+	}
+	
+	/**
+	 * write a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data
+	 * @return number of bytes sent
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int write(final UsbInterface iface, final byte endpointAddress, final byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+		return this.port.write(iface, endpointAddress, data);
+	}
+
+	/**
+	 * read a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data receive buffer
+	 * @return number of bytes received
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+		return this.port.read(iface, endpointAddress, data);
+	}
+
 }

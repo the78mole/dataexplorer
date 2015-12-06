@@ -959,4 +959,30 @@ public interface IDevice {
 	 * 2 current drop more or equal than 2 measurements 
 	 */
 	public int	getCurrentSmoothIndex();
+	
+	/**
+	 * @return the vendor ID of the USB port to be used for device communication
+	 */
+	public short getUsbVendorId();
+	
+	/**
+	 * @return the product ID of the device to be used for communication
+	 */
+	public short getUsbProductId();
+	
+	/**
+	 * @return the interface address to be used for communication
+	 */
+	public byte getUsbInterface();
+	
+	/**
+	 * @return the end point address of the interface to be used for write communication 
+	 */
+	public byte getUsbEndpointIn();
+	
+	/**
+	 * @return the end point address of the interface to be used for read communication
+	 */
+	public byte getUsbEndpointOut();
+	
 }

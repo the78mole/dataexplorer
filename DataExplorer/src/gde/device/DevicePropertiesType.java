@@ -10,6 +10,7 @@ package gde.device;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -29,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="Device" type="{}DeviceType"/>
  *         &lt;element name="SerialPort" type="{}SerialPortType" minOccurs="0"/>
+ *         &lt;element name="UsbPort" type="{}UsbPortType" minOccurs="0"/>
  *         &lt;element name="TimeBase" type="{}TimeBaseType"/>
  *         &lt;element name="DataBlock" type="{}DataBlockType" minOccurs="0"/>
  *         &lt;element name="State" type="{}StateType" minOccurs="0"/>
@@ -58,6 +60,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "DevicePropertiesType", propOrder = {
     "device",
     "serialPort",
+    "usbPort",
     "timeBase",
     "dataBlock",
     "state",
@@ -70,6 +73,8 @@ public class DevicePropertiesType {
     protected DeviceType device;
     @XmlElement(name = "SerialPort")
     protected SerialPortType serialPort;
+    @XmlElement(name = "UsbPort")
+    protected UsbPortType usbPort;
     @XmlElement(name = "TimeBase", required = true)
     protected TimeBaseType timeBase;
     @XmlElement(name = "DataBlock")
@@ -127,6 +132,30 @@ public class DevicePropertiesType {
      */
     public void setSerialPort(SerialPortType value) {
         this.serialPort = value;
+    }
+
+    /**
+     * Gets the value of the usbPort property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link UsbPortType }
+     *     
+     */
+    public UsbPortType getUsbPort() {
+        return usbPort;
+    }
+
+    /**
+     * Sets the value of the usbPort property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link UsbPortType }
+     *     
+     */
+    public void setUsbPort(UsbPortType value) {
+        this.usbPort = value;
     }
 
     /**

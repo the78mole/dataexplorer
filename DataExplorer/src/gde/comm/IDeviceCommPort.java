@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.comm;
 
+import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
@@ -26,6 +27,15 @@ import gnu.io.SerialPort;
 
 import java.io.IOException;
 import java.util.Vector;
+
+import javax.usb.UsbClaimException;
+import javax.usb.UsbDevice;
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
+import javax.usb.UsbHub;
+import javax.usb.UsbInterface;
+import javax.usb.UsbNotActiveException;
+import javax.usb.UsbNotClaimedException;
 
 /**
  * interface to device serial port to enable overloading with different implementations
@@ -206,9 +216,82 @@ public interface IDeviceCommPort {
 	public boolean isMatchAvailablePorts(String newSerialPortStr);
 
 	/**
-	 * check available bytes on inputstream
+	 * check available bytes on input stream
 	 * @return number of bytes available on inputstream
 	 * @throws IOException
 	 */
 	public int getAvailableBytes() throws IOException;
+	
+	/////// USB interface starts here
+  /**
+   * find USB device to be identified by vendor ID and product ID
+   * @param vendorId
+   * @param productId
+   * @return
+   * @throws UsbException
+   */
+	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException;
+
+	/**
+	 * find USB device starting from hub (root hub)
+	 * @param hub
+	 * @param vendorId
+	 * @param productId
+	 * @return
+	 */
+	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId);
+
+	/**
+	 * dump required information for a USB device with known product ID and
+	 * vendor ID
+	 * @param vendorId
+	 * @param productId
+	 * @throws UsbException
+	 */
+	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException;
+	
+	
+	/**
+	 * claim USB interface with given number which correlates to open a USB port
+	 * @param IDevice the actual device in use
+	 * @return
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException;
+
+	/**
+	 * release or close the given interface
+	 * @param usbInterface
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public void closeUsbPort(final UsbInterface usbInterface) throws UsbClaimException, UsbException;
+
+	/**
+	 * write a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data
+	 * @return number of bytes sent
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int write(final UsbInterface iface, final byte endpointAddress, final byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException;
+
+	/**
+	 * read a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data receive buffer
+	 * @return number of bytes received
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException;
+
 }
