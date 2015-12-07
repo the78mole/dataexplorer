@@ -64,7 +64,7 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		SLOT_1(new byte[]{0x0f, 0x04, 0x55, 0x00, 0x01, 0x56, (byte) 0xff, (byte) 0xff}), 
 		SLOT_2(new byte[]{0x0f, 0x04, 0x55, 0x00, 0x02, 0x57, (byte) 0xff, (byte) 0xff}), 
 		SLOT_3(new byte[]{0x0f, 0x04, 0x55, 0x00, 0x03, 0x58, (byte) 0xff, (byte) 0xff});
-		private final byte[]	value;
+		private byte[]	value;
 
 		private TakeMtuData(byte[] v) {
 			this.value = v;
@@ -73,9 +73,13 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		public byte[] value() {
 			return this.value;
 		}
+
+		public void setValue(final byte[] newValue) {
+			this.value = newValue;
+		}
 	};
 	
-	final byte[] GET_SYSTEM_SETTING = new byte[]{0x0f, 0x04, 0x5a, 0x00, 0x00, 0x5a, (byte) 0xff, (byte) 0xff};
+	byte[] GET_SYSTEM_SETTING = new byte[]{0x0f, 0x04, 0x5a, 0x00, 0x00, 0x5a, (byte) 0xff, (byte) 0xff};
 	
 	final int  dataSize;
 	final int  terminalDataSize = 345; // configuration menu string
@@ -92,6 +96,23 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		this.interfaceId = this.device.getUsbInterface();
 		this.endpointIn = this.device.getUsbEndpointIn();
 		this.endpointOut = this.device.getUsbEndpointOut();
+		
+		//make sure commands have enough bytes to fill endpoint buffer
+		byte[] tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(TakeMtuData.SLOT_0.value(), 0, tmpData, 0, TakeMtuData.SLOT_0.value().length);
+		TakeMtuData.SLOT_0.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(TakeMtuData.SLOT_1.value(), 0, tmpData, 0, TakeMtuData.SLOT_1.value().length);
+		TakeMtuData.SLOT_1.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(TakeMtuData.SLOT_2.value(), 0, tmpData, 0, TakeMtuData.SLOT_2.value().length);
+		TakeMtuData.SLOT_2.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(TakeMtuData.SLOT_3.value(), 0, tmpData, 0, TakeMtuData.SLOT_3.value().length);
+		TakeMtuData.SLOT_3.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(GET_SYSTEM_SETTING, 0, tmpData, 0, GET_SYSTEM_SETTING.length);
+		GET_SYSTEM_SETTING = tmpData;
 	}
 	
 	/**

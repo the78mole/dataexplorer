@@ -35,7 +35,7 @@
         <property name="Cycle" value="4" type="Integer"/>
     </State>
     <Channels lastUseOrdinal="3">
-        <Channel name="Schacht 1" type="TYPE_OUTLET">
+        <Channel name="Slot 1" type="TYPE_OUTLET">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -91,7 +91,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
         </Channel>
-        <Channel name="Schacht 2" type="TYPE_OUTLET">
+        <Channel name="Slot 2" type="TYPE_OUTLET">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -147,7 +147,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
         </Channel>
-        <Channel name="Schacht 3" type="TYPE_OUTLET">
+        <Channel name="Slot 3" type="TYPE_OUTLET">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -203,7 +203,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
         </Channel>
-        <Channel name="Schacht 4" type="TYPE_OUTLET">
+        <Channel name="Slot 4" type="TYPE_OUTLET">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -259,7 +259,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
         </Channel>
-        <Channel name="Kombi 5" type="TYPE_OUTLET">
+        <Channel name="Combi 5" type="TYPE_OUTLET">
             <Measurement>
                 <name>Voltage 1</name>
                 <symbol>U</symbol>

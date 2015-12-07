@@ -413,7 +413,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					this.application.openMessageDialog(this.dialog.getDialogShell(),
 							Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					try {
-						this.usbPort.closeUsbPort(null);
+						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
 					}
 					catch (UsbException ex) {
 						MC3000.log.log(java.util.logging.Level.SEVERE, ex.getMessage(), ex);
@@ -424,7 +424,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					this.application.openMessageDialog(this.dialog.getDialogShell(),
 							Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					try {
-						this.usbPort.closeUsbPort(null);
+						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
 					}
 					catch (UsbException ex) {
 						MC3000.log.log(java.util.logging.Level.SEVERE, ex.getMessage(), ex);
@@ -445,7 +445,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				}
 				//if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 				try {
-					this.usbPort.closeUsbPort(null);
+					if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
 				}
 				catch (UsbException e) {
 					MC3000.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
