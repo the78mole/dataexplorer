@@ -342,11 +342,13 @@ public class FileHandler {
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
 		}
-		FileDialog fileDialog;
-		String osdFilePath;
+		FileDialog fileDialog = null;
+		String osdFilePath = null;
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal(false))) {
 			fileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.FILE_SEPARATOR_UNIX, getFileNameProposal(false));
-			osdFilePath = fileDialog.open();
+			if (fileDialog != null) {
+				osdFilePath = fileDialog.open();
+			}
 		}
 		else {
 			osdFilePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
