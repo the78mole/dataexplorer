@@ -281,27 +281,27 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 			    @Override
 			    public boolean forceClaim(UsbInterface usbInterface_)
 			    {
-			    	DeviceHandle handle = new DeviceHandle();
-			    	int result = LibUsb.open(findDevice(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId()), handle);
-			    	if (result != LibUsb.SUCCESS) throw new LibUsbException("Unable to open USB device", result);
-			    	try
-			    	{
-						   // Check if kernel driver must be detached
-				    	boolean detach = LibUsb.hasCapability(LibUsb.CAP_SUPPORTS_DETACH_KERNEL_DRIVER) 
-				    	    && 1 == LibUsb.kernelDriverActive(handle, activeDevice.getUsbInterface());
-				    	log.log(Level.INFO, "kernel driver must be detached = " + detach);
-
-				    	// Detach the kernel driver
-				    	if (detach)
-				    	{
-				    	    int detachResult = LibUsb.detachKernelDriver(handle,  activeDevice.getUsbInterface());
-				    	    if (detachResult != LibUsb.SUCCESS) throw new LibUsbException("Unable to detach kernel driver", detachResult);
-				    	}
-			    	}
-			    	finally
-			    	{
-			    	    LibUsb.close(handle);
-			    	}
+//			    	DeviceHandle handle = new DeviceHandle();
+//			    	int result = LibUsb.open(findDevice(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId()), handle);
+//			    	if (result != LibUsb.SUCCESS) throw new LibUsbException("Unable to open USB device", result);
+//			    	try
+//			    	{
+//						   // Check if kernel driver must be detached
+//				    	boolean detach = LibUsb.hasCapability(LibUsb.CAP_SUPPORTS_DETACH_KERNEL_DRIVER) 
+//				    	    && 1 == LibUsb.kernelDriverActive(handle, activeDevice.getUsbInterface());
+//				    	log.log(Level.INFO, "kernel driver must be detached = " + detach);
+//
+//				    	// Detach the kernel driver
+//				    	if (detach)
+//				    	{
+//				    	    int detachResult = LibUsb.detachKernelDriver(handle,  activeDevice.getUsbInterface());
+//				    	    if (detachResult != LibUsb.SUCCESS) throw new LibUsbException("Unable to detach kernel driver", detachResult);
+//				    	}
+//			    	}
+//			    	finally
+//			    	{
+//			    	    LibUsb.close(handle);
+//			    	}
 
 			        return true;
 			    }
