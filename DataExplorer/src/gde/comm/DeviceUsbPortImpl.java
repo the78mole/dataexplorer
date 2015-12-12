@@ -1,5 +1,6 @@
 package gde.comm;
 
+import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -27,10 +28,18 @@ import javax.usb.UsbException;
 import javax.usb.UsbHostManager;
 import javax.usb.UsbHub;
 import javax.usb.UsbInterface;
+import javax.usb.UsbInterfacePolicy;
 import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
 import javax.usb.UsbPipe;
 import javax.usb.UsbServices;
+
+import org.usb4java.Device;
+import org.usb4java.DeviceDescriptor;
+import org.usb4java.DeviceHandle;
+import org.usb4java.DeviceList;
+import org.usb4java.LibUsb;
+import org.usb4java.LibUsbException;
 
 public class DeviceUsbPortImpl implements IDeviceCommPort {
 	private final static Logger								log												= Logger.getLogger(DeviceUsbPortImpl.class.getName());
@@ -202,7 +211,35 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		}
 		return null;
 	}
+	
+	public Device findDevice(short vendorId, short productId)
+	{
+	    // Read the USB device list
+	    DeviceList list = new DeviceList();
+	    int result = LibUsb.getDeviceList(null, list);
+	    if (result < 0) throw new LibUsbException("Unable to get device list", result);
 
+	    try
+	    {
+	        // Iterate over all devices and scan for the right one
+	        for (Device device: list)
+	        {
+	            DeviceDescriptor descriptor = new DeviceDescriptor();
+	            result = LibUsb.getDeviceDescriptor(device, descriptor);
+	            if (result != LibUsb.SUCCESS) throw new LibUsbException("Unable to read device descriptor", result);
+	            if (descriptor.idVendor() == vendorId && descriptor.idProduct() == productId) return device;
+	        }
+	    }
+	    finally
+	    {
+	        // Ensure the allocated device list is freed
+	        LibUsb.freeDeviceList(list, true);
+	    }
+
+	    // Device not found
+	    return null;
+	}
+	
 	/**
 	 * dump required information for a USB device with known product ID and
 	 * vendor ID
@@ -232,13 +269,47 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbClaimException
 	 * @throws UsbException
 	 */
-	public UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException {
+	public synchronized UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException {
 		byte ifaceId = activeDevice.getUsbInterface();
 		UsbDevice usbDevice = findUsbDevice(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId());
 		if (usbDevice == null) throw new UsbException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 		UsbInterface usbInterface = ((UsbConfiguration) usbDevice.getUsbConfigurations().get(0)).getUsbInterface(ifaceId);
 		log.log(Level.FINE, usbInterface.toString());
-		usbInterface.claim();
+		if (GDE.IS_LINUX) {
+			usbInterface.claim(new UsbInterfacePolicy()
+			{            
+			    @Override
+			    public boolean forceClaim(UsbInterface usbInterface_)
+			    {
+			    	DeviceHandle handle = new DeviceHandle();
+			    	int result = LibUsb.open(findDevice(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId()), handle);
+			    	if (result != LibUsb.SUCCESS) throw new LibUsbException("Unable to open USB device", result);
+			    	try
+			    	{
+						   // Check if kernel driver must be detached
+				    	boolean detach = LibUsb.hasCapability(LibUsb.CAP_SUPPORTS_DETACH_KERNEL_DRIVER) 
+				    	    && 1 == LibUsb.kernelDriverActive(handle, activeDevice.getUsbInterface());
+				    	log.log(Level.INFO, "kernel driver must be detached = " + detach);
+
+				    	// Detach the kernel driver
+				    	if (detach)
+				    	{
+				    	    int detachResult = LibUsb.detachKernelDriver(handle,  activeDevice.getUsbInterface());
+				    	    if (detachResult != LibUsb.SUCCESS) throw new LibUsbException("Unable to detach kernel driver", detachResult);
+				    	}
+			    	}
+			    	finally
+			    	{
+			    	    LibUsb.close(handle);
+			    	}
+
+			        return true;
+			    }
+			});
+		}
+		else {
+			usbInterface.claim();
+		}
 		log.log(Level.OFF, "interface claimed");
 		this.isConnected = true;
 		if (this.application != null) this.application.setPortConnected(true);
@@ -251,7 +322,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbClaimException
 	 * @throws UsbException
 	 */
-	public void closeUsbPort(UsbInterface usbInterface) throws UsbClaimException, UsbException {
+	public synchronized void closeUsbPort(UsbInterface usbInterface) throws UsbClaimException, UsbException {
 		this.isConnected = false;
 		if (usbInterface == null) {
 			UsbDevice usbDevice = findUsbDevice(this.application.getActiveDevice().getUsbVendorId(), this.application.getActiveDevice().getUsbProductId());
@@ -276,7 +347,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbDisconnectedException
 	 * @throws UsbException
 	 */
-	public int write(final UsbInterface iface, final byte endpointAddress, final byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+	public synchronized int write(final UsbInterface iface, final byte endpointAddress, final byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
 		if (this.application != null) this.application.setSerialTxOn();
 		UsbEndpoint endpoint = iface.getUsbEndpoint(endpointAddress);
 		int sent = 0;
@@ -304,7 +375,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbDisconnectedException
 	 * @throws UsbException
 	 */
-	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+	public synchronized int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
 		if (this.application != null) this.application.setSerialRxOn();
 		UsbEndpoint endpoint = iface.getUsbEndpoint(endpointAddress);
 		int received = 0;
