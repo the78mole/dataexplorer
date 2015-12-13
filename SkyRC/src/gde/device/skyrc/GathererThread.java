@@ -173,7 +173,7 @@ public class GathererThread extends Thread {
 								recordSetKey4 = (String) ch4[1];
 							}
 
-							if (this.isMoreThanOneSlotProcessing()) {
+							if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4) {
 								//build combination of all the data to display it as curve compare
 								points5[0] = points1[0];
 								points5[1] = points2[0];
@@ -460,15 +460,6 @@ public class GathererThread extends Thread {
 		}
 		else
 			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
-	}
-
-	private boolean isMoreThanOneSlotProcessing() {
-		int count = 0;
-		if (this.isProgrammExecuting1) ++count;
-		if (this.isProgrammExecuting2) ++count;
-		if (this.isProgrammExecuting3) ++count;
-		if (this.isProgrammExecuting4) ++count;
-		return count > 1;
 	}
 
 	/**
