@@ -179,6 +179,7 @@ public class Settings extends Properties {
 	public static final String			IS_REDUCE_CHARGE_DISCHARGE		= "is_reduce_charge_discharge";																																	//$NON-NLS-1$
 	public final static String			IS_ALL_IN_ONE_RECORDSET				= "is_all_in_one_record_set";																																		//$NON-NLS-1$
 	public final static String			IS_PARTIAL_DATA_TABLE					= "is_partial_data_table";																																		//$NON-NLS-1$
+	public final static String			IS_DATA_TABLE_EDITABLE				= "is_data_table_editable";																																		//$NON-NLS-1$
 	public final static String			GLOBAL_LOG_LEVEL							= "global_log_level";																																						//$NON-NLS-1$
 	public final static String			UI_LOG_LEVEL									= "ui_log_leve";																																								//$NON-NLS-1$
 	public final static String			DEVICE_LOG_LEVEL							= "device_log_level";																																						//$NON-NLS-1$
@@ -1077,6 +1078,20 @@ public class Settings extends Properties {
 	 */
 	public void setPartialDataTable(boolean enabled) {
 		this.setProperty(Settings.IS_PARTIAL_DATA_TABLE, GDE.STRING_EMPTY + enabled);
+	}
+
+	/**
+	 * @return boolean value if data table displayed selected record entry is editable, this preference is not persistence
+	 */
+	public boolean isDataTableEditable() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_TABLE_EDITABLE, "false").trim()); //$NON-NLS-1$
+	}
+
+	/**
+	 * set boolean value if data table should enable editing selected record entry, this preference will not be made persistence
+	 */
+	public void setDataTableEditable(boolean enabled) {
+		this.setProperty(Settings.IS_DATA_TABLE_EDITABLE, GDE.STRING_EMPTY + enabled);
 	}
 
 	/**

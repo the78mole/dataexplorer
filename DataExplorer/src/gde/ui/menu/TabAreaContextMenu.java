@@ -65,6 +65,7 @@ public class TabAreaContextMenu {
 	MenuItem											borderColorItem;
 	MenuItem											dateTimeItem;
 	MenuItem											partialTableItem;
+	MenuItem											editTableItem;
 	MenuItem											setDigitalFontItem;
 	boolean												isCreated = false;
 
@@ -72,7 +73,7 @@ public class TabAreaContextMenu {
 		this.application = DataExplorer.getInstance();
 	}
 
-	public void createMenu(Menu popupMenu, int type) {
+	public void createMenu(Menu popupMenu, final int type) {
 		popupMenu.addMenuListener(new MenuListener() {
 			public void menuShown(MenuEvent e) {
 				TabAreaContextMenu.log.log(Level.FINEST, "menuShown action " + e); //$NON-NLS-1$
@@ -81,6 +82,9 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+				}
+				if (type == TYPE_TABLE && editTableItem != null) {
+					editTableItem.setSelection(Settings.getInstance().isDataTableEditable());	
 				}
 			}
 			public void menuHidden(MenuEvent e) {
@@ -192,6 +196,15 @@ public class TabAreaContextMenu {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
 						TabAreaContextMenu.this.application.setAbsoluteDateTime(TabAreaContextMenu.this.dateTimeItem.getSelection());
+					}
+				});
+				this.editTableItem = new MenuItem(popupMenu, SWT.CHECK);
+				this.editTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0731));
+				this.editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
+				this.editTableItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.OFF, "editTableItem action performed! " + e); //$NON-NLS-1$
+						Settings.getInstance().setDataTableEditable(TabAreaContextMenu.this.editTableItem.getSelection());
 					}
 				});
 				this.partialTableItem = new MenuItem(popupMenu, SWT.CHECK);

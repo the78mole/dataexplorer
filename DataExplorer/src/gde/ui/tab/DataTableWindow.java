@@ -18,6 +18,22 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.utils.StringHelper;
+
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -25,39 +41,33 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.IDevice;
-import gde.device.MeasurementType;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Table display class, displays the data in table form
@@ -89,7 +99,7 @@ public class DataTableWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0233));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
@@ -103,10 +113,86 @@ public class DataTableWindow extends CTabItem {
 		this.dataTable.setLinesVisible(true);
 		this.dataTable.setHeaderVisible(true);
 
+		final TableEditor editor = new TableEditor(this.dataTable);
+		editor.horizontalAlignment = SWT.LEFT;
+		editor.grabHorizontal = true;
+
 		this.cursor = new TableCursor(this.dataTable, SWT.NONE);
 		this.cursor.addKeyListener(new KeyListener() {
-			public void keyReleased(KeyEvent event) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, ("cursor.keyReleased, keycode: " + event.keyCode));
+			@Override
+			public void keyReleased(final KeyEvent event) {
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, ("cursor.keyReleased, keycode: " + event.keyCode));
+
+				if (DataTableWindow.this.settings.isDataTableEditable()) {
+					// Clean up any previous editor control
+					Control oldEditor = editor.getEditor();
+					if (oldEditor != null) oldEditor.dispose();
+
+					// Identify the selected row
+					TableItem item = DataTableWindow.this.cursor.getRow();
+					if (item == null) return;
+
+					final String origText = item.getText(DataTableWindow.this.cursor.getColumn());
+					// The control that will be the editor must be a child of the Table
+					final Text text = new Text(DataTableWindow.this.dataTable, SWT.NONE);
+					text.setText(String.valueOf(event.character));
+					final TableItem row = DataTableWindow.this.cursor.getRow();
+					final int column = DataTableWindow.this.cursor.getColumn();
+					text.addModifyListener(new ModifyListener() {
+						@Override
+						public void modifyText(ModifyEvent me) {
+							Text modifyText = (Text) editor.getEditor();
+								editor.getItem().setText(DataTableWindow.this.cursor.getColumn(), modifyText.getText());
+						}
+					});
+					text.addVerifyListener(new VerifyListener() {
+						
+						public void verifyText(VerifyEvent ve) {
+							ve.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, text.getText());					
+						}
+					});
+					text.addFocusListener(new FocusListener() {
+						@Override
+						public void focusLost(FocusEvent fe) {
+							//System.out.println("focus lost");
+							DataTableWindow.this.settings.setDataTableEditable(false);
+							if (!setEditedRecordPoint(row, column)) 
+								DataTableWindow.this.cursor.getRow().setText(column, origText);
+							text.dispose();
+						}
+						@Override
+						public void focusGained(FocusEvent arg0) {
+							//System.out.println("focus gained");
+						}
+					});
+					text.addKeyListener(new KeyListener() {
+
+						@Override
+						public void keyReleased(KeyEvent ke) {
+							//System.out.println("key released");
+						}
+						@Override
+						public void keyPressed(KeyEvent ke) {
+							//System.out.println("key pressed");
+							if (ke.character == SWT.CR) {
+								row.setText(column, ((Text) editor.getEditor()).getText());
+								DataTableWindow.this.settings.setDataTableEditable(false);
+								if (!setEditedRecordPoint(row, column)) 
+									DataTableWindow.this.cursor.getRow().setText(column, origText);
+								text.dispose();
+							}
+							// close the text editor when the user hits "ESC"
+							else if (ke.character == SWT.ESC) {
+								DataTableWindow.this.cursor.getRow().setText(column, origText);
+								text.dispose();
+								DataTableWindow.this.settings.setDataTableEditable(false);
+							}
+						}
+					});
+					text.selectAll();
+					text.setFocus();
+					editor.setEditor(text, item, DataTableWindow.this.cursor.getColumn());
+				}
 
 				if (event.stateMask == SWT.MOD1) {
 					switch (event.keyCode) {
@@ -170,7 +256,7 @@ public class DataTableWindow extends CTabItem {
 					}
 				}
 
-				// setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
+				//setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
 				//System.out.println("cursor.keyReleased " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
 				if (DataTableWindow.this.cursor.getRow() != null && (((event.stateMask & SWT.MOD1) == 0 && event.character != 'c') || ((event.stateMask & SWT.MOD1) == 0 && event.character != 'a'))) {
 					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
@@ -197,14 +283,14 @@ public class DataTableWindow extends CTabItem {
 				 * fired and the TableCursor automatically changed the row. 
 				*/
 				int row = DataTableWindow.this.rowVector.get(0);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, ("Setting selection to row: " + row));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting selection to row: " + row));
 				DataTableWindow.this.cursor.setSelection(row, col);
 
 				/* As the TableCursor automatically changes the rows and we go back, the item that was on top of the list changes.
 				 * We fix that here to get the original item at the top of the list again.
 				 */
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER))
+					DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
 				DataTableWindow.this.dataTable.setTopIndex(DataTableWindow.this.topindexVector.get(0));
 
 				/* Workaround: When Home or End is pressed, the cursor is misplaced in such way,
@@ -215,12 +301,11 @@ public class DataTableWindow extends CTabItem {
 				DataTableWindow.this.cursor.setVisible(true);
 			}
 
+			@Override
 			public void keyPressed(KeyEvent event) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
 				//System.out.println("cursor.keyPressed " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
-				if (DataTableWindow.this.cursor.getRow() != null 
-						&& !(event.stateMask == SWT.MOD1 && event.keyCode != 0x99) 
-						&& !(event.stateMask == SWT.MOD1 && event.keyCode != 0x97) 
+				if (DataTableWindow.this.cursor.getRow() != null && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x99) && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x97)
 						&& event.keyCode != SWT.MOD1) {
 					//select the table row where the cursor get moved to
 					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
@@ -246,7 +331,7 @@ public class DataTableWindow extends CTabItem {
 			// This is called as the user navigates around the table
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.widgetSelected " + event); //$NON-NLS-1$
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, "cursor.widgetSelected " + event); //$NON-NLS-1$
 				if (DataTableWindow.this.cursor.getRow() != null) {
 					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
 				}
@@ -255,12 +340,14 @@ public class DataTableWindow extends CTabItem {
 
 		this.dataTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.dataTable.addHelpListener(new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent evt) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		this.dataTable.addListener(SWT.SetData, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				Channel activeChannel = DataTableWindow.this.channels.getActiveChannel();
 				if (activeChannel != null) {
@@ -282,14 +369,14 @@ public class DataTableWindow extends CTabItem {
 				 * fired and the TableCursor automatically changed the row. 
 				*/
 				int row = DataTableWindow.this.rowVector.get(DataTableWindow.this.rowVector.size() - 1);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, ("Setting selection to row: " + row));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting selection to row: " + row));
 				DataTableWindow.this.cursor.setSelection(row, col);
 
 				/* As the TableCursor automatically changes the rows and we go back, the item that was on top of the list changes.
 				 * We fix that here to get the original item at the top of the list again.
 				 */
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER))
+					DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
 				DataTableWindow.this.dataTable.setTopIndex(DataTableWindow.this.topindexVector.get(DataTableWindow.this.topindexVector.size() - 1));
 
 				DataTableWindow.this.cursor.setVisible(true);
@@ -298,8 +385,9 @@ public class DataTableWindow extends CTabItem {
 				DataTableWindow.this.cursor.setFocus();
 			}
 
+			@Override
 			public void keyReleased(KeyEvent event) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, ("dataTable.keyReleased, keycode: " + event.keyCode));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyReleased, keycode: " + event.keyCode));
 				if (event.keyCode == SWT.MOD2) {
 					int rowIndex = DataTableWindow.this.rowVector.get(DataTableWindow.this.rowVector.size() - 1) + this.selectionFlowIndex;
 					//check table bounds reached
@@ -308,11 +396,16 @@ public class DataTableWindow extends CTabItem {
 					updateVector(rowIndex, DataTableWindow.this.dataTable.getTopIndex());
 					workaroundTableCursor(DataTableWindow.this.cursor.getColumn());
 					this.selectionFlowIndex = 0;
+					switch (event.keyCode) {
+					case 1:
+						break;
+					}
 				}
 			}
 
+			@Override
 			public void keyPressed(KeyEvent event) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, ("dataTable.keyPressed, keycode: " + event.keyCode));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyPressed, keycode: " + event.keyCode));
 				if (event.stateMask == SWT.MOD2 && ((event.stateMask & SWT.MOD1) == 0) && ((event.stateMask & SWT.MOD3) == 0)) {
 					switch (event.keyCode) {
 					case SWT.ARROW_UP:
@@ -455,6 +548,22 @@ public class DataTableWindow extends CTabItem {
 	 */
 	public void setAbsoluteDateTime(boolean isAbsoluteDateTime) {
 		this.isAbsoluteDateTime = isAbsoluteDateTime;
+	}
+
+	/**
+	 * set an edited entry to the record at the given index
+	 * @param row
+	 * @param column
+	 */
+	private synchronized boolean setEditedRecordPoint(final TableItem row, final int column) {
+		String recordName = DataTableWindow.this.dataTable.getColumn(column).getText();
+		recordName = recordName.substring(0, recordName.lastIndexOf(GDE.STRING_BLANK));
+		Record editRecord = DataTableWindow.this.application.getActiveRecordSet().getRecord(recordName);
+		if (editRecord != null  && StringHelper.verifyTypedInput(DataTypes.DOUBLE, row.getText(column))) {
+			editRecord.set(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), (int) (Double.valueOf(row.getText(column).replace(',', '.')) * 1000));
+			return true;
+		}
+		return false;
 	}
 
 }
