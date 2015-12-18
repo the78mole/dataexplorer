@@ -738,6 +738,8 @@ public class GraphicsComposite extends Composite {
 		if (recordSet != null && recordSet.realSize() > 0) {
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
+			//changed curve selection may change the scale end values
+			recordSet.syncScaleOfSyncableRecords();
 
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, true);
@@ -963,7 +965,6 @@ public class GraphicsComposite extends Composite {
 	 */
 	synchronized void doRedrawGraphics() {
 		this.graphicsHeader.redraw();
-		this.recordSetComment.redraw();
 
 		if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
@@ -977,6 +978,7 @@ public class GraphicsComposite extends Composite {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required");
 			this.graphicCanvas.redraw(); // do full update where required
 		}
+		this.recordSetComment.redraw();
 	}
 
 	public void notifySelected() {

@@ -1975,6 +1975,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 							tmpRecord.minScaleValue = minScaleValue;
 							tmpRecord.maxScaleValue = maxScaleValue;
 						}
+						//log.log(Level.OFF, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", tmpRecord.getName(), tmpRecord.minScaleValue, tmpRecord.maxScaleValue));
 					}
 					break;
 				case Record.TYPE_AXIS_NUMBER_FORMAT:
