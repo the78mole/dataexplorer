@@ -153,7 +153,7 @@ public class JetiDataReader {
 					}
 					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "best fit # values = " + numValues);
 					timeStep_ms = data.getMaxTimestamp() * 1000.0 / numValues;
-					if (JetiDataReader.log.isLoggable(java.util.logging.Level.OFF)) JetiDataReader.log.log(java.util.logging.Level.OFF, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
+					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
 
 					try {
 						recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
