@@ -139,7 +139,7 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", this.calculateCheckSum(data), this.isChecksumOK(data)));
 			
-			if (!this.isChecksumOK(data) && this.retrys-- >= 0) {
+			if (!this.isChecksumOK(data, 16, 30, 31) && this.retrys-- >= 0) {
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", this.calculateCheckSum(data), this.isChecksumOK(data)));
 				return this.getSystemSettings(iface);
 			}
@@ -198,9 +198,20 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 	 * @param buffer
 	 * @return true/false
 	 */
-	private boolean isChecksumOK(byte[] buffer) {
+	private boolean isChecksumOK(final byte[] buffer, final int start, final int end, final int chkSumPosition) {
 		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
-		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,"CheckSum = " + (Checksum.ADD(buffer, 2, buffer.length-3))); //$NON-NLS-1$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,"CheckSum = " + (Checksum.ADD(buffer, start, end))); //$NON-NLS-1$
+		return Checksum.ADD(buffer, start, end) == (0x100 - buffer[chkSumPosition]);
+	}
+
+	/**
+	 * check check sum of data buffer
+	 * @param buffer
+	 * @return true/false
+	 */
+	private boolean isChecksumOK(final byte[] buffer) {
+		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,"CheckSum = " + (Checksum.ADD(buffer, 2, buffer.length-2))); //$NON-NLS-1$
 		return calculateCheckSum(buffer) == buffer[buffer.length-1];
 	}
 }
