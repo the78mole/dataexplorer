@@ -1626,13 +1626,13 @@ public class MenuToolBar {
 	public void updateGoogleEarthToolItem() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.googleEarthToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
-			this.googleEarthConfigToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
+			this.googleEarthConfigToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData() && this.application.getActiveDevice().getGPS2KMZMeasurementOrdinal() >= 0);
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					MenuToolBar.this.googleEarthToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());
-					MenuToolBar.this.googleEarthConfigToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());
+					MenuToolBar.this.googleEarthConfigToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData() && MenuToolBar.this.application.getActiveDevice().getGPS2KMZMeasurementOrdinal() >= 0);
 				}
 			});
 		}
