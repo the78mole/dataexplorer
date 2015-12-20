@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
@@ -131,7 +132,7 @@ public class JetiDataReader {
 						//System.out.println(telemetrySensor.getName() + " - ");
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 							//System.out.println(dataVar.getName());
-							if (dataVar.getItems().size() > 0) {
+							if (dataVar.getItems().size() > 3) { //Alarm has 3 values start time, alarm time , end time
 								if (valuesMap.containsKey(dataVar.getItems().size()) && dataVar.getItems().size() > 1) {
 									valuesMap.put(dataVar.getItems().size(), valuesMap.get(dataVar.getItems().size()) + 1);
 									maxHit = Math.max(maxHit, valuesMap.get(dataVar.getItems().size()));
@@ -309,6 +310,9 @@ public class JetiDataReader {
 					}
 					//write filename after import to record description			
 					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+					activeChannel.get(recordSetName).setRecordSetDescription(Messages.getString(gde.device.jeti.MessageIds.GDE_MSGT2914, 
+							new String[]{activeChannel.get(recordSetName).getRecordSetDescription(), data.getModelName(), 
+							String.format(Locale.getDefault(), "min=%.3f sec; max=%.3f sec; avg=%.3f sec; sigma=%.3f sec", data.getMinTimeStep()/1000.0, data.getMaxTimeStep()/1000.0, data.getAvgTimeStep()/1000.0, data.getSigmaTimeStep()/1000.0)}));
 					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 					if (JetiDataReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 				}
