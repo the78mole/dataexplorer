@@ -7,6 +7,7 @@ add support for native USB communication
 add support for SkyRC MC3000 single cell charger
 implement feature request to edit single cell in table
 fix problem while measuring due to missing scale end value synchronization when scale synchronized measurement visibility toggled
+JetiAdapter - add Rx->Tx time delta statistics (not differentiating over sensors)
 
 Version 3.2.3 - 09 Nov 2015
 HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
