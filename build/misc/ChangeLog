@@ -11,6 +11,7 @@ JetiAdapter - add Rx->Tx time delta statistics (not differentiating over sensors
 JetiAdapter - fix intermittent find best fit of time step which end up in less display points
 JetiAdapter - fix inconsistent detection of Speed record which leads to unusable color configuration while Google Earth KMZ export.
 fix problem while GPS coordinates are available, but speed record ordinal can not be identified
+fix CSV export Time unit to [hh:mm:ss.SSS]
 
 Version 3.2.3 - 09 Nov 2015
 HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
