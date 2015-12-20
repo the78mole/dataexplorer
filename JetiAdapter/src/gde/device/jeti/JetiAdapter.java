@@ -540,7 +540,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"}), 	//speed
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED), 
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
 						-1, 																																		//azimuth
@@ -586,7 +586,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), 
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"}), 	//speed
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED), 
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
 						-1, 																																		//azimuth
@@ -606,7 +606,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
-				return activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"});	//speed;
+				return activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED); 
 			}
 		}
 		return -1;

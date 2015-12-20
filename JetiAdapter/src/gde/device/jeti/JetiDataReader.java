@@ -207,7 +207,7 @@ public class JetiDataReader {
 								{
 									mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
 								}
-								else if (dataVar.getName().toLowerCase().contains("speed") && dataVar.getUnit().equals("km/h")) {
+								else if (dataVar.getName().toLowerCase().contains("speed") && (dataVar.getUnit().equals("km/h") || dataVar.getUnit().equals("kph") || dataVar.getUnit().equals("m/s"))) {
 									mapRecordType.put(index, Record.DataType.SPEED);
 								}
 								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "param = " + dataVar.getParam());
