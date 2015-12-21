@@ -1,15 +1,16 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.4 - xx yyy 2015
-JetiAdapter - increase number of initial supported measurements to 50
-iCharger - implemented checksum checking for serial communication 
+Version 3.2.4 - 23 Dec 2015
 add support for native USB communication
 add support for SkyRC MC3000 single cell charger
-implement feature request to edit single cell in table
-fix problem while measuring due to missing scale end value synchronization when scale synchronized measurement visibility toggled
+JetiAdapter - increase number of initial supported measurements to 50
+iCharger - implemented checksum checking for serial communication 
 JetiAdapter - add Rx->Tx time delta statistics (not differentiating over sensors)
 JetiAdapter - fix intermittent find best fit of time step which end up in less display points
 JetiAdapter - fix inconsistent detection of Speed record which leads to unusable color configuration while Google Earth KMZ export.
+HoTTAdapterX - HoTT V2 enable data visualization for external voltage and temperature
+implement feature request to edit single cell in table
+fix problem while measuring due to missing scale end value synchronization when scale synchronized measurement visibility toggled
 fix problem while GPS coordinates are available, but speed record ordinal can not be identified
 fix CSV export Time unit to [hh:mm:ss.SSS]
 
