@@ -60,8 +60,8 @@ public class FontSizeDialog extends org.eclipse.swt.widgets.Dialog {
 			{
 				fontSizeCombo = new CCombo(dialogShell, SWT.BORDER);
 				FormData fontSizeComboLData = new FormData();
-				fontSizeComboLData.width = 50;
-				fontSizeComboLData.height = 18;
+				//fontSizeComboLData.width = 50;
+				//fontSizeComboLData.height = 18;
 				fontSizeComboLData.left =  new FormAttachment(0, 1000, 12);
 				fontSizeComboLData.top =  new FormAttachment(0, 1000, 12);
 				fontSizeCombo.setLayoutData(fontSizeComboLData);
@@ -78,8 +78,8 @@ public class FontSizeDialog extends org.eclipse.swt.widgets.Dialog {
 			{
 				okButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				FormData okButtonLData = new FormData();
-				okButtonLData.width = 50;
-				okButtonLData.height = 28;
+				//okButtonLData.width = 50;
+				//okButtonLData.height = 28;
 				okButtonLData.right =  new FormAttachment(1000, 1000, -12);
 				okButtonLData.top =  new FormAttachment(0, 1000, 7);
 				okButton.setLayoutData(okButtonLData);
@@ -94,7 +94,6 @@ public class FontSizeDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			dialogShell.layout();
 			dialogShell.pack();			
-			dialogShell.setSize(170, 60);
 			dialogShell.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent evt) {
