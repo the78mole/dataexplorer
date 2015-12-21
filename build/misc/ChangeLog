@@ -13,6 +13,7 @@ implement feature request to edit single cell in table
 fix problem while measuring due to missing scale end value synchronization when scale synchronized measurement visibility toggled
 fix problem while GPS coordinates are available, but speed record ordinal can not be identified
 fix CSV export Time unit to [hh:mm:ss.SSS]
+fix font size dialog while using high resolution
 
 Version 3.2.3 - 09 Nov 2015
 HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
