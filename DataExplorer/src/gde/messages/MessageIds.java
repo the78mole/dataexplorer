@@ -177,6 +177,8 @@ public class MessageIds {
 	public final static String	GDE_MSGI0054 = "GDE_MSGI0054";
 	public final static String	GDE_MSGI0055 = "GDE_MSGI0055";
 	public final static String	GDE_MSGI0056 = "GDE_MSGI0056";
+	public final static String	GDE_MSGI0057 = "GDE_MSGI0057";
+	public final static String	GDE_MSGI0058 = "GDE_MSGI0058";
 	public final static String	GDE_MSGT0000 = "GDE_MSGT0000";
 	public final static String	GDE_MSGT0001 = "GDE_MSGT0001";
 	public final static String	GDE_MSGT0002 = "GDE_MSGT0002";
