@@ -7,7 +7,6 @@ import gde.messages.Messages;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -74,7 +73,7 @@ public class FontSizeDialog extends org.eclipse.swt.widgets.Dialog {
 				fontSizeCombo = new Combo(dialogShell, SWT.BORDER);
 				RowData fontSizeComboLData = new RowData();
 				fontSizeComboLData.width = 50;
-				fontSizeComboLData.height = 20;
+				//fontSizeComboLData.height = 20;
 				fontSizeCombo.setLayoutData(fontSizeComboLData);
 				fontSizeCombo.setItems(sizeValues);
 				fontSizeCombo.select(selectionIndex);
@@ -90,7 +89,7 @@ public class FontSizeDialog extends org.eclipse.swt.widgets.Dialog {
 				okButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				RowData okButtonLData = new RowData();
 				okButtonLData.width = 50;
-				okButtonLData.height = 28;
+				//okButtonLData.height = 23;
 				okButton.setLayoutData(okButtonLData);
 				okButton.setText("OK");
 				okButton.addSelectionListener(new SelectionAdapter() {
