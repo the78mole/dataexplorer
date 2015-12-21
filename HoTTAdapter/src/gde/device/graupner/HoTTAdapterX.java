@@ -101,6 +101,9 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 			case HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
 					//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+					//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
+					//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+					//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
 					tmpVoltageRx = (dataBuffer[6] & 0xFF);
 					tmpTemperatureRx = (dataBuffer[7] & 0xFF) - 20;
@@ -114,6 +117,11 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
 						points[8] = (dataBuffer[10] & 0xFF) * 1000;
+						//23 VoltageExt not part of serial protocol
+						//24 VoltageExt_min not part of serial protocol
+						//25 TemperatureExt not part of serial protocol
+						//26 TemperatureExt_max not part of serial protocol
+
 					}
 				}
 				break;
@@ -122,6 +130,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 				//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 				//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
 				//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+				//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
 				if (dataBuffer.length == 57) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
@@ -152,7 +161,10 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 			switch (dataBuffer[0]) {
 			case HoTTAdapter2.SENSOR_TYPE_RECEIVER_115200:
 				if (dataBuffer.length >= 21) {
-					//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+					//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+					//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
+					//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+					//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 12);
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
 					tmpTemperatureRx = DataParser.parse2Short(dataBuffer, 10);
@@ -167,6 +179,10 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
 						points[8] = (dataBuffer[18] & 0xFF) * 1000;
+						//23 VoltageExt not part of serial protocol
+						//24 VoltageExt_min not part of serial protocol
+						//25 TemperatureExt not part of serial protocol
+						//26 TemperatureExt_max not part of serial protocol
 					}
 				}
 				break;
@@ -175,6 +191,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 				//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 				//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
 				//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+				//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
 				if (dataBuffer.length >= 34) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);

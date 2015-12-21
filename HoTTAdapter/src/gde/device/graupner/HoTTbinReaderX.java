@@ -110,7 +110,11 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
 		boolean isInitialSwitched = false;
-		HoTTbinReaderX.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
+		//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
+		//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+		//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
+		HoTTbinReaderX.recordSetReceiver = null; 
 		HoTTbinReaderX.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 10=Ch 8
 		HoTTbinReaderX.points_1 = new int[device.getNumberOfMeasurements(1)];
 		HoTTbinReaderX.pointsChannel = new int[15];
@@ -286,7 +290,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 //							HoTTbinReaderX.logx.logp(Level.OFF, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.STRING_BLANK);
 							switch (HoTTbinReaderX.buf[7]) {
 							case 00: //receiver 1
-								parseAddReceiver(HoTTbinReaderX.buf1, HoTTbinReaderX.buf2, HoTTbinReaderX.bufD);
+								parseAddReceiver(HoTTbinReaderX.buf1, HoTTbinReaderX.buf2, HoTTbinReaderX.buf4, HoTTbinReaderX.bufD);
 								break;
 							case 02: //ESC 1
 								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) 
@@ -421,8 +425,11 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddReceiver(byte[] _buf1, byte[] _buf2, byte[] _bufD) throws DataInconsitsentException {
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx, 8=Umin Rx 
+	private static void parseAddReceiver(final byte[] _buf1, final byte[] _buf2, final byte[] _buf4, final byte[] _bufD) throws DataInconsitsentException {
+		//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
+		//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+		//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
 		HoTTbinReaderX.tmpVoltageRx = (_buf2[18] & 0xFF);
 		HoTTbinReaderX.tmpTemperatureRx = (_buf2[20] & 0xFF);
 		HoTTbinReaderX.points_1[1] = (_buf2[17] & 0xFF) * 1000;
@@ -434,6 +441,11 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			HoTTbinReaderX.points_1[6] = (_buf2[18] & 0xFF) * 1000;
 			HoTTbinReaderX.points_1[7] = (_buf2[20] & 0xFF) * 1000;
 			HoTTbinReaderX.points_1[8] = (_buf2[19] & 0xFF) * 1000;
+			
+			HoTTbinReaderX.points_1[23] = (_buf4[17] & 0xFF) * 1000;
+			HoTTbinReaderX.points_1[24] = (_buf4[19] & 0xFF) * 1000;
+			HoTTbinReaderX.points_1[25] = (_buf4[18] & 0xFF) * 1000;
+			HoTTbinReaderX.points_1[26] = (_buf4[20] & 0xFF) * 1000;
 		}
 
 		//printByteValues(_timeStep_ms, _buf);
@@ -478,9 +490,10 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseESC(byte[] _buf3, byte[] _buf4, byte[] _buf5, byte[] _buf6, byte[] _buf7, byte[] _buf8, byte[] _buf9, byte[] _bufA) throws DataInconsitsentException {
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
-		//9=VoltageM, 10=VoltageM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
+		//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
+		//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
 		//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
+		//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
 		HoTTbinReader.tmpVoltage = DataParser.parse2Short(_buf4, 20);
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf6, 20);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf5, 20);
