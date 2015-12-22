@@ -1,4 +1,4 @@
-******** DataExplorer README ***********  10 Dez 2012 WB
+******** DataExplorer README ***********  22 Dez 2015 WB
 
 Der GNU DataExplorer ist freie Software, siehe http://www.gnu.org/philosophy/free-sw.html. Sie wird kostenfrei und ohne Spende 
 zur Verfügung gestellt. Es gibt aber auch keinerlei Gewährleistung. Durch die Implementierung in Java auf der Basis von der freien Bibliotheken 
@@ -18,9 +18,11 @@ DataVario, DataVarioDuo (WStech) Variometer, GPS, Vielfachmessgerät
 eStation BC6, BC610, BC8, 902 (Bantam) Lade-Entlade-Gerät
 FlightRecorder (Multiplex) Logger
 Futaba-Telemetry (Robbe/Futaba) Vielfachlogger
+GigaLogger (Simprop) Datenlogger
 GPS-Logger, GPS-Logger2 (SM-Modellbau) - GPS, Vielfachmessgerät
 GPXAdapter GPS Exchange Format Dateianalyse, Erweiterungen vorbereitet für den Mikrokopter
 HoTTAdapter (Graupner) Empänger-, Vario-, GPS-, Universal-, Elektro-Sensormodul
+HoTTViewer(Graupner HoTTViewer-Adapter) 
 IGCAdapter (OnLine Contest/International Gliding Commission) Dateianalyse
 iCharger 206B, 208B, 306B, 3010B (Junsi) Lade-Entlade-Gerät
 IISI Cockpit V2 (Matthias Isler) Vielfachlogger
@@ -30,9 +32,11 @@ Kosmik (Kontronik) - Motorsteller Logger
 LinkVario, LinkVarioDuo (WStech) Variometer, GPS, Vielfachmessgerät
 LiPoWatch (SM-Modellbau) - LiPo saver, Einzelzellenmessungen
 NMEA-Adapter (diverse) - GPS Datenauswertung
+MC3000 (SkyRC) Einzelzellen Lade/Entlade-Gerät
 Pichler P6 , P60 (Pichler) und andere eStation BC6 Kopien Lade-Entlade-Gerät
 Picolario (Renschler) - Variometer
 Picolario2 (Renschler) - Variometer
+Polaron (Graupner) Ladegerät
 QC-Copter/QuadroControl (tt-tronix) Kontrolleinheit
 Simulator Test plug-in
 Ultramat12 (Graupner) Lade-Entlade-Gerät

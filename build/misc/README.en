@@ -1,4 +1,4 @@
-﻿******** DataExplorer README ***********  10 Dec 2012 WB
+﻿******** DataExplorer README ***********  22 Dec 2015 WB
 
 The GNU DataExplorer is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
 cost, but without any warranty. Since the implementation is based on Java using the free available libraries RXTXcomm and SWT
@@ -18,9 +18,11 @@ DataVario, DataVarioDuo (WStech) variometer, GPS, multi measurement device
 eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger
 FlightRecorder (Multiplex) Logger
 Futaba-Telemetry (Robbe/Futaba) multi logger
+GigaLogger (Simprop) multi logger
 GPS-Logger, GPS-Logger2 (SM-Modellbau) - GPS, multi measurement device
 GPXAdapter GPS Exchange Format file analyzer, extensions prepared for Mikrokopter
 HoTTAdapter (Graupner) Receiver-, Vario-, GPS-, General-, Electric-Sensor-Module
+HoTTViewer (Graupner HoTTViewer-Adapter)
 IGCAdapter (OnLine Contest/International Gliding Commission) file analyzer
 iCharger 206B, 208B, 306B, 3010B (Junsi) charger/discharger
 IISI Cockpit (Multiplex) Matthias Isler
@@ -30,9 +32,11 @@ Kosmik (Kontronik) - motor driver logger
 LinkVario, LinkVarioDuo (WStech) variometer, GPS, multi measurement device
 LiPoWatch (SM-Modellbau) - LiPo saver, cell voltage measurement
 NMEA-Adapter (diverse) - GPS track analyzer
+MC3000 (SkyRC) single cell charger/discharger
 Pichler P6 , P60 (Pichler) and other eStation BC6 clones charger/discharger
 Picolario (Renschler) - variometer
 Picolario2 (Renschler) - variometer
+Polaron (Graupner) charger
 QC-Copter/QuadroControl (tt-tronix) control unit
 Simulator test plug-in
 Ultramat12 (Graupner) charger/discharger

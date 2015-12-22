@@ -533,6 +533,7 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/Windows/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
@@ -544,6 +545,7 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/Windows/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
@@ -555,6 +557,7 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
@@ -566,6 +569,7 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
@@ -577,6 +581,7 @@
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />		
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
@@ -772,6 +777,7 @@
 				<exclude name="configure" />
 				<exclude name="install-sh" />
 				<exclude name="build/misc/GNU*" />
+				<exclude name="build/misc/MAC*" />
 				<exclude name="build/misc/maintain*" />
 				<exclude name="build/misc/*.LICENSE" />
 				<exclude name="build/misc/*.pdf" />
@@ -857,6 +863,7 @@
 	<target name="copy_misc" description="copy misc files to build/target/install" depends="init" >
 		<copy todir="${build.target.dir}" overwrite="true">
 			<fileset dir="build/misc" >
+				<include name="*MC3000*/*" />
 				<include name="GNULinux_cp210x/*" />
 				<include name="udev_rules/*" />
 				<include name="HowToCreateDevicePlugin" />

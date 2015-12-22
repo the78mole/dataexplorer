@@ -1,12 +1,19 @@
-GNU DataExplorer - News - comes with version 3.2.3
+GNU DataExplorer - News - comes with version 3.2.4
 
-1) HoTTViewer - add support to open and display saved OSD-files with Graupner/SJ HoTT Viewer App
-2) GigaLogger - add support
-3) Herkules III Telemetry - add support
-4) HoTTAdapterX - enable live logging (needs device XML to be replaced)
-5) fix - clean data model while importing CSV where record set number follow channel number 
-6) HoTTAdapter* - adapt filter GPS data parsing for import bin log data
-6) fix - scale number calculation error while display area is greater than 1500 pixels.
+1) add support for native USB communication
+2) add support for SkyRC MC3000 single cell charger
+3) JetiAdapter - increase number of initial supported measurements to 50
+4) iCharger - implemented checksum checking for serial communication 
+5) JetiAdapter - add Rx->Tx time delta statistics (not differentiating over sensors)
+6) JetiAdapter - fix intermittent find best fit of time step which end up in less display points
+7) JetiAdapter - fix inconsistent detection of Speed record which leads to unusable color configuration while Google Earth KMZ export.
+8) HoTTAdapterX - HoTT V2 enable data visualization for external voltage and temperature
+9) implement feature request to edit single cell in table
+10) fix problem while measuring due to missing scale end value synchronization when scale synchronized measurement visibility toggled
+11) fix problem while GPS coordinates are available, but speed record ordinal can not be identified
+12) fix CSV export Time unit to [hh:mm:ss.SSS]
+13) fix font size dialog while using high resolution
+14) swt update to version 4.5
 
 
 
