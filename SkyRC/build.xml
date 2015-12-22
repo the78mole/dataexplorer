@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="MC3000" default="package">
+<project name="SkyRC" default="package">
 
 	<property name="build.properties" location="../build/build.properties" />
 
