@@ -1,4 +1,4 @@
-GNU DataExplorer - News - comes with version 3.2.4
+GNU DataExplorer - News - comes with version 3.2.4 - 22 Dec 2015
 
 1) add support for native USB communication
 2) add support for SkyRC MC3000 single cell charger
@@ -24,7 +24,7 @@ GNU DataExplorer - News - comes with version 3.2.4
 7) JetiAdapter - Fehler und Inkonsistentz bei der Erkennung des Geschwindigkeitsvektor bereinigt, führte zu Problemen bei der Farbkonfiguration vor dem KMZ-Export
 8) HoTTAdapterX - Datenvisualisierung bei HoTT V2 für externe Spannung und externe Temperatur implementiert
 9) Feature zum Editieren eines einzelnen Messwertes in der Tabellenansicht implementiert
-10) Fehler beim Messen in der Anzeige behoben, Feheler wurde sichtbar wenn Messwerte auf eine Skala synchronisiert sind und einige davon ein- und aus-geschaltet wurden
+10) Fehler beim Messen in der Anzeige behoben, Fehler wurde sichtbar wenn Messwerte auf eine Skala synchronisiert sind und einige davon ein- und aus-geschaltet wurden
 11) Erkennung von fehlendem Geschwindigkeitsvektor bei existierenden GPS-Koordinaten implementiert, führte zu Fehler bei der Farbkonfiguration
 12) Fehlerbereinigung der Zeiteinheit bei CSV-Export vorgenommen [hh:mm:ss.SSS]
 13) Fehler im Schriftgrößendialog bereinigt, Dialog war bei hoher Bildschirmauflösung unter Windows nicht nutzbar
