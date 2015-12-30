@@ -110,7 +110,7 @@ public class GathererThread extends Thread {
 			this.isProgrammExecuting3 = false;
 			this.isProgrammExecuting4 = false;
 
-			long startCycleTime = 0;
+			long lastCycleTime = 0;
 			byte[] dataBuffer1 = null;
 			byte[] dataBuffer2 = null;
 			byte[] dataBuffer3 = null;
@@ -126,9 +126,9 @@ public class GathererThread extends Thread {
 			if (GathererThread.log.isLoggable(java.util.logging.Level.FINE))
 				GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
+			lastCycleTime = System.currentTimeMillis();
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
 				try {
-					startCycleTime = System.currentTimeMillis();
 					// check if device is ready for data capturing or terminal open
 					// in case of time outs wait for 180 seconds max. for actions
 					if (this.dialog != null && !this.dialog.isDisposed() && this.dialog.getTabFolderSelectionIndex() == 0) {
@@ -137,11 +137,11 @@ public class GathererThread extends Thread {
 					else { //if (this.dialog != null && this.dialog.isDisposed()) {
 						//get data from device for all4 slots
 						dataBuffer1 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_0.value());
-						WaitTimer.delay(30);
+						WaitTimer.delay(50);
 						dataBuffer2 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_1.value());
-						WaitTimer.delay(30);
+						WaitTimer.delay(50);
 						dataBuffer3 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_2.value());
-						WaitTimer.delay(30);
+						WaitTimer.delay(50);
 						dataBuffer4 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_3.value());
 
 						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer1);
@@ -248,8 +248,10 @@ public class GathererThread extends Thread {
 				}
 
 				//force data collection every second
-				long delay = System.currentTimeMillis() + 1000 - startCycleTime;
+				lastCycleTime += 1000;
+				long delay = lastCycleTime - System.currentTimeMillis();
 				if (delay > 0 ) WaitTimer.delay(delay);
+				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("delay = %d", delay)); //$NON-NLS-1$
 			}
 			this.application.setStatusMessage(""); //$NON-NLS-1$
 			if (GathererThread.log.isLoggable(java.util.logging.Level.FINE)) GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
