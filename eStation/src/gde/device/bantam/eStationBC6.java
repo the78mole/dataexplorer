@@ -169,5 +169,7 @@ public class eStationBC6 extends eStation {
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
+		updateVisibilityStatus(recordSet, true);
+		makeInActiveDisplayable(recordSet);
 	}
 }
