@@ -240,6 +240,10 @@ public class GathererThread extends Thread {
 						if (GathererThread.log.isLoggable(java.util.logging.Level.FINE))
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
 					}
+					else if (e instanceof UsbException) { //USB error detected, p.e. disconnect
+						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+						stopDataGatheringThread(false, e);
+					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
 					else {
 						GathererThread.log.log(java.util.logging.Level.FINE, "data gathering end detected"); //$NON-NLS-1$
