@@ -415,6 +415,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
+		recordSet.getDevice().updateVisibilityStatus(recordSet, true);
 	}
 
 	/**
