@@ -947,7 +947,7 @@
                <define name="OUTDIR" value="${nsis.outputdir}" />
                <define name="OUTFILENAME" value="${nsis.outputfilename}_win32.exe" />
                <define name="EXEFILENAME" value="${launch4j.outputfilename}" />
-           	<!--- don¬¥t define 64bit here -->
+           	<!--- do not define 64bit here -->
            </nsis>
            
            <nsis script="build/installer.nsi" verbosity="3">
