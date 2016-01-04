@@ -237,7 +237,7 @@ public class GDE {
 	public static final String[] 	MOD3 														= new String[] {"Alt"};
 
 	public static int							WIDGET_FONT_SIZE;
-	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
+	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : GDE.IS_MAC ? "Lucida Grande" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
 
 	// number ranges for message IDs 
 	public static final int				NUMBER_RANGE_MIN_GDE							= 0;
