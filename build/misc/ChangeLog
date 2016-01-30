@@ -6,6 +6,7 @@ eStation BC6 - fix missing Balance while loading data from file
 adapt font used by MAC OS X 10.11
 update windows NSIS installer
 update Copyright including 2016
+add Weatronic-Telemetry support
 
 Version 3.2.4 - 23 Dec 2015
 add support for native USB communication
