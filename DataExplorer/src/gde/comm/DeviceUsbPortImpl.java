@@ -325,9 +325,11 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		this.isConnected = false;
 		if (usbInterface == null) {
 			UsbDevice usbDevice = findUsbDevice(this.application.getActiveDevice().getUsbVendorId(), this.application.getActiveDevice().getUsbProductId());
-			usbInterface = ((UsbConfiguration) usbDevice.getUsbConfigurations().get(0)).getUsbInterface(this.application.getActiveDevice().getUsbInterface());
+			if (usbDevice != null) {
+				usbInterface = ((UsbConfiguration) usbDevice.getUsbConfigurations().get(0)).getUsbInterface(this.application.getActiveDevice().getUsbInterface());
+			}
 		}
-		if (usbInterface.isClaimed()) {
+		if (usbInterface != null && usbInterface.isClaimed()) {
 			usbInterface.release();		
 			log.log(Level.OFF, "interface released");
 		}

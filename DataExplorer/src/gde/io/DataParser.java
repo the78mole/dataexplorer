@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
 
@@ -238,7 +238,101 @@ public class DataParser extends NMEAParser {
 		}
 		return checksum;
 	}
+	
+	/*
+	Copyright 2007 Creare Inc.
 
+	Licensed under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. 
+	You may obtain a copy of the License at 
+
+	http://www.apache.org/licenses/LICENSE-2.0 
+
+	Unless required by applicable law or agreed to in writing, software 
+	distributed under the License is distributed on an "AS IS" BASIS, 
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+	See the License for the specific language governing permissions and 
+	limitations under the License.
+  // byte2Double method - extracts doubles from byte array
+	*/
+  public static final double[] byte2Double(byte[] inData, boolean byteSwap) {
+    int j = 0, upper, lower;
+    int length = inData.length / 8;
+    double[] outData = new double[length];
+    if (!byteSwap)
+      for (int i = 0; i < length; i++) {
+        j = i * 8;
+        upper = (((inData[j] & 0xff) << 24)
+            + ((inData[j + 1] & 0xff) << 16)
+            + ((inData[j + 2] & 0xff) << 8) + ((inData[j + 3] & 0xff) << 0));
+        lower = (((inData[j + 4] & 0xff) << 24)
+            + ((inData[j + 5] & 0xff) << 16)
+            + ((inData[j + 6] & 0xff) << 8) + ((inData[j + 7] & 0xff) << 0));
+        outData[i] = Double.longBitsToDouble((((long) upper) << 32)
+            + (lower & 0xffffffffl));
+      }
+    else
+      for (int i = 0; i < length; i++) {
+        j = i * 8;
+        upper = (((inData[j + 7] & 0xff) << 24)
+            + ((inData[j + 6] & 0xff) << 16)
+            + ((inData[j + 5] & 0xff) << 8) + ((inData[j + 4] & 0xff) << 0));
+        lower = (((inData[j + 3] & 0xff) << 24)
+            + ((inData[j + 2] & 0xff) << 16)
+            + ((inData[j + 1] & 0xff) << 8) + ((inData[j] & 0xff) << 0));
+        outData[i] = Double.longBitsToDouble((((long) upper) << 32)
+            + (lower & 0xffffffffl));
+      }
+
+    return outData;
+  }
+
+
+  public static long getLong(byte[] array, int offset) {
+    return
+      ((long)(array[offset]   & 0xff) << 56) |
+      ((long)(array[offset+1] & 0xff) << 48) |
+      ((long)(array[offset+2] & 0xff) << 40) |
+      ((long)(array[offset+3] & 0xff) << 32) |
+      ((long)(array[offset+4] & 0xff) << 24) |
+      ((long)(array[offset+5] & 0xff) << 16) |
+      ((long)(array[offset+6] & 0xff) << 8) |
+      ((array[offset+7] & 0xff));
+  }
+
+
+	/**
+	 * parse 8 byte of a data buffer to integer value
+	 * @param buffer
+	 * @param startIndex index of low byte
+	 */
+	public static long parse2Long(byte[] buffer, int startIndex) {
+		return (((long)(buffer[startIndex + 7] & 0xff) << 56) 
+				| ((long)(buffer[startIndex + 6] & 0xff) << 48) 
+				| ((long)(buffer[startIndex + 5] & 0xff) << 40) 
+				| ((long)(buffer[startIndex + 4] & 0xff) << 32) 
+				|	((long)(buffer[startIndex + 3] & 0xff) << 24) 
+				| ((long)(buffer[startIndex + 2] & 0xff) << 16) 
+				| ((long)(buffer[startIndex + 1] & 0xff) << 8) 
+				| (buffer[startIndex] & 0xff));
+	}
+	
+	public static long getUInt32(byte[] buffer, int startIndex) {
+    long value = buffer[0+startIndex] & 0xFF;
+    value |= (buffer[1+startIndex] << 8) & 0xFFFF;
+    value |= (buffer[2+startIndex] << 16) & 0xFFFFFF;
+    value |= (buffer[3+startIndex] << 24) & 0xFFFFFFFF;
+    return value;
+}
+
+	public static int getInt(byte[] array, int offset) {
+    return
+      ((array[offset]   & 0xff) << 24) |
+      ((array[offset+1] & 0xff) << 16) |
+      ((array[offset+2] & 0xff) << 8) |
+       (array[offset+3] & 0xff);
+  }
+	
 	/**
 	 * parse 4 byte of a data buffer to integer value
 	 * @param buffer

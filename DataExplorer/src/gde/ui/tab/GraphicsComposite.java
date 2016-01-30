@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
 
@@ -1828,7 +1828,8 @@ public class GraphicsComposite extends Composite {
 				else {
 					this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 					this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
-					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", recordSet.getStartTimeStamp()), this.graphicsHeaderText.substring(11)));
+					String graphicsHeaderExtend = this.graphicsHeaderText == null ? GDE.STRING_MESSAGE_CONCAT + recordSet.getName() : this.graphicsHeaderText.substring(11);
+					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", recordSet.getStartTimeStamp()), graphicsHeaderExtend));
 					this.graphicsHeader.redraw();
 				}
 				this.isRecordCommentChanged = false;
