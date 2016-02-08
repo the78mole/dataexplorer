@@ -494,8 +494,20 @@ public class MathUtils {
 			else if (tmpDeltaScale <= 5000) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.02);
 			}
-			else {
+			else if (tmpDeltaScale <= 10000) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
+			}
+			else if (tmpDeltaScale <= 50000) {
+				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.02);
+			}
+			else if (tmpDeltaScale <= 500000) {
+				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.002);
+			}
+			else if (tmpDeltaScale <= 5000000) {
+				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.0002);
+			}
+			else {
+				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.0001);
 			}
 		}
 		else {

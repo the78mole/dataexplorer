@@ -27,8 +27,8 @@ import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
-import gde.exception.NotSupportedFileFormatException;
 import gde.exception.GDEInternalException;
+import gde.exception.NotSupportedFileFormatException;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -67,7 +67,6 @@ public class OsdReaderWriter {
 
 	final static DataExplorer						application								= DataExplorer.getInstance();
 	final static Channels 							channels 									= Channels.getInstance();
-
 
 	/**
 	 * get data file header data
@@ -135,6 +134,7 @@ public class OsdReaderWriter {
 		case 1:
 		case 2: // added OBJECT_KEY to header
 		case 3: // added startTimeStamp to recordSet
+		case 4: // enable more measurements which leads to property string length more than 2**16 character
 			header.put(GDE.DATA_EXPLORER_FILE_VERSION, GDE.STRING_EMPTY+version);
 			boolean isHeaderComplete = false;
 			while (!isHeaderComplete && headerCounter-- > 0) {
@@ -218,9 +218,24 @@ public class OsdReaderWriter {
 		// record sets with it properties and records
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
 		for (int i=0; i<numberRecordSets; ++i) {
-			// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
-			line = data_in.readUTF();
-			line = line.substring(0, line.length()-1);
+			switch (Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION))) {
+			case 1:
+			case 2:
+			case 3:
+				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+				line = data_in.readUTF();
+				line = line.substring(0, line.length() - 1);
+				break;
+
+			default:
+			case 4:
+				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+				int length = data_in.readInt();
+				byte[] bytes = new byte[length];
+				data_in.read(bytes);
+				line = new String(bytes).substring(0, length - 1);
+				break;
+			}
 			recordSetsInfo.add(getRecordSetProperties(line));
 		}
 
@@ -491,8 +506,9 @@ public class OsdReaderWriter {
 							recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
 							sbs[i].append(GDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(GDE.STRING_NEW_LINE); //$NON-NLS-1$
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sbs[i].toString());
-							//data_out.writeInt(sbs[i].length());
-							data_out.writeUTF(sbs[i].toString());
+							//instead of using writeUTF, write the length and the string separate to workaround java.io.UTFDataFormatException: encoded string too long: 272312 bytes
+							data_out.writeInt(sbs[i].length());
+							data_out.writeBytes(sbs[i].toString());
 							int sizeRecord = recordSet.getRecordDataSize(true);
 							recordSizes.put(recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i], sizeRecord);
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i] + "=" + sizeRecord);

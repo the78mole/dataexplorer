@@ -2350,13 +2350,15 @@ public class Record extends Vector<Integer> {
 	 * @return
 	 */
 	public void setDataType() {
-		if (this.name.equalsIgnoreCase("Latitude") || this.name.equalsIgnoreCase("Breitengrad") || this.name.toLowerCase().contains("sirka"))
+		if (this.name.equalsIgnoreCase("Latitude") || this.name.contains("GPS_Lat") || this.name.equalsIgnoreCase("Breitengrad") || this.name.toLowerCase().contains("sirka"))
 			this.dataType = Record.DataType.GPS_LATITUDE;
-		else if (this.name.equalsIgnoreCase("Longitude") || this.name.equalsIgnoreCase("Längengrad") || this.name.equalsIgnoreCase("Laengengrad") || this.name.toLowerCase().contains("delka"))
+		else if (this.name.equalsIgnoreCase("Longitude") || this.name.contains("GPS_Long") || this.name.equalsIgnoreCase("Längengrad") || this.name.equalsIgnoreCase("Laengengrad") || this.name.toLowerCase().contains("delka"))
 			this.dataType = Record.DataType.GPS_LONGITUDE;
 		else if ((this.name.toUpperCase().contains("GPS") || this.name.toUpperCase().contains("ABS"))
 				&& (this.name.toLowerCase().contains("hoehe") || this.name.toLowerCase().contains("höhe") || this.name.toLowerCase().contains("height") || this.name.toLowerCase().contains("alt")))
 			this.dataType = Record.DataType.GPS_ALTITUDE;
+		else if (this.name.toUpperCase().contains("GPS") && (this.name.toLowerCase().contains("speed") || this.name.toLowerCase().contains("geschw")))
+			this.dataType = Record.DataType.SPEED;
 	}
 	
 	/**

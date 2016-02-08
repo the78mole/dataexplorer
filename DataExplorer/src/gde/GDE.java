@@ -287,7 +287,7 @@ public class GDE {
 	public static final String		LEGACY_FILE_VERSION							= "OpenSerialData version : ";																																																//$NON-NLS-1$
 	public static final String		DATA_EXPLORER_FILE							= "DataExplorer";																																																						//$NON-NLS-1$
 	public static final String		LEGACY_OSDE_FILE								= "OpenSerialData";																																																					//$NON-NLS-1$
-	public static final int				DATA_EXPLORER_FILE_VERSION_INT	= 3;																																																													// actual version
+	public static final int				DATA_EXPLORER_FILE_VERSION_INT	= 4;																																																													// actual version
 
 	public static final String		CREATION_TIME_STAMP							= "Created : ";																																																							//$NON-NLS-1$
 	public static final String		LAST_UPDATE_TIME_STAMP					= "Updated : ";																																																							//$NON-NLS-1$

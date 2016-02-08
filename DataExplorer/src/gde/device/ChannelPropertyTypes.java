@@ -44,6 +44,10 @@ public enum ChannelPropertyTypes {
     PINION_GEAR("pinion_gear"),
     @XmlEnumValue("main_gear")
     MAIN_GEAR("main_gear"),
+    @XmlEnumValue("status_fields")
+    STATUS_FIELDS("status_fields"),
+    @XmlEnumValue("time_info")
+    TIME_INFO("time_info"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;

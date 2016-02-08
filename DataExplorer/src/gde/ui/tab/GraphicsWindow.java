@@ -175,6 +175,7 @@ public class GraphicsWindow extends CTabItem {
 			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
+		newSelectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth/2 ? tabFolderClientAreaWidth/2 : newSelectorCompositeWidth;
 		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth};
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;

@@ -1439,7 +1439,21 @@ public class DeviceConfiguration {
 	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(int channelConfigNumber, int measurementOrdinal) {
-		return this.deviceProps.getChannels().channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal) : this.getChannel(1).getMeasurement().get(measurementOrdinal);
+		if (this.deviceProps.getChannels().channel.size() >= channelConfigNumber) {
+			try {
+				MeasurementType measurement = this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal);
+				if (measurement != null) 
+					return measurement;
+			}
+			catch (IndexOutOfBoundsException e) {
+				MeasurementType newMeasurement = this.getChannel(channelConfigNumber).getMeasurement().get(0).clone(); // this will clone statistics and properties as well
+				newMeasurement.setName("tmpMeasurement" + measurementOrdinal);
+				this.addMeasurement2Channel(channelConfigNumber, newMeasurement);
+				this.isChangePropery = true;
+			}
+		}
+		return this.deviceProps.getChannels().channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal) 
+				: this.getChannel(1).getMeasurement().get(measurementOrdinal);
 	}
 
 	/**
