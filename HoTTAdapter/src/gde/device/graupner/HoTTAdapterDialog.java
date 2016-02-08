@@ -276,7 +276,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "enableFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
-							HoTTAdapterDialog.this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).setValue(GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableFilter.getSelection());
+							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_FILTER, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableFilter.getSelection());
 							HoTTAdapter.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(), 
 									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(), 
 									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
