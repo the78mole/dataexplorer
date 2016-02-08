@@ -33,5 +33,16 @@ public class MessageIds {
 	public final static String	GDE_MSGT3706 = "GDE_MSGT3706";
 	public final static String	GDE_MSGT3707 = "GDE_MSGT3707";
 	public final static String	GDE_MSGT3709 = "GDE_MSGT3709";
+	public final static String	GDE_MSGT3715 = "GDE_MSGT3715";
+	public final static String	GDE_MSGT3716 = "GDE_MSGT3716";
+	public final static String	GDE_MSGT3717 = "GDE_MSGT3717";
+	public final static String	GDE_MSGT3718 = "GDE_MSGT3718";
+	public final static String	GDE_MSGT3719 = "GDE_MSGT3719";
+	public final static String	GDE_MSGT3720 = "GDE_MSGT3720";
+	public final static String	GDE_MSGT3721 = "GDE_MSGT3721";
+	public final static String	GDE_MSGT3722 = "GDE_MSGT3722";
+	public final static String	GDE_MSGT3723 = "GDE_MSGT3723";
+	public final static String	GDE_MSGT3724 = "GDE_MSGT3724";
+	public final static String	GDE_MSGT3725 = "GDE_MSGT3725";
 
  }

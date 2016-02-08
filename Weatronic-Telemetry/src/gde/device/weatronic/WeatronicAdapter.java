@@ -23,13 +23,13 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
+import gde.data.Record.DataType;
 import gde.data.RecordSet;
+import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
-import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
-import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -52,10 +52,14 @@ import org.eclipse.swt.widgets.FileDialog;
 public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger														log												= Logger.getLogger(WeatronicAdapter.class.getName());
 
-	protected final DataExplorer									application;
-	protected final Channels											channels;
+	final DataExplorer									application;
+	final Channels											channels;
+	final Settings							settings;
+	final WeatronicAdapterDialog			dialog;
 
-	protected HashMap<String, CalculationThread>	calculationThreads				= new HashMap<String, CalculationThread>();
+	static boolean							isChannelFilter 			= true;
+	static boolean							isUtcFilter								= true;
+	static boolean							isStatusFilter							= true;
 
 	/**
 	 * constructor using properties file
@@ -68,7 +72,12 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.weatronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.settings = Settings.getInstance();
+		this.dialog = new WeatronicAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
+		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null || this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : true;
+		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null || this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null || this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
 	}
 
 	/**
@@ -81,111 +90,41 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.weatronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.settings = Settings.getInstance();
+		this.dialog = new WeatronicAdapterDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
+		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : true;
+		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
 	}
 
 	/**
-	 * load the mapping exist between lov file configuration keys and GDE keys
-	 * @param lov2osdMap reference to the map where the key mapping has to be put
-	 * @return lov2osdMap same reference as input parameter
+	 * @param isUtcFilterEnabled the isUtcFilter to set
 	 */
-	@Override
-	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		// no device specific mapping required
-		return lov2osdMap;
+	public static synchronized void setUtcFilter(boolean isUtcFilterEnabled) {
+		WeatronicAdapter.isUtcFilter 							= isUtcFilterEnabled;
 	}
 
 	/**
-	 * convert record LogView config data to GDE config keys into records section
-	 * @param header reference to header data, contain all key value pairs
-	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
-	 * @return converted configuration data
+	 * @param isStatusFilterEnabled the isStatusFilter to set
 	 */
-	@Override
-	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		// ...
-		return ""; //$NON-NLS-1$
+	public static synchronized void setStatusFilter(boolean isStatusFilterEnabled) {
+		WeatronicAdapter.isStatusFilter = isStatusFilterEnabled;
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * @param isChannelFilterEnabled the isChannelFilter to set
 	 */
-	@Override
-	public int getLovDataByteSize() {
-		return 84;
+	public static synchronized void setChannelFilter(boolean isChannelFilterEnabled) {
+		WeatronicAdapter.isChannelFilter = isChannelFilterEnabled;
 	}
 
 	/**
-	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
-	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * this method is more usable for real logger, where data can be stored and converted in one block
-	 * @param recordSet
-	 * @param dataBuffer
-	 * @param recordDataSize
-	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @return the dialog
 	 */
 	@Override
-	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = 76; // const.
-		int[] points = new int[this.getNumberOfMeasurements(1)];
-		int offset = 0;
-		int progressCycle = 0;
-		int lovDataSize = this.getLovDataByteSize();
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
-
-		if (dataBuffer[0] == 0x7B) {
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-
-			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
-		}
-		else { // none constant time steps
-			byte[] sizeBuffer = new byte[4];
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
-				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
-				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-				offset += lovDataSize;
-
-				StringBuilder sb = new StringBuilder();
-				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
-				//sb.append(timeBuffer.length).append(" - ");
-				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length - 8) + "0000000000";
-				long dateTime = new Long(timeStamp.substring(6, 17));
-				WeatronicAdapter.log.log(java.util.logging.Level.FINEST, timeStamp + " " + timeStamp.substring(6, 17) + " " + dateTime);
-				sb.append(dateTime);
-				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
-				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
-				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime) / 1000 - 217; // value 217 is a compromis manual selected
-				sb.append(" - ").append(deltaTime);
-				sb.append(" - ").append(sumTimeDelta += deltaTime);
-				WeatronicAdapter.log.log(java.util.logging.Level.FINER, sb.toString());
-				lastDateTime = dateTime;
-
-				recordSet.addTimeStep_ms(sumTimeDelta);
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-		}
-		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
-		recordSet.syncScaleOfSyncableRecords();
+	public WeatronicAdapterDialog getDialog() {
+		return this.dialog;
 	}
 
 	/**
@@ -233,95 +172,6 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		}
 
 		return points;
-	}
-
-	/**
-	 * query if the PowerLab8 executes discharge > charge > discharge cycles
-	 */
-	boolean isCycleMode(byte[] dataBuffer) {
-		return (dataBuffer[142] & 0xFF) > 0;
-	}
-
-	/**
-	 * getNumberOfCycle for NiCd and NiMh, for LiXx it  will return 0
-	 * accuCellType -> Lithium=1, NiMH=2, NiCd=3, Pb=4
-	 * @param dataBuffer
-	 * @return cycle count
-	 */
-	public int getNumberOfCycle(byte[] dataBuffer) {
-		return dataBuffer[142] & 0xFF;
-	}
-
-	/**
-	 * @param dataBuffer
-	 * @return firmware version
-	 */
-	public int getFirmwareVersion(byte[] dataBuffer) {
-		return DataParser.parse2Short(dataBuffer[2], dataBuffer[1]);
-	}
-
-	/**
-	 * @param dataBuffer
-	 * @return cell count
-	 */
-	public int getNumberOfLithiumXCells(byte[] dataBuffer) {
-		return (dataBuffer[132] & 0xFF);
-	}
-
-	/**
-	 * get battery cell type
-	 * 1 = Lithium Polymer
-	 * 2 = Lithium Ion
-	 * 3 = A123
-	 * 4 = Lithium Manganese 5 = Lithium Cobalt
-	 * 6 = NiCd
-	 * 7 = NiMh
-	 * 8 = Lead Acid
-	 * 9 = LiFE
-	 * 10 = Primary
-	 * 11 = Power Supply
-	 * @param dataBuffer
-	 * @return for 1 = LiPo,2 = LiIo,3 = A123,4 = LiMa,5 = LiCo,6 = NiCd,7 = NiMh,8 = Lead Acid,9 = LiFE,10 = Primary,11 = Power Supply
-	 */
-	public int getAccuCellType(byte[] dataBuffer) {
-		return (dataBuffer[135] & 0xFF);
-	}
-
-	/**
-	 * check if processing 
-	 * 0 = Charger Ready to Start
-	 * 1 = Detecting Pack
-	 * 6 = Charging
-	 * 7 = Trickle Charging
-	 * 8 = Discharging
-	 * 9 = Monitoring
-	 * 10 = Halt for Safety Screen
-	 * 11 = Pack Cool Down (when cycling)
-	 * 99 = System Stop Error Occurred
-	 * byte 44,Bit8 = Charge/Discharge Complete
-	 * @param dataBuffer
-	 * @return
-	 */
-	public boolean isProcessing(byte[] dataBuffer) {
-		return getProcessingMode(dataBuffer) > 0 && getProcessingMode(dataBuffer) < 99 && (dataBuffer[44] & 0x80) == 0;
-	}
-
-	/**
-	 * get processing mode 
-	 * 0 = Charger Ready to Start
-	 * 1 = Detecting Pack
-	 * 6 = Charging
-	 * 7 = Trickle Charging
-	 * 8 = Discharging
-	 * 9 = Monitoring
-	 * 10 = Halt for Safety Screen
-	 * 11 = Pack Cool Down (when cycling)
-	 * 99 = System Stop Error Occurred
-	 * @param dataBuffer
-	 * @return
-	 */
-	public int getProcessingMode(byte[] dataBuffer) {
-		return (dataBuffer[133] & 0xFF);
 	}
 
 	/**
@@ -408,18 +258,25 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			for (int j = 0; j < recordSet.size(); j++) {
-				Record record = recordSet.get(j);
-				double reduction = record.getReduction();
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if (j > 5 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
-					dataTableRow[j + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-				else
-					dataTableRow[j + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				DataType dataType = record.getDataType();
+				if (dataType == Record.DataType.GPS_LATITUDE || dataType ==  Record.DataType.GPS_LONGITUDE) { 
+					dataTableRow[index + 1] = String.format("%09.6f", record.realGet(rowIndex) * factor); //$NON-NLS-1$
+				}
+//				else {
+//					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
+//				}
+				else {
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + (record.realGet(rowIndex) / 1000.0) * factor));
+				}
+				++index;
 			}
 		}
 		catch (RuntimeException e) {
-			WeatronicAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -431,13 +288,14 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public double translateValue(Record record, double value) {
-		// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-		// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-		// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
-
-		double newValue = value * factor + offset;
+		DataType dataType = record.getDataType();
+		double newValue;
+		if (dataType == Record.DataType.GPS_LATITUDE || dataType ==  Record.DataType.GPS_LONGITUDE) 
+			newValue = 1000 * value * factor + offset;
+		else
+			newValue = value * factor + offset;
 		WeatronicAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -449,13 +307,14 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public double reverseTranslateValue(Record record, double value) {
-		// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-		// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-		// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
-
-		double newValue = value / factor - offset;
+		DataType dataType = record.getDataType();
+		double newValue;
+		if (dataType == Record.DataType.GPS_LATITUDE || dataType ==  Record.DataType.GPS_LONGITUDE) 
+			newValue = 1000 * value / factor - offset;
+		else
+			newValue = value / factor - offset;
 		WeatronicAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -471,14 +330,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 
-		// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-		// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-		// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
 		recordSet.setAllDisplayable();
-		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
-			recordSet.get(recordKey).setActive(true);
-		}
-		for (int i = 6; i < recordSet.size(); ++i) {
+		for (int i = 0; i < recordSet.realSize(); ++i) {
 			Record record = recordSet.get(i);
 			record.setDisplayable(record.hasReasonableData());
 			if (WeatronicAdapter.log.isLoggable(java.util.logging.Level.FINER)) WeatronicAdapter.log.log(java.util.logging.Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData());
@@ -499,13 +352,9 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		// since there are live measurement points only the calculation will take place directly after switch all to displayable
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-				// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-				// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
 				int displayableCounter = 0;
 
 				// check if measurements isActive == false and set to isDisplayable == false
@@ -516,30 +365,6 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 						++displayableCounter;
 					}
 				}
-
-				Record record = recordSet.get(3);//3=Leistung
-				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
-					try {
-						this.calculationThreads.get(record.getName()).start();
-					}
-					catch (RuntimeException e) {
-						WeatronicAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
-				}
-				++displayableCounter;
-
-				record = recordSet.get(4);//4=Energie
-				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
-					try {
-						this.calculationThreads.get(record.getName()).start();
-					}
-					catch (RuntimeException e) {
-						WeatronicAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
-				}
-				++displayableCounter;
 
 				WeatronicAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 				recordSet.setConfiguredDisplayable(displayableCounter);
@@ -562,14 +387,6 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR };
-	}
-
-	/**
-	 * @return the dialog
-	 */
-	@Override
-	public DeviceDialog getDialog() {
-		return null;
 	}
 
 	/**
@@ -606,7 +423,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
-								LogReader.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								LogReader.read(selectedImportFile); //, WeatronicAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
@@ -623,26 +440,23 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		reader.start();
 	}
 
-	/**
-	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
-	 * set value of -1 to suppress this measurement
-	 */
-	@Override
-	public int[] getCellVoltageOrdinals() {
-		// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-		// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-		// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
-		return new int[] { 3, 5 };
+	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	/**
-	 * query device for specific smoothing index
-	 * 0 do nothing at all
-	 * 1 current drops just a single peak
-	 * 2 current drop more or equal than 2 measurements 
-	 */
-	@Override
-	public int	getCurrentSmoothIndex() {
-		return 2;
+	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getLovDataByteSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		// TODO Auto-generated method stub
+		
 	}
 }
