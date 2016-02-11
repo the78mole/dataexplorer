@@ -2405,5 +2405,13 @@ public class DeviceConfiguration {
 		return 0;
 	}
 	
-
+	/**
+	 * query if the measurements get build up dynamically while reading (import) the data 
+	 * the implementation must create measurementType while reading the import data, 
+	 * refer to Weatronic-Telemetry implementation DataHeader
+	 * @return true|false, default is false and we have a constant measurement size defined in device XML
+	 */
+	public boolean isVariableMeasurementSize() {
+		return false;
+	}
 }

@@ -912,6 +912,13 @@ public interface IDevice {
 	public void resetMeasurements();
 	
 	/**
+	 * remove a MeasurementType object from channel with channel number as given
+	 * @param channelConfigNumber
+	 * @param removeMeasurementType
+	 */
+	public void removeMeasurementFromChannel(int activeChannelConfigNumber, MeasurementType measurement);
+	
+	/**
 	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
 	 * @return true if curve point should be filtered
 	 */
@@ -983,6 +990,13 @@ public interface IDevice {
 	/**
 	 * @return the end point address of the interface to be used for read communication
 	 */
-	public byte getUsbEndpointOut();
+	public byte getUsbEndpointOut();	
 	
+	/**
+	 * query if the measurements get build up dynamically while reading (import) the data 
+	 * the implementation must create measurementType while reading the import data, 
+	 * refer to Weatronic-Telemetry implementation DataHeader
+	 * @return true|false, default is false and we have a constant measurement size defined in device XML
+	 */
+	public boolean isVariableMeasurementSize();	
 }
