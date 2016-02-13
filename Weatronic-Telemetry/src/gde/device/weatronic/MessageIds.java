@@ -24,6 +24,7 @@ package gde.device.weatronic;
  */ 
 public class MessageIds { 
 
+	public final static String	GDE_MSGE3700 = "GDE_MSGE3700";
 	public final static String	GDE_MSGT3700 = "GDE_MSGT3700";
 	public final static String	GDE_MSGT3701 = "GDE_MSGT3701";
 	public final static String	GDE_MSGT3702 = "GDE_MSGT3702";
@@ -37,11 +38,6 @@ public class MessageIds {
 	public final static String	GDE_MSGT3716 = "GDE_MSGT3716";
 	public final static String	GDE_MSGT3717 = "GDE_MSGT3717";
 	public final static String	GDE_MSGT3718 = "GDE_MSGT3718";
-	public final static String	GDE_MSGT3719 = "GDE_MSGT3719";
-	public final static String	GDE_MSGT3720 = "GDE_MSGT3720";
-	public final static String	GDE_MSGT3721 = "GDE_MSGT3721";
-	public final static String	GDE_MSGT3722 = "GDE_MSGT3722";
-	public final static String	GDE_MSGT3723 = "GDE_MSGT3723";
 	public final static String	GDE_MSGT3724 = "GDE_MSGT3724";
 	public final static String	GDE_MSGT3725 = "GDE_MSGT3725";
 

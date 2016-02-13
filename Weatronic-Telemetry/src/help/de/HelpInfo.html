@@ -16,38 +16,40 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    Copyright (c) 2016 Winfried Bruegmann
 ************************************************************************************** 
 -->
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.4  (Win32)">
 	<META NAME="AUTHOR" CONTENT="Winfried Br&uuml;gmann">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Winfried Br&uuml;gmann">
-	<META NAME="CHANGED" CONTENT="20080718;18370398">
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><A NAME="einleitung"></A><FONT FACE="Arial"><FONT SIZE=4><I>eStation-Ger&auml;tedialog</I></FONT></FONT></H2>
+	<H2><A NAME="einleitung"></A><FONT FACE="Arial"><FONT SIZE=4><I>Weatronic-Ger&auml;tedialog</I></FONT></FONT></H2>
 </DIV>
-<P>Der eStation-Ger&auml;tedialog dient zum Auslesen der verf&uuml;gbaren
-Daten, die bei einem Lade- bzw. Entladevorgang gemessen werden. 
+<P>Der Weatronic-Ger&auml;tedialog dient nur dazu einen Überblick über die aktuellen Messwerte zu bekommen und die Filter zu konfigurieren
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Bedienung</I></FONT></FONT></H2>
-<P>Nachdem die serielle Schnittstelle &uuml;ber den
-Ger&auml;teauswahldialog eingestellt ist und dieser Ger&auml;tedialog
-aufgerufen wurde, können durch dr&uuml;cken von „Start“ zyklisch
-Werte aus dem Ger&auml;t abgerufen und angezeigt werden. 
+<P>Es gibt 4 vorgesehene Konfigurationen, die über den GeräteEigenschaftenEditor mit Triggern zur Auswertung bestimmter Ereignisse, 
+wie die Anzahl der Steigflüge, Motorlaufzeit, Motorhöhe genutzt werden kann. 
+Das kann nicht initial geschehen, da die Zusammenstellung der Messwerte von den im Modell eingebauten Sensoren abhängig ist. 
+Hier wird auf die Dokumentation verwiesen, wenn das genutzt werden soll.
 </P>
-<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="Bild1" ALT="Bild1" ALIGN=BOTTOM WIDTH=350 HEIGHT=465 BORDER=0>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="Bild1" ALT="Bild1" ALIGN=BOTTOM BORDER=0>
 </P>
-<P>Die Umschaltung der Lade- bzw. Entladekurven erfolgt automatisch,
-da die vom Ger&auml;t gelieferten Daten diese Information enthalten.
-Ist das Ger&auml;t &uuml;ber einen gewissen Zeitraum inaktiv, wird
-der serielle Port geschlossen. 
+<H2><FONT FACE="Arial"><FONT SIZE=4><I>Synchronisation von Messwerten auf eine Skala</I></FONT></FONT></H2>
+<P>Im System verwendeten Einstellungsverzeichnis unter /DataExplorer/Mappings befindet sich eine XML-Datei über die eine Synchronisation erreicht werden kann.
+Hier findet man Schlüssel- und Wert-Paare aus denen leicht zu erkennen ist wie die Werte gebildet werden müssen.
+Ein Beispiele zeigt, wie RXSub1_UBatt_1, RXSub2_UBatt_0, RXSub2_UBatt_1 auf RXSub1_UBatt_0 synchronisiert wird:
+</BR></BR>
+	&lt;entry key="RXSub1_UBatt_1"&gt;RXSub1_UBatt_0&lt;/entry&gt;
+</BR>
+	&lt;entry key="RXSub2_UBatt_0"&gt;RXSub1_UBatt_0&lt;/entry&gt;
+</BR>
+	&lt;entry key="RXSub2_UBatt_1"&gt;RXSub1_UBatt_0&lt;/entry&gt;
 </P>
+
 </BODY>
 </HTML>

@@ -21,6 +21,7 @@ package gde.device.weatronic;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.Record.DataType;
@@ -29,16 +30,20 @@ import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
-import gde.io.DataParser;
+import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.WaitTimer;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -51,6 +56,7 @@ import org.eclipse.swt.widgets.FileDialog;
  */
 public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger														log												= Logger.getLogger(WeatronicAdapter.class.getName());
+	final static Properties	properties	= new Properties();
 
 	final DataExplorer									application;
 	final Channels											channels;
@@ -78,6 +84,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null || this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : true;
 		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null || this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
 		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null || this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
+		readProperties();
 	}
 
 	/**
@@ -96,6 +103,29 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : true;
 		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
 		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
+		readProperties();
+	}
+
+	/**
+	 * read special properties to enable configuration to specific GPX extent values
+	 * @throws FileNotFoundException
+	 */
+	private void readProperties() {
+		String preopertyFilePath = Settings.getInstance().getApplHomePath() + "/Mapping/WeatronicSynchronizationMappings.xml"; //$NON-NLS-1$
+		try {
+			if (!new File(preopertyFilePath).exists()) {
+				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping"); //$NON-NLS-1$
+				if (!path.exists() && !path.isDirectory()) path.mkdir();
+				//extract initial property files
+				FileUtils.extract(this.getClass(), "WeatronicSynchronizationMappings.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(preopertyFilePath));
+			WeatronicAdapter.properties.loadFromXML(stream);
+			stream.close();
+		}
+		catch (Exception e) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE3700, new String[] { preopertyFilePath }));
+		}
 	}
 
 	/**
@@ -135,42 +165,6 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		int maxVotage = Integer.MIN_VALUE;
-		int minVotage = Integer.MAX_VALUE;
-		int VROffset = 1;
-		float VRAmps = 1;
-
-		// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-		points[0] = DataParser.parse2Short(dataBuffer, 25) * 1000;
-		points[1] = DataParser.parse2Short(dataBuffer, 81) * 1000;
-		points[2] = (int) ((2.5 * DataParser.parse2Short(dataBuffer, 27) / 4095 - 0.986) / 0.00355 * 1000);
-		points[3] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-		points[4] = DataParser.parse2Short(dataBuffer, 43) * 1000;
-		points[5] = DataParser.parse2Int(dataBuffer, 35) * 1000;
-		points[6] = Double.valueOf((points[3] / 1000.0) * (points[4] / 1000.0) * 1000).intValue(); // power U*I [W]
-		points[7] = Double.valueOf((points[3] / 1000.0) * (points[5] / 1000.0)).intValue(); // energy U*C [mWh]
-
-		// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-		points[8] = 0;
-		for (int i = 0, j = 0; i < 8; ++i, j += 2) {
-			points[i + 9] = DataParser.parse2Short(dataBuffer, j + 3) * 1000;
-			if (points[i + 9] > 0) {
-				maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
-				minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
-			}
-		}
-		//calculate balance on the fly
-		points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-
-		VRAmps = DataParser.parse2Short(dataBuffer, 69) / 600;
-		VROffset = DataParser.parse2Short(dataBuffer, 115);
-		// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
-		points[17] = 0;
-		for (int i = 0, j = 0; i < 8; ++i, j += 2) {
-			points[i + 18] = (int) ((DataParser.parse2Short(dataBuffer, j + 53) / 6.3984 - VROffset) / VRAmps * 1000);
-			points[17] += points[i + 18]; // add up cell resistance
-		}
-
 		return points;
 	}
 
@@ -188,67 +182,43 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
-		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.size()];
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int progressCycle = 0;
-		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
+		int progressCycle = 1;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
-		int timeStampBufferSize = 0;
-		if (!recordSet.isTimeStepConstant()) {
-			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
-			byte[] timeStampBuffer = new byte[timeStampBufferSize];
-			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)
-						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
-			}
-		}
-		WeatronicAdapter.log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
-
+		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
+		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
-			WeatronicAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize);
-			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-
-			// 0=SupplyVoltage 1=SupplyVoltage 2=CPUTemperature 3=Voltage 4=Current 5=Capacity 6=Power 7=Energy 8=Balance
-			// 9=CellVoltage1 10=CellVoltage2 11=CellVoltage3 12=CellVoltage4 13=CellVoltage5 14=CellVoltage6 15=CellVoltage7 16=CellVoltage8
-			// 17=CellRi 18=CellRi1 19=CellRi2 20=CellRi3 21=CellRi4 22=CellRi5 23=CellRi6 24=CellRi7 25=CellRi8
-			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
-			points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
-			points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
-			points[3] = Double.valueOf((points[0] / 1000.0) * (points[1] / 1000.0) * 1000).intValue(); // power U*I [W]
-			points[4] = Double.valueOf((points[0] / 1000.0) * (points[2] / 1000.0)).intValue(); // energy U*C [mWh]
-			points[5] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
-			points[6] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
-			points[7] = (((convertBuffer[20] & 0xff) << 24) + ((convertBuffer[21] & 0xff) << 16) + ((convertBuffer[22] & 0xff) << 8) + ((convertBuffer[23] & 0xff) << 0));
-			points[8] = 0;
-			int maxVotage = Integer.MIN_VALUE;
-			int minVotage = Integer.MAX_VALUE;
-
-			// 8=CellVoltage1 9=CellVoltage2 10=CellVoltage3 11=CellVoltage4 12=CellVoltage5 13=CellVoltage6
-			for (int j = 0, k = 0; j < points.length - 9; ++j, k += GDE.SIZE_BYTES_INTEGER) {
-				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
-				points[j + 9] = (((convertBuffer[k + 24] & 0xff) << 24) + ((convertBuffer[k + 25] & 0xff) << 16) + ((convertBuffer[k + 26] & 0xff) << 8) + ((convertBuffer[k + 27] & 0xff) << 0));
-				if (points[j + 9] > 0) {
-					maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
-					minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
-				}
+			index = i * dataBufferSize + timeStampBufferSize;
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
+			
+			for (int j = 0; j < points.length; j++) {
+				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
-			//calculate balance on the fly
-			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
-			if (recordSet.isTimeStepConstant())
-				recordSet.addPoints(points);
-			else
-				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
+			recordSet.addPoints(points, 
+						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//return unchanged key set, reordSet was build using fileRecordsProperties keys
+		return recordSet.getRecordNames();
 	}
 
 	/**
@@ -386,7 +356,18 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public String[] getUsedPropertyKeys() {
-		return new String[] { IDevice.OFFSET, IDevice.FACTOR };
+		return new String[] { IDevice.OFFSET, IDevice.FACTOR, Record.DataType.GPS_LATITUDE.name(), Record.DataType.GPS_LONGITUDE.name(), Record.DataType.GPS_ALTITUDE.name(), Record.DataType.GPS_AZIMUTH.name(), Record.DataType.SPEED.name() };
+	}
+	
+	/**
+	 * query if the measurements get build up dynamically while reading (import) the data 
+	 * the implementation must create measurementType while reading the import data, 
+	 * refer to Weatronic-Telemetry implementation DataHeader
+	 * @return true
+	 */
+	@Override
+	public boolean isVariableMeasurementSize() {
+		return true;
 	}
 
 	/**
@@ -438,6 +419,157 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 			}
 		};
 		reader.start();
+	}
+
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * set value of -1 to suppress this measurement
+	 */
+	@Override
+	public boolean isActualRecordSetWithGpsData() {
+		boolean containsGPSdata = false;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			int latOrdinal = -1, longOrdinal = -1;
+			if (activeRecordSet != null) {
+				for (Record record : activeRecordSet.values()) {
+					Record.DataType datatype = record.getDataType();
+					switch (datatype) {
+					case GPS_LATITUDE:
+						if (record.getName().startsWith("Rx"))
+							latOrdinal = record.getOrdinal();
+						break;
+					case GPS_LONGITUDE:
+						if (record.getName().startsWith("Rx"))
+							longOrdinal = record.getOrdinal();
+						break;
+
+					default:
+						break;
+					}
+				}
+				if (latOrdinal != -1 && longOrdinal != -1)
+					containsGPSdata = activeRecordSet.get(latOrdinal).hasReasonableData() && activeRecordSet.get(longOrdinal).hasReasonableData();
+			}
+		}
+		return containsGPSdata;
+	}
+	
+	/**
+	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 * @param record
+	 * @return
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		return (record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LONGITUDE) && record.getName().startsWith("Rx");
+	}
+
+	/**
+	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 */
+	@Override
+	public Integer getGPS2KMZMeasurementOrdinal() {
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				for (Record record : activeRecordSet.values()) {
+					Record.DataType datatype = record.getDataType();
+					switch (datatype) {
+					case SPEED:
+						if (record.getName().startsWith("Rx"))
+							return record.getOrdinal();
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
+	 */
+	public void export2KMZ3D(int type) {
+		int latOrdinal = -1, longOrdinal = -1, altOrdinal = -1, climbOrdinal = -1, speedOrdinal = -1, tripOrdinal = -1;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				for (Record record : activeRecordSet.values()) {
+					Record.DataType datatype = record.getDataType();
+					switch (datatype) {
+					case GPS_LATITUDE:
+						if (record.getName().startsWith("Rx"))
+							latOrdinal = record.getOrdinal();
+						break;
+					case GPS_LONGITUDE:
+						if (record.getName().startsWith("Rx"))
+							longOrdinal = record.getOrdinal();
+						break;
+					case GPS_ALTITUDE:
+						if (record.getName().startsWith("Rx"))
+							altOrdinal = record.getOrdinal();
+						break;
+					case SPEED:
+						if (record.getName().startsWith("Rx"))
+							speedOrdinal = record.getOrdinal();
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
+		}
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3703), longOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+	}
+
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	@Override
+	public String exportFile(String fileEndingType, boolean isExport2TmpDir) {
+		String exportFileName = GDE.STRING_EMPTY;
+		int latOrdinal = -1, longOrdinal = -1, altOrdinal = -1, climbOrdinal = -1, speedOrdinal = -1, tripOrdinal = -1;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				for (Record record : activeRecordSet.values()) {
+					Record.DataType datatype = record.getDataType();
+					switch (datatype) {
+					case GPS_LATITUDE:
+						if (record.getName().startsWith("Rx"))
+							latOrdinal = record.getOrdinal();
+						break;
+					case GPS_LONGITUDE:
+						if (record.getName().startsWith("Rx"))
+							longOrdinal = record.getOrdinal();
+						break;
+					case GPS_ALTITUDE:
+						if (record.getName().startsWith("Rx"))
+							altOrdinal = record.getOrdinal();
+						break;
+					case SPEED:
+						if (record.getName().startsWith("Rx"))
+							speedOrdinal = record.getOrdinal();
+						break;
+
+					default:
+						break;
+					}
+				}
+				exportFileName = new FileHandler().exportFileKMZ(longOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
+			}
+		}
+		return exportFileName;
 	}
 
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {

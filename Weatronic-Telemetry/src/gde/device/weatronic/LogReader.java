@@ -5,12 +5,15 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DataTypes;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
@@ -18,6 +21,7 @@ import gde.utils.StringHelper;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -374,19 +378,31 @@ public class LogReader {
 					String tmpMeasurementName = measurement.getName();
 					while (isDuplicatedName(activeChannelConfigNumber, measurement.getName())) 
 							measurement.setName(tmpMeasurementName + GDE.STRING_UNDER_BAR + index++);
-					if (measurement.getName().contains("_GPS_"))
+					
+					if (measurement.getName().contains("_GPS_")) {
 						if (measurement.getName().contains("_GPS_Long"))
 							setupMeasurement(gde.data.Record.DataType.GPS_LONGITUDE, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
 						else if (measurement.getName().contains("_GPS_Lat"))
 							setupMeasurement(gde.data.Record.DataType.GPS_LATITUDE, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
 						else if (measurement.getName().contains("_GPS_Alt"))
-							setupMeasurement(gde.data.Record.DataType.GPS_ALTITUDE, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
-						else if (measurement.getName().contains("_GPS_Corse"))
-							setupMeasurement(gde.data.Record.DataType.GPS_AZIMUTH, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
+							setupMeasurement(gde.data.Record.DataType.GPS_ALTITUDE, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), false, measurement.getFactor(), measurement.getOffset(), true);
+						else if (measurement.getName().contains("_GPS_Course"))
+							setupMeasurement(gde.data.Record.DataType.GPS_AZIMUTH, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), false, measurement.getFactor(), measurement.getOffset(), true);
 						else if (measurement.getName().contains("_GPS_Speed"))
-							setupMeasurement(gde.data.Record.DataType.SPEED, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
+							setupMeasurement(gde.data.Record.DataType.SPEED, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), false, measurement.getFactor(), measurement.getOffset(), true);
+						else if (measurement.getName().contains("_GPS_IsValid"))
+							setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
+						else if (measurement.getName().contains("UTC"))
+							setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
+						else if (measurement.getName().contains("Status"))
+							setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
 						else
 							setupMeasurement(activeChannelConfigNumber, ordinal++, measurement, false);
+					}
+					else if (measurement.getName().contains("UTC")) 
+						setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
+					else if (measurement.getName().contains("Status"))
+						setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(), measurement.getOffset(), true);
 					else
 						setupMeasurement(activeChannelConfigNumber, ordinal++, measurement, false);
 					break;
@@ -413,7 +429,6 @@ public class LogReader {
 					continue;
 				record.setDataType();
 			}
-			recordSet.setStartTimeStamp(startTimeStamp_ms);
 		}
 		
 		private boolean isDuplicatedName(int channelConfigNumber, String name) {
@@ -463,14 +478,34 @@ public class LogReader {
 				break;
 			case SPEED:
 				tmpPropertyType = new PropertyType();
-				tmpPropertyType.setName(gde.data.Record.DataType.GPS_AZIMUTH.value());
+				tmpPropertyType.setName(gde.data.Record.DataType.SPEED.value());
 				tmpPropertyType.setType(DataTypes.STRING);
-				tmpPropertyType.setValue(gde.data.Record.DataType.GPS_AZIMUTH.value());
+				tmpPropertyType.setValue(gde.data.Record.DataType.SPEED.value());
 				gdeMeasurement.getProperty().add(tmpPropertyType);
 				break;
 
 			default:
 				break;
+			}
+			
+			if (WeatronicAdapter.properties.get(name) != null) { //scale_sync_ref_ordinal
+				String[] measurementNames = LogReader.device.getMeasurementNames(channelConfig);
+				int syncOrdinal = -1;
+				String syncName = (String) WeatronicAdapter.properties.get(name);
+				for (int i=0; i<measurementNames.length; i++) {
+					if (measurementNames[i].equals(syncName)) {
+						syncOrdinal = i;
+						break;
+					}
+				}
+				
+				if (syncOrdinal >= 0) {
+					PropertyType tmpPropertyType = new PropertyType();
+					tmpPropertyType.setName(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+					tmpPropertyType.setType(DataTypes.INTEGER);
+					tmpPropertyType.setValue(syncOrdinal);
+					gdeMeasurement.getProperty().add(tmpPropertyType);
+				}
 			}
 			
 			if (isClearStatistics) {
@@ -480,21 +515,43 @@ public class LogReader {
 				StatisticsType newStatisticsType = gdeMeasurement.getStatistics();
 				if (newStatisticsType == null) {
 					newStatisticsType = new StatisticsType();
-					newStatisticsType.setMin(true);
-					newStatisticsType.setMax(true);
-					newStatisticsType.setAvg(true);
-					gdeMeasurement.setStatistics(new StatisticsType());
 				}
-			}
+				newStatisticsType.setMin(true);
+				newStatisticsType.setMax(true);
+				newStatisticsType.setAvg(true);
+				newStatisticsType.setSigma(true);
+				gdeMeasurement.setStatistics(new StatisticsType());
+			}		
 		}
 
 		private void setupMeasurement(final int channelConfig, final int measurementOrdinal, Measurement measurement, boolean isClearStatistics) {
 			MeasurementType gdeMeasurement = LogReader.device.getMeasurement(channelConfig, measurementOrdinal);
-			gdeMeasurement.setName(measurement.getName().length() == 0 ? "???" : measurement.getName());
+			gdeMeasurement.setName(measurement.getName().length() == 0 ? ("???_"+measurementOrdinal) : measurement.getName());
 			gdeMeasurement.setUnit(measurement.getUnit());
 			gdeMeasurement.setActive(true);
 			gdeMeasurement.setFactor(measurement.getFactor());
 			gdeMeasurement.setOffset(measurement.getOffset());
+			
+			if (WeatronicAdapter.properties.get(measurement.getName()) != null) { //scale_sync_ref_ordinal
+				String[] measurementNames = LogReader.device.getMeasurementNames(channelConfig);
+				int syncOrdinal = -1;
+				String syncName = (String) WeatronicAdapter.properties.get(measurement.getName());
+				for (int i=0; i<measurementNames.length; i++) {
+					if (measurementNames[i].equals(syncName)) {
+						syncOrdinal = i;
+						break;
+					}
+				}
+				
+				if (syncOrdinal >= 0) {
+					PropertyType tmpPropertyType = new PropertyType();
+					tmpPropertyType.setName(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+					tmpPropertyType.setType(DataTypes.INTEGER);
+					tmpPropertyType.setValue(syncOrdinal);
+					gdeMeasurement.getProperty().add(tmpPropertyType);
+				}
+			}
+			
 			if (isClearStatistics) {
 				gdeMeasurement.setStatistics(null);
 			}
@@ -502,11 +559,12 @@ public class LogReader {
 				StatisticsType newStatisticsType = gdeMeasurement.getStatistics();
 				if (newStatisticsType == null) {
 					newStatisticsType = new StatisticsType();
-					newStatisticsType.setMin(true);
-					newStatisticsType.setMax(true);
-					newStatisticsType.setAvg(true);
-					gdeMeasurement.setStatistics(new StatisticsType());
 				}
+				newStatisticsType.setMin(true);
+				newStatisticsType.setMax(true);
+				newStatisticsType.setAvg(true);
+				newStatisticsType.setSigma(true);
+				gdeMeasurement.setStatistics(new StatisticsType());
 			}
 		}
 			
@@ -1149,6 +1207,10 @@ public class LogReader {
 				if (menuToolBar != null) LogReader.application.setProgress((int) (readByteCount*100/fileSize), sThreadId);
 				logRecordCount +=1;
 			}
+			
+			recordSet.setStartTimeStamp(startTimeStamp_ms);
+			recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms));
+
 			if (log.isLoggable(Level.FINEST)) {
 				System.out.println("logRecordCount = " + logRecordCount);
 			}
