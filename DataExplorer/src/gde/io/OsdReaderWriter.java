@@ -26,6 +26,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.exception.DataInconsitsentException;
 import gde.exception.GDEInternalException;
 import gde.exception.NotSupportedFileFormatException;
@@ -150,8 +151,25 @@ public class OsdReaderWriter {
 							//read record set descriptors
 							int lastReordNumber = headerCounter;
 							while (headerCounter-- > 0) {
-								line = data_in.readUTF();
-								line = line.substring(0, line.length() - 1);
+								switch (version) {
+								case 1:
+								case 2:
+								case 3:
+									// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+									line = data_in.readUTF();
+									line = line.substring(0, line.length() - 1);
+									break;
+
+								default:
+								case 4:
+									// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+									int length = data_in.readInt();
+									byte[] bytes = new byte[length];
+									data_in.readFully(bytes);
+									line = new String(bytes, "UTF8");
+									line = line.substring(0, line.length()-1);
+									break;
+								}
 								if (line.startsWith(GDE.RECORD_SET_NAME)) {
 									log.log(Level.FINE, line);
 									header.put((lastReordNumber-headerCounter)+GDE.STRING_BLANK+GDE.RECORD_SET_NAME, line.substring(GDE.RECORD_SET_NAME.length()));
@@ -232,8 +250,9 @@ public class OsdReaderWriter {
 				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
 				int length = data_in.readInt();
 				byte[] bytes = new byte[length];
-				data_in.read(bytes);
-				line = new String(bytes).substring(0, length - 1);
+				data_in.readFully(bytes);
+				line = new String(bytes, "UTF8");
+				line = line.substring(0, line.length()-1);
 				break;
 			}
 			recordSetsInfo.add(getRecordSetProperties(line));
@@ -297,8 +316,52 @@ public class OsdReaderWriter {
 				// "Motor 3"
 				channelConfig = channelConfig.contains(GDE.STRING_BLANK) ? channelConfig.split(GDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
-				recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
-				//apply record sets properties
+	
+				if (device.isVariableMeasurementSize()) {
+					int activeChannelConfigNumber = channels.getActiveChannelNumber();
+					
+					//cleanup measurement, it get re-created 
+					int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
+					for (int i = 1; i < existingNumberMeasurements; i++) {
+						device.removeMeasurementFromChannel(activeChannelConfigNumber, device.getMeasurement(activeChannelConfigNumber, 1));
+					}
+					//build up the record set with variable number of records just fit the sensor data
+					String[] recordNames = new String[recordsProperties.length];
+					String[] recordSymbols = new String[recordsProperties.length];
+					String[] recordUnits = new String[recordsProperties.length];
+					for (int i = 0; i < recordsProperties.length; i++) {
+						HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+						MeasurementType gdeMeasurement = device.getMeasurement(activeChannelConfigNumber, i);
+						gdeMeasurement.setName(recordNames[i] = recordProperties.get(Record.NAME));
+						gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
+						gdeMeasurement.setSymbol(recordUnits[i] = recordProperties.get(Record.SYMBOL));
+						gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
+	//					
+	//					if (recordProperties.get(Record.FACTOR) != null)
+	//						gdeMeasurement.setFactor(Double.valueOf(recordProperties.get(Record.FACTOR)));
+	//					if (recordProperties.get(Record.OFFSET) != null)
+	//						gdeMeasurement.setOffset(Double.valueOf(recordProperties.get(Record.OFFSET)));
+	//					if (recordProperties.get(Record.REDUCTION) != null)
+	//						gdeMeasurement.setReduction(Double.valueOf(recordProperties.get(Record.REDUCTION)));
+					}
+					recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
+	//				for (int i = 0; i < recordsProperties.length; i++) {
+	//					HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+	//					if (recordProperties.get(Record.DataType.GPS_LATITUDE.name()) != null)
+	//						recordSet.get(i).setDataType(Record.DataType.GPS_LATITUDE);
+	//					else if (recordProperties.get(Record.DataType.GPS_LONGITUDE.name()) != null)
+	//						recordSet.get(i).setDataType(Record.DataType.GPS_LONGITUDE);
+	//					else if (recordProperties.get(Record.DataType.GPS_ALTITUDE.name()) != null)
+	//						recordSet.get(i).setDataType(Record.DataType.GPS_ALTITUDE);
+	//					else if (recordProperties.get(Record.DataType.GPS_AZIMUTH.name()) != null)
+	//						recordSet.get(i).setDataType(Record.DataType.GPS_AZIMUTH);
+	//					else if (recordProperties.get(Record.DataType.SPEED.name()) != null)
+	//						recordSet.get(i).setDataType(Record.DataType.SPEED);
+	//				}
+				}
+				else {
+					recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
+				}
 				recordSet.setRecordSetDescription(recordSetComment);
 
 				//apply record sets records properties
@@ -477,10 +540,10 @@ public class OsdReaderWriter {
 								sbs[i].append(GDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
 							}
 							sbs[i].append(GDE.DATA_DELIMITER).append(GDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(GDE.DATA_DELIMITER); //$NON-NLS-1$
-							filePointer += GDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
+							filePointer += GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
 							filePointer += GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
-								+ (GDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								+ (GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length + GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ " filePointer = " + filePointer); //$NON-NLS-1$
 
 							if (log.isLoggable(Level.FINE)) {
@@ -507,8 +570,8 @@ public class OsdReaderWriter {
 							sbs[i].append(GDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(GDE.STRING_NEW_LINE); //$NON-NLS-1$
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sbs[i].toString());
 							//instead of using writeUTF, write the length and the string separate to workaround java.io.UTFDataFormatException: encoded string too long: 272312 bytes
-							data_out.writeInt(sbs[i].length());
-							data_out.writeBytes(sbs[i].toString());
+							data_out.writeInt(sbs[i].toString().getBytes("UTF8").length);
+							data_out.write(sbs[i].toString().getBytes("UTF8"));
 							int sizeRecord = recordSet.getRecordDataSize(true);
 							recordSizes.put(recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i], sizeRecord);
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i] + "=" + sizeRecord);

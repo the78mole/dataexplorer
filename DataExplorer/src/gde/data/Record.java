@@ -2342,7 +2342,7 @@ public class Record extends Vector<Integer> {
 	 * @return
 	 */
 	public Record.DataType getDataType() {
-		return this.dataType;
+		return this.dataType == null ? DataType.DEFAULT : this.dataType;
 	}
 
 	/**
