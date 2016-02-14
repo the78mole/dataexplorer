@@ -53,18 +53,18 @@ import org.eclipse.swt.widgets.Shell;
  * @author Winfried Brügmann
  */
 public class WeatronicAdapterDialog extends DeviceDialog {
-	final static Logger					log										= Logger.getLogger(WeatronicAdapterDialog.class.getName());
+	final static Logger			log									= Logger.getLogger(WeatronicAdapterDialog.class.getName());
 
-	CTabFolder									tabFolder;
-	CTabItem										serialComTabItem;
-	Composite										configMainComosite;
-	Button											saveButton, closeButton, helpButton;
-	Button											inputFileButton;
-	Button											enableChannelRecords, enableStatusFilter, enableUtcTimeFilter;
+	CTabFolder							tabFolder;
+	CTabItem								serialComTabItem;
+	Composite								configMainComosite;
+	Button									saveButton, closeButton, helpButton;
+	Button									inputFileButton;
+	Button									enableChannelRecords, enableStatusFilter, enableUtcTimeFilter;
 
-	final WeatronicAdapter						device;																																			// get device specific things, get serial port, ...
-	final Settings							settings;																																		// application configuration settings
-	boolean											isVisibilityChanged		= false;
+	final WeatronicAdapter	device;																																				// get device specific things, get serial port, ...
+	final Settings					settings;																																			// application configuration settings
+	boolean									isVisibilityChanged	= false;
 
 	/**
 	 * default constructor initialize all variables required
@@ -83,7 +83,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			WeatronicAdapterDialog.log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -104,23 +104,25 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
-		        switch (event.detail) {
-		        case SWT.TRAVERSE_ESCAPE:
-		        	WeatronicAdapterDialog.this.dialogShell.close();
-		          event.detail = SWT.TRAVERSE_NONE;
-		          event.doit = false;
-		          break;
-		        }
-		      }
-		    });
+					@Override
+					public void handleEvent(Event event) {
+						switch (event.detail) {
+						case SWT.TRAVERSE_ESCAPE:
+							WeatronicAdapterDialog.this.dialogShell.close();
+							event.detail = SWT.TRAVERSE_NONE;
+							event.doit = false;
+							break;
+						}
+					}
+				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (WeatronicAdapterDialog.this.device.isChangePropery()) {
 							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { WeatronicAdapterDialog.this.device.getPropertiesFileName() });
 							if (WeatronicAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								WeatronicAdapterDialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								WeatronicAdapterDialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
@@ -129,8 +131,9 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						WeatronicAdapterDialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						WeatronicAdapterDialog.this.application.openHelpDialog("WeatronicAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
@@ -152,7 +155,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int channelNumber = WeatronicAdapterDialog.this.tabFolder.getSelectionIndex() + 1;
 							//disable moving curves between configurations
 							if (channelNumber > 0 && channelNumber <= WeatronicAdapterDialog.this.device.getChannelCount()) { // enable other tabs for future use
@@ -176,8 +179,9 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.enableChannelRecords.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "enableChannelRecords.widgetSelected, event=" + evt); //$NON-NLS-1$
-							WeatronicAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL, DataTypes.BOOLEAN, GDE.STRING_EMPTY + WeatronicAdapterDialog.this.enableChannelRecords.getSelection());
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "enableChannelRecords.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL, DataTypes.BOOLEAN,
+									GDE.STRING_EMPTY + WeatronicAdapterDialog.this.enableChannelRecords.getSelection());
 							WeatronicAdapter.setChannelFilter(WeatronicAdapterDialog.this.enableChannelRecords.getSelection());
 							WeatronicAdapterDialog.this.enableSaveButton(true);
 						}
@@ -197,8 +201,9 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.enableStatusFilter.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "enableFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
-							WeatronicAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_FILTER, DataTypes.BOOLEAN, GDE.STRING_EMPTY + WeatronicAdapterDialog.this.enableStatusFilter.getSelection());
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "enableFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_FILTER, DataTypes.BOOLEAN,
+									GDE.STRING_EMPTY + WeatronicAdapterDialog.this.enableStatusFilter.getSelection());
 							WeatronicAdapter.setStatusFilter(WeatronicAdapterDialog.this.enableStatusFilter.getSelection());
 							WeatronicAdapterDialog.this.enableSaveButton(true);
 						}
@@ -218,8 +223,9 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.enableUtcTimeFilter.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "enableTextModusFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
-							WeatronicAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.TEXT_MODE, DataTypes.BOOLEAN, GDE.STRING_EMPTY + WeatronicAdapterDialog.this.enableUtcTimeFilter.getSelection());
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "enableTextModusFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.TEXT_MODE, DataTypes.BOOLEAN,
+									GDE.STRING_EMPTY + WeatronicAdapterDialog.this.enableUtcTimeFilter.getSelection());
 							WeatronicAdapter.setUtcFilter(WeatronicAdapterDialog.this.enableUtcTimeFilter.getSelection());
 							WeatronicAdapterDialog.this.enableSaveButton(true);
 						}
@@ -239,11 +245,11 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (WeatronicAdapterDialog.this.isVisibilityChanged) {
 								String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { WeatronicAdapterDialog.this.device.getPropertiesFileName() });
 								if (WeatronicAdapterDialog.this.application.openYesNoMessageDialog(WeatronicAdapterDialog.this.getDialogShell(), msg) == SWT.YES) {
-									log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+									WeatronicAdapterDialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 									WeatronicAdapterDialog.this.device.storeDeviceProperties();
 								}
 							}
@@ -265,7 +271,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.saveButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							WeatronicAdapterDialog.this.device.storeDeviceProperties();
 							WeatronicAdapterDialog.this.saveButton.setEnabled(false);
 						}
@@ -284,7 +290,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							WeatronicAdapterDialog.this.application.openHelpDialog("WeatronicAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					});
@@ -302,7 +308,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							WeatronicAdapterDialog.log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							WeatronicAdapterDialog.this.dialogShell.dispose();
 						}
 					});
@@ -315,17 +321,20 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 				}
 
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - this.dialogShell.getSize().x/2, 0));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - this.dialogShell.getSize().x / 2, 0));
 				this.dialogShell.open();
 			}
 			else {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
-			
-			this.enableChannelRecords.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() : "true"));
-			this.enableStatusFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() : "true"));
-			this.enableUtcTimeFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() : "true"));
+
+			this.enableChannelRecords.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != null ? this.device.getChannelProperty(
+					ChannelPropertyTypes.ENABLE_CHANNEL).getValue() : "true"));
+			this.enableStatusFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != null ? this.device.getChannelProperty(
+					ChannelPropertyTypes.ENABLE_FILTER).getValue() : "true"));
+			this.enableUtcTimeFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != null ? this.device.getChannelProperty(
+					ChannelPropertyTypes.TEXT_MODE).getValue() : "true"));
 
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
@@ -333,7 +342,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 			}
 		}
 		catch (Exception e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			WeatronicAdapterDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -359,6 +368,7 @@ public class WeatronicAdapterDialog extends DeviceDialog {
 	public void selectTab(final int index) {
 		if (WeatronicAdapterDialog.this.tabFolder != null && !WeatronicAdapterDialog.this.tabFolder.isDisposed()) {
 			this.dialogShell.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					WeatronicAdapterDialog.this.tabFolder.setSelection(index - 1);
 				}

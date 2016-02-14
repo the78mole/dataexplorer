@@ -31,7 +31,6 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -55,17 +54,17 @@ import org.eclipse.swt.widgets.FileDialog;
  * @author Winfried Brügmann
  */
 public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger														log												= Logger.getLogger(WeatronicAdapter.class.getName());
-	final static Properties	properties	= new Properties();
+	final static Logger						log							= Logger.getLogger(WeatronicAdapter.class.getName());
+	final static Properties				properties			= new Properties();
 
-	final DataExplorer									application;
-	final Channels											channels;
-	final Settings							settings;
-	final WeatronicAdapterDialog			dialog;
+	final DataExplorer						application;
+	final Channels								channels;
+	final Settings								settings;
+	final WeatronicAdapterDialog	dialog;
 
-	static boolean							isChannelFilter 			= true;
-	static boolean							isUtcFilter								= true;
-	static boolean							isStatusFilter							= true;
+	static boolean								isChannelFilter	= true;
+	static boolean								isUtcFilter			= true;
+	static boolean								isStatusFilter	= true;
 
 	/**
 	 * constructor using properties file
@@ -81,9 +80,14 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		this.settings = Settings.getInstance();
 		this.dialog = new WeatronicAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null || this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : true;
-		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null || this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null || this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
+		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null
+				|| this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL)
+				.getValue()) : true;
+		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null
+				|| this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue().equals(GDE.STRING_EMPTY) ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
+				.getValue()) : true;
+		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null || this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue().equals(GDE.STRING_EMPTY) ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
 		readProperties();
 	}
 
@@ -100,8 +104,10 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		this.settings = Settings.getInstance();
 		this.dialog = new WeatronicAdapterDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : true;
-		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		WeatronicAdapter.isChannelFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL)
+				.getValue()) : true;
+		WeatronicAdapter.isStatusFilter = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) == null ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
 		WeatronicAdapter.isUtcFilter = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) == null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : true;
 		readProperties();
 	}
@@ -132,7 +138,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 * @param isUtcFilterEnabled the isUtcFilter to set
 	 */
 	public static synchronized void setUtcFilter(boolean isUtcFilterEnabled) {
-		WeatronicAdapter.isUtcFilter 							= isUtcFilterEnabled;
+		WeatronicAdapter.isUtcFilter = isUtcFilterEnabled;
 	}
 
 	/**
@@ -191,15 +197,15 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize + timeStampBufferSize;
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
-			
+			if (WeatronicAdapter.log.isLoggable(java.util.logging.Level.FINER)) WeatronicAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
+
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
+				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4)
+						+ index] & 0xff) << 0));
 			}
 
-			recordSet.addPoints(points, 
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+			recordSet.addPoints(points,
+					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
@@ -233,12 +239,9 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				DataType dataType = record.getDataType();
-				if (dataType == Record.DataType.GPS_LATITUDE || dataType ==  Record.DataType.GPS_LONGITUDE) { 
+				if (dataType == Record.DataType.GPS_LATITUDE || dataType == Record.DataType.GPS_LONGITUDE) {
 					dataTableRow[index + 1] = String.format("%09.6f", record.realGet(rowIndex) * factor); //$NON-NLS-1$
 				}
-//				else {
-//					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
-//				}
 				else {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + (record.realGet(rowIndex) / 1000.0) * factor));
 				}
@@ -246,7 +249,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			WeatronicAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -262,7 +265,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		DataType dataType = record.getDataType();
 		double newValue;
-		if (dataType == Record.DataType.GPS_LATITUDE || dataType ==  Record.DataType.GPS_LONGITUDE) 
+		if (dataType == Record.DataType.GPS_LATITUDE || dataType == Record.DataType.GPS_LONGITUDE)
 			newValue = 1000 * value * factor + offset;
 		else
 			newValue = value * factor + offset;
@@ -281,7 +284,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		DataType dataType = record.getDataType();
 		double newValue;
-		if (dataType == Record.DataType.GPS_LATITUDE || dataType ==  Record.DataType.GPS_LONGITUDE) 
+		if (dataType == Record.DataType.GPS_LATITUDE || dataType == Record.DataType.GPS_LONGITUDE)
 			newValue = 1000 * value / factor - offset;
 		else
 			newValue = value / factor - offset;
@@ -356,9 +359,10 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public String[] getUsedPropertyKeys() {
-		return new String[] { IDevice.OFFSET, IDevice.FACTOR, Record.DataType.GPS_LATITUDE.name(), Record.DataType.GPS_LONGITUDE.name(), Record.DataType.GPS_ALTITUDE.name(), Record.DataType.GPS_AZIMUTH.name(), Record.DataType.SPEED.name() };
+		return new String[] { IDevice.OFFSET, IDevice.FACTOR, Record.DataType.GPS_LATITUDE.name(), Record.DataType.GPS_LONGITUDE.name(), Record.DataType.GPS_ALTITUDE.name(),
+				Record.DataType.GPS_AZIMUTH.name(), Record.DataType.SPEED.name() };
 	}
-	
+
 	/**
 	 * query if the measurements get build up dynamically while reading (import) the data 
 	 * the implementation must create measurementType while reading the import data, 
@@ -397,23 +401,23 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_LOG;
 						}
-						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						WeatronicAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							Integer channelConfigNumber = WeatronicAdapter.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
-								LogReader.read(selectedImportFile); //, WeatronicAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								LogReader.read(selectedImportFile, channelConfigNumber); //, WeatronicAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
-								log.log(Level.WARNING, e.getMessage(), e);
+								WeatronicAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
 				}
-				finally  {
+				finally {
 					WeatronicAdapter.this.application.setPortConnected(false);
 				}
 			}
@@ -437,25 +441,22 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case GPS_LATITUDE:
-						if (record.getName().startsWith("Rx"))
-							latOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) latOrdinal = record.getOrdinal();
 						break;
 					case GPS_LONGITUDE:
-						if (record.getName().startsWith("Rx"))
-							longOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) longOrdinal = record.getOrdinal();
 						break;
 
 					default:
 						break;
 					}
 				}
-				if (latOrdinal != -1 && longOrdinal != -1)
-					containsGPSdata = activeRecordSet.get(latOrdinal).hasReasonableData() && activeRecordSet.get(longOrdinal).hasReasonableData();
+				if (latOrdinal != -1 && longOrdinal != -1) containsGPSdata = activeRecordSet.get(latOrdinal).hasReasonableData() && activeRecordSet.get(longOrdinal).hasReasonableData();
 			}
 		}
 		return containsGPSdata;
 	}
-	
+
 	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
@@ -479,8 +480,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case SPEED:
-						if (record.getName().startsWith("Rx"))
-							return record.getOrdinal();
+						if (record.getName().startsWith("Rx")) return record.getOrdinal();
 						break;
 					default:
 						break;
@@ -505,20 +505,16 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case GPS_LATITUDE:
-						if (record.getName().startsWith("Rx"))
-							latOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) latOrdinal = record.getOrdinal();
 						break;
 					case GPS_LONGITUDE:
-						if (record.getName().startsWith("Rx"))
-							longOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) longOrdinal = record.getOrdinal();
 						break;
 					case GPS_ALTITUDE:
-						if (record.getName().startsWith("Rx"))
-							altOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) altOrdinal = record.getOrdinal();
 						break;
 					case SPEED:
-						if (record.getName().startsWith("Rx"))
-							speedOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) speedOrdinal = record.getOrdinal();
 						break;
 
 					default:
@@ -527,7 +523,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 		}
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3703), longOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3703), longOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1,
+				type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
 	/**
@@ -546,20 +543,16 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case GPS_LATITUDE:
-						if (record.getName().startsWith("Rx"))
-							latOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) latOrdinal = record.getOrdinal();
 						break;
 					case GPS_LONGITUDE:
-						if (record.getName().startsWith("Rx"))
-							longOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) longOrdinal = record.getOrdinal();
 						break;
 					case GPS_ALTITUDE:
-						if (record.getName().startsWith("Rx"))
-							altOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) altOrdinal = record.getOrdinal();
 						break;
 					case SPEED:
-						if (record.getName().startsWith("Rx"))
-							speedOrdinal = record.getOrdinal();
+						if (record.getName().startsWith("Rx")) speedOrdinal = record.getOrdinal();
 						break;
 
 					default:
@@ -572,23 +565,27 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		return exportFileName;
 	}
 
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public int getLovDataByteSize() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
