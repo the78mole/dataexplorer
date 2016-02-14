@@ -146,7 +146,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 			stream.close();
 		}
 		catch (Exception e) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW3300, new String[] { preopertyFilePath }));
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE3300, new String[] { preopertyFilePath }));
 		}
 	}
 
