@@ -108,9 +108,9 @@ public class LogReader {
 		return measurementId == 0xFFFF
 				|| (measurementId & 0xFF00) == 0x1000
 				|| (measurementId & 0xFF00) == 0x1100
-				|| ((measurementId >= 0x1200 && measurementId <= 0x125E) && (LogReader.measurements.get(measurementId) != null 
-																																			? LogReader.measurements.get(measurementId).getName().contains("Function")
-																																			: true));
+				|| ((measurementId >= 0x1200 && measurementId <= 0x125E) 
+						&& (LogReader.measurements.get(measurementId) != null ? LogReader.measurements.get(measurementId).getName().contains("Function") : true)
+				|| LogReader.measurements.get(measurementId).getName().contains("ControlID"));
 	}
 
 	private boolean isStatusFilter(int measurementId) {
@@ -516,7 +516,7 @@ public class LogReader {
 			newStatisticsType.setMax(true);
 			newStatisticsType.setAvg(true);
 			newStatisticsType.setSigma(true);
-			gdeMeasurement.setStatistics(new StatisticsType());
+			gdeMeasurement.setStatistics(newStatisticsType);
 		}
 
 		private void setupMeasurement(final int channelConfig, final int measurementOrdinal, Measurement measurement, 
@@ -556,7 +556,7 @@ public class LogReader {
 			newStatisticsType.setMax(true);
 			newStatisticsType.setAvg(true);
 			newStatisticsType.setSigma(true);
-			gdeMeasurement.setStatistics(new StatisticsType());
+			gdeMeasurement.setStatistics(newStatisticsType);
 		}
 
 		public String getModellName() {
