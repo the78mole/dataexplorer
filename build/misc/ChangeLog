@@ -8,12 +8,15 @@ update windows NSIS installer
 update Copyright including 2016
 add Weatronic-Telemetry support
 HoTTAdpter* - fix setting filter properties
+FutabaTelemetry - correct error message
+OpenTxTelemetry - correct error message
 fix - runtime error in GraphicsComposite in focus lost listener
-enhance scaling for large values
-enhance OSD reader/writer for large number of measurements
-enhance set measurement to add new if above of existing
-enhance IDevice interface to support device which creates measurement dynamically
 update OSD file version to support huge number of measurements
+- enhance scaling for large values
+- enhance OSD reader/writer for large number of measurements
+- enhance set measurement to add new if above of existing
+- enhance IDevice interface to support device which creates measurement dynamically
+
 
 Version 3.2.4 - 23 Dec 2015
 add support for native USB communication
