@@ -28,5 +28,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/UniLog"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UniLog2"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/VC800"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Akkumatik"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FlightRecorder"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NMEA-Adapter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/QC-Copter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Weatronic-Telemetry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/WStechVario"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
