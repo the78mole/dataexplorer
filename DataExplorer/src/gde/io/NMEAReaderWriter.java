@@ -277,11 +277,15 @@ public class NMEAReaderWriter {
 		}
 		catch (FileNotFoundException e) {
 			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-			NMEAReaderWriter.application.openMessageDialog(e.getMessage());
+			if (NMEAReaderWriter.application.getStatusBar() != null) {
+				NMEAReaderWriter.application.openMessageDialog(e.getMessage());
+			}
 		}
 		catch (IOException e) {
 			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-			NMEAReaderWriter.application.openMessageDialog(e.getMessage());
+			if (NMEAReaderWriter.application.getStatusBar() != null) {
+				NMEAReaderWriter.application.openMessageDialog(e.getMessage());
+			}
 		}
 		catch (Exception e) {
 			// check if previous records are available and needs to be displayed
@@ -295,7 +299,9 @@ public class NMEAReaderWriter {
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
 			log.log(java.util.logging.Level.WARNING, msg, e);
-			NMEAReaderWriter.application.openMessageDialog(msg);
+			if (NMEAReaderWriter.application.getStatusBar() != null) {
+				NMEAReaderWriter.application.openMessageDialog(msg);
+			}
 		}
 		finally {
 			if (NMEAReaderWriter.application.getStatusBar() != null) {
