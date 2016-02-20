@@ -383,7 +383,7 @@ public class Channel extends HashMap<String, RecordSet> {
 						record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
 						record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
 						int r, g, b;
-						String color = this.template.getProperty(i + Record.COLOR, "128,128,255"); //$NON-NLS-1$
+						String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
 						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 						b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
@@ -474,7 +474,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
 					record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
 					int r, g, b;
-					String color = this.template.getProperty(i + Record.COLOR, "128,128,255"); //$NON-NLS-1$
+					String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
