@@ -103,6 +103,7 @@ public class LogViewReader {
 		deviceMap.put("e-station bc610", "eStationBC610"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc8", "eStationBC8"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("pichler p6", "PichlerP6"); //$NON-NLS-1$ //$NON-NLS-2$		
+		deviceMap.put("imax b6", "iMax B6"); //$NON-NLS-1$ //$NON-NLS-2$		
 		deviceMap.put("pichler p60", "PichlerP60 50W"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("pichler p6 80w", "PichlerP60 80W"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("pichler p60 80w 220v", "PichlerP60 80W"); //$NON-NLS-1$ //$NON-NLS-2$
