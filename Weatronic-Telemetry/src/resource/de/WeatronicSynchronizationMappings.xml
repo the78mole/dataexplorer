@@ -11,7 +11,6 @@
 	<entry key="RXSub1_UBatt_1">RXSub1_UBatt_0</entry>
 	<entry key="RXSub2_UBatt_0">RXSub1_UBatt_0</entry>
 	<entry key="RXSub2_UBatt_1">RXSub1_UBatt_0</entry>
-	<entry key="RXSub2_ITotal">RXSub2_ITotal</entry>
 
 	<entry key="Tx_StatusWord">Rx_StatusWord</entry>
 	<entry key="Tx_HKStatusWord">Rx_StatusWord</entry>
@@ -58,14 +57,14 @@
 
 	<entry key="Rx_RSSI_1">Rx_RSSI_0</entry>
 	<entry key="Tx_RSSI_0">Rx_RSSI_0</entry>
-	<entry key="Rx_RSSI_1">Rx_RSSI_0</entry>
 	<entry key="Tx_RSSI_1">Rx_RSSI_0</entry>
+	
 	<entry key="Rx_LQI_1">Rx_LQI_0</entry>
 	<entry key="Tx_LQI_0">Rx_LQI_0</entry>
 	<entry key="Tx_LQI_1">Rx_LQI_0</entry>
 
 	<entry key="RXSub2_Temperature">Rx_Temperature</entry>
-	<entry key="RXSub1_RSSI_1">RXSub1_RSSI_0</entry>
+	
 	<entry key="RXSub1_RSSI_1">RXSub1_RSSI_0</entry>
 	<entry key="RXSub2_RSSI_0">RXSub1_RSSI_0</entry>
 	<entry key="RXSub2_RSSI_1">RXSub1_RSSI_0</entry>
@@ -261,6 +260,7 @@
 	<entry key="New Function_61">New Function_1</entry>
 	<entry key="New Function_62">New Function_1</entry>
 	<entry key="New Function_63">New Function_1</entry>
+	
 	<entry key="Tx_ControlID__2">Tx_ControlID__1</entry>
 	<entry key="Tx_ControlID__3">Tx_ControlID__1</entry>
 	<entry key="Tx_ControlID__4">Tx_ControlID__1</entry>
