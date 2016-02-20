@@ -16,6 +16,7 @@ update OSD file version to support huge number of measurements
 - enhance OSD reader/writer for large number of measurements
 - enhance set measurement to add new if above of existing
 - enhance IDevice interface to support device which creates measurement dynamically
+- enhance scale naming while synchronized names
 
 
 Version 3.2.4 - 23 Dec 2015
