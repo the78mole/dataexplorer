@@ -636,7 +636,7 @@ public class Record extends Vector<Integer> {
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
 		} 
 		else {
-			sb.append(GDE.STRING_BLANK).append(GDE.STRING_STAR);
+			sb.append(GDE.STRING_MESSAGE_CONCAT).append(this.parent.scaleSyncedRecords.get(this.ordinal).lastElement().name);
 		}
 		return sb.toString();
 	}
