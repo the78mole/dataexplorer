@@ -1095,6 +1095,10 @@ public class Record extends Vector<Integer> {
 		return this.color;
 	}
 
+	public String getRGB() {
+		return String.format("%d, %d,%d",this.color.getRed(), this.color.getGreen(), this.color.getBlue());
+	}
+
 	public void setColor(Color newColor) {
 		this.color = newColor;
 	}
