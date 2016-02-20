@@ -7,6 +7,7 @@ adapt font used by MAC OS X 10.11
 update windows NSIS installer
 update Copyright including 2016
 add Weatronic-Telemetry support
+add iMax B6 support
 HoTTAdpter* - fix setting filter properties
 FutabaTelemetry - correct error message
 OpenTxTelemetry - correct error message
