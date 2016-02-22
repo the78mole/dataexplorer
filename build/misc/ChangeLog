@@ -1,7 +1,7 @@
 Development history / change log, please read from bottom up
 
 Version 3.2.5 - xx yyy 2016
-SkyRC MC3000 - fix gatherer timing problem
+SkyRC MC3000 - fix gatherer timing problem, set activation wait timer 15 minutes
 eStation BC6 - fix missing Balance while loading data from file
 adapt font used by MAC OS X 10.11
 update windows NSIS installer
