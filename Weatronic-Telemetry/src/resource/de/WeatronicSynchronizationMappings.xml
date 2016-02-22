@@ -19,40 +19,40 @@
 	<entry key="RXSub1_StatusByte">Rx_StatusWord</entry>
 	<entry key="RXSub2_StatusByte">Rx_StatusWord</entry>
 
-	<entry key="Tx_PowerSupply_Cell1_Status">Tx_PowerSupply_Main_Status</entry>
-	<entry key="Tx_PowerSupply_Cell2_Status">Tx_PowerSupply_Main_Status</entry>
-	<entry key="Tx_PowerSupply_Cell3_Status">Tx_PowerSupply_Main_Status</entry>
-	<entry key="Tx_PowerSupply_Cell4_Status">Tx_PowerSupply_Main_Status</entry>
+	<entry key="Tx_PowerSupply_Status Cell1">Tx_PowerSupply_Status Main</entry>
+	<entry key="Tx_PowerSupply_Status Cell2">Tx_PowerSupply_Status Main</entry>
+	<entry key="Tx_PowerSupply_Status Cell3">Tx_PowerSupply_Status Main</entry>
+	<entry key="Tx_PowerSupply_Status Cell4">Tx_PowerSupply_Status Main</entry>
 
-	<entry key="Tx_PowerSupply_Cell1_Voltage">Tx_PowerSupply_Main_Voltage</entry>
-	<entry key="Tx_PowerSupply_Cell2_Voltage">Tx_PowerSupply_Main_Voltage</entry>
-	<entry key="Tx_PowerSupply_Cell3_Voltage">Tx_PowerSupply_Main_Voltage</entry>
-	<entry key="Tx_PowerSupply_Cell4_Voltage">Tx_PowerSupply_Main_Voltage</entry>
+	<entry key="Tx_PowerSupply_Voltage Cell1">Tx_PowerSupply_Voltage Main</entry>
+	<entry key="Tx_PowerSupply_Voltage Cell2">Tx_PowerSupply_Voltage Main</entry>
+	<entry key="Tx_PowerSupply_Voltage Cell3">Tx_PowerSupply_Voltage Main</entry>
+	<entry key="Tx_PowerSupply_Voltage Cell4">Tx_PowerSupply_Voltage Main</entry>
 
-	<entry key="Tx_PowerSupply_Cell1_InputVoltage">Tx_PowerSupply_Main_InputVoltage</entry>
-	<entry key="Tx_PowerSupply_Cell2_InputVoltage">Tx_PowerSupply_Main_InputVoltage</entry>
-	<entry key="Tx_PowerSupply_Cell3_InputVoltage">Tx_PowerSupply_Main_InputVoltage</entry>
-	<entry key="Tx_PowerSupply_Cell4_InputVoltage">Tx_PowerSupply_Main_InputVoltage</entry>
-
-	<entry key="Tx_PowerSupply_Cell1_Current">Tx_PowerSupply_Main_Current</entry>
-	<entry key="Tx_PowerSupply_Cell2_Current">Tx_PowerSupply_Main_Current</entry>
-	<entry key="Tx_PowerSupply_Cell3_Current">Tx_PowerSupply_Main_Current</entry>
-	<entry key="Tx_PowerSupply_Cell4_Current">Tx_PowerSupply_Main_Current</entry>
-
-	<entry key="Tx_PowerSupply_Cell1_InputCurrent">Tx_PowerSupply_Main_InputCurrent</entry>
-	<entry key="Tx_PowerSupply_Cell2_InputCurrent">Tx_PowerSupply_Main_InputCurrent</entry>
-	<entry key="Tx_PowerSupply_Cell3_InputCurrent">Tx_PowerSupply_Main_InputCurrent</entry>
-	<entry key="Tx_PowerSupply_Cell4_InputCurrent">Tx_PowerSupply_Main_InputCurrent</entry>
-
-	<entry key="Tx_PowerSupply_Cell1_Temperature">Tx_PowerSupply_Main_InputTemperature</entry>
-	<entry key="Tx_PowerSupply_Cell2_Temperature">Tx_PowerSupply_Main_InputTemperature</entry>
-	<entry key="Tx_PowerSupply_Cell3_Temperature">Tx_PowerSupply_Main_InputTemperature</entry>
-	<entry key="Tx_PowerSupply_Cell4_Temperature">Tx_PowerSupply_Main_InputTemperature</entry>
-
-	<entry key="Tx_PowerSupply_Cell2_Capacity">Tx_PowerSupply_Cell1_Capacity</entry>
-	<entry key="Tx_PowerSupply_Cell3_Capacity">Tx_PowerSupply_Cell1_Capacity</entry>
-	<entry key="Tx_PowerSupply_Cell4_Capacity">Tx_PowerSupply_Cell1_Capacity</entry>
-	
+	<entry key="Tx_PowerSupply_InputVoltage Cell1">Tx_PowerSupply_InputVoltage Main</entry>
+	<entry key="Tx_PowerSupply_InputVoltage Cell2">Tx_PowerSupply_InputVoltage Main</entry>
+	<entry key="Tx_PowerSupply_InputVoltage Cell3">Tx_PowerSupply_InputVoltage Main</entry>
+	<entry key="Tx_PowerSupply_InputVoltage Cell4">Tx_PowerSupply_InputVoltage Main</entry>
+		
+	<entry key="Tx_PowerSupply_Current Cell1">Tx_PowerSupply_Current Main</entry>
+	<entry key="Tx_PowerSupply_Current Cell2">Tx_PowerSupply_Current Main</entry>
+	<entry key="Tx_PowerSupply_Current Cell3">Tx_PowerSupply_Current Main</entry>
+	<entry key="Tx_PowerSupply_Current Cell4">Tx_PowerSupply_Current Main</entry>
+		
+	<entry key="Tx_PowerSupply_InputCurrent Cell1">Tx_PowerSupply_InputCurrent Main</entry>
+	<entry key="Tx_PowerSupply_InputCurrent Cell2">Tx_PowerSupply_InputCurrent Main</entry>
+	<entry key="Tx_PowerSupply_InputCurrent Cell3">Tx_PowerSupply_InputCurrent Main</entry>
+	<entry key="Tx_PowerSupply_InputCurrent Cell4">Tx_PowerSupply_InputCurrent Main</entry>
+		
+	<entry key="Tx_PowerSupply_Temperature Cell1">Tx_PowerSupply_InputTemperature Main</entry>
+	<entry key="Tx_PowerSupply_Temperature Cell2">Tx_PowerSupply_InputTemperature Main</entry>
+	<entry key="Tx_PowerSupply_Temperature Cell3">Tx_PowerSupply_InputTemperature Main</entry>
+	<entry key="Tx_PowerSupply_Temperature Cell4">Tx_PowerSupply_InputTemperature Main</entry>
+		
+	<entry key="Tx_PowerSupply_Capacity Cell2">Tx_PowerSupply_Capacity Cell1</entry>
+	<entry key="Tx_PowerSupply_Capacity Cell3">Tx_PowerSupply_Capacity Cell1</entry>
+	<entry key="Tx_PowerSupply_Capacity Cell4">Tx_PowerSupply_Capacity Cell1</entry>
+		
 	<entry key="RXSub1_Temperature">Rx_Temperature</entry>
 
 	<entry key="Rx_RSSI_1">Rx_RSSI_0</entry>

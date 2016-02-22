@@ -249,22 +249,26 @@ public class LogReader {
 
 		String	modellName;
 		int			measurementCount;
+		int 		realUsedMeasurementCount;
 
 		public RecordHeader(final byte[] buffer) {
 			super(); //constructor will set offset
 			this.modellName = new String(buffer, 0 + this.offset, 256);
 			this.measurementCount = DataParser.parse2UnsignedShort(buffer, 256 + this.offset);
+			this.realUsedMeasurementCount = 0;
 
 			int activeChannelConfigNumber = LogReader.application.getActiveChannelNumber();
 			int ordinal = 0;
 			int existingNumberMeasurements = LogReader.device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
-			for (int i = 1; i < existingNumberMeasurements; i++) {
-				LogReader.device.removeMeasurementFromChannel(activeChannelConfigNumber, LogReader.device.getMeasurement(activeChannelConfigNumber, 1));
+			for (int i = this.measurementCount; i < existingNumberMeasurements; i++) {
+				LogReader.device.removeMeasurementFromChannel(activeChannelConfigNumber, LogReader.device.getMeasurement(activeChannelConfigNumber, this.measurementCount));
 			}
-			existingNumberMeasurements = LogReader.device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
-			for (int i = 0; i < existingNumberMeasurements; i++) {
-				LogReader.device.getMeasurement(activeChannelConfigNumber, i).setName(i + GDE.STRING_DOLLAR);
-			}
+			if (this.measurementCount != existingNumberMeasurements)
+				System.out.println();
+//			existingNumberMeasurements = LogReader.device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
+//			for (int i = 0; i < existingNumberMeasurements; i++) {
+//				LogReader.device.getMeasurement(activeChannelConfigNumber, i).setName(i + GDE.STRING_DOLLAR);
+//			}
 			//device.getDeviceConfiguration().storeDeviceProperties();
 
 			for (int i = 0; i < this.measurementCount; i++) {
@@ -319,7 +323,7 @@ public class LogReader {
 					break;
 
 				case PowerSupply://Power Supply packet
-					String[] powerSupplyNames = { "_Main_Status", "_Main_Voltage", "_Main_Current", "_Main_InputVoltage", "_Main_InputCurrent", "_Main_MainVoltage", "_Main_ReserveVoltage",
+					String[] powerSupplyNames = { "_Status Main", "_Voltage Main", "_Current Main", "_InputVoltage Main", "_InputCurrent Main", "_MainVoltage Main", "_ReserveVoltage Main",
 							"_Main_InputTemperature" };
 					String[] powerSupplyUnits = { "-", "V", "A", "V", "A", "V", "V", "°C" };
 					double[] powerSupplyFactors = { 1.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1.0 };
@@ -334,7 +338,7 @@ public class LogReader {
 						setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, powerSupplyName, powerSupplyUnits[j], true, powerSupplyFactors[j], 0.0,
 								(powerSupplyName.endsWith("Status") ? true : false));
 					}
-					String[] mainCellMeasurementNames = { "_Cell%d_Status", "_Cell%d_Voltage", "_Cell%d_Current", "_Cell%d_Capacity", "_Cell%d_Temperature" };
+					String[] mainCellMeasurementNames = { "_Status Cell%d", "_Voltage Cell%d", "_Current Cell%d", "_Capacity Cell%d", "_Temperature Cell%d" };
 					String[] mainCellMeasurementUnits = { "-", "V", "A", "mAh", "°C" };
 					double[] mainCellMeasurementFactors = { 1.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1.0 };
 					//"%d;%.3fV;%.3fA;%.3fAh;%d°C;", cell1_Status, cell1_Voltage / 1000.0f, cell1_Current / 1000.0f, cell1_Capacity / 1000.0f, cell1_Temperature));
@@ -366,7 +370,7 @@ public class LogReader {
 
 					int index = 1;
 					String tmpMeasurementName = measurement.getName();
-					while (isDuplicatedName(activeChannelConfigNumber, measurement.getName()))
+					while (isDuplicatedName(this.realUsedMeasurementCount, activeChannelConfigNumber, measurement.getName()))
 						measurement.setName(tmpMeasurementName + GDE.STRING_UNDER_BAR + index++);
 
 					if (measurement.getName().contains("_GPS_")) {
@@ -408,6 +412,15 @@ public class LogReader {
 					break;
 				}
 			}
+			if (this.realUsedMeasurementCount != existingNumberMeasurements) {
+				for (int i = this.realUsedMeasurementCount; i < existingNumberMeasurements; i++) {
+					LogReader.device.removeMeasurementFromChannel(activeChannelConfigNumber, LogReader.device.getMeasurement(activeChannelConfigNumber, this.realUsedMeasurementCount));
+				}
+			}
+//		existingNumberMeasurements = LogReader.device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
+//		for (int i = 0; i < existingNumberMeasurements; i++) {
+//			LogReader.device.getMeasurement(activeChannelConfigNumber, i).setName(i + GDE.STRING_DOLLAR);
+//		}
 			LogReader.device.getDeviceConfiguration().storeDeviceProperties();
 
 			//build up the record set with variable number of records just fit the sensor data
@@ -429,23 +442,32 @@ public class LogReader {
 				if (measurementType == null || measurementType.getProperty(gde.data.Record.DataType.DEFAULT.value()) != null) continue;
 				record.setDataType();
 			}
+			//LogReader.recordSet.realSize();
 		}
 
-		private boolean isDuplicatedName(int channelConfigNumber, String name) {
-			for (String measurementName : LogReader.device.getMeasurementNames(channelConfigNumber)) {
-				if (measurementName.equals(name)) return true;
+		private boolean isDuplicatedName(int ordinal, int channelConfigNumber, String name) {
+			String[] measurementNames = LogReader.device.getMeasurementNames(channelConfigNumber);
+			for (int i = 0; i < ordinal; i++) {
+				if (measurementNames[i].equals(name)) 
+					return true;
 			}
 			return false;
 		}
 
 		private void setupMeasurement(final gde.data.Record.DataType dataType, final int channelConfig, final int measurementOrdinal, String name, String unit, boolean isActive, double factor,
 				double offset, boolean isClearStatistics) { //TODO individual statistics required?
+			++this.realUsedMeasurementCount;
 			MeasurementType gdeMeasurement = LogReader.device.getMeasurement(channelConfig, measurementOrdinal);
-			gdeMeasurement.setName(name);
+			if (!name.equals(gdeMeasurement.getName())) {
+				gdeMeasurement.setName(name);
+				gdeMeasurement.setStatistics(null);//delete statistics with trigger, ....
+			}
 			gdeMeasurement.setUnit(unit);
 			gdeMeasurement.setActive(isActive);
 			gdeMeasurement.setFactor(factor);
 			gdeMeasurement.setOffset(offset);
+			
+			gdeMeasurement.deleteProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 
 			switch (dataType) {
 			case GPS_LATITUDE:
@@ -508,25 +530,36 @@ public class LogReader {
 				}
 			}
 
-			StatisticsType newStatisticsType = gdeMeasurement.getStatistics();
-			if (newStatisticsType == null) {
-				newStatisticsType = new StatisticsType();
+			if (isClearStatistics) {
+				gdeMeasurement.setStatistics(null);
 			}
-			newStatisticsType.setMin(true);
-			newStatisticsType.setMax(true);
-			newStatisticsType.setAvg(true);
-			newStatisticsType.setSigma(true);
-			gdeMeasurement.setStatistics(newStatisticsType);
+			else {
+				StatisticsType newStatisticsType = gdeMeasurement.getStatistics();
+				if (newStatisticsType == null) {
+					newStatisticsType = new StatisticsType();
+				}
+				newStatisticsType.setMin(true);
+				newStatisticsType.setMax(true);
+				newStatisticsType.setAvg(true);
+				newStatisticsType.setSigma(true);
+				gdeMeasurement.setStatistics(newStatisticsType);
+			}
 		}
 
 		private void setupMeasurement(final int channelConfig, final int measurementOrdinal, Measurement measurement, 
 				boolean isClearStatistics) {//TODO individual statistics required?
+			++this.realUsedMeasurementCount;
 			MeasurementType gdeMeasurement = LogReader.device.getMeasurement(channelConfig, measurementOrdinal);
-			gdeMeasurement.setName(measurement.getName().length() == 0 ? ("???_" + measurementOrdinal) : measurement.getName());
+			if (!measurement.getName().equals(gdeMeasurement.getName())) {
+				gdeMeasurement.setName(measurement.getName().length() == 0 ? ("???_" + measurementOrdinal) : measurement.getName());
+				gdeMeasurement.setStatistics(null);//delete statistics with trigger, ....
+			}
 			gdeMeasurement.setUnit(measurement.getUnit());
 			gdeMeasurement.setActive(true);
 			gdeMeasurement.setFactor(measurement.getFactor());
 			gdeMeasurement.setOffset(measurement.getOffset());
+			
+			gdeMeasurement.deleteProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 
 			if (WeatronicAdapter.properties.get(measurement.getName()) != null) { //scale_sync_ref_ordinal
 				String[] measurementNames = LogReader.device.getMeasurementNames(channelConfig);
@@ -548,15 +581,21 @@ public class LogReader {
 				}
 			}
 
-			StatisticsType newStatisticsType = gdeMeasurement.getStatistics();
-			if (newStatisticsType == null) {
-				newStatisticsType = new StatisticsType();
+
+			if (isClearStatistics) {
+				gdeMeasurement.setStatistics(null);
 			}
-			newStatisticsType.setMin(true);
-			newStatisticsType.setMax(true);
-			newStatisticsType.setAvg(true);
-			newStatisticsType.setSigma(true);
-			gdeMeasurement.setStatistics(newStatisticsType);
+			else {
+				StatisticsType newStatisticsType = gdeMeasurement.getStatistics();
+				if (newStatisticsType == null) {
+					newStatisticsType = new StatisticsType();
+				}
+				newStatisticsType.setMin(true);
+				newStatisticsType.setMax(true);
+				newStatisticsType.setAvg(true);
+				newStatisticsType.setSigma(true);
+				gdeMeasurement.setStatistics(newStatisticsType);
+			}
 		}
 
 		public String getModellName() {
@@ -994,8 +1033,8 @@ public class LogReader {
 							for (int i = 0; i < LogReader.points.length; i++) {
 								LogReader.points[i] = LogReader.pointsVector.get(i);
 							}
-
-							LogReader.recordSet.addPoints(LogReader.points, (timeStamp_ms - startTimeStamp_ms) * 1.0);
+							if (LogReader.receivedDataItems.get(33968) != null) //skip first measurements as long as Tx power supply has data
+								LogReader.recordSet.addPoints(LogReader.points, (timeStamp_ms - startTimeStamp_ms) * 1.0);
 						}
 					}
 					catch (DataInconsitsentException e) {
