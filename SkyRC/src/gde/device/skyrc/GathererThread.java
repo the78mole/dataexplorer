@@ -37,14 +37,17 @@ import java.util.logging.Logger;
 import javax.usb.UsbDisconnectedException;
 import javax.usb.UsbException;
 import javax.usb.UsbInterface;
+import javax.usb.UsbNotClaimedException;
 
 /**
  * Thread implementation to gather data from eStation device
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
+	protected static final int	USB_Query_Delay	= 230;
 	final static String	$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(GathererThread.class.getName());
+	final static int		WAIT_TIME_RETRYS						= 900;		// 900 * 1 sec = 15 Minutes
 
 	final DataExplorer	application;
 	final MC3000UsbPort	usbPort;
@@ -64,6 +67,7 @@ public class GathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
+	int									retryCounter								= GathererThread.WAIT_TIME_RETRYS;	//900 * 1 sec = 15 Min
 
 	/**
 	 * data gatherer thread definition 
@@ -136,13 +140,13 @@ public class GathererThread extends Thread {
 					}
 					else { //if (this.dialog != null && this.dialog.isDisposed()) {
 						//get data from device for all4 slots
-						dataBuffer1 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_0.value());
-						WaitTimer.delay(50);
-						dataBuffer2 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_1.value());
-						WaitTimer.delay(50);
-						dataBuffer3 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_2.value());
-						WaitTimer.delay(50);
-						dataBuffer4 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_3.value());
+						if (this.usbPort.isConnected()) dataBuffer1 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_0.value());
+						WaitTimer.delay(USB_Query_Delay);
+						if (this.usbPort.isConnected()) dataBuffer2 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_1.value());
+						WaitTimer.delay(USB_Query_Delay);
+						if (this.usbPort.isConnected()) dataBuffer3 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_2.value());
+						WaitTimer.delay(USB_Query_Delay);
+						if (this.usbPort.isConnected()) dataBuffer4 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_3.value());
 
 						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer1);
 						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer2);
@@ -225,7 +229,18 @@ public class GathererThread extends Thread {
 									this.device.updateVisibilityStatus(recordSet5, true);
 								}
 							}
+							this.application.setStatusMessage(Messages.getString(GDE.STRING_EMPTY));
+							this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//900 * 1 sec = 15 Min
+						}
+						else {
+							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
+							log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 
+							if (0 >= (retryCounter -= 1)) {
+								log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
+								this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
+								stopDataGatheringThread(false, null);
+							}
 						}
 					}
 				}
@@ -239,6 +254,9 @@ public class GathererThread extends Thread {
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
 						if (GathererThread.log.isLoggable(java.util.logging.Level.FINE))
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
+					}
+					else if (e instanceof UsbNotClaimedException) { //USB error detected, p.e. disconnect
+						stopDataGatheringThread(false, e);
 					}
 					else if (e instanceof UsbException) { //USB error detected, p.e. disconnect
 						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
