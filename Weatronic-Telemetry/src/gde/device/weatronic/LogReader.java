@@ -462,13 +462,12 @@ public class LogReader {
 				gdeMeasurement.setName(name);
 				gdeMeasurement.setStatistics(null);//delete statistics with trigger, ....
 			}
+			gdeMeasurement.removeProperties();
 			gdeMeasurement.setUnit(unit);
 			gdeMeasurement.setActive(isActive);
 			gdeMeasurement.setFactor(factor);
 			gdeMeasurement.setOffset(offset);
 			
-			gdeMeasurement.deleteProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-
 			switch (dataType) {
 			case GPS_LATITUDE:
 				PropertyType tmpPropertyType = new PropertyType();
@@ -554,12 +553,11 @@ public class LogReader {
 				gdeMeasurement.setName(measurement.getName().length() == 0 ? ("???_" + measurementOrdinal) : measurement.getName());
 				gdeMeasurement.setStatistics(null);//delete statistics with trigger, ....
 			}
+			gdeMeasurement.removeProperties();
 			gdeMeasurement.setUnit(measurement.getUnit());
 			gdeMeasurement.setActive(true);
 			gdeMeasurement.setFactor(measurement.getFactor());
 			gdeMeasurement.setOffset(measurement.getOffset());
-			
-			gdeMeasurement.deleteProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 
 			if (WeatronicAdapter.properties.get(measurement.getName()) != null) { //scale_sync_ref_ordinal
 				String[] measurementNames = LogReader.device.getMeasurementNames(channelConfig);
