@@ -8,6 +8,8 @@
 package gde.device;
 
 
+import gde.GDE;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -430,4 +432,76 @@ public class StatisticsType implements Cloneable {
 		this.ratioText = value;
 	}
 
+	/**
+	 * serialize statistics type as string
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+//<statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="Anzahl Motorsteigflüge:" sumTriggerTimeText="Gesamte Motorlaufzeit:">
+//<statistics min="true" max="true" avg="true" sigma="true" sumByTriggerRefOrdinal="9" sumTriggerText="Mit Motorsteigflügen erreichte Höhe" ratioRefOrdinal="10" ratioText="Verbrauchte Kapazität/Höhen-Meter:"/>
+//<trigger level="3000" isGreater="true" minTimeSec="10" comment="Motorstromtrigger: &gt;3A, &gt;10 Sekunden"/>
+		sb.append(String.format("statistics min=%b max=%b avg=%b sigma=%b", this.min, this.max, this.avg, this.sigma));
+		if (triggerRefOrdinal != null) sb.append(String.format(" triggerRefOrdinal=%d", this.triggerRefOrdinal));
+		if (sumByTriggerRefOrdinal != null) sb.append(String.format(" sumByTriggerRefOrdinal=%d", this.sumByTriggerRefOrdinal));
+		if (sumTriggerText != null) sb.append(String.format(" sumTriggerText=%s", this.sumTriggerText));
+		if (countByTrigger != null) sb.append(String.format(" countByTrigger=%b", this.countByTrigger));
+		if (countTriggerText != null) sb.append(String.format(" countTriggerText=%s", this.countTriggerText));
+		if (comment != null) sb.append(String.format(" comment=%s", this.comment));
+		if (sumTriggerTimeText != null) sb.append(String.format(" sumTriggerTimeText=%s", this.sumTriggerTimeText));
+		if (ratioRefOrdinal != null) sb.append(String.format(" ratioRefOrdinal=%d", this.ratioRefOrdinal));
+		if (ratioText != null) sb.append(String.format(" ratioText=%s", this.ratioText));
+
+		if (this.trigger != null) {
+			sb.append(String.format(" trigger level=%s isGreater=%b minTimeSec=%s", this.trigger.level, this.trigger.isGreater, this.trigger.minTimeSec));
+			if (this.trigger.comment != null)
+				sb.append(String.format(" comment=%s", this.trigger.comment));
+		}
+		
+		return sb.toString();
+	}
+	
+	/**
+	 * parse stringified statistics to StatisticsType
+	 * @param statisticsAsText
+	 * @return
+	 */
+	public StatisticsType fromString(String statisticsAsText) {
+		StatisticsType statistics = new StatisticsType();
+		String[] tmpStatistics = statisticsAsText.split("trigger");
+		if (tmpStatistics.length == 2) { // statistics contains a defined trigger
+			TriggerType tmpTrigger = new TriggerType();
+			for (String property : tmpStatistics[1].split(GDE.STRING_BLANK)) {
+				String[] props = property.split(GDE.STRING_EQUAL);
+				if (props.length == 2) { //contains =
+					if (props[0].equals("level")) tmpTrigger.level = Integer.valueOf(props[1]);
+					else if (props[0].equals("isGreater")) tmpTrigger.isGreater = Boolean.valueOf(props[1]);
+					else if (props[0].equals("minTimeSec")) tmpTrigger.minTimeSec = Integer.valueOf(props[1]);
+					else if (props[0].equals("comment")) tmpTrigger.comment = props[1];
+				}
+			}
+			statistics.setTrigger(tmpTrigger);
+		}
+		String strStatistics = tmpStatistics.length == 2 ? tmpStatistics[0] : statisticsAsText;
+		for (String property : strStatistics.split(GDE.STRING_BLANK)) {
+			String[] props = property.split(GDE.STRING_EQUAL);
+			if (props.length == 2) { //contains =
+				if (props[0].equals("min")) statistics.min = Boolean.valueOf(props[1]);
+				else if (props[0].equals("max")) statistics.max = Boolean.valueOf(props[1]);
+				else if (props[0].equals("avg")) statistics.avg = Boolean.valueOf(props[1]);
+				else if (props[0].equals("sigma")) statistics.sigma = Boolean.valueOf(props[1]);
+				else if (props[0].equals("triggerRefOrdinal")) statistics.triggerRefOrdinal = Integer.valueOf(props[1]);
+				else if (props[0].equals("sumByTriggerRefOrdinal")) statistics.sumByTriggerRefOrdinal = Integer.valueOf(props[1]);
+				else if (props[0].equals("sumTriggerText")) statistics.sumTriggerText = props[1];
+				else if (props[0].equals("countByTrigger")) statistics.countByTrigger = Boolean.valueOf(props[1]);
+				else if (props[0].equals("countTriggerText")) statistics.countTriggerText = props[1];
+				else if (props[0].equals("comment")) statistics.comment = props[1];				
+				else if (props[0].equals("sumTriggerTimeText")) statistics.sumTriggerTimeText = props[1];
+				else if (props[0].equals("ratioRefOrdinal")) statistics.ratioRefOrdinal = Integer.valueOf(props[1]);
+				else if (props[0].equals("ratioText")) statistics.ratioText = props[1];			
+			}
+		}
+		
+		return statistics;
+	}
 }

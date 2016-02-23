@@ -8,6 +8,7 @@
 package gde.device;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -265,6 +266,35 @@ public class MeasurementType implements Cloneable {
 		newProperty.setType(type);
 		newProperty.setValue("" + value); //$NON-NLS-1$
 		this.getProperty().add(newProperty);
+	}
+
+	/**
+	 * remove all property types
+	 * @param propertyKey
+	 * @return PropertyType object
+	 */
+	public void removeProperties() {
+		Iterator<PropertyType> iterator = this.getProperty().iterator();
+		
+		while (iterator.hasNext()) {
+			iterator.next();
+			iterator.remove();
+		}
+	}
+
+	/**
+	 * remove property type with given key (IDevice.OFFSET, ...)
+	 * @param propertyKey
+	 * @return PropertyType object
+	 */
+	public void removeProperty(String propertyKey) {
+		Iterator<PropertyType> iterator = this.getProperty().iterator();
+		
+		while (iterator.hasNext()) {
+			PropertyType tmpProp = iterator.next();
+			if (tmpProp.name.equals(propertyKey))
+				iterator.remove();
+		}
 	}
 
 	/**

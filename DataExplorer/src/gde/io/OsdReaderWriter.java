@@ -320,10 +320,12 @@ public class OsdReaderWriter {
 				if (device.isVariableMeasurementSize()) {
 					int activeChannelConfigNumber = channels.getActiveChannelNumber();
 					
-					//cleanup measurement, it get re-created 
+					//cleanup measurement, if count doesn't match
 					int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
-					for (int i = 1; i < existingNumberMeasurements; i++) {
-						device.removeMeasurementFromChannel(activeChannelConfigNumber, device.getMeasurement(activeChannelConfigNumber, 1));
+					if (recordsProperties.length != existingNumberMeasurements) {
+						for (int i = recordsProperties.length; i < existingNumberMeasurements; i++) {
+							device.removeMeasurementFromChannel(activeChannelConfigNumber, device.getMeasurement(activeChannelConfigNumber, recordsProperties.length));
+						}
 					}
 					//build up the record set with variable number of records just fit the sensor data
 					String[] recordNames = new String[recordsProperties.length];
@@ -336,28 +338,8 @@ public class OsdReaderWriter {
 						gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
 						gdeMeasurement.setSymbol(recordUnits[i] = recordProperties.get(Record.SYMBOL));
 						gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
-	//					
-	//					if (recordProperties.get(Record.FACTOR) != null)
-	//						gdeMeasurement.setFactor(Double.valueOf(recordProperties.get(Record.FACTOR)));
-	//					if (recordProperties.get(Record.OFFSET) != null)
-	//						gdeMeasurement.setOffset(Double.valueOf(recordProperties.get(Record.OFFSET)));
-	//					if (recordProperties.get(Record.REDUCTION) != null)
-	//						gdeMeasurement.setReduction(Double.valueOf(recordProperties.get(Record.REDUCTION)));
 					}
 					recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
-	//				for (int i = 0; i < recordsProperties.length; i++) {
-	//					HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-	//					if (recordProperties.get(Record.DataType.GPS_LATITUDE.name()) != null)
-	//						recordSet.get(i).setDataType(Record.DataType.GPS_LATITUDE);
-	//					else if (recordProperties.get(Record.DataType.GPS_LONGITUDE.name()) != null)
-	//						recordSet.get(i).setDataType(Record.DataType.GPS_LONGITUDE);
-	//					else if (recordProperties.get(Record.DataType.GPS_ALTITUDE.name()) != null)
-	//						recordSet.get(i).setDataType(Record.DataType.GPS_ALTITUDE);
-	//					else if (recordProperties.get(Record.DataType.GPS_AZIMUTH.name()) != null)
-	//						recordSet.get(i).setDataType(Record.DataType.GPS_AZIMUTH);
-	//					else if (recordProperties.get(Record.DataType.SPEED.name()) != null)
-	//						recordSet.get(i).setDataType(Record.DataType.SPEED);
-	//				}
 				}
 				else {
 					recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
