@@ -19,6 +19,7 @@ update OSD file version to support huge number of measurements
 - enhance IDevice interface to support device which creates measurement dynamically
 - enhance scale naming while synchronized names
 - enhance record coloring if color not available in template
+- enhance store statistics, actually not restored
 
 
 Version 3.2.4 - 23 Dec 2015
