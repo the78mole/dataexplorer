@@ -229,7 +229,7 @@ public class GathererThread extends Thread {
 									this.device.updateVisibilityStatus(recordSet5, true);
 								}
 							}
-							this.application.setStatusMessage(Messages.getString(GDE.STRING_EMPTY));
+							this.application.setStatusMessage(GDE.STRING_EMPTY);
 							this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//900 * 1 sec = 15 Min
 						}
 						else {

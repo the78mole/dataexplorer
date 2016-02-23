@@ -80,6 +80,8 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 	};
 	
 	byte[] GET_SYSTEM_SETTING = new byte[]{0x0f, 0x04, 0x5a, 0x00, 0x00, 0x5a, (byte) 0xff, (byte) 0xff};
+	byte[] START_PROCESSING 	= new byte[]{0x0F, 0x03, 0x05, 0x00, 0x05, (byte) 0xff, (byte) 0xff, (byte) 0xff};
+	byte[] STOP_PROCESSING 		= new byte[]{0x0F, 0x03, (byte) 0xFE, 0x00, (byte) 0xFE, (byte) 0xff, (byte) 0xff, (byte) 0xff};
 	
 	final int  dataSize;
 	final int  terminalDataSize = 345; // configuration menu string
@@ -113,6 +115,74 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		tmpData = new byte[Math.abs(this.dataSize)];
 		System.arraycopy(GET_SYSTEM_SETTING, 0, tmpData, 0, GET_SYSTEM_SETTING.length);
 		GET_SYSTEM_SETTING = tmpData;
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(START_PROCESSING, 0, tmpData, 0, START_PROCESSING.length);
+		START_PROCESSING = tmpData;
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(STOP_PROCESSING, 0, tmpData, 0, STOP_PROCESSING.length);
+		STOP_PROCESSING = tmpData;
+	}
+	
+	/**
+	 * start the processing just before query slot data
+	 * @param usbInterface
+	 * @throws Exception
+	 */
+	public synchronized void startProcessing(UsbInterface usbInterface) throws Exception {
+		final String $METHOD_NAME = "startProcessing"; //$NON-NLS-1$
+		UsbInterface iface = null;
+		boolean isPortOpenedByCall = false;
+
+		try {
+			if (usbInterface == null) {
+				iface = this.openUsbPort(this.device);
+				isPortOpenedByCall = true;
+			}
+			iface = usbInterface == null ? this.openUsbPort(this.device) : usbInterface;
+			this.write(iface, this.endpointIn, this.START_PROCESSING);					
+		}
+		catch (Exception e) {
+			if (!(e instanceof TimeOutException)) {
+				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			}
+			throw e;
+		}
+		finally {
+				if (isPortOpenedByCall) this.closeUsbPort(iface);
+		}
+	}
+	
+	/**
+	 * stop the data collection not really processing
+	 * @param usbInterface
+	 * @throws Exception
+	 */
+	public synchronized void stopProcessing(UsbInterface usbInterface) {
+		final String $METHOD_NAME = "stopProcessing"; //$NON-NLS-1$
+		UsbInterface iface = null;
+		boolean isPortOpenedByCall = false;
+
+		try {
+			if (usbInterface == null) {
+				iface = this.openUsbPort(this.device);
+				isPortOpenedByCall = true;
+			}
+			iface = usbInterface == null ? this.openUsbPort(this.device) : usbInterface;
+			this.write(iface, this.endpointIn, this.STOP_PROCESSING);					
+		}
+		catch (Exception e) {
+			if (!(e instanceof TimeOutException)) {
+				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			}
+		}
+		finally {
+				if (isPortOpenedByCall) try {
+					this.closeUsbPort(iface);
+				}
+				catch (Throwable e) {
+					log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				}
+		}
 	}
 	
 	/**
