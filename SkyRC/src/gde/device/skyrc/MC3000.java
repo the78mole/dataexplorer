@@ -397,13 +397,16 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 						try {
 							if (this.getDialog().dataGatherThread != null && this.usbPort.isConnected()) {
 								this.systemSettings = new MC3000.SystemSettings(this.usbPort.getSystemSettings(this.getDialog().dataGatherThread.getUsbInterface()));
+								WaitTimer.delay(100);
 								this.usbPort.startProcessing(this.getDialog().dataGatherThread.getUsbInterface());
+								WaitTimer.delay(100);
 								this.getDialog().dataGatherThread.start();
 							}
 						}
 						catch (Throwable e) {
 							MC3000.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-							this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
+							if (this.getDialog().dataGatherThread != null) 
+								this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
 						}
 					}
 				}
@@ -420,7 +423,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				}
 				catch (UsbException e) {
 					MC3000.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
+					if (this.getDialog().dataGatherThread != null) 
+						this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
 					this.application.openMessageDialog(this.dialog.getDialogShell(),
 							Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					try {
@@ -432,13 +436,15 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				}
 				catch (ApplicationConfigurationException e) {
 					MC3000.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
+					if (this.getDialog().dataGatherThread != null)
+						this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (Throwable e) {
 					MC3000.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
+					if (this.getDialog().dataGatherThread != null)
+						this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
 				}
 			}
 			else {
