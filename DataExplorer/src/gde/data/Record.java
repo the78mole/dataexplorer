@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.DataTypes;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
@@ -1969,7 +1970,7 @@ public class Record extends Vector<Integer> {
 		if (tmpValue!=null && tmpValue.length() > 0 && !this.name.trim().equalsIgnoreCase(tmpValue.trim())) {
 			this.setName(tmpValue.trim()); // might replace the record set key as well
 		}
-}
+	}
 	
 	/**
 	 * set the device specific properties for this record
@@ -1979,7 +1980,14 @@ public class Record extends Vector<Integer> {
 		HashMap<String, String> recordDeviceProps = StringHelper.splitString(serializedProperties, DELIMITER, this.getDevice().getUsedPropertyKeys());
 		StringBuilder sb = new StringBuilder().append("update: "); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) sb.append(this.name).append(GDE.STRING_MESSAGE_CONCAT);
-		
+	
+		//this.getDevice().getUsedPropertyKeys()) needs to declare "statistics" to enable statistics re-construction during OSD file load
+		if (recordDeviceProps.get("statistics") != null) { 
+			MeasurementType measurement = device.getMeasurement(this.parent.parent.number, this.ordinal);
+			measurement.setStatistics(StatisticsType.fromString(recordDeviceProps.get("statistics")));
+			this.statistics = measurement.getStatistics();
+		}
+
 		// each record loaded from a file updates properties instead of using the default initialized in constructor
 		for (Entry<String, String> entry : recordDeviceProps.entrySet()) {
 			for (PropertyType defaultProperty : this.properties) {
