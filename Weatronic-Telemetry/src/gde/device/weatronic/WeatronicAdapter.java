@@ -359,8 +359,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public String[] getUsedPropertyKeys() {
-		return new String[] { IDevice.OFFSET, IDevice.FACTOR, Record.DataType.GPS_LATITUDE.name(), Record.DataType.GPS_LONGITUDE.name(), Record.DataType.GPS_ALTITUDE.name(),
-				Record.DataType.GPS_AZIMUTH.name(), Record.DataType.SPEED.name() };
+		return new String[] { IDevice.OFFSET, IDevice.FACTOR, Record.DataType.GPS_LATITUDE.value(), Record.DataType.GPS_LONGITUDE.value(), Record.DataType.GPS_ALTITUDE.value(),
+				Record.DataType.GPS_AZIMUTH.value(), Record.DataType.SPEED.value(), "statistics" };
 	}
 
 	/**
