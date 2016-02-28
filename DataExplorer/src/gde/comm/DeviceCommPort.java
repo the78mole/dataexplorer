@@ -215,7 +215,7 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 * @see gde.serial.IDeviceCommPort#isConnected()
 	 */
 	public boolean isConnected() {
-		return this.port.isConnected();
+		return this.port != null ? this.port.isConnected() : false;
 	}
 
 	/* (non-Javadoc)

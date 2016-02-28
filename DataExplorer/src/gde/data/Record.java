@@ -415,8 +415,9 @@ public class Record extends Vector<Integer> {
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
 		this.isStartpointZero = record.isStartpointZero;
-		this.maxScaleValue = this.maxValue;
-		this.minScaleValue = this.minValue;
+		this.isStartEndDefined = record.isStartEndDefined;
+		this.maxScaleValue = record.maxScaleValue;
+		this.minScaleValue = record.minScaleValue;
 		
 		this.drawTimeWidth = record.getMaxTime_ms();
 		// handle special keys for compare set record
