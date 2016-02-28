@@ -20,6 +20,7 @@ update OSD file version to support huge number of measurements
 - enhance scale naming while synchronized names
 - enhance record coloring if color not available in template
 - enhance store statistics, actually not restored
+- enhance restore statistics configuration for devices declaring "statistics" in getUsedPropertyKeys()
 
 
 Version 3.2.4 - 23 Dec 2015
