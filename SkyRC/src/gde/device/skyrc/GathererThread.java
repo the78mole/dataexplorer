@@ -44,7 +44,7 @@ import javax.usb.UsbNotClaimedException;
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
-	protected static final int	USB_Query_Delay	= 230;
+	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 80 : 160;
 	final static String	$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(GathererThread.class.getName());
 	final static int		WAIT_TIME_RETRYS						= 900;		// 900 * 1 sec = 15 Minutes
@@ -130,7 +130,7 @@ public class GathererThread extends Thread {
 			if (GathererThread.log.isLoggable(java.util.logging.Level.FINE))
 				GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
-			lastCycleTime = System.currentTimeMillis();
+			lastCycleTime = System.nanoTime()/1000000;
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
 				try {
 					// check if device is ready for data capturing or terminal open
@@ -141,11 +141,11 @@ public class GathererThread extends Thread {
 					else { //if (this.dialog != null && this.dialog.isDisposed()) {
 						//get data from device for all4 slots
 						if (this.usbPort.isConnected()) dataBuffer1 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_0.value());
-						WaitTimer.delay(USB_Query_Delay);
+						WaitTimer.delay(USB_QUERY_DELAY);
 						if (this.usbPort.isConnected()) dataBuffer2 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_1.value());
-						WaitTimer.delay(USB_Query_Delay);
+						WaitTimer.delay(USB_QUERY_DELAY);
 						if (this.usbPort.isConnected()) dataBuffer3 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_2.value());
-						WaitTimer.delay(USB_Query_Delay);
+						WaitTimer.delay(USB_QUERY_DELAY);
 						if (this.usbPort.isConnected()) dataBuffer4 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_3.value());
 
 						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer1);
@@ -271,7 +271,7 @@ public class GathererThread extends Thread {
 
 				//force data collection every second
 				lastCycleTime += 1000;
-				long delay = lastCycleTime - System.currentTimeMillis();
+				long delay = lastCycleTime - (System.nanoTime()/1000000);
 				if (delay > 0 ) WaitTimer.delay(delay);
 				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("delay = %d", delay)); //$NON-NLS-1$
 			}
