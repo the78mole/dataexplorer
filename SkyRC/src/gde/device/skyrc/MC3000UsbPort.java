@@ -204,6 +204,12 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			}
 			iface = usbInterface == null ? this.openUsbPort(this.device) : usbInterface;
 			this.write(iface, this.endpointIn, this.GET_SYSTEM_SETTING);					
+			try {
+				Thread.sleep(10);
+			}
+			catch (Exception e) {
+				// ignore
+			}
 			this.read(iface, this.endpointOut, data);
 			
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
@@ -238,7 +244,13 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		byte[] data = new byte[Math.abs(this.dataSize)];
 
 		try {
-			this.write(iface, this.endpointIn, request);					
+			this.write(iface, this.endpointIn, request);			
+			try {
+				Thread.sleep(10);
+			}
+			catch (Exception e) {
+				// ignore
+			}
 			this.read(iface, this.endpointOut, data);
 			
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));

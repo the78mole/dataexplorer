@@ -44,7 +44,7 @@ import javax.usb.UsbNotClaimedException;
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
-	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 80 : 160;
+	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
 	final static String	$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(GathererThread.class.getName());
 	final static int		WAIT_TIME_RETRYS						= 900;		// 900 * 1 sec = 15 Minutes
@@ -127,8 +127,8 @@ public class GathererThread extends Thread {
 			String recordSetKey5 = Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 
 			this.isCollectDataStopped = false;
-			if (GathererThread.log.isLoggable(java.util.logging.Level.FINE))
-				GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+			if (GathererThread.log.isLoggable(Level.FINE))
+				GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 			lastCycleTime = System.nanoTime()/1000000;
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
@@ -212,7 +212,7 @@ public class GathererThread extends Thread {
 
 										slotChannel.put(recordSetKey5, RecordSet.createRecordSet(recordSetKey5, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
 										slotChannel.applyTemplateBasics(recordSetKey5);
-										GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey5 + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
+										GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey5 + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 										recordSet5 = slotChannel.get(recordSetKey5);
 										recordSet5.setAllDisplayable();
 										//channel.applyTemplate(recordSetKey, false);
@@ -234,10 +234,10 @@ public class GathererThread extends Thread {
 						}
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
-							log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+							log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 
 							if (0 >= (retryCounter -= 1)) {
-								log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
+								log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
 								this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
 								stopDataGatheringThread(false, null);
 							}
@@ -252,8 +252,8 @@ public class GathererThread extends Thread {
 					// this case will be reached while data gathering enabled, but no data will be received
 					if (e instanceof TimeOutException) {
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
-						if (GathererThread.log.isLoggable(java.util.logging.Level.FINE))
-							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
+						if (GathererThread.log.isLoggable(Level.FINE))
+							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
 					}
 					else if (e instanceof UsbNotClaimedException) { //USB error detected, p.e. disconnect
 						stopDataGatheringThread(false, e);
@@ -264,7 +264,7 @@ public class GathererThread extends Thread {
 					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
 					else {
-						GathererThread.log.log(java.util.logging.Level.FINE, "data gathering end detected"); //$NON-NLS-1$
+						GathererThread.log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
 						stopDataGatheringThread(true, e);
 					}
 				}
@@ -276,7 +276,7 @@ public class GathererThread extends Thread {
 				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("delay = %d", delay)); //$NON-NLS-1$
 			}
 			this.application.setStatusMessage(""); //$NON-NLS-1$
-			if (GathererThread.log.isLoggable(java.util.logging.Level.FINE)) GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+			if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 
 			if (!this.isCollectDataStopped) {
 				this.stopDataGatheringThread(true, null);
@@ -286,11 +286,11 @@ public class GathererThread extends Thread {
 			try {
 				if (this.usbInterface != null) {
 					this.device.usbPort.closeUsbPort(this.usbInterface);
-					GathererThread.log.log(java.util.logging.Level.OFF, "USB interface closed");
+					GathererThread.log.log(Level.FINE, "USB interface closed");
 				}
 			}
 			catch (UsbException e) {
-				GathererThread.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+				GathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
@@ -314,8 +314,8 @@ public class GathererThread extends Thread {
 		String processTypeName = this.device.getProcessingTypeName(dataBuffer);
 		//STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
 		String processStatusName = this.device.getProcessingStatusName(dataBuffer);
-		if (GathererThread.log.isLoggable(java.util.logging.Level.FINE)) {
-			GathererThread.log.log(java.util.logging.Level.FINE, number + " : processName = " + processTypeName + " - processStatusName = " + processStatusName);
+		if (GathererThread.log.isLoggable(Level.FINE)) {
+			GathererThread.log.log(Level.FINE, number + " : processName = " + processTypeName + " - processStatusName = " + processStatusName);
 		}
 		Channel slotChannel = this.channels.get(number);
 		if (slotChannel != null) {
@@ -344,7 +344,7 @@ public class GathererThread extends Thread {
 
 				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
 				slotChannel.applyTemplateBasics(processRecordSetKey);
-				GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
+				GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 				recordSet = slotChannel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
 				//channel.applyTemplate(recordSetKey, false);
@@ -393,20 +393,20 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			GathererThread.log.logp(java.util.logging.Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			GathererThread.log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
 
 		this.isCollectDataStopped = true;
 
 		if (this.usbPort != null && this.usbPort.getXferErrors() > 0) {
-			GathererThread.log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.usbPort != null && this.usbPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.usbPort.isConnected()) {
 			try {
 				this.usbPort.closeUsbPort(null);
 			}
 			catch (UsbException e) {
-				GathererThread.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 		if (this.dialog != null && !this.dialog.isDisposed()) {
@@ -436,7 +436,7 @@ public class GathererThread extends Thread {
 			this.usbPort.closeUsbPort(null);
 		}
 		catch (UsbException e) {
-			GathererThread.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 		}
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
