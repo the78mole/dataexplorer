@@ -1,34 +1,49 @@
-GNU DataExplorer - News - comes with version 3.2.4 - 22 Dec 2015
+GNU DataExplorer - News - comes with version 3.2.4 - 03 Mar 2016
 
-1) add support for native USB communication
-2) add support for SkyRC MC3000 single cell charger
-3) JetiAdapter - increase number of initial supported measurements to 50
-4) iCharger - implemented checksum checking for serial communication 
-5) JetiAdapter - add Rx->Tx time delta statistics (not differentiating over sensors)
-6) JetiAdapter - fix intermittent find best fit of time step which end up in less display points
-7) JetiAdapter - fix inconsistent detection of Speed record which leads to unusable color configuration while Google Earth KMZ export.
-8) HoTTAdapterX - HoTT V2 enable data visualization for external voltage and temperature
-9) implement feature request to edit single cell in table
-10) fix problem while measuring due to missing scale end value synchronization when scale synchronized measurement visibility toggled
-11) fix problem while GPS coordinates are available, but speed record ordinal can not be identified
-12) fix CSV export Time unit to [hh:mm:ss.SSS]
-13) fix font size dialog while using high resolution
-14) swt update to version 4.5
+1) SkyRC MC3000 - fix gatherer timing problem, set activation wait timer 15 minutes, add start stop message
+2) eStation BC6 - fix missing Balance while loading data from file
+3) adapt font used by MAC OS X 10.11
+4) update windows NSIS installer
+5) update Copyright including 2016
+6) add Weatronic-Telemetry support
+7) add iMax B6 support
+8) HoTTAdpter* - fix setting filter properties
+9) FutabaTelemetry - correct error message
+10)OpenTxTelemetry - correct error message
+11)fix - runtime error in GraphicsComposite in focus lost listener
+12)fix - keep record formating while cut edge (add missing copy fields in copy constructor)
+13)update OSD file version to support huge number of measurements
+	- enhance scaling for large values
+	- enhance OSD reader/writer for large number of measurements
+	- enhance set measurement to add new if above of existing
+	- enhance IDevice interface to support device which creates measurement dynamically
+	- enhance scale naming while synchronized names
+	- enhance record coloring if color not available in template
+	- enhance store statistics, actually not restored
+	- enhance restore statistics configuration for devices declaring "statistics" in getUsedPropertyKeys()
 
-1) Unterstützung für native USB Kommunikation implementiert
-2) Unterstützung für SkyRC MC3000 Einzelzellen analyse Lade- Entlade-Gerät
-3) JetiAdapter - Anzahl initial unterstützter Messwerte auf 50 erhöht
-4) iCharger - Checksummenprüfung implementiert 
-5) JetiAdapter - Rx->Tx Zeitdelta-Statistik implementiert (es wird nicht zwischen einzelnen Sensorgruppen differenziert)
-6) JetiAdapter - Fehler bei der Berechnung des besten Messpunktabstandes behoben (kam bei Alarmen zufällig vor)
-7) JetiAdapter - Fehler und Inkonsistentz bei der Erkennung des Geschwindigkeitsvektor bereinigt, führte zu Problemen bei der Farbkonfiguration vor dem KMZ-Export
-8) HoTTAdapterX - Datenvisualisierung bei HoTT V2 für externe Spannung und externe Temperatur implementiert
-9) Feature zum Editieren eines einzelnen Messwertes in der Tabellenansicht implementiert
-10) Fehler beim Messen in der Anzeige behoben, Fehler wurde sichtbar wenn Messwerte auf eine Skala synchronisiert sind und einige davon ein- und aus-geschaltet wurden
-11) Erkennung von fehlendem Geschwindigkeitsvektor bei existierenden GPS-Koordinaten implementiert, führte zu Fehler bei der Farbkonfiguration
-12) Fehlerbereinigung der Zeiteinheit bei CSV-Export vorgenommen [hh:mm:ss.SSS]
-13) Fehler im Schriftgrößendialog bereinigt, Dialog war bei hoher Bildschirmauflösung unter Windows nicht nutzbar
-14) SWT (Standard Widget Toolkit) auf neuen Stand gebracht, Version 4.5
+
+1) SkyRC MC3000 - Datenaufnahme Timingprobleme gelöst, 15 Minuten Aktivierungstimer eingeführt, sende Start- und Stop-Signal 
+2) eStation BC6 - fehlende Balance beim Laden von Datendateien behoben
+3) Schriftart angepasst an MAC OS X 10.11
+4) Windows NSIS Installer Update
+5) Update Copyright für 2016
+6) hinzugefügt Weatronic-Telemetry Unterstützung
+7) hinzugefügt iMax B6 Unterstützung
+8) HoTTAdpter* - Setzen von Filtereigenschaften bereinigt
+9) FutabaTelemetry - Fehlernachricht verbessert
+10)OpenTxTelemetry - Fehlernachricht verbessert
+11)berichtigt - Laufzeitfehler in GraphicsComposite im "focus lost listener"
+12)berichtigt - Datensatz-Formatierung wird jetzt auch für definierte Skalenendwerte beibehalten
+13)Update OSD Datei-Version
+	- verbessert, Skalierung für große Werte
+	- verbessert, OSD lesen/schreiben für große Anzahl von Messwerten
+	- verbessert, automatisches Anpassen von Messwerten 
+	- angepasst, IDevice Interface erlaubt die Abfrage nach dynamischer Anzahl von Messwerten, um die Behhandlung hierfür zu ermöglichen 
+	- verbessert, Namen bei Skalen synchronisierten Messwerten
+	- verbessert, Datensatzfarbe bei nicht vorhandenen Definitionen im GraphicsTemplate
+	- verbessert, Statistikdefinition wird jetzt mit gesichert und auch wieder hergestellt
+	- verbessert, Wiederherstellung von Statistikkonfigurationen wenn das Gerät das in der Abfrage in getUsedPropertyKeys() mit gibt
 
 
 
