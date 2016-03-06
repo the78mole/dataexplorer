@@ -47,9 +47,10 @@ public class GathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
 	final static String	$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(GathererThread.class.getName());
-	final static int		WAIT_TIME_RETRYS						= 900;		// 900 * 1 sec = 15 Minutes
+	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
 
 	final DataExplorer	application;
+	final Settings			settings;
 	final MC3000UsbPort	usbPort;
 	final MC3000				device;
 	final MC3000Dialog	dialog;
@@ -67,7 +68,7 @@ public class GathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= GathererThread.WAIT_TIME_RETRYS;	//900 * 1 sec = 15 Min
+	int									retryCounter								= GathererThread.WAIT_TIME_RETRYS;	//60 Min
 
 	/**
 	 * data gatherer thread definition 
@@ -80,6 +81,7 @@ public class GathererThread extends Thread {
 			UsbDisconnectedException, UsbException {
 		super("dataGatherer");
 		this.application = currentApplication;
+		this.settings = Settings.getInstance();
 		this.device = useDevice;
 		this.dialog = useDialog;
 		this.usbPort = useSerialPort;
@@ -215,12 +217,8 @@ public class GathererThread extends Thread {
 										GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey5 + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 										recordSet5 = slotChannel.get(recordSetKey5);
 										recordSet5.setAllDisplayable();
-										//channel.applyTemplate(recordSetKey, false);
-										// switch the active record set if the current record set is child of active channel
-										//this.channels.switchChannel(slotChannel.getNumber(), recordSetKey5);
-										//slotChannel.switchRecordSet(recordSetKey5);
 										String description = recordSet5.getRecordSetDescription();
-										recordSet5.setRecordSetDescription(description);
+										recordSet5.setRecordSetDescription(description + GDE.LINE_SEPARATOR + this.device.getFirmwareString());
 									}
 								}
 								if (recordSet5 != null) recordSet5.addPoints(points5);
@@ -230,7 +228,7 @@ public class GathererThread extends Thread {
 								}
 							}
 							this.application.setStatusMessage(GDE.STRING_EMPTY);
-							this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//900 * 1 sec = 15 Min
+							this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//60 Min
 						}
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
@@ -325,7 +323,7 @@ public class GathererThread extends Thread {
 
 				// record set does not exist or is out dated, build a new name and create
 				StringBuilder extend = new StringBuilder();
-				if (!Settings.getInstance().isContinuousRecordSet()) {
+				if (!this.settings.isContinuousRecordSet()) {
 					//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE 3=DISCHARGE 4=CYCLE
 					//Mode Other battery:	0=CHARGE 1=REFRESH 2=PAUSE   3=DISCHARGE 4=CYCLE
 					if (processModeNumber == 4) { //4=CYCLE
@@ -335,7 +333,7 @@ public class GathererThread extends Thread {
 							extend.append(GDE.STRING_BLANK_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_COLON).append(cycleNumber).append(GDE.STRING_RIGHT_BRACKET);
 						}
 					}
-					else if (processModeNumber == 1 || this.device.getBatteryType(dataBuffer) < 3 && processModeNumber == 2) { //1=Refresh || Li storage
+					else if (processModeNumber == 1 || (this.device.getBatteryType(dataBuffer) < 3 && processModeNumber == 2)) { //1=Refresh || Li storage
 						extend.append(GDE.STRING_BLANK_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_RIGHT_BRACKET);
 					}
 				}
@@ -365,7 +363,8 @@ public class GathererThread extends Thread {
 				}
 			}
 
-			if (Settings.getInstance().isContinuousRecordSet() && this.device.getProcessingStatus(dataBuffer) == 3) { //pause will not be recorded
+			// STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
+			if (this.settings.isReduceChargeDischarge() && this.device.getProcessingStatus(dataBuffer) == 3) { //pause will not be recorded
 				result[0] = recordSet;
 				result[1] = processRecordSetKey;
 				return result;

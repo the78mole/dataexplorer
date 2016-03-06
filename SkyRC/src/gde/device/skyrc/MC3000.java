@@ -495,8 +495,6 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		points[0] = DataParser.parse2Short(dataBuffer[9], dataBuffer[8]) * 1000;
 		points[1] = DataParser.parse2Short(dataBuffer[11], dataBuffer[10]) * 1000 * chargeCorrection;
 		points[2] = DataParser.parse2Short(dataBuffer[13], dataBuffer[12]) * 1000;
-//		points[3] = Double.valueOf(points[0] * points[1] / 1000.0 * chargeCorrection).intValue(); // power U*I [W]
-//		points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 		points[3] = Double.valueOf(points[0] / 1000 * (points[1] / 1000.0) * chargeCorrection).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] / 1000 * (points[2] / 1000.0)).intValue(); // energy U*C [Wh]
 		points[5] = DataParser.parse2Short(dataBuffer[15], dataBuffer[14]) * 1000;
@@ -617,7 +615,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 */
 	public boolean isProcessing(final int outletNum, final byte[] dataBuffer) {
 		if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, "isProcessing = " + dataBuffer[5]);
-		if (this.settings.isReduceChargeDischarge()) return (dataBuffer[5] == 1 || dataBuffer[5] == 2) && !(dataBuffer[5] >= 4);
+		if (this.settings.isReduceChargeDischarge()) 
+			return (dataBuffer[5] == 1 || dataBuffer[5] == 2) && !(dataBuffer[5] >= 4);
 		return dataBuffer[5] >= 1 && dataBuffer[5] <= 3 && !(dataBuffer[5] >= 4);
 	}
 
