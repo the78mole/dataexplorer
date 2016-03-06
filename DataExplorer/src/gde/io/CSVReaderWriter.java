@@ -433,7 +433,7 @@ public class CSVReaderWriter {
 				String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
 
 				// add time entry
-				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
+				sb.append(row[0].replace('.', decimalSeparator)).append(separator);
 				// add data entries
 				int j = 0;
 				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
