@@ -650,7 +650,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 
 	private int findRecordByType(RecordSet recordSet, Record.DataType dataType) {
 		for (Record record : recordSet.values()) {
-			if (record.getDataType().equals(dataType)) 
+			if (record.getDataType().equals(dataType) && record.hasReasonableData()) 
 				return record.getOrdinal();
 		}
 		return -1;
