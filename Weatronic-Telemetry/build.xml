@@ -19,7 +19,7 @@
     Copyright (c) 2014,2015,2016 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="Weatrinic-Telemetry" default="compile">
+<project name="Weatronic-Telemetry" default="compile">
 
 	<property name="build.properties" location="../build/build.properties" />
 
