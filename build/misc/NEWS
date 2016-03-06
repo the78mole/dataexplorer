@@ -1,18 +1,28 @@
-GNU DataExplorer - News - comes with version 3.2.4 - 03 Mar 2016
+GNU DataExplorer - News - comes with version 3.2.5 - 06 Mar 2016
 
-1) SkyRC MC3000 - fix gatherer timing problem, set activation wait timer 15 minutes, add start stop message
-2) eStation BC6 - fix missing Balance while loading data from file
+1) SkyRC MC3000 
+- fix gatherer timing problem
+- set activation wait timer 60 minutes
+- add start stop message
+- fix pause reduction in combi record set
+2) eStation BC6 
+- fix missing Balance while loading data from file
 3) adapt font used by MAC OS X 10.11
 4) update windows NSIS installer
 5) update Copyright including 2016
 6) add Weatronic-Telemetry support
 7) add iMax B6 support
-8) HoTTAdpter* - fix setting filter properties
-9) FutabaTelemetry - correct error message
-10)OpenTxTelemetry - correct error message
+8) HoTTAdpter* 
+- fix setting filter properties
+9) FutabaTelemetry 
+- correct error message
+- add plausibility check to altitude data to better succeed while KMZ export
+10)OpenTxTelemetry 
+- correct error message
 11)fix - runtime error in GraphicsComposite in focus lost listener
 12)fix - keep record formating while cut edge (add missing copy fields in copy constructor)
-13)update OSD file version to support huge number of measurements
+13)fix - CSV export remove blank character after time column
+14)update OSD file version to support huge number of measurements
 	- enhance scaling for large values
 	- enhance OSD reader/writer for large number of measurements
 	- enhance set measurement to add new if above of existing
@@ -23,19 +33,29 @@ GNU DataExplorer - News - comes with version 3.2.4 - 03 Mar 2016
 	- enhance restore statistics configuration for devices declaring "statistics" in getUsedPropertyKeys()
 
 
-1) SkyRC MC3000 - Datenaufnahme Timingprobleme gelöst, 15 Minuten Aktivierungstimer eingeführt, sende Start- und Stop-Signal 
-2) eStation BC6 - fehlende Balance beim Laden von Datendateien behoben
+1) SkyRC MC3000 
+- Datenaufnahme Timingprobleme gelöst
+- 60 Minuten Aktivierungstimer eingeführt
+- sende Start- und Stop-Signal 
+- Korrektur Datenaufnahme ohne Pause in dem Kombinationsdatensatz
+2) eStation BC6 
+- fehlende Balance beim Laden von Datendateien behoben
 3) Schriftart angepasst an MAC OS X 10.11
 4) Windows NSIS Installer Update
 5) Update Copyright für 2016
 6) hinzugefügt Weatronic-Telemetry Unterstützung
 7) hinzugefügt iMax B6 Unterstützung
-8) HoTTAdpter* - Setzen von Filtereigenschaften bereinigt
-9) FutabaTelemetry - Fehlernachricht verbessert
-10)OpenTxTelemetry - Fehlernachricht verbessert
+8) HoTTAdpter* 
+- Setzen von Filtereigenschaften bereinigt
+9) FutabaTelemetry 
+- Fehlernachricht verbessert
+- Plausibilitätscheck für den Höhendatensatz beim KMZ-Export hinzugefügt
+10)OpenTxTelemetry 
+- Fehlernachricht verbessert
 11)berichtigt - Laufzeitfehler in GraphicsComposite im "focus lost listener"
 12)berichtigt - Datensatz-Formatierung wird jetzt auch für definierte Skalenendwerte beibehalten
-13)Update OSD Datei-Version
+13)berichtigt - störenden Leerzeichen nach der Zeitspalte im CSV-Export
+14)Update OSD Datei-Version
 	- verbessert, Skalierung für große Werte
 	- verbessert, OSD lesen/schreiben für große Anzahl von Messwerten
 	- verbessert, automatisches Anpassen von Messwerten 
