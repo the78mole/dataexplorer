@@ -9,7 +9,7 @@ update Copyright including 2016
 add Weatronic-Telemetry support
 add iMax B6 support
 HoTTAdpter* - fix setting filter properties
-FutabaTelemetry - correct error message
+FutabaTelemetry - correct error message, add plausibility check to altitude data to better succeed while KMZ export.
 OpenTxTelemetry - correct error message
 fix - runtime error in GraphicsComposite in focus lost listener
 fix - keep record formating while cut edge (add missing copy fields in copy constructor)
