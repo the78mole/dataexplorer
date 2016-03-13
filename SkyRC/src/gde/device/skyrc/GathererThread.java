@@ -368,15 +368,6 @@ public class GathererThread extends Thread {
 				String description = String.format("%s%s%s; Memory # %02d", 
 						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getFirmwareString(), this.device.getBatteryMemoryNumber(number, this.usbInterface)); //$NON-NLS-1$
 				recordSet.setRecordSetDescription(description);
-
-				// STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
-				if (this.device.getProcessingStatus(dataBuffer) == 4 && !this.isAlerted4Finish[number - 1]) {
-					this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3604, new Object[] { number }));
-					this.isAlerted4Finish[number - 1] = true;
-				}
-				else {
-					this.isAlerted4Finish[number - 1] = false;
-				}
 			}
 
 			// STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
