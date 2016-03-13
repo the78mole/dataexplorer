@@ -1843,7 +1843,7 @@ public class DataExplorer extends Composite {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (!this.graphicsTabItem.isActiveCurveSelectorContextMenu()) {
 				int tabSelectionIndex = this.displayTab.getSelectionIndex();
-				if (tabSelectionIndex == 0) { //graphics tab is alwasy the first one
+				if (tabSelectionIndex == 0) { //graphics tab is always the first one
 					this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
 				}
 				else if (tabSelectionIndex > 0) {
