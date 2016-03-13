@@ -179,7 +179,12 @@ public class GraphicsWindow extends CTabItem {
 		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth};
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
-			this.graphicSashForm.setWeights(this.sashFormWeights);
+			try {
+				this.graphicSashForm.setWeights(this.sashFormWeights);
+			}
+			catch (IllegalArgumentException e) {
+				 log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e);
+			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " windowType = " + this.windowType);
 		}
 	}
