@@ -158,6 +158,11 @@ public class GathererThread extends Thread {
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
 						if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4) {
+							points1 = new int[this.device.getMeasurementNames(1).length];
+							points2 = new int[this.device.getMeasurementNames(2).length];
+							points3 = new int[this.device.getMeasurementNames(3).length];
+							points4 = new int[this.device.getMeasurementNames(4).length];
+
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
 								ch1 = processDataChannel(1, recordSet1, recordSetKey1, dataBuffer1, points1);
 								recordSet1 = (RecordSet) ch1[0];
@@ -227,8 +232,19 @@ public class GathererThread extends Thread {
 									this.device.updateVisibilityStatus(recordSet5, true);
 								}
 							}
+							
 							this.application.setStatusMessage(GDE.STRING_EMPTY);
-							this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//60 Min
+							
+							//check for all processing finished and stop gathering after 15 min
+							if (this.device.isProcessingStatusStandByOrFinished(dataBuffer1) && this.device.isProcessingStatusStandByOrFinished(dataBuffer2) && this.device.isProcessingStatusStandByOrFinished(dataBuffer3) && this.device.isProcessingStatusStandByOrFinished(dataBuffer4)) {
+								if (0 >= (retryCounter -= 4)) {
+									log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+									this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
+									stopDataGatheringThread(false, null);
+								}
+							}
+							else
+								this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//60 Min
 						}
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));

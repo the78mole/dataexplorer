@@ -616,8 +616,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	public boolean isProcessing(final int outletNum, final byte[] dataBuffer) {
 		if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, "isProcessing = " + dataBuffer[5]);
 		if (this.settings.isReduceChargeDischarge()) 
-			return (dataBuffer[5] == 1 || dataBuffer[5] == 2) && !(dataBuffer[5] >= 4);
-		return dataBuffer[5] >= 1 && dataBuffer[5] <= 3 && !(dataBuffer[5] >= 4);
+			return dataBuffer[5] > 0 && dataBuffer[5] < 3;
+		return dataBuffer[5] >= 1;
 	}
 
 	/**
@@ -627,6 +627,15 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 */
 	public int getProcessingStatus(final byte[] dataBuffer) {
 		return dataBuffer[5];
+	}
+
+	/**
+	 * STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
+	 * @param dataBuffer
+	 * @return
+	 */
+	public boolean isProcessingStatusStandByOrFinished(final byte[] dataBuffer) {
+		return dataBuffer[5]==0 || dataBuffer[5]==4;
 	}
 
 	/**
