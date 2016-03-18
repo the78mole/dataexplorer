@@ -5,6 +5,8 @@ fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
 MC3000 
 	- add warning message selecting continuous data recording in combination with reduced without pause,..
 	- add capability to data capture finish for 15 minutes
+iCharger* 
+	- fix get state property while received data is incomplete
 
 Version 3.2.5 - 06 Mar 2016
 SkyRC MC3000 
