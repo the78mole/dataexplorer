@@ -390,7 +390,13 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public String getProcessName(byte[] buffer) {
-		return this.getStateProperty(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1]))).getName();
+		try {
+			return this.getStateProperty(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1]))).getName();
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			return this.getStateProperty(7).getName();
+		}
 	}
 	
 	/**
