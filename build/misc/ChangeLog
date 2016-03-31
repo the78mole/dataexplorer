@@ -6,7 +6,9 @@ MC3000
 	- add warning message selecting continuous data recording in combination with reduced without pause,..
 	- add capability to data capture finish for 15 minutes
 iCharger* 
-	- fix get state property while received data is incomplete
+	- handle state property exception while receiving incomplete data 
+Weatronic-Telemetry
+	- handle not initialized measurement symbols which are sometimes displayed as string null
 
 Version 3.2.5 - 06 Mar 2016
 SkyRC MC3000 
