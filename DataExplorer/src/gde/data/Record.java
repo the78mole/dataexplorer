@@ -1885,8 +1885,8 @@ public class Record extends Vector<Integer> {
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(NAME).append(GDE.STRING_EQUAL).append(this.name).append(DELIMITER);
-		sb.append(UNIT).append(GDE.STRING_EQUAL).append(this.unit).append(DELIMITER);
-		sb.append(SYMBOL).append(GDE.STRING_EQUAL).append(this.symbol).append(DELIMITER);
+		sb.append(UNIT).append(GDE.STRING_EQUAL).append(this.unit==null?GDE.STRING_EMPTY:this.unit).append(DELIMITER);
+		sb.append(SYMBOL).append(GDE.STRING_EQUAL).append(this.symbol==null||this.symbol.equals("null")?GDE.STRING_EMPTY:this.symbol).append(DELIMITER);
 		sb.append(IS_ACTIVE).append(GDE.STRING_EQUAL).append(this.isActive).append(DELIMITER);
 		sb.append(IS_DIPLAYABLE).append(GDE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
 		sb.append(IS_VISIBLE).append(GDE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
@@ -1924,8 +1924,11 @@ public class Record extends Vector<Integer> {
 				
 		tmpValue = recordProps.get(UNIT);
 		if (tmpValue!=null && tmpValue.length() > 0) this.unit =  tmpValue.trim();
+		else this.unit = GDE.STRING_EMPTY;
 		tmpValue = recordProps.get(SYMBOL);
 		if (tmpValue!=null && tmpValue.length() > 0) this.symbol =  tmpValue.trim();
+		else this.symbol = GDE.STRING_EMPTY;
+		this.symbol = this.symbol.equals("null")?GDE.STRING_EMPTY:this.symbol;
 		tmpValue = recordProps.get(IS_ACTIVE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isActive =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
