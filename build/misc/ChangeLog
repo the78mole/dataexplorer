@@ -5,6 +5,7 @@ fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
 MC3000 
 	- add warning message selecting continuous data recording in combination with reduced without pause,..
 	- add capability to data capture finish for 15 minutes
+	- change energy calculation method
 iCharger* 
 	- handle state property exception while receiving incomplete data 
 Weatronic-Telemetry
