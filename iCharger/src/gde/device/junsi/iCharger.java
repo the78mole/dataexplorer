@@ -203,10 +203,20 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if(index > 9 && record.getUnit().equals("V")) //cell voltage no temperature measurements //$NON-NLS-1$
-					dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
+				if(index > 9 && record.getUnit().equals("V"))
+					try {
+						dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
+					}
+					catch (Exception e) {
+						dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(record.realSize()-1) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
+					}
 				else
-					dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					try {
+						dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					}
+					catch (Exception e) {
+						dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(record.realSize()-1) / 1000.0) - reduction) * factor));
+					}
 				++index;
 			}
 		}
@@ -395,7 +405,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			return this.getStateProperty(7).getName();
+			return "Error";
 		}
 	}
 	

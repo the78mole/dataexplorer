@@ -48,7 +48,6 @@ public class iChargerSerialPort extends DeviceCommPort {
 	byte[]							answer;
 	byte[]							tmpData;
 	byte[]							data						= new byte[] { 0x00 };
-	byte[] 							tmpChkSum 			= new byte[2];
 
 	long								time						= 0;
 	boolean							isDataReceived	= false;
@@ -103,12 +102,6 @@ public class iChargerSerialPort extends DeviceCommPort {
 
 			//find end index
 			findDataEnd(startIndex);
-			
-			System.arraycopy(this.data, data.length-3, this.tmpChkSum, 0, 2);
-			if (!(Integer.valueOf(new String(this.tmpChkSum).trim()) == Checksum.XOR(this.data, this.data.length-3))) {
-				log.logp(Level.WARNING, iChargerSerialPort.$CLASS_NAME, $METHOD_NAME, String.format("Checksum mismatch detected %s != %d", new String(this.tmpChkSum).trim(), Checksum.XOR(this.data, this.data.length-3)));
-				return getData();
-			}
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
