@@ -8,6 +8,7 @@ MC3000
 	- change energy calculation method
 iCharger* 
 	- handle state property exception while receiving incomplete data 
+	- remove checksum calculation
 Weatronic-Telemetry
 	- handle not initialized measurement symbols which are sometimes displayed as string null
 
