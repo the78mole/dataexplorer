@@ -37,6 +37,7 @@ import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.usb.UsbClaimException;
@@ -60,6 +61,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected String[]	USAGE_MODE_LI;
 	protected String[]	USAGE_MODE_NI;
 	protected String[]	ERROR_MODE;
+	protected int[]			resetEnergy = new int[] {5,5,5,5};
 
 	protected class SystemSettings {
 		byte currentSlotNumber;
@@ -495,9 +497,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		points[0] = DataParser.parse2Short(dataBuffer[9], dataBuffer[8]) * 1000;
 		points[1] = DataParser.parse2Short(dataBuffer[11], dataBuffer[10]) * 1000 * chargeCorrection;
 		points[2] = DataParser.parse2Short(dataBuffer[13], dataBuffer[12]) * 1000;
-		points[3] = Double.valueOf(points[0] / 1000 * (points[1] / 1000.0) * chargeCorrection).intValue(); // power U*I [W]
-		points[4] = Double.valueOf(points[0] / 1000 * (points[2] / 1000.0)).intValue(); // energy U*C [Wh]
-		points[5] = DataParser.parse2Short(dataBuffer[15], dataBuffer[14]) * 1000;
+		points[3] = Double.valueOf(points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection).intValue(); // power U*I [W]
+		//points[4] = Double.valueOf(points[0] / 1000.0 * (points[2] / 1000.0)).intValue(); // energy U*C [Wh]
+		points[4] = dataBuffer[1] == 0 
+				? points[4] + Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0 + 0.5).intValue() 
+				: 0; //transferred energy über längeren Zeitraum bis zum Zeitpunkt t = Integral von P*dt (von 0 bis t) = P(t=0)*1sec+P(t=1s)*1sec+…+P(t=t)*1sec
+		if (dataBuffer[1] != 0) log.log(Level.OFF, "reset Energy");
+		//System.out.println(points[4] + " - " + Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0).intValue());
 		points[6] = DataParser.parse2Short(dataBuffer[17], dataBuffer[16]) * 1000;
 
 		return points;
@@ -615,6 +621,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 */
 	public boolean isProcessing(final int outletNum, final byte[] dataBuffer) {
 		if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, "isProcessing = " + dataBuffer[5]);
+
+		if (this.resetEnergy[outletNum-1] > dataBuffer[5])
+			dataBuffer[1] = 1;
+		else
+			dataBuffer[1] = 0;		
+		this.resetEnergy[outletNum-1] = dataBuffer[5];
+		
 		if (this.settings.isReduceChargeDischarge()) 
 			return dataBuffer[5] > 0 && dataBuffer[5] < 3;
 		return dataBuffer[5] >= 1;

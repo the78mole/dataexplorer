@@ -110,6 +110,7 @@ public class GathererThread extends Thread {
 			int[] points3 = new int[this.device.getMeasurementNames(3).length];
 			int[] points4 = new int[this.device.getMeasurementNames(4).length];
 			int[] points5 = new int[this.device.getMeasurementNames(5).length];
+			int lastEnergie1, lastEnergie2, lastEnergie3, lastEnergie4;
 
 			this.isProgrammExecuting1 = false;
 			this.isProgrammExecuting2 = false;
@@ -158,27 +159,39 @@ public class GathererThread extends Thread {
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
 						if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4) {
+							lastEnergie1 = points1[4];
 							points1 = new int[this.device.getMeasurementNames(1).length];
+							
+							lastEnergie2 = points2[4];
 							points2 = new int[this.device.getMeasurementNames(2).length];
+							
+							lastEnergie3 = points3[4];
 							points3 = new int[this.device.getMeasurementNames(3).length];
+							
+							lastEnergie4 = points4[4];
 							points4 = new int[this.device.getMeasurementNames(4).length];
 
+
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+								points1[4] = lastEnergie1;
 								ch1 = processDataChannel(1, recordSet1, recordSetKey1, dataBuffer1, points1);
 								recordSet1 = (RecordSet) ch1[0];
 								recordSetKey1 = (String) ch1[1];
 							}
 							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+								points2[4] = lastEnergie2;
 								ch2 = processDataChannel(2, recordSet2, recordSetKey2, dataBuffer2, points2);
 								recordSet2 = (RecordSet) ch2[0];
 								recordSetKey2 = (String) ch2[1];
 							}
 							if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
+								points3[4] = lastEnergie3;
 								ch3 = processDataChannel(3, recordSet3, recordSetKey3, dataBuffer3, points3);
 								recordSet3 = (RecordSet) ch3[0];
 								recordSetKey3 = (String) ch3[1];
 							}
 							if (this.isProgrammExecuting4) { // checks for processes active includes check state change waiting to discharge to charge
+								points4[4] = lastEnergie4;
 								ch4 = processDataChannel(4, recordSet4, recordSetKey4, dataBuffer4, points4);
 								recordSet4 = (RecordSet) ch4[0];
 								recordSetKey4 = (String) ch4[1];
