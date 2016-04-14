@@ -136,6 +136,7 @@ public class PolaronGathererThread extends Thread {
 					case PolaronACDC:
 					case PolaronPro:
 					case PolaronEx:
+					case PolaronEx1400:
 					case PolaronSports:
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							this.isLinkedMode = true;
@@ -155,6 +156,12 @@ public class PolaronGathererThread extends Thread {
 								case PolaronSports:
 									System.arraycopy(dataBuffer, 0, buffer, 0, 9);//header, application, product code
 									System.arraycopy(dataBuffer, 77, buffer, 9, dataBuffer.length-77);
+									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+									break;
+
+								case PolaronEx1400:
+									System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
+									System.arraycopy(dataBuffer, 129, buffer, 11, 130);
 									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
 									break;
 

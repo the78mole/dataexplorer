@@ -56,7 +56,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 
 	public enum GraupnerDeviceType {
 		//0=unknown, 1=PolaronEx, 2=PolaronAcDcEQ, 3=PolaronAcDc, 4=PolaronPro, 5=PolaronSports
-		unknown, PolaronEx, PolaronACDC_EQ, PolaronACDC, PolaronPro, PolaronSports
+		unknown, PolaronEx, PolaronACDC_EQ, PolaronACDC, PolaronPro, PolaronSports, PolaronEx1400
 	};
 
 	protected String[]								PROCESSING_MODE;
