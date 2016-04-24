@@ -9,6 +9,8 @@ MC3000
 iCharger* 
 	- handle state property exception while receiving incomplete data 
 	- remove checksum calculation
+iCharger4010DUO
+	- enable USB live data gathering
 Weatronic-Telemetry
 	- handle not initialized measurement symbols which are sometimes displayed as string null
 Polaron EX1400
