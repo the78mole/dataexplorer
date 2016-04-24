@@ -41,6 +41,7 @@ import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -55,8 +56,8 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	final static Logger	log	= Logger.getLogger(Polaron.class.getName());
 
 	public enum GraupnerDeviceType {
-		//0=unknown, 1=PolaronEx, 2=PolaronAcDcEQ, 3=PolaronAcDc, 4=PolaronPro, 5=PolaronSports
-		unknown, PolaronEx, PolaronACDC_EQ, PolaronACDC, PolaronPro, PolaronSports, PolaronEx1400
+		//0=unknown, 1=PolaronEx, 2=PolaronAcDcEQ, 3=PolaronAcDc, 4=PolaronPro, 5=PolaronSports, 6=Gemini2030iEvo, 7=Absolute1807, 8=PolronEX1400, 9=UltraDuoPlus80
+		unknown, PolaronEx, PolaronACDC_EQ, PolaronACDC, PolaronPro, PolaronSports, Gemini2030iEvo, Absolute1807, PolaronEx1400, UltraDuoPlus80
 	};
 
 	protected String[]								PROCESSING_MODE;
@@ -840,7 +841,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	 * @return 1.337
 	 */
 	public String getFirmwareVersion(byte[] dataBuffer) {
-		return String.format("%.3f", DataParser.parse2Short(dataBuffer, 7) / 1000.0);
+		return String.format(Locale.ENGLISH, "%.3f", DataParser.parse2Short(dataBuffer, 7) / 1000.0);
 	}
 
 	/**
