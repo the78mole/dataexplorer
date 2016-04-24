@@ -11,6 +11,7 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.WaitTimer;
 import gnu.io.SerialPort;
 
 import java.io.IOException;
@@ -33,6 +34,9 @@ import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
 import javax.usb.UsbPipe;
 import javax.usb.UsbServices;
+import javax.usb.event.UsbPipeDataEvent;
+import javax.usb.event.UsbPipeErrorEvent;
+import javax.usb.event.UsbPipeListener;
 
 import org.usb4java.Device;
 import org.usb4java.DeviceDescriptor;
@@ -48,7 +52,8 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	final Settings												settings;
 
 	boolean																isConnected								= false;
-
+	int 																	asyncReceived							= 0;
+	boolean																isAsyncReceived						= false;
 	
 	/**
 	 * normal constructor to be used within DataExplorer
@@ -393,6 +398,60 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		}
 		if (this.application != null) this.application.setSerialRxOff();
 		return received;
+	}
+
+	/**
+	 * read a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data receive buffer
+	 * @param timeout_msec
+	 * @return number of bytes received
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public synchronized int read(final UsbInterface iface, final byte endpointAddress, final byte[] data, final int timeout_msec) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+		if (this.application != null) this.application.setSerialRxOn();
+		UsbEndpoint endpoint = iface.getUsbEndpoint(endpointAddress);
+		int waitTime_msec = timeout_msec;
+		int waitDelay_msec = timeout_msec/100;
+		asyncReceived = 0;
+		isAsyncReceived = false;
+		final UsbPipe pipe = endpoint.getUsbPipe();
+		UsbPipeListener usbPipeListener = new UsbPipeListener() {
+
+			public void errorEventOccurred(UsbPipeErrorEvent evt) {
+				log.log(Level.WARNING, evt.toString());
+			}
+
+			public void dataEventOccurred(UsbPipeDataEvent evt) {
+				byte[] tmpData = evt.getData();
+				isAsyncReceived = true;
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, (asyncReceived=tmpData.length) + " bytes received");
+			}
+		};
+		try {
+			pipe.open();
+			pipe.addUsbPipeListener(usbPipeListener);
+			pipe.asyncSubmit(data);
+			
+			while (isConnected && !isAsyncReceived && waitTime_msec > 0) {
+				WaitTimer.delay(waitDelay_msec);
+				waitTime_msec -= waitDelay_msec;
+			}
+		}
+		finally
+		{
+			pipe.removeUsbPipeListener(usbPipeListener);
+			if (pipe.isOpen()) {
+				pipe.abortAllSubmissions();
+				pipe.close();
+			}
+		}
+		if (this.application != null) this.application.setSerialRxOff();
+		return asyncReceived;
 	}
 
 }

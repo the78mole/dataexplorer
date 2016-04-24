@@ -294,4 +294,18 @@ public interface IDeviceCommPort {
 	 */
 	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException;
 
+	/**
+	 * read a byte array of data using the given interface and its end point address
+	 * @param iface
+	 * @param endpointAddress
+	 * @param data receive buffer
+	 * @param timeout_msec
+	 * @return number of bytes received
+	 * @throws UsbNotActiveException
+	 * @throws UsbNotClaimedException
+	 * @throws UsbDisconnectedException
+	 * @throws UsbException
+	 */
+	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data, final int timeout_msec) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException;
+
 }
