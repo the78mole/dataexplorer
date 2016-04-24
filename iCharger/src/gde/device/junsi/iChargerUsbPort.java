@@ -30,6 +30,8 @@ import gde.utils.StringHelper;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
 import javax.usb.UsbInterface;
 
 /**
@@ -80,6 +82,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		}
 		catch (Exception e) {
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				if (e instanceof UsbDisconnectedException) throw e;
 		}
 		return data;
 	}

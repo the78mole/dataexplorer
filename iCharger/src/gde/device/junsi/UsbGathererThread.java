@@ -33,6 +33,7 @@ import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.WaitTimer;
 
 import java.util.logging.Logger;
 
@@ -161,8 +162,9 @@ public class UsbGathererThread extends Thread {
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
 							log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+							WaitTimer.delay(1000);
 
-							if (0 >= (retryCounter -= 1)) {
+							if (0 >= (this.retryCounter -= 1)) {
 								log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
 								this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2600));
 								stopDataGatheringThread(false, null);
@@ -327,7 +329,7 @@ public class UsbGathererThread extends Thread {
 		}
 		else {
 			if (throwable != null) {
-				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }) + Messages.getString(MessageIds.GDE_MSGT2602));
+				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }));
 			}
 			else {
 				if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + Messages.getString(MessageIds.GDE_MSGT2602));
