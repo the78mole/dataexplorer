@@ -57,7 +57,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	public final static String		CONFIG_PROCESSING_TIME			= "processing_time"; //$NON-NLS-1$
 
 	protected final DataExplorer									application;
-	protected final iChargerSerialPort						serialPort;
+	protected   		iChargerSerialPort						serialPort;
 	protected final Channels											channels;
 	protected       GathererThread								gathererThread;
 
@@ -88,7 +88,9 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
-		this.serialPort = new iChargerSerialPort(this, this.application);
+		if (deviceConfig.getSerialPortType() != null) {
+			this.serialPort = new iChargerSerialPort(this, this.application);
+		}		
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) 
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));

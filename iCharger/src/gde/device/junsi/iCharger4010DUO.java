@@ -21,20 +21,26 @@ package gde.device.junsi;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DataBlockType;
 import gde.device.DeviceConfiguration;
 import gde.device.InputTypes;
+import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
+import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
 
+import javax.usb.UsbClaimException;
+import javax.usb.UsbException;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
@@ -52,7 +58,8 @@ public class iCharger4010DUO extends iCharger {
 
 	protected boolean							isFileIO		= false;
 	protected boolean							isSerialIO	= false;
-
+	final iChargerUsbPort					usbPort;
+	protected UsbGathererThread   dataGatherThread;
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -76,6 +83,8 @@ public class iCharger4010DUO extends iCharger {
 			if (isFileIO)
 				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
+		
+		this.usbPort = new iChargerUsbPort(this, this.application);
 	}
 
 	/**
@@ -100,6 +109,8 @@ public class iCharger4010DUO extends iCharger {
 			if (isFileIO)
 				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
+		
+		this.usbPort = new iChargerUsbPort(this, this.application);
 	}
 	
 	/**
@@ -178,46 +189,34 @@ public class iCharger4010DUO extends iCharger {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this.getDataBlockFormat(InputTypes.SERIAL_IO), false);
-		int[] startLength = new int[] {0,0};
-		byte[] lineBuffer = null;
-				
-		try {
-			//setDataLineStartAndLength(dataBuffer, startLength);
-			lineBuffer = new byte[startLength[1]];
-			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-			data.parse(new String(lineBuffer), 1);
-			int[] values = data.getValues();
-			
-			//0=VersorgungsSpg. 1=Spannung 2=Strom  
-			points[0] = values[0];
-			points[1] = values[1];
-			points[2] = values[2];			
-			//3=Ladung 4=Leistung 5=Energie
-			points[3] = values[13] * 1000;
-			points[4] = points[1] * points[2] / 100; 							// power U*I [W]
-			points[5] = points[1]/1000 * points[3]/1000;						// energy U*C [mWh]
-			//6=Temp.intern 7=Temp.extern 
-			points[6] = values[11];
-			points[7] = values[12];
-			//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8
-			for (int i = 0; i < 10; i++) {
-				points[i+9] = values[i+3];
-				if (points[i + 9] > 0) {
-					maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
-					minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
-				}
+		
+		//2C 10 01 F8 7D 07 00 02 01 00 E5 FF 04 87 2B 3C CF FF FF FF 64 01 00 00 02 0F 0B 0F 0E 0F 00 0F 00 00 00 00 00 00 00 00 00 00 00 
+	  //                                    34564 15403             35,6        3842  3851  3854  3840
+		//0=Strom 1=VersorgungsSpg. 2=Spannung   
+		points[0] = DataParser.parse2Short(dataBuffer, 10);			
+		points[1] = DataParser.parse2UnsignedShort(dataBuffer, 12);
+		points[2] = DataParser.parse2Short(dataBuffer, 14);
+		//3=Ladung 4=Leistung 5=Energie
+		points[3] = DataParser.parse2Int(dataBuffer, 16);
+		points[4] = points[0] * points[2] / 100; 							// power U*I [W]
+		points[5] = Double.valueOf(points[2]/1.0 * points[3]/1000.0).intValue();					// energy U*C [mWh]
+		//6=Temp.intern 7=Temp.extern 
+		points[6] = DataParser.parse2Short(dataBuffer, 20);
+		points[7] = DataParser.parse2Short(dataBuffer, 22);
+		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8
+		for (int i = 0,j=0; i < 10; i++,j+=2) {
+			points[i+9] = DataParser.parse2Short(dataBuffer, 24+j);
+			if (points[i + 9] > 0) {
+				maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
+				minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
 			}
-			//8=Balance
-			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage());
-		}
+		//8=Balance
+		points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
@@ -299,7 +298,66 @@ public class iCharger4010DUO extends iCharger {
 			break;
 			
 		case DeviceCommPort.ICON_SET_START_STOP:
-			this.serialPort.isInterruptedByUser = true;
+			if (this.usbPort != null) {
+				if (!this.usbPort.isConnected()) {
+					try {
+						Channel activChannel = Channels.getInstance().getActiveChannel();
+						if (activChannel != null) {
+							this.dataGatherThread = new UsbGathererThread(this.application, this, this.usbPort, activChannel.getNumber());
+							try {
+								if (this.dataGatherThread != null && this.usbPort.isConnected()) {
+									WaitTimer.delay(100);
+									this.dataGatherThread.start();
+								}
+							}
+							catch (Throwable e) {
+								log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+							}
+						}
+					}
+					catch (UsbClaimException e) {
+						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+						try {
+							if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
+						}
+						catch (UsbException ex) {
+							log.log(java.util.logging.Level.SEVERE, ex.getMessage(), ex);
+						}
+					}
+					catch (UsbException e) {
+						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+						try {
+							if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
+						}
+						catch (UsbException ex) {
+							log.log(java.util.logging.Level.SEVERE, ex.getMessage(), ex);
+						}
+					}
+					catch (ApplicationConfigurationException e) {
+						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+						this.application.getDeviceSelectionDialog().open();
+					}
+					catch (Throwable e) {
+						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					}
+				}
+				else {
+					if (this.dataGatherThread != null) {
+						this.dataGatherThread.stopDataGatheringThread(false, null);
+					}
+					//if (this.boundsComposite != null && !this.isDisposed()) this.boundsComposite.redraw();
+					try {
+						WaitTimer.delay(1000);
+						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
+					}
+					catch (UsbException e) {
+						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					}
+				}
+			}
 			break;
 		}
 	}
