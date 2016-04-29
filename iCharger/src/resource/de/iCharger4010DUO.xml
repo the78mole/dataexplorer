@@ -41,8 +41,8 @@
         <property name="Motortest" value="5" type="Integer" description="Motortestlauf"/>
         <property name="Fertig" value="6" type="Integer" description="alle Programme abgelaufen"/>
         <property name="Fehler" value="7" type="Integer" description="Fehler"/>
-        <property name="LiXx Erhalten" value="8" type="Integer" description="LiXx Erhaltungsladung"/>
-        <property name="Balancieren/Erhalten" value="9" type="Integer" description="LiXx Balancieren oder NiXx Erhaltungsladung"/>
+        <property name="Erhalten" value="8" type="Integer" description="NiXx Erhaltungsladung"/>
+        <property name="Balancieren" value="9" type="Integer" description="LiXx Balancieren"/>
         <property name="Schaumschnitt" value="10" type="Integer" description="Schaumschneideprogramm"/>
         <property name="Info" value="11" type="Integer" description="Informationsanzeige"/>
         <property name="ex-Entladen" value="12" type="Integer" description="Entladeoperationende"/>
