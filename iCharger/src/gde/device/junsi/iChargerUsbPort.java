@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.usb.UsbDisconnectedException;
-import javax.usb.UsbException;
 import javax.usb.UsbInterface;
 
 /**

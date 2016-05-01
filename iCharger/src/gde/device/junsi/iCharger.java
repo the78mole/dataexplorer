@@ -60,6 +60,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	protected   		iChargerSerialPort						serialPort;
 	protected final Channels											channels;
 	protected       GathererThread								gathererThread;
+	protected String[]														BATTERIE_TYPE;
 
 	/**
 	 * constructor using properties file

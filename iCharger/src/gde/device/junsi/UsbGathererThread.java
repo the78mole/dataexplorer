@@ -235,18 +235,20 @@ public class UsbGathererThread extends Thread {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
 		boolean isContinuousRecordSet = this.settings.isContinuousRecordSet();
+		//BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
+		String batterieType = this.device.getBattrieType(dataBuffer);
 		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE
 		int processModeNumber = dataBuffer[7];
 		String processTypeName = this.device.getStateProperty(processModeNumber).getName();
 		//STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
 		String processStatusName = !isContinuousRecordSet && dataBuffer[9] != 0 ? Messages.getString(MessageIds.GDE_MSGT2610) : GDE.STRING_EMPTY;
 		if (UsbGathererThread.log.isLoggable(Level.FINE)) {
-			UsbGathererThread.log.log(Level.FINE, number + " : processName = " + processTypeName + " - processStatusName = " + processStatusName);
+			UsbGathererThread.log.log(Level.FINE, number + String.format("%s %s %s", batterieType, processTypeName, processStatusName).trim());
 		}
-		Channel slotChannel = this.channels.get(number);
-		if (slotChannel != null) {
+		Channel outputChannel = this.channels.get(number);
+		if (outputChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
-			if (recordSet == null || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
+			if (recordSet == null || !processRecordSetKey.contains(batterieType)  || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 
 				// record set does not exist or is out dated, build a new name and create
@@ -261,18 +263,18 @@ public class UsbGathererThread extends Thread {
 						}
 					}
 				}
-				processRecordSetKey = slotChannel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processTypeName + extend.toString();
+				processRecordSetKey = String.format("%d) %s - %s %s", outputChannel.getNextRecordSetNumber(), batterieType, processTypeName, extend.toString()).trim();
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
-				slotChannel.applyTemplateBasics(processRecordSetKey);
-				UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
-				recordSet = slotChannel.get(processRecordSetKey);
+				outputChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), outputChannel.getNumber(), true, false));
+				outputChannel.applyTemplateBasics(processRecordSetKey);
+				UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + outputChannel.getName()); //$NON-NLS-1$
+				recordSet = outputChannel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
 				//channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
-				this.channels.switchChannel(slotChannel.getNumber(), processRecordSetKey);
-				slotChannel.switchRecordSet(processRecordSetKey);
+				this.channels.switchChannel(outputChannel.getNumber(), processRecordSetKey);
+				outputChannel.switchRecordSet(processRecordSetKey);
 			}
 
 			//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE

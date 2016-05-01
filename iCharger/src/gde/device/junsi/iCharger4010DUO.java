@@ -60,6 +60,7 @@ public class iCharger4010DUO extends iCharger {
 	protected boolean							isSerialIO	= false;
 	final iChargerUsbPort					usbPort;
 	protected UsbGathererThread   dataGatherThread;
+
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -69,6 +70,15 @@ public class iCharger4010DUO extends iCharger {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		this.BATTERIE_TYPE = new String[] { "? - ",      //unknown batteries type
+				Messages.getString(MessageIds.GDE_MSGT2611), //LiPo
+				Messages.getString(MessageIds.GDE_MSGT2612), //LiIo
+				Messages.getString(MessageIds.GDE_MSGT2613), //LiFe
+				Messages.getString(MessageIds.GDE_MSGT2614), //NiMH
+				Messages.getString(MessageIds.GDE_MSGT2615), //NiCd
+				Messages.getString(MessageIds.GDE_MSGT2616), //Pb
+				Messages.getString(MessageIds.GDE_MSGT2617), //NiZn
+				"? - " };//unknown batterie type
 
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
@@ -95,6 +105,15 @@ public class iCharger4010DUO extends iCharger {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		this.BATTERIE_TYPE = new String[] { "? - ",      //unknown batteries type
+				Messages.getString(MessageIds.GDE_MSGT2611), //LiPo
+				Messages.getString(MessageIds.GDE_MSGT2612), //LiIo
+				Messages.getString(MessageIds.GDE_MSGT2613), //LiFe
+				Messages.getString(MessageIds.GDE_MSGT2614), //NiMH
+				Messages.getString(MessageIds.GDE_MSGT2615), //NiCd
+				Messages.getString(MessageIds.GDE_MSGT2616), //Pb
+				Messages.getString(MessageIds.GDE_MSGT2617), //NiZn
+				"? - " };//unknown batterie type
 
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
@@ -137,6 +156,14 @@ public class iCharger4010DUO extends iCharger {
 	}
 
 	/**
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 */
+	@Override
+	public int getLovDataByteSize() {
+		return 64;  
+	}
+
+	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
@@ -160,10 +187,9 @@ public class iCharger4010DUO extends iCharger {
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		for (int i = 0; i < recordDataSize; i++) {
-			lovDataSize = deviceDataBufferSize/3;
 			//prepare convert buffer for conversion
-			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize/3);
-			for (int j = deviceDataBufferSize/3; j < deviceDataBufferSize; j++) { //start at minimum length of data buffer 
+			System.arraycopy(dataBuffer, offset+5, convertBuffer, 0, deviceDataBufferSize);
+			for (int j = deviceDataBufferSize; j < deviceDataBufferSize; j++) { //start at minimum length of data buffer 
 				convertBuffer[j] = dataBuffer[offset+j];
 				++lovDataSize;
 				if (dataBuffer[offset+j] == 0x0A && dataBuffer[offset+j-1] == 0x0D)
@@ -171,7 +197,7 @@ public class iCharger4010DUO extends iCharger {
 			}
 
 			recordSet.addPoints(convertDataBytes(points, convertBuffer));
-			offset += lovDataSize+8;
+			offset += lovDataSize+8+5;
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
@@ -285,6 +311,15 @@ public class iCharger4010DUO extends iCharger {
 		return 10;
 	}
 
+	/**
+	 * query the batteries type BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
+	 * @param databuffer
+	 * @return
+	 */
+	public String getBattrieType(final byte[] databuffer) {
+		return this.BATTERIE_TYPE[databuffer[8]];
+	}
+	
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
