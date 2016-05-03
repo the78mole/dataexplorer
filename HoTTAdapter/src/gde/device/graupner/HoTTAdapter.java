@@ -105,7 +105,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean										isSwitchG[]												= { false, false, false, false, false, false, false, false };
 	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
 
-	final static int												QUERY_GAP_MS											= 15;
+	final static int												QUERY_GAP_MS											= 30;
 	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																			//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
@@ -424,8 +424,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[1] = (dataBuffer[9] & 0xFF) * 1000;
 						points[2] = (dataBuffer[5] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;
-						points[4] = (dataBuffer[13] & 0xFF) * 1000;
-						points[5] = (dataBuffer[8] & 0xFF) * 1000;
+						points[4] = (dataBuffer[13] & 0xFF) * -1000;
+						points[5] = (dataBuffer[8] & 0xFF) * -1000;
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
 						points[8] = (dataBuffer[10] & 0xFF) * 1000;
@@ -592,8 +592,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[1] = (dataBuffer[17] & 0xFF) * 1000;
 						points[2] = (dataBuffer[14] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;
-						points[4] = (dataBuffer[5] & 0xFF) * 1000;
-						points[5] = (dataBuffer[4] & 0xFF) * 1000;
+						points[4] = (dataBuffer[5] & 0xFF) * -1000;
+						points[5] = (dataBuffer[4] & 0xFF) * -1000;
 						points[6] = tmpVoltageRx * 1000;
 						points[7] = tmpTemperatureRx * 1000;
 						points[8] = (dataBuffer[10] & 0xFF) * 1000;

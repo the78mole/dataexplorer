@@ -51,6 +51,7 @@ import java.util.logging.Logger;
 public class HoTTbinReader {
 	final static String													$CLASS_NAME						= HoTTbinReader.class.getName();
 	final static Logger													log										= Logger.getLogger(HoTTbinReader.$CLASS_NAME);
+	protected static final int									NUMBER_LOG_RECORDS_TO_SCAN	= 1500;
 
 	final static DataExplorer										application						= DataExplorer.getInstance();
 	final static Channels												channels							= Channels.getInstance();
@@ -112,10 +113,10 @@ public class HoTTbinReader {
 
 		try {
 			fileInfo = new HashMap<String, String>();
-			if (numberLogs < 3130) {
+			if (numberLogs < 7000) {
 				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
 			}
-			else if (numberLogs < 500) {
+			else if (numberLogs < 5500) {
 				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
 				throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
 			}
@@ -128,14 +129,14 @@ public class HoTTbinReader {
 			data_in = new DataInputStream(file_input);
 			if (HoTTbinReader.log.isLoggable(Level.FINER))
 				HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
-			long position = (file.length() / 2) - ((120 * 64) / 2);
+			long position = (file.length() / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
 			position = position - position % 64;
 			if (position <= 0) {
 				sensorCount = 1;
 			}
 			else {
 				if (position > 64 * 4000) {
-					//64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 4000)
+					//64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 6000)
 					position = 64 * 4000;
 				}
 				data_in.read(buffer);
@@ -144,7 +145,7 @@ public class HoTTbinReader {
 					throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 				}
 				data_in.skip(position - 64);
-				for (int i = 0; i < 120; i++) {
+				for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN; i++) {
 					data_in.read(buffer);
 					if (HoTTbinReader.log.isLoggable(Level.FINER))
 						HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));

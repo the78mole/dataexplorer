@@ -805,6 +805,60 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		recordSet.syncScaleOfSyncableRecords();
 		this.application.updateStatisticsData(true);
 		this.updateVisibilityStatus(recordSet, true);
+		
+//		// start slope calculation
+//		String[] measurements = recordSet.getActiveRecordNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
+//		int regressionInterval = 5;
+//		this.calculationThread = new LinearRegression(recordSet, measurements[5], measurements[3], regressionInterval);
+//		try {
+//			this.calculationThread.start();
+//			this.calculationThread.join();
+//		}
+//		catch (Exception e) {
+//			log.log(Level.WARNING, e.getMessage(), e);
+//		}
+//		
+//		regressionInterval = 3;
+//		this.calculationThread = new LinearRegression(recordSet, measurements[3], measurements[2], regressionInterval);
+//		try {
+//			this.calculationThread.start();
+//			this.calculationThread.join();
+//		}
+//		catch (Exception e) {
+//			log.log(Level.WARNING, e.getMessage(), e);
+//		}
+//
+//		long deadTime_ms = 12000; //10 sec
+//		long maxTimeForLapCounting_ms = 4 * 60 * 1000;
+//		double lapStartTime_ms = 0;
+//		int lapTime = 0;
+//		Record laps = recordSet.get(1); //RXSQ
+//		Record smoothedAndDiffRxdbm = recordSet.get(2);
+//		
+//		int i = 0;
+//		for (; i < smoothedAndDiffRxdbm.realSize(); i++) {
+//			laps.set(i, lapTime);
+//			if (smoothedAndDiffRxdbm.getTime_ms(i) > 1.5*deadTime_ms)
+//				break;
+//		}
+//		int lastValue = 0;
+//		for (; i < smoothedAndDiffRxdbm.realSize() && smoothedAndDiffRxdbm.getTime_ms(i) <= maxTimeForLapCounting_ms; i++) {
+//			if (lastValue > 0 && smoothedAndDiffRxdbm.get(i) <= 0) { //lap event detected
+//				if (lapStartTime_ms != 0) {
+//					log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lapStartTime_ms)/1000.0));
+//					lapTime = (int) (recordSet.getTime_ms(i) - lapStartTime_ms);
+//				}
+//				lapStartTime_ms = recordSet.getTime_ms(i);
+//				while (smoothedAndDiffRxdbm.getTime_ms(i)-lapStartTime_ms < deadTime_ms && i < smoothedAndDiffRxdbm.realSize()-1) // skip dead time before start search next event
+//					laps.set(i++, lapTime);
+//			}
+//			laps.set(i, lapTime);
+//			lastValue = smoothedAndDiffRxdbm.get(i);
+//		}
+//		for (; i < smoothedAndDiffRxdbm.realSize(); i++) {
+//			laps.set(i, 0);
+//		}
+		
 	}
 
 	/**

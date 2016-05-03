@@ -228,7 +228,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
 		recordSetMotorDriver = RecordSet.createRecordSet(recordSetKey, this.device, 7, true, true);
 		this.channel.put(recordSetKey, recordSetMotorDriver);
-		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), recordSetElectric);
+		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), recordSetMotorDriver);
 		this.channel.applyTemplate(recordSetKey, true);
 		pointsMotorDriver = new int[recordSetMotorDriver.size()];
 
@@ -320,8 +320,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 							try {
 								//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
-								//HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -334,8 +332,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
-								//HoTTAdapterLiveGatherer.this.serialPort.getData(false);
-								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								recordSetElectric.addPoints(this.device.convertDataBytes(pointsElectric, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -348,8 +344,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						if (queryRing.size() > 0 && queryRing.firstElement() == 3) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
-								//HoTTAdapterLiveGatherer.this.serialPort.getData(false);
-								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								recordSetGeneral.addPoints(this.device.convertDataBytes(pointsGeneral, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -362,8 +356,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
-								//HoTTAdapterLiveGatherer.this.serialPort.getData(false);
-								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								recordSetGeneral.addPoints(this.device.convertDataBytes(pointsMotorDriver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -376,8 +368,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						if (queryRing.size() > 0 && queryRing.firstElement() == 2) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
-								//HoTTAdapterLiveGatherer.this.serialPort.getData(false);
-								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								recordSetGPS.addPoints(this.device.convertDataBytes(pointsGPS, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -390,8 +380,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						if (queryRing.size() > 0 && queryRing.firstElement() == 1) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
-								//HoTTAdapterLiveGatherer.this.serialPort.getData(false);
-								//WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 								recordSetVario.addPoints(this.device.convertDataBytes(pointsVario, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -408,7 +396,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						try {
 							//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(true, this.dataBuffer);
@@ -508,7 +496,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200);
-							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -522,7 +510,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 3) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_115200);
-							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -536,7 +524,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200);
-							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -550,7 +538,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 2) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
-							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -564,7 +552,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 1) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_115200);
-							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -581,6 +569,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 
 				if (++measurementCount % 5 == 0) {
 					for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
+						System.out.println("update recordSet = " + recordSet.getName());
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 				}

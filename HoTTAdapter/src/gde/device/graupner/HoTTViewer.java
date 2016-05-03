@@ -130,7 +130,10 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
-		recordSet.setRecordSetDescription(this.getName() + recordSet.getRecordSetDescription().substring(recordSet.getRecordSetDescription().indexOf(GDE.STRING_MESSAGE_CONCAT)));
+		if (recordSet.getRecordSetDescription().contains(GDE.STRING_LEFT_PARENTHESIS))
+			recordSet.setRecordSetDescription(this.getName() + recordSet.getRecordSetDescription().substring(recordSet.getRecordSetDescription().lastIndexOf(GDE.STRING_LEFT_PARENTHESIS)));
+		else if (recordSet.getRecordSetDescription().contains(GDE.STRING_MESSAGE_CONCAT))
+			recordSet.setRecordSetDescription(this.getName() + recordSet.getRecordSetDescription().substring(recordSet.getRecordSetDescription().indexOf(GDE.STRING_MESSAGE_CONCAT)));
 	}
 
 	/**
@@ -349,7 +352,60 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		this.updateVisibilityStatus(recordSet, true);
 		this.application.getActiveChannel().setFileDescription(recordSet.getFormatedTime_sec(0, true).trim().split(GDE.STRING_BLANK)[0]);
 		
-		//GPSHelper.calculateLabs(this, recordSet, 22, 23, 20, -1, 7);
+//    // start laps calculation
+//    String[] measurements = recordSet.getActiveRecordNames(); //0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
+//    int regressionInterval = 6; //5 seconds interval used for first linear regression
+//    this.calculationThread = new LinearRegression(recordSet, measurements[0], measurements[1], regressionInterval); //RXSQ is source record VPacks is temporary target
+//    try {
+//        this.calculationThread.start();
+//        this.calculationThread.join();
+//    }
+//    catch (Exception e) {
+//        log.log(Level.WARNING, e.getMessage(), e);
+//    }
+//   
+//    regressionInterval = 3; //5 seconds interval used for first linear regression       
+//    this.calculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval); //tmp VPack is source, Strenght is temporary target
+//    try {
+//        this.calculationThread.start();
+//        this.calculationThread.join();
+//    }
+//    catch (Exception e) {
+//        log.log(Level.WARNING, e.getMessage(), e);
+//    }
+//
+//    long deadTime_ms = 5000; //12 seconds time minimum time space between laps
+//    long maxTimeForLapCounting_ms = 6 * 60 * 1000; // maximum time frame in which laps should be calculated
+//    double lapStartTime_ms = 0;
+//    int lapTime = 0;
+//    Record laps = recordSet.get(3); //RXSQ this is target for the laps
+//    Record smoothedAndDiffRxdbm = recordSet.get(2); //this record contains the last stored smoothed data
+//   
+//    int i = 0;
+//    for (; i < smoothedAndDiffRxdbm.realSize(); i++) { //skip time to start lap calculation
+//        laps.set(i, lapTime);
+//        if (smoothedAndDiffRxdbm.getTime_ms(i) > 1.5*deadTime_ms)
+//            break;
+//    }
+//    int lastValue = 0;
+//    for (; i < smoothedAndDiffRxdbm.realSize() && smoothedAndDiffRxdbm.getTime_ms(i) <= maxTimeForLapCounting_ms; i++) {
+//        if (lastValue > 0 && smoothedAndDiffRxdbm.get(i) <= 0) { //lap event detected
+//            if (lapStartTime_ms != 0) {
+//                log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lapStartTime_ms)/1000.0));
+//                lapTime = (int) (recordSet.getTime_ms(i) - lapStartTime_ms);
+//            }
+//            lapStartTime_ms = recordSet.getTime_ms(i);
+//            while (smoothedAndDiffRxdbm.getTime_ms(i)-lapStartTime_ms < deadTime_ms && i < smoothedAndDiffRxdbm.realSize()-1) // skip dead time before start search next event
+//                laps.set(i++, lapTime);
+//        }
+//        laps.set(i, lapTime);
+//        lastValue = smoothedAndDiffRxdbm.get(i);
+//    }
+//    for (; i < smoothedAndDiffRxdbm.realSize(); i++) {
+//        laps.set(i, 0);
+//    }
+//
+//		GPSHelper.calculateLabs(this, recordSet, 22, 23, 20, -1, 7);
 		recordSet.setSaved(true);
 
 	}
