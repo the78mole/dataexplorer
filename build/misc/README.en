@@ -7,63 +7,18 @@ and MAC OS. To execute the only prerequisite is an installed Java runtime with v
 SUN/Oracles Java Runtime.
 
 The GNU DataExplorer read data from serial connected devices or text file import and display this data for a 
-various of further analysis. Actually the following devices are available as plug-in: 
-
-AkkuMasterC4 (Htronic) - 4 outlet battery charger/discharger
-4D-AkkuMonitor (4D) - battery monitor
-AV4ms (Fritz Mössinger/accu-select) 4 outlet battery charger/discharger firmware >= 762
-CellLog 8S, (Junsi) battery cell monitor
-CSV2SerialAdapter, import of configurable CVS data files
-DataVario, DataVarioDuo (WStech) variometer, GPS, multi measurement device
-eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger
-FlightRecorder (Multiplex) Logger
-Futaba-Telemetry (Robbe/Futaba) multi logger
-GigaLogger (Simprop) multi logger
-GPS-Logger, GPS-Logger2 (SM-Modellbau) - GPS, multi measurement device
-GPXAdapter GPS Exchange Format file analyzer, extensions prepared for Mikrokopter
-HoTTAdapter (Graupner) Receiver-, Vario-, GPS-, General-, Electric-Sensor-Module
-HoTTViewer (Graupner HoTTViewer-Adapter)
-IGCAdapter (OnLine Contest/International Gliding Commission) file analyzer
-iCharger 206B, 208B, 306B, 3010B (Junsi) charger/discharger
-IISI Cockpit (Multiplex) Matthias Isler
-JetiAdapter (Jeti, Jeti-Box) multi-sensor-log
-JLog2 (SM-Modellbau) - Jive/Castle motor driver logger
-Kosmik (Kontronik) - motor driver logger
-LinkVario, LinkVarioDuo (WStech) variometer, GPS, multi measurement device
-LiPoWatch (SM-Modellbau) - LiPo saver, cell voltage measurement
-NMEA-Adapter (diverse) - GPS track analyzer
-MC3000 (SkyRC) single cell charger/discharger
-Pichler P6 , P60 (Pichler) and other eStation BC6 clones charger/discharger
-Picolario (Renschler) - variometer
-Picolario2 (Renschler) - variometer
-Polaron (Graupner) charger
-QC-Copter/QuadroControl (tt-tronix) control unit
-Simulator test plug-in
-Ultramat12 (Graupner) charger/discharger
-Ultramat16 (Graupner) charger/discharger
-Ultramat16S (Graupner) charger/discharger
-Ultramat18 (Graupner) charger/discharger
-Ultra Duo Plus 40 (Graupner) charger/discharger
-Ultra Duo Plus 45 (Graupner) charger/discharger
-Ultra Duo Plus 50 (Graupner) charger/discharger
-Ultra Duo Plus 60 (Graupner) charger/discharger
-Ultra Duo Plus 80 (Graupner) charger/discharger
-Ultra Trio Plus 14 (Graupner) charger/discharger
-Ultra Trio Plus 16S (Graupner) charger/discharger
-UniLog, UniLog2 (SM-Modellbau) multi - measurement device
-VC820, VC840 (Conrad/VoltCraft) multimeter
+various of further analysis. A listing of supported devices can be found http://www.nongnu.org/dataexplorer/index.html.
 
 More device are under construction. Help doing this is very welcome.		
 
 A device API (IDevice) is defined to enable a relative simple adaptation of a new device to work together with the base application.
-Documentation how to proceed doing this is available at download area.	
 		
 Hint: It is planned to use the DataExplorer on different operating systems and share the data files, do not use special characters at all.
 (conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operating systems. Object related data files don't get duplicated,
 they get referenced using file links. Before you move data files to a different operating system, remove the object related file links and re-create afterwards.
 Please use the preferences dialog with the miscellaneous tab with the related buttons.
 
-For questions or suggestions for improvement feel free to contact me using the e-mail address at the download page.
+For questions or suggestions for improvement feel free to contact me using the e-mail address at the download page http://www.nongnu.org/dataexplorer/download.html.
 						 
 
 
@@ -106,8 +61,8 @@ While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_
 
 MAC OS X:
 
-MAC OS run always on a 64 Bit processor architecture and supports the execution of 32 Bit as well as 64 Bit Java applications.	
-Starting with 10.8 an installation of a Java runtime is required. It should match the processor architecture. Please check while downloading.
+MAC OS run always on a 64 Bit processor architecture and supports the execution of 64 Bit Java applications.	
+Starting with 10.8 an installation of a Java-Software-Development-Kit is required. It should match the processor architecture. Please check while downloading.
 MAC OS version <= 10.7 already has a Java runtime installed. Configure under system preferences to have as top selection the newest available Java version.
 Older versions you might find the Java preferences under Applications -> Utilities -> Java Preferences.
 The download and opened DMG file show up DataExplorer.app which need simply drag to the Applications folder.
