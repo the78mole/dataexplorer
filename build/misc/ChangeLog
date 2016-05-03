@@ -15,6 +15,10 @@ Weatronic-Telemetry
 	- handle not initialized measurement symbols which are sometimes displayed as string null
 Polaron EX1400
 	- add support
+HoTTAdapter 
+	- fix live data gathering of missing ESC values
+HoTTAdapter*
+	- enhance sensor detection in transmitter logs mainly needed while high Rx->Tx PLoss (pupil transmitter logs)
 
 Version 3.2.5 - 06 Mar 2016
 SkyRC MC3000 
