@@ -339,7 +339,9 @@ public class CSVReaderWriter {
 							}
 							catch (NumberFormatException e) {
 								if (!isParsingErrorLine) CSVReaderWriter.log.log(java.util.logging.Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }));
-								CSVReaderWriter.application.setStatusMessage(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }), SWT.COLOR_RED);
+								if (CSVReaderWriter.application.getStatusBar() != null) {
+									CSVReaderWriter.application.setStatusMessage(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }), SWT.COLOR_RED);
+								}
 								isParsingError = isParsingErrorLine = true;
 							}
 							break;
@@ -349,8 +351,8 @@ public class CSVReaderWriter {
 					
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
-						application.setProgress(progress, sThreadId);
+					if (CSVReaderWriter.application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+						CSVReaderWriter.application.setProgress(progress, sThreadId);
 						try {
 							Thread.sleep(2);
 						}
