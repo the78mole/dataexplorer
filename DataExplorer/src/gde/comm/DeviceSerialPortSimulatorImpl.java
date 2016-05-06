@@ -199,6 +199,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
 					}
+					if (this.device.getName().toLowerCase().contains("4010duo")) {
+						byte[] tmpBuffer = new byte[ Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
+						System.arraycopy(readBuffer, 5, tmpBuffer, 0, tmpBuffer.length-5);
+						System.arraycopy(tmpBuffer, 0, readBuffer, 0, tmpBuffer.length);						
+					}
 				}
 				else {
 					readBuffer = new byte[0];
@@ -682,6 +687,12 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException {
+		try {
+			return (UsbInterface) this.open();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -738,6 +749,12 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public int read(final UsbInterface iface, final byte endpointAddress, final byte[] data, final int timeout_msec) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
+		try {
+			return (read(data, timeout_msec)).length;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		return 0;
 	}
 
