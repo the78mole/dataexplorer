@@ -867,6 +867,7 @@
 		<copy todir="${build.target.dir}" overwrite="true">
 			<fileset dir="build/misc" >
 				<include name="*MC3000*/*" />
+				<include name="*4010*/*" />
 				<include name="GNULinux_cp210x/*" />
 				<include name="udev_rules/*" />
 				<include name="HowToCreateDevicePlugin" />
