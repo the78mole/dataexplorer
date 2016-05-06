@@ -29,7 +29,6 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
-import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -136,20 +135,20 @@ public class UsbGathererThread extends Thread {
 
 						// check if device is ready for data capturing, charge,discharge or pause only
 						if (this.isProgrammExecuting1 || this.isProgrammExecuting2) {
-							lastEnergie1 = points1[4];
+							lastEnergie1 = points1[5];
 							points1 = new int[this.device.getMeasurementNames(1).length];
 							
-							lastEnergie2 = points2[4];
+							lastEnergie2 = points2[5];
 							points2 = new int[this.device.getMeasurementNames(2).length];
 
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
-								points1[4] = lastEnergie1;
+								points1[5] = lastEnergie1;
 								ch1 = processDataChannel(1, recordSet1, recordSetKey1, dataBuffer1, points1);
 								recordSet1 = (RecordSet) ch1[0];
 								recordSetKey1 = (String) ch1[1];
 							}
 							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-								points2[4] = lastEnergie2;
+								points2[5] = lastEnergie2;
 								ch2 = processDataChannel(2, recordSet2, recordSetKey2, dataBuffer2, points2);
 								recordSet2 = (RecordSet) ch2[0];
 								recordSetKey2 = (String) ch2[1];
@@ -234,17 +233,27 @@ public class UsbGathererThread extends Thread {
 	private Object[] processDataChannel(final int number, RecordSet recordSet, String processRecordSetKey, final byte[] dataBuffer, final int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
+		boolean isReduceChargeDischarge = this.settings.isReduceChargeDischarge();
 		boolean isContinuousRecordSet = this.settings.isContinuousRecordSet();
+
 		//BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
 		String batterieType = this.device.getBattrieType(dataBuffer);
-		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE
+		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE 8=TrickleCurrent 9=Balancing
 		int processModeNumber = dataBuffer[7];
-		String processTypeName = this.device.getStateProperty(processModeNumber).getName();
-		//STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
+		String processTypeName = isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2618) : this.device.getStateProperty(processModeNumber).getName();
+		//STATUS:     0=normal !0=cycle
 		String processStatusName = !isContinuousRecordSet && dataBuffer[9] != 0 ? Messages.getString(MessageIds.GDE_MSGT2610) : GDE.STRING_EMPTY;
 		if (UsbGathererThread.log.isLoggable(Level.FINE)) {
-			UsbGathererThread.log.log(Level.FINE, number + String.format("%s %s %s", batterieType, processTypeName, processStatusName).trim());
+			UsbGathererThread.log.log(Level.FINE, String.format("channel:%d %s %s %s", number, batterieType, processTypeName, processStatusName).trim());
 		}
+		
+		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE
+		if (isReduceChargeDischarge && dataBuffer[7] == 4) {
+			result[0] = recordSet;
+			result[1] = processRecordSetKey;
+			return result;
+		}
+
 		Channel outputChannel = this.channels.get(number);
 		if (outputChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
@@ -271,18 +280,10 @@ public class UsbGathererThread extends Thread {
 				UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + outputChannel.getName()); //$NON-NLS-1$
 				recordSet = outputChannel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
-				//channel.applyTemplate(recordSetKey, false);
+				channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(outputChannel.getNumber(), processRecordSetKey);
 				outputChannel.switchRecordSet(processRecordSetKey);
-			}
-
-			//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE
-			if ((this.settings.isReduceChargeDischarge() && dataBuffer[7] == 4)									//pause will not be recorded
-					|| (recordSet.realSize() == 0 && DataParser.parse2Int(dataBuffer, 16) != 0)) {	//start of new recordSet with capacity != 0
-				result[0] = recordSet;
-				result[1] = processRecordSetKey;
-				return result;
 			}
 
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));

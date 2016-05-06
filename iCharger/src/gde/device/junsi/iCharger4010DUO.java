@@ -160,7 +160,7 @@ public class iCharger4010DUO extends iCharger {
 	 */
 	@Override
 	public int getLovDataByteSize() {
-		return 64;  
+		return 64+8+5;  
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class iCharger4010DUO extends iCharger {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getLovDataByteSize();
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		int offset = 0;
 		int progressCycle = 0;
@@ -189,15 +189,8 @@ public class iCharger4010DUO extends iCharger {
 		for (int i = 0; i < recordDataSize; i++) {
 			//prepare convert buffer for conversion
 			System.arraycopy(dataBuffer, offset+5, convertBuffer, 0, deviceDataBufferSize);
-			for (int j = deviceDataBufferSize; j < deviceDataBufferSize; j++) { //start at minimum length of data buffer 
-				convertBuffer[j] = dataBuffer[offset+j];
-				++lovDataSize;
-				if (dataBuffer[offset+j] == 0x0A && dataBuffer[offset+j-1] == 0x0D)
-					break;
-			}
-
 			recordSet.addPoints(convertDataBytes(points, convertBuffer));
-			offset += lovDataSize+8+5;
+			offset += lovDataSize;
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
