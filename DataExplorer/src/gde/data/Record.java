@@ -2198,7 +2198,7 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
-	 * get/calcualte sum of values by configuraed trigger
+	 * get/calculate sum of values by configured trigger
 	 * @param referencedMeasurementOrdinal
 	 * @return sum value according trigger range specification of referenced measurement
 	 */

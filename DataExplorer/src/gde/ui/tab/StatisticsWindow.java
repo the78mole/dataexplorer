@@ -393,13 +393,13 @@ public class StatisticsWindow extends CTabItem {
 
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
 										if (referencedStatistics.isAvg()) {
-											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValue() / 1000.0)
+											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)
 													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 										else if (referencedStatistics.isMax()) {
-											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValue() / 1000.0)
+											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)
 													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
