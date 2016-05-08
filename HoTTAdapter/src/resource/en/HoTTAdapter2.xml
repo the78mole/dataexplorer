@@ -556,6 +556,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -892,7 +893,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1104,6 +1105,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1297,7 +1299,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="37" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="37" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -1440,7 +1442,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="37" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="37" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1652,6 +1654,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1847,7 +1850,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -2355,6 +2358,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -2548,7 +2552,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="61" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="61" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -2689,7 +2693,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="61" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="61" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -2903,7 +2907,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="61" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="61" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>

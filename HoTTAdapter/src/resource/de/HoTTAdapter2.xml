@@ -556,6 +556,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -892,7 +893,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="Bezogen auf Stromtrigger"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="20" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -1104,6 +1105,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -1297,7 +1299,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="Bezogen auf Stromtrigger"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="37" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -1440,7 +1442,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="Bezogen auf Stromtrigger"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="37" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -1652,6 +1654,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -1847,7 +1850,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -2355,6 +2358,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -2548,7 +2552,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="Bezogen auf Stromtrigger"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>
@@ -2689,7 +2693,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="Bezogen auf Stromtrigger"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -2893,7 +2897,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="Anzahl Steigflüge" sumTriggerTimeText="Motorlaufzeit:">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="Strom &gt; 3 A über &gt; 5 Sekunden"/>
+                    <trigger level="5000" isGreater="true" minTimeSec="5" comment="Strom &gt; 5 A über &gt; 5 Sekunden"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
@@ -2903,7 +2907,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="Bezogen auf Stromtrigger"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
