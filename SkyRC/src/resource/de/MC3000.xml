@@ -90,7 +90,15 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
-        </Channel>
+            <Measurement>
+                <name>SystemTemperatur</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            </Channel>
         <Channel name="Schacht 2" type="TYPE_OUTLET">
             <Measurement>
                 <name>Spannung</name>
@@ -145,6 +153,14 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>SystemTemperatur</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
         </Channel>
         <Channel name="Schacht 3" type="TYPE_OUTLET">
@@ -202,6 +218,14 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
+            <Measurement>
+                <name>SystemTemperatur</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
         </Channel>
         <Channel name="Schacht 4" type="TYPE_OUTLET">
             <Measurement>
@@ -257,6 +281,14 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>SystemTemperatur</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
         </Channel>
         <Channel name="Kombi 5" type="TYPE_OUTLET">
@@ -427,7 +459,16 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="16" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
-        </Channel>
+            <Measurement>
+                <name>SystemTemperatur</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="12" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            </Channel>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>

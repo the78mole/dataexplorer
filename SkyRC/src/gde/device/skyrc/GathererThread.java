@@ -219,6 +219,17 @@ public class GathererThread extends Thread {
 								points5[17] = points2[6];
 								points5[18] = points3[6];
 								points5[19] = points4[6];
+								
+								//add system temperature using one of the processing slots
+								if (this.isProgrammExecuting1)
+									points5[20] = points1[7];
+								else if (this.isProgrammExecuting2)
+									points5[20] = points2[7];
+								else if (this.isProgrammExecuting3)
+									points5[20] = points3[7];
+								else if (this.isProgrammExecuting4)
+									points5[20] = points4[7];
+								
 								String processName = Messages.getString(MessageIds.GDE_MSGT3630);
 								Channel slotChannel = this.channels.get(5);
 								if (slotChannel != null) {
@@ -335,38 +346,43 @@ public class GathererThread extends Thread {
 	private Object[] processDataChannel(final int number, RecordSet recordSet, String processRecordSetKey, final byte[] dataBuffer, final int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
-		//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE 3=DISCHARGE 4=CYCLE
-		//Mode Other battery:	0=CHARGE 1=REFRESH 2=PAUSE   3=DISCHARGE 4=CYCLE
+		//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
+		//Mode Ni battery:		0=CHARGE 1=REFRESH 2=PAUSE     3=DISCHARGE 4=CYCLE
+		//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
+		//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 		int processModeNumber = this.device.getProcessingMode(dataBuffer);
 		String processTypeName = this.device.getProcessingTypeName(dataBuffer);
 		//STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
 		String processStatusName = this.device.getProcessingStatusName(dataBuffer);
+		String processBatteryType = this.device.getProcessingBatteryType(dataBuffer);
 		if (GathererThread.log.isLoggable(Level.FINE)) {
 			GathererThread.log.log(Level.FINE, number + " : processName = " + processTypeName + " - processStatusName = " + processStatusName);
 		}
 		Channel slotChannel = this.channels.get(number);
 		if (slotChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
-			if (recordSet == null || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
+			if (recordSet == null || !processRecordSetKey.contains(processBatteryType) || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 
 				// record set does not exist or is out dated, build a new name and create
 				StringBuilder extend = new StringBuilder();
 				if (!this.settings.isContinuousRecordSet()) {
-					//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE 3=DISCHARGE 4=CYCLE
-					//Mode Other battery:	0=CHARGE 1=REFRESH 2=PAUSE   3=DISCHARGE 4=CYCLE
-					if (processModeNumber == 4) { //4=CYCLE
+					//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
+					//Mode Ni battery:		0=CHARGE 1=REFRESH 2=PAUSE     3=DISCHARGE 4=CYCLE
+					//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
+					//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
+					if ((dataBuffer[2] == 5 && processModeNumber == 3) || (dataBuffer[2] != 5 && processModeNumber == 4)) { //4=CYCLE
 						int cycleNumber = this.device.getCycleNumber(number, dataBuffer);
 
 						if (cycleNumber >= 0) {
-							extend.append(GDE.STRING_BLANK_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_COLON).append(cycleNumber).append(GDE.STRING_RIGHT_BRACKET);
+							extend.append(GDE.STRING_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_COLON).append(cycleNumber).append(GDE.STRING_RIGHT_BRACKET);
 						}
 					}
 					else if (processModeNumber == 1 || (this.device.getBatteryType(dataBuffer) < 3 && processModeNumber == 2)) { //1=Refresh || Li storage
-						extend.append(GDE.STRING_BLANK_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_RIGHT_BRACKET);
+						extend.append(GDE.STRING_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_RIGHT_BRACKET);
 					}
 				}
-				processRecordSetKey = slotChannel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processTypeName + extend.toString();
+				processRecordSetKey = String.format("%d) %s - %s %s", slotChannel.getNextRecordSetNumber(), processBatteryType, processTypeName, extend.toString());
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));

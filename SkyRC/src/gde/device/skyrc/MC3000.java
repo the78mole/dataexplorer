@@ -60,7 +60,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected String[]	STATUS_MODE;
 	protected String[]	USAGE_MODE_LI;
 	protected String[]	USAGE_MODE_NI;
-	protected String[]	ERROR_MODE;
+	protected String[]	USAGE_MODE_ZN;
+	protected String[]	BATTERY_TYPE;
 	protected int[]			resetEnergy = new int[] {5,5,5,5};
 
 	protected class SystemSettings {
@@ -218,9 +219,11 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3613), Messages.getString(MessageIds.GDE_MSGT3614) };
 		this.USAGE_MODE_NI = new String[] { Messages.getString(MessageIds.GDE_MSGT3620), Messages.getString(MessageIds.GDE_MSGT3621), Messages.getString(MessageIds.GDE_MSGT3622),
 				Messages.getString(MessageIds.GDE_MSGT3623), Messages.getString(MessageIds.GDE_MSGT3624) };
-		//		this.ERROR_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
-		//				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220),
-		//				Messages.getString(MessageIds.GDE_MSGT2222) };
+		this.USAGE_MODE_ZN = new String[] { Messages.getString(MessageIds.GDE_MSGT3620), Messages.getString(MessageIds.GDE_MSGT3621), Messages.getString(MessageIds.GDE_MSGT3623), 
+				Messages.getString(MessageIds.GDE_MSGT3624), Messages.getString(MessageIds.GDE_MSGT3624) };
+		this.BATTERY_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3640), Messages.getString(MessageIds.GDE_MSGT3641), Messages.getString(MessageIds.GDE_MSGT3642), 
+				Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3645),
+				Messages.getString(MessageIds.GDE_MSGT3646), Messages.getString(MessageIds.GDE_MSGT3647) };
 
 		this.application = DataExplorer.getInstance();
 		this.settings = Settings.getInstance();
@@ -245,9 +248,11 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3613), Messages.getString(MessageIds.GDE_MSGT3614) };
 		this.USAGE_MODE_NI = new String[] { Messages.getString(MessageIds.GDE_MSGT3620), Messages.getString(MessageIds.GDE_MSGT3621), Messages.getString(MessageIds.GDE_MSGT3622),
 				Messages.getString(MessageIds.GDE_MSGT3623), Messages.getString(MessageIds.GDE_MSGT3624) };
-		//		this.ERROR_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
-		//				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220),
-		//				Messages.getString(MessageIds.GDE_MSGT2222) };
+		this.USAGE_MODE_ZN = new String[] { Messages.getString(MessageIds.GDE_MSGT3620), Messages.getString(MessageIds.GDE_MSGT3621), Messages.getString(MessageIds.GDE_MSGT3623), 
+				Messages.getString(MessageIds.GDE_MSGT3624), Messages.getString(MessageIds.GDE_MSGT3624) };
+		this.BATTERY_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3640), Messages.getString(MessageIds.GDE_MSGT3641), Messages.getString(MessageIds.GDE_MSGT3642), 
+				Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3645),
+				Messages.getString(MessageIds.GDE_MSGT3646), Messages.getString(MessageIds.GDE_MSGT3647) };
 
 		this.application = DataExplorer.getInstance();
 		this.settings = Settings.getInstance();
@@ -498,12 +503,23 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		points[1] = DataParser.parse2Short(dataBuffer[11], dataBuffer[10]) * 1000 * chargeCorrection;
 		points[2] = DataParser.parse2Short(dataBuffer[13], dataBuffer[12]) * 1000;
 		points[3] = Double.valueOf(points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection).intValue(); // power U*I [W]
-		points[4] = dataBuffer[1] == 0 
-				? points[4] + Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0 + 0.5).intValue() 
-				: 0; //transferred energy über längeren Zeitraum bis zum Zeitpunkt t = Integral von P*dt (von 0 bis t) = P(t=0)*1sec+P(t=1s)*1sec+…+P(t=t)*1sec
-		if (dataBuffer[1] != 0) log.log(Level.OFF, "reset Energy");
-		//System.out.println(points[4] + " - " + Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0).intValue());
+		switch (dataBuffer[1]) {
+		case 0: //add up energy
+			points[4] += Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0 + 0.5).intValue();
+			break;
+		case 1: // reset energy
+			points[4] = 0;
+			log.log(Level.OFF, "reset Energy");
+			break;
+		default: // keep energy untouched
+		case -1: // keep energy untouched
+			points[4] = points[4];
+			log.log(Level.OFF, "untouche Energy");
+			break;
+		}
+		points[5] = DataParser.parse2Short(dataBuffer[15], dataBuffer[14]) * 1000;
 		points[6] = DataParser.parse2Short(dataBuffer[17], dataBuffer[16]) * 1000;
+		points[7] = DataParser.parse2Short(dataBuffer[19], dataBuffer[18]) * 1000;
 
 		return points;
 	}
@@ -533,7 +549,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 
 			for (int j = 0, k = 0; j < points.length; j++, k += 4) {
-				//0=Voltage 1=Current 2=Capacity 3=Power 4=Energy 5=Teperature 6=Resistance
+				//0=Voltage 1=Current 2=Capacity 3=Power 4=Energy 5=Teperature 6=Resistance 7=SysTemperature
 				points[j] = (((convertBuffer[k] & 0xff) << 24) + ((convertBuffer[k + 1] & 0xff) << 16) + ((convertBuffer[k + 2] & 0xff) << 8) + ((convertBuffer[k + 3] & 0xff) << 0));
 			}
 			recordSet.addPoints(points);
@@ -622,9 +638,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, "isProcessing = " + dataBuffer[5]);
 
 		if (this.resetEnergy[outletNum-1] != dataBuffer[5] || dataBuffer[5] > 2)
-			dataBuffer[1] = 1;
+			if (dataBuffer[5] > 2)
+				dataBuffer[1] = -1; //keep energy
+			else
+				dataBuffer[1] = 1;  //reset energy
 		else
-			dataBuffer[1] = 0;		
+			dataBuffer[1] = 0;	//add up energy
+		
 		this.resetEnergy[outletNum-1] = dataBuffer[5];
 		
 		if (this.settings.isReduceChargeDischarge()) 
@@ -660,9 +680,20 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * battery type:  0:LiIon 1:LiFe 2:LiHV 3:NiMH 4:NiCd 5:NiZn 6:Eneloop 7:RAM
+	 * @param dataBuffer
+	 * @return
+	 */
+	public String getProcessingBatteryType(final byte[] dataBuffer) {
+		return this.BATTERY_TYPE[dataBuffer[2]];
+	}
+
+	/**
 	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
-	 * Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE 3=DISCHARGE 4=CYCLE
-	 * Mode Other battery		0=CHARGE 1=REFRESH 2=PAUSE   3=DISCHARGE 4=CYCLE
+	 * Mode LI battery： 	0=CHARGE 1=REFRESH 2=STORAGE 3=DISCHARGE 4=CYCLE
+	 * Mode Ni battery:		0=CHARGE 1=REFRESH 2=PAUSE     3=DISCHARGE 4=CYCLE
+	 * Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
+	 * Mode RAM battery:	0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 	 * @param dataBuffer 
 	 * @return
 	 */
@@ -672,7 +703,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * query battery type
-	 * battery type:     0:LiIon       1:LiFe        2:LiHV        3:NiMH        4:NiCd        5:NiZn        6:Eneloop
+	 * battery type:  0:LiIon 1:LiFe 2:LiHV 3:NiMH 4:NiCd 5:NiZn 6:Eneloop 7:RAM
 	 * @param dataBuffer
 	 * @return
 	 */
@@ -687,8 +718,10 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 */
 	public String getProcessingTypeName(byte[] dataBuffer) {
 		String processTypeName = GDE.STRING_EMPTY;
-		// Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE 3=DISCHARGE 4=CYCLE
-		// Mode Other battery		0=CHARGE 1=REFRESH 2=PAUSE   3=DISCHARGE 4=CYCLE
+		//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE 	 3=DISCHARGE 4=CYCLE
+		//Mode Ni battery:		0=CHARGE 1=REFRESH 2=PAUSE     3=DISCHARGE 4=CYCLE
+		//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
+		//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 
 		// battery type:     0:LiIon       1:LiFe        2:LiHV        3:NiMH        4:NiCd        5:NiZn        6:Eneloop
 		switch (this.getBatteryType(dataBuffer)) {
@@ -699,9 +732,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			break;
 		case 3: //NiMH
 		case 4: //NiCD
-		case 5: //NiZn
 		case 6: //Eneloop
 			processTypeName = this.USAGE_MODE_NI[this.getProcessingMode(dataBuffer)];
+			break;
+		case 5: //NiZn
+		case 7: //RAM
+			processTypeName = this.USAGE_MODE_ZN[this.getProcessingMode(dataBuffer)];
 			break;
 		}
 		return this.settings.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;

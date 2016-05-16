@@ -90,6 +90,14 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
+            <Measurement>
+                <name>SystemTemperature</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.1" type="Double" description="Factor to correct device value"/>
+            </Measurement>
         </Channel>
         <Channel name="Slot 2" type="TYPE_OUTLET">
             <Measurement>
@@ -145,6 +153,14 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>SystemTemperature</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.1" type="Double" description="Factor to correct device value"/>
             </Measurement>
         </Channel>
         <Channel name="Slot 3" type="TYPE_OUTLET">
@@ -202,6 +218,14 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
+            <Measurement>
+                <name>SystemTemperature</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.1" type="Double" description="Factor to correct device value"/>
+            </Measurement>
         </Channel>
         <Channel name="Slot 4" type="TYPE_OUTLET">
             <Measurement>
@@ -257,6 +281,14 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>SystemTemperature</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.1" type="Double" description="Factor to correct device value"/>
             </Measurement>
         </Channel>
         <Channel name="Combi 5" type="TYPE_OUTLET">
@@ -426,6 +458,15 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="16" type="Integer" description="Scale synchronisation measurement reference ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>SystemTemperature</name>
+                <symbol>Ts</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="12" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
     </Channels>
