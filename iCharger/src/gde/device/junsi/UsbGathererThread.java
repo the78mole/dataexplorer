@@ -51,13 +51,13 @@ public class UsbGathererThread extends Thread {
 	final static Logger	log													= Logger.getLogger(UsbGathererThread.class.getName());
 	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
 
-	final DataExplorer	application;
-	final Settings			settings;
-	final iChargerUsbPort	usbPort;
-	final iCharger4010DUO	device;
-	final Channels			channels;
-	final Channel				channel;
-	final int						channelNumber;
+	final DataExplorer					application;
+	final Settings							settings;
+	final iChargerUsbPort				usbPort;
+	final iChargerUsb						device;
+	final Channels							channels;
+	final Channel								channel;
+	final int										channelNumber;
 
 	String							recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean							isPortOpenedByLiveGatherer	= false;
@@ -78,7 +78,7 @@ public class UsbGathererThread extends Thread {
 	 * @throws UsbException 
 	 * @throws Exception 
 	 */
-	public UsbGathererThread(DataExplorer currentApplication, iCharger4010DUO useDevice, iChargerUsbPort useSerialPort, int channelConfigNumber) throws ApplicationConfigurationException,
+	public UsbGathererThread(DataExplorer currentApplication, iChargerUsb useDevice, iChargerUsbPort useSerialPort, int channelConfigNumber) throws ApplicationConfigurationException,
 			UsbDisconnectedException, UsbException {
 		super("dataGatherer");
 		this.application = currentApplication;

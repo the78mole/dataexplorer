@@ -19,39 +19,22 @@
 package gde.device.junsi;
 
 import gde.GDE;
-import gde.comm.DeviceCommPort;
-import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.device.DataBlockType;
 import gde.device.DeviceConfiguration;
-import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
-import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
 import gde.log.Level;
-import gde.messages.Messages;
-import gde.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-
 /**
  * Junsi iCharger 308DUO device class
  * @author Winfried Brügmann
  */
-public class iCharger308DUO extends iCharger {
-
-	protected boolean							isFileIO		= false;
-	protected boolean							isSerialIO	= false;
+public class iCharger308DUO extends iChargerUsb {
 
 	/**
 	 * constructor using properties file
@@ -60,22 +43,6 @@ public class iCharger308DUO extends iCharger {
 	 */
 	public iCharger308DUO(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-
-		if (this.application.getMenuToolBar() != null) {
-			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
-				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
-				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
-			}
-			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
-				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));
-			} else { //InputTypes.FILE_IO
-				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2603), Messages.getString(MessageIds.GDE_MSGT2603));
-			}
-			if (isFileIO)
-				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
-		}
 	}
 
 	/**
@@ -84,89 +51,9 @@ public class iCharger308DUO extends iCharger {
 	 */
 	public iCharger308DUO(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-
-		if (this.application.getMenuToolBar() != null) {
-			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
-				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
-				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
-			}
-			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
-				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));
-			} else { //InputTypes.FILE_IO
-				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2603), Messages.getString(MessageIds.GDE_MSGT2603));
-			}
-			if (isFileIO)
-				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
-		}
 	}
 	
-	/**
-	 * update the file import menu by adding new entry to import device specific files
-	 * @param importMenue
-	 */
-	public void updateFileImportMenu(Menu importMenue) {
-		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
-			new MenuItem(importMenue, SWT.SEPARATOR);
-
-			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
-			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2604, GDE.MOD1));
-			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2604));
-			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
-					if (!isSerialIO) open_closeCommPort();
-					else importDeviceData();
-				}
-			});
-		}
-	}
-
-	/**
-	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
-	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * this method is more usable for real logger, where data can be stored and converted in one block
-	 * @param recordSet
-	 * @param dataBuffer
-	 * @param recordDataSize
-	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
-	 */
-	@Override
-	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getLovDataByteSize();
-		int[] points = new int[this.getNumberOfMeasurements(1)];
-		int offset = 0;
-		int progressCycle = 0;
-		int lovDataSize = this.getLovDataByteSize();
-		byte[] convertBuffer = new byte[deviceDataBufferSize];
-
-		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
-		for (int i = 0; i < recordDataSize; i++) {
-			lovDataSize = deviceDataBufferSize/3;
-			//prepare convert buffer for conversion
-			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize/3);
-			for (int j = deviceDataBufferSize/3; j < deviceDataBufferSize; j++) { //start at minimum length of data buffer 
-				convertBuffer[j] = dataBuffer[offset+j];
-				++lovDataSize;
-				if (dataBuffer[offset+j] == 0x0A && dataBuffer[offset+j-1] == 0x0D)
-					break;
-			}
-
-			recordSet.addPoints(convertDataBytes(points, convertBuffer));
-			offset += lovDataSize+8;
-
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-		}
-
-		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-	}
 
 	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
@@ -178,43 +65,31 @@ public class iCharger308DUO extends iCharger {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this.getDataBlockFormat(InputTypes.SERIAL_IO), false);
-		int[] startLength = new int[] {0,0};
-		byte[] lineBuffer = null;
-				
-		try {
-			//setDataLineStartAndLength(dataBuffer, startLength);
-			lineBuffer = new byte[startLength[1]];
-			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-			data.parse(new String(lineBuffer), 1);
-			int[] values = data.getValues();
-			
-			//0=VersorgungsSpg. 1=Spannung 2=Strom  
-			points[0] = values[0];
-			points[1] = values[1];
-			points[2] = values[2];			
-			//3=Ladung 4=Leistung 5=Energie
-			points[3] = values[13] * 1000;
-			points[4] = points[1] * points[2] / 100; 							// power U*I [W]
-			points[5] = points[1]/1000 * points[3]/1000;						// energy U*C [mWh]
-			//6=Temp.intern 7=Temp.extern 
-			points[6] = values[11];
-			points[7] = values[12];
-			//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8
-			for (int i = 0; i < 8; i++) {
-				points[i+9] = values[i+3];
-				if (points[i + 9] > 0) {
-					maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
-					minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
-				}
+		
+		//2C 10 01 F8 7D 07 00 02 01 00 E5 FF 04 87 2B 3C CF FF FF FF 64 01 00 00 02 0F 0B 0F 0E 0F 00 0F 00 00 00 00 00 00 00 00 00 00 00 
+	  //                                    34564 15403             35,6        3842  3851  3854  3840
+		//0=Strom 1=VersorgungsSpg. 2=Spannung   
+		points[0] = DataParser.parse2Short(dataBuffer, 10);			
+		points[1] = DataParser.parse2UnsignedShort(dataBuffer, 12);
+		points[2] = DataParser.parse2Short(dataBuffer, 14);
+		//3=Ladung 4=Leistung 5=Energie
+		points[3] = DataParser.parse2Int(dataBuffer, 16);
+		points[4] = points[0] * points[2] / 100; 							// power U*I [W]
+		points[5] = Double.valueOf(points[2]/1.0 * points[3]/1000.0).intValue();					// energy U*C [mWh]
+		//6=Temp.intern 7=Temp.extern 
+		points[6] = DataParser.parse2Short(dataBuffer, 20);
+		points[7] = DataParser.parse2Short(dataBuffer, 22);
+		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8
+		for (int i = 0,j=0; i < 8; i++,j+=2) {
+			points[i+9] = DataParser.parse2Short(dataBuffer, 24+j);
+			if (points[i + 9] > 0) {
+				maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
+				minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
 			}
-			//8=Balance
-			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage());
-		}
+		//8=Balance
+		points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+
 		return points;
 	}
 	
@@ -284,76 +159,6 @@ public class iCharger308DUO extends iCharger {
 	@Override
 	public int getNumberOfLithiumCells() {
 		return 8;
-	}
-
-	/**
-	 * method toggle open close serial port or start/stop gathering data from device
-	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
-	 */
-
-	@Override	public void open_closeCommPort() {
-		switch (application.getMenuBar().getSerialPortIconSet()) {
-		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
-			importDeviceData();
-			break;
-			
-		case DeviceCommPort.ICON_SET_START_STOP:
-			this.serialPort.isInterruptedByUser = true;
-			break;
-		}
-	}
-
-	/**
-	 * import device specific *.bin data files
-	 */
-	public void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2600));
-
-		Thread reader = new Thread("reader") { //$NON-NLS-1$
-			@Override
-			public void run() {
-				try {
-					application.setPortConnected(true);
-					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-
-						if (fd.getFileName().length() > 4) {
-							try {
-								String recordNameExtend;
-								try {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-									Integer.valueOf(recordNameExtend);
-								}
-								catch (Exception e) {
-									try {
-										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-										Integer.valueOf(recordNameExtend);
-									}
-									catch (Exception e1) {
-										recordNameExtend = GDE.STRING_EMPTY;
-									}
-								}
-								CSVSerialDataReaderWriter.read(selectedImportFile, iCharger308DUO.this, recordNameExtend, 1, 
-										new  DataParserDuo(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, Math.abs(getDataBlockSize(InputTypes.FILE_IO)), getDataBlockFormat(InputTypes.FILE_IO), false, 2)
-//										new DataParserDuo(getDataBlockTimeUnitFactor(), 
-//												getDataBlockLeader(), getDataBlockSeparator().value(), 
-//												getDataBlockCheckSumType(), getDataBlockSize(InputTypes.FILE_IO), 2)
-								);
-							}
-							catch (Throwable e) {
-								log.log(Level.WARNING, e.getMessage(), e);
-							}
-						}
-					}
-				}
-				finally {
-					application.setPortConnected(false);
-				}
-			}
-		};
-		reader.start();
 	}
 
 	/**
