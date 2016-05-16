@@ -8,6 +8,8 @@ MC3000
 	- add new system temperature measurement value
 	- add RAM cell type support
 	- correct NiZn program modus 
+iCharger 308 DUO
+	- add live data gathering support
 
 Version 3.2.6 - 06 May 2016
 fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
