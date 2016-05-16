@@ -4,6 +4,10 @@ Version 3.2.7 - xx yyy 2016
 - correct statistics calculation in regard of using max or average calculated using measurement reference ordinal
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
+MC3000
+	- add new system temperature measurement value
+	- add RAM cell type support
+	- correct NiZn program modus 
 
 Version 3.2.6 - 06 May 2016
 fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
