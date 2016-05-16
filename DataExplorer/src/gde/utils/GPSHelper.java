@@ -496,7 +496,7 @@ public class GPSHelper {
 				lapStartTrip = recordTrip != null ? recordTrip.get(i) : 0;
 				
 				//calculate index delta for 12 sec filter time
-				filterIndexCount = (int) (3); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
+				filterIndexCount = (int) (15); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
 
 			
 				//create the start line between start point and next nearest point.
@@ -508,8 +508,11 @@ public class GPSHelper {
 //				final LatLong endPoint = new LatLong(tmpStartPoint.getLatitude() + deltaLatitude * 3, tmpStartPoint.getLongitude() + deltaLongitude * 3);
 //				final LatLong startPoint = new LatLong(48.63880287032757,8.982284478843212);
 //				final LatLong endPoint = new LatLong(48.63902685860762,8.982386738061905);
-				final LatLong startPoint = new LatLong(48.66253588583959,9.435037337243557);
-				final LatLong endPoint = new LatLong(48.66224158131457,9.435062482953072);
+//        48.66253588583959,9.435037337243557:48.66224158131457,9.435062482953072
+//				48.66253012820547,9.434816054999828:48.6626791621384,9.434885457158089
+				//48.6625593592642,9.434632658958435:48.66223848103202,9.43461287766695
+				final LatLong startPoint = new LatLong(48.6625593592642,9.434632658958435);
+				final LatLong endPoint = new LatLong(48.66223848103202,9.43461287766695);
 //				log.log(Level.OFF, "startLine - startPoint = " + startPoint.toString() + " endPoint = " + endPoint);
 				double deltaLatitude = Math.abs(endPoint.getLatitude()-startPoint.getLatitude());
 				double deltaLongitude = Math.abs(endPoint.getLongitude()-startPoint.getLongitude());
@@ -552,6 +555,7 @@ public class GPSHelper {
 					final int speedFactor = 1 + recordSpeed.get(i)/ 1000 / 15; 
 					if (isLatitude) {
 						if (startLine.get(lastLatLong.getFormattedLatitude()) != null && startLine.get(latLong.getFormattedLatitude()) != null) { //startLine hit found
+//						log.log(Level.OFF, String.format(Locale.ENGLISH, "%03.7f <= %03.7f", Math.abs(startLine.get(lastLatLong.getFormattedLatitude()) - lastLatLong.getLongitude()), (0.00008*speedFactor) ) );							
 							if (Math.abs(startLine.get(lastLatLong.getFormattedLatitude()) - lastLatLong.getLongitude()) <= 0.00008*speedFactor) {
 //								log.log(Level.OFF, String.format(Locale.ENGLISH, "%03.7f", Math.abs(Double.valueOf(startLine.get(lastLatLong.getFormattedLatitude())) - lastLatLong.getLongitude())) 
 //								+ " - " + String.format(Locale.ENGLISH, "%03.7f", Math.abs(Double.valueOf(startLine.get(latLong.getFormattedLatitude())) - latLong.getLongitude())));
