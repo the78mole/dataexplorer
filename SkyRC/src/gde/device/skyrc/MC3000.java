@@ -509,12 +509,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			break;
 		case 1: // reset energy
 			points[4] = 0;
-			log.log(Level.OFF, "reset Energy");
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reset Energy");
 			break;
 		default: // keep energy untouched
 		case -1: // keep energy untouched
 			points[4] = points[4];
-			log.log(Level.OFF, "untouche Energy");
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "untouche Energy");
 			break;
 		}
 		points[5] = DataParser.parse2Short(dataBuffer[15], dataBuffer[14]) * 1000;
