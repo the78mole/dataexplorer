@@ -630,7 +630,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	/**
 	 * check if one of the outlet channels are in processing mode
 	 * STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
-	 * @param outletNum 1
+	 * @param outletNum
 	 * @param dataBuffer
 	 * @return true if channel 1 is active 
 	 */
@@ -649,7 +649,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		
 		if (this.settings.isReduceChargeDischarge()) 
 			return dataBuffer[5] > 0 && dataBuffer[5] < 3;
-		return dataBuffer[5] >= 1;
+		return dataBuffer[5] > 0;
 	}
 
 	/**
