@@ -755,6 +755,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 													else if (GDE.IS_MAC)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
 												}
+												else if (deviceName.contains("DUO") && deviceName.contains("iCharger")) {
+													if (GDE.IS_LINUX)
+														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
+													else if (GDE.IS_MAC)
+														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
+												}
 											}
 										}
 										else {
