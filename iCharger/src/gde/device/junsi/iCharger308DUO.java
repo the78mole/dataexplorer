@@ -74,8 +74,8 @@ public class iCharger308DUO extends iChargerUsb {
 		points[2] = DataParser.parse2Short(dataBuffer, 14);
 		//3=Ladung 4=Leistung 5=Energie
 		points[3] = DataParser.parse2Int(dataBuffer, 16);
-		points[4] = points[0] * points[2] / 100; 							// power U*I [W]
-		points[5] = Double.valueOf(points[2]/1.0 * points[3]/1000.0).intValue();					// energy U*C [mWh]
+		points[4] = points[0] * points[2] / 100; 																	// power U*I [W]
+		points[5] = Double.valueOf(points[2]/1.0 * points[3]/1000.0).intValue();	// energy U*C [mWh]
 		//6=Temp.intern 7=Temp.extern 
 		points[6] = DataParser.parse2Short(dataBuffer, 20);
 		points[7] = DataParser.parse2Short(dataBuffer, 22);
@@ -191,7 +191,7 @@ public class iCharger308DUO extends iChargerUsb {
 				for (int i = 0; i < recordCurrent.size(); i++) {
 					//4=Leistung 5=Energie
 					recordPower.add(recordVoltage.get(i) * recordCurrent.get(i) / 100); // power U*I [W]
-					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 100); // energy U*C [mWh]
+					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 1000); // energy U*C [mWh]
 
 					int maxVotage = Integer.MIN_VALUE;
 					int minVotage = Integer.MAX_VALUE;
