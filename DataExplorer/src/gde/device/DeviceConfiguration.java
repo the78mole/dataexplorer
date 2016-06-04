@@ -876,9 +876,15 @@ public class DeviceConfiguration {
 	 */
 	public int getDataBlockSize(FormatTypes formatType) {
 		int dataBlockSize = -1;
-		for (DataBlockType.Format format : this.dataBlock.getFormat()) {
-			if (format.getType() == formatType)
-				dataBlockSize = format.getSize();
+		try {
+			for (DataBlockType.Format format : this.dataBlock.getFormat()) {
+				if (format.getType() == formatType)
+					dataBlockSize = format.getSize();
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] {this.xmlFile.getName()}));
 		}
 		return dataBlockSize;
 	}
@@ -1082,7 +1088,14 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockPreferredFileExtention() {
-		return this.dataBlock.getPreferredFileExtention();
+		try {
+			return this.dataBlock.getPreferredFileExtention();
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] {this.xmlFile.getName()}));
+		}
+		return "*.*";
 	}
 
 	public void setDataBlockPreferredFileExtention(String value) {
