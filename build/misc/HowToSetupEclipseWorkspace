@@ -5,8 +5,8 @@ How to setup eclipse workspace to build the DataExplorer
 - Install Eclipse
 - Install ant-contrib from http://ant-contrib.sourceforge.net/
 - Make sure that the ANT classpath (Window > Preferences > Ant > Runtime) is correct, containing...
-  - all the jars from Eclipse�s org.apache.ant plugin directory
-  - the tools.jar from the JDK�s lib directory
+  - all the jars from Eclipse's org.apache.ant plugin directory
+  - the tools.jar from the JDK's lib directory
   - the ant-contrib jar
 - Check that the file encoding is set to UTF-8 (Window > Preferences > General > Workspace)
 
@@ -26,3 +26,7 @@ How to setup eclipse workspace to build the DataExplorer
 
 == Start the application within Eclipse ==
 - In the DataExplorer project, locate the file "DataExplorer.launch", right-click on it and choose "Debug as > Java Application"
+
+Additional hints:
+Do not check out dataexplorer, instead use DataExplorer project to check out.
+Rename checked out SKYRC to SkyRC to successful run the build, refer to .project file.
