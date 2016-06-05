@@ -20,6 +20,7 @@ package gde.ui;
 
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
+import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -531,15 +532,25 @@ public class DataExplorer extends Composite {
 					if (DataExplorer.application.getActiveDevice() != null) {
 						DataExplorer.application.getActiveDevice().storeDeviceProperties();
 
-						if (DataExplorer.application.getDeviceDialog() != null && !DataExplorer.application.getDeviceDialog().isDisposed()) {// if a device tool box is open, dispose it
-							DataExplorer.application.getDeviceDialog().forceDispose();
-						}
 						//close open communication ports
-						if (DataExplorer.application.getActiveDevice().getCommunicationPort() != null) {// if serial port still open, close it
-							DataExplorer.application.getActiveDevice().getCommunicationPort().close();
+						IDeviceCommPort port = DataExplorer.application.getActiveDevice().getCommunicationPort();
+						if (port != null) {// if communication port still open, close it
+							try {
+								if (port.getClass().getName().toLowerCase().contains("usb")) //USB port
+										port.closeUsbPort(null);
+								else port.close(); //serial port
+							}
+							catch (Exception e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 							DataExplorer.application.getActiveDevice().storeDeviceProperties();
 						}
 					}
+					
+					if (DataExplorer.application.getDeviceDialog() != null && !DataExplorer.application.getDeviceDialog().isDisposed()) {// if a device tool box is open, dispose it
+						DataExplorer.application.getDeviceDialog().forceDispose();
+					}
+
 					// query the item definition to save it for restore option 
 					DataExplorer.this.order = DataExplorer.this.menuCoolBar.getItemOrder();
 					DataExplorer.this.wrapIndices = DataExplorer.this.menuCoolBar.getWrapIndices();

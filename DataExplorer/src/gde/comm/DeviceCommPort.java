@@ -118,7 +118,8 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 * @see gde.serial.IDeviceCommPort#close()
 	 */
 	public void close() {
-		this.port.close();	
+		if (this.port != null)
+			this.port.close();	
 	}
 
 	/* (non-Javadoc)

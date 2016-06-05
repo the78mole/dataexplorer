@@ -328,6 +328,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 */
 	public synchronized void closeUsbPort(UsbInterface usbInterface) throws UsbClaimException, UsbException {
 		this.isConnected = false;
+		WaitTimer.delay(200); // enable gatherer thread to stop execution
 		if (usbInterface == null) {
 			UsbDevice usbDevice = findUsbDevice(this.application.getActiveDevice().getUsbVendorId(), this.application.getActiveDevice().getUsbProductId());
 			if (usbDevice != null) {
