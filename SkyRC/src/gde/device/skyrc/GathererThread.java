@@ -317,7 +317,7 @@ public class GathererThread extends Thread {
 			if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 
 			if (!this.isCollectDataStopped) {
-				this.stopDataGatheringThread(true, null);
+				this.stopDataGatheringThread(false, null);
 			}
 		}
 		finally {
