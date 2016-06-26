@@ -112,6 +112,20 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		int progressCycle = 1;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
+		//laps calculation init begin
+//		final int pointsPerInterval = 15; //fix odd number of points used for calculation 
+//		final int lapsPointDelta = pointsPerInterval/2; //15/2 = 7
+//		long filterLapMinTime_ms = 12000; //5 seconds time minimum time space between laps
+//    double lapStartTime_ms = 0;
+//    int lapTime = 0;
+//    Record laps = recordSet.get(2); //this is target for the laps
+//    Record smoothedAndDiffRxdbm = recordSet.get(1); //this record contains the last stored smoothed data
+//    int lastValue = 0;
+//    int lapCount = 0;
+//    int lastRxdbm = 0;
+//    int absorptionLevel = 7;
+    //labs calculation init end
+    
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
@@ -123,9 +137,44 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
 
+//			if (recordSet.size() >= 27) {
+//				points[26] = (lastRxdbm*absorptionLevel + points[26])/(absorptionLevel+1);
+//				lastRxdbm = points[26];
+//			}
+			
 			recordSet.addNoneCalculationRecordsPoints(points, 
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
+//			if (recordSet.size() >= 27) {
+//				this.smoothAndDifferentiate(recordSet, 26, 1, i);
+//				if (i > pointsPerInterval) {
+//					if (smoothedAndDiffRxdbm.getTime_ms(i - lapsPointDelta) > 135000 //wait 1 minute before starting lab counting
+//							&& (smoothedAndDiffRxdbm.getTime_ms(i - lapsPointDelta) - lapStartTime_ms) > filterLapMinTime_ms) { //check dead time between lap events
+//
+//						if (lastValue > 0 && smoothedAndDiffRxdbm.get(i - lapsPointDelta) <= 0) { //lap event detected
+//							if (lapStartTime_ms != 0) {
+//								log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lapStartTime_ms) / 1000.0));
+//								lapTime = (int) (recordSet.getTime_ms(i - lapsPointDelta) - lapStartTime_ms);
+//							}
+//							lapStartTime_ms = recordSet.getTime_ms(i - lapsPointDelta);
+//							laps.set(i - lapsPointDelta, lapTime);
+//							if (lapTime != 0) {
+//								if (lapCount % 2 == 0) {
+//									recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+//								}
+//								else {
+//									recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+//								}
+//							}
+//						}
+//						laps.set(i - lapsPointDelta, lapTime);
+//					}
+//					else
+//						laps.set(i - lapsPointDelta, lapTime);
+//
+//					lastValue = smoothedAndDiffRxdbm.get(i - lapsPointDelta);
+//				}
+//			}
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -135,6 +184,79 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		else if (recordSet.getRecordSetDescription().contains(GDE.STRING_MESSAGE_CONCAT))
 			recordSet.setRecordSetDescription(this.getName() + recordSet.getRecordSetDescription().substring(recordSet.getRecordSetDescription().indexOf(GDE.STRING_MESSAGE_CONCAT)));
 	}
+
+//	/**
+//	 * smooth and differentiate Rx dbm values targeting lab counting to be called modulo 3
+//	 * @param sourceRecordOrdinal
+//	 * @param targetRecordOrdinal
+//	 * @param position
+//	 */
+//	protected void smoothAndDifferentiate(final RecordSet activeRecordSet, final int sourceRecordOrdinal, final int targetRecordOrdinal, final int position) {
+//
+//		final int pointsPerInterval = 15; //fix number of points used for calculation 
+//		final int pointInterval = 1; 			// fix number of points where the calculation will result in values, rest is overlap
+//		final int frontPadding = (pointsPerInterval - pointInterval) / 2; // (15-3)/2 |------...------|		
+//		final int startPosition = position - pointsPerInterval;
+//
+//		try {
+//			Record recordSource = activeRecordSet.get(sourceRecordOrdinal);
+//			Record recordTarget = activeRecordSet.get(targetRecordOrdinal);
+//			if (recordSource != null && recordSource.realSize() >= pointsPerInterval && recordTarget != null) {
+//				//recordTarget.clear(); // make sure to clean the target record before calculate new data points
+//				int timeStep_sec = Double.valueOf((activeRecordSet.getTime_ms(position - 1 - frontPadding)  - activeRecordSet.getTime_ms(position + 1 + frontPadding)) / 1000.0).intValue();
+//				//int modCounter = pointInterval; //(numberDataPoints - (pointsPerInterval - pointInterval)) / pointInterval;
+//				//log.log(Level.FINE, "numberDataPoints = " + numberDataPoints + " modCounter = " + modCounter + " frontPadding = " + frontPadding); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//				// calculate avg x == time step in msec
+//				double avgX = timeStep_sec; // timeStepsPerInterval * time_ms / 1000.0 / timeStepsPerInterval; 
+//				// (xi - avgX)*(xi - avgX)
+//				double ssXX = 0.0;
+//				for (int i = 1; i <= pointsPerInterval; i++) {
+//					ssXX = ssXX + (((timeStep_sec * i) - avgX) * ((timeStep_sec * i) - avgX));
+//				}
+//				ssXX = ssXX / pointsPerInterval;
+//				//log.log(Level.FINE, "avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
+//				//--modCounter;
+//				//while (modCounter > 0) {
+//					// calculate avg y
+//					double avgY = 0.0;
+//					for (int i = 1; i <= pointsPerInterval; i++) {
+//						avgY = avgY + (recordSource.realGet(i + startPosition));
+//					}
+//					avgY = avgY / pointsPerInterval;
+//
+//					// (yi - avgY)
+//					double sumYi_avgY = 0.0;
+//					for (int i = 1; i <= pointsPerInterval; i++) {
+//						sumYi_avgY = sumYi_avgY + ((recordSource.realGet(i + startPosition)) - avgY);
+//					}
+//					sumYi_avgY = sumYi_avgY / pointsPerInterval;
+//
+//					// (xi - avgX)*(yi - avgY)
+//					double ssXY = 0.0;
+//					for (int i = 1; i <= pointsPerInterval; i++) {
+//						ssXY = ssXY + (((timeStep_sec * i) - avgX) * ((recordSource.realGet(i + startPosition)) - avgY));
+//					}
+//					ssXY = ssXY / pointsPerInterval;
+//
+//					int slope = Double.valueOf(ssXY / ssXX * 4).intValue(); // slope = ssXY / ssXX;
+//					// add point over pointInterval
+//					//for (int i = 0; i < pointInterval; i++) {
+//						recordTarget.set(position-pointsPerInterval/2, slope);
+//					//}
+//
+//					//log.log(Level.FINE, "slope = " + slope + " startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//					//--modCounter;
+//				//}
+//			}
+//			else if (recordSource != null && recordSource.realSize() < (pointsPerInterval-pointInterval) && recordTarget != null) {
+//					recordTarget.set(position, 0);
+//			}
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//			throw new RuntimeException(e);
+//		}
+//	}
 
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
@@ -407,7 +529,5 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //
 //		GPSHelper.calculateLabs(this, recordSet, 22, 23, 20, -1, 7);
 		recordSet.setSaved(true);
-
 	}
-
 }

@@ -197,7 +197,7 @@ public class HoTTbinReader {
 			20, 20, 15, 15, 10, 10, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0 };
 
 	/**
-	 * convert from RF_RXSQ to strength using lookup table
+	 * convert from Rx dbm to strength using lookup table
 	 * @param inValue
 	 * @return
 	 */
