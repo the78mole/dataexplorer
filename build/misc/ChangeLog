@@ -5,6 +5,8 @@ Version 3.2.7 - xx yyy 2016
 - add some error handling if device XML is corrupt in <DataBlock>
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
+HoTTViewer Adapter
+	- add Rx dbm measurement value
 MC3000
 	- add new system temperature measurement value
 	- add RAM cell type support
