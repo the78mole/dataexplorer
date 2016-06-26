@@ -898,6 +898,47 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
+            <Measurement>
+                <name>Rxl</name>
+                <symbol>rxl</symbol>
+                <unit>dbm</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="filter_factor" value="100" type="String" description="Filterfaktor - höherer Wert, stärkere Glättung"/>
+            </Measurement>
+            <Measurement>
+                <name>Rxl'</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="filter_factor" value="10" type="String" description="Filterfaktor - höherer Wert, längere Wartezeit"/>
+            </Measurement>
+            <Measurement>
+                <name>Rundenzeit</name>
+                <symbol>t</symbol>
+                <unit>sec</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="filter_factor" value="7" type="String" description="Filterfaktor - höherer Wert, langere mitteler Rundenzeit"/>
+            </Measurement>
+            <Measurement>
+                <name>Dist'</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="scale_sync_ref_ordinal" value="110" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Rundenzeit Dist</name>
+                <symbol>t</symbol>
+                <unit>sec</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="111" name="scale_sync_ref_ordinal"/>
+                <property name="scale_sync_ref_ordinal" value="111" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
         </Channel>
         <property type="Boolean" value="true" name="enable_filter"/>
     </Channels>

@@ -71,6 +71,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	Button											enableChannelRecords, enableFilter, enableTextModusFilter, tolrateSignLatitude, tolerateSignLongitude;
 	CLabel											filterFactorLatitudeLabel, filterFactorLongitudeLabel;
 	CCombo											filterFactorLatitudeCombo, filterFactorLongitudeCombo;
+	CLabel											absorptionLevelLabel, filterStartTimeLabel, filterLapMinTimeLabel;
+	CCombo											absorptionLevelCombo, filterStartTimeCombo, filterLapMinTimeCombo;
 
 	final HoTTAdapter						device;																																			// get device specific things, get serial port, ...
 	final Settings							settings;																																		// application configuration settings
@@ -81,10 +83,12 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	boolean											isHoTTAdapter 				= false;
 	boolean											isHoTTAdapter2 				= false;
 	boolean											isHoTTAdapterX 				= false;
+	boolean											isHoTTAdapterD 				= false;
 
 	int													measurementsCount			= 0;
 	int 												protocolTypeOrdinal		= 0;
 	String[]										filterItems = new String[] {"10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100", "105", "110", "115", "120", "130", "140", "150", "160", "170", "180", "190", "200"};
+	String[]										filterMinItems = new String[] {"5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "25", "30", "40", "50", "60"};
 
 	/**
 	 * default constructor initialize all variables required
@@ -111,6 +115,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			this.isHoTTAdapter = this.device != null && (this.device.getName().equals("HoTTAdapter") || this.device.getName().equals("HoTTAdapterM")); //$NON-NLS-1$
 			this.isHoTTAdapter2 = this.device != null && this.device.getName().startsWith("HoTTAdapter2"); //$NON-NLS-1$
 			this.isHoTTAdapterX = this.device != null && this.device.getName().equals("HoTTAdapterX"); //$NON-NLS-1$
+			this.isHoTTAdapterD = this.device != null && this.device.getName().startsWith("HoTTAdapterD"); //$NON-NLS-1$
 
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
@@ -131,7 +136,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				//dialogShell.pack();
-				this.dialogShell.setSize(620, 582); //header + tab + label + this.measurementsCount * 28 + loadButton + save/close buttons
+				this.dialogShell.setSize(620, this.isHoTTAdapterD ? 602 : 582); //header + tab + label + this.measurementsCount * 28 + loadButton + save/close buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -178,7 +183,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					tabFolderLData.top = new FormAttachment(0, 1000, 0);
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
-					tabFolderLData.bottom = new FormAttachment(1000, 1000, -102);
+					tabFolderLData.bottom = new FormAttachment(1000, 1000, this.isHoTTAdapterD ? -122 : -102);
 					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
@@ -259,6 +264,118 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								HoTTAdapterDialog.this.enableSaveButton(true);
 							}
 						});
+					}
+				}
+				{
+					if (this.isHoTTAdapterD) {
+						{
+							this.absorptionLevelLabel = new CLabel(this.dialogShell, SWT.RIGHT);
+							FormData enableFilterLData = new FormData();
+							enableFilterLData.height = GDE.IS_MAC ? 22: 20;
+							enableFilterLData.left = new FormAttachment(0, 1000, 15);
+							enableFilterLData.width = 140;
+							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -98 : -100);
+							this.absorptionLevelLabel.setLayoutData(enableFilterLData);
+							this.absorptionLevelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.absorptionLevelLabel.setText("Rx dbm Glättungsgrad");
+							this.absorptionLevelLabel.setToolTipText("Glättung von Rx dbm");
+						}
+						{
+							this.absorptionLevelCombo = new CCombo(this.dialogShell, SWT.BORDER);
+							FormData enableFilterLData = new FormData();
+							enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
+							enableFilterLData.left = new FormAttachment(0, 1000, 160);
+							enableFilterLData.width = 42;
+							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -100 : -100);
+							this.absorptionLevelCombo.setLayoutData(enableFilterLData);
+							this.absorptionLevelCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.absorptionLevelCombo.setItems(filterItems);
+							//this.absorptionLevelCombo.select(12);
+							this.absorptionLevelCombo.setToolTipText("Größerer Wert -> größere Glättung");
+							this.absorptionLevelCombo.setEditable(false);
+							this.absorptionLevelCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+							this.absorptionLevelCombo.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									log.log(java.util.logging.Level.FINEST, "absorptionLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+									HoTTAdapterDialog.this.device.setMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.absorptionLevelCombo.getText().trim());
+									HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
+									HoTTAdapterDialog.this.enableSaveButton(true);
+								}
+							});
+						}
+						{
+							this.filterStartTimeLabel = new CLabel(this.dialogShell, SWT.RIGHT);
+							FormData enableFilterLData = new FormData();
+							enableFilterLData.height = GDE.IS_MAC ? 22: 20;
+							enableFilterLData.left = new FormAttachment(0, 1000, 210);
+							enableFilterLData.width = 140;
+							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -98 : -100);
+							this.filterStartTimeLabel.setLayoutData(enableFilterLData);
+							this.filterStartTimeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.filterStartTimeLabel.setText("Start-Warte-Zeit");
+							this.filterStartTimeLabel.setToolTipText("Zeit bevor das Rundenzählen startet");
+						}
+						{
+							this.filterStartTimeCombo = new CCombo(this.dialogShell, SWT.BORDER);
+							FormData enableFilterLData = new FormData();
+							enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
+							enableFilterLData.left = new FormAttachment(0, 1000, 360);
+							enableFilterLData.width = 42;
+							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -100 : -100);
+							this.filterStartTimeCombo.setLayoutData(enableFilterLData);
+							this.filterStartTimeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.filterStartTimeCombo.setItems(filterItems);
+							//this.filterStartTimeCombo.select(10);
+							this.filterStartTimeCombo.setToolTipText("Größerer Wert -> späterer Start Rundenzeiten");
+							this.filterStartTimeCombo.setEditable(false);
+							this.filterStartTimeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+							this.filterStartTimeCombo.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									log.log(java.util.logging.Level.FINEST, "filterStartTimeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+									HoTTAdapterDialog.this.device.setMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterStartTimeCombo.getText().trim());
+									HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
+									HoTTAdapterDialog.this.enableSaveButton(true);
+								}
+							});
+						}
+						{
+							this.filterLapMinTimeLabel = new CLabel(this.dialogShell, SWT.RIGHT);
+							FormData enableFilterLData = new FormData();
+							enableFilterLData.height = GDE.IS_MAC ? 22: 20;
+							enableFilterLData.left = new FormAttachment(0, 1000, 410);
+							enableFilterLData.width = 140;
+							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -98 : -100);
+							this.filterLapMinTimeLabel.setLayoutData(enableFilterLData);
+							this.filterLapMinTimeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.filterLapMinTimeLabel.setText("Minimale Rundenzeit");
+							this.filterLapMinTimeLabel.setToolTipText("Etwas mehr, wie die halbe Rundenzeit einstellen");
+						}
+						{
+							this.filterLapMinTimeCombo = new CCombo(this.dialogShell, SWT.BORDER);
+							FormData enableFilterLData = new FormData();
+							enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
+							enableFilterLData.left = new FormAttachment(0, 1000, 555);
+							enableFilterLData.width = 42;
+							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -100 : -100);
+							this.filterLapMinTimeCombo.setLayoutData(enableFilterLData);
+							this.filterLapMinTimeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.filterLapMinTimeCombo.setItems(filterMinItems);
+							//this.filterLapMinTimeCombo.select(0);
+							this.filterLapMinTimeCombo.setToolTipText("Filter Rundenzeitfehlmessung");
+							this.filterLapMinTimeCombo.setEditable(false);
+							this.filterLapMinTimeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+							this.filterLapMinTimeCombo.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									log.log(java.util.logging.Level.FINEST, "filterLapMinTimeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+									HoTTAdapterDialog.this.device.setMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterLapMinTimeCombo.getText().trim());
+									HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
+									HoTTAdapterDialog.this.enableSaveButton(true);
+								}
+							});
+						}
 					}
 				}
 				{
@@ -643,8 +760,19 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			else if (isHoTTAdapter2) { 
 				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
 				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
+				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
 				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+			}
+			else if (isHoTTAdapterD) { 
+				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 12, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
+				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 12, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
+				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+				if (this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
+					this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
+					this.filterStartTimeCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
+					this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
+				}
 			}
 			
 			if (this.serialPort.isConnected()) { // check serial port state, if user has closed the dialog while gathering data
@@ -663,6 +791,21 @@ public class HoTTAdapterDialog extends DeviceDialog {
 		}
 	}
 
+	/** 
+	 * find position of a string value in an array
+	 * @param valueArray
+	 * @param value
+	 * @param defaultPosition
+	 * @return
+	 */
+	private int findPosition(final String[] valueArray, final String value, final int defaultPosition) {
+		for (int i = 0; i < valueArray.length; i++) {
+			if (value.equals(valueArray[i])) {
+				return i;
+			}
+		}
+		return defaultPosition;
+	}
 	/**
 	 * implementation of noop method from base dialog class
 	 */
