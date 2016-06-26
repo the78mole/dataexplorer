@@ -332,7 +332,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 
 						if (HoTTbinReader.blockSequenceCheck.size() > 1) {
-							if (HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4)
+							if (HoTTbinReader.blockSequenceCheck.get(1) != 0 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1 
+									&& HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4 && HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() < 15)
 								++HoTTbinReader.oldProtocolCount;
 							HoTTbinReader.blockSequenceCheck.remove(0);
 						}
@@ -681,7 +682,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						}
 
 						if (HoTTbinReader.blockSequenceCheck.size() > 1) {
-							if (HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4)
+							if (HoTTbinReader.blockSequenceCheck.get(1) != 0 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1 
+									&& HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4 && HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() < 15)
 								++HoTTbinReader.oldProtocolCount;
 							HoTTbinReader.blockSequenceCheck.remove(0);
 						}
