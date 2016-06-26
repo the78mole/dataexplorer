@@ -1902,11 +1902,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		final String $METHOD_NAME = "isRecordContained";
 		boolean isContained = false;
 		synchronized (this.scaleSyncedRecords) {
-			for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-				if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
-				if (tempRecord.name.equals(tmpRecord.name)) {
-					isContained = true;
-					break;
+			if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) != null) {
+				for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
+					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
+					if (tempRecord.name.equals(tmpRecord.name)) {
+						isContained = true;
+						break;
+					}
 				}
 			}
 		}
