@@ -117,7 +117,7 @@ public class FileHandler {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void exportFileCSV(final String dialogName, final boolean isRaw) {
+	public void exportFileCSV(final String dialogName, final boolean isRaw, final String encoding) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
@@ -143,7 +143,7 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
+				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw, encoding);
 			}
 			catch (Exception e) {
 				FileHandler.log.log(Level.WARNING, e.getMessage(), e);

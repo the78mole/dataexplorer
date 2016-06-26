@@ -83,7 +83,7 @@ public class MenuBar {
 	MenuItem											viewMenuItem;
 	Menu													graphicsMenu;
 	MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
-	MenuItem											csvExportMenuItem1, csvExportMenuItem2;
+	MenuItem											csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
 	MenuItem											nextDeviceMenuItem;
 	MenuItem											prevDeviceMenuItem;
 	MenuItem											selectDeviceMenuItem;
@@ -286,21 +286,32 @@ public class MenuBar {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0017), false);
+									MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0017), false, "ISO-8859-1");
 								}
 							});
 						}
-					}
-					{
-						this.csvExportMenuItem2 = new MenuItem(this.exportMenu, SWT.CASCADE);
-						this.csvExportMenuItem2.setText(Messages.getString(MessageIds.GDE_MSGT0018));
-						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-								MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0019), true); 
-							}
-						});
+						{
+							this.csvExportMenuItem2 = new MenuItem(this.exportMenu, SWT.CASCADE);
+							this.csvExportMenuItem2.setText(Messages.getString(MessageIds.GDE_MSGT0018));
+							this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0019), true, "ISO-8859-1"); 
+								}
+							});
+						}
+						{
+							this.csvExportMenuItem3 = new MenuItem(this.exportMenu, SWT.CASCADE);
+							this.csvExportMenuItem3.setText(Messages.getString(MessageIds.GDE_MSGT0732));
+							this.csvExportMenuItem3.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0733), false, "UTF-8");
+								}
+							});
+						}
 					}
 				}
 				if (!GDE.IS_MAC) {
@@ -1155,7 +1166,7 @@ public class MenuBar {
 	 */
 	public void cleanup() {
 		//cleanup exportMenu for device specific entries
-		for (int i = this.exportMenu.getItemCount()-1; !this.exportMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
+		for (int i = this.exportMenu.getItemCount()-1; !this.exportMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0732)); i--) {
 			this.exportMenu.getItem(i).dispose();
 		}
 		for (int i = this.importMenu.getItemCount()-1; !this.importMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
@@ -1179,7 +1190,7 @@ public class MenuBar {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			boolean isAdditionalExportItem = false;
 			for (MenuItem menuItem : this.exportMenu.getItems()) {
-				if (menuItem.getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+				if (menuItem.getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0732))) {
 					isAdditionalExportItem = true;
 				}
 				else {
@@ -1192,7 +1203,7 @@ public class MenuBar {
 				public void run() {
 					boolean isAdditionalExportItem = false;
 					for (MenuItem menuItem : MenuBar.this.exportMenu.getItems()) {
-						if (menuItem.getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+						if (menuItem.getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0732))) {
 							isAdditionalExportItem = true;
 						}
 						else {

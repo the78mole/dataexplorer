@@ -380,13 +380,13 @@ public class CSVReaderWriter {
 	 * write data CVS file
 	 * @throws Exception 
 	 */
-	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
+	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw, final String encoding) throws Exception {
 		BufferedWriter writer;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 
 		try {
 			if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] {GDE.FILE_ENDING_CSV, filePath}));
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), encoding)); 
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
 			df3.setGroupingUsed(false);
