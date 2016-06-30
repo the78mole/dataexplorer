@@ -4,6 +4,7 @@ Version 3.2.7 - xx yyy 2016
 - correct statistics calculation in regard of using max or average calculated using measurement reference ordinal
 - add some error handling if device XML is corrupt in <DataBlock>
 - enable CSV export using UTF-8 encoding (HoTTAdapterM2 for DashWare)
+- fix error not writing OSD file if date as file name leader is not set
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
 HoTTViewer Adapter
