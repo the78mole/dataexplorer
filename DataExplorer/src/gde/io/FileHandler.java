@@ -354,7 +354,7 @@ public class FileHandler {
 			osdFilePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
 		}
 
-		if (osdFilePath != null && osdFilePath.length() > 4 && !osdFilePath.endsWith(getFileNameProposal(false))) { // file name has a reasonable length
+		if (osdFilePath != null && osdFilePath.length() > 4 && (getFileNameProposal(false).length() == 0 || !osdFilePath.endsWith(getFileNameProposal(false)))) { // file name has a reasonable length
 			while (osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_OSD) || osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOV)) {
 				osdFilePath = osdFilePath.substring(0, osdFilePath.lastIndexOf('.'));
 			}
