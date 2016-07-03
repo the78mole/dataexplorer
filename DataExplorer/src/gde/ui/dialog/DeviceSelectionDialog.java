@@ -1225,6 +1225,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		boolean result = true;
 		String unsaved = Channels.getInstance().checkRecordSetsSaved();
 		if (unsaved.length() != 0) {
+			if (unsaved.length() > 500)
+				unsaved = unsaved.substring(0, 500) + "........";
 			String msg = Messages.getString(MessageIds.GDE_MSGW0020) + unsaved.toString();
 			if (this.application.openOkCancelMessageDialog(msg) == SWT.CANCEL) {
 				result = false;
