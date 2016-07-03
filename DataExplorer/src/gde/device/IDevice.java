@@ -887,7 +887,12 @@ public interface IDevice {
 	public String getJarName();
 	
 	/**
-	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 * set the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
+	 */
+	public void setGPS2KMZMeasurementOrdinal(final Integer ordinal);
+	
+	/**
+	 * @return the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
 	 */
 	public Integer getGPS2KMZMeasurementOrdinal();
 	

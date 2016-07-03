@@ -105,7 +105,7 @@ public class GDE {
 	public static final String		FILE_SEPARATOR_WINDOWS					= "\\";																																																											//$NON-NLS-1$
 	public static final String		FILE_SEPARATOR									= System.getProperty("file.separator");																																											//$NON-NLS-1$
 	public static final String		JAVA_IO_TMPDIR									= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) //$NON-NLS-1$
-																																? System.getProperty("java.io.tmpdir") //$NON-NLS-1$
+																																		? System.getProperty("java.io.tmpdir") //$NON-NLS-1$
 																																		: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;																															//$NON-NLS-1$
 
 	public final static int				SIZE_BYTES_INTEGER							= Integer.SIZE / 8;																																																					// 32 bits / 8 bits per byte 

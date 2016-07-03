@@ -47,6 +47,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -55,13 +56,28 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * this dialog enable to modify speed limits and associated colors of the KML track
  */
@@ -72,6 +88,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 	final IDevice				device;
 
 	Shell dialogShell;
+	Composite valueSelectorComposite;
 	Composite colorComposite;
 	Text upperLimitText;
 	CLabel upperLimitLabel;
@@ -79,6 +96,10 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 	CLabel averageFactorLabel;
 	Text avgText;
 	CLabel averageLabel;
+	private Label valueSelectionLabel;
+	private Button randomColorButton;
+	private Button extrudeButton;
+	private Combo valueSelectionCombo;
 	Composite fillerComposite;
 	Text lowerLimitText;
 	CLabel lowerLimitLabel;
@@ -125,11 +146,11 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			SWTResourceManager.registerResourceUser(dialogShell);
-			dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0283));
+			dialogShell.setText("Zusatzmesswert-Konfiguration");
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();			
-			dialogShell.setSize(350, 200);
+			dialogShell.setSize(350, 236);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
 	      public void handleEvent(Event event) {
 	        switch (event.detail) {
@@ -150,14 +171,76 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				}
 			});
 			{
+				valueSelectorComposite = new Composite(dialogShell, SWT.NONE);
+				RowLayout compositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+				valueSelectorComposite.setLayout(compositeLayout);
+				FormData colorCompositeLData = new FormData();
+				colorCompositeLData.bottom =  new FormAttachment(240, 1000, 0);
+				colorCompositeLData.left =  new FormAttachment(0, 1000, 5);
+				colorCompositeLData.top =  new FormAttachment(0, 1000, 0);
+				colorCompositeLData.width = 340;
+				colorCompositeLData.height = 51;
+				colorCompositeLData.right =  new FormAttachment(1000, 1000, -5);
+				valueSelectorComposite.setLayoutData(colorCompositeLData);
+				{
+					valueSelectionLabel = new Label(valueSelectorComposite, SWT.NONE);
+					RowData valueSelectionLabelLData = new RowData();
+					valueSelectionLabel.setLayoutData(valueSelectionLabelLData);
+					valueSelectionLabel.setText("Messwert Konfiguration");
+				}
+				{
+					RowData valueSelectionComboLData = new RowData();
+					valueSelectionCombo = new Combo(valueSelectorComposite, SWT.NONE);
+					valueSelectionCombo.setLayoutData(valueSelectionComboLData);
+					valueSelectionCombo.setItems(application.getActiveRecordSet().getActiveRecordNames());
+					valueSelectionCombo.select(device.getGPS2KMZMeasurementOrdinal());
+					valueSelectionCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "valueSelectionCombo.widgetSelected, event="+evt); //$NON-NLS-1$
+							device.setGPS2KMZMeasurementOrdinal(valueSelectionCombo.getSelectionIndex());
+							avgFactorText.notifyListeners(SWT.KeyUp, new Event());
+						}
+					});
+				}
+				{
+					extrudeButton = new Button(valueSelectorComposite, SWT.CHECK | SWT.LEFT);
+					RowData isExtrudeButtonLData = new RowData();
+					extrudeButton.setLayoutData(isExtrudeButtonLData);
+					extrudeButton.setText("extrude track");
+					extrudeButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "extrudeButton.widgetSelected, event="+evt);
+							//no extra code needed
+						}
+					});
+				}
+				{
+					randomColorButton = new Button(valueSelectorComposite, SWT.CHECK | SWT.LEFT);
+					RowData randomColorButtonLData = new RowData();
+					randomColorButton.setLayoutData(randomColorButtonLData);
+					randomColorButton.setText("random color");
+					randomColorButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "randomColorButton.widgetSelected, event="+evt);
+							//no extra code needed
+						}
+					});
+				}
+			}
+			{
 				colorComposite = new Composite(dialogShell, SWT.NONE);
 				RowLayout compositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
 				colorComposite.setLayout(compositeLayout);
 				FormData colorCompositeLData = new FormData();
 				colorCompositeLData.right =  new FormAttachment(450, 1000, 0);
-				colorCompositeLData.bottom =  new FormAttachment(750, 1000, 0);
 				colorCompositeLData.left =  new FormAttachment(0, 1000, 0);
-				colorCompositeLData.top =  new FormAttachment(0, 1000, 0);
+				colorCompositeLData.width = 157;
+				colorCompositeLData.height = 118;
+				colorCompositeLData.top =  new FormAttachment(240, 1000, 0);
+				colorCompositeLData.bottom =  new FormAttachment(1000, 1000, -45);
 				colorComposite.setLayoutData(colorCompositeLData);
 				{
 					compositeLower = new Composite(colorComposite, SWT.BORDER);
@@ -264,18 +347,20 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				RowLayout limitCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				limitComposite.setLayout(limitCompositeLayout);
 				FormData limitCompositeLData = new FormData();
-				limitCompositeLData.left =  new FormAttachment(460, 1000, 0);
-				limitCompositeLData.bottom =  new FormAttachment(750, 1000, 0);
+				limitCompositeLData.left =  new FormAttachment(461, 1000, 0);
 				limitCompositeLData.right =  new FormAttachment(1000, 1000, 0);
-				limitCompositeLData.top =  new FormAttachment(0, 1000, 0);
+				limitCompositeLData.top =  new FormAttachment(240, 1000, 0);
+				limitCompositeLData.width = 189;
+				limitCompositeLData.height = 118;
+				limitCompositeLData.bottom =  new FormAttachment(1000, 1000, -45);
 				limitComposite.setLayoutData(limitCompositeLData);
-				{
-					fillerComposite = new Composite(limitComposite, SWT.NONE);
-					RowData composite_IL2LData = new RowData();
-					composite_IL2LData.width = 145;
-					composite_IL2LData.height = 20;
-					fillerComposite.setLayoutData(composite_IL2LData);
-				}
+//				{
+//					fillerComposite = new Composite(limitComposite, SWT.NONE);
+//					RowData composite_IL2LData = new RowData();
+//					composite_IL2LData.width = 145;
+//					composite_IL2LData.height = 20;
+//					fillerComposite.setLayoutData(composite_IL2LData);
+//				}
 				{
 					lowerLimitLabel = new CLabel(limitComposite, SWT.RIGHT);
 					RowData lowerLimitLabelLData = new RowData();
@@ -380,7 +465,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					averageLabelLData.width = 115;
 					averageLabelLData.height = 22;
 					averageLabel.setLayoutData(averageLabelLData);
-					averageLabel.setText(Messages.getString(MessageIds.GDE_MSGT0678));
+					averageLabel.setText("Mittelwert");
 					averageLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0679));
 				}
 				{
@@ -420,6 +505,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			initialize();
 			this.dialogShell.setLocation(getParent().toDisplay(350, 50));
 			dialogShell.open();
+			avgFactorText.notifyListeners(SWT.KeyUp, new Event()); //update average value according to selected measurement
 			Display display = dialogShell.getDisplay();
 			while (!dialogShell.isDisposed()) {
 				if (!display.readAndDispatch())
@@ -491,6 +577,10 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				catch (Exception e) {
 					// ignore
 				}
+				if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()) != null)
+					extrudeButton.setSelection(Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()).toString()));
+				if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()) != null)
+					randomColorButton.setSelection(Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()).toString()));
 			}
 		}
 		else { //device oriented
@@ -564,6 +654,24 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						// ignore
 					}
 				}
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value());
+				if (property != null) {
+					try {
+						extrudeButton.setSelection(Boolean.parseBoolean(property.getValue()));
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value());
+				if (property != null) {
+					try {
+						randomColorButton.setSelection(Boolean.parseBoolean(property.getValue()));
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
 			}
 		}
 		
@@ -624,6 +732,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value(), withinLimitsColor.red + GDE.STRING_COMMA + withinLimitsColor.green + GDE.STRING_COMMA	+ withinLimitsColor.blue);
 				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value(), lowerLimitColor.red + GDE.STRING_COMMA + lowerLimitColor.green + GDE.STRING_COMMA	+ lowerLimitColor.blue);
 				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value(), upperLimitColor.red + GDE.STRING_COMMA + upperLimitColor.green + GDE.STRING_COMMA	+ upperLimitColor.blue);
+				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value(), extrudeButton.getSelection() ? "true" : "false");
+				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value(), randomColorButton.getSelection() ? "true" : "false");
 
 				object.save();
 			}
@@ -645,6 +755,9 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value(), DataTypes.STRING, withinLimitsColor.red + GDE.STRING_COMMA + withinLimitsColor.green + GDE.STRING_COMMA + withinLimitsColor.blue);
 				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value(), DataTypes.STRING, lowerLimitColor.red + GDE.STRING_COMMA + lowerLimitColor.green + GDE.STRING_COMMA + lowerLimitColor.blue);
 				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value(), DataTypes.STRING, upperLimitColor.red + GDE.STRING_COMMA + upperLimitColor.green + GDE.STRING_COMMA + upperLimitColor.blue);
+
+				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value(), DataTypes.BOOLEAN, extrudeButton.getSelection() ? "true" : "false");
+				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value(), DataTypes.BOOLEAN, randomColorButton.getSelection() ? "true" : "false");
 			}
 			device.storeDeviceProperties();
 		}

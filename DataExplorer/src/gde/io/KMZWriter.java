@@ -126,8 +126,9 @@ public class KMZWriter {
 																						+ "\t\t\t<tr><td><b>Distance</b> %.1f km </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Min Alt</b> %.0f meters </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Max Alt</b> %.0f%s meters </td></tr>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<tr><td><b>Max Speed</b> %.1f km/hour </td></tr>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<tr><td><b>Avg Speed</b> %.1f km/hour </td></tr>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<tr><td><b>Min %s</b> %.1f %s </td></tr>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<tr><td><b>Avg %s</b> %.1f %s </td></tr>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<tr><td><b>Max %s</b> %.1f %s </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Start Time</b> %sT %sZ  </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>End Time</b> %sT %sZ  </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t</table>]]></description>" + GDE.LINE_SEPARATOR
@@ -144,13 +145,13 @@ public class KMZWriter {
 
 	static final String				dataPoint				= "\t\t<Placemark>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<visibility>0</visibility>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<name>t:%ds   v=%.1fkm/h   h=%.0fm</name>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<name>t:%ds   x=%.1f%s   h=%.0fm</name>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<Snippet maxLines=\"0\"></Snippet>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<description><![CDATA[<table>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<tr><td>Longitude: %.7f </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<tr><td>Latitude: %.7f </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<tr><td>Altitude: %.0f meters </td></tr>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t\t<tr><td>Speed: %.1f km/hour </td></tr>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t<tr><td>%s: %.1f %s </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<tr><td>Heading: %.1f </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<tr><td>Time: %sT %sZ </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t</table>]]></description>" + GDE.LINE_SEPARATOR
@@ -200,7 +201,7 @@ public class KMZWriter {
 	
 	
 	static final String				speedHeader			= "\t<Folder>" + GDE.LINE_SEPARATOR
-																						+ "\t\t<name>Speed-Track</name>" + GDE.LINE_SEPARATOR
+																						+ "\t\t<name>%s-Track</name>" + GDE.LINE_SEPARATOR
 																						+ "\t\t<open>0</open>" + GDE.LINE_SEPARATOR;
 	
 	static final String				speedLeader			= "\t\t\t<Placemark>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
@@ -210,6 +211,11 @@ public class KMZWriter {
 																						+ "\t\t\t\t\t<color>%s</color>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t\t\t\t<width>%d</width>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t\t\t</LineStyle>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+																						+ "\t\t\t\t<PolyStyle>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t\t<color>5f%s</color>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t\t<colorMode>%s</colorMode>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t\t<outline>0</outline>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t</PolyStyle>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t</Style>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t\t<LineString>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t\t\t<extrude>%d</extrude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
@@ -235,7 +241,7 @@ public class KMZWriter {
 	 * @param ordinalLongitude
 	 * @param ordinalLatitude
 	 * @param ordinalHeight
-	 * @param ordinalVelocity
+	 * @param ordinalMeasurement
 	 * @param ordinalSlope
 	 * @param ordinalHeight
 	 * @param ordinalTripLength
@@ -244,7 +250,7 @@ public class KMZWriter {
 	 * @param isClampToGround
 	 * @throws Exception
 	 */
-	public static void write(String kmzFilePath, String kmlFileName, RecordSet recordSet, final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final int ordinalSlope, final int ordinalTripLength, final int ordinalAzimuth,
+	public static void write(String kmzFilePath, String kmlFileName, RecordSet recordSet, final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalMeasurement, final int ordinalSlope, final int ordinalTripLength, final int ordinalAzimuth,
  final boolean isHeightRelative, boolean isClampToGround) throws Exception {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		StringBuilder sb = new StringBuilder();
@@ -270,13 +276,49 @@ public class KMZWriter {
 			int dataSize = recordSet.getRecordDataSize(false);
 			int progressCycle = 0;
 			if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setProgress(progressCycle, sThreadId);
-			Record recordLongitude = recordSet.get(ordinalLongitude);
-			Record recordLatitude = recordSet.get(ordinalLatitude);
-			Record recordHeight = ordinalHeight < 0 ? null : recordSet.get(ordinalHeight);
-			Record recordVelocity = ordinalVelocity < 0 ? null : recordSet.get(ordinalVelocity);
-			Record recordSlope = ordinalSlope < 0 ? null : recordSet.get(ordinalSlope);
-			String velocityUnit = recordVelocity != null ? recordVelocity.getUnit(): GDE.STRING_EMPTY;
-
+			final Record recordLongitude = recordSet.get(ordinalLongitude);
+			final Record recordLatitude = recordSet.get(ordinalLatitude);
+			final Record recordHeight = ordinalHeight < 0 ? null : recordSet.get(ordinalHeight);
+			final Record recordMeasurement = ordinalMeasurement < 0 ? null : recordSet.get(ordinalMeasurement);
+			final Record recordSlope = ordinalSlope < 0 ? null : recordSet.get(ordinalSlope);
+			final String measurementName = recordMeasurement != null ? recordMeasurement.getName() : GDE.STRING_EMPTY;
+			final String measurementUnit = recordMeasurement != null ? recordMeasurement.getUnit() : GDE.STRING_EMPTY;
+			
+			boolean isExtrude = false;
+			String randomColor = "";
+			if (application.isObjectoriented()) {
+				ObjectData object = application.getObject();
+				Properties properties = object.getProperties();
+				if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()) != null)
+					isExtrude = Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()).toString());
+				if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()) != null)
+					randomColor = Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()).toString()) ? "random" : "";
+			}
+			else { //device oriented
+				Integer activeChannelNumber = application.getActiveChannelNumber();
+				Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
+				if(activeChannelNumber != null && measurementOrdinal != null) {
+					PropertyType property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value());
+					if (property != null) {
+						try {
+							isExtrude = Boolean.parseBoolean(property.getValue());
+						}
+						catch (Exception e) {
+							// ignore
+						}
+					}
+					property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value());
+					if (property != null) {
+						try {
+							randomColor = Boolean.parseBoolean(property.getValue()) ? "random" : "";
+						}
+						catch (Exception e) {
+							// ignore
+						}
+					}
+				}
+			}
+			
 			if (recordLongitude == null || recordLatitude == null)
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() }));
 			if (recordHeight == null) {
@@ -352,8 +394,8 @@ public class KMZWriter {
 			}
 			int startIndex = i;
 			int velocityRange = 0;
-			int velocityAvg = recordVelocity != null ? (int) device.translateValue(recordVelocity, recordVelocity.getAvgValue() / 1000.0) : 0;
-			int velocityLowerLimit = 20;
+			int velocityAvg = recordMeasurement != null ? (int) device.translateValue(recordMeasurement, recordMeasurement.getAvgValue() / 1000.0) : 0;
+			int measurementLowerLimit = 20;
 			int velocityUpperLimit = 100;
 			String withinLimitsColor = "ff0000ff"; //$NON-NLS-1$
 			String lowerLimitColor = "ff00ff00"; //$NON-NLS-1$
@@ -383,7 +425,7 @@ public class KMZWriter {
 					catch (Exception e) {
 						// ignore
 					}
-					velocityLowerLimit = (int) (avgLimitFactor != 0 ? velocityAvg / avgLimitFactor : lowerLimitVelocity != 0 ? lowerLimitVelocity : 0);
+					measurementLowerLimit = (int) (avgLimitFactor != 0 ? velocityAvg / avgLimitFactor : lowerLimitVelocity != 0 ? lowerLimitVelocity : 0);
 					velocityUpperLimit = (int) (avgLimitFactor != 0 ? velocityAvg * avgLimitFactor : upperLimitVelocity != 0 ? upperLimitVelocity : 500);
 
 					int r, g, b;
@@ -420,20 +462,20 @@ public class KMZWriter {
 				}
 			}
 			else {
-				PropertyType propertyAvg = recordVelocity == null ? null : recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity,
+				PropertyType propertyAvg = recordMeasurement == null ? null : recordMeasurement.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalMeasurement,
 						MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value());
-				PropertyType propertyLowerLimit = recordVelocity == null ? null : recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity,
+				PropertyType propertyLowerLimit = recordMeasurement == null ? null : recordMeasurement.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalMeasurement,
 						MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value());
-				PropertyType propertyUpperLimit = recordVelocity == null ? null : recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity,
+				PropertyType propertyUpperLimit = recordMeasurement == null ? null : recordMeasurement.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalMeasurement,
 						MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
-				velocityLowerLimit = (int) (propertyAvg != null ? velocityAvg / Double.valueOf(propertyAvg.getValue()) : propertyLowerLimit != null ? Integer.valueOf(propertyLowerLimit.getValue()) : 0);
+				measurementLowerLimit = (int) (propertyAvg != null ? velocityAvg / Double.valueOf(propertyAvg.getValue()) : propertyLowerLimit != null ? Integer.valueOf(propertyLowerLimit.getValue()) : 0);
 				velocityUpperLimit = (int) (propertyAvg != null ? velocityAvg * Double.valueOf(propertyAvg.getValue()) : propertyUpperLimit != null ? Integer.valueOf(propertyUpperLimit.getValue()) : 500);
 
-				PropertyType propertyWithinLimitsColor = recordVelocity == null ? null : recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity,
+				PropertyType propertyWithinLimitsColor = recordMeasurement == null ? null : recordMeasurement.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalMeasurement,
 						MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value());
-				PropertyType propertyLowerLimitColor = recordVelocity == null ? null : recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity,
+				PropertyType propertyLowerLimitColor = recordMeasurement == null ? null : recordMeasurement.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalMeasurement,
 						MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value());
-				PropertyType propertyUpperLimitColor = recordVelocity == null ? null : recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity,
+				PropertyType propertyUpperLimitColor = recordMeasurement == null ? null : recordMeasurement.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalMeasurement,
 						MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value());
 				String[] colorRGB = propertyWithinLimitsColor != null ? propertyWithinLimitsColor.getValue().split(GDE.STRING_COMMA) : new String[3];
 				withinLimitsColor = propertyWithinLimitsColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff0000ff"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -446,25 +488,37 @@ public class KMZWriter {
 
 			//write track statistics
 			double height = !isClampToGround && recordHeight != null ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0 : 0;
-			zipWriter.write(String.format(Locale.ENGLISH, statistics, "Statistics", recordTripLength == null ? 0 : device.translateValue(recordTripLength, recordTripLength.getMaxValue() / 1000.0),
-					height, recordHeight == null ? 0 : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0, 
+			zipWriter.write(String.format(Locale.ENGLISH, statistics, 
+					"Statistics", 
+					recordTripLength == null ? 0 : device.translateValue(recordTripLength, recordTripLength.getMaxValue() / 1000.0),
+					height, 
+					recordHeight == null ? 0 : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0, 	
 					isHeightRelative ? "" : String.format("(%.0f)", (recordHeight == null ? 0.0f : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height)),
-					recordVelocity == null ? 0 : device.translateValue(recordVelocity, recordVelocity.getMaxValue() / 1000.0), recordVelocity == null ? 0 : device.translateValue(recordVelocity, recordVelocity.getAvgValue() / 1000.0), dateString,
+					measurementName, 
+					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getMinValue() / 1000.0), 
+					measurementUnit, 
+					measurementName, 
+					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getAvgValue() / 1000.0), 
+					measurementUnit,
+					measurementName, 
+					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getMaxValue() / 1000.0), 
+					measurementUnit, 
+					dateString,
 					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)), dateString,
 					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1))).getBytes());
 
 			//speed-track
-			zipWriter.write(KMZWriter.speedHeader.getBytes());
-			String initialPlacemarkName = Messages.getString(MessageIds.GDE_MSGT0604, new Object[] { velocityLowerLimit, velocityUnit });
-			zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, initialPlacemarkName, lowerLimitColor, 2, 0, altitudeMode).getBytes());
+			zipWriter.write(String.format(KMZWriter.speedHeader, measurementName).getBytes());
+			String initialPlacemarkName = Messages.getString(MessageIds.GDE_MSGT0604, new Object[] { measurementName, measurementLowerLimit, measurementUnit });
+			zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, initialPlacemarkName, lowerLimitColor, 2, lowerLimitColor.substring(2), randomColor, isExtrude ? 1 : 0, altitudeMode).getBytes());
 			long lastTimeStamp = -1, timeStamp;
 			long recordSetStartTimeStamp = recordSet.getTime(recordSet.isZoomMode() ? 0 : startIndex) / 10;
 			for (i = recordSet.isZoomMode() ? 0 : startIndex; isPositionWritten && i < dataSize; i++) {
 				timeStamp = recordSet.getTime(i) / 10 + recordSetStartTimeStamp;
 				if ((timeStamp - lastTimeStamp) >= 500 || lastTimeStamp == -1) {// write a point all ~1000 ms
-					int velocity = recordVelocity == null ? 0 : (int) device.translateValue(recordVelocity, recordVelocity.get(i) / 1000.0);
-					if (!((velocity < velocityLowerLimit && velocityRange == 0) || (velocity >= velocityLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
-						velocityRange = switchColor(zipWriter, recordVelocity, velocity, velocityLowerLimit, velocityUpperLimit, velocityColors, velocityRange, velocityUnit, altitudeMode);
+					int velocity = recordMeasurement == null ? 0 : (int) device.translateValue(recordMeasurement, recordMeasurement.get(i) / 1000.0);
+					if (!((velocity < measurementLowerLimit && velocityRange == 0) || (velocity >= measurementLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
+						velocityRange = switchColor(zipWriter, recordMeasurement, velocity, measurementLowerLimit, velocityUpperLimit, velocityColors, velocityRange, altitudeMode, isExtrude, randomColor);
 	
 						//re-write last coordinates
 //						height = device.translateValue(recordHeight, recordHeight.get(i - 1) / 1000.0) - height0;
@@ -499,14 +553,23 @@ public class KMZWriter {
 			for (i = recordSet.isZoomMode() ? 0 : startIndex; isPositionWritten && i < dataSize; i++) {
 				timeStamp = recordSet.getTime(i) / 10 + recordSetStartTimeStamp;
 				if ((timeStamp - lastTimeStamp) >= 500 || lastTimeStamp == -1) {// write a point all ~1000 ms
-					double speed = recordVelocity == null ? 0 : device.translateValue(recordVelocity, recordVelocity.get(i) / 1000.0);
+					double speed = recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.get(i) / 1000.0);
 					double slope = recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i) / 1000.0);
 					double slopeLast = i==0 ? slope : recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i-1) / 1000.0);
 					boolean isSlope0 = speed > 2 && ((slope <= 0 && slopeLast > 0) || (slope > 0 && slopeLast <= 0) || slope == 0);
 					height = recordHeight == null ? 0 : (device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0);
 					zipWriter.write(String.format(Locale.ENGLISH, dataPoint, 
-							recordSet.getTime(i) / 1000 / 10, speed, height, 
-							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), height, speed, recordAzimuth.get(i) / 1000.0, 
+							recordSet.getTime(i) / 1000 / 10, 
+							speed, 
+							measurementUnit,
+							height, 
+							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), 
+							device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), 
+							height, 
+							measurementName,
+							speed, 
+							measurementUnit,
+							recordAzimuth.get(i) / 1000.0, 
 							dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(i)),
 							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),	height, recordAzimuth.get(i) / 1000.0, 
 							dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(i)),
@@ -615,36 +678,37 @@ public class KMZWriter {
 	/**
 		velocityRange = 0; // 0 = <= 30; 1 = <= 70; 2 = <= 90; 3 = > 120
 	 * @param writer
-	 * @param velocityRecord
-	 * @param actualVelocity
-	 * @param velocityLowerLimit
-	 * @param velocityUpperLimit
-	 * @param velocitColors {lowerLimitColor, withinLimitsColor, upperLimitColor) 
+	 * @param measurementRecord
+	 * @param actualValue
+	 * @param measurementLowerLimit
+	 * @param measurementUpperLimit
+	 * @param measurementColors {lowerLimitColor, withinLimitsColor, upperLimitColor) 
 	 * @param velocityRange
-	 * @param velocityUnit
 	 * @param altitudeMode
+	 * @param isExtrude
+	 * @param randomColor
 	 * @return
 	 * @throws IOException
 	 */
-	public static int switchColor(ZipOutputStream writer, Record velocityRecord, int actualVelocity, int velocityLowerLimit, int velocityUpperLimit, String[] velocitColors, int velocityRange,
-			String velocityUnit, String altitudeMode) throws IOException {
+	public static int switchColor(ZipOutputStream writer, Record measurementRecord, int actualValue, int measurementLowerLimit, int measurementUpperLimit, String[] measurementColors, int velocityRange,
+			String altitudeMode, final boolean isExtrude, final String randomColor) throws IOException {
 
-		if (actualVelocity < velocityLowerLimit) {
-			String placemarkName0 = Messages.getString(MessageIds.GDE_MSGT0604, new Object[] { velocityLowerLimit, velocityUnit });
+		if (actualValue < measurementLowerLimit) {
+			String placemarkName0 = Messages.getString(MessageIds.GDE_MSGT0604, new Object[] { measurementRecord.getName(), measurementLowerLimit, measurementRecord.getUnit() });
 			writer.write(KMZWriter.speedTrailer.getBytes());
-			writer.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, placemarkName0, velocitColors[0], 2, 0, altitudeMode).getBytes());
+			writer.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, placemarkName0, measurementColors[0], 2, measurementColors[0].substring(2), randomColor, isExtrude ? 1 : 0, altitudeMode).getBytes());
 			velocityRange = 0;
 		}
-		else if (actualVelocity >= velocityLowerLimit && actualVelocity <= velocityUpperLimit) {
-			String placemarkName1 = Messages.getString(MessageIds.GDE_MSGT0605, new Object[] { velocityLowerLimit, velocityUpperLimit, velocityUnit });
+		else if (actualValue >= measurementLowerLimit && actualValue <= measurementUpperLimit) {
+			String placemarkName1 = Messages.getString(MessageIds.GDE_MSGT0605, new Object[] { measurementRecord.getName(), measurementLowerLimit, measurementUpperLimit, measurementRecord.getUnit() });
 			writer.write(KMZWriter.speedTrailer.getBytes());
-			writer.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, placemarkName1, velocitColors[1], 2, 0, altitudeMode).getBytes());
+			writer.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, placemarkName1, measurementColors[1], 2, measurementColors[1].substring(2), randomColor, isExtrude ? 1 : 0, altitudeMode).getBytes());
 			velocityRange = 1;
 		}
-		else if (actualVelocity > velocityUpperLimit) {
-			String placemarkName2 = Messages.getString(MessageIds.GDE_MSGT0606, new Object[] { velocityUpperLimit, velocityUnit });
+		else if (actualValue > measurementUpperLimit) {
+			String placemarkName2 = Messages.getString(MessageIds.GDE_MSGT0606, new Object[] { measurementRecord.getName(), measurementUpperLimit, measurementRecord.getUnit() });
 			writer.write(KMZWriter.speedTrailer.getBytes());
-			writer.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, placemarkName2, velocitColors[2], 2, 0, altitudeMode).getBytes());
+			writer.write(String.format(Locale.ENGLISH, KMZWriter.speedLeader, placemarkName2, measurementColors[2], 2, measurementColors[2].substring(2), randomColor, isExtrude ? 1 : 0, altitudeMode).getBytes());
 			velocityRange = 2;
 		}
 		return velocityRange;

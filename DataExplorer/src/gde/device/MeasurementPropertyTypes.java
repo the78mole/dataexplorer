@@ -98,6 +98,10 @@ public enum MeasurementPropertyTypes {
     GOOGLE_EARTH_LOWER_LIMIT_COLOR("google_earth_lower_limit_color"),
     @XmlEnumValue("google_earth_upper_limit_color")
     GOOGLE_EARTH_UPPER_LIMIT_COLOR("google_earth_upper_limit_color"),
+    @XmlEnumValue("google_earth_is_extrude")
+    GOOGLE_EARTH_IS_EXTRUDE("google_earth_is_extrude"),
+    @XmlEnumValue("google_earth_is_random_color")
+    GOOGLE_EARTH_IS_RANDOM_COLOR("google_earth_is_random_color"),
     @XmlEnumValue("filter_factor")
     FILTER_FACTOR("filter_factor"),
     @XmlEnumValue("tolerate_sign_change")
