@@ -705,7 +705,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			double reduction = record.getReduction(); // != 0 if a unit translation is required
 			newValue = (value - reduction) * factor + offset;
 		}
-
+		
 		HoTTAdapterD.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -738,7 +738,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		HoTTAdapterD.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HoTTAdapterD.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
 		return newValue;
 	}
 
@@ -758,168 +758,256 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 
-		Record recordLatitude = recordSet.get(12);
-		Record recordLongitude = recordSet.get(13);
-		Record recordAlitude = recordSet.get(8);
-		
-		if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 12=Latitude, 13=Longitude 8=Height
-			int recordSize = recordLatitude.realSize();
-			int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
-			//check GPS latitude and longitude				
-			int indexGPS = 0;
-			int i = 0;
-			for (; i < recordSize; ++i) {
-				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
-					indexGPS = i;
-					++i;
-					break;
+		if (recordSet != null) {
+			Record recordLatitude = recordSet.get(12);
+			Record recordLongitude = recordSet.get(13);
+			Record recordAlitude = recordSet.get(8);
+			if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 12=Latitude, 13=Longitude 8=Height
+				int recordSize = recordLatitude.realSize();
+				int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
+				//check GPS latitude and longitude				
+				int indexGPS = 0;
+				int i = 0;
+				for (; i < recordSize; ++i) {
+					if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+						indexGPS = i;
+						++i;
+						break;
+					}
+				}
+				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
+
+				GPSHelper.calculateTripLength(this, recordSet, 12, 13, 8, startAltitude, 15, 17);
+			}
+			//laps calculation init begin
+			Record recordSourceRx_dbm = recordSet.get(5);
+			Record recordSmoothRx_dbm = recordSet.get(109);
+			Record recordDiffRx_dbm = recordSet.get(110);
+			Record recordLapsRx_dbm = recordSet.get(111);
+			Record recordDistanceStart = recordSet.get(15);
+			Record recordDiffDistance = recordSet.get(112);
+			Record recordLapsDistance = recordSet.get(113);
+			//adjustable variables
+			int absorptionLevel = 70;
+			long filterStartTime = 15000;//wait 15 seconds before starting lab counting
+			long filterMaxTime = 300000;//300 seconds = 5 min window for lab counting
+			long filterLapMinTime_ms = 5000; //5 seconds time minimum time space between laps
+			int filterMinDeltaRxDbm = 3;
+			int filterMinDeltaDist = 20;
+			if (this.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
+//				//5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
+//				this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(1, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
+//				this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
+//				this.filterStartTimeCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
+//				this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
+//				this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
+//				//15=DistanceStart, 112=DiffDistance, 113=LapsDistance		
+//				this.filterMinDistDeltaCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
+				try {
+					absorptionLevel = Integer.valueOf(this.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
+				}
+				catch (NumberFormatException e) {
+					// ignore and use intial value
+				}
+				try {
+					filterStartTime = 1000 * Integer.valueOf(this.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
+				}
+				catch (NumberFormatException e) {
+					// ignore and use intial value
+				}
+				try {
+					filterMaxTime = 1000 * Integer.valueOf(this.getMeasurementPropertyValue(1, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
+				}
+				catch (NumberFormatException e) {
+					// ignore and use intial value
+				}
+				try {
+					filterLapMinTime_ms = 1000 * Integer.valueOf(this.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
+				}
+				catch (NumberFormatException e) {
+					// ignore and use intial value
+				}
+				try {
+					filterMinDeltaRxDbm = Integer.valueOf(this.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim());
+				}
+				catch (NumberFormatException e) {
+					// ignore and use intial value
+				}
+				try {
+					filterMinDeltaDist = Integer.valueOf(this.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim());
+				}
+				catch (NumberFormatException e) {
+					// ignore and use intial value
 				}
 			}
-			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
+			if (recordSourceRx_dbm != null && recordSmoothRx_dbm != null && recordDiffRx_dbm != null && recordLapsRx_dbm != null) {
+				//temporary variables
+				double lastLapTimeStamp_ms = 0;
+				int lapTime = 0;
+				int lastValue = 0;
+				int lapCount = 0;
+				int lastRxdbm = 0;
+				boolean isLapEvent = false;
+				int localRxDbmMin = 0;
 
-			GPSHelper.calculateTripLength(this, recordSet, 12, 13, 8, startAltitude, 15, 17);
-		}
-			
-		//laps calculation init begin
-		Record recordSourceRx_dbm = recordSet.get(5);
-		Record recordSmoothRx_dbm = recordSet.get(109);
-		Record recordDiffRx_dbm = recordSet.get(110);
-		Record recordLapsRx_dbm = recordSet.get(111);
-		Record recordDistanceStart = recordSet.get(15);
-		Record recordDiffDistance = recordSet.get(112);
-		Record recordLapsDistance = recordSet.get(113);
+				//prepare smoothed Rx dbm
+				for (int i = 0; i < recordSourceRx_dbm.realSize(); ++i) {
+					if (recordSourceRx_dbm.get(i) == 0)
+						recordSmoothRx_dbm.set(i, lastRxdbm);
+					else
+						recordSmoothRx_dbm.set(i, (lastRxdbm * absorptionLevel + recordSourceRx_dbm.get(i)) / (absorptionLevel + 1));
+					lastRxdbm = recordSmoothRx_dbm.get(i);
 
-		//adjustable variables
-		int absorptionLevel = 70;
-		long filterStartTime = 15000;//wait 15 seconds before starting lab counting
-		long filterLapMinTime_ms = 5000; //5 seconds time minimum time space between laps
-		if (this.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
-			try {
-				absorptionLevel = Integer.valueOf(this.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
-				// ignore and use intial value
-			}
-			try {
-				filterStartTime = 1000*Integer.valueOf(this.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
-				// ignore and use intial value
-			}
-			try {
-				filterLapMinTime_ms = 1000*Integer.valueOf(this.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
-				// ignore and use intial value
-			}
-		}
+				}
+				//smooth and calculate differentiation
+				CalculationThread thread = new LinearRegression(recordSet, recordSmoothRx_dbm.getName(), recordDiffRx_dbm.getName(), 2);
+				thread.start();
+				try {
+					thread.join();
+				}
+				catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-		if (recordSourceRx_dbm != null && recordSmoothRx_dbm != null && recordDiffRx_dbm != null && recordLapsRx_dbm != null) {
-			//temporary variables
-			double lastLapTimeStamp_ms = 0;
-			int lapTime = 0;
-			int lastValue = 0;
-			int lapCount = 0;
-			int lastRxdbm = 0;
-		
-			//prepare smoothed Rx dbm
-			for (int i = 0; i < recordSourceRx_dbm.realSize(); ++i) {
-				if (recordSourceRx_dbm.get(i) == 0) 
-					recordSmoothRx_dbm.set(i, lastRxdbm);
-				else
-					recordSmoothRx_dbm.set(i, (lastRxdbm * absorptionLevel + recordSourceRx_dbm.get(i)) / (absorptionLevel + 1));
-				lastRxdbm = recordSmoothRx_dbm.get(i);
+				for (int i = 0; i < recordDiffRx_dbm.realSize(); ++i) {
+					if (recordDiffRx_dbm.getTime_ms(i) > filterStartTime && recordDiffRx_dbm.getTime_ms(i) < (filterStartTime+filterMaxTime)) { //check start time before starting lab counting
 
-			}
-			//smooth and calculate differentiation
-			CalculationThread thread = new LinearRegression(recordSet, recordSmoothRx_dbm.getName(), recordDiffRx_dbm.getName(), 2);
-			thread.start();
-			try {
-				thread.join();
-			}
-			catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+						if ((recordDiffRx_dbm.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
 
-			for (int i = 0; i < recordDiffRx_dbm.realSize(); ++i) {
-					if (recordDiffRx_dbm.getTime_ms(i) > filterStartTime //check start time before starting lab counting
-							&& (recordDiffRx_dbm.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
+							if (lastValue > 0 && recordDiffRx_dbm.get(i) <= 0 
+									&& (recordSmoothRx_dbm.get(i) / 1000 - localRxDbmMin) > filterMinDeltaRxDbm) { //lap event detected maximum Rx dbm
+								isLapEvent = true;
+								if (lastLapTimeStamp_ms != 0) {
+									log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
+									lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
+								}
+								lastLapTimeStamp_ms = recordSet.getTime_ms(i);
+								recordLapsRx_dbm.set(i, lapTime);
+								if (lapTime != 0) {
+									if (lapCount % 2 == 0) {
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+									}
+									else {
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+									}
+								}
+								if (isLapEvent && lapTime == 0) { //first lap start
+									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
+								}
 
-						if (lastValue > 0 && recordDiffRx_dbm.get(i) <= 0) { //lap event detected maximum Rx dbm
-							if (lastLapTimeStamp_ms != 0) {
-								log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
-								lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
+								localRxDbmMin = 0; //rest local min value of Rx dbm
 							}
-							lastLapTimeStamp_ms = recordSet.getTime_ms(i);
-							recordLapsRx_dbm.set(i, lapTime);
-							if (lapTime != 0) {
-								if (lapCount % 2 == 0) {
-									recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
-								}
-								else {
-									recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
-								}
+							else if (lapTime == 0)
+								if (isLapEvent)
+									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
+								else
+									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
+							else
+								recordLapsRx_dbm.set(i, lapTime);
+
+							if (lastValue < 0 && recordDiffRx_dbm.get(i) >= 0) { //local minimum Rx dbm detected
+								if (recordSmoothRx_dbm.get(i) / 1000 < localRxDbmMin) 
+									localRxDbmMin = recordSmoothRx_dbm.get(i) / 1000;
 							}
 						}
-						recordLapsRx_dbm.set(i, lapTime);
+						else if (lapTime == 0)
+							if (isLapEvent)
+								recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
+							else
+								recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
+						else
+							recordLapsRx_dbm.set(i, lapTime);
 					}
 					else
-						recordLapsRx_dbm.set(i, lapTime);
+						if (recordDiffRx_dbm.getTime_ms(i) > (filterStartTime+filterMaxTime))
+							recordLapsRx_dbm.set(i, 0);
+						else
+							recordLapsRx_dbm.set(i, lapTime);
 
 					lastValue = recordDiffRx_dbm.get(i);
+				}
+				//labs calculation end
 			}
-			//labs calculation end
-		}
-		if (recordDistanceStart != null && recordDiffDistance != null && recordLapsDistance != null) {
-			//temporary variables
-			double lastLapTimeStamp_ms = 0;
-			int lapTime = 0;
-			int lastValue = 0;
-			int lapCount = 0;
+			if (recordDistanceStart != null && recordDistanceStart.hasReasonableData() && recordDiffDistance != null && recordLapsDistance != null) {
+				//temporary variables
+				double lastLapTimeStamp_ms = 0;
+				int lapTime = 0;
+				int lastValue = 0;
+				int lapCount = 0;
+				boolean isLapEvent = false;
+				int localDistMax = 0;
 
-			//smooth and calculate differentiation
-			CalculationThread thread = new LinearRegression(recordSet, recordDistanceStart.getName(), recordDiffDistance.getName(), 2);
-			thread.start();
-			try {
-				thread.join();
-			}
-			catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				//smooth and calculate differentiation
+				CalculationThread thread = new LinearRegression(recordSet, recordDistanceStart.getName(), recordDiffDistance.getName(), 2);
+				thread.start();
+				try {
+					thread.join();
+				}
+				catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-			for (int i = 0; i < recordDiffDistance.realSize(); ++i) {
-					if (recordDiffDistance.getTime_ms(i) > filterStartTime //check start time before starting lab counting
-							&& (recordDiffDistance.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
+				for (int i = 0; i < recordDiffDistance.realSize(); ++i) {
+					if (recordDiffDistance.getTime_ms(i) > filterStartTime && recordDiffDistance.getTime_ms(i) < (filterStartTime+filterMaxTime)) { //check start time before starting lab counting
 
-						if (lastValue < 0 && recordDiffDistance.get(i) >= 0) { //lap event detected, nearest distance
-							if (lastLapTimeStamp_ms != 0) {
-								log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
-								lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
+						if ((recordDiffDistance.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
+
+							if (lastValue < 0 && recordDiffDistance.get(i) >= 0
+									&& (localDistMax - recordDistanceStart.get(i) / 1000) > filterMinDeltaDist) { //lap event detected, nearest distance
+								isLapEvent = true;
+								if (lastLapTimeStamp_ms != 0) {
+									log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
+									lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
+								}
+								lastLapTimeStamp_ms = recordSet.getTime_ms(i);
+								recordLapsDistance.set(i, lapTime);
+								if (lapTime != 0) {
+									if (lapCount % 2 == 0) {
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+									}
+									else {
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+									}
+								}
+								if (isLapEvent && lapTime == 0) //first lap start
+									recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
+
+								localDistMax = 0; //reset local distance maximum
 							}
-							lastLapTimeStamp_ms = recordSet.getTime_ms(i);
-							recordLapsDistance.set(i, lapTime);
-							if (lapTime != 0) {
-								if (lapCount % 2 == 0) {
-									recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
-								}
-								else {
-									recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
-								}
+							else if (lapTime == 0)
+								if (isLapEvent)
+									recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
+								else
+									recordLapsDistance.set(i, (int) filterLapMinTime_ms);
+							else
+								recordLapsDistance.set(i, lapTime);
+
+							if (lastValue > 0 && recordDiffDistance.get(i) <= 0) { //local maximum distance detected
+								if (recordDistanceStart.get(i) / 1000 > localDistMax) localDistMax = recordDistanceStart.get(i) / 1000;
 							}
 						}
-						recordLapsDistance.set(i, lapTime);
+						else if (lapTime == 0)
+							if (isLapEvent)
+								recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
+							else
+								recordLapsDistance.set(i, (int) filterLapMinTime_ms);
+						else
+							recordLapsDistance.set(i, lapTime);
 					}
 					else
-						recordLapsDistance.set(i, lapTime);
+						if (recordDiffDistance.getTime_ms(i) > (filterStartTime+filterMaxTime))
+							recordLapsDistance.set(i, 0);
+						else
+							recordLapsDistance.set(i, lapTime);
 
 					lastValue = recordDiffDistance.get(i);
+				}
 			}
+			this.application.updateStatisticsData(true);
+			this.updateVisibilityStatus(recordSet, true);
 		}
-
-		this.application.updateStatisticsData(true);
-		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**

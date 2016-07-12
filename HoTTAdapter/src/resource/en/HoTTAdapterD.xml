@@ -940,7 +940,8 @@
                 <property name="scale_sync_ref_ordinal" value="111" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
-        <property type="Boolean" value="true" name="enable_filter"/>
+        <property name="enable_filter" value="true" type="Boolean"/>
+        <property name="text_mode" value="true" type="Boolean"/>
     </Channels>
     <Desktop>
         <property value="true" name="table_tab"/>

@@ -144,8 +144,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				data_in.read(HoTTbinReader.buf);
 				if (HoTTbinReader2.logger.isLoggable(Level.FINE) && i % 10 == 0) {
 					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-				}
-				if (HoTTbinReader2.logger.isLoggable(Level.FINE)) {
 					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
@@ -474,12 +472,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader.buf);
 				if (HoTTbinReader2.logger.isLoggable(Level.FINEST)) {
-//if (((HoTTbinReader.buf[7] & 0xFF) == 0x89 && HoTTbinReader.buf[33] >= 2) || ((HoTTbinReader.buf[7] & 0xFF) == 0x8A) && HoTTbinReader.buf[33] == 4) {
-//	//					if (i%10 == 0)
-//	//						HoTTbinReader2.logger.logp(Level.OFF, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-//	System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-//	HoTTbinReader2.logger.logp(Level.OFF, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, String.format("0x%X - %d - %s", HoTTbinReader.buf[7], HoTTbinReader.buf[33], new String(buf0)));
-//}
 					HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 

@@ -148,8 +148,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				data_in.read(HoTTbinReader.buf);
 				if (HoTTbinReaderD.logger.isLoggable(Level.FINE) && i % 10 == 0) {
 					HoTTbinReaderD.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-				}
-				if (HoTTbinReaderD.logger.isLoggable(Level.FINE)) {
 					HoTTbinReaderD.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 

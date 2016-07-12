@@ -1097,8 +1097,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 				//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 				//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-				final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9, climbOrdinal = 10, speedOrdinal = 15, tripOrdinal = 18;
-				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
+				final int latOrdinal = 13, lonOrdinal = 14, altOrdinal = 9, climbOrdinal = 10, tripOrdinal = 18;
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, additionalMeasurementOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
@@ -1117,7 +1118,10 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-		return 15;
+		if (kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
+			return 15;
+		
+		return kmzMeasurementOrdinal;
 	}
 	
 	/**

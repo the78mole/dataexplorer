@@ -2939,6 +2939,7 @@
             </Measurement>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
+        <property name="text_mode" value="true" type="Boolean"/>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>

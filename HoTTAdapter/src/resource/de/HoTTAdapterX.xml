@@ -372,7 +372,9 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
         </Channel>
-        <property type="Boolean" value="true" name="enable_filter"/>
+        <property name="enable_filter" value="true" type="Boolean"/>
+        <property name="enable_channel" value="false" type="Boolean"/>
+        <property name="text_mode" value="true" type="Boolean"/>
     </Channels>
     <Desktop>
         <property value="true" name="table_tab"/>
