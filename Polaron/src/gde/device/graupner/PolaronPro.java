@@ -95,7 +95,7 @@ public class PolaronPro extends Polaron {
 						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
 					}
 				}
-				// 15=SpannungZelle8 16=SpannungZelle8 17=SpannungZelle10 18=SpannungZelle11 19=SpannungZelle12 20=SpannungZelle13 21=SpannungZelle14
+				// 15=SpannungZelle8 16=SpannungZelle9 17=SpannungZelle10 18=SpannungZelle11 19=SpannungZelle12 20=SpannungZelle13 21=SpannungZelle14
 				for (int j = 0; i < 7; ++i, j += 2) {
 					points[i + 8] = DataParser.parse2Short(dataBuffer, j + 159);
 					if (points[i + 8] > 0) {
