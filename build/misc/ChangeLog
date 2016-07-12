@@ -9,6 +9,7 @@ Version 3.2.7 - xx yyy 2016
 - reduce message in unsaved waring message box
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
+	- add default filter settings to device XML
 HoTTViewer Adapter
 	- add Rx dbm measurement value
 MC3000
