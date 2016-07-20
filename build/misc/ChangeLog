@@ -7,6 +7,7 @@ Version 3.2.7 - xx yyy 2016
 - fix error not writing OSD file if date as file name leader is not set
 - make Google Earth auto export more configurable
 - reduce message in unsaved waring message box
+- enable builds using Windows 10
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
 	- add default filter settings to device XML
