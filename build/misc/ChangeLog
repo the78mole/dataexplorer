@@ -19,6 +19,7 @@ MC3000
 	- correct NiZn program modus 
 	- adapt to FW 1.05+, power and energy retrieved directly from device
 	- fix problem while closing application with running data gatherer thread
+	- enable set charge programs to slots (FW >= 1.12)
 iCharger 308 DUO
 	- add live data gathering support
 iCharger 308/4010 DUO
