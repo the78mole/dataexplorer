@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2006 rel. 3 sp1 (http://www.altova.com) by Winfried Brügmann (IBM DEUTSCHLAND) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified">
 	<xs:element name="UltraDuoPlusType">
 		<xs:annotation>
