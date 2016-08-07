@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.device.DataTypes;
 import gde.utils.StringHelper;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +53,8 @@ public class ParameterConfigControl {
 	final String				format;
 
 	int									value					= 0;
+	String[]						textValues		= new String[0];
+	float								devisor				= 1.0f;
 
 	/**
 	 * create a parameter configuration control for number values with factor and offset, calculate with total height of 25 to 30
@@ -76,6 +79,24 @@ public class ParameterConfigControl {
 			final int sliderMaxValue, final int sliderOffset, final boolean isRounding) {
 		this.value = valueArray[valueIndex];
 		this.format = valueFormat.equals(GDE.STRING_EMPTY) ? "%d" : valueFormat; //$NON-NLS-1$
+		if (this.format.contains(GDE.STRING_DOT)) {
+			int startIndex = this.format.indexOf(GDE.STRING_DOT)+1;
+			int digits = Integer.valueOf(this.format.substring(startIndex, startIndex+1));
+			switch (digits) {
+			case 1:
+				devisor = 10.0f;
+				break;
+			case 2:
+				devisor = 100.0f;
+				break;
+			case 3:
+				devisor = 1000.0f;
+				break;
+			default:
+				devisor = 1.0f;
+				break;
+			}
+		}
 		this.offset = sliderOffset;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -105,21 +126,21 @@ public class ParameterConfigControl {
 					@Override
 					public void verifyText(VerifyEvent evt) {
 						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
-						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						evt.doit = StringHelper.verifyTypedInput(devisor == 1.0 ? DataTypes.INTEGER : DataTypes.DOUBLE, evt.text);
 					}
 				});
 				this.text.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
 						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
-						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
+						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText().replace(GDE.STRING_DOT,GDE.STRING_EMPTY));
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : ParameterConfigControl.this.value/devisor));
 						}
 						if (ParameterConfigControl.this.value > sliderMaxValue) {
 							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : ParameterConfigControl.this.value/devisor));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
@@ -170,7 +191,10 @@ public class ParameterConfigControl {
 							: ParameterConfigControl.this.value - 5) / 10 * 10;
 					else
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
-					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+					if (devisor == 1.0)
+						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+					else
+						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value/devisor));
 					if (evt.data == null) {
 						Event changeEvent = new Event();
 						changeEvent.index = valueIndex;
@@ -314,6 +338,7 @@ public class ParameterConfigControl {
 	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
 			final int descriptionWidth, final String[] textFiledValues, final int textFieldWidth, final int sliderWidth) {
 		this.value = valueArray[valueIndex];
+		this.textValues = textFiledValues;
 		this.format = GDE.STRING_EMPTY;
 		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
@@ -357,14 +382,14 @@ public class ParameterConfigControl {
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(0);
-			this.slider.setMaximum(textFiledValues.length < 10 ? 10 + textFiledValues.length - 1 : textFiledValues.length + 1);
+			this.slider.setMaximum(this.textValues.length < 10 ? 10 + this.textValues.length - 1 : this.textValues.length + 1);
 			this.slider.setSelection(this.value);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
-					ParameterConfigControl.this.text.setText(textFiledValues[ParameterConfigControl.this.value]);
+					ParameterConfigControl.this.text.setText(ParameterConfigControl.this.textValues[ParameterConfigControl.this.value]);
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
 					if (evt.data == null) {
 						Event changeEvent = new Event();
@@ -379,6 +404,13 @@ public class ParameterConfigControl {
 	public ParameterConfigControl dispose() {
 		this.baseComposite.dispose();
 		return null;
+	}
+
+	public void setEnabled(final boolean enable) {
+		this.nameLabel.setForeground(enable ? DataExplorer.COLOR_BLACK : DataExplorer.COLOR_GREY);
+		this.text.setEnabled(enable);
+		this.descriptionLabel.setForeground(enable ? DataExplorer.COLOR_BLACK : DataExplorer.COLOR_GREY);
+		this.slider.setEnabled(enable);
 	}
 
 	/**
@@ -434,5 +466,12 @@ public class ParameterConfigControl {
 		this.offset = newOffset;
 		this.slider.setMinimum(newMinSliderValue + this.offset);
 		this.slider.setMaximum(newMaxSliderValue + this.offset + 10);
+	}
+	
+	public void updateTextFieldValues(final String[] textFiledValues) {
+		this.textValues = textFiledValues;
+		this.slider.setMaximum(this.textValues.length < 10 ? 10 + this.textValues.length - 1 : this.textValues.length + 1);
+		this.value = ParameterConfigControl.this.slider.getSelection();
+		this.text.setText(this.textValues[ParameterConfigControl.this.value]);
 	}
 }
