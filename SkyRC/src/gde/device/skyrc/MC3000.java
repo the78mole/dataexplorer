@@ -31,6 +31,7 @@ import gde.device.MeasurementType;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.WaitTimer;
@@ -63,6 +64,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected String[]	BATTERY_TYPE;
 	//firmware 1.05+ power and energy comes direct from device
 	//protected int[]			resetEnergy = new int[] {5,5,5,5};
+  final static String[]			cellTypeNames							= {"LiIo","LiFe","LiHV","NiMH","NiCd","NiZn","Eneloop","RAM"};
+	final static String[]			cycleModeNames						= {"D>C","D>C>D","C>D","C>D>C"};
+	final static String[]			operationModeLi						= {"CHARGE","REFRESH","STORAGE","DISCHARGE","CYCLE"};
+	final static String[]			operationModeOther				= {"CHARGE","REFRESH","BREAKIN","DISCHARGE","CYCLE"};
+	final static String[]			cellModelNames						= {"Lite AAA","Std AAA","Pro/XX AAA","Lite AA","Std AA","Pro/XX AA","Std C","Std D"};
+	final static int[]			  cellModelCapacity					= {720, 960, 1080, 1200, 2400, 3000, 3840, 7200};
 
 	protected class SystemSettings {
 		byte currentSlotNumber;
@@ -76,10 +83,11 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		boolean isHideLiFe;
 		boolean isHideLiIon435;
 		boolean isHideEneloop;
-		boolean isHideLiZn;
+		boolean isHideNiZn;
 		byte LCDoffTime;
 		byte minVoltage;
 		byte[] machineId = new byte[16];
+		boolean isHideRAM;
 		
 		public SystemSettings(final byte[] buffer) {
 			currentSlotNumber = buffer[2];
@@ -93,17 +101,22 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			isHideLiFe = buffer[10] == 0x01;
 			isHideLiIon435 = buffer[11] == 0x01;
 			isHideEneloop = buffer[12] == 0x01;
-			isHideLiZn = buffer[13] == 0x01;
+			isHideNiZn = buffer[13] == 0x01;
 			LCDoffTime = buffer[14];
 			minVoltage = buffer[15];
 			for (int i = 0; i < 15; i++) {
 				machineId[i] = buffer[i+16];
 			}
+			isHideRAM = buffer[32] == 0x01;
 			//System.out.println(new String(machineId));
 		}
 
 		public String getFirmwareVersion() {
 			return String.format("Firmware : %d.%02d", machineId[11], machineId[12]);
+		}
+
+		public int getFirmwareVersionAsInt() {
+			return Integer.valueOf(String.format("%d%02d", machineId[11], machineId[12])).intValue();
 		}
 		
 		public byte getCurrentSlotNumber() {
@@ -162,12 +175,20 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			this.isHideEneloop = isHideEneloop;
 		}
 
-		public boolean isHideLiZn() {
-			return isHideLiZn;
+		public boolean isHideNiZn() {
+			return isHideNiZn;
 		}
 
-		public void setHideLiZn(boolean isHideLiZn) {
-			this.isHideLiZn = isHideLiZn;
+		public void setHideRAM(boolean isHideRAM) {
+			this.isHideRAM = isHideRAM;
+		}
+
+		public boolean isHideRAM() {
+			return isHideRAM;
+		}
+
+		public void setHideNiZn(boolean isHideNiZn) {
+			this.isHideNiZn = isHideNiZn;
 		}
 
 		public byte getLCDoffTime() {
@@ -203,6 +224,149 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		}
 	}
 	SystemSettings systemSettings;
+
+	protected class SlotSettings {
+		byte[] slotBuffer = new byte[64];
+		byte slotNumber;
+		byte batteryType;
+		byte operatinoMode;
+		byte[] capacity;
+		byte[] chargeCurrent;
+		byte[] dischargeCurrent;
+		byte[] dischargeEndVoltage;
+		byte[] chargeEndVoltage;
+		byte[] dischargeEndCurrent;
+		byte[] chargeEndCurrent;
+		byte numberCycle;
+		byte chargeRestingTime;
+		byte cycleMode;
+		byte endDeltaVoltage; //Ni cells only
+		byte trickleCurrent;
+		byte cutTemperature;
+		byte[] cutTime;
+	
+		public SlotSettings(final byte[] buffer) {
+			System.arraycopy(buffer, 0, this.slotBuffer, 0, buffer.length);
+			this.slotNumber = buffer[1];
+			this.batteryType = buffer[3];
+			this.operatinoMode = buffer[4];
+			this.capacity = new byte[] {buffer[5], buffer[6]};
+			this.chargeCurrent = new byte[] {buffer[7], buffer[8]};
+			this.dischargeCurrent = new byte[] {buffer[9], buffer[10]};
+			this.dischargeEndVoltage = new byte[] {buffer[11], buffer[12]};
+			this.chargeEndVoltage = new byte[] {buffer[13], buffer[14]};
+			this.dischargeEndCurrent = new byte[] {buffer[15], buffer[16]};
+			this.chargeEndCurrent = new byte[] {buffer[17], buffer[18]};
+			this.numberCycle = buffer[19];
+			this.chargeRestingTime = buffer[20];
+			this.cycleMode = buffer[21];
+			this.endDeltaVoltage = buffer[22];
+			this.trickleCurrent = buffer[23];
+			this.cutTemperature = buffer[26];
+			this.cutTime = new byte[] {buffer[27], buffer[28]};
+			log.log(Level.OFF, this.toString());
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("slotNumber=%02d batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d",
+					this.slotNumber, this.batteryType, this.operatinoMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaVoltage, this.trickleCurrent, this.cutTemperature, getCutTime());
+		}
+		
+		public String toString4View() {
+			int i = 0;
+		for (; this.batteryType == 6 && i < cellModelCapacity.length; i++) {
+			if (this.getCapacity() == cellModelCapacity[i])
+				break;
+		}
+			return String.format("%s - %s - %04d mAh (%s)",
+					MC3000.cellTypeNames[this.batteryType], 
+					this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode] : MC3000.operationModeOther[this.operatinoMode],
+					getCapacity(),
+					this.batteryType == 6 ? MC3000.cellModelNames[i] : GDE.STRING_DASH );
+		}
+		
+		public byte[] getBuffer() {
+			return this.slotBuffer;
+		}
+		public void setSlotNumber(final byte newSlotNumber) {
+			this.slotNumber = newSlotNumber;
+			this.slotBuffer[1] = newSlotNumber;
+			this.setCheckSum(MC3000UsbPort.calculateCheckSum(this.slotBuffer));
+		}
+		
+		public int getSlotNumber() {
+			return this.slotNumber;
+		}
+
+		public byte getBatteryType() {
+			return batteryType;
+		}
+
+		public byte getOperatinoMode() {
+			return operatinoMode;
+		}
+
+		public short getCapacity() {
+			return DataParser.parse2Short(this.capacity[1], this.capacity[0]);
+		}
+
+		public short getChargeCurrent() {
+			return DataParser.parse2Short(this.chargeCurrent[1], this.chargeCurrent[0]);
+		}
+
+		public short getDischargeCurrent() {
+			return DataParser.parse2Short(this.dischargeCurrent[1], this.dischargeCurrent[0]);
+		}
+
+		public short getDischargeEndVoltage() {
+			return DataParser.parse2Short(this.dischargeEndVoltage[1], this.dischargeEndVoltage[0]);
+		}
+
+		public short getChargeEndVoltage() {
+			return DataParser.parse2Short(this.chargeEndVoltage[1], this.chargeEndVoltage[0]);
+		}
+
+		public short getDischargeEndCurrent() {
+			return DataParser.parse2Short(this.dischargeEndCurrent[1], this.dischargeEndCurrent[0]);
+		}
+
+		public short getChargeEndCurrent() {
+			return DataParser.parse2Short(this.chargeEndCurrent[1], this.chargeEndCurrent[0]);
+		}
+
+		public byte getNumberCycle() {
+			return numberCycle;
+		}
+
+		public byte getChargeRestingTime() {
+			return chargeRestingTime;
+		}
+
+		public byte getCycleMode() {
+			return cycleMode;
+		}
+
+		public byte getEndDeltaVoltage() {
+			return endDeltaVoltage;
+		}
+
+		public byte getTrickleCurrent() {
+			return trickleCurrent;
+		}
+
+		public byte getCutTemperature() {
+			return cutTemperature;
+		}
+
+		public short getCutTime() {
+			return DataParser.parse2Short(this.cutTime[1], this.cutTime[0]);
+		}
+
+		public void setCheckSum(final byte newChecksum) {
+			this.slotBuffer[this.slotBuffer.length - 1] = newChecksum;
+		}
+	}
 
 	/**
 	 * constructor using properties file

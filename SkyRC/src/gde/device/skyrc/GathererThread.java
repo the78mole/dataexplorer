@@ -444,9 +444,9 @@ public class GathererThread extends Thread {
 				GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
-		if (this.dialog != null && !this.dialog.isDisposed()) {
-			this.dialog.checkPortStatus();
-		}
+//		if (this.dialog != null && !this.dialog.isDisposed()) {
+//			this.dialog.checkPortStatus();
+//		}
 
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points

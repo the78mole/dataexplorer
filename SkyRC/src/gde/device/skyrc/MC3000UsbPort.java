@@ -78,6 +78,26 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			this.value = newValue;
 		}
 	};
+
+	public enum QuerySlotData {
+		SLOT_0(new byte[]{0x0f, 0x04, 0x5F, 0x00, 0x00, 0x5F, (byte) 0xff, (byte) 0xff}), 
+		SLOT_1(new byte[]{0x0f, 0x04, 0x5F, 0x00, 0x01, 0x60, (byte) 0xff, (byte) 0xff}), 
+		SLOT_2(new byte[]{0x0f, 0x04, 0x5F, 0x00, 0x02, 0x61, (byte) 0xff, (byte) 0xff}), 
+		SLOT_3(new byte[]{0x0f, 0x04, 0x5F, 0x00, 0x03, 0x62, (byte) 0xff, (byte) 0xff});
+		private byte[]	value;
+
+		private QuerySlotData(byte[] v) {
+			this.value = v;
+		}
+
+		public byte[] value() {
+			return this.value;
+		}
+
+		public void setValue(final byte[] newValue) {
+			this.value = newValue;
+		}
+	};
 	
 	byte[] GET_SYSTEM_SETTING = new byte[]{0x0f, 0x04, 0x5a, 0x00, 0x00, 0x5a, (byte) 0xff, (byte) 0xff};
 	byte[] START_PROCESSING 	= new byte[]{0x0F, 0x03, 0x05, 0x00, 0x05, (byte) 0xff, (byte) 0xff, (byte) 0xff};
@@ -112,6 +132,20 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		tmpData = new byte[Math.abs(this.dataSize)];
 		System.arraycopy(TakeMtuData.SLOT_3.value(), 0, tmpData, 0, TakeMtuData.SLOT_3.value().length);
 		TakeMtuData.SLOT_3.setValue(tmpData);
+		
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(QuerySlotData.SLOT_0.value(), 0, tmpData, 0, QuerySlotData.SLOT_0.value().length);
+		QuerySlotData.SLOT_0.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(QuerySlotData.SLOT_1.value(), 0, tmpData, 0, QuerySlotData.SLOT_1.value().length);
+		QuerySlotData.SLOT_1.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(QuerySlotData.SLOT_2.value(), 0, tmpData, 0, QuerySlotData.SLOT_2.value().length);
+		QuerySlotData.SLOT_2.setValue(tmpData);
+		tmpData = new byte[Math.abs(this.dataSize)];
+		System.arraycopy(QuerySlotData.SLOT_3.value(), 0, tmpData, 0, QuerySlotData.SLOT_3.value().length);
+		QuerySlotData.SLOT_3.setValue(tmpData);
+
 		tmpData = new byte[Math.abs(this.dataSize)];
 		System.arraycopy(GET_SYSTEM_SETTING, 0, tmpData, 0, GET_SYSTEM_SETTING.length);
 		GET_SYSTEM_SETTING = tmpData;
@@ -213,10 +247,10 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			this.read(iface, this.endpointOut, data);
 			
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
-			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", this.calculateCheckSum(data), this.isChecksumOK(data)));
+			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
 			
 			if (!this.isChecksumOK(data, 16, 30, 31) && this.retrys-- >= 0) {
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", this.calculateCheckSum(data), this.isChecksumOK(data)));
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
 				return this.getSystemSettings(iface);
 			}
 		}
@@ -251,10 +285,10 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			this.read(iface, this.endpointOut, data);
 			
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
-			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", this.calculateCheckSum(data), this.isChecksumOK(data)));
+			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
 			
 			if (!this.isChecksumOK(data) && this.retrys-- >= 0) {
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", this.calculateCheckSum(data), this.isChecksumOK(data)));
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
 				return this.getData(iface, request);
 			}
 		}
@@ -265,7 +299,42 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		return data;
 	}
 	
-	private byte calculateCheckSum(byte[] buffer) {
+
+	/**
+	 * method to gather data from device, implementation is individual for device
+	 * @return byte array containing gathered data - this can individual specified per device
+	 * @throws IOException
+	 */
+	public synchronized byte[] getSlotData(final UsbInterface iface, final byte[] request) throws Exception {
+		final String $METHOD_NAME = "getSlotData"; //$NON-NLS-1$
+		byte[] data = new byte[Math.abs(this.dataSize)];
+
+		try {
+			this.write(iface, this.endpointIn, request);			
+			try {
+				Thread.sleep(10);
+			}
+			catch (Exception e) {
+				// ignore
+			}
+			this.read(iface, this.endpointOut, data);
+			
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
+			
+			if (!this.isChecksumOK(data) && this.retrys-- >= 0) {
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
+				return this.getData(iface, request);
+			}
+		}
+		catch (Exception e) {
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+		}
+		this.retrys = 1;
+		return data;
+	}
+
+	public static byte calculateCheckSum(byte[] buffer) {
 		return (byte) Checksum.ADD(buffer, 0, buffer.length-2);
 	}
 
