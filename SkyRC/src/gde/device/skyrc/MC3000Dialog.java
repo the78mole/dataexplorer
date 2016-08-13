@@ -539,19 +539,19 @@ public class MC3000Dialog extends DeviceDialog {
 					switch (index) {
 					case 0:
 						newProgramBuffer = MC3000Dialog.this.slotSettings_0.getBuffer((byte)0, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.usbPort.write(newProgramBuffer);
+						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 					case 1:
 						newProgramBuffer = MC3000Dialog.this.slotSettings_1.getBuffer((byte)1, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.usbPort.write(newProgramBuffer);
+						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 					case 2:
 						newProgramBuffer = MC3000Dialog.this.slotSettings_2.getBuffer((byte)2, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.usbPort.write(newProgramBuffer);
+						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 					case 3:
 						newProgramBuffer = MC3000Dialog.this.slotSettings_3.getBuffer((byte)3, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.usbPort.write(newProgramBuffer);
+						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 
 					default:

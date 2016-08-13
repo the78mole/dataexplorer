@@ -316,7 +316,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[25] = this.cutTemperature;
 				System.arraycopy(this.slotBuffer, 27, reducedBuffer, 26,  2);//cut time
 				System.arraycopy(this.slotBuffer, 24, reducedBuffer, 28,  2);//restart voltage
-				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer);
+				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer, 29);
 				reducedBuffer[31] = (byte) 0xFF;
 				reducedBuffer[32] = (byte) 0xFF;
 				log.log(Level.OFF, StringHelper.byte2Hex2CharString(reducedBuffer, 64));

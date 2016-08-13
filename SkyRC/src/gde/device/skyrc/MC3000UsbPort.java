@@ -264,6 +264,51 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 		return data;
 	
 	}
+	
+	/**
+	 * query the actual system settings
+	 * @param usbInterface
+	 * @return
+	 * @throws Exception
+	 */
+	public synchronized byte[] setSlotProgram(final UsbInterface usbInterface, final byte[] buffer) throws Exception {
+		final String $METHOD_NAME = "getSystemSettings"; //$NON-NLS-1$
+		byte[] data = new byte[Math.abs(this.dataSize)];
+		UsbInterface iface = null;
+		boolean isPortOpenedByCall = false;
+
+		try {
+			if (usbInterface == null) {
+				iface = this.openUsbPort(this.device);
+				isPortOpenedByCall = true;
+			}
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(buffer, buffer.length));
+			iface = usbInterface == null ? this.openUsbPort(this.device) : usbInterface;
+			this.write(iface, this.endpointIn, buffer);					
+			try {
+				Thread.sleep(10);
+			}
+			catch (Exception e) {
+				// ignore
+			}
+			this.read(iface, this.endpointOut, data);			
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+			
+			if (!this.isChecksumOK(data, 16, 30, 31) && this.retrys-- >= 0) {
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
+				return this.getSystemSettings(iface);
+			}
+		}
+		catch (Exception e) {
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+		}
+		finally {
+				if (isPortOpenedByCall) this.closeUsbPort(iface);
+		}
+		this.retrys = 1;
+		return data;
+	
+	}
 
 	/**
 	 * method to gather data from device, implementation is individual for device
@@ -311,6 +356,7 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 
 		try {
 			this.write(iface, this.endpointIn, request);			
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(request, request.length));
 			try {
 				Thread.sleep(10);
 			}
@@ -335,11 +381,11 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 	}
 
 	public static byte calculateCheckSum(byte[] buffer) {
-		return (byte) (Checksum.ADD(buffer, 0, buffer.length-2)%256);
+		return  (byte) (Checksum.ADD(buffer, 0, buffer.length-2)%256);
 	}
 
 	public static byte calculateCheckSum(byte[] buffer, final int length) {
-		return (byte) (Checksum.ADD(buffer, 0, length)%256);
+		return (byte) (Checksum.ADD(buffer, 2, length)%256);
 	}
 
 	/**
