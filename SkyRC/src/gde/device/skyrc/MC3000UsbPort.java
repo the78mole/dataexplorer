@@ -335,7 +335,11 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 	}
 
 	public static byte calculateCheckSum(byte[] buffer) {
-		return (byte) Checksum.ADD(buffer, 0, buffer.length-2);
+		return (byte) (Checksum.ADD(buffer, 0, buffer.length-2)%256);
+	}
+
+	public static byte calculateCheckSum(byte[] buffer, final int length) {
+		return (byte) (Checksum.ADD(buffer, 0, length)%256);
 	}
 
 	/**

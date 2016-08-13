@@ -34,6 +34,7 @@ import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
@@ -228,6 +229,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected class SlotSettings {
 		byte[] slotBuffer = new byte[64];
 		byte slotNumber;
+		byte busyTag;
 		byte batteryType;
 		byte operatinoMode;
 		byte[] capacity;
@@ -244,10 +246,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		byte trickleCurrent;
 		byte cutTemperature;
 		byte[] cutTime;
+		byte[] restartVoltage;
+		byte temeratureUnit;
 	
 		public SlotSettings(final byte[] buffer) {
 			System.arraycopy(buffer, 0, this.slotBuffer, 0, buffer.length);
 			this.slotNumber = buffer[1];
+			this.busyTag = buffer[2];
 			this.batteryType = buffer[3];
 			this.operatinoMode = buffer[4];
 			this.capacity = new byte[] {buffer[5], buffer[6]};
@@ -262,15 +267,21 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			this.cycleMode = buffer[21];
 			this.endDeltaVoltage = buffer[22];
 			this.trickleCurrent = buffer[23];
+			this.restartVoltage = new byte[] {buffer[24], buffer[25]};
 			this.cutTemperature = buffer[26];
 			this.cutTime = new byte[] {buffer[27], buffer[28]};
+			this.temeratureUnit = buffer[29];
 			log.log(Level.OFF, this.toString());
+		}
+		
+		public boolean isBusy() {
+			return this.busyTag == 0x01;
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("slotNumber=%02d batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d",
-					this.slotNumber, this.batteryType, this.operatinoMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaVoltage, this.trickleCurrent, this.cutTemperature, getCutTime());
+			return String.format("slotNumber=%02d busy=%b batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d restartVoltage=%03d temeratureUnit=%d",
+					this.slotNumber, this.busyTag == 0x01, this.batteryType, this.operatinoMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaVoltage, this.trickleCurrent, this.cutTemperature, getCutTime(), getRestartVoltage(), this.temeratureUnit);
 		}
 		
 		public String toString4View() {
@@ -283,12 +294,38 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					MC3000.cellTypeNames[this.batteryType], 
 					this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode] : MC3000.operationModeOther[this.operatinoMode],
 					getCapacity(),
-					this.batteryType == 6 ? MC3000.cellModelNames[i] : GDE.STRING_DASH );
+					this.batteryType == 6 && i < MC3000.cellModelNames.length ? MC3000.cellModelNames[i] : GDE.STRING_DASH );
 		}
 		
 		public byte[] getBuffer() {
 			return this.slotBuffer;
 		}
+		
+		public byte[] getBuffer(final byte newSlotNumber, final int firmwareAsNumber) {
+			byte[] reducedBuffer = new byte[64];
+			if (firmwareAsNumber <= 111) {
+				reducedBuffer[0] = 0x0F;
+				reducedBuffer[1] = 0x1D;
+				reducedBuffer[2] = 0x11;
+				reducedBuffer[3] = 0x00;
+				reducedBuffer[4] = newSlotNumber;
+				reducedBuffer[5] = this.batteryType;
+				reducedBuffer[6] = (byte) (this.getCapacity()/100);
+				reducedBuffer[7] = this.operatinoMode;
+				System.arraycopy(this.slotBuffer,  7, reducedBuffer,  8, 17);//charge current to trickle current
+				reducedBuffer[25] = this.cutTemperature;
+				System.arraycopy(this.slotBuffer, 27, reducedBuffer, 26,  2);//cut time
+				System.arraycopy(this.slotBuffer, 24, reducedBuffer, 28,  2);//restart voltage
+				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer);
+				reducedBuffer[31] = (byte) 0xFF;
+				reducedBuffer[32] = (byte) 0xFF;
+				log.log(Level.OFF, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
+				log.log(Level.OFF, String.format("slotNumber=%02d batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d restartVoltage=%04d",
+						reducedBuffer[4], reducedBuffer[5], this.operatinoMode, reducedBuffer[6]*100, getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaVoltage, this.trickleCurrent, this.cutTemperature, DataParser.parse2Short(reducedBuffer[27], reducedBuffer[26]), DataParser.parse2Short(reducedBuffer[29], reducedBuffer[28])));
+			}
+			return reducedBuffer;
+		}
+		
 		public void setSlotNumber(final byte newSlotNumber) {
 			this.slotNumber = newSlotNumber;
 			this.slotBuffer[1] = newSlotNumber;
@@ -361,6 +398,10 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 
 		public short getCutTime() {
 			return DataParser.parse2Short(this.cutTime[1], this.cutTime[0]);
+		}
+
+		public short getRestartVoltage() {
+			return DataParser.parse2Short(this.restartVoltage[1], this.restartVoltage[0]);
 		}
 
 		public void setCheckSum(final byte newChecksum) {
@@ -666,25 +707,29 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		points[0] = DataParser.parse2Short(dataBuffer[9], dataBuffer[8]) * 1000;
 		points[1] = DataParser.parse2Short(dataBuffer[11], dataBuffer[10]) * 1000 * chargeCorrection;
 		points[2] = DataParser.parse2Short(dataBuffer[13], dataBuffer[12]) * 1000;
-//		points[3] = Double.valueOf(points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection).intValue(); // power U*I [W]
-//		switch (dataBuffer[1]) {
-//		case 0: //add up energy
-//			points[4] += Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0 + 0.5).intValue();
-//			break;
-//		case 1: // reset energy
-//			points[4] = 0;
-//			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reset Energy");
-//			break;
-//		default: // keep energy untouched
-//		case -1: // keep energy untouched
-//			points[4] = points[4];
-//			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "untouche Energy");
-//			break;
-//		}
-		//firmware 1.05+ Energy and power comes direct from the device
-		points[3] = DataParser.parse2Short(dataBuffer[23], dataBuffer[22]) * 1000;
-		points[4] = DataParser.parse2Short(dataBuffer[21], dataBuffer[20]) * 1000;
-		
+		if (this.systemSettings != null && this.systemSettings.getFirmwareVersionAsInt() <= 105) {
+			points[3] = Double.valueOf(points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection).intValue(); // power U*I [W]
+			switch (dataBuffer[1]) {
+			case 0: //add up energy
+				points[4] += Double.valueOf((points[0] / 1000.0 * points[1] / 1000.0 * chargeCorrection)/3600.0 + 0.5).intValue();
+				break;
+			case 1: // reset energy
+				points[4] = 0;
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reset Energy");
+				break;
+			default: // keep energy untouched
+			case -1: // keep energy untouched
+				points[4] = points[4];
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "untouche Energy");
+				break;
+			}
+		} else {//firmware 1.05+ Energy and power comes direct from the device			
+			points[3] = DataParser.parse2Short(dataBuffer[23], dataBuffer[22]) * 1000;
+			points[4] = DataParser.parse2Short(dataBuffer[21], dataBuffer[20]) * 1000;
+		}
+		if (this.systemSettings != null && this.systemSettings.getFirmwareVersionAsInt() >= 111) {
+			points[2] += dataBuffer[24] * 100; //capacity decimal
+		}
 		points[5] = DataParser.parse2Short(dataBuffer[15], dataBuffer[14]) * 1000;
 		points[6] = DataParser.parse2Short(dataBuffer[17], dataBuffer[16]) * 1000;
 		points[7] = DataParser.parse2Short(dataBuffer[19], dataBuffer[18]) * 1000;
