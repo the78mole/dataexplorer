@@ -233,6 +233,9 @@
 			<os name="Windows 8.1" />
 		</condition>
 		<condition property="isWindows">
+			<os name="Windows 10" />
+		</condition>
+		<condition property="isWindows">
 			<os name="Windows NT (unknown)" /> <!-- Windows 8 -->
 		</condition>
 		<antcall target="Windows" />
