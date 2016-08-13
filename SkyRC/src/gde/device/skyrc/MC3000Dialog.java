@@ -20,9 +20,6 @@ package gde.device.skyrc;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.skyrc.MC3000.SlotSettings;
 import gde.device.skyrc.MC3000.SystemSettings;
@@ -101,21 +98,9 @@ public class MC3000Dialog extends DeviceDialog {
 	ScrolledComposite						scrolledchargeComposite;
 	Group												slotsViewGroup;
 
-	//final Listener						memoryParameterChangeListener;
-
-	//ParameterConfigControl[]	memoryParameters					= new ParameterConfigControl[31];
-	//int[]											memoryValues							= new int[30];
 	int													parameterSelectHeight		= 25;
 	int													chargeSelectHeight			= 17 * this.parameterSelectHeight;
-
-	//  static String[]						cellTypeNames							= {"LiIo","LiFe","LiHV","NiMH","NiCd","NiZn","Eneloop","RAM"};
-	//	final static String[]			cycleModeNames						= {"D>C","D>C>D","C>D","C>D>C"};
-	//	final static String[]			operationModeLi						= {"CHARGE","REFRESH","STORAGE","DISCHARGE","CYCLE"};
-	//	final static String[]			operationModeOther				= {"CHARGE","REFRESH","BREAKIN","DISCHARGE","CYCLE"};
-	//	final static String[]			restingTimeValues					= {"OFF", "END", "REST"};
-	//	final static String[]			cellModelNames						= {"Std AA","Std AAA","Pro/XX AA","Pro/XX AAA","Plus AA","Lite AA","Lite AAA","Std C","Std D"};
-	//	final static int[]			  cellModelCapacity					= {2000, 960, 3000, 1500, 2200, 1000, 800, 1200, 1800};
-	String[]										programmNames						= new String[MC3000Dialog.NUMBER_PROGRAM_ENTRIES];
+ 	String[]										programmNames						= new String[MC3000Dialog.NUMBER_PROGRAM_ENTRIES];
 	int													lastSelectionIndex[]		= { 0, 0, 0, 0 };
 	CCombo[]										programmNameCombos			= new CCombo[4];
 
@@ -156,101 +141,8 @@ public class MC3000Dialog extends DeviceDialog {
 		for (int i = 0; i < MC3000Dialog.NUMBER_PROGRAM_ENTRIES; i++) {
 			this.programmNames[i] = String.format("%02d - %s", i + 1, MC3000Dialog.NEW_PROG_NAME); //$NON-NLS-1$
 		}
-		//disable listener and battery dependent handling of parameters due to inconsistent setting of device program parameters 
-		//		this.memoryParameterChangeListener = new Listener() {
-		//			@Override
-		//			public void handleEvent(Event evt) {
-		//				int selectionIndex = 0;
-		//				if (memoryParameters[evt.index] != null) 
-		//					selectionIndex = memoryParameters[evt.index].getSlider().getSelection();
-		//				log.log(java.util.logging.Level.OFF,	"memoryParameterChangeListener (" + " memoryValues[" + evt.index + "] changed -> " + selectionIndex); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
-		//				switch (evt.index) {
-		//				case 5://Battery Type LiIo NiMH ...
-		//					updateBatteryTypeParameter(selectionIndex);					
-		//					break;
-		//				case 6://Battery Model AAA AA ...
-		//					updateBatteryModelParameter(selectionIndex);					
-		//					break;
-		//				case 7://Operation Mode Charge Discharge ...
-		//					updateOperationModeParameter(selectionIndex);					
-		//					break;
-		//
-		//				default:
-		//					break;
-		//				}
-		//			}
-		//		};
 	}
 
-	//	/**
-	//	 * update the memory setup parameter list to cell type dependent
-	//	 */
-	//	private void updateBatteryTypeParameter(int selectionIndex) {
-	//		log.log(java.util.logging.Level.FINE,	"selectionIndex = " + selectionIndex + " - " + cellTypeNames[selectionIndex]); 
-	//		//4=slotNumber 5=batteryType 6=capacity 7=operationMode 8,9=chargeCurrent 10,11=dischargeCurrent 12,13=dischargeEndVoltage 14,15=chargeEndVoltage 
-	//		//16,17=chargeEndCurrent 18,19=dischargeEndCurrent 20=cycleCount 21=cycleRestTime 22=cycleMode 23=niVoltageDelta 24=niTrickleCurrent 25=cutTemperature
-	//		//26=cutTime 27=restartVoltage
-	//		switch (selectionIndex) {
-	//		case 0: //"LiIo"
-	//			this.memoryParameters[6].setEnabled(false);
-	//			this.memoryParameters[7].updateTextFieldValues(operationModeLi);
-	//			this.memoryParameters[12].updateValueRange("[V] (2.50 - 3.65 V)", 0, 365, -250);
-	//			this.memoryParameters[14].updateValueRange("[V] (4.00 - 4,25 V)", 0, 425, -400); //$NON-NLS-1$
-	//			this.memoryParameters[23].setEnabled(false);
-	//			this.memoryParameters[24].setEnabled(false);
-	//			this.memoryParameters[26].setEnabled(false);
-	//			this.memoryParameters[27].setEnabled(false);
-	//			break;
-	//		case 1: //"LiFe"
-	//			this.memoryParameters[1].setEnabled(true);
-	//			this.memoryParameters[6].setEnabled(false);
-	//			this.memoryParameters[7].updateTextFieldValues(operationModeLi);
-	//			this.memoryParameters[12].updateValueRange("[V] (2.50 - 3.65 V)", 0, 365, -250);
-	//			this.memoryParameters[14].updateValueRange("[V] (4.00 - 4,25 V)", 0, 425, -400); //$NON-NLS-1$
-	//			this.memoryParameters[23].setEnabled(false);
-	//			this.memoryParameters[24].setEnabled(false);
-	//			this.memoryParameters[26].setEnabled(false);
-	//			this.memoryParameters[27].setEnabled(false);
-	//			break;
-	//		case 2: //"LiHV"
-	//			this.memoryParameters[1].setEnabled(true);
-	//			this.memoryParameters[6].setEnabled(false);
-	//			this.memoryParameters[7].updateTextFieldValues(operationModeLi);
-	//			this.memoryParameters[12].updateValueRange("[V] (2.50 - 3.65 V)", 0, 365, -250);
-	//			this.memoryParameters[14].updateValueRange("[V] (4.10 - 4,40 V)", 0, 440, -410); //$NON-NLS-1$
-	//			this.memoryParameters[23].setEnabled(false);
-	//			this.memoryParameters[24].setEnabled(false);
-	//			this.memoryParameters[26].setEnabled(false);
-	//			this.memoryParameters[27].setEnabled(false); 
-	//			break;
-	//		case 3: //"NiMH"
-	//		case 4: //"NiCd"
-	//		case 6: //"Eneloop"
-	//			this.memoryParameters[1].setEnabled(false);
-	//			this.memoryParameters[6].setEnabled(true);
-	//			this.memoryParameters[7].updateTextFieldValues(operationModeOther);
-	//			this.memoryParameters[12].updateValueRange("[V] (0.50 - 1 V)", 0, 100, -50);
-	//			this.memoryParameters[14].updateValueRange("[V] (1.47 - 1.8 V)", 0, 180, -147); //$NON-NLS-1$
-	//			this.memoryParameters[23].setEnabled(true);
-	//			this.memoryParameters[24].setEnabled(true);
-	//			this.memoryParameters[26].setEnabled(true);
-	//			this.memoryParameters[27].setEnabled(true);
-	//			break;
-	//		case 5: //"NiZn"
-	//			
-	//			break;
-	//		case 7: //"RAM"
-	//			
-	//			break;
-	//
-	//		default:
-	//			break;
-	//		}
-	//		this.chargeGroup.setSize(this.scrolledchargeComposite.getClientArea().width, this.chargeSelectHeight);
-	//		this.chargeGroup.layout(true);
-	//		this.scrolledchargeComposite.layout(true);
-	//	}
-	//
 	/**
 	 * update the memory parameter according to system properties
 	 */
@@ -261,114 +153,6 @@ public class MC3000Dialog extends DeviceDialog {
 			}
 		}
 	}
-
-	//	/**
-	//	 * update the memory setup parameter list to cell type dependent
-	//	 */
-	//	private void updateBatteryModelParameter(int selectionIndex) {
-	//		log.log(java.util.logging.Level.FINE,	"selectionIndex = " + selectionIndex + " - " + cellTypeNames[selectionIndex]); 
-	//		switch (selectionIndex) {
-	//		case 0: //"LiIo"
-	//			
-	//			break;
-	//		case 1: //"LiFe"
-	//			
-	//			break;
-	//		case 2: //"LiHV"
-	//			
-	//			break;
-	//		case 3: //"NiMH"
-	//			
-	//			break;
-	//		case 4: //"NiCd"
-	//			
-	//			break;
-	//		case 5: //"NiZn"
-	//			
-	//			break;
-	//		case 6: //"Eneloop"
-	//			
-	//			break;
-	//		case 7: //"RAM"
-	//			
-	//			break;
-	//
-	//		default:
-	//			break;
-	//		}
-	//	}
-	//
-	//	/**
-	//	 * update the memory setup parameter list to cell type dependent
-	//	 */
-	//	private void updateOperationModeParameter(int selectionIndex) {
-	//		log.log(java.util.logging.Level.FINE,	"selectionIndex = " + selectionIndex + " - " + cellTypeNames[selectionIndex]); 
-	//		switch (selectionIndex) {
-	//		case 0: //"LiIo"
-	//			
-	//			break;
-	//		case 1: //"LiFe"
-	//			
-	//			break;
-	//		case 2: //"LiHV"
-	//			
-	//			break;
-	//		case 3: //"NiMH"
-	//			
-	//			break;
-	//		case 4: //"NiCd"
-	//			
-	//			break;
-	//		case 5: //"NiZn"
-	//			
-	//			break;
-	//		case 6: //"Eneloop"
-	//			
-	//			break;
-	//		case 7: //"RAM"
-	//			
-	//			break;
-	//
-	//		default:
-	//			break;
-	//		}
-	//	}
-	//
-	//	/**
-	//	 * update the memory setup parameter list to cell type dependent
-	//	 */
-	//	private void updateBatteryTypeParameter(int selectionIndex) {
-	//		log.log(java.util.logging.Level.FINE,	"selectionIndex = " + selectionIndex + " - " + cellTypeNames[selectionIndex]); 
-	//		switch (selectionIndex) {
-	//		case 0: //"LiIo"
-	//			
-	//			break;
-	//		case 1: //"LiFe"
-	//			
-	//			break;
-	//		case 2: //"LiHV"
-	//			
-	//			break;
-	//		case 3: //"NiMH"
-	//			
-	//			break;
-	//		case 4: //"NiCd"
-	//			
-	//			break;
-	//		case 5: //"NiZn"
-	//			
-	//			break;
-	//		case 6: //"Eneloop"
-	//			
-	//			break;
-	//		case 7: //"RAM"
-	//			
-	//			break;
-	//
-	//		default:
-	//			break;
-	//		}
-	//	}
 
 	@Override
 	public void open() {
@@ -417,7 +201,6 @@ public class MC3000Dialog extends DeviceDialog {
 			}
 			catch (Exception e) {
 				MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-				this.application.openMessageDialogAsync(e.getMessage());
 			}
 			finally {
 				if (isConnectedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
@@ -450,7 +233,7 @@ public class MC3000Dialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(355, 75 + this.chargeSelectHeight);
+				this.dialogShell.setSize(355, (GDE.IS_WINDOWS ? 85 : 75) + this.chargeSelectHeight);
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -493,64 +276,17 @@ public class MC3000Dialog extends DeviceDialog {
 					this.tabFolder.setLayout(new FillLayout(SWT.VERTICAL));
 					this.tabFolder.setSize(this.dialogShell.getClientArea().width, this.chargeSelectHeight);
 					this.tabFolder.layout();
-					//					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 					{
-						//						this.chargeTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-						//						this.chargeTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						//						this.chargeTabItem.setText("Slot 1");
 						{
 							this.scrolledchargeComposite = new ScrolledComposite(this.tabFolder, SWT.BORDER | SWT.V_SCROLL);
 							FillLayout scrolledMemoryCompositeLayout = new FillLayout();
 							this.scrolledchargeComposite.setLayout(scrolledMemoryCompositeLayout);
-							//							this.chargeTabItem.setControl(this.scrolledchargeComposite);
 							{
 								this.slotsViewGroup = new Group(this.scrolledchargeComposite, SWT.NONE);
 								this.slotsViewGroup.setLayout(new FillLayout(SWT.VERTICAL));
 								for (int i = 0; i < 4; i++) {
 									createSlotGroup(i);
 								}
-								//								Group slot1 = new Group(this.slotsViewGroup, SWT.NONE);
-								//								slot1.setLayout(new RowLayout(SWT.HORIZONTAL));
-								//								slot1.setText("Slot 1");
-								//								CLabel label1 = new CLabel(slot1, SWT.None);
-								//								label1.setText(this.slotSettings_1 != null ? this.slotSettings_1.toString4View() : "no connetion to device");
-								//								Group slot2 = new Group(this.slotsViewGroup, SWT.NONE);
-								//								slot2.setLayout(new RowLayout(SWT.HORIZONTAL));
-								//								slot2.setText("Slot 2");
-								//								CLabel label2 = new CLabel(slot2, SWT.None);
-								//								label2.setText(this.slotSettings_2 != null ? this.slotSettings_2.toString4View() : "no connetion to device");
-								//								Group slot3 = new Group(this.slotsViewGroup, SWT.NONE);
-								//								slot3.setLayout(new RowLayout(SWT.HORIZONTAL));
-								//								slot3.setText("Slot 3");
-								//								CLabel label3 = new CLabel(slot3, SWT.None);
-								//								label3.setText(this.slotSettings_3 != null ? this.slotSettings_3.toString4View() : "no connetion to device");
-
-								//								this.chargeGroup.addListener(SWT.Selection, memoryParameterChangeListener);
-								//								//charge parameter
-								//								//4=slotNumber 5=batteryType 6=capacity 7=operationMode 8,9=chargeCurrent 10,11=dischargeCurrent 12,13=dischargeEndVoltage 14,15=chargeEndVoltage 
-								//								//16,17=chargeEndCurrent 18,19=dischargeEndCurrent 20=cycleCount 21=cycleRestTime 22=cycleMode 23=niVoltageDelta 24=niTrickleCurrent 25=cutTemperature
-								//								//26,27=cutTime 28,29=restartVoltage
-								//								this.memoryParameters[5] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 5, "Battery Type", 175,	GDE.STRING_EMPTY, 190, cellTypeNames, 80, 150);
-								//								this.memoryParameters[6] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 6, "Battery Model", 175,	GDE.STRING_EMPTY, 190, cellModelNames, 80, 150);
-								//								this.memoryParameters[7] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 7, "Operation Mode", 175,	GDE.STRING_EMPTY, 190, operationModeLi, 80, 150);
-								//								this.memoryParameters[1] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 6, GDE.STRING_EMPTY, "Capacity", 175, "[mAh] (0 = OFF)", 190, true, 80, 150, 0, 5000, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[8] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 8, "%3.2f", "Charge Current", 175,	"[A] (0.05 - 3 A)", 190, true, 80, 150, 5, 300, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[10] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 10, "%3.2f", "Discharge Current", 175, "[A] (0.05 - 2 A)", 190, true, 80, 150, 5, 200, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[14] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 11, "%3.2f", "Charge Target Voltage", 175, "[V] (1.47 - 1.8 V)", 190, true, 80, 150, 0, 180, -147, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[16] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 8, "%3.2f", "Charge Termination Current", 175, "[A] (0 - 0.49 A, 0.5 = OFF)", 190, true, 80, 150, 0, 50, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[18] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 10, "%3.2f", "Discharge End Current", 175,	"[A] (0.01 - 0.99 A 1.00=OFF)", 190, true, 80, 150, 1, 100, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[20] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 10, GDE.STRING_EMPTY, "Cycle Count", 175,	"1 - 99", 190, true, 80, 150, 1, 99); //$NON-NLS-1$ 
-								//								this.memoryParameters[21] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 12, GDE.STRING_EMPTY, "Cycle Rest Time", 175,	"[min] (0 - 240 min)", 190, true, 80, 150, 0, 240);
-								//								this.memoryParameters[22] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, "Cycle Mode", 175, GDE.STRING_EMPTY, 190, cycleModeNames, 80, 150);
-								//								this.memoryParameters[23] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 9, GDE.STRING_EMPTY, "NiMH/NiCd Delta Peak", 175, "[mV] (0 - 15 mV)", 190, true, 80, 150, 0, 15, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[24] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, GDE.STRING_EMPTY, "NiMH/NiCd Trickle Current", 175,	"[mA] (OFF = 9) 10 - 200 mA", 190, true, 80, 150, 9, 200, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[25] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 7, GDE.STRING_EMPTY, "Cut temperature", 175,"[°C] (20 - 75 °C)", 190, true, 80, 150, 20, 75); //$NON-NLS-1$ 
-								//								this.memoryParameters[26] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 26, "NiMH/NiCd Trickle Time", 175,	"OFF - End - Resting", 190, restingTimeValues, 80, 150); //$NON-NLS-1$ 								
-								//								this.memoryParameters[12] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 11, "%3.2f", "Discharge Cut Voltage", 175, "[V] (0.50 - 1 V)", 190, true, 80, 150, 0, 100, -50, false); //$NON-NLS-1$
-								//								this.memoryParameters[27] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 8, GDE.STRING_EMPTY, "Cut time", 175, "[min] (OFF=0, 1 - 1440 min)", 190, true, 80, 150, 0, 1440); //$NON-NLS-1$ 
-								//								this.memoryParameters[28] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 15, "%3.2f", "Restart Voltage", 175,	"[V] (OFF=1.29 1.3 - 1.45 V)", 190, true, 80, 150, 129, 145, -129, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[29] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 15, GDE.STRING_EMPTY, "Charge Rest Time", 175,	"[min] (0 - 240 min)", 190, true, 80, 150, 0, 240, 0, false); //$NON-NLS-1$ 
-								//								this.memoryParameters[30] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 15, GDE.STRING_EMPTY, "Discharge Rest Time", 175,	"[min] (0 - 240 min)", 190, true, 80, 150, 0, 240, 0, false); //$NON-NLS-1$ 
 							}
 							this.scrolledchargeComposite.setContent(this.slotsViewGroup);
 							this.slotsViewGroup.setSize(620, this.chargeSelectHeight);
@@ -572,11 +308,6 @@ public class MC3000Dialog extends DeviceDialog {
 							this.scrolledchargeComposite.layout(true);
 						}
 					}
-					//					{
-					//						for (int i = 0; i < this.device.getChannelCount(); i++) {
-					//							this.configurations.add(new MC3000TabItem(this.tabFolder, this, (i + 1), this.device));
-					//						}
-					//					}
 					{
 						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
@@ -641,20 +372,8 @@ public class MC3000Dialog extends DeviceDialog {
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					//this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
-				}
-
-				Channel activChannel = Channels.getInstance().getActiveChannel();
-				if (activChannel != null) {
-					RecordSet activeRecordSet = activChannel.getActiveRecordSet();
-					if (activeRecordSet != null) {
-						//						this.tabFolder.setSelection(activeRecordSet.getChannelConfigNumber());
-						//						tabFolderSelectionIndex = tabFolder.getSelectionIndex();
-					}
-					else {
-						if (this.device.usbPort.isMatchAvailablePorts(this.device.getPort()) && !this.device.usbPort.isConnected()) this.device.open_closeCommPort();
-					}
 				}
 
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
@@ -665,7 +384,6 @@ public class MC3000Dialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
-			//			updateBatteryTypeParameter(0); //TODO
 			updateSystemParameter(this.systemSettings);
 
 			Display display = this.dialogShell.getDisplay();
@@ -681,9 +399,9 @@ public class MC3000Dialog extends DeviceDialog {
 	private void createSlotGroup(final int index) {
 		Group slot = new Group(this.slotsViewGroup, SWT.NONE);
 		slot.setLayout(new RowLayout(SWT.HORIZONTAL));
-		slot.setText(Messages.getString(MessageIds.GDE_MSGT3652, new Object[] { index }));
+		slot.setText(Messages.getString(MessageIds.GDE_MSGT3651, new Object[] { index }));
 		CLabel nameLabel = new CLabel(slot, SWT.None);
-		nameLabel.setLayoutData(new RowData(120, 20));
+		nameLabel.setLayoutData(new RowData(GDE.IS_WINDOWS ? 115 : 120, 20));
 		nameLabel.setText(Messages.getString(MessageIds.GDE_MSGT3652));
 		final CCombo programmNameCombo = new CCombo(slot, SWT.BORDER);
 		this.programmNameCombos[index] = programmNameCombo;
@@ -989,6 +707,7 @@ public class MC3000Dialog extends DeviceDialog {
 				devicePrograms.add(program);
 			}
 		}
+		saveMc3000SetupData();
 	}
 
 	private void saveMc3000SetupData() {
@@ -1000,7 +719,7 @@ public class MC3000Dialog extends DeviceDialog {
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, MC3000Dialog.MC3000_XSD);
 			marshaller.marshal(this.mc3000Setup, new FileOutputStream(new File(this.settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML))); //$NON-NLS-1$
 			MC3000Dialog.log.log(Level.TIME, "write program setup XML time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-			this.saveButton.setEnabled(false);
+			if (this.saveButton != null && !this.saveButton.isDisposed()) this.saveButton.setEnabled(false);
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
