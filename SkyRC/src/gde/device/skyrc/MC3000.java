@@ -39,6 +39,7 @@ import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.usb.UsbClaimException;
@@ -65,8 +66,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected String[]	BATTERY_TYPE;
 	//firmware 1.05+ power and energy comes direct from device
 	//protected int[]			resetEnergy = new int[] {5,5,5,5};
-  final static String[]			cellTypeNames							= {"LiIo","LiFe","LiHV","NiMH","NiCd","NiZn","Eneloop","RAM"};
-	final static String[]			cycleModeNames						= {"D>C","D>C>D","C>D","C>D>C"};
+  final static String[]			cellTypeNames							= {"LiIo","LiFe","LiIo4.35","NiMH","NiCd","NiZn","Eneloop","RAM"};
+	final static String[]			cycleModeNames						= {"C>D","C>D>C","D>C","D>C>D"};
 	final static String[]			operationModeLi						= {"CHARGE","REFRESH","STORAGE","DISCHARGE","CYCLE"};
 	final static String[]			operationModeOther				= {"CHARGE","REFRESH","BREAKIN","DISCHARGE","CYCLE"};
 	final static String[]			cellModelNames						= {"Lite AAA","Std AAA","Pro/XX AAA","Lite AA","Std AA","Pro/XX AA","Std C","Std D"};
@@ -242,14 +243,18 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		byte numberCycle;
 		byte chargeRestingTime;
 		byte cycleMode;
-		byte endDeltaVoltage; //Ni cells only
+		byte endDeltaPeakVoltage; //Ni cells only
 		byte trickleCurrent;
 		byte cutTemperature;
 		byte[] cutTime;
 		byte[] restartVoltage;
 		byte temeratureUnit;
-	
-		public SlotSettings(final byte[] buffer) {
+		//TODO coming with FW 1.12?
+		byte dischargeRestingTime;
+		byte dischargeRductionCurrent;
+		byte trickleTime;
+		
+		public SlotSettings(final byte[] buffer, final int firmware) {
 			System.arraycopy(buffer, 0, this.slotBuffer, 0, buffer.length);
 			this.slotNumber = buffer[1];
 			this.busyTag = buffer[2];
@@ -265,12 +270,17 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			this.numberCycle = buffer[19];
 			this.chargeRestingTime = buffer[20];
 			this.cycleMode = buffer[21];
-			this.endDeltaVoltage = buffer[22];
+			this.endDeltaPeakVoltage = buffer[22];
 			this.trickleCurrent = buffer[23];
 			this.restartVoltage = new byte[] {buffer[24], buffer[25]};
 			this.cutTemperature = buffer[26];
 			this.cutTime = new byte[] {buffer[27], buffer[28]};
 			this.temeratureUnit = buffer[29];
+			//TODO coming with FW 1.12?
+			this.dischargeRestingTime = 0;
+			this.dischargeRductionCurrent = 0;
+			this.trickleTime = 0;
+			
 			log.log(Level.OFF, this.toString());
 		}
 		
@@ -280,21 +290,130 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		
 		@Override
 		public String toString() {
-			return String.format("slotNumber=%02d busy=%b batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d restartVoltage=%03d temeratureUnit=%d",
-					this.slotNumber, this.busyTag == 0x01, this.batteryType, this.operatinoMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaVoltage, this.trickleCurrent, this.cutTemperature, getCutTime(), getRestartVoltage(), this.temeratureUnit);
+			return String.format(" slotNumber=%02d busy=%b batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d restartVoltage=%03d temeratureUnit=%d",
+					this.slotNumber, this.busyTag == 0x01, this.batteryType, this.operatinoMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaPeakVoltage, this.trickleCurrent, this.cutTemperature, getCutTime(), getRestartVoltage(), this.temeratureUnit);
 		}
 		
-		public String toString4View() {
-			int i = 0;
-		for (; this.batteryType == 6 && i < cellModelCapacity.length; i++) {
-			if (this.getCapacity() == cellModelCapacity[i])
-				break;
+		public String toString4Tip(final int firmware) {
+			StringBuilder sb = new StringBuilder();
+			//add battery type "LiIo","LiFe","LiHV","NiMH","NiCd","NiZn","Eneloop","RAM"
+			sb.append(MC3000.cellTypeNames[this.batteryType]).append(GDE.STRING_NEW_LINE);
+			//operationModeLi	   = {"CHARGE","REFRESH","STORAGE","DISCHARGE","CYCLE"};
+			//operationModeOther = {"CHARGE","REFRESH","BREAKIN","DISCHARGE","CYCLE"};
+			sb.append(this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode]	: MC3000.operationModeOther[this.operatinoMode]).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %d mAh",   Messages.getString(MessageIds.GDE_MSGT3660), getCapacity())).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %4.2f A",  Messages.getString(MessageIds.GDE_MSGT3661), this.getChargeCurrent()/1000.0)).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %4.2f A",  Messages.getString(MessageIds.GDE_MSGT3662), this.getChargeCurrent()/1000.0)).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %d Min",   Messages.getString(MessageIds.GDE_MSGT3663), this.chargeRestingTime)).append(GDE.STRING_NEW_LINE);
+			if (firmware > 111)
+				sb.append(String.format(Locale.ENGLISH, "%s %d Min", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime)).append(GDE.STRING_NEW_LINE);
+
+			sb.append(String.format(Locale.ENGLISH, "%s %d",       Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %s",       Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %4.2f V",  Messages.getString(MessageIds.GDE_MSGT3667), this.getChargeEndVoltage()/1000.0)).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %4.2f A",  Messages.getString(MessageIds.GDE_MSGT3668), this.getDischargeEndCurrent()/1000.0)).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %4.2f V",  Messages.getString(MessageIds.GDE_MSGT3669), this.getRestartVoltage()/1000.0)).append(GDE.STRING_NEW_LINE);
+			if (firmware > 111)
+				sb.append(String.format(Locale.ENGLISH, "%s %d Min", Messages.getString(MessageIds.GDE_MSGT3670), this.dischargeRductionCurrent)).append(GDE.STRING_NEW_LINE);
+
+			if (this.batteryType > 3) {
+				sb.append(String.format(Locale.ENGLISH, "%s %4.2f V",  Messages.getString(MessageIds.GDE_MSGT3674), this.endDeltaPeakVoltage/1000.0)).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%s %d mA", Messages.getString(MessageIds.GDE_MSGT3675), this.trickleCurrent)).append(GDE.STRING_NEW_LINE);
+				if (firmware > 111)
+					sb.append(String.format(Locale.ENGLISH, "%s %d Min", Messages.getString(MessageIds.GDE_MSGT3676), this.trickleTime)).append(GDE.STRING_NEW_LINE);
+			}
+			sb.append(String.format(Locale.ENGLISH, "%s %d %s",    Messages.getString(MessageIds.GDE_MSGT3672), this.cutTemperature, this.temeratureUnit == 0 ? "°C" : "°F")).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s %d Min",   Messages.getString(MessageIds.GDE_MSGT3673), this.getCutTime())).append(GDE.STRING_NEW_LINE);
+
+
+//			GDE_MSGT3660=Capacity
+//			GDE_MSGT3661=C.Current
+//			GDE_MSGT3662=D.Current
+//			GDE_MSGT3663=C.Resting
+//			GDE_MSGT3664=D.Resting
+//			GDE_MSGT3665=Cycle Count
+//			GDE_MSGT3666=Cycle Mode
+			
+//			GDE_MSGT3667=Target Voltage
+//			GDE_MSGT3668=Termination
+//			GDE_MSGT3669=Restart Volt
+//			GDE_MSGT3670=D.Reduce
+//			GDE_MSGT3671=Cut Volt
+//			GDE_MSGT3672=Cut Temp
+//			GDE_MSGT3673=Cut Time
+			return sb.toString();
 		}
-			return String.format("%s - %s - %04d mAh (%s)",
-					MC3000.cellTypeNames[this.batteryType], 
-					this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode] : MC3000.operationModeOther[this.operatinoMode],
-					getCapacity(),
-					this.batteryType == 6 && i < MC3000.cellModelNames.length ? MC3000.cellModelNames[i] : GDE.STRING_DASH );
+		
+		/**
+		 * "NiMH — Cycle — -1.50/3.00A — N=4"
+		 * "LiIon — Storage — 3.75V"
+		 * "Eneloop — Break_in — Std AA"
+	 	 * "NiCd — Break_in — 2400mAh"
+		 * "LiFe — Charge — 2.50A"
+		 * "RAM — Discharge — -0.75A"
+		 * "LiIo4.35 — Refresh — -1.50/3.00A"
+		 * "NiZn — Cycle — -1.50/3.00A — N=2"
+		 * @return string for display
+		 */
+		public String toString4View() {
+
+			int i = 0;
+			for (; this.batteryType == 6 && i < cellModelCapacity.length; i++) {
+				if (this.getCapacity() == cellModelCapacity[i]) break;
+			}
+			StringBuilder sb = new StringBuilder();
+			//add battery type "LiIo","LiFe","LiHV","NiMH","NiCd","NiZn","Eneloop","RAM"
+			sb.append(MC3000.cellTypeNames[this.batteryType]).append(GDE.STRING_MESSAGE_CONCAT);
+			//add operation mode
+			//operationModeLi	   = {"CHARGE","REFRESH","STORAGE","DISCHARGE","CYCLE"};
+			//operationModeOther = {"CHARGE","REFRESH","BREAKIN","DISCHARGE","CYCLE"};
+			sb.append(this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode]	: MC3000.operationModeOther[this.operatinoMode]).append(GDE.STRING_MESSAGE_CONCAT);
+
+			switch (this.operatinoMode) {
+			case 0: //CHARGE
+				sb.append(String.format(Locale.ENGLISH, "%4.2f A", this.getChargeCurrent()/1000.0));
+				break;
+			case 1: //REFRESH
+				sb.append(String.format(Locale.ENGLISH, "%4.2f/%4.2f A", this.getDischargeCurrent()/1000.0, this.getChargeCurrent()/1000.0));
+				break;
+			case 2: //STORAGE or BREAKIN
+				switch (this.batteryType) {
+				case 6: //Eneloop
+					sb.append(cellModelCapacity[i]);
+					break;
+				case 0: //LiIo
+				case 1: //LiFe
+				case 2: //LiHV
+					sb.append(String.format(Locale.ENGLISH, "%3.2f V", this.getDischargeEndCurrent()/1000.0));
+					break;
+				case 3: //NiMH
+				case 4: //NiCd
+				case 5: //NiZn
+				case 7: //RAM
+				default:
+					sb.append(String.format(Locale.ENGLISH, "%d mAh", this.getCapacity()));
+					break;
+				}
+				break;
+			case 3: //DISCHARGE
+				sb.append(String.format(Locale.ENGLISH, "-%4.2f A", this.getDischargeCurrent()/1000.0));				
+				break;
+			case 4: //CYCLE
+				sb.append(String.format(Locale.ENGLISH, "-%4.2f/%4.2f A", this.getDischargeCurrent()/1000.0, this.getChargeCurrent()/1000.0));
+				sb.append(String.format(" - N=%d (%s)", this.numberCycle, this.getCycleModeString()));
+				break;
+			default:
+				break;
+			}
+//	  final static String[]			cellTypeNames							= {};
+//		final static String[]			cycleModeNames						= {"D>C","D>C>D","C>D","C>D>C"};
+//		final static String[]			operationModeLi						= {"CHARGE","REFRESH","STORAGE","DISCHARGE","CYCLE"};
+//		final static String[]			operationModeOther				= {"CHARGE","REFRESH","BREAKIN","DISCHARGE","CYCLE"};
+//		final static String[]			cellModelNames						= {"Lite AAA","Std AAA","Pro/XX AAA","Lite AA","Std AA","Pro/XX AA","Std C","Std D"};
+//		final static int[]			  cellModelCapacity					= {720, 960, 1080, 1200, 2400, 3000, 3840, 7200};
+			return sb.toString();
+//					String.format("%s - %s - %04d mAh (%s)", MC3000.cellTypeNames[this.batteryType], this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode]
+//					: MC3000.operationModeOther[this.operatinoMode], getCapacity(), this.batteryType == 6 && i < MC3000.cellModelNames.length ? MC3000.cellModelNames[i] : GDE.STRING_DASH);
 		}
 		
 		public byte[] getBuffer() {
@@ -321,7 +440,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[32] = (byte) 0xFF;
 				log.log(Level.OFF, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
 				log.log(Level.OFF, String.format("slotNumber=%02d batteryType=%02d operatinoMode=%02d capacity=%04d chargeCurrent=%04d dischargeCurrent=%04d dischargeEndVoltage=%04d chargeEndVoltage=%04d dischargeEndCurrent=%04d chargeEndCurrent=%04d numberCycle=%02d chargeRestingTime=%02d cycleMode=%d endDeltaVoltage=%02d trickleCurrent=%02d cutTemperature=%02d cutTime=%03d restartVoltage=%04d",
-						reducedBuffer[4], reducedBuffer[5], this.operatinoMode, reducedBuffer[6]*100, getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaVoltage, this.trickleCurrent, this.cutTemperature, DataParser.parse2Short(reducedBuffer[27], reducedBuffer[26]), DataParser.parse2Short(reducedBuffer[29], reducedBuffer[28])));
+						reducedBuffer[4], reducedBuffer[5], this.operatinoMode, reducedBuffer[6]*100, getChargeCurrent(), getDischargeCurrent(), getDischargeEndCurrent(), getChargeEndVoltage(), getDischargeEndCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime, this.cycleMode, this.endDeltaPeakVoltage, this.trickleCurrent, this.cutTemperature, DataParser.parse2Short(reducedBuffer[27], reducedBuffer[26]), DataParser.parse2Short(reducedBuffer[29], reducedBuffer[28])));
 			}
 			return reducedBuffer;
 		}
@@ -384,8 +503,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			return cycleMode;
 		}
 
+		public String getCycleModeString() {
+			return cycleModeNames[cycleMode];
+		}
+
 		public byte getEndDeltaVoltage() {
-			return endDeltaVoltage;
+			return endDeltaPeakVoltage;
 		}
 
 		public byte getTrickleCurrent() {
