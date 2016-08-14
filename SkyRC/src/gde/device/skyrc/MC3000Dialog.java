@@ -83,11 +83,11 @@ public class MC3000Dialog extends DeviceDialog {
 
 	final static Logger					log											= Logger.getLogger(MC3000Dialog.class.getName());
 	static final int						NUMBER_PROGRAM_ENTRIES	= 30;
-	static final int						SIZE_PROGRAM_NAME				= 20;
-	static final String					NEW_PROG_NAME						= "NEW-PROG-NAME";																	//$NON-NLS-1$
-	static final String					STRING_FORMAT_02d_s			= "%02d - %s";																			//$NON-NLS-1$
-	static final String					STRING_FORMAT_02d				= "%02d - ";																				//$NON-NLS-1$
-	static final String					STRING_20_BLANK					= "                    ";													  //$NON-NLS-1$
+	static final int						SIZE_PROGRAM_NAME				= 35;
+	static final String					NEW_PROG_NAME						= "NEW-PROG-NAME";																	  //$NON-NLS-1$
+	static final String					STRING_FORMAT_02d_s			= "[%02d] - %s";																			//$NON-NLS-1$
+	static final String					STRING_FORMAT_02d				= "[%02d] - ";																				//$NON-NLS-1$
+	static final String					STRING_35_BLANK					= "                                   ";						  //$NON-NLS-1$
 	static final String				  DEVICE_JAR_NAME					= "SkyRC";																																																											//$NON-NLS-1$
 	static final int						DIALOG_WIDTH						= 355;
 
@@ -397,25 +397,25 @@ public class MC3000Dialog extends DeviceDialog {
 						MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_0.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_0.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4View());
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
 						break;
 					case 1:
 						MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_1.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_1.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4View());
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
 						break;
 					case 2:
 						MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_2.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_2.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4View());
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
 						break;
 					case 3:
 						MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_3.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_3.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4View());
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
 						break;
 
 					default:
@@ -438,16 +438,16 @@ public class MC3000Dialog extends DeviceDialog {
 						if (MC3000Dialog.this.mc3000Setup == null) createMC3000Setup();
 						MC3000Dialog.log.log(java.util.logging.Level.OFF, String.format("slot # %d selection index = %d", index, MC3000Dialog.this.lastSelectionIndex[index])); //$NON-NLS-1$
 						String nameLeader = String.format(MC3000Dialog.STRING_FORMAT_02d, MC3000Dialog.this.lastSelectionIndex[index] + 1);
-						String tmpName = programmNameCombo.getText() + MC3000Dialog.STRING_20_BLANK;
+						String tmpName = programmNameCombo.getText() + MC3000Dialog.STRING_35_BLANK;
 						tmpName = tmpName.startsWith(nameLeader) ? tmpName : (nameLeader + tmpName);
-						String newSlotProgramName = String.format(MC3000Dialog.STRING_FORMAT_02d_s, MC3000Dialog.this.lastSelectionIndex[index] + 1, tmpName.substring(5, MC3000Dialog.SIZE_PROGRAM_NAME + 5)
+						String newSlotProgramName = String.format(MC3000Dialog.STRING_FORMAT_02d_s, MC3000Dialog.this.lastSelectionIndex[index] + 1, tmpName.substring(7, MC3000Dialog.SIZE_PROGRAM_NAME + 5)
 								.trim());
 						MC3000Dialog.this.programmNames[MC3000Dialog.this.lastSelectionIndex[index]] = newSlotProgramName;
 						programmNameCombo.setText(newSlotProgramName);
 						programmNameCombo.setItem(MC3000Dialog.this.lastSelectionIndex[index], newSlotProgramName);
 
 						MC3000Dialog.this.mc3000Setup.getProgram().get(MC3000Dialog.this.lastSelectionIndex[index])
-								.setName(MC3000Dialog.this.programmNames[MC3000Dialog.this.lastSelectionIndex[index]].substring(5).trim());
+								.setName(MC3000Dialog.this.programmNames[MC3000Dialog.this.lastSelectionIndex[index]].substring(7).trim());
 						switch (index) {
 						case 0:
 							MC3000Dialog.this.mc3000Setup.getProgram().get(MC3000Dialog.this.lastSelectionIndex[index]).getSetupData().setValue(MC3000Dialog.this.slotSettings_0.getBuffer());

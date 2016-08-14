@@ -303,7 +303,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			sb.append(this.batteryType < 3 ? MC3000.operationModeLi[this.operatinoMode]	: MC3000.operationModeOther[this.operatinoMode]).append(GDE.STRING_NEW_LINE);
 			sb.append(String.format(Locale.ENGLISH, "%s %d mAh",   Messages.getString(MessageIds.GDE_MSGT3660), getCapacity())).append(GDE.STRING_NEW_LINE);
 			sb.append(String.format(Locale.ENGLISH, "%s %4.2f A",  Messages.getString(MessageIds.GDE_MSGT3661), this.getChargeCurrent()/1000.0)).append(GDE.STRING_NEW_LINE);
-			sb.append(String.format(Locale.ENGLISH, "%s %4.2f A",  Messages.getString(MessageIds.GDE_MSGT3662), this.getChargeCurrent()/1000.0)).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format(Locale.ENGLISH, "%s -%4.2f A",  Messages.getString(MessageIds.GDE_MSGT3662), this.getDischargeCurrent()/1000.0)).append(GDE.STRING_NEW_LINE);
 			sb.append(String.format(Locale.ENGLISH, "%s %d Min",   Messages.getString(MessageIds.GDE_MSGT3663), this.chargeRestingTime)).append(GDE.STRING_NEW_LINE);
 			if (firmware > 111)
 				sb.append(String.format(Locale.ENGLISH, "%s %d Min", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime)).append(GDE.STRING_NEW_LINE);
