@@ -347,7 +347,7 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
 		//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
-		//Mode Ni battery:		0=CHARGE 1=REFRESH 2=PAUSE     3=DISCHARGE 4=CYCLE
+		//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
 		//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 		//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 		int processModeNumber = this.device.getProcessingMode(dataBuffer);
@@ -356,33 +356,39 @@ public class GathererThread extends Thread {
 		String processStatusName = this.device.getProcessingStatusName(dataBuffer);
 		String processBatteryType = this.device.getProcessingBatteryType(dataBuffer);
 		if (GathererThread.log.isLoggable(Level.FINE)) {
-			GathererThread.log.log(Level.FINE, number + " : processName = " + processTypeName + " - processStatusName = " + processStatusName);
+			GathererThread.log.log(Level.FINE, number + " : processTypeName = " + processTypeName + " - processStatusName = " + processStatusName);
 		}
 		Channel slotChannel = this.channels.get(number);
 		if (slotChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
-			if (recordSet == null || !processRecordSetKey.contains(processBatteryType) || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
+			if (recordSet == null || !processRecordSetKey.contains(processBatteryType) || !processRecordSetKey.contains(processTypeName) && !processRecordSetKey.contains(processStatusName)) {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 
 				// record set does not exist or is out dated, build a new name and create
 				StringBuilder extend = new StringBuilder();
 				if (!this.settings.isContinuousRecordSet()) {
 					//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
-					//Mode Ni battery:		0=CHARGE 1=REFRESH 2=PAUSE     3=DISCHARGE 4=CYCLE
+					//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
 					//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 					//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
-					if ((dataBuffer[2] == 5 && processModeNumber == 3) || (dataBuffer[2] != 5 && processModeNumber == 4)) { //4=CYCLE
+					//battery type:  0:LiIon 1:LiFe 2:LiHV 3:NiMH 4:NiCd 5:NiZn 6:Eneloop 7:RAM
+					final int batterieType = this.device.getBatteryType(dataBuffer);
+					if (((batterieType == 5 || batterieType == 7) && processModeNumber == 3) //NiZn, RAM -> Cycle
+							|| (batterieType != 5 && batterieType != 7  && processModeNumber == 4)) { //LiIon, LiFe, LiHV, NiMH, NiCd, Eneloop -> CYCLE
 						int cycleNumber = this.device.getCycleNumber(number, dataBuffer);
 
 						if (cycleNumber >= 0) {
 							extend.append(GDE.STRING_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_COLON).append(cycleNumber).append(GDE.STRING_RIGHT_BRACKET);
 						}
 					}
-					else if (processModeNumber == 1 || (this.device.getBatteryType(dataBuffer) < 3 && processModeNumber == 2)) { //1=Refresh || Li storage
+					else if (processModeNumber == 1 || (batterieType != 5 && batterieType != 7  && processModeNumber == 2)) { //1=Refresh || Li storage || Ni break-in
 						extend.append(GDE.STRING_LEFT_BRACKET).append(processStatusName).append(GDE.STRING_RIGHT_BRACKET);
 					}
 				}
 				processRecordSetKey = String.format("%d) %s - %s %s", slotChannel.getNextRecordSetNumber(), processBatteryType, processTypeName, extend.toString());
+				if (GathererThread.log.isLoggable(Level.FINE)) {
+					GathererThread.log.log(Level.FINE, number + " : processRecordSetKey = " + processRecordSetKey);
+				}
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));

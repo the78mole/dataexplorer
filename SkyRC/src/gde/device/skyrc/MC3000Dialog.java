@@ -53,6 +53,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
@@ -84,47 +87,46 @@ public class MC3000Dialog extends DeviceDialog {
 	final static Logger					log											= Logger.getLogger(MC3000Dialog.class.getName());
 	static final int						NUMBER_PROGRAM_ENTRIES	= 30;
 	static final int						SIZE_PROGRAM_NAME				= 35;
-	static final String					NEW_PROG_NAME						= "NEW-PROG-NAME";																	  //$NON-NLS-1$
-	static final String					STRING_FORMAT_02d_s			= "[%02d] - %s";																			//$NON-NLS-1$
-	static final String					STRING_FORMAT_02d				= "[%02d] - ";																				//$NON-NLS-1$
-	static final String					STRING_35_BLANK					= "                                   ";						  //$NON-NLS-1$
-	static final String				  DEVICE_JAR_NAME					= "SkyRC";																																																											//$NON-NLS-1$
+	static final String					NEW_PROG_NAME						= "NEW-PROG-NAME";																	//$NON-NLS-1$
+	static final String					STRING_FORMAT_02d_s			= "[%02d] - %s";																		//$NON-NLS-1$
+	static final String					STRING_FORMAT_02d				= "[%02d] - ";																			//$NON-NLS-1$
+	static final String					STRING_35_BLANK					= "                                   ";						//$NON-NLS-1$
+	static final String					DEVICE_JAR_NAME					= "SkyRC";																					//$NON-NLS-1$
 	static final int						DIALOG_WIDTH						= 355;
 
 	Composite										tabFolder;
 	final List<CTabItem>				configurations					= new ArrayList<CTabItem>();
 	CTabItem										chargeTabItem;
 	Group												slotsViewGroup;
+	Clipboard										clipboard;
 
 	int													parameterSelectHeight		= 25;
 	int													chargeSelectHeight			= 17 * this.parameterSelectHeight;
- 	String[]										programmNames						= new String[MC3000Dialog.NUMBER_PROGRAM_ENTRIES];
+	String[]										programmNames						= new String[MC3000Dialog.NUMBER_PROGRAM_ENTRIES];
 	int													lastSelectionIndex[]		= { 0, 0, 0, 0 };
 	CCombo[]										programmNameCombos			= new CCombo[4];
+	CLabel[]										programLables						= new CLabel[4];
 
 	Schema											schema;
 	JAXBContext									jc;
 	MC3000Type									mc3000Setup;
 	static final String					MC3000_XSD							= "MC3000_V01.xsd";																//$NON-NLS-1$
 
-	Button											saveButton, helpButton, closeButton;
+	Button											saveButton, helpButton, reloadButton, closeButton;
 	GathererThread							dataGatherThread;
 
 	final MC3000								device;																																		// get device specific things, get serial port, ...
-	final MC3000UsbPort					usbPort;																																		// open/close port execute getData()....
+	final MC3000UsbPort					usbPort;																																	// open/close port execute getData()....
 	UsbInterface								usbInterface						= null;
 	final Settings							settings;																																	// application configuration settings
 	SystemSettings							systemSettings;
-	SlotSettings								slotSettings_0;
-	SlotSettings								slotSettings_1;
-	SlotSettings								slotSettings_2;
-	SlotSettings								slotSettings_3;
+	SlotSettings								slotSettings_0, slotSettings_1, slotSettings_2, slotSettings_3;
+	SlotSettings								slotInitialSettings_0, slotInitialSettings_1, slotInitialSettings_2, slotInitialSettings_3;
 	int													measurementsCount				= 0;
 	int													tabFolderSelectionIndex	= 0;
 	protected static final int	USB_QUERY_DELAY					= GDE.IS_WINDOWS ? 70 : 160;
 	boolean											isConnectedByDialog			= false;
-	boolean 										isConnectedByButton 		= false;
-
+	boolean											isConnectedByButton			= false;
 
 	/**
 	 * default constructor initialize all variables required
@@ -137,7 +139,7 @@ public class MC3000Dialog extends DeviceDialog {
 		this.usbPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		for (int i = 0; i < MC3000Dialog.NUMBER_PROGRAM_ENTRIES; i++) {
-			this.programmNames[i] = String.format("%02d - %s", i + 1, MC3000Dialog.NEW_PROG_NAME); //$NON-NLS-1$
+			this.programmNames[i] = String.format(MC3000Dialog.STRING_FORMAT_02d_s, i + 1, MC3000Dialog.NEW_PROG_NAME);
 		}
 	}
 
@@ -156,60 +158,30 @@ public class MC3000Dialog extends DeviceDialog {
 	public void open() {
 		if (!this.usbPort.isConnected()) {
 			try {
-
 				this.jc = JAXBContext.newInstance("gde.device.skyrc"); //$NON-NLS-1$
 				this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
 						new StreamSource(MC3000Dialog.class.getClassLoader().getResourceAsStream("resource/" + MC3000Dialog.MC3000_XSD))); //$NON-NLS-1$
 
-				try {
-					Unmarshaller unmarshaller = this.jc.createUnmarshaller();
-					unmarshaller.setSchema(this.schema);
-					this.mc3000Setup = (MC3000Type) unmarshaller.unmarshal(new File(this.settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML)); //$NON-NLS-1$
-					int index = 0;
-					for (ProgramType prog : this.mc3000Setup.program) {
-						if (!prog.getName().contains(MC3000Dialog.NEW_PROG_NAME)) this.programmNames[index++] = String.format("%02d - %s", index, prog.getName()); //$NON-NLS-1$
-					}
+				Unmarshaller unmarshaller = this.jc.createUnmarshaller();
+				unmarshaller.setSchema(this.schema);
+				this.mc3000Setup = (MC3000Type) unmarshaller.unmarshal(new File(this.settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML)); //$NON-NLS-1$
+				int index = 0;
+				for (ProgramType prog : this.mc3000Setup.program) {
+					if (!prog.getName().contains(MC3000Dialog.NEW_PROG_NAME)) this.programmNames[index++] = String.format(STRING_FORMAT_02d_s, index, prog.getName()); //$NON-NLS-1$
+					else this.programmNames[index++] = prog.getName();
 				}
-				catch (UnmarshalException e) {
-					MC3000Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					createMC3000Setup();
-				}
-				catch (Exception e) {
-					if (e.getCause() instanceof FileNotFoundException) {
-						createMC3000Setup();
-					}
-					else
-						throw e;
-				}
-
-				if (!this.usbPort.isConnected()) {
-					this.usbInterface = this.usbPort.openUsbPort(this.device);				
-					this.isConnectedByDialog = true;
-				}
-
-				if (this.usbPort.isConnected()) this.systemSettings = this.device.new SystemSettings(this.usbPort.getSystemSettings(this.usbInterface));
-				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
-				if (this.usbPort.isConnected()) this.slotSettings_0 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_0.value()), systemSettings.getFirmwareVersionAsInt());
-				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
-				if (this.usbPort.isConnected()) this.slotSettings_1 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_1.value()), systemSettings.getFirmwareVersionAsInt());
-				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
-				if (this.usbPort.isConnected()) this.slotSettings_2 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_2.value()), systemSettings.getFirmwareVersionAsInt());
-				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
-				if (this.usbPort.isConnected()) this.slotSettings_3 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_3.value()), systemSettings.getFirmwareVersionAsInt());
+			}
+			catch (UnmarshalException e) {
+				MC3000Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+				createMC3000Setup();
 			}
 			catch (Exception e) {
-				MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-			}
-			finally {
-				if (isConnectedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-					try {
-						this.usbPort.closeUsbPort(this.usbInterface != null ? this.usbInterface : null);
-					}
-					catch (UsbException e) {
-						MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
+				if (e.getCause() instanceof FileNotFoundException) {
+					createMC3000Setup();
 				}
 			}
+
+			readInitialSlotPrograms();
 		}
 		try {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
@@ -259,6 +231,7 @@ public class MC3000Dialog extends DeviceDialog {
 								setClosePossible(true);
 							}
 						}
+						MC3000Dialog.this.clipboard.dispose();
 						MC3000Dialog.this.dispose();
 					}
 				});
@@ -269,6 +242,7 @@ public class MC3000Dialog extends DeviceDialog {
 						MC3000Dialog.this.application.openHelpDialog("SkyRC", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
+				this.clipboard = new Clipboard(this.dialogShell.getDisplay());
 				{
 					this.tabFolder = new Composite(this.dialogShell, SWT.NONE);
 					this.tabFolder.setLayout(new FillLayout(SWT.VERTICAL));
@@ -284,10 +258,10 @@ public class MC3000Dialog extends DeviceDialog {
 					{
 						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
-						saveButtonLData.width = 120;
-						saveButtonLData.height = 30;
+						saveButtonLData.width = 90;
+						saveButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						saveButtonLData.left = new FormAttachment(0, 1000, 25);
+						saveButtonLData.left = new FormAttachment(0, 1000, 10);
 						this.saveButton.setLayoutData(saveButtonLData);
 						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
@@ -305,25 +279,71 @@ public class MC3000Dialog extends DeviceDialog {
 						this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
 						FormData LoadButtonLData = new FormData();
-						LoadButtonLData.width = 50;
+						LoadButtonLData.width = 40;
 						LoadButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						LoadButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						LoadButtonLData.left = new FormAttachment(0, 1000, MC3000Dialog.DIALOG_WIDTH/2-25);
+						LoadButtonLData.left = new FormAttachment(0, 1000, 107);
 						this.helpButton.setLayoutData(LoadButtonLData);
 						this.helpButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								MC3000Dialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MC3000Dialog.this.application.openHelpDialog(MC3000Dialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$ 
+							}
+						});
+					}
+					{
+						this.reloadButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+						FormData reloadButtonLData = new FormData();
+						reloadButtonLData.width = 90;
+						reloadButtonLData.height = GDE.IS_MAC ? 33 : 30;
+						reloadButtonLData.right = new FormAttachment(1000, 1000, -110);
+						reloadButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+						this.reloadButton.setLayoutData(reloadButtonLData);
+						this.reloadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.reloadButton.setText(Messages.getString(MessageIds.GDE_MSGT3679));
+						this.reloadButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT3680));
+						this.reloadButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								MC3000Dialog.log.log(java.util.logging.Level.FINEST, "reloadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								for (int i = 0; i < 4; i++) {
+									switch (i) {
+									case 0:
+										programLables[i].setText(MC3000Dialog.this.slotInitialSettings_0 != null ? MC3000Dialog.this.slotInitialSettings_0.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
+										programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_0 != null ? MC3000Dialog.this.slotInitialSettings_0.toString4Tip()
+												: Messages.getString(MessageIds.GDE_MSGT3654));
+										break;
+									case 1:
+										programLables[i].setText(MC3000Dialog.this.slotInitialSettings_1 != null ? MC3000Dialog.this.slotInitialSettings_1.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
+										programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_1 != null ? MC3000Dialog.this.slotInitialSettings_1.toString4Tip()
+												: Messages.getString(MessageIds.GDE_MSGT3654));
+										break;
+									case 2:
+										programLables[i].setText(MC3000Dialog.this.slotInitialSettings_2 != null ? MC3000Dialog.this.slotInitialSettings_2.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
+										programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_2 != null ? MC3000Dialog.this.slotInitialSettings_2.toString4Tip()
+												: Messages.getString(MessageIds.GDE_MSGT3654));
+										break;
+									case 3:
+										programLables[i].setText(MC3000Dialog.this.slotInitialSettings_3 != null ? MC3000Dialog.this.slotInitialSettings_3.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
+										programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_3 != null ? MC3000Dialog.this.slotInitialSettings_3.toString4Tip()
+												: Messages.getString(MessageIds.GDE_MSGT3654));
+										break;
+
+									default:
+										break;
+									}
+								}
+
 							}
 						});
 					}
 					{
 						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData closeButtonLData = new FormData();
-						closeButtonLData.width = 120;
-						closeButtonLData.height = 30;
-						closeButtonLData.right = new FormAttachment(1000, 1000, -25);
+						closeButtonLData.width = 90;
+						closeButtonLData.height = GDE.IS_MAC ? 33 : 30;
+						closeButtonLData.right = new FormAttachment(1000, 1000, -10);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -332,7 +352,9 @@ public class MC3000Dialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								MC3000Dialog.log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								MC3000Dialog.this.dialogShell.dispose();
+								if (!saveButton.isEnabled() || (saveButton.isEnabled() && SWT.OK == application.openOkCancelMessageDialog(dialogShell, Messages.getString(MessageIds.GDE_MSGT3681)))) {
+									MC3000Dialog.this.dialogShell.dispose();
+								}	
 							}
 						});
 					}
@@ -365,18 +387,63 @@ public class MC3000Dialog extends DeviceDialog {
 		}
 	}
 
+	private void readInitialSlotPrograms() {
+		try {
+			if (!this.usbPort.isConnected()) {
+				this.usbInterface = this.usbPort.openUsbPort(this.device);
+				this.isConnectedByDialog = true;
+			}
+
+			if (this.usbPort.isConnected()) this.systemSettings = this.device.new SystemSettings(this.usbPort.getSystemSettings(this.usbInterface));
+			WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
+			if (this.usbPort.isConnected())
+				this.slotSettings_0 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_0.value()), this.systemSettings.getFirmwareVersionAsInt());
+			this.slotInitialSettings_0 = this.device.new SlotSettings(this.slotSettings_0);
+			WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
+			if (this.usbPort.isConnected())
+				this.slotSettings_1 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_1.value()), this.systemSettings.getFirmwareVersionAsInt());
+			this.slotInitialSettings_1 = this.device.new SlotSettings(this.slotSettings_1);
+			WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
+			if (this.usbPort.isConnected())
+				this.slotSettings_2 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_2.value()), this.systemSettings.getFirmwareVersionAsInt());
+			this.slotInitialSettings_2 = this.device.new SlotSettings(this.slotSettings_2);
+			WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
+			if (this.usbPort.isConnected())
+				this.slotSettings_3 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_3.value()), this.systemSettings.getFirmwareVersionAsInt());
+			this.slotInitialSettings_3 = this.device.new SlotSettings(this.slotSettings_3);
+		}
+		catch (Exception e) {
+			MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+		}
+		finally {
+			if (this.isConnectedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
+				try {
+					this.usbPort.closeUsbPort(this.usbInterface != null ? this.usbInterface : null);
+				}
+				catch (UsbException e) {
+					MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				}
+			}
+		}
+	}
+
 	private void createSlotGroup(final int index) {
 		Group slot = new Group(this.slotsViewGroup, SWT.NONE);
 		slot.setLayout(new RowLayout(SWT.HORIZONTAL));
-		slot.setText(Messages.getString(MessageIds.GDE_MSGT3651, new Object[] { index+1 }));
+		slot.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		slot.setText(Messages.getString(MessageIds.GDE_MSGT3651, new Object[] { index + 1 }));
 		CLabel nameLabel = new CLabel(slot, SWT.None);
 		nameLabel.setLayoutData(new RowData(GDE.IS_WINDOWS ? 115 : 120, 20));
+		nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		nameLabel.setText(Messages.getString(MessageIds.GDE_MSGT3652));
 		final CCombo programmNameCombo = new CCombo(slot, SWT.BORDER);
 		this.programmNameCombos[index] = programmNameCombo;
 		final CLabel label0 = new CLabel(slot, SWT.None);
+		final Button writeButton = new Button(slot, SWT.PUSH | SWT.CENTER);
+		this.programLables[index] = label0;
 		programmNameCombo.setItems(this.programmNames);
 		programmNameCombo.setVisibleItemCount(20);
+		programmNameCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		programmNameCombo.setTextLimit(5 + MC3000Dialog.SIZE_PROGRAM_NAME);
 		programmNameCombo.setLayoutData(new RowData(187, GDE.IS_WINDOWS ? 16 : 18));
 		programmNameCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT3653));
@@ -394,33 +461,39 @@ public class MC3000Dialog extends DeviceDialog {
 				if (!devicePrograms.get(programmNameCombo.getSelectionIndex()).getName().contains(MC3000Dialog.NEW_PROG_NAME)) {
 					switch (index) {
 					case 0:
-						MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
+						MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_0.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_0.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip());
 						break;
 					case 1:
-						MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
+						MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_1.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_1.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip());
 						break;
 					case 2:
-						MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
+						MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_2.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_2.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip());
 						break;
 					case 3:
-						MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(), systemSettings.getFirmwareVersionAsInt());
+						MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.slotSettings_3.setSlotNumber((byte) index);
 						label0.setText(MC3000Dialog.this.slotSettings_3.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip(systemSettings.getFirmwareVersionAsInt()));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip());
 						break;
 
 					default:
 						break;
 					}
+					if (programmNameCombo.getText().contains(NEW_PROG_NAME)) writeButton.setEnabled(false);
+					else writeButton.setEnabled(true);
 				}
 			}
 		});
@@ -478,34 +551,32 @@ public class MC3000Dialog extends DeviceDialog {
 			}
 		});
 		label0.setLayoutData(new RowData(350, 25));
+		label0.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		switch (index) {
 		case 0:
 			label0.setText(this.slotSettings_0 != null ? this.slotSettings_0.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_0 != null 
-					? this.slotSettings_0.toString4Tip(this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_0 != null ? this.slotSettings_0.toString4Tip() : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 		case 1:
 			label0.setText(this.slotSettings_1 != null ? this.slotSettings_1.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_1 != null 
-					? this.slotSettings_1.toString4Tip(this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_1 != null ? this.slotSettings_1.toString4Tip() : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 		case 2:
 			label0.setText(this.slotSettings_2 != null ? this.slotSettings_2.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_2 != null 
-					? this.slotSettings_2.toString4Tip(this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_2 != null ? this.slotSettings_2.toString4Tip() : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 		case 3:
 			label0.setText(this.slotSettings_3 != null ? this.slotSettings_3.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_3 != null 
-					? this.slotSettings_3.toString4Tip(this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_3 != null ? this.slotSettings_3.toString4Tip() : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 
 		default:
 			break;
 		}
-		Button writeButton = new Button(slot, SWT.CENTER);
-		writeButton.setLayoutData(new RowData(155, 22));
+		writeButton.setLayoutData(new RowData(110, 22));
+		writeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		writeButton.setText(Messages.getString(MessageIds.GDE_MSGT3656));
+		writeButton.setEnabled(false);
 		writeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT3657));
 		writeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -514,24 +585,24 @@ public class MC3000Dialog extends DeviceDialog {
 				try {
 					if (!MC3000Dialog.this.usbPort.isConnected()) {
 						MC3000Dialog.this.usbInterface = MC3000Dialog.this.usbPort.openUsbPort(MC3000Dialog.this.device);
-						isConnectedByButton = true;
+						MC3000Dialog.this.isConnectedByButton = true;
 					}
 					byte[] newProgramBuffer;
 					switch (index) {
 					case 0:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_0.getBuffer((byte)0, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+						newProgramBuffer = MC3000Dialog.this.slotSettings_0.getBuffer((byte) 0, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 					case 1:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_1.getBuffer((byte)1, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+						newProgramBuffer = MC3000Dialog.this.slotSettings_1.getBuffer((byte) 1, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 					case 2:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_2.getBuffer((byte)2, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+						newProgramBuffer = MC3000Dialog.this.slotSettings_2.getBuffer((byte) 2, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 					case 3:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_3.getBuffer((byte)3, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+						newProgramBuffer = MC3000Dialog.this.slotSettings_3.getBuffer((byte) 3, MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						break;
 
@@ -544,7 +615,7 @@ public class MC3000Dialog extends DeviceDialog {
 					MC3000Dialog.this.application.openMessageDialogAsync(e.getMessage());
 				}
 				finally {
-					if (isConnectedByButton && MC3000Dialog.this.usbPort != null && MC3000Dialog.this.usbPort.isConnected()) {
+					if (MC3000Dialog.this.isConnectedByButton && MC3000Dialog.this.usbPort != null && MC3000Dialog.this.usbPort.isConnected()) {
 						try {
 							MC3000Dialog.this.usbPort.closeUsbPort(MC3000Dialog.this.usbInterface != null ? MC3000Dialog.this.usbInterface : null);
 						}
@@ -555,8 +626,23 @@ public class MC3000Dialog extends DeviceDialog {
 				}
 			}
 		});
-		Button loadButton = new Button(slot, SWT.CENTER);
-		loadButton.setLayoutData(new RowData(155, 22));
+		Button copyClipBoardButton = new Button(slot, SWT.PUSH | SWT.CENTER);
+		copyClipBoardButton.setLayoutData(new RowData(90, 22));
+		copyClipBoardButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		copyClipBoardButton.setText(Messages.getString(MessageIds.GDE_MSGT3677));
+		copyClipBoardButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT3678));
+		copyClipBoardButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String data = label0.getToolTipText();
+				if (data.length() > 0) {
+					clipboard.setContents(new Object[] {data}, new Transfer[] {TextTransfer.getInstance()});
+				}
+			}
+		});
+		Button loadButton = new Button(slot, SWT.PUSH | SWT.CENTER);
+		loadButton.setLayoutData(new RowData(110, 22));
+		loadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		loadButton.setText(Messages.getString(MessageIds.GDE_MSGT3658));
 		loadButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT3659));
 		loadButton.addSelectionListener(new SelectionAdapter() {
@@ -566,33 +652,41 @@ public class MC3000Dialog extends DeviceDialog {
 				try {
 					if (!MC3000Dialog.this.usbPort.isConnected()) {
 						MC3000Dialog.this.usbInterface = MC3000Dialog.this.usbPort.openUsbPort(MC3000Dialog.this.device);
-						isConnectedByButton = true;
+						MC3000Dialog.this.isConnectedByButton = true;
 					}
 
 					switch (index) {
 					case 0:
-						if (MC3000Dialog.this.usbPort.isConnected()) MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_0.value()), systemSettings.getFirmwareVersionAsInt());
+						if (MC3000Dialog.this.usbPort.isConnected())
+							MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
+									MC3000UsbPort.QuerySlotData.SLOT_0.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_0 != null 
-								? MC3000Dialog.this.slotSettings_0.toString4Tip(MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip() : Messages
+								.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 1:
-						if (MC3000Dialog.this.usbPort.isConnected()) MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_1.value()), systemSettings.getFirmwareVersionAsInt());
+						if (MC3000Dialog.this.usbPort.isConnected())
+							MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
+									MC3000UsbPort.QuerySlotData.SLOT_1.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_1 != null 
-								? MC3000Dialog.this.slotSettings_1.toString4Tip(MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip() : Messages
+								.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 2:
-						if (MC3000Dialog.this.usbPort.isConnected()) MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_2.value()), systemSettings.getFirmwareVersionAsInt());
+						if (MC3000Dialog.this.usbPort.isConnected())
+							MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
+									MC3000UsbPort.QuerySlotData.SLOT_2.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_2 != null 
-								? MC3000Dialog.this.slotSettings_2.toString4Tip(MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip() : Messages
+								.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 3:
-						if (MC3000Dialog.this.usbPort.isConnected()) MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_3.value()), systemSettings.getFirmwareVersionAsInt());
+						if (MC3000Dialog.this.usbPort.isConnected())
+							MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
+									MC3000UsbPort.QuerySlotData.SLOT_3.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_3 != null 
-								? MC3000Dialog.this.slotSettings_3.toString4Tip(MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt()) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip() : Messages
+								.getString(MessageIds.GDE_MSGT3654));
 						break;
 
 					default:
@@ -604,7 +698,7 @@ public class MC3000Dialog extends DeviceDialog {
 					MC3000Dialog.this.application.openMessageDialogAsync(e.getMessage());
 				}
 				finally {
-					if (isConnectedByButton && MC3000Dialog.this.usbPort != null && MC3000Dialog.this.usbPort.isConnected()) {
+					if (MC3000Dialog.this.isConnectedByButton && MC3000Dialog.this.usbPort != null && MC3000Dialog.this.usbPort.isConnected()) {
 						try {
 							MC3000Dialog.this.usbPort.closeUsbPort(MC3000Dialog.this.usbInterface != null ? MC3000Dialog.this.usbInterface : null);
 						}
@@ -620,27 +714,22 @@ public class MC3000Dialog extends DeviceDialog {
 			boolean isEnabled = this.slotSettings_0 != null && this.slotSettings_0.isBusy() == false ? true : false;
 			programmNameCombo.setEnabled(isEnabled);
 			loadButton.setEnabled(isEnabled);
-			writeButton.setEnabled(isEnabled);
 			break;
 		case 1:
 			isEnabled = this.slotSettings_1 != null && this.slotSettings_1.isBusy() == false ? true : false;
 			programmNameCombo.setEnabled(isEnabled);
 			loadButton.setEnabled(isEnabled);
-			writeButton.setEnabled(isEnabled);
 			break;
 		case 2:
 			isEnabled = this.slotSettings_2 != null && this.slotSettings_2.isBusy() == false ? true : false;
 			programmNameCombo.setEnabled(isEnabled);
 			loadButton.setEnabled(isEnabled);
-			writeButton.setEnabled(isEnabled);
 			break;
 		case 3:
 			isEnabled = this.slotSettings_3 != null && this.slotSettings_3.isBusy() == false ? true : false;
 			programmNameCombo.setEnabled(isEnabled);
 			loadButton.setEnabled(isEnabled);
-			writeButton.setEnabled(isEnabled);
 			break;
-
 		default:
 			break;
 		}
