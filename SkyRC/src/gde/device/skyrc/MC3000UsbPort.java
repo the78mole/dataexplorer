@@ -247,10 +247,10 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			this.read(iface, this.endpointOut, data);
 			
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
-			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
+			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, String.format("Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data, data.length-2), this.isChecksumOK(data, 16, 30, 31)));
 			
 			if (!this.isChecksumOK(data, 16, 30, 31) && this.retrys-- >= 0) {
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data, data.length-2), this.isChecksumOK(data, 16, 30, 31)));
 				return this.getSystemSettings(iface);
 			}
 		}

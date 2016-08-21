@@ -355,13 +355,13 @@ public class GathererThread extends Thread {
 		//STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
 		String processStatusName = this.device.getProcessingStatusName(dataBuffer);
 		String processBatteryType = this.device.getProcessingBatteryType(dataBuffer);
-		if (GathererThread.log.isLoggable(Level.FINE)) {
-			GathererThread.log.log(Level.FINE, number + " : processTypeName = " + processTypeName + " - processStatusName = " + processStatusName);
+		if (GathererThread.log.isLoggable(Level.OFF)) {
+			GathererThread.log.log(Level.OFF, number + " : processTypeName = " + processTypeName + " - processStatusName = " + processStatusName);
 		}
 		Channel slotChannel = this.channels.get(number);
 		if (slotChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
-			if (recordSet == null || !processRecordSetKey.contains(processBatteryType) || !processRecordSetKey.contains(processTypeName) && !processRecordSetKey.contains(processStatusName)) {
+			if (recordSet == null || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 
 				// record set does not exist or is out dated, build a new name and create
