@@ -392,7 +392,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3671), this.getDischargeCutVoltage() / 1000.0)).append(GDE.STRING_NEW_LINE);
 			//CUT TEMP:
 			if (this.cutTemperature >= 20)
-				sb.append(String.format(Locale.ENGLISH, "%-14s %d %s", Messages.getString(MessageIds.GDE_MSGT3672), this.cutTemperature, this.temperatureUnit == 0 ? "°C" : "°F"));
+				sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), this.cutTemperature, this.temperatureUnit == 0 ? "°C" : "°F"));
 			else
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
 			//CUT TIME:			
@@ -782,7 +782,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					break;
 				case 4: //CYCLE
 					sb.append(String.format(Locale.ENGLISH, "-%4.2f/%4.2fA", this.getDischargeCurrent() / 1000.0, this.getChargeCurrent() / 1000.0));
-					sb.append(String.format(" - N=%d (%s)", this.numberCycle, this.getCycleModeString()));
+					sb.append(String.format("  N=%d (%s)", this.numberCycle, this.getCycleModeString()));
 					break;
 				default:
 					break;
@@ -875,16 +875,15 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer, 29);
 				reducedBuffer[31] = (byte) 0xFF;
 				reducedBuffer[32] = (byte) 0xFF;
-				MC3000.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
-				MC3000.log
-						.log(
-								java.util.logging.Level.OFF,
-								String
-										.format(
-												"slot#=%02d BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d D.REDUCE=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d CUT TEMP=%02d CUT TIME=%03d RESTART VOLT=%04d",
-												reducedBuffer[4], reducedBuffer[5], this.operationMode, reducedBuffer[6] * 100, getChargeCurrent(), getDischargeCurrent(), getDischargeReduceCurrent(), getChargeEndVoltage(),
-												getDischargeReduceCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime & 0xFF, this.cycleMode, this.peakSenseVoltage, this.trickleCurrent, this.cutTemperature,
-												DataParser.parse2UnsignedShort(reducedBuffer[27], reducedBuffer[26]), DataParser.parse2UnsignedShort(reducedBuffer[29], reducedBuffer[28])));
+				if (MC3000.log.isLoggable(Level.OFF)) {
+					MC3000.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
+					MC3000.log.log(java.util.logging.Level.OFF,
+						String.format("slot#=%02d BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d D.REDUCE=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d CUT TEMP=%02d CUT TIME=%03d RESTART VOLT=%04d",
+													reducedBuffer[4], reducedBuffer[5], this.operationMode, (reducedBuffer[6] & 0xFF) * 100, getChargeCurrent(), getDischargeCurrent(), getDischargeReduceCurrent(),
+													getChargeEndVoltage(), getDischargeReduceCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime & 0xFF, this.cycleMode, this.peakSenseVoltage,
+													this.trickleCurrent, this.cutTemperature, DataParser.parse2UnsignedShort(reducedBuffer[27], reducedBuffer[26]),
+													DataParser.parse2UnsignedShort(reducedBuffer[29], reducedBuffer[28])));
+				}
 	
 				//D.RESTING: TRICKLE TIME: CUT VOLT:
 			}

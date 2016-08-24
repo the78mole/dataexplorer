@@ -31,6 +31,7 @@ import gde.utils.StringHelper;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.usb.UsbException;
 import javax.usb.UsbInterface;
 
 /**
@@ -272,7 +273,7 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 	 * @throws Exception
 	 */
 	public synchronized byte[] setSlotProgram(final UsbInterface usbInterface, final byte[] buffer) throws Exception {
-		final String $METHOD_NAME = "getSystemSettings"; //$NON-NLS-1$
+		final String $METHOD_NAME = "setSlotProgram"; //$NON-NLS-1$
 		byte[] data = new byte[Math.abs(this.dataSize)];
 		UsbInterface iface = null;
 		boolean isPortOpenedByCall = false;
@@ -294,9 +295,9 @@ public class MC3000UsbPort extends DeviceCommPort implements IDeviceCommPort {
 			this.read(iface, this.endpointOut, data);			
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 			
-			if (!this.isChecksumOK(data, 16, 30, 31) && this.retrys-- >= 0) {
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, String.format("Error: Checksum = 0x%02X -> %b", MC3000UsbPort.calculateCheckSum(data), this.isChecksumOK(data)));
-				return this.getSystemSettings(iface);
+			if ((data[0]&0xFF) != 0xF0) {
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+				throw new UsbException("Error: answer != 0xF0");
 			}
 		}
 		catch (Exception e) {
