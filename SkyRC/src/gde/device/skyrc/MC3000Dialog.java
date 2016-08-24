@@ -239,7 +239,7 @@ public class MC3000Dialog extends DeviceDialog {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						MC3000Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						MC3000Dialog.this.application.openHelpDialog("SkyRC", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						MC3000Dialog.this.application.openHelpDialog(MC3000Dialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.clipboard = new Clipboard(this.dialogShell.getDisplay());
