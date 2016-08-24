@@ -143,10 +143,7 @@ public class HelpInfoDialog extends Dialog {
 				jarName = deviceName + GDE.FILE_ENDING_DOT_JAR;
 				targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR_UNIX;
 
-				if (!(new File(targetDir)).exists()) {
-					log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
-					FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
-				}
+				FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
 			}
 		
 		
