@@ -151,6 +151,9 @@ public class MC3000Dialog extends DeviceDialog {
 			if (sysSettings.getFirmwareVersionAsInt() <= 111) {
 				this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT3650, new String[] { sysSettings.getFirmwareVersion() }));
 			}
+			if (sysSettings.getFirmwareVersionAsInt() > 111) {
+				this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW3600, new String[] { sysSettings.getFirmwareVersion() }));
+			}
 		}
 	}
 
@@ -508,41 +511,46 @@ public class MC3000Dialog extends DeviceDialog {
 				if (MC3000Dialog.this.mc3000Setup == null) createMC3000Setup();
 				List<ProgramType> devicePrograms = MC3000Dialog.this.mc3000Setup.getProgram();
 				if (!devicePrograms.get(programmNameCombo.getSelectionIndex()).getName().contains(MC3000Dialog.NEW_PROG_NAME)) {
-					switch (index) {
-					case 0:
-						MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
-								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.slotSettings_0.setSlotNumber((byte) index);
-						label0.setText(MC3000Dialog.this.slotSettings_0.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip());
-						break;
-					case 1:
-						MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
-								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.slotSettings_1.setSlotNumber((byte) index);
-						label0.setText(MC3000Dialog.this.slotSettings_1.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip());
-						break;
-					case 2:
-						MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
-								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.slotSettings_2.setSlotNumber((byte) index);
-						label0.setText(MC3000Dialog.this.slotSettings_2.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip());
-						break;
-					case 3:
-						MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
-								MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
-						MC3000Dialog.this.slotSettings_3.setSlotNumber((byte) index);
-						label0.setText(MC3000Dialog.this.slotSettings_3.toString4View());
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip());
-						break;
+					try {
+						switch (index) {
+						case 0:
+							MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+							MC3000Dialog.this.slotSettings_0.setSlotNumber((byte) index);
+							label0.setText(MC3000Dialog.this.slotSettings_0.toString4View());
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip());
+							break;
+						case 1:
+							MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+							MC3000Dialog.this.slotSettings_1.setSlotNumber((byte) index);
+							label0.setText(MC3000Dialog.this.slotSettings_1.toString4View());
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip());
+							break;
+						case 2:
+							MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+							MC3000Dialog.this.slotSettings_2.setSlotNumber((byte) index);
+							label0.setText(MC3000Dialog.this.slotSettings_2.toString4View());
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip());
+							break;
+						case 3:
+							MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
+									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
+							MC3000Dialog.this.slotSettings_3.setSlotNumber((byte) index);
+							label0.setText(MC3000Dialog.this.slotSettings_3.toString4View());
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip());
+							break;
 
-					default:
-						break;
+						default:
+							break;
+						}
+						if (programmNameCombo.getText().contains(NEW_PROG_NAME)) writeButton.setEnabled(false);
+						else writeButton.setEnabled(true);
 					}
-					if (programmNameCombo.getText().contains(NEW_PROG_NAME)) writeButton.setEnabled(false);
-					else writeButton.setEnabled(true);
+					catch (Exception e) {
+						// ignore checksum error detected
+					}
 				}
 			}
 		});

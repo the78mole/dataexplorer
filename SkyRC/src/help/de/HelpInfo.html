@@ -31,23 +31,21 @@
 <DIV TYPE=HEADER>
 	<H2><FONT FACE="Arial"><FONT SIZE=4><I>SkyRC MC3000 Ger&auml;tedialog</I></FONT></FONT></H2>
 </DIV>
-<P>Der gezeigte Ger&auml;tedialog dient zur Konfiguration temporärer Programmspeicher, die aus vorher am Gerät konfigurierten Programmspeichern
-gebildet werden. Man kann sich eine Sicherungskopie der Programmspeicher ablegen, die nach einem Geräte-Reset, z.B. durch einen Firmware-Update,
-gelöscht wurden. Viele Elemente von diesem Dialog sind mit Tooltips versehen, die dem Benutzer helfen die Funktion zu erklären.
+<P>Der gezeigte Gerätedialog dient zur Konfiguration der vier Schächte mit temporären Programmspeichern, die aus zuvor auf dem Gerät abgespeicherten und anschließend mit Hilfe dieses Gerätedialogs gesicherten Programmen gebildet werden. Das Anlegen einer Sicherungskopie der Geräte-Programmspeicher macht Sinn, da diese spätestens nach einem Geräte-Reset oder durch ein Firmware-Update auf dem Gerät verloren gehen. 
+Der DataExplorer legt beim Speichern automatisch eine mit bis zu 30 belegbaren Plätzen breite Datenbank ab, die ebenso automatisch beim Aufrufen des Gerätedialogs direkt zur Verfügung steht. Viele Elemente in diesem Dialog sind mit einem Tooltip versehen, der dem Benutzer hilft deren Funktion zu erklären.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="HelpInfo_Bild_1" ALT="HelpInfo_Bild_1">
 </P>
 
-<P>Für eine Beschreibung des Programmspeichers, der gesichert werden soll, kann man bis zu 35 Zeichen verwenden. Die charakteristischen
-Merkmale werden in Kurzform angezeigt. Eine Detailliste bekommt man indem man mit dem Mauszeiger über dieser Beschriftung steht. Diese Liste
-kann auch in den Zwischenspeicher kopiert werden. Damit kann man sich ausführlichere Beschreibungen herstellen.
+<P>Für jeden Schacht werden die charakteristischen Merkmale des aktuell dem Benutzer zur Verfügung stehenden Programms in Kurzform unterhalb des Aufklappmenüs angezeigt. 
+Er kann dann entweder dieses Programm einem der 30 Sicherungsplätze zuordnen (Aufklapp-Menü) und es dabei auch umbenennen, oder es für das temporäre Überschreiben auf den Schacht übertragen (überschreiben), oder seine vollständigen Programmeinstellungen im Detail einfach nur betrachten. Letzteres, die Detail-Liste, wird einerseits als Tooltip, indem man mit dem Mauszeiger über jene Kurzform fährt, angezeigt. Andererseits ließe sie sich auch in den Zwischenspeicher kopieren (clipboard). Damit kann man sich durch systematisches Einfügen in eine separate Text-Datei eine eigene Programm-Datenbank mit ausführlicheren Beschriftungen und Beschreibungen aufbauen. Um sicherzustellen, dass die Detail-Liste den derzeitigen Programmeinstellungen im Schacht entspricht, sollten diese frisch eingelesen sein (einlesen). Für eine z.B. zur Umschreibung des zu sichernden Programmspeichers neue Benennung kann man bis zu 35 Zeichen verwenden, im nächsten Schritt sollte die getätigte Eingabe dann gespeichert werden (sichern). Der eigenen Übersicht ist es dienlich und sinnvoll, ein auf dem Gerät unter einer bestimmten Programmnummer abgespeichertes Programm unter derselben Platznummer in der Datenbank zu sichern.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_2.png" NAME="HelpInfo_Bild_1" ALT="HelpInfo_Bild_1">
 </P>
-<P><B>Hinweis: </B>Der Reset-Knopf lädt die initial beim Öffnen des Dialogs geladenen Programmspeicher. 
-Diese können dann durch den Überschreiben-Knopf in den temporären Programmspeicher des Gerätes geladen werden.
-Dieser erscheint in Kurzform, je nach Einstellung, nur am Gerät wenn eine Zelle im betreffenden Schacht liegt.
-Leider kann eine Überprüfung der Programm-Parameter nur mit diesem Dialog geschehen eine Überprüfung am Gerät gibt es nicht. 
+<P><B>Hinweis: </B>Der Reset-Knopf (reset) bringt die initial beim Aufrufen des Dialogs automatisch eingelesenen Programmspeicher zurück und überträgt diese auch zurück auf die Schächte. 
+Ob ein welches Programm, ein Programmspeicher, in der Tat erfolgreich übertragen worden ist, lässt sich auf dem Gerät nur bedingt, je nach Geräte-Einstellung samt Kurzform, erkennen, und zwar nur wenn ein Akku im betreffenden Schacht eingelegt liegt. 
+Eine vollständige visuelle Überprüfung der übertragenen Programm-Parameter kann nur über diesen Dialog vorgenommen werden (clipboard), auf dem Gerät selbst besteht leider keine weitere Möglichkeit der vollständigen Überprüfung. Der Benutzer ist selbst dafür verantwortlich, dass nach dem Verlassen des Dialogs (schliessen) und beim Starten der Aufnahme (Start Aufnahme) der zum Programm passende Akku im Schacht liegt. 
+Nach dem Starten des Programms zeigt dann das Gerät die Zustandsgrößen wie gewöhnlich an. 
 Der Benutzer ist selbst dafür verantwortlich, dass nach dem verlassen des Dialogs und ein Starten der Aufnahme der zum Programm passende Akku im Schacht liegt.
 Nach dem Starten des Programms zeigt dann das Gerät die Parameter wie gewöhnlich an.
 </P>

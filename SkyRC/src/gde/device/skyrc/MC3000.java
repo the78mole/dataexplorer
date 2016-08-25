@@ -71,8 +71,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	final static String[]	operationModeLi			= { "Charge", "Refresh", "Storage", "Discharge", "Cycle" };
 	final static String[]	operationModeNi			= { "Charge", "Refresh", "Break_in", "Discharge", "Cycle" };
 	final static String[]	operationModeZnRAM	= { "Charge", "Refresh", "Discharge", "Cycle" };
-	final static String[]	cellModelNames			= { "Std AA", "Lite AAA", "Std AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std D", "OFF" };
-	final static int[]		cellModelCapacity		= { 0, 720, 960, 1080, 1200, 2000, 2400, 3000, 3840, 7200 };
+	final static String[]	cellModelNames			= { "Std AA", "Lite AAA", "Lite AAA", "Std AAA", "Std AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std D", "OFF" };
+	final static int[]		cellModelCapacity		= { 0, 700, 720, 900, 960, 1080, 1200, 2000, 2400, 3000, 3840, 7200 };
 	final static String[] trickleTimeValues		= {"OFF", "REST", "END"};
 
 	protected class SystemSettings {
@@ -241,34 +241,42 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		byte		dischargeRestingTime;
 		byte		trickleTime;
 
-		public SlotSettings(final byte[] buffer, final int firmware) {
-			System.arraycopy(buffer, 0, this.slotBuffer, 0, buffer.length);
-			this.firmwareVersion = firmware;
-			this.slotNumber = buffer[1];
-			this.busyTag = buffer[2];
-			this.batteryType = buffer[3];
-			this.operationMode = buffer[4];
-			this.capacity = new byte[] { buffer[5], buffer[6] };
-			this.chargeCurrent = new byte[] { buffer[7], buffer[8] };
-			this.dischargeCurrent = new byte[] { buffer[9], buffer[10] };
-			this.dischargeCutVoltage = new byte[] { buffer[11], buffer[12] };
-			this.chargeEndVoltage = new byte[] { buffer[13], buffer[14] };
-			this.chargeEndCurrent = new byte[] { buffer[15], buffer[16] };
-			this.dischargeReduceCurrent = new byte[] { buffer[17], buffer[18] };
-			this.numberCycle = buffer[19];
-			this.chargeRestingTime = buffer[20];
-			this.cycleMode = buffer[21];
-			this.peakSenseVoltage = buffer[22];
-			this.trickleCurrent = buffer[23];
-			this.restartVoltage = new byte[] { buffer[24], buffer[25] };
-			this.cutTemperature = buffer[26];
-			this.cutTime = new byte[] { buffer[27], buffer[28] };
-			this.temperatureUnit = buffer[29];
-			//TODO coming with FW 1.12?
-			this.dischargeRestingTime = 0;
-			this.trickleTime = 0;
+		public SlotSettings(final byte[] buffer, final int firmware) throws Exception {
+			if (MC3000UsbPort.calculateCheckSum(buffer) == buffer[buffer.length-1]) {
+				System.arraycopy(buffer, 0, this.slotBuffer, 0, buffer.length);
+				this.firmwareVersion = firmware;
+				this.slotNumber = buffer[1];
+				this.busyTag = buffer[2];
+				this.batteryType = buffer[3];
+				this.operationMode = buffer[4];
+				this.capacity = new byte[] { buffer[5], buffer[6] };
+				this.chargeCurrent = new byte[] { buffer[7], buffer[8] };
+				this.dischargeCurrent = new byte[] { buffer[9], buffer[10] };
+				this.dischargeCutVoltage = new byte[] { buffer[11], buffer[12] };
+				this.chargeEndVoltage = new byte[] { buffer[13], buffer[14] };
+				this.chargeEndCurrent = new byte[] { buffer[15], buffer[16] };
+				this.dischargeReduceCurrent = new byte[] { buffer[17], buffer[18] };
+				this.numberCycle = buffer[19];
+				this.chargeRestingTime = buffer[20];
+				this.cycleMode = buffer[21];
+				this.peakSenseVoltage = buffer[22];
+				this.trickleCurrent = buffer[23];
+				this.restartVoltage = new byte[] { buffer[24], buffer[25] };
+				this.cutTemperature = buffer[26];
+				this.cutTime = new byte[] { buffer[27], buffer[28] };
+				this.temperatureUnit = buffer[29];
+				//TODO coming with FW 1.12?
+				this.dischargeRestingTime = 0;
+				this.trickleTime = 0;
 
-			MC3000.log.log(java.util.logging.Level.OFF, this.toString());
+				MC3000.log.log(java.util.logging.Level.OFF, this.toString());
+			}
+			else {
+				log.log(Level.SEVERE, Messages.getString(MessageIds.GDE_MSGE3600));
+				WaitTimer.delay(500);
+				application.openMessageDialogAsync(application.getShell(), Messages.getString(MessageIds.GDE_MSGE3600));
+				throw new Exception(Messages.getString(MessageIds.GDE_MSGE3600));
+			}
 		}
 
 		/**
@@ -322,7 +330,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		public String toString4Tip() {
 			StringBuilder sb = new StringBuilder();
 			//BATT TYPE
-			sb.append(Messages.getString(MessageIds.GDE_MSGT3682)).append(MC3000.cellTypeNames[this.batteryType]).append(GDE.STRING_NEW_LINE);
+			sb.append(Messages.getString(MessageIds.GDE_MSGT3682)).append(MC3000.cellTypeNames[this.batteryType]).append(GDE.LINE_SEPARATOR);
 			//MODE
 			appendOperationMode(sb.append(Messages.getString(MessageIds.GDE_MSGT3683)));
 			//CAPACITY
@@ -336,31 +344,31 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			if ((((this.batteryType <=4 || this.batteryType == 6) && this.operationMode != 3)  //!discharge Li -> Ni + Eneloop
 					|| ((this.batteryType == 5 || this.batteryType == 7) && this.operationMode != 2)) //!discharge NiZn, RAM
 					&& this.getChargeCurrent() != 0 ) {
-				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3661), this.getChargeCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3661), this.getChargeCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 			} else {
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3661))).append(GDE.STRING_NEW_LINE);
 			}
 			//D.CURRENT:
 			if (this.operationMode != 0 && this.getDischargeCurrent() != 0) { //!charge
-				sb.append(String.format(Locale.ENGLISH, "%-13s -%4.2fA", Messages.getString(MessageIds.GDE_MSGT3662), this.getDischargeCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-13s -%4.2fA", Messages.getString(MessageIds.GDE_MSGT3662), this.getDischargeCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 			} else {
-				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3662))).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3662))).append(GDE.LINE_SEPARATOR);
 			}		
 		  //C.RESTING:
 			if (((this.batteryType <=4 || this.batteryType == 6) && this.operationMode != 3)  //!discharge Li -> Ni + Eneloop
 					|| ((this.batteryType == 5 || this.batteryType == 7) && this.operationMode != 2)) { //!discharge NiZn, RAM
-				sb.append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3663), this.chargeRestingTime & 0xFF)).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3663), this.chargeRestingTime & 0xFF)).append(GDE.LINE_SEPARATOR);
 			} else {
-				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3663))).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3663))).append(GDE.LINE_SEPARATOR);
 			}
 		  //D.RESTING:			
 			if (this.operationMode != 0) { //!charge
 				if (this.firmwareVersion > 111)
-					sb.append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime & 0xFF)).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime & 0xFF)).append(GDE.LINE_SEPARATOR);
 				else
-					sb.append(String.format(Locale.ENGLISH, "%-14s %dmin (FW <=1.11 = %s)", Messages.getString(MessageIds.GDE_MSGT3664), this.chargeRestingTime & 0xFF, Messages.getString(MessageIds.GDE_MSGT3663))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %dmin (FW <=1.11 = %s)", Messages.getString(MessageIds.GDE_MSGT3664), this.chargeRestingTime & 0xFF, Messages.getString(MessageIds.GDE_MSGT3663))).append(GDE.LINE_SEPARATOR);
 			} else {
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime & 0xFF)).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime & 0xFF)).append(GDE.LINE_SEPARATOR);
 			}		
 			//CYCLE COUNT://CYCLE MODE:
 			appendCycleCountCycleMode(sb);
@@ -373,9 +381,9 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			if ((this.batteryType <=2 && this.operationMode != 3)  //!discharge Li
 					|| ((this.batteryType == 3 || this.batteryType == 4 || this.batteryType == 6) && (this.operationMode != 2 && this.operationMode != 3))//!break_in !discharge Ni + Eneloop
 					|| ((this.batteryType == 5 || this.batteryType == 7) && this.operationMode != 2)) { //!discharge NiZn, RAM
-				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3667), this.getChargeEndVoltage() / 1000.0)).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3667), this.getChargeEndVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
 			} else {
-				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3667))).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3667))).append(GDE.LINE_SEPARATOR);
 			}
 			//TERMINATION:
 			appendCcCvTerminationCurrent(sb);
@@ -387,9 +395,9 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			appendDischargeReductionCurrent(sb);
 			//CUT VOLT:
 			if (this.operationMode == 0 || (this.operationMode == 2 && this.batteryType < 3)) // charge or Li storage
-				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3671))).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3671))).append(GDE.LINE_SEPARATOR);
 			else
-				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3671), this.getDischargeCutVoltage() / 1000.0)).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3671), this.getDischargeCutVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
 			//CUT TEMP:
 			if (this.cutTemperature >= 20)
 				sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), this.cutTemperature, this.temperatureUnit == 0 ? "°C" : "°F"));
@@ -397,12 +405,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
 			//CUT TIME:			
 			if ((this.batteryType == 3 || this.batteryType == 4 || this.batteryType == 6) && this.operationMode == 2) // NiMH, NiCd, Eneloop & break_in
-				sb.append(GDE.STRING_NEW_LINE).append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3673)));
+				sb.append(GDE.LINE_SEPARATOR).append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3673)));
 			else
 				if (this.getCutTime() == 0)
-					sb.append(GDE.STRING_NEW_LINE).append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3673)));
+					sb.append(GDE.LINE_SEPARATOR).append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3673)));
 				else
-					sb.append(GDE.STRING_NEW_LINE).append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3673), this.getCutTime()));
+					sb.append(GDE.LINE_SEPARATOR).append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3673), this.getCutTime()));
 
 			return sb.toString();
 		}
@@ -419,11 +427,11 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 1://LiFe
 			case 2://LiHV
 				if (this.getDischargeReduceCurrent() == 0)
-					sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 				else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent())
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 				else
-					sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 				break;
 
 			case 3://NiMH
@@ -432,15 +440,15 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				switch (this.operationMode) {
 				case 0://charge
 				case 2://break_in 
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 					break;
 				default://discharge, refresh, cycle
 					if (this.getDischargeReduceCurrent() == 0)
-						sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 					else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent())
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -449,15 +457,15 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 7://RAM
 				switch (this.operationMode) {
 				case 0://charge 
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 					break;
 				default://discharge, refresh, cycle
 					if (this.getDischargeReduceCurrent() == 0)
-						sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 					else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent())
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -481,13 +489,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				switch (this.operationMode) {
 				case 2://storage, break_in 
 				case 3://discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.LINE_SEPARATOR);
 					break;
 				default://charge, refresh, cycle
 					if (this.getRestartVoltage() != 0)
-						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3669), this.getRestartVoltage() / 1000.0)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3669), this.getRestartVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -496,13 +504,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 7://RAM
 				switch (this.operationMode) {
 				case 2://discharge 
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.LINE_SEPARATOR);
 					break;
 				default://charge, refresh, cycle
 					if (this.getRestartVoltage() != 0)
-						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3669), this.getRestartVoltage() / 1000.0)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3669), this.getRestartVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3669))).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -528,25 +536,25 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				switch (this.operationMode) {
 				case 2://break_in 
 				case 3://discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3674))).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3675))).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3676))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3674))).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3675))).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3676))).append(GDE.LINE_SEPARATOR);
 					break;
 				default://charge, refresh, cycle
 					if (this.peakSenseVoltage == 0)
-						sb.append(String.format(Locale.ENGLISH, "%-14s 0dV", Messages.getString(MessageIds.GDE_MSGT3674))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s 0dV", Messages.getString(MessageIds.GDE_MSGT3674))).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s %dmV", Messages.getString(MessageIds.GDE_MSGT3674), this.peakSenseVoltage)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %dmV", Messages.getString(MessageIds.GDE_MSGT3674), this.peakSenseVoltage)).append(GDE.LINE_SEPARATOR);
 
 					if (this.trickleCurrent != 0)
-						sb.append(String.format(Locale.ENGLISH, "%-14s %dmA", Messages.getString(MessageIds.GDE_MSGT3675), this.trickleCurrent*10)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %dmA", Messages.getString(MessageIds.GDE_MSGT3675), this.trickleCurrent*10)).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3675))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3675))).append(GDE.LINE_SEPARATOR);
 												
 					if (this.trickleTime != 0 && this.firmwareVersion > 111)
-						sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3676), trickleTimeValues[this.trickleTime])).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3676), trickleTimeValues[this.trickleTime])).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s ?? FW <=1.11", Messages.getString(MessageIds.GDE_MSGT3676))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s ?? FW <=1.11", Messages.getString(MessageIds.GDE_MSGT3676))).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -571,17 +579,17 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 2://LiHV
 				switch (this.operationMode) {
 				case 3://discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					break;
 				case 1://refresh
 				case 4://cycle
 				default://charge, storage  {Zero|current range|OFF}
 					if (this.getChargeEndCurrent() == 0)
-						sb.append(String.format(Locale.ENGLISH, "%-14s Zero", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s Zero", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					else if (this.getChargeEndCurrent() >= this.getChargeCurrent())
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3668), this.getChargeEndCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3668), this.getChargeEndCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -590,17 +598,17 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 7://RAM
 				switch (this.operationMode) {
 				case 2://discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					break;
 				case 1://refresh
 				case 3://cycle
 				default://charge
 					if (this.getChargeEndCurrent() == 0)
-						sb.append(String.format(Locale.ENGLISH, "%-14s Zero", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s Zero", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					else if (this.getChargeEndCurrent() >= this.getChargeCurrent())
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3668), this.getChargeEndCurrent() / 1000.0)).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3668), this.getChargeEndCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -620,16 +628,16 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 2://LiHV
 				switch (this.operationMode) {
 				case 1://refresh
-					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), cycleModeNames[1])).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), cycleModeNames[1])).append(GDE.LINE_SEPARATOR);
 					break;
 				case 4://cycle
-					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.LINE_SEPARATOR);
 					break;
 				default://charge, discharge, storage
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);				
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.LINE_SEPARATOR);				
 					break;
 				}
 				break;
@@ -639,20 +647,20 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 6://Eneloop
 				switch (this.operationMode) {
 				case 1://refresh
-					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), cycleModeNames[1])).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), cycleModeNames[1])).append(GDE.LINE_SEPARATOR);
 					break;
 				case 2://break_in C>D>C | D>C>D TODO
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.cycleMode == 0 ? MC3000.cycleModeNames[1] : MC3000.cycleModeNames[3] )).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.cycleMode == 0 ? MC3000.cycleModeNames[1] : MC3000.cycleModeNames[3] )).append(GDE.LINE_SEPARATOR);
 					break;
 				case 4://cycle
-					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.LINE_SEPARATOR);
 					break;
 				default://charge, discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);				
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.LINE_SEPARATOR);				
 					break;
 				}
 				break;
@@ -661,16 +669,16 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 7://RAM
 				switch (this.operationMode) {
 				case 1://refresh
-					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), cycleModeNames[1])).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), cycleModeNames[1])).append(GDE.LINE_SEPARATOR);
 					break;
 				case 3://cycle
-					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), this.numberCycle)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.LINE_SEPARATOR);
 					break;
 				default://charge, discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.STRING_NEW_LINE);
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.STRING_NEW_LINE);				
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3665))).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3666), this.getCycleModeString())).append(GDE.LINE_SEPARATOR);				
 					break;
 				}
 				break;
@@ -688,9 +696,9 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 7://RAM
 				//Capacity
 				if (getCapacity() == 0) 
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3660))).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3660))).append(GDE.LINE_SEPARATOR);
 				else
-					sb.append(String.format(Locale.ENGLISH, "%-14s %dmAh", Messages.getString(MessageIds.GDE_MSGT3660), getCapacity())).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %dmAh", Messages.getString(MessageIds.GDE_MSGT3660), getCapacity())).append(GDE.LINE_SEPARATOR);
 				break;
 
 			case 3://NiMH
@@ -698,13 +706,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				//Capacity - Nominal (braek_in)
 				switch (this.operationMode) {
 				case 2://break_in
-					sb.append(String.format(Locale.ENGLISH, "%-14s %dmAh", Messages.getString(MessageIds.GDE_MSGT3685), getCapacity())).append(GDE.STRING_NEW_LINE);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %dmAh", Messages.getString(MessageIds.GDE_MSGT3685), getCapacity())).append(GDE.LINE_SEPARATOR);
 					break;
 				default:
 					if (getCapacity() == 0) 
-						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3660))).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3660))).append(GDE.LINE_SEPARATOR);
 					else
-						sb.append(String.format(Locale.ENGLISH, "%-14s %dmAh", Messages.getString(MessageIds.GDE_MSGT3660), getCapacity())).append(GDE.STRING_NEW_LINE);
+						sb.append(String.format(Locale.ENGLISH, "%-14s %dmAh", Messages.getString(MessageIds.GDE_MSGT3660), getCapacity())).append(GDE.LINE_SEPARATOR);
 					break;
 				}
 				break;
@@ -714,7 +722,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				int i = 0;
 				for (; this.batteryType == 6 && i < MC3000.cellModelCapacity.length; i++) 
 					if (this.getCapacity() == MC3000.cellModelCapacity[i]) break;
-				sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames[i])).append(GDE.STRING_NEW_LINE);
+				sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames[i])).append(GDE.LINE_SEPARATOR);
 				break;
 			}
 		}
@@ -828,27 +836,27 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 2://LiHV
 				//Capacity
 				//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
-				sb.append(MC3000.operationModeLi[this.operationMode]).append(GDE.STRING_NEW_LINE);
+				sb.append(MC3000.operationModeLi[this.operationMode]).append(GDE.LINE_SEPARATOR);
 				break;
 				
 			case 5://NiZn
 			case 7://RAM
 				//Capacity
 				//Mode Zn/RAM battery:0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
-				sb.append(MC3000.operationModeZnRAM[this.operationMode]).append(GDE.STRING_NEW_LINE);
+				sb.append(MC3000.operationModeZnRAM[this.operationMode]).append(GDE.LINE_SEPARATOR);
 				break;
 
 			case 3://NiMH
 			case 4://NiCd
 				//Capacity - Nominal (braek_in)
 				//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
-				sb.append(MC3000.operationModeNi[this.operationMode]).append(GDE.STRING_NEW_LINE);
+				sb.append(MC3000.operationModeNi[this.operationMode]).append(GDE.LINE_SEPARATOR);
 				break;
 
 			case 6://Eneloop
 				//Model
 				//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
-				sb.append(MC3000.operationModeNi[this.operationMode]).append(GDE.STRING_NEW_LINE);
+				sb.append(MC3000.operationModeNi[this.operationMode]).append(GDE.LINE_SEPARATOR);
 				break;
 			}
 		}
