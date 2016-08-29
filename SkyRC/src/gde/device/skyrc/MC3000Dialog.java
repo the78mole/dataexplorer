@@ -605,7 +605,7 @@ public class MC3000Dialog extends DeviceDialog {
 				if (evt.character == SWT.CR) {
 					try {
 						if (MC3000Dialog.this.mc3000Setup == null) createMC3000Setup();
-						MC3000Dialog.log.log(java.util.logging.Level.OFF, String.format("slot # %d selection index = %d", index, MC3000Dialog.this.lastSelectionIndex[index])); //$NON-NLS-1$
+						MC3000Dialog.log.log(java.util.logging.Level.FINE, String.format("slot # %d selection index = %d", index, MC3000Dialog.this.lastSelectionIndex[index])); //$NON-NLS-1$
 						String nameLeader = String.format(MC3000Dialog.STRING_FORMAT_02d, MC3000Dialog.this.lastSelectionIndex[index] + 1);
 						String tmpName = programmNameCombo.getText() + MC3000Dialog.STRING_35_BLANK;
 						tmpName = tmpName.startsWith(nameLeader) ? tmpName : (nameLeader + tmpName);

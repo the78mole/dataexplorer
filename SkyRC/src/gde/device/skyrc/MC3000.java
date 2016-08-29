@@ -269,7 +269,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				this.dischargeRestingTime = 0;
 				this.trickleTime = 0;
 
-				MC3000.log.log(java.util.logging.Level.OFF, this.toString());
+				MC3000.log.log(java.util.logging.Level.FINE, this.toString());
 			}
 			else {
 				MC3000.log.log(java.util.logging.Level.SEVERE, Messages.getString(MessageIds.GDE_MSGE3600));
@@ -442,12 +442,16 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 0://LiIon
 			case 1://LiFe
 			case 2://LiHV
-				if (this.getDischargeReduceCurrent() == 0)
+				if (this.getDischargeReduceCurrent() == 0) {
 					sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
-				else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent())
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
-				else
+				}
+				else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent()) {
+					if (!isToolTip)
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
+				}
+				else {
 					sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
+				}
 				break;
 
 			case 3://NiMH
@@ -597,7 +601,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 2://LiHV
 				switch (this.operationMode) {
 				case 3://discharge
-					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
+					if (!isToolTip)
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					break;
 				case 1://refresh
 				case 4://cycle
@@ -616,7 +621,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 7://RAM
 				switch (this.operationMode) {
 				case 2://discharge
-					if (!isToolTip) sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
+					if (!isToolTip) 
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3668))).append(GDE.LINE_SEPARATOR);
 					break;
 				case 1://refresh
 				case 3://cycle
@@ -841,7 +847,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					break;
 				case 3: //CYCLE
 					sb.append(String.format(Locale.ENGLISH, "-%4.2f/%4.2fA", this.getDischargeCurrent() / 1000.0, this.getChargeCurrent() / 1000.0));
-					sb.append(String.format(" - N=%d (%s)", this.numberCycle, this.getCycleModeString()));
+					sb.append(String.format("  N=%d (%s)", this.numberCycle, this.getCycleModeString()));
 					break;
 				default:
 					break;
@@ -907,11 +913,11 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer, 29);
 				reducedBuffer[31] = (byte) 0xFF;
 				reducedBuffer[32] = (byte) 0xFF;
-				if (MC3000.log.isLoggable(java.util.logging.Level.OFF)) {
-					MC3000.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
+				if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) {
+					MC3000.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
 					MC3000.log
 							.log(
-									java.util.logging.Level.OFF,
+									java.util.logging.Level.FINE,
 									String
 											.format(
 													"slot#=%02d BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d D.REDUCE=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d CUT TEMP=%02d CUT TIME=%03d RESTART VOLT=%04d",
