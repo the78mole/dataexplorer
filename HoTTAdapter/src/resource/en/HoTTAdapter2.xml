@@ -579,12 +579,59 @@
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature M</name>
-                <symbol></symbol>
+                <name>TemperatureM 1</name>
+                <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M_min</name>
+                <symbol>U_min</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M_max</name>
+                <symbol>I</symbol>
+                <unit>A_max</unit>
+                <active>true</active>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M_max</name>
+                <symbol>rpm_max</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1_max</name>
+                <symbol>T1_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2_max</name>
+                <symbol>T2_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorGeneral">
@@ -1128,12 +1175,59 @@
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature M</name>
-                <symbol></symbol>
+                <name>TemperatureM 1</name>
+                <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M_min</name>
+                <symbol>U_min</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M_max</name>
+                <symbol>I</symbol>
+                <unit>A_max</unit>
+                <active>true</active>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M_max</name>
+                <symbol>rpm_max</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1_max</name>
+                <symbol>T1_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2_max</name>
+                <symbol>T2_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorElectric">
@@ -1677,12 +1771,59 @@
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature M</name>
-                <symbol></symbol>
+                <name>TemperatureM 1</name>
+                <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M_min</name>
+                <symbol>U_min</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M_max</name>
+                <symbol>I</symbol>
+                <unit>A_max</unit>
+                <active>true</active>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M_max</name>
+                <symbol>rpm_max</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1_max</name>
+                <symbol>T1_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2_max</name>
+                <symbol>T2_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Channels">
@@ -2381,12 +2522,59 @@
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature M</name>
-                <symbol></symbol>
+                <name>TemperatureM 1</name>
+                <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M_min</name>
+                <symbol>U_min</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M_max</name>
+                <symbol>I</symbol>
+                <unit>A_max</unit>
+                <active>true</active>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M_max</name>
+                <symbol>rpm_max</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1_max</name>
+                <symbol>T1_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2_max</name>
+                <symbol>T2_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorControl">
@@ -2930,12 +3118,59 @@
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature M</name>
-                <symbol></symbol>
+                <name>TemperatureM 1</name>
+                <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M_min</name>
+                <symbol>U_min</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M_max</name>
+                <symbol>I</symbol>
+                <unit>A_max</unit>
+                <active>true</active>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M_max</name>
+                <symbol>rpm_max</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1_max</name>
+                <symbol>T1_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2_max</name>
+                <symbol>T2_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>

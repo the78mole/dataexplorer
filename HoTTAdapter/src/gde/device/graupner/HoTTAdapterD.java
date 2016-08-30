@@ -844,7 +844,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 				//temporary variables
 				double lastLapTimeStamp_ms = 0;
 				int lapTime = 0;
-				int lastValue = 0;
+				int lastRxDbmValue = 0;
 				int lapCount = 0;
 				int lastRxdbm = 0;
 				boolean isLapEvent = false;
@@ -874,30 +874,39 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 					if (recordDiffRx_dbm.getTime_ms(i) > filterStartTime && recordDiffRx_dbm.getTime_ms(i) < (filterStartTime+filterMaxTime)) { //check start time before starting lab counting
 
 						if ((recordDiffRx_dbm.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
-
-							if (lastValue > 0 && recordDiffRx_dbm.get(i) <= 0 
-									&& (recordSmoothRx_dbm.get(i) / 1000 - localRxDbmMin) > filterMinDeltaRxDbm) { //lap event detected maximum Rx dbm
-								isLapEvent = true;
-								if (lastLapTimeStamp_ms != 0) {
-									log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
-									lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
-								}
-								lastLapTimeStamp_ms = recordSet.getTime_ms(i);
-								recordLapsRx_dbm.set(i, lapTime);
-								if (lapTime != 0) {
-									if (lapCount % 2 == 0) {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+							
+							if ((recordSmoothRx_dbm.get(i) / 1000 - localRxDbmMin) > filterMinDeltaRxDbm) { // check minimal Rx dbm difference
+								
+								if (lastRxDbmValue > 0 && recordDiffRx_dbm.get(i) <= 0) { //lap event detected 
+									isLapEvent = true;
+									if (lastLapTimeStamp_ms != 0) {
+										log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
+										lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
 									}
-									else {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+									lastLapTimeStamp_ms = recordSet.getTime_ms(i);
+									recordLapsRx_dbm.set(i, lapTime);
+									if (lapTime != 0) {
+										if (lapCount % 2 == 0) {
+											recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										}
+										else {
+											recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										}
 									}
-								}
-								if (isLapEvent && lapTime == 0) { //first lap start
-									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
-								}
-
-								localRxDbmMin = 0; //rest local min value of Rx dbm
-							}
+									if (isLapEvent && lapTime == 0) { //first lap start
+										recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
+									}
+	
+									localRxDbmMin = 0; //reset local min value of Rx dbm
+								} //end lap event detected 
+								else if (lapTime == 0)
+									if (isLapEvent)
+										recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
+									else
+										recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
+								else
+									recordLapsRx_dbm.set(i, lapTime);
+							} //end check minimal Rx dbm difference
 							else if (lapTime == 0)
 								if (isLapEvent)
 									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
@@ -905,12 +914,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
 							else
 								recordLapsRx_dbm.set(i, lapTime);
-
-							if (lastValue < 0 && recordDiffRx_dbm.get(i) >= 0) { //local minimum Rx dbm detected
-								if (recordSmoothRx_dbm.get(i) / 1000 < localRxDbmMin) 
-									localRxDbmMin = recordSmoothRx_dbm.get(i) / 1000;
-							}
-						}
+						} //end check minimal time between lap events
 						else if (lapTime == 0)
 							if (isLapEvent)
 								recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
@@ -918,14 +922,20 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 								recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
 						else
 							recordLapsRx_dbm.set(i, lapTime);
-					}
+						
+						// find a local minimal value of Rx dbm 
+						if (lastRxDbmValue < 0 && recordDiffRx_dbm.get(i) >= 0) { //local minimum Rx dbm detected
+							if (recordSmoothRx_dbm.get(i) / 1000 < localRxDbmMin) 
+								localRxDbmMin = recordSmoothRx_dbm.get(i) / 1000;
+						}
+					} //end check start time before starting lab counting
 					else
 						if (recordDiffRx_dbm.getTime_ms(i) > (filterStartTime+filterMaxTime))
 							recordLapsRx_dbm.set(i, 0);
 						else
 							recordLapsRx_dbm.set(i, lapTime);
 
-					lastValue = recordDiffRx_dbm.get(i);
+					lastRxDbmValue = recordDiffRx_dbm.get(i);
 				}
 				//labs calculation end
 			}
@@ -933,13 +943,13 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 				//temporary variables
 				double lastLapTimeStamp_ms = 0;
 				int lapTime = 0;
-				int lastValue = 0;
+				int lastDistanceValue = 0;
 				int lapCount = 0;
 				boolean isLapEvent = false;
 				int localDistMax = 0;
 
 				//smooth and calculate differentiation
-				CalculationThread thread = new LinearRegression(recordSet, recordDistanceStart.getName(), recordDiffDistance.getName(), 2);
+				CalculationThread thread = new LinearRegression(recordSet, recordDistanceStart.getName(), recordDiffDistance.getName(), 4);
 				thread.start();
 				try {
 					thread.join();
@@ -953,29 +963,38 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 					if (recordDiffDistance.getTime_ms(i) > filterStartTime && recordDiffDistance.getTime_ms(i) < (filterStartTime+filterMaxTime)) { //check start time before starting lab counting
 
 						if ((recordDiffDistance.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
-
-							if (lastValue < 0 && recordDiffDistance.get(i) >= 0
-									&& (localDistMax - recordDistanceStart.get(i) / 1000) > filterMinDeltaDist) { //lap event detected, nearest distance
-								isLapEvent = true;
-								if (lastLapTimeStamp_ms != 0) {
-									log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
-									lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
-								}
-								lastLapTimeStamp_ms = recordSet.getTime_ms(i);
-								recordLapsDistance.set(i, lapTime);
-								if (lapTime != 0) {
-									if (lapCount % 2 == 0) {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+							
+							if ((localDistMax - recordDistanceStart.get(i) / 1000) > filterMinDeltaDist) { //check minimal distance difference
+								
+								if (lastDistanceValue < 0 && recordDiffDistance.get(i) >= 0) { //lap event detected
+									isLapEvent = true;
+									if (lastLapTimeStamp_ms != 0) {
+										log.log(Level.OFF, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
+										lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
 									}
-									else {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+									lastLapTimeStamp_ms = recordSet.getTime_ms(i);
+									recordLapsDistance.set(i, lapTime);
+									if (lapTime != 0) {
+										if (lapCount % 2 == 0) {
+											recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										}
+										else {
+											recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										}
 									}
-								}
-								if (isLapEvent && lapTime == 0) //first lap start
-									recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
-
-								localDistMax = 0; //reset local distance maximum
-							}
+									if (isLapEvent && lapTime == 0) //first lap start
+										recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
+	
+									localDistMax = 0; //reset local distance maximum
+								} //end lap event detected
+								else if (lapTime == 0)
+									if (isLapEvent)
+										recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
+									else
+										recordLapsDistance.set(i, (int) filterLapMinTime_ms);
+								else
+									recordLapsDistance.set(i, lapTime);
+							} //end check minimal distance difference
 							else if (lapTime == 0)
 								if (isLapEvent)
 									recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
@@ -983,11 +1002,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 									recordLapsDistance.set(i, (int) filterLapMinTime_ms);
 							else
 								recordLapsDistance.set(i, lapTime);
-
-							if (lastValue > 0 && recordDiffDistance.get(i) <= 0) { //local maximum distance detected
-								if (recordDistanceStart.get(i) / 1000 > localDistMax) localDistMax = recordDistanceStart.get(i) / 1000;
-							}
-						}
+						} //end check minimal time between lap events
 						else if (lapTime == 0)
 							if (isLapEvent)
 								recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
@@ -995,14 +1010,20 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 								recordLapsDistance.set(i, (int) filterLapMinTime_ms);
 						else
 							recordLapsDistance.set(i, lapTime);
-					}
+						
+						//find local distance maximum
+						if (lastDistanceValue > 0 && recordDiffDistance.get(i) <= 0) { //local maximum distance detected
+							if (recordDistanceStart.get(i) / 1000 > localDistMax) 
+								localDistMax = recordDistanceStart.get(i) / 1000;
+						}
+					} //end check start time before starting lab counting
 					else
 						if (recordDiffDistance.getTime_ms(i) > (filterStartTime+filterMaxTime))
 							recordLapsDistance.set(i, 0);
 						else
 							recordLapsDistance.set(i, lapTime);
 
-					lastValue = recordDiffDistance.get(i);
+					lastDistanceValue = recordDiffDistance.get(i);
 				}
 			}
 			this.application.updateStatisticsData(true);

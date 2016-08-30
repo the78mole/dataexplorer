@@ -1216,7 +1216,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 
 			case 64: //HoTTAdapter2 without channels prior to 3.1.9
 			case 84: //HoTTAdapter2 with channels prior to 3.1.9
-			default:
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i != 59) {
 						cleanedRecordNames.add(recordKeys[i]);
@@ -1224,6 +1223,16 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					else
 						measurements.get(i).setActive(null);
+				}
+				break;
+			default: //HoTTAdapter2 3.2.6 > only adds measurement at the end 
+				int i = 0;
+				for (; i < fileRecordsProperties.length; ++i) {
+					cleanedRecordNames.add(recordKeys[i]);
+				}
+				//cleanup recordSet
+				for (; i < recordKeys.length; ++i) {
+					recordSet.remove(recordKeys[i]);
 				}
 				break;
 			}

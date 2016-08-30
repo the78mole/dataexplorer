@@ -290,7 +290,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -120 : -120);
 							this.filterStartTimeCombo.setLayoutData(enableFilterLData);
 							this.filterStartTimeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.filterStartTimeCombo.setItems(filterItems);
+							this.filterStartTimeCombo.setItems(filterMinItems);
 							//this.filterStartTimeCombo.select(10);
 							this.filterStartTimeCombo.setToolTipText("Größerer Wert -> späterer Start Rundenzeiten");
 							this.filterStartTimeCombo.setEditable(false);
