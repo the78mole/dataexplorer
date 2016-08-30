@@ -9,6 +9,8 @@ Version 3.2.7 - xx yyy 2016
 - reduce message in unsaved waring message box
 - enable builds using Windows 10
 - fix problem displaying help after language switch
+HoTTAdapter*
+	- add ESC missing measurement values Temperature2, Voltage min, Current max, RPM max, Temperature1 max, Temperature2 max
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
 	- add default filter settings to device XML
