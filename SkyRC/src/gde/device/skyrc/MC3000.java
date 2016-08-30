@@ -442,17 +442,21 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 0://LiIon
 			case 1://LiFe
 			case 2://LiHV
-				if (this.getDischargeReduceCurrent() == 0) {
-					sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
-				}
-				else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent()) {
+				switch (this.operationMode) {
+				case 0://charge
 					if (!isToolTip)
 						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
+					break;
+				default://refresh, storage, discharge cycle
+					if (this.getDischargeReduceCurrent() == 0)  
+						sb.append(String.format(Locale.ENGLISH, "%-13s -Zero", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
+					else if (this.getDischargeReduceCurrent() >= this.getDischargeCurrent())  
+						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3670))).append(GDE.LINE_SEPARATOR);
+	 				else  
+						sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
+					break;
 				}
-				else {
-					sb.append(String.format(Locale.ENGLISH, "%-13s -%3.2fA", Messages.getString(MessageIds.GDE_MSGT3670), this.getDischargeReduceCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
-				}
-				break;
+ 				break;
 
 			case 3://NiMH
 			case 4://NiCd
