@@ -14,6 +14,7 @@ HoTTAdapter*
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
 	- add default filter settings to device XML
+	- correct trigger references in XML
 HoTTViewer Adapter
 	- add Rx dbm measurement value
 MC3000
