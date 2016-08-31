@@ -1302,7 +1302,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="36" sumTriggerText="Summe Motorhöhe" countTriggerText="Bezogen auf Stromtrigger" ratioRefOrdinal="39" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="37" sumTriggerText="Summe Motorhöhe" countTriggerText="Bezogen auf Stromtrigger" ratioRefOrdinal="39" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
