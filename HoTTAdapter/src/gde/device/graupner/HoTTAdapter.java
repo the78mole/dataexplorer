@@ -34,7 +34,6 @@ import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.io.FileHandler;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -106,7 +105,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
 
 	final static int												QUERY_GAP_MS											= 30;
-	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																			//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
+	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
@@ -121,7 +120,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		public String value() {
 			return this.value;
 		}
-		
+
 		public static List<Sensor> getAsList() {
 			List<HoTTAdapter.Sensor> sensors = new ArrayList<HoTTAdapter.Sensor>();
 			for (Sensor sensor : Sensor.values()) {
@@ -169,14 +168,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final HoTTAdapterDialog			dialog;
 	final HoTTAdapterSerialPort	serialPort;
 
-	static boolean							isChannelsChannelEnabled 			= false;
+	static boolean							isChannelsChannelEnabled			= false;
 	static boolean							isFilterEnabled								= true;
 	static boolean							isFilterTextModus							= true;
 	static boolean							isTolerateSignChangeLatitude	= false;
 	static boolean							isTolerateSignChangeLongitude	= false;
 	static double								latitudeToleranceFactor				= 90.0;
 	static double								longitudeToleranceFactor			= 25.0;
-	
+
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -197,15 +196,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
-		
-		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" 
-				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
-		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
+
+		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
+		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3,
+				1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3,
+				2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this
+				.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
+		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this
+				.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
 	}
 
 	/**
@@ -227,15 +232,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
-		
-		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" 
-				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
-		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
+
+		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" ? Boolean
+				.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
+		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3,
+				1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3,
+				2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this
+				.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
+		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this
+				.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
 	}
 
 	/**
@@ -251,6 +262,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -263,6 +275,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -271,6 +284,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
+	@Override
 	public int getLovDataByteSize() {
 		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -286,6 +300,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		//LogView doesn't support HoTT sensor logfiles
 	}
@@ -296,6 +311,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte array with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
@@ -565,7 +581,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 29) * 1000;
@@ -732,8 +748,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) { 
-						points[1] = tmpVoltage * 1000; 
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
+						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
@@ -760,6 +776,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		int[] points = new int[recordSet.size()];
@@ -772,15 +789,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize + timeStampBufferSize;
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
+			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINER)) HoTTAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
 
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
+				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4)
+						+ index] & 0xff) << 0));
 			}
 
-			recordSet.addPoints(points, 
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+			recordSet.addPoints(points,
+					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
@@ -792,6 +809,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
@@ -817,7 +835,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			HoTTAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -827,6 +845,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -843,7 +862,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -852,6 +871,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -868,7 +888,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -880,6 +900,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -891,8 +912,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
@@ -900,23 +920,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				if (log.isLoggable(Level.FINE))
-					log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				if (log.isLoggable(Level.FINE))
-					log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
 				++displayableCounter;
-				if (log.isLoggable(Level.FINE))
-					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 			}
 		}
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
@@ -927,6 +943,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 
 		if (recordSet.getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude 3=Height
@@ -971,6 +988,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -980,12 +998,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
+	@Override
 	public void open_closeCommPort() {
-		switch (application.getMenuBar().getSerialPortIconSet()) {
+		switch (this.application.getMenuBar().getSerialPortIconSet()) {
 		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
 			importDeviceData();
 			break;
-			
+
 		case DeviceCommPort.ICON_SET_START_STOP:
 			this.serialPort.isInterruptedByUser = true;
 			break;
@@ -1011,7 +1030,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
 						}
-						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
@@ -1022,12 +1041,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
-								log.log(Level.WARNING, e.getMessage(), e);
+								HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
 				}
-				finally  {
+				finally {
 					HoTTAdapter.this.application.setPortConnected(false);
 				}
 			}
@@ -1042,8 +1061,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileExportMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
-//		MenuItem convertGPXItem;
-//		MenuItem convertGPXGarminItem;
+		//		MenuItem convertGPXItem;
+		//		MenuItem convertGPXGarminItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -1051,8 +1070,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2405));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -1060,8 +1080,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2406));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -1069,29 +1090,30 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2407));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
 
-//			convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
-//			convertGPXItem.addListener(SWT.Selection, new Listener() {
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(false);
-//				}
-//			});
-//
-//			convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
-//			convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(true);
-//				}
-//			});
+			//			convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
+			//			convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
+			//			convertGPXItem.addListener(SWT.Selection, new Listener() {
+			//				public void handleEvent(Event e) {
+			//					log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
+			//					export2GPX(false);
+			//				}
+			//			});
+			//
+			//			convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
+			//			convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
+			//			convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
+			//				public void handleEvent(Event e) {
+			//					log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
+			//					export2GPX(true);
+			//				}
+			//			});
 		}
 	}
 
@@ -1102,15 +1124,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2416, GDE.MOD1));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2416));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					importDeviceData();
 				}
 			});
@@ -1133,11 +1156,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void export2GPX(final boolean isGarminExtension) {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		if (isGarminExtension)
-			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	1, 2, 3, 6, -1, -1, -1, -1, new int[] {-1,-1,-1});
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 1, 2, 3, 6, -1, -1, -1, -1, new int[] { -1, -1, -1 });
 		else
-			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	1, 2, 3, 6, -1, -1, -1, -1, new int[0]);
+			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 1, 2, 3, 6, -1, -1, -1, -1, new int[0]);
 	}
-	
+
 	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
@@ -1151,7 +1174,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		}
 		return false;
 	}
-		
+
 	/**
 	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
@@ -1161,8 +1184,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		Record recordLatitude = recordSet.get(1);
 		Record recordLongitude = recordSet.get(2);
 		Record gpsAlitude = recordSet.get(3);
-		
-		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", 																																														//$NON-NLS-1$
+
+		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", //$NON-NLS-1$
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
 				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
 				fixValidity, (this.translateValue(gpsAlitude, gpsAlitude.get(index) / 1000.0) + offsetAltitude), (this.translateValue(gpsAlitude, gpsAlitude.get(index) / 1000.0) + offsetAltitude));
@@ -1198,7 +1221,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				exportFileName = new FileHandler().exportFileKMZ(2, 1, 3, 6, 5, 9, -1, true, isExport2TmpDir);
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				exportFileName = new FileHandler().exportFileKMZ(2, 1, 3, additionalMeasurementOrdinal, 5, 9, -1, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
@@ -1210,18 +1234,22 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		return 6;
+		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
+			return 6;
+
+		return this.kmzMeasurementOrdinal;
 	}
 
 	/**
 	 * @param isFilterEnabled the isFilterEnabled to set
 	 */
-	public static synchronized void setFilterProperties(boolean isFilterEnabled, boolean isTolerateSignChangeLatitude, boolean isTolerateSignChangeLongitude, double latitudeTolranceFactor, double longitudeTolranceFactor) {
-		HoTTAdapter.isFilterEnabled 							= isFilterEnabled;
-		HoTTAdapter.isTolerateSignChangeLatitude	= isTolerateSignChangeLatitude;
-		HoTTAdapter.isTolerateSignChangeLongitude	= isTolerateSignChangeLongitude;
-		HoTTAdapter.latitudeToleranceFactor				= latitudeTolranceFactor;
-		HoTTAdapter.longitudeToleranceFactor			= longitudeTolranceFactor;
+	public static synchronized void setFilterProperties(boolean isFilterEnabled, boolean isTolerateSignChangeLatitude, boolean isTolerateSignChangeLongitude, double latitudeTolranceFactor,
+			double longitudeTolranceFactor) {
+		HoTTAdapter.isFilterEnabled = isFilterEnabled;
+		HoTTAdapter.isTolerateSignChangeLatitude = isTolerateSignChangeLatitude;
+		HoTTAdapter.isTolerateSignChangeLongitude = isTolerateSignChangeLongitude;
+		HoTTAdapter.latitudeToleranceFactor = latitudeTolranceFactor;
+		HoTTAdapter.longitudeToleranceFactor = longitudeTolranceFactor;
 	}
 
 	/**
@@ -1237,7 +1265,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public static synchronized void setChannelEnabledProperty(boolean isChannelEnabled) {
 		HoTTAdapter.isChannelsChannelEnabled = isChannelEnabled;
 	}
-	
+
 	/**
 	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
 	 * specific curve calculated from point combinations or other specific dialog
@@ -1245,12 +1273,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
-		if (isMdlTabRequested())
-			application.registerCustomTabItem(this.getMdlTabItem());
-		
+		if (isMdlTabRequested()) this.application.registerCustomTabItem(this.getMdlTabItem());
+
 		return new FileTransferTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, this.serialPort);
 	}
-	
+
 	/**
 	 * query if the MDL decoder tab item can be displayed
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
@@ -1267,17 +1294,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				constructor.newInstance();
 			}
 			else {
-				log.log(Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 				rc = false;
 			}
 		}
 		catch (final Throwable t) {
-			log.log(Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
+			HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 			rc = false;
 		}
 		return rc;
 	}
-	
+
 	/**
 	 * This function allows to register a CTabItem to to display MDL content converted to HTML
 	 */
@@ -1285,34 +1312,33 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		Object inst = null;
 		try {
 			String className = "gde.mdl.ui.MdlTabItem";//$NON-NLS-1$
-			log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
+			HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
 			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { CTabFolder.class, int.class, int.class });
-			log.log(Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			HoTTAdapter.log.log(java.util.logging.Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
-				
+
 				//set directory where to start search for mdl files
 				System.setProperty("log.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
-				log.log(Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$
 				System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
-				log.log(Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$
 				URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 				System.setProperty("program.dir", url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName())));//$NON-NLS-1$
-				log.log(Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$
 				System.setProperty("template.dir", "");//load from classpath //$NON-NLS-1$
-				log.log(Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
-				
-				inst = constructor.newInstance(new Object[] {application.getTabFolder(), SWT.NONE, application.getTabFolder().getItemCount()});
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
+
+				inst = constructor.newInstance(new Object[] { this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount() });
 			}
 		}
 		catch (final Throwable t) {
 			t.printStackTrace();
 		}
-		if (log.isLoggable(Level.OFF) && inst != null) 
-			log.log(Level.OFF, "loading TabItem " + ((CTabItem)inst).getText()); //$NON-NLS-1$
+		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.OFF) && inst != null) HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading TabItem " + ((CTabItem) inst).getText()); //$NON-NLS-1$
 
-		if (inst != null) ((CTabItem)inst).setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
-		return (CTabItem)inst;
+		if (inst != null) ((CTabItem) inst).setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		return (CTabItem) inst;
 	}
 }

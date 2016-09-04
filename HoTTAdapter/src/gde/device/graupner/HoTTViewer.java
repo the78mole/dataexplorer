@@ -341,7 +341,10 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
-		return 7;
+		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
+			return 7;
+
+		return this.kmzMeasurementOrdinal;
 	}
 
 	/**
@@ -359,8 +362,9 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
-				final int latOrdinal = 22, lonOrdinal = 23, altOrdinal = 6, climbOrdinal = 3, speedOrdinal = 7;
-				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, -1, -1, true, isExport2TmpDir);
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				final int latOrdinal = 22, lonOrdinal = 23, altOrdinal = 6, climbOrdinal = 3;
+				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, additionalMeasurementOrdinal, climbOrdinal, -1, -1, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
