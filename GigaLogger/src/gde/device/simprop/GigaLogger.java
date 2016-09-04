@@ -551,16 +551,18 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
 	}
 	
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
-		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit))
-				return entry.getValue().getOrdinal();
+		if (recordSet != null) {
+			for (Entry<String, Record> entry : recordSet.entrySet()) {
+				if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+			}
 		}
 		return -1;
 	}
@@ -571,7 +573,10 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-		return -1;
+		if (this.kmzMeasurementOrdinal == null && this.application.getActiveRecordSet() != null) // keep usage as initial supposed and use speed measurement ordinal
+			return findRecordByUnit(this.application.getActiveRecordSet(), "km/h");
+
+		return this.kmzMeasurementOrdinal;
 	}
 		
 	/**
