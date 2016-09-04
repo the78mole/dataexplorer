@@ -560,17 +560,11 @@ importCsvFiles();	}
 	 */
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		int ordinal = -1;
 		RecordSet actualRecordSet = this.application.getActiveRecordSet();
-		if (actualRecordSet != null) {
-			for (Record record : actualRecordSet.values()) {
-				if (record.getDataType().equals(Record.DataType.GPS_LATITUDE) || record.getDataType().equals(Record.DataType.GPS_LONGITUDE)) {
-					ordinal = record.getOrdinal();
-					break;
-				}
-			}
+		if (this.kmzMeasurementOrdinal == null && actualRecordSet != null) {
+			return findRecordByUnit(this.application.getActiveRecordSet(), "km/h");
 		}
-		return ordinal;
+		return this.kmzMeasurementOrdinal;
 	}
 
 	/**
@@ -584,11 +578,12 @@ importCsvFiles();	}
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				exportFileName = new FileHandler().exportFileKMZ(
 						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
 						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
 						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-						findRecordByUnit(activeRecordSet, "km/h"), 	//$NON-NLS-1$
+						additionalMeasurementOrdinal,
 						findRecordByUnit(activeRecordSet, "m/s"), 	//$NON-NLS-1$
 						findRecordByUnit(activeRecordSet, "km"),		//$NON-NLS-1$
 						findRecordByUnit(activeRecordSet, "*"),		//$NON-NLS-1$
@@ -607,8 +602,10 @@ importCsvFiles();	}
 	}
 
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
-		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+		if (recordSet != null) {
+			for (Entry<String, Record> entry : recordSet.entrySet()) {
+				if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+			}
 		}
 		return -1;
 	}
