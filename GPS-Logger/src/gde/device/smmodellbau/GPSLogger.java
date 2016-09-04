@@ -648,7 +648,8 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
 				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, 7, 9, 11, -1, true, isExportTmpDir);
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, 9, 11, -1, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
@@ -663,7 +664,10 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
 		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		return 7;
+		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
+			return 7;
+
+		return this.kmzMeasurementOrdinal;
 	}
 		
 	/**
