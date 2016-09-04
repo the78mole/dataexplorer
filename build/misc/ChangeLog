@@ -5,7 +5,7 @@ Version 3.2.7 - xx yyy 2016
 - add some error handling if device XML is corrupt in <DataBlock>
 - enable CSV export using UTF-8 encoding (HoTTAdapterM2 for DashWare)
 - fix error not writing OSD file if date as file name leader is not set
-- make Google Earth auto export more configurable
+- make Google Earth auto export more configurable, extrude, select some record
 - reduce message in unsaved waring message box
 - enable builds using Windows 10
 - fix problem displaying help after language switch
