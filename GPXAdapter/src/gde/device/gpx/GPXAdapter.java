@@ -687,7 +687,8 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						true, isExportTmpDir);
 			}
 		}
@@ -707,7 +708,10 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-		return -1;
+		if (this.kmzMeasurementOrdinal == null && this.application.getActiveRecordSet() != null) // keep usage as initial supposed and use speed measurement ordinal
+			return findRecordByUnit(this.application.getActiveRecordSet(), "km/h");
+
+		return this.kmzMeasurementOrdinal;
 	}
 
 	/**
