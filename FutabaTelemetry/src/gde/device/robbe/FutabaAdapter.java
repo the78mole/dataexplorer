@@ -605,12 +605,10 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		int ordinal = -1;
 		RecordSet actualRecordSet = this.application.getActiveRecordSet();
 		if (actualRecordSet != null) {
-			for (Record record : actualRecordSet.values()) {
-				if (record.getDataType().equals(Record.DataType.GPS_LATITUDE) || record.getDataType().equals(Record.DataType.GPS_LONGITUDE)) {
-					ordinal = record.getOrdinal();
-					break;
-				}
-			}
+			if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
+				ordinal = findRecordByUnit(actualRecordSet, "km/h");
+
+			ordinal = this.kmzMeasurementOrdinal;
 		}
 		return ordinal;
 	}
@@ -626,11 +624,12 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				exportFileName = new FileHandler().exportFileKMZ(
 						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
 						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
 						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-						findRecordByUnit(activeRecordSet, "km/h"), 
+						additionalMeasurementOrdinal, 
 						findRecordByUnit(activeRecordSet, "m/s"), 
 						findRecordByUnit(activeRecordSet, "km"), 
 						-1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
