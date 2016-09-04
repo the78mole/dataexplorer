@@ -64,19 +64,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * this dialog enable to modify speed limits and associated colors of the KML track
  */
@@ -191,7 +178,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					RowData valueSelectionComboLData = new RowData();
 					valueSelectionCombo = new Combo(valueSelectorComposite, SWT.NONE);
 					valueSelectionCombo.setLayoutData(valueSelectionComboLData);
-					valueSelectionCombo.setItems(application.getActiveRecordSet().getActiveRecordNames());
+					valueSelectionCombo.setItems(application.getActiveRecordSet().getRecordNames());
 					valueSelectionCombo.select(device.getGPS2KMZMeasurementOrdinal());
 					valueSelectionCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -206,7 +193,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					extrudeButton = new Button(valueSelectorComposite, SWT.CHECK | SWT.LEFT);
 					RowData isExtrudeButtonLData = new RowData();
 					extrudeButton.setLayoutData(isExtrudeButtonLData);
-					extrudeButton.setText("extrude track");
+					extrudeButton.setText(Messages.getString(MessageIds.GDE_MSGT0734));
+					extrudeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0735));
 					extrudeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -219,7 +207,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					randomColorButton = new Button(valueSelectorComposite, SWT.CHECK | SWT.LEFT);
 					RowData randomColorButtonLData = new RowData();
 					randomColorButton.setLayoutData(randomColorButtonLData);
-					randomColorButton.setText("random color");
+					randomColorButton.setText(Messages.getString(MessageIds.GDE_MSGT0736));
+					randomColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0737));
 					randomColorButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
