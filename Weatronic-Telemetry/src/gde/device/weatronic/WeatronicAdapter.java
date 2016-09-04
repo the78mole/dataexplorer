@@ -473,6 +473,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		Channel activeChannel = this.channels.getActiveChannel();
+		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
@@ -488,7 +489,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 		}
-		return -1;
+		return this.kmzMeasurementOrdinal;
 	}
 
 	/**
@@ -534,9 +535,10 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public String exportFile(String fileEndingType, boolean isExport2TmpDir) {
 		String exportFileName = GDE.STRING_EMPTY;
-		int latOrdinal = -1, longOrdinal = -1, altOrdinal = -1, climbOrdinal = -1, speedOrdinal = -1, tripOrdinal = -1;
+		int latOrdinal = -1, longOrdinal = -1, altOrdinal = -1, climbOrdinal = -1, tripOrdinal = -1;
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
+			final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				for (Record record : activeRecordSet.values()) {
@@ -551,15 +553,11 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					case GPS_ALTITUDE:
 						if (record.getName().startsWith("Rx")) altOrdinal = record.getOrdinal();
 						break;
-					case SPEED:
-						if (record.getName().startsWith("Rx")) speedOrdinal = record.getOrdinal();
-						break;
-
 					default:
 						break;
 					}
 				}
-				exportFileName = new FileHandler().exportFileKMZ(longOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
+				exportFileName = new FileHandler().exportFileKMZ(longOrdinal, latOrdinal, altOrdinal, additionalMeasurementOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
