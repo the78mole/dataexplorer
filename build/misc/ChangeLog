@@ -28,7 +28,8 @@ iCharger 308 DUO
 	- add live data gathering support
 iCharger 308/4010 DUO
 	- correct energy value calculation for import
-
+UniLog2
+	- adapt configuration capabilities to FW 1.12
 Version 3.2.6 - 06 May 2016
 fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
 MC3000 
