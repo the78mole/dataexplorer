@@ -30,7 +30,6 @@ import gde.device.DeviceDialog;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.unilog2.MessageIds;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
@@ -136,22 +135,24 @@ public class UniLog2Dialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(650, 80 + 25 + 25 + this.measurementsCount * 29 + 50 + 70); //header + tab + label + this.measurementsCount * 23 + buttons
+				this.dialogShell.setSize(650, 80 + 65 + 25 + this.measurementsCount * 29 + 50 + 70); //header + tab + label + this.measurementsCount * 23 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
-		        switch (event.detail) {
-		        case SWT.TRAVERSE_ESCAPE:
-		        	UniLog2Dialog.this.dialogShell.close();
-		          event.detail = SWT.TRAVERSE_NONE;
-		          event.doit = false;
-		          break;
-		        }
-		      }
-		    });
+					@Override
+					public void handleEvent(Event event) {
+						switch (event.detail) {
+						case SWT.TRAVERSE_ESCAPE:
+							UniLog2Dialog.this.dialogShell.close();
+							event.detail = SWT.TRAVERSE_NONE;
+							event.doit = false;
+							break;
+						}
+					}
+				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UniLog2Dialog.this.device.isChangePropery()) {
@@ -166,6 +167,7 @@ public class UniLog2Dialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
 						UniLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						UniLog2Dialog.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2510), "HelpInfo.html"); //$NON-NLS-1$
@@ -174,20 +176,23 @@ public class UniLog2Dialog extends DeviceDialog {
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					@Override
 					public void mouseEnter(MouseEvent evt) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+						if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINER)) UniLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
 					}
+
 					@Override
 					public void mouseHover(MouseEvent evt) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+						if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINEST)) UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
+
 					@Override
 					public void mouseExit(MouseEvent evt) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+						if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINER)) UniLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
 					}
 				});
 				this.dialogShell.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent paintevent) {
 						if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINEST)) UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
@@ -440,12 +445,12 @@ public class UniLog2Dialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
-			
-			if (this.serialPort != null && this.serialPort.isConnected()) 
+
+			if (this.serialPort != null && this.serialPort.isConnected())
 				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
 			else
 				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
-			
+
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
@@ -632,7 +637,7 @@ public class UniLog2Dialog extends DeviceDialog {
 			this.liveThread = null;
 		}
 	}
-	
+
 	public void updateAnalogAlarmUnits() {
 		this.configuration2Composite.updateAnalogAlarmUnits();
 	}

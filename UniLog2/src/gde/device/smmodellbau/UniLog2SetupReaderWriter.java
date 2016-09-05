@@ -21,7 +21,6 @@ package gde.device.smmodellbau;
 import gde.GDE;
 import gde.device.smmodellbau.unilog2.MessageIds;
 import gde.io.DataParser;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
@@ -56,15 +55,18 @@ public class UniLog2SetupReaderWriter {
 	final static int		TEL_ALARM_HEIGHT				= 0x0010;
 	final static int		TEL_ALARM_VOLTAGE_RX		= 0x0020;
 	final static int		TEL_ALARM_VOLTAGE_CELL	= 0x0040;
-	final static int		TEL_ALARM_ANALOG_1			= 0x2000;
-	final static int		TEL_ALARM_ANALOG_2			= 0x4000;
-	final static int		TEL_ALARM_ANALOG_3			= 0x8000;
-	
+	final static int		TEL_ALARM_ANALOG_1			= 0x0080;
+	final static int		TEL_ALARM_ANALOG_2			= 0x0100;
+	final static int		TEL_ALARM_ANALOG_3			= 0x0200;
+	final static int		TEL_ALARM_CLIMB					= 0x0400;
+	final static int		TEL_ALARM_SINK					= 0x0800;
+	final static int		TEL_ALARM_ENERGIE				= 0x1000;
+
 	final static int		AUTO_START_CURRENT			= 0x0001;
 	final static int		AUTO_START_RX						= 0x0002;
 	final static int		AUTO_START_TIME					= 0x0004;
-	
-	public enum Sensor { 
+
+	public enum Sensor {
 		GAM("GAM"), EAM("EAM"), ESC("ESC");
 		private final String	value;
 
@@ -75,7 +77,7 @@ public class UniLog2SetupReaderWriter {
 		public String value() {
 			return this.value;
 		}
-		
+
 		public static List<Sensor> getAsList() {
 			List<UniLog2SetupReaderWriter.Sensor> sensors = new ArrayList<UniLog2SetupReaderWriter.Sensor>();
 			for (Sensor sensor : Sensor.values()) {
@@ -84,73 +86,82 @@ public class UniLog2SetupReaderWriter {
 			return sensors;
 		}
 	};
-	
-	final static byte		SENSOR_TYPE_GAM					= 0x00;
-	final static int		SENSOR_TYPE_EAM					= 0x01;
-	final static int		SENSOR_TYPE_ESC					= 0x02;
+
+	final static byte	SENSOR_TYPE_GAM					= 0x00;
+	final static int	SENSOR_TYPE_EAM					= 0x01;
+	final static int	SENSOR_TYPE_ESC					= 0x02;
 
 	//$UL2SETUP,192 Byte*
-	short								serialNumber						= 357;																												// 1
-	short								firmwareVersion					= 109;																												// 2
-	short								dataRate								= 2;																													// 3 0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
-	short								startModus							= 1;																													// 4 AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
-	short								startCurrent						= 3;																													// 5 1 - 50 A
-	short								startRx									= 15;																													// 6 value/10 msec
-	short								startTime								= 5;																													// 7 5 - 90 sec
-	short								currentSensorType				= 1;																													// 8 0=20A, 1=40/80A, 2=150A, 3=400A
-	short								modusA1									= 0;																													// 9 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
-	short								modusA2									= 0;																													// 10 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
-	short								modusA3									= 0;																													// 11 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
-	short								numberProb_MotorPole		= 2;																													// 12 value propeller blade, value*2 = motor pols
-	short								gearFactor							= 100;																												// 13 value/100
-	short								varioThreshold					= 5;																													// 14 value/10 m/sec
-	short								varioTon								= 0;																													// 15 0=off, 1=up/down, 2=up, 3=down
-	short								limiterModus						= 0;																													// 16 0=off, 1=F1Q, 2=F5D, 3=F5B, 4= F5J
-	short								energyLimit							= 1000;																												// 17 1 - 2000 Wmin
-	short								minMaxRx								= 0;																													// 18 0=off, 1=on
-	short								stopModus								= 0;																													// 19 0=off, 1=on
-	short								varioThresholdSink			= 5;																													// 20 value/10 m/sec
-	short								sensorType							= 0;																													// 21 GAM=0;EAM=1;ESC=2
-	short								telemetrieType					= 0;																													// 22 HoTT=0;FASST=1;JRDMSS=2
-	short								capacityReset 					= 0; 																													// 23 capacity keep=0, reset=1
-	short								currentOffset 					= 0; 																													// 24 current always=0, never=1
-	//short[] A = new short[16]; 																																							// 23-37
-	short								telemetryAlarms					= 0x0000;																											// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
-	short								currentAlarm						= 100;																												// 39 1A --> 400A
-	short								voltageStartAlarm				= 124;																												// 40 10V/10 --> 600V/10
-	short								voltageAlarm						= 100;																												// 41 10V/10 --> 600V/10
-	short								capacityAlarm						= 2000;																												// 42 100mAh --> 30000mAh
-	short								heightAlarm							= 200;																												// 43 10m --> 4000m step 50
-	short								voltageRxAlarm					= 450;																												// 44 300 --> 800 V/100
-	short								cellVoltageAlarm				= 30;																													// 45 20 - 40 V/10 
-	short								analogAlarm1						= 100;																												// 46 -100 to 3000
-	short								analogAlarm2						= 100;																												// 47 -100 to 3000
-	short								analogAlarm3						= 100;																												// 48 -100 to 3000
-	short								analogAlarm1Direct			= 0;																													// 49 0 = >; 1 = <
-	short								analogAlarm2Direct			= 0;																													// 50 0 = >; 1 = <
-	short								analogAlarm3Direct			= 0;																													// 51 0 = >; 1 = <
-	//short[] B = new short[13]; 																																							// 52-64
-	byte								mLinkAddressVoltage			= 0;																													// 
-	byte								mLinkAddressCurrent			= 1;																													// 65 0 - 15, "--"
-	byte								mLinkAddressRevolution	= 2;																													// 
-	byte								mLinkAddressCapacity		= 3;																													// 66 0 - 15, "--"
-	byte								mLinkAddressVario				= 4;																													// 
-	byte								mLinkAddressHeight			= 5;																													// 67 0 - 15, "--"
-	byte								mLinkAddressIntHeight		= 6;																													// 67 0 - 15, "--"
-	byte								mLinkAddressA1					= 7;																													// 
-	byte								mLinkAddressA2					= 8;																													// 68 0 - 15, "--"
-	byte								mLinkAddressA3					= 9;																													// 
-	byte								mLinkAddressCellMinimum = 10;																													// 69
-	byte								mLinkAddressCell1				= 11;																													// 70 0 - 15, "--"
-	byte								mLinkAddressCell2				= 12;																													// 
-	byte								mLinkAddressCell3				= 13;																													// 71 0 - 15, "--"
-	byte								mLinkAddressCell4				= 14;																													// 
-	byte								mLinkAddressCell5				= 15;																													// 72 0 - 15, "--"
-	byte								mLinkAddressCell6				= 16;																													//
-	//short[] C = new short[190/2 - 72]; // 73-95
-	short								checkSum;																																							// 55
+	short							serialNumber						= 357;						// 1
+	short							firmwareVersion					= 109;						// 2
+	short							dataRate								= 2;							// 3 0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
+	short							startModus							= 1;							// 4 AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
+	short							startCurrent						= 3;							// 5 1 - 50 A
+	short							startRx									= 15;						// 6 value/10 msec
+	short							startTime								= 5;							// 7 5 - 90 sec
+	short							currentSensorType				= 1;							// 8 0=20A, 1=40/80A, 2=150A, 3=400A
+	short							modusA1									= 0;							// 9 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
+	short							modusA2									= 0;							// 10 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
+	short							modusA3									= 0;							// 11 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
+	short							numberProb_MotorPole		= 2;							// 12 value propeller blade, value*2 = motor pols
+	short							gearFactor							= 100;						// 13 value/100
+	short							varioThreshold					= 5;							// 14 value/10 m/sec
+	short							varioTon								= 0;							// 15 0=off, 1=up/down, 2=up, 3=down
+	short							limiterModus						= 0;							// 16 0=off, 1=F1Q, 2=F5D, 3=F5B, 4= F5J
+	short							energyLimit							= 1000;					// 17 1 - 2000 Wmin
+	short							minMaxRx								= 0;							// 18 0=off, 1=on
+	short							stopModus								= 0;							// 19 0=off, 1=on
+	short							varioThresholdSink			= 5;							// 20 value/10 m/sec
+	short							frskyAddr								= 0;							// 21 IDs {0x00, 0xA1, 0x22, 0x83, 0xE4, 0x45, 0xC6, 0x67, 0x48, 0xE9, 0x6A, 0xCB, 0xAC, 0x0D, 0x8E, 0x2F, 0xD0, 0x71, 0xF2, 0x53, 0x34, 0x95, 0x16, 0xB7, 0x98, 0x39, 0xBA, 0x1B}
+	short							telemetrieType					= 0;							// 22 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT_GAM, 4=HoTT_EAM, 5=HoTT_ESC, 6=JetiDuplex, 7=M-Link, 8=FrSky, 9=HoTT_Vario
+	short							capacityReset						= 0;							// 23 capacity keep=0, reset=1
+	short							currentOffset						= 0;							// 24 current always=0, never=1
+	short							varioOffMotor						= 0;							// 25 Vario_aus_bei_Motor
+	int								jetiValueVisibility			= 0xFFFFFFFF;		// 26/27 Jeti_EX_Ausblenden
+	short							varioFactor							= 0;							// 28 Vario Faktor
+	short							serialNumberFix					= 0;							// 29 fixe_Seriennummer;
+	short							setTime									= 0;							// 30 Zeit_setzen
+	short							varioFilter							= 1;							// 31 Vario filter
+	//short[] A = new short[6]; 																																							// 32-37
+	short							telemetryAlarms					= 0x0000;				// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
+	short							currentAlarm						= 100;						// 39 1A --> 400A
+	short							voltageStartAlarm				= 124;						// 40 10V/10 --> 600V/10
+	short							voltageAlarm						= 100;						// 41 10V/10 --> 600V/10
+	short							capacityAlarm						= 2000;					// 42 100mAh --> 30000mAh
+	short							heightAlarm							= 200;						// 43 10m --> 4000m step 50
+	short							voltageRxAlarm					= 450;						// 44 300 --> 800 V/100
+	short							cellVoltageAlarm				= 30;						// 45 20 - 40 V/10 
+	short							analogAlarm1						= 100;						// 46 -100 to 3000
+	short							analogAlarm2						= 100;						// 47 -100 to 3000
+	short							analogAlarm3						= 100;						// 48 -100 to 3000
+	short							analogAlarm1Direct			= 0;							// 49 0 = >; 1 = <
+	short							analogAlarm2Direct			= 0;							// 50 0 = >; 1 = <
+	short							analogAlarm3Direct			= 0;							// 51 0 = >; 1 = <
+	short							energyAlarm							= 0;							// 52 0 = >; 1 = <
+	//short[] B = new short[12]; 																																							// 53-64
+	byte							mLinkAddressVoltage			= 0;							// 
+	byte							mLinkAddressCurrent			= 1;							// 65 0 - 15, "--"
+	byte							mLinkAddressRevolution	= 2;							// 
+	byte							mLinkAddressCapacity		= 3;							// 66 0 - 15, "--"
+	byte							mLinkAddressVario				= 4;							// 
+	byte							mLinkAddressHeight			= 5;							// 67 0 - 15, "--"
+	byte							mLinkAddressA1					= 7;							// 
+	byte							mLinkAddressA2					= 8;							// 68 0 - 15, "--"
+	byte							mLinkAddressA3					= 9;							// 
+	byte							mLinkAddressCellMinimum	= 10;						// 69
+	byte							mLinkAddressCell1				= 11;						// 70 0 - 15, "--"
+	byte							mLinkAddressCell2				= 12;						// 
+	byte							mLinkAddressCell3				= 13;						// 71 0 - 15, "--"
+	byte							mLinkAddressCell4				= 14;						// 
+	byte							mLinkAddressCell5				= 15;						// 72 0 - 15, "--"
+	byte							mLinkAddressCell6				= 15;						//
+	byte							mLinkAddressHeightGain	= 6;							// 73
+	byte							mLinkAddressEnergy			= 15;						// 
+	byte[]						sbusStartSlot						= new byte[8];		// 74 - 77
+	//short[] C = new short[190/2 - 77]; 																																			// 77-95
+	short							checkSum;																// 96
 
-	short[]							setupData								= new short[192];
+	byte[]						setupData								= new byte[192];
 
 	public UniLog2SetupReaderWriter(Shell useParent, UniLog2 useDevice) {
 		this.parent = useParent;
@@ -161,9 +172,9 @@ public class UniLog2SetupReaderWriter {
 		FileDialog fd = this.application.openFileOpenDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2501), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName(), SWT.SINGLE);
 		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
+		UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
-		if (fd.getFileName().length() > 4) {			
+		if (fd.getFileName().length() > 4) {
 			try {
 				FileInputStream file_input = new FileInputStream(new File(selectedSetupFile));
 				DataInputStream data_in = new DataInputStream(file_input);
@@ -172,10 +183,11 @@ public class UniLog2SetupReaderWriter {
 				data_in.close();
 
 				if (size != 192) {
-					log.log(java.util.logging.Level.SEVERE, "error reading configuration file, data size != 192 Bytes!"); //$NON-NLS-1$
+					UniLog2SetupReaderWriter.log.log(java.util.logging.Level.SEVERE, "error reading configuration file, data size != 192 Bytes!"); //$NON-NLS-1$
 				}
 				this.serialNumber = DataParser.parse2Short(buffer, 0);
 				this.firmwareVersion = DataParser.parse2Short(buffer, 2);
+				if (this.firmwareVersion != 112) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2501));
 				this.dataRate = DataParser.parse2Short(buffer, 4); //0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
 				this.startModus = DataParser.parse2Short(buffer, 6); //AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
 				this.startCurrent = DataParser.parse2Short(buffer, 8); //1 - 50 A
@@ -195,13 +207,19 @@ public class UniLog2SetupReaderWriter {
 				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
 				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
 				this.varioThresholdSink = DataParser.parse2Short(buffer, 38); // 20 value/10 m/sec		
-				this.sensorType = DataParser.parse2Short(buffer, 40); // 21 GAM=0;EAM=1;ESC=2		
-				this.telemetrieType = DataParser.parse2Short(buffer, 42); // 22 HoTT=0, FASST=1, JRDMSS=2
+				this.frskyAddr = DataParser.parse2Short(buffer, 40); // 21 IDs {0x00, 0xA1, 0x22, 0x83, 0xE4, 0x45, 0xC6, 0x67, 0x48, 0xE9, 0x6A, 0xCB, 0xAC, 0x0D, 0x8E, 0x2F, 0xD0, 0x71, 0xF2, 0x53, 0x34, 0x95, 0x16, 0xB7, 0x98, 0x39, 0xBA, 0x1B}
+				this.telemetrieType = DataParser.parse2Short(buffer, 42); // 22 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT_GAM, 4=HoTT_EAM, 5=HoTT_ESC, 6=JetiDuplex, 7=M-Link, 8=FrSky, 9=HoTT_Vario
 				this.capacityReset = DataParser.parse2Short(buffer, 44); // 23 capacity keep=0, reset=1
 				this.currentOffset = DataParser.parse2Short(buffer, 46); // 24 current always=0, never=1
-				//short[] A = new short[13]; // 25-37
+				this.varioOffMotor = DataParser.parse2Short(buffer, 48); // 25 Vario_aus_bei_Motor on=0 off=1
+				this.jetiValueVisibility = DataParser.parse2Int(buffer, 50); // 26/27 Jeti_EX_Ausblenden
+				this.varioFactor = DataParser.parse2Short(buffer, 54); // 28 Vario Faktor
+				this.serialNumberFix = DataParser.parse2Short(buffer, 56); // 29 fixe_Seriennummer;
+				this.setTime = DataParser.parse2Short(buffer, 58); // 30 Zeit_setzen
+				this.varioFilter = DataParser.parse2Short(buffer, 60); // 31 Vario filter
+				//short[] A = new short[6]; 													 // 32-37
 				this.telemetryAlarms = DataParser.parse2Short(buffer, 74); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
+				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.FINE)) UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
 				this.currentAlarm = DataParser.parse2Short(buffer, 76); //1A --> 400A
 				this.voltageStartAlarm = DataParser.parse2Short(buffer, 78); //10V/10 --> 600V/10
 				this.voltageAlarm = DataParser.parse2Short(buffer, 80); //10V/10 --> 600V/10
@@ -215,7 +233,8 @@ public class UniLog2SetupReaderWriter {
 				this.analogAlarm1Direct = DataParser.parse2Short(buffer, 96); // 49 0 = >; 1 = <
 				this.analogAlarm2Direct = DataParser.parse2Short(buffer, 98); // 50 0 = >; 1 = <
 				this.analogAlarm3Direct = DataParser.parse2Short(buffer, 100); // 51 0 = >; 1 = <
-				//short[] B = new short[13]; // 52-64
+				this.energyAlarm = DataParser.parse2Short(buffer, 102); // 52 0 = >; 1 = <
+				//short[] B = new short[12]; // 52-64
 				this.mLinkAddressVoltage = buffer[128]; //0 - 15, "--"
 				this.mLinkAddressCurrent = buffer[129]; //0 - 15, "--"
 				this.mLinkAddressRevolution = buffer[130]; //0 - 15, "--"
@@ -232,21 +251,23 @@ public class UniLog2SetupReaderWriter {
 				this.mLinkAddressCell4 = buffer[141]; //0 - 15, "--"
 				this.mLinkAddressCell5 = buffer[142]; //0 - 15, "--"
 				this.mLinkAddressCell6 = buffer[143]; //0 - 15, "--"
-				this.mLinkAddressIntHeight = buffer[144]; //0 - 15, "--"
-				//short[] C = new short[190/2 - 72]; // 73-95
+				this.mLinkAddressHeightGain = buffer[144]; //0 - 15, "--"
+				this.mLinkAddressEnergy = buffer[145]; //0 - 15, "--"
+				System.arraycopy(buffer, 146, this.sbusStartSlot, 0, 8); // 74 - 77
+				//short[] C = new short[190/2 - 77]; 																																			// 77-95
 				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));
 
-				if (log.isLoggable(java.util.logging.Level.FINE))
-					log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
+				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.FINE))
+					UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
 				short checkCRC = Checksum.CRC16(chkBuffer, 0);
 				if (this.checkSum != checkCRC) {
-					log.log(java.util.logging.Level.WARNING, "Checksum missmatch!"); //$NON-NLS-1$
+					UniLog2SetupReaderWriter.log.log(java.util.logging.Level.WARNING, "Checksum missmatch!"); //$NON-NLS-1$
 				}
 			}
 			catch (Throwable e) {
-				log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				UniLog2SetupReaderWriter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			}
 		}
 	}
@@ -254,10 +275,10 @@ public class UniLog2SetupReaderWriter {
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2502), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName());
-		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
+		UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
-		
-		if (setupFilePath != null && setupFilePath.length() > 4) {			
+
+		if (setupFilePath != null && setupFilePath.length() > 4) {
 			File setupFile = new File(setupFilePath);
 			byte[] buffer = new byte[192];
 			int tmpCheckSum = 0;
@@ -303,18 +324,32 @@ public class UniLog2SetupReaderWriter {
 				buffer[37] = (byte) ((this.stopModus & 0xFF00) >> 8);
 				buffer[38] = (byte) (this.varioThresholdSink & 0x00FF); //20 value/10 m/sec
 				buffer[39] = (byte) ((this.varioThresholdSink & 0xFF00) >> 8);
-				buffer[40] = (byte) (this.sensorType & 0x00FF); // 21 GAM=0;EAM=1;ESC=2	
-				buffer[41] = (byte) ((this.sensorType & 0xFF00) >> 8);
-				buffer[42] = (byte) (this.telemetrieType & 0x00FF); // 22 HoTT=0;FASST=1;JRDMSS=2	
+				buffer[40] = (byte) (this.frskyAddr & 0x00FF); // 21 IDs {0x00, 0xA1, 0x22, 0x83, 0xE4, 0x45, 0xC6, 0x67, 0x48, 0xE9, 0x6A, 0xCB, 0xAC, 0x0D, 0x8E, 0x2F, 0xD0, 0x71, 0xF2, 0x53, 0x34, 0x95, 0x16, 0xB7, 0x98, 0x39, 0xBA, 0x1B}
+				buffer[41] = (byte) ((this.frskyAddr & 0xFF00) >> 8);
+				buffer[42] = (byte) (this.telemetrieType & 0x00FF); // 22 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT_GAM, 4=HoTT_EAM, 5=HoTT_ESC, 6=JetiDuplex, 7=M-Link, 8=FrSky, 9=HoTT_Vario
 				buffer[43] = (byte) ((this.telemetrieType & 0xFF00) >> 8);
 				buffer[44] = (byte) (this.capacityReset & 0x00FF); // 23 capacity keep=0, reset=1
 				buffer[45] = (byte) ((this.capacityReset & 0xFF00) >> 8);
 				buffer[46] = (byte) (this.currentOffset & 0x00FF); // 24 current always=0, never=1
 				buffer[47] = (byte) ((this.currentOffset & 0xFF00) >> 8);
+				buffer[48] = (byte) (this.varioOffMotor & 0x00FF); // 25 on=0 off=1
+				buffer[49] = (byte) ((this.varioOffMotor & 0xFF00) >> 8);
+				buffer[50] = (byte) (this.jetiValueVisibility & 0x000000FF); // 26/27 Jeti_EX_Ausblenden
+				buffer[51] = (byte) ((this.jetiValueVisibility & 0x0000FF00) >> 8);
+				buffer[52] = (byte) ((this.jetiValueVisibility & 0x00FF0000) >> 16);
+				buffer[53] = (byte) ((this.jetiValueVisibility & 0xFF000000) >> 24);
+				buffer[54] = (byte) (this.varioFactor & 0x00FF); // 28 Vario Faktor 0-40
+				buffer[55] = (byte) ((this.varioFactor & 0xFF00) >> 8);
+				buffer[56] = (byte) (this.serialNumberFix & 0x00FF); // 29 fixe_Seriennummer 0/1
+				buffer[57] = (byte) ((this.serialNumberFix & 0xFF00) >> 8);
+				buffer[58] = (byte) (this.setTime & 0x00FF); // 30 Zeit_setzen 0/1
+				buffer[59] = (byte) ((this.setTime & 0xFF00) >> 8);
+				buffer[60] = (byte) (this.varioFilter & 0x00FF); // 31 Vario filter 0-2
+				buffer[61] = (byte) ((this.varioFilter & 0xFF00) >> 8);
 				//short[] A = new short[15]; // 23-37
 				buffer[74] = (byte) (this.telemetryAlarms & 0x00FF); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				buffer[75] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
+				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.FINE)) UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
 				buffer[76] = (byte) (this.currentAlarm & 0x00FF); //1A --> 400A
 				buffer[77] = (byte) ((this.currentAlarm & 0xFF00) >> 8);
 				buffer[78] = (byte) (this.voltageStartAlarm & 0x00FF); //10V/10 --> 600V/10
@@ -329,20 +364,22 @@ public class UniLog2SetupReaderWriter {
 				buffer[87] = (byte) ((this.voltageRxAlarm & 0xFF00) >> 8);
 				buffer[88] = (byte) (this.cellVoltageAlarm & 0x00FF); //45 20 - 40 V/10 
 				buffer[89] = (byte) ((this.cellVoltageAlarm & 0xFF00) >> 8);
-				
+
 				buffer[90] = (byte) (this.analogAlarm1 & 0x00FF); //46 -100 to 3000
 				buffer[91] = (byte) ((this.analogAlarm1 & 0xFF00) >> 8);
 				buffer[92] = (byte) (this.analogAlarm2 & 0x00FF); //47 -100 to 3000
 				buffer[93] = (byte) ((this.analogAlarm2 & 0xFF00) >> 8);
 				buffer[94] = (byte) (this.analogAlarm3 & 0x00FF); //48 -100 to 3000
 				buffer[95] = (byte) ((this.analogAlarm3 & 0xFF00) >> 8);
-				
+
 				buffer[96] = (byte) (this.analogAlarm1Direct & 0x00FF); //49  0 = >; 1 = <
 				buffer[97] = (byte) ((this.analogAlarm1Direct & 0xFF00) >> 8);
 				buffer[98] = (byte) (this.analogAlarm2Direct & 0x00FF); //50  0 = >; 1 = <
 				buffer[99] = (byte) ((this.analogAlarm2Direct & 0xFF00) >> 8);
 				buffer[100] = (byte) (this.analogAlarm3Direct & 0x00FF); //51  0 = >; 1 = <
 				buffer[101] = (byte) ((this.analogAlarm3Direct & 0xFF00) >> 8);
+				buffer[102] = (byte) (this.energyAlarm & 0x00FF); //52 0 = >; 1 = <
+				buffer[103] = (byte) ((this.energyAlarm & 0xFF00) >> 8);
 				//short[] B = new short[13]; // 46-64
 				buffer[128] = this.mLinkAddressVoltage; //0 - 15, "--"
 				buffer[129] = this.mLinkAddressCurrent; //0 - 15, "--"
@@ -360,7 +397,9 @@ public class UniLog2SetupReaderWriter {
 				buffer[141] = this.mLinkAddressCell4; //0 - 15, "--"
 				buffer[142] = this.mLinkAddressCell5; //0 - 15, "--"
 				buffer[143] = this.mLinkAddressCell6; //0 - 15, "--"
-				buffer[144] = this.mLinkAddressIntHeight; //0 - 15, "--"
+				buffer[144] = this.mLinkAddressHeightGain; //0 - 15, "--"
+				buffer[145] = this.mLinkAddressEnergy; //0 - 15, "--"
+				System.arraycopy(this.sbusStartSlot, 0, buffer, 146, 8); // 74 - 77
 				//short[] C = new short[190/2 - 72]; 					// 73-95
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
@@ -368,15 +407,15 @@ public class UniLog2SetupReaderWriter {
 				buffer[190] = (byte) (tmpCheckSum & 0x00FF);
 				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);
 
-				if (log.isLoggable(java.util.logging.Level.FINE))
-					log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
+				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.OFF))
+					UniLog2SetupReaderWriter.log.log(java.util.logging.Level.OFF, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
 				FileOutputStream file_out = new FileOutputStream(setupFile);
 				DataOutputStream data_out = new DataOutputStream(file_out);
 				data_out.write(buffer);
 				data_out.close();
 			}
 			catch (Throwable e) {
-				log.log(java.util.logging.Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
+				UniLog2SetupReaderWriter.log.log(java.util.logging.Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
 		}
 	}
