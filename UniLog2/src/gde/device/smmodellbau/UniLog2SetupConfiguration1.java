@@ -264,6 +264,96 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
+					this.telemetrieTypeLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData telemetrieTypeLabelLData = new RowData();
+					telemetrieTypeLabelLData.width = 135;
+					telemetrieTypeLabelLData.height = 20;
+					this.telemetrieTypeLabel.setLayoutData(telemetrieTypeLabelLData);
+					this.telemetrieTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2580));
+					this.telemetrieTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.telemetrieTypeCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
+					RowData telemetrieTypeComboLData = new RowData();
+					telemetrieTypeComboLData.width = 130;
+					telemetrieTypeComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.telemetrieTypeCombo.setLayoutData(telemetrieTypeComboLData);
+					this.telemetrieTypeCombo.setItems(this.telemetrieTypes);
+					this.telemetrieTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetrieTypeCombo.setEditable(false);
+					this.telemetrieTypeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.telemetrieTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration1.log.log(Level.FINEST, "telemetrieTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.telemetrieType = (short) (UniLog2SetupConfiguration1.this.telemetrieTypeCombo.getSelectionIndex());
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+
+							changeVisibility();
+						}
+					});
+				}
+				{
+					this.addonComposite = new Composite(this.commonAdjustmentsGroup, SWT.NONE);
+					this.addonComposite.setLayout(new FormLayout());
+					RowData addonCompositeLData = new RowData();
+					addonCompositeLData.width = 285;
+					addonCompositeLData.height = 22;
+					this.addonComposite.setLayoutData(addonCompositeLData);
+					{
+						this.frskyIdLabel = new CLabel(this.addonComposite, SWT.NONE);
+						FormData frskyIdLabelLData = new FormData();
+						frskyIdLabelLData.width = 135;
+						frskyIdLabelLData.height = 20;
+						frskyIdLabelLData.left = new FormAttachment(0, 1000, 2);
+						frskyIdLabelLData.top = new FormAttachment(0, 1000, 0);
+						this.frskyIdLabel.setLayoutData(frskyIdLabelLData);
+						this.frskyIdLabel.setText(Messages.getString(MessageIds.GDE_MSGT2579));
+						this.frskyIdLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					}
+					{
+						this.fixSerialNumberButton = new Button(this.addonComposite, SWT.CHECK | SWT.RIGHT);
+						FormData sensorTypeLabelLData = new FormData();
+						sensorTypeLabelLData.width = 135;
+						sensorTypeLabelLData.height = 20;
+						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
+						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 0);
+						this.fixSerialNumberButton.setLayoutData(sensorTypeLabelLData);
+						this.fixSerialNumberButton.setText("fix serial number");
+						this.fixSerialNumberButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.fixSerialNumberButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								UniLog2SetupConfiguration1.log.log(Level.FINEST, "fixSerialNumberButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UniLog2SetupConfiguration1.this.configuration.serialNumberFix = (short) (UniLog2SetupConfiguration1.this.fixSerialNumberButton.getSelection() ? 1 : 0);
+								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+						});
+					}
+					{
+						this.frskyIdCombo = new CCombo(this.addonComposite, SWT.BORDER);
+						FormData sensorTypeComboLData = new FormData();
+						sensorTypeComboLData.width = 80;
+						sensorTypeComboLData.height = 20;
+						sensorTypeComboLData.left = new FormAttachment(0, 1000, 137);
+						sensorTypeComboLData.top = new FormAttachment(0, 1000, 0);
+						this.frskyIdCombo.setLayoutData(sensorTypeComboLData);
+						this.frskyIdCombo.setItems(this.frskyIDs);
+						this.frskyIdCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.frskyIdCombo.setEditable(false);
+						this.frskyIdCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+						this.frskyIdCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								UniLog2SetupConfiguration1.log.log(Level.FINEST, "sensorTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UniLog2SetupConfiguration1.this.configuration.frskyAddr = (short) (UniLog2SetupConfiguration1.this.frskyIdCombo.getSelectionIndex() + 1);
+								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+						});
+					}
+					this.addonComposite.layout();
+				}
+				{
 					this.dataRateLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData dataRateLabelLData = new RowData();
 					dataRateLabelLData.width = 135;
@@ -828,96 +918,6 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
-				}
-				{
-					this.telemetrieTypeLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
-					RowData telemetrieTypeLabelLData = new RowData();
-					telemetrieTypeLabelLData.width = 135;
-					telemetrieTypeLabelLData.height = 20;
-					this.telemetrieTypeLabel.setLayoutData(telemetrieTypeLabelLData);
-					this.telemetrieTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2580));
-					this.telemetrieTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				}
-				{
-					this.telemetrieTypeCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
-					RowData telemetrieTypeComboLData = new RowData();
-					telemetrieTypeComboLData.width = 130;
-					telemetrieTypeComboLData.height = GDE.IS_MAC ? 18 : 14;
-					this.telemetrieTypeCombo.setLayoutData(telemetrieTypeComboLData);
-					this.telemetrieTypeCombo.setItems(this.telemetrieTypes);
-					this.telemetrieTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.telemetrieTypeCombo.setEditable(false);
-					this.telemetrieTypeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-					this.telemetrieTypeCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							UniLog2SetupConfiguration1.log.log(Level.FINEST, "telemetrieTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2SetupConfiguration1.this.configuration.telemetrieType = (short) (UniLog2SetupConfiguration1.this.telemetrieTypeCombo.getSelectionIndex());
-							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
-
-							changeVisibility();
-						}
-					});
-				}
-				{
-					this.addonComposite = new Composite(this.commonAdjustmentsGroup, SWT.NONE);
-					this.addonComposite.setLayout(new FormLayout());
-					RowData addonCompositeLData = new RowData();
-					addonCompositeLData.width = 285;
-					addonCompositeLData.height = 22;
-					this.addonComposite.setLayoutData(addonCompositeLData);
-					{
-						this.frskyIdLabel = new CLabel(this.addonComposite, SWT.NONE);
-						FormData frskyIdLabelLData = new FormData();
-						frskyIdLabelLData.width = 135;
-						frskyIdLabelLData.height = 20;
-						frskyIdLabelLData.left = new FormAttachment(0, 1000, 2);
-						frskyIdLabelLData.top = new FormAttachment(0, 1000, 0);
-						this.frskyIdLabel.setLayoutData(frskyIdLabelLData);
-						this.frskyIdLabel.setText(Messages.getString(MessageIds.GDE_MSGT2579));
-						this.frskyIdLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					}
-					{
-						this.fixSerialNumberButton = new Button(this.addonComposite, SWT.CHECK | SWT.RIGHT);
-						FormData sensorTypeLabelLData = new FormData();
-						sensorTypeLabelLData.width = 135;
-						sensorTypeLabelLData.height = 20;
-						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
-						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 0);
-						this.fixSerialNumberButton.setLayoutData(sensorTypeLabelLData);
-						this.fixSerialNumberButton.setText("fix serial number");
-						this.fixSerialNumberButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.fixSerialNumberButton.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent evt) {
-								UniLog2SetupConfiguration1.log.log(Level.FINEST, "fixSerialNumberButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								UniLog2SetupConfiguration1.this.configuration.serialNumberFix = (short) (UniLog2SetupConfiguration1.this.fixSerialNumberButton.getSelection() ? 1 : 0);
-								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
-							}
-						});
-					}
-					{
-						this.frskyIdCombo = new CCombo(this.addonComposite, SWT.BORDER);
-						FormData sensorTypeComboLData = new FormData();
-						sensorTypeComboLData.width = 80;
-						sensorTypeComboLData.height = 20;
-						sensorTypeComboLData.left = new FormAttachment(0, 1000, 137);
-						sensorTypeComboLData.top = new FormAttachment(0, 1000, 0);
-						this.frskyIdCombo.setLayoutData(sensorTypeComboLData);
-						this.frskyIdCombo.setItems(this.frskyIDs);
-						this.frskyIdCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.frskyIdCombo.setEditable(false);
-						this.frskyIdCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-						this.frskyIdCombo.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent evt) {
-								UniLog2SetupConfiguration1.log.log(Level.FINEST, "sensorTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								UniLog2SetupConfiguration1.this.configuration.frskyAddr = (short) (UniLog2SetupConfiguration1.this.frskyIdCombo.getSelectionIndex() + 1);
-								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
-							}
-						});
-					}
-					this.addonComposite.layout();
 				}
 			}
 			{
