@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V28.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V29.xsd">
     <Device>
         <name implementation="gde.device.graupner.HoTTAdapterX">HoTTAdapterX</name>
         <manufacturer>Graupner</manufacturer>
@@ -100,7 +100,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -117,7 +116,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -134,7 +132,6 @@
                 <symbol>Amax</symbol>
                 <unit>I</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="11" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -167,7 +164,6 @@
                 <symbol>rpmmax</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="15" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -184,7 +180,6 @@
                 <symbol>rpmmax</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="17" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -201,7 +196,6 @@
                 <symbol>TMmax</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -218,7 +212,6 @@
                 <symbol>Vmax</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -235,7 +228,6 @@
                 <symbol>Uextmin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
                 </Measurement>
@@ -252,7 +244,6 @@
                 <symbol>Textmax</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="25" name="scale_sync_ref_ordinal"/>
             </Measurement>

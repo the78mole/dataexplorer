@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V28.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V29.xsd">
     <Device>
         <name implementation="gde.device.graupner.HoTTAdapter">HoTTAdapter</name>
         <manufacturer>Graupner</manufacturer>
@@ -102,7 +102,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
@@ -960,7 +959,6 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
@@ -968,7 +966,6 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>

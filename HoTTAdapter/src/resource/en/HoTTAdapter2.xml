@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V28.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V29.xsd">
     <Device>
         <name implementation="gde.device.graupner.HoTTAdapter2">HoTTAdapter2</name>
         <manufacturer>Graupner</manufacturer>
@@ -117,10 +117,8 @@
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="~ Motor runtime" countTriggerText="Number counted climb flights" countByTrigger="true" sigma="false" avg="false" max="true" min="false">
-                    <trigger comment="Trigger: climb ratio &gt; 1.5 m/sec &gt; 10 sec" minTimeSec="10" isGreater="true" level="1500"/>
-                </statistics>
-            </Measurement>
+                <statistics sigma="false" avg="false" max="true" min="false"/>
+             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
                 <symbol>vs</symbol>
@@ -529,7 +527,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger" triggerRefOrdinal="59" sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -622,7 +620,6 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
@@ -630,7 +627,6 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
@@ -697,7 +693,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1218,7 +1213,6 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
@@ -1226,7 +1220,6 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
@@ -1293,7 +1286,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1814,7 +1806,6 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
@@ -1822,7 +1813,6 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
@@ -1889,7 +1879,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -2565,7 +2554,6 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
@@ -2573,7 +2561,6 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
         </Channel>
@@ -2640,7 +2627,6 @@
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -3161,7 +3147,6 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
@@ -3169,8 +3154,638 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel type="TYPE_CONFIG" name="Lab-Time">
+            <Measurement>
+                <name>Rx->Tx-PLoss</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>RXSQ</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Strength</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>VPack</name>
+                <symbol></symbol>
+                <unit>ms</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Tx</name>
+                <symbol></symbol>
+                <unit>dBm</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Rx</name>
+                <symbol></symbol>
+                <unit>dBm</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>VoltageRx</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureRx</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>VoltageRx_min</name>
+                <symbol>Umin</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Height</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Climb 1</name>
+                <symbol>vh</symbol>
+                <unit>m/sec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Climb 3</name>
+                <symbol>vh</symbol>
+                <unit>m/3sec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="10" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Climb 10</name>
+                <symbol>vh</symbol>
+                <unit>m/10sec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="10" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Latitude</name>
+                <symbol></symbol>
+                <unit>° '</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="100.0" name="filter_factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Longitude</name>
+                <symbol></symbol>
+                <unit>° '</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="25.0" name="filter_factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Velocity</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>DistanceStart</name>
+                <symbol></symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Azimuth</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>TripLength</name>
+                <symbol></symbol>
+                <unit>km</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage G</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current G</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity G</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Power G</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Balance G</name>
+                <symbol></symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage G1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage G2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage G3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage G4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage G5</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage G6</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Fuel</name>
+                <symbol></symbol>
+                <unit>ml</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage GS1</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage GS2</name>
+                <symbol>U2</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature G1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature G2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage E</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Current E</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity E</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Power E</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Balance E</name>
+                <symbol></symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E5</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E6</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E7</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E8</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E9</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E10</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E11</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E12</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E13</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage E14</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
+                <property type="Integer" value="24" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage ES1</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage ES2</name>
+                <symbol>U2</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature E1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature E2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution E</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Power M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="30" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M_min</name>
+                <symbol>U_min</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M_max</name>
+                <symbol>I</symbol>
+                <unit>A_max</unit>
+                <active>true</active>
+                <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M_max</name>
+                <symbol>rpm_max</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 1_max</name>
+                <symbol>T1_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>TemperatureM 2_max</name>
+                <symbol>T2_max</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Rxl</name>
+                <symbol>rxl</symbol>
+                <unit>dbm</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="filter_factor" value="100" type="String" description="Filterfaktor - höherer Wert, stärkere Glättung"/>
+            </Measurement>
+            <Measurement>
+                <name>Rxl'</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="filter_factor" value="10" type="String" description="Filterfaktor - höherer Wert, längere Wartezeit"/>
+            </Measurement>
+            <Measurement>
+                <name>Lab-Time Rx</name>
+                <symbol>t</symbol>
+                <unit>sec</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="filter_factor" value="7" type="String" description="Filterfaktor - höherer Wert, langere mitteler Rundenzeit"/>
+            </Measurement>
+            <Measurement>
+                <name>Dist'</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="scale_sync_ref_ordinal" value="73" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lab-Time Dist</name>
+                <symbol>t</symbol>
+                <unit>sec</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="74" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
