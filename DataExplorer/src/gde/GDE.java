@@ -82,10 +82,10 @@ public class GDE {
 
 
 	// ****** begin global constants section *******
-	public static final String		VERSION													= "Version 3.2.6";																																																						//$NON-NLS-1$
+	public static final String		VERSION													= "Version 3.2.7";																																																						//$NON-NLS-1$
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V28";																																																										//$NON-NLS-1$
+	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V29";																																																										//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V08";																																																										//$NON-NLS-1$
 	public final static String		CLEAN_SETTINGS_WHILE_SHUTDOWN 	= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 	public final static String		TEMP_FILE_STEM 									= "~TempFile";
