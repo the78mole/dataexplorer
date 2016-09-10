@@ -11,10 +11,12 @@ Version 3.2.7 - xx yyy 2016
 - fix problem displaying help after language switch
 HoTTAdapter*
 	- add ESC missing measurement values Temperature2, Voltage min, Current max, RPM max, Temperature1 max, Temperature2 max
+	- remove statistics properties from minimal and maximal measurements
 HoTTAdapter2
 	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
 	- add default filter settings to device XML
 	- correct trigger references in XML
+	- enable lab time evaluation based on Rx dbm and/or distance from start in separate configuration
 HoTTViewer Adapter
 	- add Rx dbm measurement value
 MC3000
@@ -30,6 +32,7 @@ iCharger 308/4010 DUO
 	- correct energy value calculation for import
 UniLog2
 	- adapt configuration capabilities to FW 1.12
+
 Version 3.2.6 - 06 May 2016
 fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
 MC3000 
