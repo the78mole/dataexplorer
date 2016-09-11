@@ -1113,7 +1113,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			//66=TemperatureM 2 67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
 			if ((recordKeys.length - fileRecordsProperties.length) > 0) { //osd saved before 8.2.7 and need procedure below
 				int i = 0;
-				for (; i < fileRecordsProperties.length; ++i) {
+				for (; i < recordKeys.length - 6; ++i) {// 6 additional measurements
 					cleanedRecordNames.add(recordKeys[i]);
 				}
 				//cleanup recordSet
@@ -1129,7 +1129,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			//86=TemperatureM 2 87=Voltage_min, 88=Current_max, 89=Revolution_max, 90=Temperature1_max, 91=Temperature2_max
 			if ((recordKeys.length - fileRecordsProperties.length) > 0) { //osd saved before 8.2.7 and need procedure below
 				int i = 0;
-				for (; i < fileRecordsProperties.length; ++i) {
+				for (; i < recordKeys.length - 6; ++i) {
 					cleanedRecordNames.add(recordKeys[i]);
 				}
 				//cleanup recordSet
@@ -1148,6 +1148,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		}
 		
 		//this part of code is only neeeded for OSD files saved before 8.2.7
+		cleanedRecordNames = new Vector<String>();
 		int noneCalculationRecords = 0;
 		for (String fileRecord : fileRecordsProperties) {
 			if (fileRecord.contains("_isActive=true") || fileRecord.contains("_name=Ch ")) ++noneCalculationRecords;
