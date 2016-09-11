@@ -48,6 +48,8 @@ MC3000
 	- enable set charge programs to slots
 OpenTxTelemetry
 	- make Google Earth auto export more configurable, extrude, select some record
+Polaron Sports
+	- correct device XML
 WeatronicTelemetry
 	- make Google Earth auto export more configurable, extrude, select some record
 WStechVario*

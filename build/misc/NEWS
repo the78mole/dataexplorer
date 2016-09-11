@@ -47,9 +47,11 @@ GNU DataExplorer - News - comes with version 3.2.7 - 11 Sep 2016
 	- enable set charge programs to slots
 21) OpenTxTelemetry
 	- make Google Earth auto export more configurable, extrude, select some record
-22) WeatronicTelemetry
+22) Polaron Sports
+	- correct English device XML
+23) WeatronicTelemetry
 	- make Google Earth auto export more configurable, extrude, select some record
-23) WStechVario*
+24) WStechVario*
 	- make Google Earth auto export more configurable, extrude, select some record
 
 1) Berichtigung der Statistikberechnung bezüglich des referenzierten Messwert-Ordnungszahl
@@ -102,7 +104,9 @@ GNU DataExplorer - News - comes with version 3.2.7 - 11 Sep 2016
 	- Ladeprogramme können gelesen, gesichert und auf das Gerät geschrieben werden, erfordert FW 1.11
 21) OpenTxTelemetry
 	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
-22) WeatronicTelemetry
+22) Polaron Sports
+	- Korrektur der englischen Geräte XML
+23) WeatronicTelemetry
 	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
-23) WStechVario*
+24) WStechVario*
 	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
