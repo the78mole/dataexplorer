@@ -1,48 +1,108 @@
-GNU DataExplorer - News - comes with version 3.2.6 - 07 May 2016
+GNU DataExplorer - News - comes with version 3.2.7 - 11 Sep 2016
 
-1) fix - Linux adaptation for incompatible but working SWT SashForm.setWeights
-2) MC3000 
-	- add warning message selecting continuous data recording in combination with reduced without pause,..
-	- add capability to data capture finish for 15 minutes
-	- change energy calculation method
-3) iCharger* 
-	- handle state property exception while receiving incomplete data 
-	- remove checksum calculation
-4) iCharger4010DUO
-	- enable USB live data gathering (one time deletion of iCharger4010DUO.xml required)
-5) Weatronic-Telemetry
-	- handle not initialized measurement symbols which are sometimes displayed as string null
-6) Polaron EX1400
-	- add support
-7) HoTTAdapter 
+1) correct statistics calculation in regard of using max or average calculated using measurement reference ordinal
+2) add some error handling if device XML is corrupt in <DataBlock/>
+3) enable CSV export using UTF-8 encoding (HoTTAdapterM2 for DashWare)
+4) fix error not writing OSD file if date as file name leader is not set
+5) reduce message in unsaved waring message box
+6) enable builds using Windows 10
+7) fix problem displaying help after language switch
+8) FlightRecorder
+	- make Google Earth auto export more configurable, extrude, select some record
+9) FutabaTelemetry
+	- make Google Earth auto export more configurable, extrude, select some record
+10) GigaLogger
+	- make Google Earth auto export more configurable, extrude, select some record
+11) GPS-Logger*
+	- make Google Earth auto export more configurable, extrude, select some record
+12) GPXAdapter
+	- make Google Earth auto export more configurable, extrude, select some record
+13) HoTTAdapter*
 	- fix live data gathering of missing ESC values
-8) HoTTAdapter*
+	- add ESC missing measurement values Temperature2, Voltage min, Current max, RPM max, Temperature1 max, Temperature2 max
 	- enhance sensor detection in transmitter logs mainly needed while high Rx->Tx PLoss (pupil transmitter logs)
+	- remove statistics properties from minimal and maximal measurements
+14) HoTTAdapter2
+	- correct device XMl in regards of ESC statistics calculation capacity/altitude  
+	- add default filter settings to device XML
+	- correct trigger references in XML
+	- make Google Earth auto export more configurable, extrude, select some record
+	- enable lab time evaluation based on Rx dbm and/or distance from start in separate configuration
+15) HoTTViewer Adapter
+	- add Rx dbm measurement value
+16) iCharger 308 DUO
+	- add live data gathering support
+17) iCharger 308/4010 DUO
+	- correct energy value calculation for import
+18) IISI-Cockpit V2
+	- make Google Earth auto export more configurable, extrude, select some record
+19) JetiAdapter
+	- make Google Earth auto export more configurable, extrude, select some record
+20) MC3000
+	- add new system temperature measurement value
+	- add RAM cell type support
+	- correct NiZn program modus 
+	- adapt to FW 1.05+, power and energy retrieved directly from device
+	- fix problem while closing application with running data gatherer thread
+	- enable set charge programs to slots
+21) OpenTxTelemetry
+	- make Google Earth auto export more configurable, extrude, select some record
+22) WeatronicTelemetry
+	- make Google Earth auto export more configurable, extrude, select some record
+23) WStechVario*
+	- make Google Earth auto export more configurable, extrude, select some record
 
-
-1) Fehler behoben - Linux Anpassung der SWT SashForm.setWeights
-2) MC3000 
-	- Warnung hinzugefügt bei Verwendung der kontinuierlichen Datenaufnahme ohnen Pausen
-	- es werden nach Programmablaufende weitere 15 Minuten aufgezeichnet
-	- Korrectur der Energieberechnung
-3) iCharger* 
-	- Fehlerbehandlung bei unvollständigen Daten eingeführt 
-	- Prüfsummenkalkulation wieder entfernt, auf einigen Systemen hat das zu gehäuften Fehlern geführt
-4) iCharger4010DUO
-	- native Datensammlung über USB eingebaut (es muss einmalig das iCharger4010DUO.xml gelöscht werden)
-5) Weatronic-Telemetry
-	- Behandlung von nicht initialisierten Messwertsymbolen eingeführt
-6) Polaron EX1400
-	- Unterstützung eingebaut
-7) HoTTAdapter 
-	- Fehler behoben bei der Live-Datenaufnahme und angeschlossenem ESC
-8) HoTTAdapter*
-	- verbesserte Sensorerkennung, besonders für Schüler-Sender Logs mit hoher Rx->Tx PLoss Rate
-
-
-
-
-
-
-
-
+1) Berichtigung der Statistikberechnung bezüglich des referenzierten Messwert-Ordnungszahl
+2) Erweiterte Fehlerbehandlung in Geräte XML <DataBlock/>
+3) CSV-Export mit "UTF-8 encoding" ermöglicht (HoTTAdapterM2 for DashWare)
+4) Berichtugung des Fehlers bei nicht spezifiziertem Datum in den Einstellungen, OSD-Datei wurde nicht geschrieben
+5) Reduktion der Warnungsmeldung bei ungesicherter oder veränderter Datei, die Nachricht passte nicht immer auf den Bildschirm
+6) Projekt-Build unter Windows 10 ermöglicht
+7) Korrektur des Problems, nach Sprachenänderung wurde die Hilfe nicht angezeigt
+8) FlightRecorder
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+9) FutabaTelemetry
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+10) GigaLogger
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+11) GPS-Logger*
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+12) GPXAdapter
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+13) HoTTAdapter*
+	- fix live data gathering of missing ESC values
+	- add ESC missing measurement values Temperature2, Voltage min, Current max, RPM max, Temperature1 max, Temperature2 max
+	- enhance sensor detection in transmitter logs mainly needed while high Rx->Tx PLoss (pupil transmitter logs)
+	- remove statistics properties from minimal and maximal measurements
+14) HoTTAdapter2
+	- Berichtigung der Geräte XML bezüglich der ESC statistischen Berechnung für Kapazität zur gewonnenen Höhe  
+	- Initiale Einstellungen für Filter in die Geräte XML übernommen, es gab Probleme beim sichern wenn Filter verändert wurden
+	- Berichtigung von Trigger-Referenzen in Geräte XML
+	- Entfernen des Trigger-Beispiels aus der allgemeinen Konfiguration, ein Trigger gegen Steigwerte wird heute nicht mehr gebraucht und durch Stromtrigger ersetzt
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+	- Ermögliche Rundenzeit-Auswertung basierend auf Rx dbm- und/oder Entfernungs-Differenz in einer zusätzlichen Konfiguration "Rundenzeit"
+15) HoTTViewer Adapter
+	- Messwert Rx dbm hinzu gefügt
+	- Berichtigung des Fehlers, der ein Merken des HoTTViewers als zuletzt verwendetes Gerät verhindert hat
+16) iCharger 308 DUO
+	- Live-Datenaufnahme über USB hinzugefügt
+17) iCharger 308/4010 DUO
+	- Berichtigung der Energieberechnung beim Import
+18) IISI-Cockpit V2
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+19) JetiAdapter
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+20) MC3000
+	- System-Temperatur als Messwert hinzugefügt, erfordert FW 1.11
+	- Unterstützung für RAM-Zellen hinzugefügt, erfordert FW 1.11
+	- Berichtigung im Aufnahmeverhalten bei NiZn-Programm-Modus 
+	- Berichtigung im Aufnahmeverhalten bei Break-In-Programm-Modus 
+	- Anpassung für FW 1.05+, Leistung und Energie wird vom Gerät ausgegeben und nicht mehr berechnet
+	- Berichtigung des Fehlers beim Schliessen der DataExplorers bei laufender USB-Aufnahme
+	- Ladeprogramme können gelesen, gesichert und auf das Gerät geschrieben werden, erfordert FW 1.11
+21) OpenTxTelemetry
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+22) WeatronicTelemetry
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...
+23) WStechVario*
+	- Erweiterung der Konfiguration zu Google Earth, z.B. anderen Messwert selektieren, Schatten bis zum Grund,...

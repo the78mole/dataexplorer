@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.7 - xx yyy 2016
+Version 3.2.7 - 11 Sep 2016
 - correct statistics calculation in regard of using max or average calculated using measurement reference ordinal
 - add some error handling if device XML is corrupt in <DataBlock>
 - enable CSV export using UTF-8 encoding (HoTTAdapterM2 for DashWare)
@@ -15,6 +15,8 @@ FutabaTelemetry
 GigaLogger
 	- make Google Earth auto export more configurable, extrude, select some record
 GPS-Logger*
+	- make Google Earth auto export more configurable, extrude, select some record
+GPXAdapter
 	- make Google Earth auto export more configurable, extrude, select some record
 HoTTAdapter*
 	- fix live data gathering of missing ESC values
