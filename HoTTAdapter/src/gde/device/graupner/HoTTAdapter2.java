@@ -803,10 +803,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//GPSHelper.calculateLabs(this, recordSet, latOrdinal, lonOrdinal, distOrdinal, tripOrdinal, 15);
 			}
 			
-			//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-			//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-			runLabsCalculation(recordSet, 6, 5, 72, 73, 74, 15, 75, 76);
-
+			if (recordSet.getChannelConfigNumber() == 6) { // do lab calculation with configuration Lab-Time only
+				//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
+				//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
+				runLabsCalculation(recordSet, 6, 5, 72, 73, 74, 15, 75, 76);
+			}
 			//recordSet.syncScaleOfSyncableRecords();
 			this.application.updateStatisticsData(true);
 			this.updateVisibilityStatus(recordSet, true);
@@ -1102,6 +1103,51 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
+		
+		switch (recordSet.getChannelConfigNumber()) { //8.2.7 introduce additional ESC measurement values and additional channelConfig	
+		case 1://Standard
+		case 2://GAM
+		case 3://EAM
+		case 5://ESC
+		default:
+			//66=TemperatureM 2 67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
+			if ((recordKeys.length - fileRecordsProperties.length) > 0) { //osd saved before 8.2.7 and need procedure below
+				int i = 0;
+				for (; i < fileRecordsProperties.length; ++i) {
+					cleanedRecordNames.add(recordKeys[i]);
+				}
+				//cleanup recordSet
+				for (; i < recordKeys.length; ++i) {
+					recordSet.remove(recordKeys[i]);
+				}
+				recordKeys = cleanedRecordNames.toArray(new String[1]);
+			}
+			else //osd saved with 8.2.7 with the added ESC measurements
+				return recordKeys;
+			break;
+		case 4://Channels
+			//86=TemperatureM 2 87=Voltage_min, 88=Current_max, 89=Revolution_max, 90=Temperature1_max, 91=Temperature2_max
+			if ((recordKeys.length - fileRecordsProperties.length) > 0) { //osd saved before 8.2.7 and need procedure below
+				int i = 0;
+				for (; i < fileRecordsProperties.length; ++i) {
+					cleanedRecordNames.add(recordKeys[i]);
+				}
+				//cleanup recordSet
+				for (; i < recordKeys.length; ++i) {
+					recordSet.remove(recordKeys[i]);
+				}
+				recordKeys = cleanedRecordNames.toArray(new String[1]);
+			}
+			else //osd saved with 8.2.7 with the added ESC measurements
+				return recordKeys;
+			break;
+		case 6://Lab-Time			
+			//66=TemperatureM 2 67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
+			//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm 15=DistanceStart, 75=DiffDistance, 76=LapsDistance
+			return recordKeys;
+		}
+		
+		//this part of code is only neeeded for OSD files saved before 8.2.7
 		int noneCalculationRecords = 0;
 		for (String fileRecord : fileRecordsProperties) {
 			if (fileRecord.contains("_isActive=true") || fileRecord.contains("_name=Ch ")) ++noneCalculationRecords;
@@ -1168,6 +1214,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 
 			case 64: //HoTTAdapter2 without channels prior to 3.1.9
 			case 84: //HoTTAdapter2 with channels prior to 3.1.9
+			default:
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i != 59) {
 						cleanedRecordNames.add(recordKeys[i]);
@@ -1175,16 +1222,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					else
 						measurements.get(i).setActive(null);
-				}
-				break;
-			default: //HoTTAdapter2 3.2.6 > only adds measurement at the end 
-				int i = 0;
-				for (; i < fileRecordsProperties.length; ++i) {
-					cleanedRecordNames.add(recordKeys[i]);
-				}
-				//cleanup recordSet
-				for (; i < recordKeys.length; ++i) {
-					recordSet.remove(recordKeys[i]);
 				}
 				break;
 			}
