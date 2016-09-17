@@ -197,7 +197,7 @@ public class GathererThread extends Thread {
 								recordSetKey4 = (String) ch4[1];
 							}
 
-							if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4) {
+							if (points5.length != 0 && (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4)) {
 								//build combination of all the data to display it as curve compare
 								points5[0] = points1[0];
 								points5[1] = points2[0];

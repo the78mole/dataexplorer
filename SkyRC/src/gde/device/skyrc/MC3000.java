@@ -70,9 +70,10 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	final static String[]	operationModeLi			= { "Charge", "Refresh", "Storage", "Discharge", "Cycle" };
 	final static String[]	operationModeNi			= { "Charge", "Refresh", "Break_in", "Discharge", "Cycle" };
 	final static String[]	operationModeZnRAM	= { "Charge", "Refresh", "Discharge", "Cycle" };
-	final static String[]	cellModelNames			= { "Std AA", "Lite AAA", "Lite AAA", "Std AAA", "Std AAA", "Pro/XX AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std C",
-			"Std D", "OFF"												};
-	final static int[]		cellModelCapacity		= { 0, 700, 720, 900, 960, 1000, 1080, 1200, 2000, 2400, 3000, 3800, 3840, 7200 };
+	final static String[]	cellModelNames111		= { "Std AA", "Lite AAA", "Lite AAA", "Std AAA", "Std AAA", "Pro/XX AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std C", "Std D", "OFF"												};
+	final static int[]		cellModelCapacity111= { 0, 700, 720, 900, 960, 1000, 1080, 1200, 2000, 2400, 3000, 3800, 3840, 7200 };
+	final static String[]	cellModelNames112		= { "Std AA", "Lite AAA", "Std AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std D", "OFF"												};
+	final static int[]		cellModelCapacity112= {  0,        600,        800,       900,          1000,      2000,     2200,      2500,        3200,    6000      };
 	final static String[]	trickleTimeValues		= { "OFF", "REST", "END" };
 
 	protected class SystemSettings {
@@ -237,7 +238,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		byte		cutTemperature;
 		byte[]	cutTime;
 		byte		temperatureUnit;
-		//TODO coming with FW 1.12?
+		//FW 1.12
 		byte		dischargeRestingTime;
 		byte		trickleTime;
 
@@ -265,10 +266,10 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				this.cutTemperature = buffer[26];
 				this.cutTime = new byte[] { buffer[27], buffer[28] };
 				this.temperatureUnit = buffer[29];
-				//TODO coming with FW 1.12?
-				this.dischargeRestingTime = 0;
-				this.trickleTime = 0;
-
+				if (this.firmwareVersion > 111) {
+					this.trickleTime = buffer[30];
+					this.dischargeRestingTime = buffer[31];
+				}
 				MC3000.log.log(java.util.logging.Level.FINE, this.toString());
 			}
 			else {
@@ -306,9 +307,10 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			this.cutTemperature = slotSettings.cutTemperature;
 			this.cutTime = slotSettings.cutTime.clone();
 			this.temperatureUnit = slotSettings.temperatureUnit;
-			//TODO coming with FW 1.12?
-			this.dischargeRestingTime = slotSettings.dischargeRestingTime;
-			this.trickleTime = slotSettings.trickleTime;
+			if (this.firmwareVersion > 111) {
+				this.trickleTime = slotSettings.trickleTime;
+				this.dischargeRestingTime = slotSettings.dischargeRestingTime;
+			}
 
 			if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, this.toString());
 		}
@@ -319,12 +321,18 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 
 		@Override
 		public String toString() {
-			return String.format(
+			if (this.firmwareVersion <= 111) //FW > 1.12 missing D.RESTING TRICKLE TIME
+				return String.format(
 							" slot#=%02d busy=%b BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d CUT VOLT=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d RESTART VOLT=%03d CUT TEMP=%02d CUT TIME=%03d temeratureUnit=%d",
 							this.slotNumber, this.busyTag == 0x01, this.batteryType, this.operationMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeCutVoltage(), getChargeEndVoltage(),
 							getDischargeReduceCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime & 0xFF, this.cycleMode, this.peakSenseVoltage, this.trickleCurrent, getRestartVoltage(),
 							this.cutTemperature, getCutTime(), this.temperatureUnit);
-			//TODO FW 1.12 missing D.RESTING TRICKLE TIME
+			
+				return String.format(
+						" slot#=%02d busy=%b BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d CUT VOLT=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d D.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d TRICKLE TIME=%s RESTART VOLT=%03d CUT TEMP=%02d CUT TIME=%03d temeratureUnit=%d",
+						this.slotNumber, this.busyTag == 0x01, this.batteryType, this.operationMode, getCapacity(), getChargeCurrent(), getDischargeCurrent(), getDischargeCutVoltage(), getChargeEndVoltage(),
+						getDischargeReduceCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime & 0xFF, this.dischargeRestingTime & 0xFF, this.cycleMode, this.peakSenseVoltage, this.trickleCurrent, this.trickleTime == 0 ? "OFF" : this.trickleTime == 1 ? "END" : "Rest", getRestartVoltage(),
+						this.cutTemperature, getCutTime(), this.temperatureUnit);
 		}
 
 		/**
@@ -374,9 +382,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				if (this.firmwareVersion > 111)
 					sb.append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime & 0xFF)).append(GDE.LINE_SEPARATOR);
 				else
-					sb.append(
-							String.format(Locale.ENGLISH, "%-14s %dmin (FW <=1.11 = %s)", Messages.getString(MessageIds.GDE_MSGT3664), this.chargeRestingTime & 0xFF, Messages.getString(MessageIds.GDE_MSGT3663)))
-							.append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "%-14s %dmin (FW <=1.11 = %s)", Messages.getString(MessageIds.GDE_MSGT3664), this.chargeRestingTime & 0xFF, Messages.getString(MessageIds.GDE_MSGT3663))).append(GDE.LINE_SEPARATOR);
 			}
 			else if (!isToolTip) {
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3664), this.dischargeRestingTime & 0xFF)).append(GDE.LINE_SEPARATOR);
@@ -577,7 +583,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					else
 						sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3675))).append(GDE.LINE_SEPARATOR);
 
-					if (this.trickleTime != 0 && this.firmwareVersion > 111)
+					if (this.firmwareVersion > 111)
 						sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3676), MC3000.trickleTimeValues[this.trickleTime])).append(GDE.LINE_SEPARATOR);
 					else
 						sb.append(String.format(Locale.ENGLISH, "%-14s ?? FW <=1.11", Messages.getString(MessageIds.GDE_MSGT3676))).append(GDE.LINE_SEPARATOR);
@@ -755,9 +761,16 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 6://Eneloop
 				//Model
 				int i = 0;
-				for (; this.batteryType == 6 && i < MC3000.cellModelCapacity.length; i++)
-					if (this.getCapacity() == MC3000.cellModelCapacity[i]) break;
-				sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames[i])).append(GDE.LINE_SEPARATOR);
+				if (this.firmwareVersion >= 111) {
+					for (; this.batteryType == 6 && i < MC3000.cellModelCapacity111.length; i++)
+						if (this.getCapacity() == MC3000.cellModelCapacity111[i]) break;
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames111[i])).append(GDE.LINE_SEPARATOR);
+				}
+				else {
+					for (; this.batteryType == 6 && i < MC3000.cellModelCapacity112.length; i++)
+						if (this.getCapacity() == MC3000.cellModelCapacity112[i]) break;
+					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames112[i])).append(GDE.LINE_SEPARATOR);
+				}
 				break;
 			}
 		}
@@ -800,10 +813,20 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					switch (this.batteryType) {
 					case 6: //Eneloop
 						int i = 0;
-						for (; i < MC3000.cellModelCapacity.length; i++) {
-							if (this.getCapacity() == MC3000.cellModelCapacity[i]) {
-								sb.append(MC3000.cellModelNames[i]);
-								break;
+						if (this.firmwareVersion >= 111) {
+							for (; i < MC3000.cellModelCapacity111.length; i++) {
+								if (this.getCapacity() == MC3000.cellModelCapacity111[i]) {
+									sb.append(MC3000.cellModelNames111[i]);
+									break;
+								}
+							}
+						}
+						else {
+							for (; i < MC3000.cellModelCapacity112.length; i++) {
+								if (this.getCapacity() == MC3000.cellModelCapacity112[i]) {
+									sb.append(MC3000.cellModelNames112[i]);
+									break;
+								}
 							}
 						}
 						break;
@@ -903,7 +926,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			byte[] reducedBuffer = new byte[64];
 			if (firmwareAsNumber <= 111) {
 				reducedBuffer[0] = 0x0F;
-				reducedBuffer[1] = 0x1D;
+				reducedBuffer[1] = 0x1D; //29
 				reducedBuffer[2] = 0x11;
 				reducedBuffer[3] = 0x00;
 				reducedBuffer[4] = newSlotNumber;
@@ -914,7 +937,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[25] = this.cutTemperature;
 				System.arraycopy(this.slotBuffer, 27, reducedBuffer, 26, 2);//cut time
 				System.arraycopy(this.slotBuffer, 24, reducedBuffer, 28, 2);//restart voltage
-				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer, 29);
+				reducedBuffer[30] = MC3000UsbPort.calculateCheckSum(reducedBuffer, reducedBuffer[1]);
 				reducedBuffer[31] = (byte) 0xFF;
 				reducedBuffer[32] = (byte) 0xFF;
 				if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) {
@@ -931,7 +954,44 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 													DataParser.parse2UnsignedShort(reducedBuffer[29], reducedBuffer[28])));
 				}
 
-				//D.RESTING: TRICKLE TIME: CUT VOLT:
+				//D.RESTING: TRICKLE TIME: CUT VOLT: missing in FW <= 1.11
+			}
+			else {
+				reducedBuffer[0] = 0x0F;
+				reducedBuffer[1] = 0x20; //32
+				reducedBuffer[2] = 0x11;
+				reducedBuffer[3] = 0x00;
+				reducedBuffer[4] = newSlotNumber;
+				reducedBuffer[5] = this.batteryType;
+				System.arraycopy(this.slotBuffer, 5, reducedBuffer, 6, 2);//capacity
+				reducedBuffer[8] = this.operationMode;
+				System.arraycopy(this.slotBuffer, 7, reducedBuffer, 9, 14);//C.CURRRENT to C.RESTING
+				reducedBuffer[23] = this.dischargeRestingTime;//D.RESTING
+				reducedBuffer[24] = this.cycleMode;
+				reducedBuffer[25] = this.peakSenseVoltage;
+				reducedBuffer[26] = this.trickleCurrent;
+				reducedBuffer[27] = this.trickleTime;
+				reducedBuffer[28] = this.getCutTemperatureC();
+				System.arraycopy(this.slotBuffer, 26, reducedBuffer, 29, 3);//cut time
+				System.arraycopy(this.slotBuffer, 24, reducedBuffer, 31, 2);//restart voltage
+				reducedBuffer[33] = MC3000UsbPort.calculateCheckSum(reducedBuffer, reducedBuffer[1]);
+				reducedBuffer[34] = (byte) 0xFF;
+				reducedBuffer[35] = (byte) 0xFF;
+				if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) {
+					MC3000.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(reducedBuffer, 64));
+					MC3000.log
+							.log(
+									java.util.logging.Level.FINE,
+									String
+											.format(
+													"slot#=%02d BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d D.REDUCE=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d CUT TEMP=%02d CUT TIME=%03d RESTART VOLT=%04d",
+													reducedBuffer[4], reducedBuffer[5], this.operationMode, (reducedBuffer[6] & 0xFF) * 100, getChargeCurrent(), getDischargeCurrent(), getDischargeReduceCurrent(),
+													getChargeEndVoltage(), getDischargeReduceCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime & 0xFF, this.cycleMode, this.peakSenseVoltage,
+													this.trickleCurrent, this.cutTemperature, DataParser.parse2UnsignedShort(reducedBuffer[27], reducedBuffer[26]),
+													DataParser.parse2UnsignedShort(reducedBuffer[29], reducedBuffer[28])));
+				}
+
+				//D.RESTING: TRICKLE TIME: CUT VOLT: missing in FW <= 1.11
 			}
 			return reducedBuffer;
 		}
@@ -1008,6 +1068,14 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 
 		public short getCutTemperature() {
 			return (short) (this.cutTemperature & 0xFF);
+		}
+
+		public byte getCutTemperatureC() {
+			if (this.temperatureUnit == 0) //°C
+				return (byte) (this.cutTemperature & 0xFF);
+
+			//temperature unit is °F
+			return (byte) (((this.cutTemperature - 32)*5/9) & 0xFF);
 		}
 
 		public int getCutTime() {

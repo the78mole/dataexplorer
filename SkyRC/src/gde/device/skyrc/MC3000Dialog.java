@@ -149,12 +149,13 @@ public class MC3000Dialog extends DeviceDialog {
 	private void updateSystemParameter(final SystemSettings sysSettings) {
 		if (sysSettings != null) {
 			int actualFirmware = sysSettings.getFirmwareVersionAsInt();
-			if (actualFirmware < 104 || actualFirmware > 111) {
+			if (actualFirmware < 104) {
 				this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW3600, new String[] { sysSettings.getFirmwareVersion() }));
 			}
-			else { // (sysSettings.getFirmwareVersionAsInt() <= 111) 
+			else if (sysSettings.getFirmwareVersionAsInt() == 111) {
 				this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT3650, new String[] { sysSettings.getFirmwareVersion() }));
 			}
+			//firmware > 1.12
 		}
 	}
 
