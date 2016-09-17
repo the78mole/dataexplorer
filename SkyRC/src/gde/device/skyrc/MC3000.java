@@ -74,7 +74,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	final static int[]		cellModelCapacity111= { 0, 700, 720, 900, 960, 1000, 1080, 1200, 2000, 2400, 3000, 3800, 3840, 7200 };
 	final static String[]	cellModelNames112		= { "Std AA", "Lite AAA", "Std AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std D", "OFF"												};
 	final static int[]		cellModelCapacity112= {  0,        600,        800,       900,          1000,      2000,     2200,      2500,        3200,    6000      };
-	final static String[]	trickleTimeValues		= { "OFF", "REST", "END" };
+	final static String[]	trickleTimeValues		= { "OFF", "END", "REST" };
 
 	protected class SystemSettings {
 		byte		currentSlotNumber;
