@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+Version 3.2.8 - yy xxx 2016
+MC3000
+	- fix setting slot programs with capabilities of FW >= 1.12
+	- add device XML with TYPE_CONFIG as MC3000_C to enable single file for all 4 slots
+
 Version 3.2.7 - 11 Sep 2016
 - correct statistics calculation in regard of using max or average calculated using measurement reference ordinal
 - add some error handling if device XML is corrupt in <DataBlock>
