@@ -74,7 +74,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 	final static String											SENSOR_COUNT											= "SensorCount";																																																			//$NON-NLS-1$
 	final static String											LOG_COUNT													= "LogCount";																																																				//$NON-NLS-1$
-	final static String											SD_LOG_VERSION										= "SD-Log Version";																																																	//$NON-NLS-1$
+	final static String											FILE_PATH													= "FilePath";																																																				//$NON-NLS-1$
 	final static Map<String, RecordSet>			recordSets												= new HashMap<String, RecordSet>();
 
 	//HoTT sensor bytes 19200 Baud protocol 

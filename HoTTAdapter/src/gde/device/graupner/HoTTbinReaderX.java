@@ -29,7 +29,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
-import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 
 import java.io.DataInputStream;
@@ -37,7 +36,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -49,6 +47,8 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	final static Logger	logx					= Logger.getLogger(HoTTbinReaderX.$CLASS_NAMEX);
 
 	static int[] points_1;
+	final static int headerSize = 27;
+	final static int footerSize = 323;
 
 	/**
 	 * convert from RF_RXSQ to strength using lookup table
@@ -75,21 +75,48 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
 			HoTTAdapter.isSensorType[i] = false;
 		}
+		boolean isHoTTV2 = true;
+		
 		File inputFile = new File(filePath);
-		if (inputFile.exists()) {
-			FileInputStream file_input = new FileInputStream(inputFile);
-			DataInputStream data_in = new DataInputStream(file_input);
-			byte[] buffer = new byte[23];
-			data_in.read(buffer);
-			data_in.close();
-			if (new String(buffer).startsWith("GRAUPNER SD LOG8"))
-				readSingle(inputFile);
-			else {
-				DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
-				throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+		FileInputStream file_input = new FileInputStream(inputFile);
+		DataInputStream data_in = new DataInputStream(file_input);
+		try {
+			if (inputFile.exists()) {
+				byte[] buffer = new byte[HoTTbinReaderX.headerSize];
+				data_in.read(buffer);
+				if (new String(buffer).startsWith("GRAUPNER SD LOG8")) {
+					//check for internal used buffer size 23 == HoTT V2, 64 HoTT V4 (normal receiver/sensor
+					buffer = new byte[23];
+					for (int i = 0; i < 4; i++) {
+						data_in.read(buffer);
+						if (buffer[0] != i+1)
+							isHoTTV2 = false;
+					}
+					data_in.close();
+					data_in = null;
+					
+					if (isHoTTV2)
+						readSingle(inputFile);
+					else {
+						DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+						throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+					}
+				}
+				else {
+					DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+					throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+				}
 			}
+			else throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2409));
 		}
-		else throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2409));
+		catch (Exception e) {
+			log.log(Level.WARNING,e.getMessage(), e);
+		}
+		finally {
+			if (data_in != null)
+					data_in.close();
+
+		}
 	}
 
 	/**
@@ -140,8 +167,6 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		HoTTAdapter.isChannelsChannelEnabled = false;
 		int lastCounter = 0x00;
 		int countPackageLoss = 0;
-		int headerSize = 27;
-		int footerSize = 323;
 		int lapTimes = 99;
 		long numberDatablocks = (fileSize - headerSize - footerSize) / HoTTbinReaderX.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -542,34 +567,5 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			sb.append("(").append(i).append(")").append(DataParser.parse2Short(buffer, i)).append(GDE.STRING_BLANK);
 		}
 		HoTTbinReaderX.logx.log(Level.FINE, sb.toString());
-	}
-
-	/**
-	 * main method for test purpose only !
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String directory = "f:\\Documents\\DataExplorer\\HoTTAdapter\\";
-
-		try {
-			List<File> files = FileUtils.getFileListing(new File(directory), 2);
-			for (File file : files) {
-				if (!file.isDirectory() && file.getName().endsWith(".bin")) {
-					//					FileInputStream file_input = new FileInputStream(file);
-					//					DataInputStream data_in = new DataInputStream(file_input);
-					//					HoTTbinReader.buf = new byte[64];
-					//					data_in.read(HoTTbinReader.buf);
-					//					System.out.println(file.getName());
-					//					System.out.println(StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-					//					System.out.println(StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
-					//					data_in.close();
-					System.out.println(file.getName() + " - " + Integer.parseInt(getFileInfo(file).get(HoTTAdapter.SD_LOG_VERSION)));
-
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

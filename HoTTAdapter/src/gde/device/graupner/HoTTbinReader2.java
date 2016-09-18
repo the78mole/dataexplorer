@@ -53,17 +53,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws Exception 
 	 */
 	public static synchronized void read(String filePath) throws Exception {
-		HashMap<String, String> header = null;
-		File file = new File(filePath);
-		HoTTbinReader.log.log(Level.FINER, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
-		header = getFileInfo(file);
+		HashMap<String, String> header = getFileInfo(new File(filePath));
 
 		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
 			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
-			readSingle(file);
+			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
 		}
 		else
-			readMultiple(file);
+			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)));
 	}
 
 	/**
@@ -104,6 +101,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.points[2] = 0;
 		HoTTbinReader.pointsGeneral = HoTTbinReader.pointsElectric = HoTTbinReader.pointsSpeedControl = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReader2.points;
 		HoTTbinReader.timeStep_ms = 0;
+		HoTTbinReader.dataBlockSize = 64;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
 		HoTTbinReader.buf1 = null;
@@ -432,6 +430,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.pointsGPS = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.pointsChannel = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.timeStep_ms = 0;
+		HoTTbinReader.dataBlockSize = 64;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
 		HoTTbinReader.buf1 = new byte[30];
