@@ -138,7 +138,7 @@ public class HoTTbinReader {
 					file_input = new FileInputStream(file);
 					data_in = new DataInputStream(file_input);
 					buffer = new byte[HoTTbinReaderX.headerSize];
-					File outputFile = new File(GDE.JAVA_IO_TMPDIR + "/~" + file.getPath().substring(1 + file.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+					File outputFile = new File(GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR + "~" + file.getPath().substring(1 + file.getPath().lastIndexOf(GDE.FILE_SEPARATOR)));
 					FileOutputStream file_output = new FileOutputStream(outputFile);
 					DataOutputStream data_out = new DataOutputStream(file_output);
 					long fileSize = file.length() - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize;
