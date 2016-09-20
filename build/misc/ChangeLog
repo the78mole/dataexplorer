@@ -4,6 +4,7 @@ Version 3.2.8 - yy xxx 2016
 MC3000
 	- fix setting slot programs with capabilities of FW >= 1.12
 	- add device XML with TYPE_CONFIG as MC3000_C to enable single file for all 4 slots
+	- fix handling with different temperature units and unit switch
 HoTTAdapterX
 	- refine log content analyze to distinguish between HoTT V2 and the normal HoTT V4 content
 HoTTAdapter*
