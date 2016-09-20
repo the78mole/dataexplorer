@@ -72,9 +72,9 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	final static String[]	operationModeZnRAM	= { "Charge", "Refresh", "Discharge", "Cycle" };
 	final static String[]	cellModelNames111		= { "Std AA", "Lite AAA", "Lite AAA", "Std AAA", "Std AAA", "Pro/XX AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std C", "Std D", "OFF"												};
 	final static int[]		cellModelCapacity111= { 0, 700, 720, 900, 960, 1000, 1080, 1200, 2000, 2400, 3000, 3800, 3840, 7200 };
-	final static String[]	cellModelNames112		= { "Std AA", "Lite AAA", "Std AAA", "Pro/XX AAA", "Lite AA", "Std AA", "Plus AA", "Pro/XX AA", "Std C", "Std D", "OFF"												};
-	final static int[]		cellModelCapacity112= {  0,        600,        800,       900,          1000,      2000,     2200,      2500,        3200,    6000      };
-	final static String[]	trickleTimeValues		= { "OFF", "END", "REST" };
+	final static String[]	cellModelNames112		= { "Std AA", "Lite AAA", "Lite AAA", "Std AAA", "Std AAA", "Pro/XX AAA", "Pro/XX AAA", "Lite AA", "Lite AA", "Std AA", "Std AA", "Plus AA", "Plus AA", "Pro/XX AA", "Pro/XX AA", "Std C", "Std C", "Std D", "Std D", "OFF"												};
+	final static int[]		cellModelCapacity112= {  0,        600,        720,        800,       960,       900,          1080,         1000,      1200,      2000,     2400,     2200,      2640,      2500,        3000,        3200,    3840,    6000,    7200      };
+	final static String[]	trickleTimeValues		= { "OFF", "End", "Rest" };
 
 	protected class SystemSettings {
 		byte		currentSlotNumber;
@@ -339,7 +339,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		 * @param isToolTip true will suppress fixed OFFs
 		 * @return tool tip text 
 		 */
-		public String toString4Tip(final boolean isToolTip) {
+		public String toString4Tip(final boolean isToolTip, final byte systemTemperatureUnit) {
 			StringBuilder sb = new StringBuilder();
 			//BATT TYPE
 			sb.append(Messages.getString(MessageIds.GDE_MSGT3682)).append(MC3000.cellTypeNames[this.batteryType]).append(GDE.LINE_SEPARATOR);
@@ -420,7 +420,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			}
 			//CUT TEMP:
 			if (this.cutTemperature >= 20)
-				sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), this.cutTemperature, this.temperatureUnit == 0 ? "°C" : "°F"));
+				sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), (this.getCutTemperature(systemTemperatureUnit) & 0xFF), systemTemperatureUnit == 0 ? "°C" : "°F"));
 			else
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
 			//CUT TIME:			
@@ -761,13 +761,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 6://Eneloop
 				//Model
 				int i = 0;
-				if (this.firmwareVersion >= 111) {
+				if (this.firmwareVersion <= 111) {
 					for (; this.batteryType == 6 && i < MC3000.cellModelCapacity111.length; i++)
 						if (this.getCapacity() == MC3000.cellModelCapacity111[i]) break;
 					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames111[i])).append(GDE.LINE_SEPARATOR);
 				}
 				else {
-					for (; this.batteryType == 6 && i < MC3000.cellModelCapacity112.length; i++)
+					for (; i < MC3000.cellModelCapacity112.length; i++)
 						if (this.getCapacity() == MC3000.cellModelCapacity112[i]) break;
 					sb.append(String.format(Locale.ENGLISH, "%-14s %s", Messages.getString(MessageIds.GDE_MSGT3684), MC3000.cellModelNames112[i])).append(GDE.LINE_SEPARATOR);
 				}
@@ -813,7 +813,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					switch (this.batteryType) {
 					case 6: //Eneloop
 						int i = 0;
-						if (this.firmwareVersion >= 111) {
+						if (this.firmwareVersion <= 111) {
 							for (; i < MC3000.cellModelCapacity111.length; i++) {
 								if (this.getCapacity() == MC3000.cellModelCapacity111[i]) {
 									sb.append(MC3000.cellModelNames111[i]);
@@ -922,7 +922,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			return this.slotBuffer;
 		}
 
-		public byte[] getBuffer(final byte newSlotNumber, final int firmwareAsNumber) {
+		public byte[] getBuffer(final byte newSlotNumber, final int firmwareAsNumber, final byte systemTemperatureUnit) {
 			byte[] reducedBuffer = new byte[64];
 			if (firmwareAsNumber <= 111) {
 				reducedBuffer[0] = 0x0F;
@@ -971,8 +971,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[25] = this.peakSenseVoltage;
 				reducedBuffer[26] = this.trickleCurrent;
 				reducedBuffer[27] = this.trickleTime;
-				reducedBuffer[28] = this.getCutTemperatureC();
-				System.arraycopy(this.slotBuffer, 26, reducedBuffer, 29, 3);//cut time
+				reducedBuffer[28] = this.getCutTemperature(systemTemperatureUnit);
+				System.arraycopy(this.slotBuffer, 27, reducedBuffer, 29, 2);//cut time
 				System.arraycopy(this.slotBuffer, 24, reducedBuffer, 31, 2);//restart voltage
 				reducedBuffer[33] = MC3000UsbPort.calculateCheckSum(reducedBuffer, reducedBuffer[1]);
 				reducedBuffer[34] = (byte) 0xFF;
@@ -1066,16 +1066,42 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			return (short) (this.trickleCurrent & 0xFF);
 		}
 
-		public short getCutTemperature() {
-			return (short) (this.cutTemperature & 0xFF);
-		}
+//		/**
+//		 * get cut temperature from buffer in °C 
+//		 * @param systemtemperatureUnit
+//		 * @return
+//		 */
+//		public byte getCutTemperatureInCelsius() {
+//			if (this.temperatureUnit == 0) //buffer temperature is °C
+//				return (byte) (this.cutTemperature & 0xFF);
+//
+//			//buffer temperature unit is °F
+//			return (byte) (((this.cutTemperature - 32)*5/9) & 0xFF);
+//		}
 
-		public byte getCutTemperatureC() {
-			if (this.temperatureUnit == 0) //°C
+		/**
+		 * get cut temperature from buffer according system cut temperature setting
+		 * @param systemtemperatureUnit
+		 * @return
+		 */
+		public byte getCutTemperature(final byte systemtemperatureUnit) {
+			switch (systemtemperatureUnit) {
+			case 1://°F = °C × 9/5 + 32
+				if (this.temperatureUnit == 0) //buffer temperature unit == °C
+					return (byte) (((int)(this.cutTemperature*1.8) + 32) & 0xFF);
+
+				//buffer temperature unit is °F
 				return (byte) (this.cutTemperature & 0xFF);
+				
 
-			//temperature unit is °F
-			return (byte) (((this.cutTemperature - 32)*5/9) & 0xFF);
+			case 0://°C = (°F − 32) * 5/9
+			default:
+				if (this.temperatureUnit == 0) //buffer temperature unit == °C
+					return (byte) (this.cutTemperature & 0xFF);
+
+				//buffer temperature unit is °F
+				return (byte) ((int)((this.cutTemperature - 32)/1.8) & 0xFF);
+			}
 		}
 
 		public int getCutTime() {
@@ -1672,6 +1698,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 */
 	public String getFirmwareString() {
 		return this.systemSettings.getFirmwareVersion();
+	}
+
+	/**
+	 * @return string containing system temperatur unit
+	 */
+	public String getTemperatureUnit() {
+		return this.systemSettings.getTemperatureUnit() == 0 ? "°C" : "°F";
 	}
 
 	/**

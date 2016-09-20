@@ -396,6 +396,8 @@ public class GathererThread extends Thread {
 				GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 				recordSet = slotChannel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
+				recordSet.get(5).setUnit(device.getTemperatureUnit());
+				recordSet.get(7).setUnit(device.getTemperatureUnit());
 				//channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(slotChannel.getNumber(), processRecordSetKey);

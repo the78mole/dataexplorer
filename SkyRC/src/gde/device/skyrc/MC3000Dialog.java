@@ -188,8 +188,9 @@ public class MC3000Dialog extends DeviceDialog {
 				}
 			}
 
-			if (readInitialSlotPrograms()) {
-				this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW3601));
+			String busyMessage = readInitialSlotPrograms();
+			if (busyMessage != null) {
+				this.application.openMessageDialog(busyMessage);
 				return;
 			}
 		}
@@ -327,6 +328,7 @@ public class MC3000Dialog extends DeviceDialog {
 										MC3000Dialog.this.isConnectedByButton = true;
 									}
 									int firmware = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt() : 0;
+									byte systemTemperatureUnit = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getTemperatureUnit() : 0;
 									byte[] tmpProgramBuffer;
 									for (int i = 0; i < 4; i++) {
 										switch (i) {
@@ -335,61 +337,61 @@ public class MC3000Dialog extends DeviceDialog {
 											//programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_0 != null ? MC3000Dialog.this.slotInitialSettings_0.toString4Tip()
 											//		: Messages.getString(MessageIds.GDE_MSGT3654));
 											if (MC3000Dialog.this.slotInitialSettings_0 != null) {
-												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_0.getBuffer((byte) 0, firmware);
+												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_0.getBuffer((byte) 0, firmware, systemTemperatureUnit);
 												MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, tmpProgramBuffer);
 												MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 														MC3000UsbPort.QuerySlotData.SLOT_0.value()), firmware);
 												MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4View() : Messages
 														.getString(MessageIds.GDE_MSGT3654));
-												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(true) : Messages
+												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(true, systemTemperatureUnit) : Messages
 														.getString(MessageIds.GDE_MSGT3654));
 											}
 											break;
 										case 1:
 											MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotInitialSettings_1 != null ? MC3000Dialog.this.slotInitialSettings_1.toString4View() : Messages
 													.getString(MessageIds.GDE_MSGT3654));
-											MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_1 != null ? MC3000Dialog.this.slotInitialSettings_1.toString4Tip(true) : Messages
+											MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_1 != null ? MC3000Dialog.this.slotInitialSettings_1.toString4Tip(true, systemTemperatureUnit) : Messages
 													.getString(MessageIds.GDE_MSGT3654));
 											if (MC3000Dialog.this.slotInitialSettings_1 != null) {
-												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_1.getBuffer((byte) 1, firmware);
+												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_1.getBuffer((byte) 1, firmware, systemTemperatureUnit);
 												MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, tmpProgramBuffer);
 												MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 														MC3000UsbPort.QuerySlotData.SLOT_1.value()), firmware);
 												MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4View() : Messages
 														.getString(MessageIds.GDE_MSGT3654));
-												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(true) : Messages
+												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(true, systemTemperatureUnit) : Messages
 														.getString(MessageIds.GDE_MSGT3654));
 											}
 											break;
 										case 2:
 											MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotInitialSettings_2 != null ? MC3000Dialog.this.slotInitialSettings_2.toString4View() : Messages
 													.getString(MessageIds.GDE_MSGT3654));
-											MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_2 != null ? MC3000Dialog.this.slotInitialSettings_2.toString4Tip(true) : Messages
+											MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_2 != null ? MC3000Dialog.this.slotInitialSettings_2.toString4Tip(true, systemTemperatureUnit) : Messages
 													.getString(MessageIds.GDE_MSGT3654));
 											if (MC3000Dialog.this.slotInitialSettings_2 != null) {
-												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_2.getBuffer((byte) 2, firmware);
+												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_2.getBuffer((byte) 2, firmware, systemTemperatureUnit);
 												MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, tmpProgramBuffer);
 												MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 														MC3000UsbPort.QuerySlotData.SLOT_2.value()), firmware);
 												MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4View() : Messages
 														.getString(MessageIds.GDE_MSGT3654));
-												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(true) : Messages
+												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(true, systemTemperatureUnit) : Messages
 														.getString(MessageIds.GDE_MSGT3654));
 											}
 											break;
 										case 3:
 											MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotInitialSettings_3 != null ? MC3000Dialog.this.slotInitialSettings_3.toString4View() : Messages
 													.getString(MessageIds.GDE_MSGT3654));
-											MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_3 != null ? MC3000Dialog.this.slotInitialSettings_3.toString4Tip(true) : Messages
+											MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotInitialSettings_3 != null ? MC3000Dialog.this.slotInitialSettings_3.toString4Tip(true, systemTemperatureUnit) : Messages
 													.getString(MessageIds.GDE_MSGT3654));
 											if (MC3000Dialog.this.slotInitialSettings_3 != null) {
-												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_3.getBuffer((byte) 3, firmware);
+												tmpProgramBuffer = MC3000Dialog.this.slotInitialSettings_3.getBuffer((byte) 3, firmware, systemTemperatureUnit);
 												MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, tmpProgramBuffer);
 												MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 														MC3000UsbPort.QuerySlotData.SLOT_3.value()), firmware);
 												MC3000Dialog.this.programLables[i].setText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4View() : Messages
 														.getString(MessageIds.GDE_MSGT3654));
-												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(true) : Messages
+												MC3000Dialog.this.programLables[i].setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(true, systemTemperatureUnit) : Messages
 														.getString(MessageIds.GDE_MSGT3654));
 											}
 											break;
@@ -467,8 +469,9 @@ public class MC3000Dialog extends DeviceDialog {
 		}
 	}
 
-	private boolean readInitialSlotPrograms() {
-		boolean isBusy = true;
+	private String readInitialSlotPrograms() {
+		boolean isBusy = false;
+		String isBusyString = null;
 		try {
 			if (!this.usbPort.isConnected()) {
 				this.usbInterface = this.usbPort.openUsbPort(this.device);
@@ -482,27 +485,35 @@ public class MC3000Dialog extends DeviceDialog {
 				this.slotInitialSettings_0 = this.device.new SlotSettings(this.slotSettings_0);
 				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
 				isBusy = this.slotInitialSettings_0.isBusy();
+				isBusyString = isBusy ? Messages.getString(MessageIds.GDE_MSGW3601) : null;
 			}
 			if (this.usbPort.isConnected() && !isBusy) {
 				this.slotSettings_1 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_1.value()), this.systemSettings.getFirmwareVersionAsInt());
 				this.slotInitialSettings_1 = this.device.new SlotSettings(this.slotSettings_1);
 				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
-				isBusy = this.slotInitialSettings_1.isBusy();
+				isBusy = this.slotInitialSettings_0.isBusy();
+				isBusyString = isBusy ? Messages.getString(MessageIds.GDE_MSGW3601) : null;
 			}
 			if (this.usbPort.isConnected() && !isBusy) {
 				this.slotSettings_2 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_2.value()), this.systemSettings.getFirmwareVersionAsInt());
 				this.slotInitialSettings_2 = this.device.new SlotSettings(this.slotSettings_2);
 				WaitTimer.delay(MC3000Dialog.USB_QUERY_DELAY);
-				isBusy = this.slotInitialSettings_2.isBusy();
+				isBusy = this.slotInitialSettings_0.isBusy();
+				isBusyString = isBusy ? Messages.getString(MessageIds.GDE_MSGW3601) : null;
 			}
 			if (this.usbPort.isConnected() && !isBusy) {
 				this.slotSettings_3 = this.device.new SlotSettings(this.usbPort.getSlotData(this.usbInterface, MC3000UsbPort.QuerySlotData.SLOT_3.value()), this.systemSettings.getFirmwareVersionAsInt());
 				this.slotInitialSettings_3 = this.device.new SlotSettings(this.slotSettings_3);
-				isBusy = this.slotInitialSettings_3.isBusy();
+				isBusy = this.slotInitialSettings_0.isBusy();
+				isBusyString = isBusy ? Messages.getString(MessageIds.GDE_MSGW3601) : null;
 			}
 		}
 		catch (Exception e) {
 			MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			if (e instanceof UsbException)
+				isBusyString = e.getMessage();
+			else 
+				isBusyString = Messages.getString(MessageIds.GDE_MSGW3601);
 		}
 		finally {
 			if (this.isConnectedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
@@ -514,7 +525,7 @@ public class MC3000Dialog extends DeviceDialog {
 				}
 			}
 		}
-		return isBusy;
+		return isBusyString;
 	}
 
 	private void createSlotGroup(final int index) {
@@ -550,34 +561,35 @@ public class MC3000Dialog extends DeviceDialog {
 				List<ProgramType> devicePrograms = MC3000Dialog.this.mc3000Setup.getProgram();
 				if (!devicePrograms.get(programmNameCombo.getSelectionIndex()).getName().contains(MC3000Dialog.NEW_PROG_NAME)) {
 					try {
+						byte systemTemperatureUnit = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getTemperatureUnit() : 0;
 						switch (index) {
 						case 0:
 							MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
 									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 							MC3000Dialog.this.slotSettings_0.setSlotNumber((byte) index);
 							label0.setText(MC3000Dialog.this.slotSettings_0.toString4View());
-							label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip(true));
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_0.toString4Tip(true, systemTemperatureUnit));
 							break;
 						case 1:
 							MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
 									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 							MC3000Dialog.this.slotSettings_1.setSlotNumber((byte) index);
 							label0.setText(MC3000Dialog.this.slotSettings_1.toString4View());
-							label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip(true));
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_1.toString4Tip(true, systemTemperatureUnit));
 							break;
 						case 2:
 							MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
 									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 							MC3000Dialog.this.slotSettings_2.setSlotNumber((byte) index);
 							label0.setText(MC3000Dialog.this.slotSettings_2.toString4View());
-							label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip(true));
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_2.toString4Tip(true, systemTemperatureUnit));
 							break;
 						case 3:
 							MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(devicePrograms.get(programmNameCombo.getSelectionIndex()).getSetupData().getValue(),
 									MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 							MC3000Dialog.this.slotSettings_3.setSlotNumber((byte) index);
 							label0.setText(MC3000Dialog.this.slotSettings_3.toString4View());
-							label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip(true));
+							label0.setToolTipText(MC3000Dialog.this.slotSettings_3.toString4Tip(true, systemTemperatureUnit));
 							break;
 
 						default:
@@ -649,22 +661,23 @@ public class MC3000Dialog extends DeviceDialog {
 		});
 		label0.setLayoutData(new RowData(350, 25));
 		label0.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		byte sysTemperatureUnit = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getTemperatureUnit() : 0;
 		switch (index) {
 		case 0:
 			label0.setText(this.slotSettings_0 != null ? this.slotSettings_0.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_0 != null ? this.slotSettings_0.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_0 != null ? this.slotSettings_0.toString4Tip(true, sysTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 		case 1:
 			label0.setText(this.slotSettings_1 != null ? this.slotSettings_1.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_1 != null ? this.slotSettings_1.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_1 != null ? this.slotSettings_1.toString4Tip(true, sysTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 		case 2:
 			label0.setText(this.slotSettings_2 != null ? this.slotSettings_2.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_2 != null ? this.slotSettings_2.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_2 != null ? this.slotSettings_2.toString4Tip(true, sysTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 		case 3:
 			label0.setText(this.slotSettings_3 != null ? this.slotSettings_3.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-			label0.setToolTipText(this.slotSettings_3 != null ? this.slotSettings_3.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+			label0.setToolTipText(this.slotSettings_3 != null ? this.slotSettings_3.toString4Tip(true, sysTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 			break;
 
 		default:
@@ -685,42 +698,43 @@ public class MC3000Dialog extends DeviceDialog {
 						MC3000Dialog.this.isConnectedByButton = true;
 					}
 					int firmware = MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt();
+					byte systemTemperatureUnit = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getTemperatureUnit() : 0;
 					byte[] newProgramBuffer;
 					switch (index) {
 					case 0:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_0.getBuffer((byte) 0, firmware);
+						newProgramBuffer = MC3000Dialog.this.slotSettings_0.getBuffer((byte) 0, firmware, systemTemperatureUnit);
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 								MC3000UsbPort.QuerySlotData.SLOT_0.value()), firmware);
 						MC3000Dialog.this.programLables[index].setText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(true) : Messages
+						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(true, systemTemperatureUnit) : Messages
 								.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 1:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_1.getBuffer((byte) 1, firmware);
+						newProgramBuffer = MC3000Dialog.this.slotSettings_1.getBuffer((byte) 1, firmware, systemTemperatureUnit);
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 								MC3000UsbPort.QuerySlotData.SLOT_1.value()), firmware);
 						MC3000Dialog.this.programLables[index].setText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(true) : Messages
+						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(true, systemTemperatureUnit) : Messages
 								.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 2:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_2.getBuffer((byte) 2, firmware);
+						newProgramBuffer = MC3000Dialog.this.slotSettings_2.getBuffer((byte) 2, firmware, systemTemperatureUnit);
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 								MC3000UsbPort.QuerySlotData.SLOT_2.value()), firmware);
 						MC3000Dialog.this.programLables[index].setText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(true) : Messages
+						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(true, systemTemperatureUnit) : Messages
 								.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 3:
-						newProgramBuffer = MC3000Dialog.this.slotSettings_3.getBuffer((byte) 3, firmware);
+						newProgramBuffer = MC3000Dialog.this.slotSettings_3.getBuffer((byte) 3, firmware, systemTemperatureUnit);
 						MC3000Dialog.this.usbPort.setSlotProgram(MC3000Dialog.this.usbInterface, newProgramBuffer);
 						MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 								MC3000UsbPort.QuerySlotData.SLOT_3.value()), firmware);
 						MC3000Dialog.this.programLables[index].setText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(true) : Messages
+						MC3000Dialog.this.programLables[index].setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(true, systemTemperatureUnit) : Messages
 								.getString(MessageIds.GDE_MSGT3654));
 						break;
 
@@ -753,19 +767,20 @@ public class MC3000Dialog extends DeviceDialog {
 		copyClipBoardButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				byte systemTemperatureUnit = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getTemperatureUnit() : 0;
 				String data = new String();
 				switch (index) {
 				case 0:
-					data = MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(false) : Messages.getString(MessageIds.GDE_MSGT3654);
+					data = MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(false, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654);
 					break;
 				case 1:
-					data = MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(false) : Messages.getString(MessageIds.GDE_MSGT3654);
+					data = MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(false, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654);
 					break;
 				case 2:
-					data = MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(false) : Messages.getString(MessageIds.GDE_MSGT3654);
+					data = MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(false, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654);
 					break;
 				case 3:
-					data = MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(false) : Messages.getString(MessageIds.GDE_MSGT3654);
+					data = MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(false, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654);
 					break;
 				default:
 					break;
@@ -790,34 +805,35 @@ public class MC3000Dialog extends DeviceDialog {
 						MC3000Dialog.this.isConnectedByButton = true;
 					}
 
+					byte systemTemperatureUnit = MC3000Dialog.this.systemSettings != null ? MC3000Dialog.this.systemSettings.getTemperatureUnit() : 0;
 					switch (index) {
 					case 0:
 						if (MC3000Dialog.this.usbPort.isConnected())
 							MC3000Dialog.this.slotSettings_0 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 									MC3000UsbPort.QuerySlotData.SLOT_0.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_0 != null ? MC3000Dialog.this.slotSettings_0.toString4Tip(true, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 1:
 						if (MC3000Dialog.this.usbPort.isConnected())
 							MC3000Dialog.this.slotSettings_1 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 									MC3000UsbPort.QuerySlotData.SLOT_1.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_1 != null ? MC3000Dialog.this.slotSettings_1.toString4Tip(true, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 2:
 						if (MC3000Dialog.this.usbPort.isConnected())
 							MC3000Dialog.this.slotSettings_2 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 									MC3000UsbPort.QuerySlotData.SLOT_2.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_2 != null ? MC3000Dialog.this.slotSettings_2.toString4Tip(true, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 						break;
 					case 3:
 						if (MC3000Dialog.this.usbPort.isConnected())
 							MC3000Dialog.this.slotSettings_3 = MC3000Dialog.this.device.new SlotSettings(MC3000Dialog.this.usbPort.getSlotData(MC3000Dialog.this.usbInterface,
 									MC3000UsbPort.QuerySlotData.SLOT_3.value()), MC3000Dialog.this.systemSettings.getFirmwareVersionAsInt());
 						label0.setText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4View() : Messages.getString(MessageIds.GDE_MSGT3654));
-						label0.setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(true) : Messages.getString(MessageIds.GDE_MSGT3654));
+						label0.setToolTipText(MC3000Dialog.this.slotSettings_3 != null ? MC3000Dialog.this.slotSettings_3.toString4Tip(true, systemTemperatureUnit) : Messages.getString(MessageIds.GDE_MSGT3654));
 						break;
 
 					default:
