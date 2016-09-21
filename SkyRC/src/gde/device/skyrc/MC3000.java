@@ -419,7 +419,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3671), this.getDischargeCutVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
 			}
 			//CUT TEMP:
-			if (this.cutTemperature >= 20)
+			if ((systemTemperatureUnit == 0 && (this.cutTemperature & 0xFF) >= 20) || (systemTemperatureUnit == 1 && (this.cutTemperature & 0xFF) >= 68)) //0==°C; 1==°F
 				sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), (this.getCutTemperature(systemTemperatureUnit) & 0xFF), systemTemperatureUnit == 0 ? "°C" : "°F"));
 			else
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
@@ -971,7 +971,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				reducedBuffer[25] = this.peakSenseVoltage;
 				reducedBuffer[26] = this.trickleCurrent;
 				reducedBuffer[27] = this.trickleTime;
-				reducedBuffer[28] = this.getCutTemperature(systemTemperatureUnit);
+				reducedBuffer[28] = (byte) this.getCutTemperature(systemTemperatureUnit);
 				System.arraycopy(this.slotBuffer, 27, reducedBuffer, 29, 2);//cut time
 				System.arraycopy(this.slotBuffer, 24, reducedBuffer, 31, 2);//restart voltage
 				reducedBuffer[33] = MC3000UsbPort.calculateCheckSum(reducedBuffer, reducedBuffer[1]);
@@ -1084,23 +1084,23 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		 * @param systemtemperatureUnit
 		 * @return
 		 */
-		public byte getCutTemperature(final byte systemtemperatureUnit) {
+		public short getCutTemperature(final byte systemtemperatureUnit) {
 			switch (systemtemperatureUnit) {
 			case 1://°F = °C × 9/5 + 32
 				if (this.temperatureUnit == 0) //buffer temperature unit == °C
-					return (byte) (((int)(this.cutTemperature*1.8) + 32) & 0xFF);
+					return (short) (((int)(this.cutTemperature*1.8) + 32) & 0xFF);
 
 				//buffer temperature unit is °F
-				return (byte) (this.cutTemperature & 0xFF);
+				return (short) (this.cutTemperature & 0xFF);
 				
 
 			case 0://°C = (°F − 32) * 5/9
 			default:
 				if (this.temperatureUnit == 0) //buffer temperature unit == °C
-					return (byte) (this.cutTemperature & 0xFF);
+					return (short) (this.cutTemperature & 0xFF);
 
 				//buffer temperature unit is °F
-				return (byte) ((int)((this.cutTemperature - 32)/1.8) & 0xFF);
+				return (short) ((int)((this.cutTemperature - 32)/1.8) & 0xFF);
 			}
 		}
 
