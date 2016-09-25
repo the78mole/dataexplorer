@@ -23,6 +23,7 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.ChannelTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -242,7 +243,10 @@ public class GathererThread extends Thread {
 										recordSetKey5 = recordSetKey5.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey5 : recordSetKey5.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 										slotChannel.put(recordSetKey5, RecordSet.createRecordSet(recordSetKey5, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
-										slotChannel.applyTemplateBasics(recordSetKey5);
+										if (slotChannel.getType() == ChannelTypes.TYPE_CONFIG) 
+											slotChannel.applyTemplate(recordSetKey5, false);
+										else
+											slotChannel.applyTemplateBasics(recordSetKey5);
 										GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey5 + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 										recordSet5 = slotChannel.get(recordSetKey5);
 										recordSet5.setAllDisplayable();
@@ -392,7 +396,12 @@ public class GathererThread extends Thread {
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
-				slotChannel.applyTemplateBasics(processRecordSetKey);
+
+				if (slotChannel.getType() == ChannelTypes.TYPE_CONFIG) 
+					slotChannel.applyTemplate(processRecordSetKey, false);
+				else
+					slotChannel.applyTemplateBasics(processRecordSetKey);
+
 				GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 				recordSet = slotChannel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
