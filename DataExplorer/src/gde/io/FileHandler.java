@@ -75,7 +75,7 @@ public class FileHandler {
 			return;
 		}
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String devicePath = getDevicePath();
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, null, SWT.SINGLE);
 		if (csvFileDialog.getFileName().length() > 4) {
@@ -130,7 +130,7 @@ public class FileHandler {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String devicePath = getDevicePath();
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal(true));
 		String recordSetKey = activeRecordSet.getName();
@@ -225,7 +225,7 @@ public class FileHandler {
 				path = this.application.getObjectFilePath();
 			}
 			else {
-				String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+				String devicePath = getDevicePath();
 				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
 				if (!FileUtils.checkDirectoryAndCreate(path)) {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
@@ -243,6 +243,21 @@ public class FileHandler {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
 			}
 		}
+	}
+
+	/**
+	 * @return device path to store or read files
+	 */
+	private String getDevicePath() {
+		String devicePath = GDE.FILE_SEPARATOR_UNIX;
+		if (this.application.getActiveDevice() != null) {
+			if (this.application.getActiveDevice().getName().startsWith("MC3000")) {
+				devicePath = GDE.FILE_SEPARATOR_UNIX + "MC3000";
+			}
+			else
+			 devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName();
+		}
+		return devicePath;
 	}
 
 	/**
@@ -337,7 +352,7 @@ public class FileHandler {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String devicePath = getDevicePath();
 		String path = deviceSetting.getDataFilePath() + devicePath;
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
@@ -511,7 +526,7 @@ public class FileHandler {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String devicePath = getDevicePath();
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
 		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
@@ -586,7 +601,7 @@ public class FileHandler {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String devicePath = getDevicePath();
 		String path = isExportTmpDir ? GDE.JAVA_IO_TMPDIR : (deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX);
 		FileUtils.checkDirectoryAndCreate(path);
 		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName());
@@ -653,7 +668,7 @@ public class FileHandler {
 			}
 	
 			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+			String devicePath = getDevicePath();
 			String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 			String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
 			fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
@@ -714,7 +729,7 @@ public class FileHandler {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String devicePath = getDevicePath();
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
 		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
