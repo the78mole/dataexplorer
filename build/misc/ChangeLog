@@ -5,6 +5,9 @@ MC3000
 	- fix setting slot programs with capabilities of FW >= 1.12
 	- add device XML with TYPE_CONFIG as MC3000-Set to enable single file for all 4 slots, all batteries are a set
 	- fix handling with different temperature units and unit switch
+	- extend help info to describe difference between MC3000 and MC3000-Set
+GPS-Logger2
+	- correct maximal number of measurements using file I/O data block -52
 HoTTAdapterX
 	- refine log content analyze to distinguish between HoTT V2 and the normal HoTT V4 content
 HoTTAdapter*
