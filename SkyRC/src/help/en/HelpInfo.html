@@ -27,7 +27,21 @@
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>SkyRC MC3000 Device Dialog</I></FONT></FONT></H2>
+	<H2><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>SkyRC MC3000</I></FONT></FONT></H2>
+</DIV>
+<P>
+The MC3000 is providing two device descriptions. 
+A <B>MC3000-Set</B> is storing all collected data sets in a single file. 
+It makes sense to choose continuous record set in settings. 
+This will help to keep track of the slot to data set relation. 
+In such a case four simultaneously processed batteries will result in one record set per battery and all four record sets will be stored in a single file. 
+</BR>
+A <B>MC3000</B> treat each slot independent of the other. 
+Each slot has a separate sequence of record sets. 
+This will result in one file for each slot and battery since each battery does not have a relation to the others.
+</P>
+<DIV TYPE=HEADER>
+	<H3><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>Device Dialog</I></FONT></FONT></H2>
 </DIV>
 <P>The device dialog enables the user to configure the four slots with temporary programs (set) which were once stored programs on the device themselves and subsequently backed up with this very dialog. It makes sense to make a backup of the device programs because they can get overwritten by other users or erased by a device reset or a firmware update. DataExplorer automatically creates an internal database allocating up to 30 spots for memorizing or backing up device programs, which are likewise automatically available in a direct manner as soon as the device dialog is launched (read all). Most of the widgets in this dialog have a tool tip to help the user understand their functionality.
 </P>

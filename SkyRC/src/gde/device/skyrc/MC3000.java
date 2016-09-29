@@ -418,11 +418,27 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			else {
 				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3671), this.getDischargeCutVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
 			}
+
 			//CUT TEMP:
-			if ((systemTemperatureUnit == 0 && (this.cutTemperature & 0xFF) >= 20) || (systemTemperatureUnit == 1 && (this.cutTemperature & 0xFF) >= 68)) //0==°C; 1==°F
-				sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), (this.getCutTemperature(systemTemperatureUnit) & 0xFF), systemTemperatureUnit == 0 ? "°C" : "°F"));
-			else
-				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
+			switch (systemTemperatureUnit) {
+			case 1: //°F
+				if (this.getCutTemperature(systemTemperatureUnit) >= 68) {
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), this.getCutTemperature(systemTemperatureUnit), systemTemperatureUnit == 0 ? "°C" : "°F"));
+				} else {
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
+				}
+				break;
+
+			case 0: //°C
+			default:
+				if (this.getCutTemperature(systemTemperatureUnit) >= 20) {
+					sb.append(String.format(Locale.ENGLISH, "%-14s %d%s", Messages.getString(MessageIds.GDE_MSGT3672), this.getCutTemperature(systemTemperatureUnit), systemTemperatureUnit == 0 ? "°C" : "°F"));
+				} else {
+					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3672)));
+				}
+				break;
+			}
+
 			//CUT TIME:			
 			if ((this.batteryType == 3 || this.batteryType == 4 || this.batteryType == 6) && this.operationMode == 2) {// NiMH, NiCd, Eneloop & break_in
 				if (!isToolTip) sb.append(GDE.LINE_SEPARATOR).append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3673)));
@@ -987,7 +1003,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 													"slot#=%02d BATT TYPE=%02d MODE=%02d CAPACITY=%04d C.CURRENT=%04d D.CURRENT=%04d D.REDUCE=%04d TARGET VOLT=%04d D.REDUCE=%04d TERMINATION=%04d CYCLE COUNT=%02d C.RESTING=%02d CYCLE MODE=%d DELTA PEAK=%02d TRICKLE C=%02d CUT TEMP=%02d CUT TIME=%03d RESTART VOLT=%04d",
 													reducedBuffer[4], reducedBuffer[5], this.operationMode, (reducedBuffer[6] & 0xFF) * 100, getChargeCurrent(), getDischargeCurrent(), getDischargeReduceCurrent(),
 													getChargeEndVoltage(), getDischargeReduceCurrent(), getChargeEndCurrent(), this.numberCycle, this.chargeRestingTime & 0xFF, this.cycleMode, this.peakSenseVoltage,
-													this.trickleCurrent, this.cutTemperature, DataParser.parse2UnsignedShort(reducedBuffer[27], reducedBuffer[26]),
+													this.trickleCurrent, this.getCutTemperature(systemTemperatureUnit), DataParser.parse2UnsignedShort(reducedBuffer[27], reducedBuffer[26]),
 													DataParser.parse2UnsignedShort(reducedBuffer[29], reducedBuffer[28])));
 				}
 
@@ -1088,7 +1104,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			switch (systemtemperatureUnit) {
 			case 1://°F = °C × 9/5 + 32
 				if (this.temperatureUnit == 0) //buffer temperature unit == °C
-					return (short) (((int)(this.cutTemperature*1.8) + 32) & 0xFF);
+					return (short) (((this.cutTemperature&0xFF)*1.8) + 32);
 
 				//buffer temperature unit is °F
 				return (short) (this.cutTemperature & 0xFF);
@@ -1100,7 +1116,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					return (short) (this.cutTemperature & 0xFF);
 
 				//buffer temperature unit is °F
-				return (short) ((int)((this.cutTemperature - 32)/1.8) & 0xFF);
+				return (short) (((this.cutTemperature&0xFF) - 32)/1.8);
 			}
 		}
 
