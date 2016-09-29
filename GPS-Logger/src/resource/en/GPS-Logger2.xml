@@ -15,7 +15,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="-47"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="-52"/>
         <checkSum type="XOR"/>
         <timeUnit>msec</timeUnit>
         <separator>comma</separator>
