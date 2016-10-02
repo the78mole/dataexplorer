@@ -850,11 +850,11 @@ public class Settings extends Properties {
 	 */
 	public String getDataFilePath() {
 		final String $METHOD_NAME = "getDataFilePath"; //$NON-NLS-1$
-		String dataPath = this.getProperty(Settings.DATA_FILE_PATH, GDE.FILE_SEPARATOR_UNIX).replace("\\\\", GDE.FILE_SEPARATOR_UNIX).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+		String dataPath = this.getProperty(Settings.DATA_FILE_PATH, System.getProperty("user.home")).replace("\\\\", GDE.FILE_SEPARATOR_UNIX).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "dataFilePath = " + dataPath); //$NON-NLS-1$
 		return dataPath.trim();
 	}
-
+	
 	/**
 	 * set the default dataFilePath
 	 */
