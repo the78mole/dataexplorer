@@ -2236,7 +2236,7 @@ public class DeviceConfiguration {
 	 * @return the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
 	 */
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		return null;
+		return -1;
 	}
 	
 	/**
