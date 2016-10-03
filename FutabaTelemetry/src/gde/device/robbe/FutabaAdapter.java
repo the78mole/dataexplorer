@@ -602,15 +602,12 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		int ordinal = -1;
 		RecordSet actualRecordSet = this.application.getActiveRecordSet();
 		if (actualRecordSet != null) {
 			if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
-				ordinal = findRecordByUnit(actualRecordSet, "km/h");
-
-			ordinal = this.kmzMeasurementOrdinal;
+				return findRecordByUnit(actualRecordSet, "km/h");
 		}
-		return ordinal;
+		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
 
 	/**
