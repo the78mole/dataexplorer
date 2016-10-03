@@ -14,6 +14,20 @@ HoTTAdapterX
 	- refine log content analyze to distinguish between HoTT V2 and the normal HoTT V4 content
 HoTTAdapter*
 	- enable reading 'GRAUPNER SD LOG8' which contains normal HoTT V4 sensor data 
+Futaba-Telemetry
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+GigaLogger
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+IISI-Cockpit V2
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+JetiAdapter
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+NMEAAdapter
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+OpenTxTelemetry
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+Weatronic-Telemetry
+	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 
 Version 3.2.7 - 11 Sep 2016
 - correct statistics calculation in regard of using max or average calculated using measurement reference ordinal
