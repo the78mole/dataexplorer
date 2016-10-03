@@ -564,7 +564,7 @@ importCsvFiles();	}
 		if (this.kmzMeasurementOrdinal == null && actualRecordSet != null) {
 			return findRecordByUnit(this.application.getActiveRecordSet(), "km/h");
 		}
-		return this.kmzMeasurementOrdinal;
+		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
 
 	/**
