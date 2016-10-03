@@ -481,7 +481,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case SPEED:
-						if (record.getName().startsWith("Rx")) return record.getOrdinal();
+						if (record.getName().startsWith("Rx")) 
+							return record.getOrdinal();
 						break;
 					default:
 						break;
@@ -489,7 +490,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 		}
-		return this.kmzMeasurementOrdinal;
+		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
 
 	/**
