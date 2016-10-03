@@ -1,57 +1,58 @@
-GNU DataExplorer - News - comes with version 3.2.7 - 11 Sep 2016
+GNU DataExplorer - News - comes with version 3.2.8 - 03 Oct 2016
 
 1) remove the restriction re-naming compressed OSD-Files
 2) exchange the default value of data file path to user.home instead of using root which causing permission errors
 3) MC3000
-	- fix setting slot programs with capabilities of FW >= 1.12
-	- add device XML with TYPE_CONFIG as MC3000-Set to enable single file for all 4 slots, all batteries are a set
-	- fix handling with different temperature units and unit switch
-	- extend help info to describe difference between MC3000 and MC3000-Set
+    - fix setting slot programs with capabilities of FW >= 1.12
+    - add device XML with TYPE_CONFIG as MC3000-Set to enable single file for all 4 slots, all batteries are a set
+    - fix handling with different temperature units and unit switch
+    - extend help info to describe difference between MC3000 and MC3000-Set
 4) GPS-Logger2
-	- correct maximal number of measurements using file I/O data block -52, require manual exchange by deleting GPS-Logger2.xml
+    - correct maximal number of measurements using file I/O data block -52, require manual exchange by deleting GPS-Logger2.xml
 5) HoTTAdapterX
-	- refine log content analyze to distinguish between HoTT V2 and the normal HoTT V4 content
+    - refine log content analyze to distinguish between HoTT V2 and the normal HoTT V4 content
 6) HoTTAdapter*
-	- enable reading 'GRAUPNER SD LOG8' which contains normal HoTT V4 sensor data 
+    - enable reading 'GRAUPNER SD LOG8' which contains normal HoTT V4 sensor data
 7) Futaba-Telemetry
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 8) GigaLogger
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 9) IISI-Cockpit V2
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 10) JetiAdapter
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 11) NMEAAdapter
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 12) OpenTxTelemetry
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 13) Weatronic-Telemetry
-	- correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
+    - correct error in getGPS2KMZMeasurementOrdinal used to set up the Google Earth configuration dialog
 
-1) entferne die Restriktion, dass komrimierte OSD-Dateien nicht umbenannt werden können
+1) entferne die Restriktion, dass komprimierte OSD-Dateien nicht umbenannt werden können
 2) bei nicht gesetztem Standard-Datenpfad in den Einstellungen wir ketzt user.home anstatt das Wurzelverzeichnis verwendet
 3) MC3000
-	- Korrektur von Schachtprogrammierung für Firmware-Versionen > 1.11
-	- MC3000-Set als Gerätebeschreibung hinzugefügt, hier werden alle Schächte als Set behandelt und in einer Datei gesichert
-	- die Behandlung mit unterschiedlichen Temperatureinheiten wurde korrigiert
-	- erweiterte Hilfeinformation für MC3000 und MC3000-Set
+    - Korrektur von Schachtprogrammierung für Firmware-Versionen > 1.11
+    - MC3000-Set als Gerätebeschreibung hinzugefügt, hier werden alle Schächte als Set behandelt und in einer Datei gesichert
+    - die Behandlung mit unterschiedlichen Temperatureinheiten wurde korrigiert
+    - erweiterte Hilfeinformation für MC3000 und MC3000-Set
 4) GPS-Logger2
-	- Korrektur der maximalen Anzahl vom Messwerten im Konfigurationsblock "file I/O", manueller Tausch durch löschen der GPS-Logger2.xml
+    - Korrektur der maximalen Anzahl vom Messwerten im Konfigurationsblock "file I/O", manueller Tausch durch löschen der GPS-Logger2.xml
 5) HoTTAdapterX
-	- verbesserte Log-Inhalt-Analyse um zwischen HoTT V2 und normalen HoTT V4 Log-Daten unterscheiden zu können
+    - verbesserte Log-Inhalt-Analyse um zwischen HoTT V2 und normalen HoTT V4 Log-Daten unterscheiden zu können
 6) HoTTAdapter*
-	- Ermögliche 'GRAUPNER SD LOG8' mit HoTT V4 Log-Daten zu lesen 
+    - Ermögliche 'GRAUPNER SD LOG8' mit HoTT V4 Log-Daten zu lesen
 7) Futaba-Telemetry
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
 8) GigaLogger
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
 9) IISI-Cockpit V2
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
 10) JetiAdapter
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
 11) NMEAAdapter
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
 12) OpenTxTelemetry
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
 13) Weatronic-Telemetry
-	- Korrektur in getGPS2KMZMeasurementOrdinal, wird im GooGle Earth Konfigurations-Dialog benutzt
+    - Korrektur in getGPS2KMZMeasurementOrdinal, wird im Google Earth Konfigurations-Dialog benutzt
+
