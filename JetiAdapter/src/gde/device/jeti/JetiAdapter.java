@@ -610,7 +610,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 				if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 					return activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED); 
 
-				return this.kmzMeasurementOrdinal;
+				return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 			}
 		}
 		return -1;
