@@ -621,7 +621,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 			return 7;
 
-		return this.kmzMeasurementOrdinal;
+		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
 	
 	/**
