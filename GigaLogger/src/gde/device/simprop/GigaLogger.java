@@ -576,7 +576,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 		if (this.kmzMeasurementOrdinal == null && this.application.getActiveRecordSet() != null) // keep usage as initial supposed and use speed measurement ordinal
 			return findRecordByUnit(this.application.getActiveRecordSet(), "km/h");
 
-		return this.kmzMeasurementOrdinal;
+		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
 		
 	/**
