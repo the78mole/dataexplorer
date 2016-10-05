@@ -80,7 +80,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * Dialog class to adjust application wide properties
- * @author Winfried Br��gmann
+ * @author Winfried Bruegmann
  */
 public class SettingsDialog extends Dialog {
 	final static Logger									log											= Logger.getLogger(SettingsDialog.class.getName());
