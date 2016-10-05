@@ -1073,32 +1073,32 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "helpToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-								if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {
-									MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().notifyListeners(SWT.Help, new Event());
-								}
-								else {
-									for (CTabItem tabItem : MenuToolBar.this.application.getTabFolder().getItems()) {
-										if (!tabItem.isDisposed()&& tabItem.getControl().isVisible()) {
-											if (tabItem.getControl().isListening(SWT.Help)) {
-												tabItem.getControl().notifyListeners(SWT.Help, new Event());
-												break;
-											}
-											else if (tabItem instanceof GraphicsWindow) {
-												((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
-											}
-											else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
-												if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
-													try {
-														MenuToolBar.this.application.openHelpDialog(FileUtils.getJarFileNameOfDevice(MenuToolBar.this.application.getActiveDevice().getDeviceConfiguration()), "HelpInfo.html");//$NON-NLS-1$
-													}
-													catch (Throwable e) {
-														//ignore
-													} 	
+							if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {
+								MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().notifyListeners(SWT.Help, new Event());
+							}
+							else {
+								for (CTabItem tabItem : MenuToolBar.this.application.getTabFolder().getItems()) {
+									if (!tabItem.isDisposed() && tabItem.getControl() != null && tabItem.getControl().isVisible()) {
+										if (tabItem.getControl() != null && tabItem.getControl().isListening(SWT.Help)) {
+											tabItem.getControl().notifyListeners(SWT.Help, new Event());
+											break;
+										}
+										else if (tabItem instanceof GraphicsWindow) {
+											((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
+										}
+										else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
+											if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
+												try {
+													MenuToolBar.this.application.openHelpDialog(FileUtils.getJarFileNameOfDevice(MenuToolBar.this.application.getActiveDevice().getDeviceConfiguration()), "HelpInfo.html");//$NON-NLS-1$
 												}
+												catch (Throwable e) {
+													//ignore
+												} 	
 											}
 										}
 									}
 								}
+							}
 						}
 					});
 				}
