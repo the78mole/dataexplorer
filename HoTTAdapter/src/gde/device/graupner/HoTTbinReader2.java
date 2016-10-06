@@ -1164,7 +1164,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				HoTTbinReader.pointsSpeedControl[65] = HoTTbinReader.tmpTemperatureFet * 1000;
 
 				HoTTbinReader.pointsSpeedControl[66] = (_buf2[9] - 20) * 1000;
-			  //87=Voltage_min, 88=Current_max, 89=Revolution_max, 90=Temperature1_max, 91=Temperature2_max
+			  //67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
 				HoTTbinReader.pointsSpeedControl[67] = DataParser.parse2Short(_buf1, 5) * 1000;
 				HoTTbinReader.pointsSpeedControl[68] = DataParser.parse2Short(_buf2, 3) * 1000;
 				HoTTbinReader.pointsSpeedControl[69] = DataParser.parse2Short(_buf2, 7) * 1000;
