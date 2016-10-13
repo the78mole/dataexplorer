@@ -232,6 +232,7 @@ public class HoTTbinReader {
 		}
 		finally {
 			if (data_in != null) data_in.close();
+			if (file_input != null) file_input.close();
 		}
 		return fileInfo;
 	}
@@ -261,14 +262,21 @@ public class HoTTbinReader {
 	 * @throws Exception 
 	 */
 	public static synchronized void read(String filePath) throws Exception {
-		HashMap<String, String> header = getFileInfo(new File(filePath));
+		File file = null;
+		try {
+			HashMap<String, String> header = getFileInfo(new File(filePath));
 
-		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
-			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
+			if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
+				HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+				readSingle(file = new File(header.get(HoTTAdapter.FILE_PATH)));
+			}
+			else
+				readMultiple(file = new File(header.get(HoTTAdapter.FILE_PATH)));
 		}
-		else
-			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)));
+		finally {
+			if (file != null && file.getName().startsWith("~") && file.exists())
+				file.delete();
+		}
 	}
 
 	/**
