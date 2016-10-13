@@ -132,7 +132,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			SWTResourceManager.registerResourceUser(dialogShell);
-			dialogShell.setText("Zusatzmesswert-Konfiguration");
+			dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0283));
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();			
@@ -453,7 +453,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					averageLabelLData.width = 115;
 					averageLabelLData.height = 22;
 					averageLabel.setLayoutData(averageLabelLData);
-					averageLabel.setText("Mittelwert");
+					averageLabel.setText(Messages.getString(MessageIds.GDE_MSGT0678));
 					averageLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0679));
 				}
 				{
