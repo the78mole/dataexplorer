@@ -1,5 +1,3 @@
-build
-bin
-classes
+/classes
 .DS_Store
 */**/.DS_Store
