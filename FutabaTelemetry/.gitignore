@@ -1,4 +1,5 @@
 build
-/classes
+classes
+bin
 .DS_Store
 */**/.DS_Store
