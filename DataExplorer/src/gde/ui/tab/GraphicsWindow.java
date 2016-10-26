@@ -50,6 +50,7 @@ public class GraphicsWindow extends CTabItem {
 	public static final int				TYPE_NORMAL							= 0;
 	public static final int				TYPE_COMPARE						= 1;
 	public static final int				TYPE_UTIL								= 2;
+	public static final int				TYPE_HISTO								= 3;
 	public static final String		WINDOW_TYPE							= "window_type"; //$NON-NLS-1$
 
 	final CTabFolder							tabFolder;

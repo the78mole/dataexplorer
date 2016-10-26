@@ -30,46 +30,60 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class TimeSteps extends Vector<Long> {
-	final static String			$CLASS_NAME				= RecordSet.class.getName();
-	final static long				serialVersionUID	= 26031957;
-	final static Logger			log								= Logger.getLogger(RecordSet.class.getName());
+	final static String			$CLASS_NAME					= RecordSet.class.getName();
+	final static long				serialVersionUID		= 26031957;
+	final static Logger			log									= Logger.getLogger(RecordSet.class.getName());
 
-	final boolean						isConstant;				// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
-	final SimpleDateFormat	timeFormat				= new SimpleDateFormat("HH:mm:ss.SSS");
-	final SimpleDateFormat	absoluteTimeFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	long  startTimeStamp_ms 									= 0;
-	
+	final boolean						isConstant;																														// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
+	final SimpleDateFormat	timeFormat					= new SimpleDateFormat("HH:mm:ss.SSS");
+	final SimpleDateFormat	absoluteTimeFormat	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	long										startTimeStamp_ms		= 0;
+
 	/**
 	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
 	 * This class should hide time step calculations for constant or individual time steps of a device.
 	 * @param newTimeStep_ms
 	 */
 	public TimeSteps(double newTimeStep_ms) {
-		super(1, 1);
+		super(newTimeStep_ms < 0 ? 5555 : 5, 11111); // TODO find better solution; has 20-30% better performance (test data: 113,366 timeSteps, 23 measurements), reason is the vector doubling mechanism
+		// mein Vorschlag wäre: super(newTimeStep_ms < 0 ? 9999 : 5);
 		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
-		if (this.isConstant) 
-			super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
+		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
 		this.startTimeStamp_ms = new Date().getTime();
 	}
-	
+
+	/**
+	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
+	 * This class should hide time step calculations for constant or individual time steps of a device.
+	 * @param newTimeStep_ms
+	 * @param initialCapacity
+	 */
+	public TimeSteps(double newTimeStep_ms, int initialCapacity) {
+		super(initialCapacity);
+		this.timeFormat.getTimeZone().setRawOffset(0);
+		this.isConstant = newTimeStep_ms > 0;
+		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
+		this.startTimeStamp_ms = new Date().getTime();
+	}
+
 	/**
 	 * copy constructor
 	 */
 	private TimeSteps(TimeSteps toBeClonedTimeSteps) {
-  	super(toBeClonedTimeSteps);
-  	this.isConstant = toBeClonedTimeSteps.isConstant;
+		super(toBeClonedTimeSteps);
+		this.isConstant = toBeClonedTimeSteps.isConstant;
 		this.startTimeStamp_ms = toBeClonedTimeSteps.startTimeStamp_ms;
 	}
-	
+
 	/**
 	 * copy constructor
 	 */
 	private TimeSteps(TimeSteps toBeClonedTimeSteps, int index, boolean isFromBegin) {
-  	super(toBeClonedTimeSteps);
-  	this.clear();
-  	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
-			this.startTimeStamp_ms = isFromBegin ? toBeClonedTimeSteps.startTimeStamp_ms + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTimeStamp_ms;
+		super(toBeClonedTimeSteps);
+		this.clear();
+		if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
+			this.startTimeStamp_ms = isFromBegin ? toBeClonedTimeSteps.startTimeStamp_ms + toBeClonedTimeSteps.get(index) / 10 : toBeClonedTimeSteps.startTimeStamp_ms;
 			if (isFromBegin) {
 				long cutOffVal = toBeClonedTimeSteps.get(index);
 				for (int i = index; i < toBeClonedTimeSteps.elementCount; i++) {
@@ -82,33 +96,32 @@ public class TimeSteps extends Vector<Long> {
 				}
 			}
 		}
-  	else {
-  		this.startTimeStamp_ms = toBeClonedTimeSteps.startTimeStamp_ms;
+		else {
+			this.startTimeStamp_ms = toBeClonedTimeSteps.startTimeStamp_ms;
 			this.add(toBeClonedTimeSteps.get(0));
-  	}
-  	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+		}
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 	}
-	
+
 	/**
 	 * overwritten clone method
 	 */
 	@Override
 	public synchronized TimeSteps clone() {
 		super.clone();
-  	return new TimeSteps(this);
-  }
-	
+		return new TimeSteps(this);
+	}
+
 	/**
 	 * clone method re-writes time steps
 	 * - if isFromBegin == true, the given index is the index where the record starts after this operation
 	 * - if isFromBegin == false, the given index represents the last data point index of the records.
 	 */
 	public synchronized TimeSteps clone(int index, boolean isFromBegin) {
-  	return new TimeSteps(this, index, isFromBegin);
-  }
-	
+		return new TimeSteps(this, index, isFromBegin);
+	}
 
- 	/**
+	/**
 	 * query the delta time in msec between two index positions
 	 * @param indexStart
 	 * @param indexEnd
@@ -145,32 +158,100 @@ public class TimeSteps extends Vector<Long> {
 	 * @return time fit to index
 	 */
 	public String getFormattedTime(String formatPattern, int index, boolean isAbsolute) {
-		this.timeFormat.applyPattern(formatPattern);			
+		this.timeFormat.applyPattern(formatPattern);
 		return String.format("%25s", isAbsolute ? this.getIndexDateTime(index) : this.timeFormat.format(this.getTime_ms(index)));
 	}
 
 	/**
-	 * add a new time step
-	 * @param value
+	 * add a new time step without conversion overhead.
+	 * @param time_100ns in 0.1 ms (divide by 10 to get ms)
 	 * @return true if add was successful
 	 */
-	public synchronized boolean add(double value) {
+	public synchronized boolean addRaw(long time_100ns) {
 		synchronized (this) {
-			return this.isConstant ? true : super.add(Double.valueOf(value * 10).longValue());
+			return this.isConstant ? true : super.add(time_100ns);
 		}
 	}
-	
+
+	/**
+	 * add a new time step
+	 * @param value_ms in ms
+	 * @return true if add was successful
+	 */
+	public synchronized boolean add(double value_ms) {
+		synchronized (this) {
+			return this.isConstant ? true : super.add((long) (value_ms * 10));
+		}
+	}
+
 	/**
 	 * @return the const. time step in msec
 	 */
 	public double getAverageTimeStep_ms() {
 		try {
-			return this.isConstant ? this.getTime_ms(1) : (this.elementCount > 2 ? (double)this.lastElement()/(elementCount-1)/10.0 : this.get(1)/10.0);
+			return this.isConstant ? this.getTime_ms(1) : (this.elementCount > 2 ? (double) this.lastElement() / (elementCount - 1) / 10.0 : this.get(1) / 10.0);
 		}
 		catch (Exception e) {
 			// a redraw event where the record set has no records 
 			return 0.0;
-		} 
+		}
+	}
+
+	/**
+	 * @return the minimum time step in msec
+	 */
+	public double getMinimumTimeStep_ms() {
+		if (this.isConstant || this.elementCount < 2) {
+			return this.getTime_ms(1);
+		}
+		else {
+			double minimumTimeStep = Double.MAX_VALUE;
+			for (double timeStep : this) {
+				if (minimumTimeStep > timeStep) {
+					minimumTimeStep = timeStep;
+				}
+			}
+			return minimumTimeStep / 10.;
+		}
+	}
+
+	/**
+	 * @return the maximum time step in msec
+	 */
+	public double getMaximumTimeStep_ms() {
+		if (this.isConstant || this.elementCount < 2) {
+			return this.getTime_ms(1);
+		}
+		else {
+			double maximumTimeStep = -Double.MAX_VALUE;
+			for (double timeStep : this) {
+				if (maximumTimeStep > timeStep) {
+					maximumTimeStep = timeStep;
+				}
+			}
+			return maximumTimeStep / 10.;
+		}
+	}
+
+	/**
+	 * @return the standard deviation of the time step population in msec
+	 */
+	public double getSigmaTimeStep_ms() {
+		if (this.isConstant || this.elementCount < 2) {
+			return 0;
+		}
+		else {
+			double avg = 0, q = 0;
+			for (int i = 0; i < this.size(); i++) {
+				double timeStep = this.get(i);
+				// https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
+				double deltaAvg = timeStep - avg;
+				avg += deltaAvg / i;
+				q += deltaAvg * (timeStep - avg);
+			}
+			log.log(Level.FINE, String.format("SD=%f", Math.sqrt(q / this.size()))); //$NON-NLS-1$
+			return Math.sqrt(q / this.size()) / 10.;
+		}
 	}
 
 	/**
@@ -179,22 +260,22 @@ public class TimeSteps extends Vector<Long> {
 	public boolean isConstant() {
 		return isConstant;
 	}
-	
+
 	/**
 	 * @return the maximum time relative to the displayable area 
 	 */
 	public double getMaxTime_ms() {
 		double maxTime = 0.0;
 		if (isConstant) {
-			maxTime = this.get(0)/10.0; 
+			maxTime = this.get(0) / 10.0;
 		}
 		else {
-			maxTime = this.elementCount > 1 ? this.lastElement()/10.0 : 0.0;
+			maxTime = this.elementCount > 1 ? this.lastElement() / 10.0 : 0.0;
 		}
 		//return isConstant ? this.get(0)*this.parent.realSize()/10.0 : this.lastElement()/10.0;
 		return maxTime;
 	}
-	
+
 	/**
 	 * Find the indexes in this time vector where the given time value is placed
 	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
@@ -228,7 +309,7 @@ public class TimeSteps extends Vector<Long> {
 			}
 		}
 		//log.log(Level.INFO, index1 + " - " + index2);
-		return new int[] {index1, index2};
+		return new int[] { index1, index2 };
 	}
 
 	/**
@@ -245,7 +326,7 @@ public class TimeSteps extends Vector<Long> {
 				index = (int) (position + 0.5);
 			}
 			else {
-				index = (int) (time_ms / (this.lastElement() / (double)(this.elementCount - 1) / 10.0) / 2.0);
+				index = (int) (time_ms / (this.lastElement() / (double) (this.elementCount - 1) / 10.0) / 2.0);
 				int value = Double.valueOf(time_ms * 10.0).intValue();
 				for (; index < elementCount; index++) {
 					if (value <= this.get(index)) break;
@@ -256,7 +337,7 @@ public class TimeSteps extends Vector<Long> {
 		//log.log(Level.INFO, "index=" + index);
 		return index;
 	}
-	
+
 	/**
 	 * set absolute start and end time of this record set
 	 * @param newStartTimeStamp_ms
@@ -272,13 +353,13 @@ public class TimeSteps extends Vector<Long> {
 	public long getStartTimeStamp() {
 		return this.startTimeStamp_ms;
 	}
-		
+
 	/**
 	 * query the formated absolute date time at index
 	 * @param index
 	 * @return
 	 */
 	public String getIndexDateTime(int index) {
-			return absoluteTimeFormat.format(this.startTimeStamp_ms + getTime_ms(index));
+		return absoluteTimeFormat.format(this.startTimeStamp_ms + getTime_ms(index));
 	}
 }

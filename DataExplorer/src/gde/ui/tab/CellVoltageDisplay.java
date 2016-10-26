@@ -96,6 +96,7 @@ public class CellVoltageDisplay extends Composite {
 		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit); //$NON-NLS-1$
 		this.application = currentApplication;
 		this.parent = useParent;
+		this.backgroundColor = Settings.getInstance().getCellVoltageInnerAreaBackground();
 		this.setBackground(this.backgroundColor);
 		GridLayout mainCompositeLayout = new GridLayout();
 		mainCompositeLayout.makeColumnsEqualWidth = true;
@@ -110,6 +111,7 @@ public class CellVoltageDisplay extends Composite {
 		this.beginSpreadVoltage = voltageLimits[3];
 		this.lowerLimitColorRed = voltageLimits[4];
 		this.lowerLimitVoltage = voltageLimits[5];
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.setMenu(this.popupmenu);
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
@@ -118,8 +120,6 @@ public class CellVoltageDisplay extends Composite {
 			}
 		});
 		
-		this.backgroundColor = Settings.getInstance().getCellVoltageInnerAreaBackground();
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
 		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 	}

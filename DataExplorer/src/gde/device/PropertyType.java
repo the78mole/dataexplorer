@@ -41,6 +41,31 @@ import gde.GDE;
 @XmlType(name = "PropertyType") //$NON-NLS-1$
 public class PropertyType implements Cloneable {
 
+	public enum ScoreType {
+		REAL_SIZE("realSize"),
+		TOTAL_READINGS("totalReadings"),
+		SAMPLED_READINGS("sampledReadings"),
+		TOTAL_PACKAGES("totalPackages"),
+		LOST_PACKAGES("lostPackages"),
+		SENSORS("sensors"),
+		LOST_PACKAGES_PERMILLE("lostPackagesPerMille"),
+		LOST_PACKAGES_AVG_MS("lostPackagesAvg_ms"),
+		LOST_PACKAGES_MIN_MS("lostPackagesMin_ms"),
+		LOST_PACKAGES_MAX_MS("lostPackagesMax_ms"),
+		LOST_PACKAGES_SIGMA_MS("lostPackagesSigma_ms"),
+		AVG_TIMESTEP_MS("averageTimeStep_ms"),
+		MIN_TIMESTEP_MS("minimumTimeStep_ms"),
+		MAX_TIMESTEP_MS("maximumTimeStep_ms"),
+		SIGMA_TIMESTEP_MS("sigmaTimeStep_ms"),
+		DURATION_MM("duration_mm");
+
+		public final String value;
+
+		private ScoreType(String v) {
+			this.value = v;
+		}
+	}
+
     @XmlAttribute(required = true)
     protected String name;
     @XmlAttribute(required = true)

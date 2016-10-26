@@ -47,7 +47,11 @@ public enum DesktopPropertyTypes {
     @XmlEnumValue("utility_garphics_tab")
     UTILITY_GRAPHICS_TAB("utility_garphics_tab"),
     @XmlEnumValue("utility_device_tab")
-    UTILITY_DEVICE_TAB("utility_device_tab");
+    UTILITY_DEVICE_TAB("utility_device_tab"),
+    @XmlEnumValue("histo_graphics_tab")
+    HISTO_GRAPHICS_TAB("histo_graphics_tab"),
+    @XmlEnumValue("histo_table_tab")
+    HISTO_TABLE_TAB("histo_table_tab");
     private final String value;
 
     DesktopPropertyTypes(String v) {

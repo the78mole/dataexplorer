@@ -5,7 +5,6 @@
 // Generated on: 2008.02.08 at 09:38:52 PM CET 
 //
 
-
 package gde.device;
 
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
 
 /**
  * <p>Java class for ChannelType complex type.
@@ -29,6 +27,9 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="Measurement" type="{}MeasurementType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
+ *       &lt;sequence>
+ *         &lt;element name="Settlement" type="{}SettlementType" maxOccurs="unbounded"/>
+ *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="type" use="required" type="{}channel_types" />
  *     &lt;/restriction>
@@ -39,46 +40,82 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ChannelType", propOrder = { //$NON-NLS-1$
-    "measurement" //$NON-NLS-1$
-})
+@XmlType(name = "ChannelType", propOrder = { "measurement", "settlement", "transition" })
 public class ChannelType {
 
-    @XmlElement(name = "Measurement", required = true) //$NON-NLS-1$
-    protected List<MeasurementType> measurement;
-    @XmlAttribute(required = true)
-    protected String name;
-    @XmlAttribute(required = true)
-    protected ChannelTypes type;
+	@XmlElement(name = "Measurement", required = true) //$NON-NLS-1$
+	protected List<MeasurementType>	measurement;
+	@XmlElement(name = "Settlement") //$NON-NLS-1$
+	protected List<SettlementType>	settlement;
+	@XmlElement(name = "Transition") //$NON-NLS-1$
+	protected List<TransitionType>	transition;
+	@XmlAttribute(required = true)
+	protected String						name;
+	@XmlAttribute(required = true)
+	protected ChannelTypes				type;
 
-    /**
-     * Gets the value of the measurement property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the measurement property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMeasurement().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link MeasurementType }
-     * 
-     * 
-     */
-    public List<MeasurementType> getMeasurement() {
-        if (this.measurement == null) {
-        	this.measurement = new ArrayList<MeasurementType>();
-        }
-        return this.measurement;
-    }
+	/**
+	 * Gets the value of the measurement property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list,
+	 * not a snapshot. Therefore any modification you make to the
+	 * returned list will be present inside the JAXB object.
+	 * This is why there is not a <CODE>set</CODE> method for the measurement property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * <pre>
+	 *    getMeasurement().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list
+	 * {@link MeasurementType }
+	 * 
+	 * 
+	 */
+	public List<MeasurementType> getMeasurement() {
+		if (this.measurement == null) {
+			this.measurement = new ArrayList<MeasurementType>();
+		}
+		return this.measurement;
+	}
+
+	/**
+	 * Gets the value of the settlement property.
+	 */
+	public List<SettlementType> getSettlement() {
+		if (this.settlement == null) {
+			this.settlement = new ArrayList<SettlementType>();
+		}
+		return this.settlement;
+	}
+
+	/**
+	 * Gets the value of the transition property.
+	 */
+	public List<TransitionType> getTransition() {
+		if (this.transition == null) {
+			this.transition = new ArrayList<TransitionType>();
+		}
+		return this.transition;
+	}
+
+	/**
+	 * Get the value of the transition property.
+	 */
+	public TransitionType getTransitionById(int transitionId) {
+		TransitionType result = null;
+		for (TransitionType transitionType : this.transition) {
+			if (transitionType.getTransitionId() == transitionId) {
+				result = transitionType;
+				break;
+			}
+		}
+		return result;
+	}
 
     /**
      * Gets the value of the name property.

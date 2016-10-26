@@ -28,10 +28,12 @@ import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.IHistoDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -45,13 +47,17 @@ import gde.utils.LinearRegression;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -69,15 +75,15 @@ import org.eclipse.swt.widgets.MenuItem;
  * Graupner HoTT device base class
  * @author Winfried Brügmann
  */
-public class HoTTAdapter extends DeviceConfiguration implements IDevice {
+public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoDevice {
 	final static Logger											log																= Logger.getLogger(HoTTAdapter.class.getName());
 
 	final static String											SENSOR_COUNT											= "SensorCount";																																																			//$NON-NLS-1$
-	final static String											LOG_COUNT													= "LogCount";																																																				//$NON-NLS-1$
-	final static String											FILE_PATH													= "FilePath";																																																				//$NON-NLS-1$
+	final static String											LOG_COUNT													= "LogCount";																																																					//$NON-NLS-1$
+	final static String											FILE_PATH													= "FilePath";																																																					//$NON-NLS-1$
 	final static Map<String, RecordSet>			recordSets												= new HashMap<String, RecordSet>();
 
-	//HoTT sensor bytes 19200 Baud protocol 
+	// HoTT sensor bytes 19200 Baud protocol
 	static boolean													IS_SLAVE_MODE											= false;
 	final static byte												SENSOR_TYPE_RECEIVER_19200				= (byte) (0x80 & 0xFF);
 	final static byte												SENSOR_TYPE_VARIO_19200						= (byte) (0x89 & 0xFF);
@@ -91,8 +97,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte												ANSWER_SENSOR_ELECTRIC_19200			= (byte) (0xE0 & 0xFF);
 	final static byte												ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xC0 & 0xFF);
 
-	//HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
-	//there is no real slave mode for this protocol
+	// HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
+	// there is no real slave mode for this protocol
 	final static byte												SENSOR_TYPE_RECEIVER_115200				= 0x34;
 	final static byte												SENSOR_TYPE_VARIO_115200					= 0x37;
 	final static byte												SENSOR_TYPE_GPS_115200						= 0x38;
@@ -109,13 +115,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
 
 	final static int												QUERY_GAP_MS											= 30;
-	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
+	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																// isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 	public enum Sensor {
 		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GAM("General-Air"), EAM("Electric-Air"), CHANNEL("Channel"), ESC("MotorDriver");
-		private final String	value;
+		private final String				value;
+		public static final Sensor	values[]	= values();	// use this to avoid cloning if calling values()
 
 		private Sensor(String v) {
 			this.value = v;
@@ -123,6 +130,22 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 		public String value() {
 			return this.value;
+		}
+
+		public static Sensor fromOrdinal(int ordinal) {
+			return Sensor.values[ordinal];
+		}
+
+		/**
+		 * @param isSensorType sensors which are available are marked with true
+		 * @return names of the sensors which are available
+		 */
+		public static List<String> getSensorNames(boolean[] isSensorType) {
+			List<String> sensors = new ArrayList<String>();
+			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
+				if (HoTTAdapter.isSensorType[i]) sensors.add(HoTTAdapter.Sensor.fromOrdinal(i).name());
+			}
+			return sensors;
 		}
 
 		public static List<Sensor> getAsList() {
@@ -134,11 +157,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		}
 	};
 
-	//protocol definitions
+	// protocol definitions
 	public enum Protocol {
 		TYPE_19200_V3("19200 V3"), TYPE_19200_V4("19200 V4"), TYPE_115200("115200");
 
-		private final String	value;
+		private final String value;
 
 		private Protocol(String v) {
 			this.value = v;
@@ -306,7 +329,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		//LogView doesn't support HoTT sensor logfiles
+		// LogView doesn't support HoTT sensor logfiles
 	}
 
 	/**
@@ -326,7 +349,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+					// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 					points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = (dataBuffer[9] & 0xFF) * 1000;
 					points[2] = (dataBuffer[5] & 0xFF) * 1000;
@@ -340,7 +363,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 31) {
-					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+					// 0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = DataParser.parse2Short(dataBuffer, 16) * 1000;
 					points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
@@ -353,7 +376,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 40) {
-					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+					// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					points[0] = (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 					points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
@@ -373,13 +396,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 				if (dataBuffer.length == 48) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
+					// 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 					points[0] = (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
 					points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
 					points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
 					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-					points[5] = 0; //5=Balance
+					points[5] = 0; // 5=Balance
 					for (int j = 0; j < 6; j++) {
 						points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
 						if (points[j + 6] > 0) {
@@ -387,7 +410,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 							minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
 						}
 					}
-					//calculate balance on the fly
+					// calculate balance on the fly
 					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
 					points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
 					points[13] = DataParser.parse2Short(dataBuffer, 33) * 1000;
@@ -403,13 +426,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 				if (dataBuffer.length == 51) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
+					// 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2
 					points[0] = (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
 					points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
 					points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
 					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-					points[5] = 0; //5=Balance
+					points[5] = 0; // 5=Balance
 					for (int j = 0; j < 14; j++) {
 						points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
 						if (points[j + 6] > 0) {
@@ -417,7 +440,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 							minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
 						}
 					}
-					//calculate balance on the fly
+					// calculate balance on the fly
 					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
 					points[20] = DataParser.parse2Short(dataBuffer, 36) * 1000;
 					points[21] = DataParser.parse2Short(dataBuffer, 44) * 1000;
@@ -435,7 +458,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx, 8=VoltageRxMin
+					// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx, 8=VoltageRxMin
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
 					tmpVoltageRx = (dataBuffer[6] & 0xFF);
 					tmpTemperatureRx = (dataBuffer[7] & 0xFF);
@@ -455,7 +478,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 57) {
-					//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+					// 0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 16);
 					if (!HoTTAdapter.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
@@ -475,7 +498,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 57) {
-					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+					// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					tmpLatitude = DataParser.parse2Short(dataBuffer, 20);
 					tmpLongitude = DataParser.parse2Short(dataBuffer, 25);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 31);
@@ -501,7 +524,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 				if (dataBuffer.length == 57) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
+					// 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 40);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 33);
@@ -523,7 +546,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 									minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
 								}
 							}
-							//calculate balance on the fly
+							// calculate balance on the fly
 							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
 						points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
@@ -541,7 +564,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 				if (dataBuffer.length == 57) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
+					// 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 40);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 36);
@@ -563,7 +586,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 									minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
 								}
 							}
-							//calculate balance on the fly
+							// calculate balance on the fly
 							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
 						points[20] = tmpHeight * 1000;
@@ -580,7 +603,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 				if (dataBuffer.length == 57) {
-					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
+					// 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
@@ -602,13 +625,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			switch (dataBuffer[0]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200:
 				if (dataBuffer.length >= 21) {
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+					// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 12);
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
 					tmpTemperatureRx = (DataParser.parse2Short(dataBuffer, 10) + 20);
 					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
 						HoTTAdapter.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
-						points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;//(dataBuffer[16] & 0xFF) * 1000;
+						points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;// (dataBuffer[16] & 0xFF) * 1000;
 						points[1] = (dataBuffer[17] & 0xFF) * 1000;
 						points[2] = (dataBuffer[14] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;
@@ -623,7 +646,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 				if (dataBuffer.length >= 25) {
-					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+					// 0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 10) + 500;
 					if (!HoTTAdapter.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
@@ -643,7 +666,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 				if (dataBuffer.length >= 34) {
-					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+					// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					tmpLatitude = DataParser.parse2Short(dataBuffer, 16);
 					tmpLongitude = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
@@ -669,7 +692,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 				if (dataBuffer.length >= 49) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
+					// 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 36);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 38);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 32) + 500;
@@ -691,7 +714,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 									minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
 								}
 							}
-							//calculate balance on the fly
+							// calculate balance on the fly
 							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
 						points[12] = DataParser.parse2Short(dataBuffer, 30) * 1000;
@@ -709,7 +732,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 				if (dataBuffer.length >= 60) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
+					// 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 50);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 52);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 46) + 500;
@@ -731,7 +754,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 									minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
 								}
 							}
-							//calculate balance on the fly
+							// calculate balance on the fly
 							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
 						points[20] = tmpHeight * 1000;
@@ -747,7 +770,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				break;
 			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 				if (dataBuffer.length >= 34) {
-					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
+					// 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
@@ -759,7 +782,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 						points[5] = tmpRevolution * 1000;
 						points[6] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-						//points[7] = dataBuffer[19] * 1000;
+						// points[7] = dataBuffer[19] * 1000;
 					}
 				}
 				break;
@@ -810,6 +833,81 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
+	 * @param dataBuffer Holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
+	 * @param recordDataSize Number of time steps 
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
+	 */
+	public void addDataBufferAsRawDataPointsTest(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		final String $METHOD_NAME = "addDataBufferAsRawDataPoints"; //$NON-NLS-1$
+		long currentTime, readTime = 0, addTime = 0, pickTime = 0, lastTime = System.nanoTime();
+		if (recordSet.getNoneCalculationRecordNames().length != recordSet.size()) {
+			throw new DataInconsitsentException(
+					Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, recordSet.size(), recordSet.getNoneCalculationRecordNames().length }));
+			// log.log(Level.SEVERE, "RecordSet.size = " + pointsLength + " not equal to recordSet.getNoneCalculationRecordNames().length " + recordSet.getNoneCalculationRecordNames().length); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		log.log(Level.FINER, String.format("%s holds %,d time steps (rows) with %d measurements (columns)", recordSet.getChannelConfigName(), recordDataSize, recordSet.size())); //$NON-NLS-1$
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int progressCycle = 1;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+
+		IntBuffer intBuffer = ByteBuffer.wrap(dataBuffer).asIntBuffer(); // no performance penalty compared to familiar bit shifting solution
+		int[] points = new int[recordSet.size()]; // curve points for one single time step
+		for (int i = 0, pointsLength = recordSet.size(); i < recordDataSize; i++) {
+			for (int j = 0, iOffset = i * pointsLength + recordDataSize; j < pointsLength; j++) {
+				points[j] = intBuffer.get(j + iOffset);
+				// if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("row%,9d column %2d value%,11d", i , j , points[j])); //$NON-NLS-1$
+			}
+			currentTime = System.nanoTime();
+			readTime += currentTime - lastTime;
+			lastTime = currentTime;
+			recordSet.addPoints(points, intBuffer.get(i) / 10.0); // addPointsRaw(int[], long) reduces addDataBufferAsRawDataPoints elapsed time from ~80 ms to ~70 ms for 19.620 time steps and 9 points (? saving is hard to believe. more measurements required ?)
+			// if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%,11d: points[0..3] %,11d/%,11d/%,11d/%,11d", (int) timeStamp, points[0] , points[1], points[2] , points[3])); //$NON-NLS-1$ // currentTime = System.nanoTime();
+			currentTime = System.nanoTime();
+			addTime += currentTime - lastTime;
+			lastTime = currentTime;
+			currentTime = System.nanoTime();
+			pickTime += currentTime - lastTime;
+			lastTime = currentTime;
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		recordSet.syncScaleOfSyncableRecords();
+		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s processed: %,9d", recordSet.getChannelConfigName(), recordDataSize)); //$NON-NLS-1$
+		if (log.isLoggable(Level.TIME)) log.log(Level.TIME,
+				String.format("readTime: %,9d  addTime: %,9d  pickTime: %,9d", TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime))); //$NON-NLS-1$
+	}
+
+	/**
+	 * add record data size points from binary file to each measurement.
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
+	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * collects life data if device setting |isLiveDataActive| is true.
+	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
+	 * @param filePath 
+	 * @throws DataInconsitsentException 
+	 */
+	public void addBinFileAsRawDataPoints(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException {
+		final String $METHOD_NAME = "addBinFileAsRawDataPoints"; //$NON-NLS-1$
+		if (recordSet.getNoneCalculationRecordNames().length != recordSet.size()) {
+			throw new DataInconsitsentException(
+					Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, recordSet.size(), recordSet.getNoneCalculationRecordNames().length }));
+			// log.log(Level.SEVERE, "RecordSet.size = " + pointsLength + " not equal to recordSet.getNoneCalculationRecordNames().length " + recordSet.getNoneCalculationRecordNames().length); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		log.log(Level.FINER, String.format("%s holds %d measurements (columns)", recordSet.getChannelConfigName(), recordSet.size())); //$NON-NLS-1$
+
+		HoTTbinHistoReader.read(recordSet, filePath);
+	}
+
+	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
@@ -822,14 +920,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				int ordinal = record.getOrdinal();
-				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
-				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
+				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
+				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[ordinal + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 				}
-				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-				else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { //Receiver
+				// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+				else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { // Receiver
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0));
 				}
 				else {
@@ -856,12 +954,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if (record.getParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude 
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		if (record.getParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude
+			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			int grad = ((int) (value / 1000));
 			double minuten = (value - (grad * 1000.0)) / 10.0;
 			newValue = grad + minuten / 60.0;
 		}
+		// ET logic differs compared to prepareDataTableRow for getChannelConfigNumber() == 1 (Receiver)
 		else {
 			newValue = (value - reduction) * factor + offset;
 		}
@@ -882,8 +981,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  ) 
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude )
+			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
@@ -938,7 +1037,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		}
 		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
-		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
+		this.setChangePropery(configChanged); // reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
 
 	/**
@@ -951,14 +1050,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 
 		if (recordSet.getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude 3=Height
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			Record recordLatitude = recordSet.get(1);
 			Record recordLongitude = recordSet.get(2);
 			Record recordAlitude = recordSet.get(3);
 			if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) {
 				int recordSize = recordLatitude.realSize();
 				int startAltitude = recordAlitude.get(0); // using this as start point might be sense less if the GPS data has no 3D-fix
-				//check GPS latitude and longitude				
+				// check GPS latitude and longitude
 				int indexGPS = 0;
 				int i = 0;
 				for (; i < recordSize; ++i) {
@@ -968,10 +1067,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						break;
 					}
 				}
-				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
+				startAltitude = recordAlitude.get(indexGPS); // set initial altitude to enable absolute altitude calculation
 
 				GPSHelper.calculateTripLength(this, recordSet, 1, 2, 3, startAltitude, 7, 9);
-				//GPSHelper.calculateLabs(this, recordSet, 1, 2, 7, 9, 6);
+				// GPSHelper.calculateLabs(this, recordSet, 1, 2, 7, 9, 6);
 			}
 		}
 		recordSet.syncScaleOfSyncableRecords();
@@ -1039,9 +1138,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
-								HoTTbinReader.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								HoTTbinReader.read(selectedImportFile); // , HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
@@ -1065,8 +1164,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileExportMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
-		//		MenuItem convertGPXItem;
-		//		MenuItem convertGPXGarminItem;
+		// MenuItem convertGPXItem;
+		// MenuItem convertGPXGarminItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -1101,23 +1200,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 			});
 
-			//			convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
-			//			convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
-			//			convertGPXItem.addListener(SWT.Selection, new Listener() {
-			//				public void handleEvent(Event e) {
-			//					log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
-			//					export2GPX(false);
-			//				}
-			//			});
+			// convertGPXItem = new MenuItem(exportMenue, SWT.PUSH);
+			// convertGPXItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0728));
+			// convertGPXItem.addListener(SWT.Selection, new Listener() {
+			// public void handleEvent(Event e) {
+			// log.log(java.util.logging.Level.FINEST, "convertGPXItem action performed! " + e); //$NON-NLS-1$
+			// export2GPX(false);
+			// }
+			// });
 			//
-			//			convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
-			//			convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
-			//			convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
-			//				public void handleEvent(Event e) {
-			//					log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
-			//					export2GPX(true);
-			//				}
-			//			});
+			// convertGPXGarminItem = new MenuItem(exportMenue, SWT.PUSH);
+			// convertGPXGarminItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0729));
+			// convertGPXGarminItem.addListener(SWT.Selection, new Listener() {
+			// public void handleEvent(Event e) {
+			// log.log(java.util.logging.Level.FINEST, "convertGPXGarminItem action performed! " + e); //$NON-NLS-1$
+			// export2GPX(true);
+			// }
+			// });
 		}
 	}
 
@@ -1149,7 +1248,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
 	 */
 	public void export2KMZ3D(int type) {
-		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), 2, 1, 3, 6, 5, 9, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
@@ -1158,7 +1257,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
 	 */
 	public void export2GPX(final boolean isGarminExtension) {
-		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		if (isGarminExtension)
 			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 1, 2, 3, 6, -1, -1, -1, -1, new int[] { -1, -1, -1 });
 		else
@@ -1173,7 +1272,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public boolean isGPSCoordinates(Record record) {
 		if (this.application.getActiveChannelNumber() == 3) {
-			//0=RXSQ, 1=Latitude, 2=Longitude
+			// 0=RXSQ, 1=Latitude, 2=Longitude
 			return record.getOrdinal() == 1 || record.getOrdinal() == 2;
 		}
 		return false;
@@ -1184,14 +1283,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
-		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		Record recordLatitude = recordSet.get(1);
 		Record recordLongitude = recordSet.get(2);
 		Record gpsAlitude = recordSet.get(3);
 
 		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", //$NON-NLS-1$
-				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
-				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
+				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S", //$NON-NLS-1$
+				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W", //$NON-NLS-1$
 				fixValidity, (this.translateValue(gpsAlitude, gpsAlitude.get(index) / 1000.0) + offsetAltitude), (this.translateValue(gpsAlitude, gpsAlitude.get(index) / 1000.0) + offsetAltitude));
 	}
 
@@ -1206,7 +1305,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null && activeChannel.getNumber() == 3) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 				containsGPSdata = activeRecordSet.get(1).hasReasonableData() && activeRecordSet.get(2).hasReasonableData();
 			}
 		}
@@ -1224,7 +1323,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				exportFileName = new FileHandler().exportFileKMZ(2, 1, 3, additionalMeasurementOrdinal, 5, 9, -1, true, isExport2TmpDir);
 			}
@@ -1237,7 +1336,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 			return 6;
 
@@ -1290,7 +1389,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		boolean rc = true;
 		try {
 			String className = "de.treichels.hott.HoTTDecoder";//$NON-NLS-1$
-			//log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
+			// log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
 			Constructor<?> constructor = c.getDeclaredConstructor();
@@ -1323,7 +1422,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			HoTTAdapter.log.log(java.util.logging.Level.OFF, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 
-				//set directory where to start search for mdl files
+				// set directory where to start search for mdl files
 				System.setProperty("log.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$
 				System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
@@ -1331,7 +1430,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 				System.setProperty("program.dir", url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName())));//$NON-NLS-1$
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$
-				System.setProperty("template.dir", "");//load from classpath //$NON-NLS-1$
+				System.setProperty("template.dir", "");// load from classpath //$NON-NLS-1$
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
 
 				inst = constructor.newInstance(new Object[] { this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount() });
@@ -1345,22 +1444,22 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		if (inst != null) ((CTabItem) inst).setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		return (CTabItem) inst;
 	}
-	
-  /**
-   * calculate labs based on Rx dbm and based on distance from start point
-   * HoTTAdapterD 
-   * //5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
+
+	/**
+	 * calculate labs based on Rx dbm and based on distance from start point
+	 * HoTTAdapterD 
+	 * //5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
 	 * //15=DistanceStart, 112=DiffDistance, 113=LapsDistance		
-   * @param recordSet
-   * @param channelNumber
-   * @param ordinalSourceRx_dbm
-   * @param ordinalSmoothRx_dbm
-   * @param ordinalDiffRx_dbm
-   * @param ordinalLabsRx_dbm
-   * @param ordinalSourceDist
-   * @param ordinalDiffDist
-   * @param ordinalLapsDistance
-   */
+	 * @param recordSet
+	 * @param channelNumber
+	 * @param ordinalSourceRx_dbm
+	 * @param ordinalSmoothRx_dbm
+	 * @param ordinalDiffRx_dbm
+	 * @param ordinalLabsRx_dbm
+	 * @param ordinalSourceDist
+	 * @param ordinalDiffDist
+	 * @param ordinalLapsDistance
+	 */
 	protected void runLabsCalculation(final RecordSet recordSet, final int channelNumber,
 			final int ordinalSourceRx_dbm, final int ordinalSmoothRx_dbm, final int ordinalDiffRx_dbm, final int ordinalLabsRx_dbm,
 			final int ordinalSourceDist, final int ordinalDiffDist, final int ordinalLapsDistance) {
@@ -1380,14 +1479,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		int filterMinDeltaRxDbm = 3;
 		int filterMinDeltaDist = 20;
 		if (this.getMeasurementPropertyValue(channelNumber, ordinalLabsRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
-//				//5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
-//				this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(1, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
-//				this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
-//				this.filterStartTimeCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
-//				this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
-//				this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
-//				//15=DistanceStart, 112=DiffDistance, 113=LapsDistance		
-//				this.filterMinDistDeltaCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
+			//				//5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
+			//				this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(1, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
+			//				this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
+			//				this.filterStartTimeCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
+			//				this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
+			//				this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
+			//				//15=DistanceStart, 112=DiffDistance, 113=LapsDistance		
+			//				this.filterMinDistDeltaCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 			try {
 				absorptionLevel = Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalSmoothRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
 			}

@@ -47,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -140,7 +141,7 @@ public class OsdReaderWriter {
 			boolean isHeaderComplete = false;
 			while (!isHeaderComplete && headerCounter-- > 0) {
 				line = data_in.readUTF();
-				line = line.substring(0, line.length() - 1);
+				line = line.substring(0, (line.length() > 0 ? line.length() - 1 : 0));
 				log.log(Level.FINE, line);
 				for (String headerKey : GDE.OSD_FORMAT_HEADER_KEYS) {
 					if (line.startsWith(headerKey)) {
@@ -223,40 +224,15 @@ public class OsdReaderWriter {
 		Channel channel = null;
 		RecordSet recordSet = null;
 		IDevice device = OsdReaderWriter.application.getActiveDevice();
-		String line;
 		boolean isFirstRecordSetDisplayed = false;
 
 		HashMap<String, String> header = getHeader(filePath);
 		ChannelTypes channelType = ChannelTypes.valueOf(header.get(GDE.CHANNEL_CONFIG_TYPE).trim());
 		String objectKey = header.get(GDE.OBJECT_KEY) != null ? header.get(GDE.OBJECT_KEY) : GDE.STRING_EMPTY;
-		int numberRecordSets = Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
 		while(!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
 
-		// record sets with it properties and records
-		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
-		for (int i=0; i<numberRecordSets; ++i) {
-			switch (Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION))) {
-			case 1:
-			case 2:
-			case 3:
-				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
-				line = data_in.readUTF();
-				line = line.substring(0, line.length() - 1);
-				break;
-
-			default:
-			case 4:
-				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
-				int length = data_in.readInt();
-				byte[] bytes = new byte[length];
-				data_in.readFully(bytes);
-				line = new String(bytes, "UTF8");
-				line = line.substring(0, line.length()-1);
-				break;
-			}
-			recordSetsInfo.add(getRecordSetProperties(line));
-		}
+		List<HashMap<String, String>> recordSetsInfo = readRecordSetsInfo4AllVersions(data_in, header);
 
 		//reset, previous manipulated channel types measurements (p.e. set active = null as calculation)
 		device.resetMeasurements();
@@ -336,7 +312,7 @@ public class OsdReaderWriter {
 						MeasurementType gdeMeasurement = device.getMeasurement(activeChannelConfigNumber, i);
 						gdeMeasurement.setName(recordNames[i] = recordProperties.get(Record.NAME));
 						gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
-						gdeMeasurement.setSymbol(recordUnits[i] = recordProperties.get(Record.SYMBOL));
+						gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
 						gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
 					}
 					recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
@@ -424,6 +400,82 @@ public class OsdReaderWriter {
 			file_input = null;
 			zip_input = null;
 		}
+	}
+
+	/**
+	 * @param data_in
+	 * @param header
+	 * @return
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 * @throws UnsupportedEncodingException
+	 */
+	protected static List<HashMap<String, String>> readRecordSetsInfo4AllVersions(DataInputStream data_in, HashMap<String, String> header)
+			throws NumberFormatException, IOException, UnsupportedEncodingException {
+		String line;
+		// record sets with it properties and records
+		List<HashMap<String, String>> recordSetsInfo = new ArrayList<HashMap<String, String>>();
+		for (int i = 0; i < Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue(); ++i) {
+			switch (Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION))) {
+			case 1:
+			case 2:
+			case 3:
+				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+				line = data_in.readUTF();
+				line = line.substring(0, line.length() - 1);
+				break;
+
+			default:
+			case 4:
+				// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+				int length = data_in.readInt();
+				byte[] bytes = new byte[length];
+				data_in.readFully(bytes);
+				line = new String(bytes, "UTF8");
+				line = line.substring(0, line.length() - 1);
+				break;
+			}
+			recordSetsInfo.add(getRecordSetProperties(line));
+		}
+		return recordSetsInfo;
+	}
+
+	/**
+	 * determine channel number in file and access the device configuration.
+	 * @param channelConfig
+	 * @return
+	 */
+	protected static Channel getChannel(String channelConfig) {
+		Channel channel = null;
+		// String channelConfigKey;
+		// Channel currentChannel = channels.get(channels.getChannelNumber(channelConfig));
+		// 1.st try channelConfiguration not found
+		try { // get channel last digit and use as channel config ordinal : 'Channel/Configuration Name: 1 : Ausgang 1'
+			channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length() - 1)));
+			// channelConfigKey = channel.getChannelConfigKey();
+		} catch (NumberFormatException e) {
+			// ignore and keep channel as null
+		} catch (NullPointerException e) {
+			// ignore and keep channel as null
+		}
+		if (channel == null) { // 2.nd try channelConfiguration not found
+			try { // try to get channel startsWith configuration name : 'Channel/Configuration Name: 1 : Receiver'
+				channel = channels.get(Integer.valueOf(channelConfig.split(GDE.STRING_BLANK)[0]));
+				// channelConfigKey = channel.getChannelConfigKey();
+			} catch (NullPointerException e) {
+				// ignore and keep channel as null
+			}
+		}
+		if (channel == null) { // 3.rd try channelConfiguration not found
+			// do not rely on channel nomenclature
+			// "3 : Motor"
+			// channelConfigKey = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
+			// "Motor 3"
+			// channelConfigKey = channelConfigKey.contains(GDE.STRING_BLANK) ? channelConfigKey.split(GDE.STRING_BLANK)[0].trim() : channelConfigKey.trim();
+			// "Motor"
+			// channel = channels.get(channels.getChannelNumber(channelConfigKey));
+		}
+		return channel;
 	}
 
 	/**

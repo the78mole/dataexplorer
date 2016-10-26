@@ -15,6 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    					2016 Thomas Eickert
 ****************************************************************************************/
 package gde.device;
 
@@ -100,6 +101,7 @@ public class DeviceConfiguration {
 	
 	protected 					CalculationThread			calculationThread 				= null; // universal device calculation thread (slope)
 	protected						Integer								kmzMeasurementOrdinal			= null;
+	protected int sampledCounter;
 
 	/**
 	 * method to test this class
@@ -1231,6 +1233,54 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * query if the histo graphics tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isHistoGraphicsTabRequested() {
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+	}
+	
+	/**
+	 * set the DesktopType.HISTO_GRAPHICS_TAB property to the given value
+	 * @param enable
+	 */
+	public void setHistoGraphicsTabRequested(boolean enable) {
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB);
+		if (property == null) {
+			createDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB.name(), enable);
+		}
+		else {
+			property.setValue(enable);
+		}
+		this.isChangePropery = true;
+	}
+		
+	/**
+	 * query if the histo table tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isHistoTableTabRequested() {
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+	}
+	
+	/**
+	 * set the DesktopType.HISTO_TABLE_TAB property to the given value
+	 * @param enable
+	 */
+	public void setHistoTableTabRequested(boolean enable) {
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB);
+		if (property == null) {
+			createDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB.name(), enable);
+		}
+		else {
+			property.setValue(enable);
+		}
+		this.isChangePropery = true;
+	}
+		
+	/**
 	 * query if the target measurement reference ordinal used by the given desktop type
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */
@@ -1393,6 +1443,41 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getChannel(channelConfigKey).measurement.remove(newMeasurementType);
 	}
+
+	/**
+	 * @return the channel settlements by given channel configuration key (name)
+	 */
+	public List<SettlementType> getChannelSettlements(int channelConfigNumber) {
+		return this.getChannel(channelConfigNumber).getSettlement();
+	}
+	
+	/**
+	 * @return the number of settlements of a channel by given channel number
+	 */
+	public int getNumberOfSettlements(int channelConfigNumber) {
+		return this.getChannel(channelConfigNumber).getSettlement().size();
+	}
+	
+	/**
+	 * add (append) a new SettlementType object to channel with channel number as given
+	 * @param channelNumber
+	 * @param newSettlementType
+	 */
+	public void addSettlement2Channel(int channelNumber, SettlementType newSettlementType) {
+		this.isChangePropery = true;
+		this.getChannel(channelNumber).settlement.add(newSettlementType);
+	}
+	
+	/**
+	 * remove a SettlementType object from channel with channel number as given
+	 * @param channelConfigNumber
+	 * @param removeSettlementType
+	 */
+	public void removeSettlementFromChannel(int channelConfigNumber, SettlementType removeSettlementType) {
+		this.isChangePropery = true;
+		this.getChannel(channelConfigNumber).settlement.remove(removeSettlementType);
+	}
+	
 
 	/**
 	 * get the channel type by given channel configuration key (name)
@@ -1687,6 +1772,35 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setStatistics(null);
+	}
+	
+	/**
+	 * @return the measurement and settlement names in device configuration order which conforms to the record ordinal sequence.
+	 */
+	public String[] getMeasurementSettlementNames(int channelConfigNumber) {
+		StringBuilder sb = new StringBuilder();
+		ChannelType channel = this.getChannel(channelConfigNumber);
+		if (channel != null) {
+//			// display section 1: look for settlements at the top - settlements' ordinals start after measurements due to GraphicsTemplate compatibility
+//			for (SettlementType settlement : channel.getSettlement()) {
+//				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement");
+//				if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
+//					sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
+//				}
+//			}
+			// display section 2: all measurements
+			for (MeasurementType measurementType : channel.getMeasurement()) {
+				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
+			}
+			// display section 3: take remaining settlements
+			for (SettlementType settlement : channel.getSettlement()) {
+//				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement");
+//				if ( ! (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
+					sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
+//				}
+			}
+		}
+		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
 	
 	/**
@@ -2434,4 +2548,9 @@ public class DeviceConfiguration {
 	public boolean isVariableMeasurementSize() {
 		return false;
 	}
+
+		public int getSampledCounter() {
+		return this.sampledCounter;
+	}
+	
 }
