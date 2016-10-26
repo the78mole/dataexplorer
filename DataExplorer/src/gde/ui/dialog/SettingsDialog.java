@@ -84,10 +84,10 @@ import org.eclipse.swt.widgets.TreeItem;
  */
 public class SettingsDialog extends Dialog {
 	final static Logger									log											= Logger.getLogger(SettingsDialog.class.getName());
-	static final String									DEFAULT_LOG_LEVEL				= "WARNING";																				//$NON-NLS-1$
+	static final String									DEFAULT_LOG_LEVEL				= "WARNING";																																															//$NON-NLS-1$
 
-	public static final String					LOGGER_NAME							= "logger_name";																		//$NON-NLS-1$
-	public static final String					LOG_LEVEL								= "log_level";																			//$NON-NLS-1$
+	public static final String					LOGGER_NAME							= "logger_name";																																													//$NON-NLS-1$
+	public static final String					LOG_LEVEL								= "log_level";																																														//$NON-NLS-1$
 
 	CCombo															configLevelCombo;
 	CLabel															utilsLevelLabel;
@@ -121,6 +121,8 @@ public class SettingsDialog extends Dialog {
 	Composite														generalTabComposite;
 	Composite														analysisComposite;
 	CTabItem														generalTabItem;
+	CTabItem														histoTabItem;
+	Button															histoActiveButton;
 	CTabItem														analysisTabItem;
 	CTabFolder													settingsTabFolder;
 	Slider															alphaSlider;
@@ -138,12 +140,12 @@ public class SettingsDialog extends Dialog {
 	Button															partialDataTableButton, blankChargeDischargeButton, continiousRecordSetButton;
 	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, addChannelConfigNameCurveCompareButton;
 	ParameterConfigControl							fontSizeCorrectionSlider;
-	int[]                               fontCorrection = new int[1];
+	int[]																fontCorrection					= new int[1];
 	Composite														osMiscComposite;
 	Composite														miscComposite;
 	Group																shellMimeType;
 	Group																desktopLauncher;
-	Group																fontSizeGroup, dataTableGroup, chargerSpecials, graphicsView;
+	Group																histoGeneralGroup, fontSizeGroup, dataTableGroup, chargerSpecials, graphicsView;
 	CTabItem														osMiscTabItem;
 	CTabItem														miscTabItem;
 	CLabel															fileIOLevelLabel;
@@ -168,12 +170,12 @@ public class SettingsDialog extends Dialog {
 	Tree																tree;
 
 	Thread															listPortsThread;
-	Vector<String>											availablePorts = new Vector<String>();
+	Vector<String>											availablePorts					= new Vector<String>();
 	final Settings											settings;
 	final DataExplorer									application;
-	final String[]											supportedLocals					= { "en", "de" };	//$NON-NLS-1$ //$NON-NLS-2$
+	final String[]											supportedLocals					= { "en", "de" };																																													//$NON-NLS-1$ //$NON-NLS-2$
 	boolean															isLocaleLanguageChanged	= false;
-	
+
 	final LogLevelSelectionContextMenu	logLevelMenu						= new LogLevelSelectionContextMenu();
 	Menu																popupmenu;
 
@@ -195,16 +197,16 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.setText(GDE.NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0300));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
-	        switch (event.detail) {
-	        case SWT.TRAVERSE_ESCAPE:
-	        	SettingsDialog.this.dialogShell.close();
-	          event.detail = SWT.TRAVERSE_NONE;
-	          event.doit = false;
-	          break;
-	        }
-	      }
-	    });
+				public void handleEvent(Event event) {
+					switch (event.detail) {
+					case SWT.TRAVERSE_ESCAPE:
+						SettingsDialog.this.dialogShell.close();
+						event.detail = SWT.TRAVERSE_NONE;
+						event.doit = false;
+						break;
+					}
+				}
+			});
 			{ // begin tab folder
 				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.FLAT | SWT.BORDER);
 				this.settingsTabFolder.setSimple(false);
@@ -735,6 +737,53 @@ public class SettingsDialog extends Dialog {
 						} // end serial port group
 					} // end tabComposite1
 				} // end general tab item
+				{ // begin histo tab item
+					this.histoTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
+					this.histoTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.histoTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0738));
+					{
+						this.miscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
+						this.histoTabItem.setControl(this.miscComposite);
+						RowLayout compositeHistoLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+						compositeHistoLayout.marginLeft = 11;
+						compositeHistoLayout.spacing = 11;
+						compositeHistoLayout.marginTop = 22;
+						this.miscComposite.setLayout(compositeHistoLayout);
+						{
+							this.histoActiveButton = new Button(this.miscComposite, SWT.CHECK);
+							this.histoActiveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoActiveButton.setText(Messages.getString(MessageIds.GDE_MSGT0739));
+							this.histoActiveButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0740));
+							this.histoActiveButton.setSelection(this.settings.isHistoActive());
+							this.histoActiveButton.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									SettingsDialog.log.log(Level.FINEST, "histoActiveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActiveButton.getSelection());
+									application.setupHistoWindows();
+								}
+							});
+						}
+						{
+							this.histoGeneralGroup = new Group(this.miscComposite, SWT.NONE);
+							RowLayout histoGeneralGroupLayout = new RowLayout(SWT.HORIZONTAL);
+							this.histoGeneralGroup.setLayout(histoGeneralGroupLayout);
+							RowData histoGeneralGroupLData = new RowData();
+							histoGeneralGroupLData.width = 466;
+							histoGeneralGroupLData.height = 70;
+							this.histoGeneralGroup.setLayoutData(histoGeneralGroupLData);
+							this.histoGeneralGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoGeneralGroup.setText(Messages.getString(MessageIds.GDE_MSGT0738));
+							{
+								this.localLabel = new CLabel(this.histoGeneralGroup, SWT.NONE);
+								this.localLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.localLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
+								this.localLabel.setText(Messages.getString(MessageIds.GDE_MSGT0739));
+								this.localLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0740));
+							}
+						} // end histoGeneral group
+					} // end miscComposite
+				} // end histo tab item
 				{
 					this.miscTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
 					this.miscTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -764,17 +813,17 @@ public class SettingsDialog extends Dialog {
 								labelLData.width = 400;
 								labelLData.height = 18;
 								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 								label.setText("Font Size Correction Factor");
 								label.setToolTipText("This factor enable adjustment of the overall font size. Initial correction factor is 1.0. A factor of 2.0 will result in double font sizes which may result that some text can not be read anymore due to lack of nessecary space.");
 							}
 							{
 								this.fontSizeCorrectionSlider = new ParameterConfigControl(this.fontSizeGroup, this.fontCorrection, 0, GDE.STRING_EMPTY, "Correction value / 10", 140, GDE.STRING_EMPTY, 0, true, 30, 250, 10, 20);
-								this.fontSizeCorrectionSlider.setSliderSelection((int)(this.settings.getFontDisplayDensityAdaptionFactor() * 10));
+								this.fontSizeCorrectionSlider.setSliderSelection((int) (this.settings.getFontDisplayDensityAdaptionFactor() * 10));
 								this.fontSizeGroup.addListener(SWT.Selection, new Listener() {
 									@Override
 									public void handleEvent(Event evt) {
-										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(fontCorrection[0]/10.0);
+										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(fontCorrection[0] / 10.0);
 									}
 								});
 							}
@@ -799,7 +848,7 @@ public class SettingsDialog extends Dialog {
 								labelLData.width = 460;
 								labelLData.height = 18;
 								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0693));
 							}
 							{
@@ -856,20 +905,20 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
-//							{
-//								Label label = new Label(this.graphicsView, SWT.LEFT);
-//								RowData labelLData = new RowData();
-//								labelLData.width = 460;
-//								labelLData.height = 2;
-//								label.setLayoutData(labelLData);
-//							}
+							//							{
+							//								Label label = new Label(this.graphicsView, SWT.LEFT);
+							//								RowData labelLData = new RowData();
+							//								labelLData.width = 460;
+							//								labelLData.height = 2;
+							//								label.setLayoutData(labelLData);
+							//							}
 							{
 								Label label = new Label(this.graphicsView, SWT.LEFT);
 								RowData labelLData = new RowData();
 								labelLData.width = 460;
 								labelLData.height = 18;
 								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0699));
 							}
 							{
@@ -911,7 +960,7 @@ public class SettingsDialog extends Dialog {
 								labelLData.width = 400;
 								labelLData.height = 18;
 								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0703));
 							}
 							{
@@ -954,7 +1003,7 @@ public class SettingsDialog extends Dialog {
 								labelLData.width = 400;
 								labelLData.height = 20;
 								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 								label.setText(Messages.getString(MessageIds.GDE_MSGT0698));
 							}
 							{
@@ -1480,6 +1529,7 @@ public class SettingsDialog extends Dialog {
 			} // end tab folder
 
 			this.dialogShell.addHelpListener(new HelpListener() {
+
 				public void helpRequested(HelpEvent evt) {
 					SettingsDialog.log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					SettingsDialog.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_1.html"); //$NON-NLS-1$
@@ -1575,11 +1625,12 @@ public class SettingsDialog extends Dialog {
 		// execute independent from dialog UI
 		this.listPortsThread = new Thread("updateAvailablePorts") {
 			public boolean stop = false;
+
 			@Override
 			public void run() {
 				try {
 					while (!SettingsDialog.this.dialogShell.isDisposed() && !this.stop) {
-						SettingsDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
+						SettingsDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(),
 								SettingsDialog.this.settings.isSerialPortBlackListEnabled() ? SettingsDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 						GDE.display.syncExec(new Runnable() {
@@ -1601,7 +1652,7 @@ public class SettingsDialog extends Dialog {
 									}
 								}
 							}
-							});
+						});
 						WaitTimer.delay(200);
 					}
 				}
@@ -1760,7 +1811,7 @@ public class SettingsDialog extends Dialog {
 		TreeItem treeItemRoot = null;
 		TreeItem treeItemNode;
 		for (String string : loggers) {
-			String[] tmp = string.replace(GDE.STRING_DOT, GDE.STRING_COLON).split(GDE.STRING_COLON); 
+			String[] tmp = string.replace(GDE.STRING_DOT, GDE.STRING_COLON).split(GDE.STRING_COLON);
 			switch (tmp.length) {
 			case 3:
 				if (!root.equals(tmp[0] + GDE.STRING_DOT + tmp[1])) {

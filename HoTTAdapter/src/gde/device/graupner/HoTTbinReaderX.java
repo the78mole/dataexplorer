@@ -450,7 +450,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddReceiver(final byte[] _buf1, final byte[] _buf2, final byte[] _buf4, final byte[] _bufD) throws DataInconsitsentException {
+	protected static void parseAddReceiver(final byte[] _buf1, final byte[] _buf2, final byte[] _buf4, final byte[] _bufD) throws DataInconsitsentException {
 		//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 		//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
 		//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
@@ -485,7 +485,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddChannel(byte[] _buf) throws DataInconsitsentException {
+	protected static void parseAddChannel(byte[] _buf) throws DataInconsitsentException {
 
 		//0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 10=Ch 8
 		//119=PowerOff, 12=BattLow, 13=Reset, 14=reserved

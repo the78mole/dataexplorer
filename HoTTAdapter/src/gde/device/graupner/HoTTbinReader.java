@@ -51,7 +51,9 @@ import java.util.logging.Logger;
 public class HoTTbinReader {
 	final static String													$CLASS_NAME						= HoTTbinReader.class.getName();
 	final static Logger													log										= Logger.getLogger(HoTTbinReader.$CLASS_NAME);
-	protected static final int									NUMBER_LOG_RECORDS_TO_SCAN	= 1500;
+	protected static final int							LOG_RECORD_SCAN_START		= 4000;																															// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 6000)
+	protected static final int							NUMBER_LOG_RECORDS_TO_SCAN	= 1500;
+	protected static final int							NUMBER_LOG_RECORDS_MIN		= 7000;
 
 	final static DataExplorer										application						= DataExplorer.getInstance();
 	final static Channels												channels							= Channels.getInstance();
@@ -1088,12 +1090,22 @@ public class HoTTbinReader {
 		}
 	}
 
+	//ET splitting the parseAddxyz methods was preferred against copying the code. so this specific code is not scattered over two classes. 
 	/**
 	 * parse the buffered data from buffer and add points to record set
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddReceiver(byte[] _buf) throws DataInconsitsentException {
+	protected static void parseAddReceiver(byte[] _buf) throws DataInconsitsentException {
+		HoTTbinReader.parse4Receiver(_buf);
+		HoTTbinReader.recordSetReceiver.addPoints(HoTTbinReader.pointsReceiver, HoTTbinReader.timeStep_ms);
+	}
+
+	/**
+	 * parse the buffered data from buffer
+	 * @param _buf
+	 */
+	protected static void parse4Receiver(byte[] _buf) {
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx, 8=Umin Rx 
 		HoTTbinReader.tmpVoltageRx = (_buf[35] & 0xFF);
 		HoTTbinReader.tmpTemperatureRx = (_buf[36] & 0xFF);
@@ -1111,8 +1123,6 @@ public class HoTTbinReader {
 		//printByteValues(_timeStep_ms, _buf);
 		//if (HoTTbinReader.pointsReceiver[3] > 2000000)
 		//	System.out.println();
-
-		HoTTbinReader.recordSetReceiver.addPoints(HoTTbinReader.pointsReceiver, HoTTbinReader.timeStep_ms);
 	}
 
 	/**
@@ -1120,8 +1130,16 @@ public class HoTTbinReader {
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddChannel(byte[] _buf) throws DataInconsitsentException {
+	protected static void parseAddChannel(byte[] _buf) throws DataInconsitsentException {
+		HoTTbinReader.parse4Channel(_buf);
+		HoTTbinReader.recordSetChannel.addPoints(HoTTbinReader.pointsChannel, HoTTbinReader.timeStep_ms);
+	}
 
+	/**
+	 * parse the buffered data from buffer
+	 * @param _buf
+	 */
+	protected static void parse4Channel(byte[] _buf) {
 		//0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		//19=PowerOff, 20=BattLow, 21=Reset, 22=reserved
 		HoTTbinReader.pointsChannel[0] = (_buf[1] & 0xFF) * 1000;
@@ -1165,8 +1183,6 @@ public class HoTTbinReader {
 		}
 
 		//printByteValues(_timeStep_ms, _buf);
-
-		HoTTbinReader.recordSetChannel.addPoints(HoTTbinReader.pointsChannel, HoTTbinReader.timeStep_ms);
 	}
 
 	/**
@@ -1177,7 +1193,23 @@ public class HoTTbinReader {
 	 * @param _buf2
 	 * @throws DataInconsitsentException
 	 */
-	private static int parseAddVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
+	protected static int parseAddVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
+		HoTTbinReader.parse4Vario(sdLogVersion, _buf0, _buf1, _buf2);
+		if (!HoTTAdapter.isFilterEnabled
+				|| (HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && HoTTbinReader.tmpClimb10 < 40000 && HoTTbinReader.tmpClimb10 > 20000)) {
+			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
+		}
+		return sdLogVersion;
+	}
+
+	/**
+	 * parse the buffered data from buffer 0 to 2
+	 * @param sdLogVersion
+	 * @param _buf0
+	 * @param _buf1
+	 * @param _buf2
+	 */
+	protected static int parse4Vario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2)  { //TODO re-activate LogVersion for histo data?
 		//		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
 		//		switch (sdLogVersion) {
 		//		case 3:
@@ -1209,8 +1241,6 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsVario[4] = HoTTbinReader.tmpClimb10 * 1000;
 			HoTTbinReader.pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
 			HoTTbinReader.pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
-
-			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
 		}
 		//			break;
 		//		}
@@ -1240,7 +1270,21 @@ public class HoTTbinReader {
 	 * @param _buf3
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) throws DataInconsitsentException {
+	protected static void parseAddGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) throws DataInconsitsentException {
+		HoTTbinReader.parse4GPS( _buf0,_buf1,  _buf2, _buf3);
+		if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > 10000 && HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 4500)) {
+			HoTTbinReader.recordSetGPS.addPoints(HoTTbinReader.pointsGPS, HoTTbinReader.timeStep_ms);
+		}
+	}
+
+	/**
+	 * parse the buffered data from buffer 0 to 3 
+	 * @param _buf0
+	 * @param _buf1
+	 * @param _buf2
+	 * @param _buf3
+	 */
+	protected static void parse4GPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf2, 8);
 		HoTTbinReader.tmpClimb1 = DataParser.parse2UnsignedShort(_buf3, 0);
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF);
@@ -1293,7 +1337,6 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGPS[10] = (_buf0[1] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[11] = (_buf0[2] & 0xFF) * 1000;
 
-			HoTTbinReader.recordSetGPS.addPoints(HoTTbinReader.pointsGPS, HoTTbinReader.timeStep_ms);
 			HoTTbinReader.isJustParsed = true;
 		}
 	}
@@ -1307,7 +1350,24 @@ public class HoTTbinReader {
 	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddGAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+	protected static void parseAddGAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+		HoTTbinReader.parse4GAM(_buf0, _buf1, _buf2, _buf3, _buf4);
+		if (!HoTTAdapter.isFilterEnabled
+				|| (HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600
+						&& Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
+			HoTTbinReader.recordSetGeneral.addPoints(HoTTbinReader.pointsGeneral, HoTTbinReader.timeStep_ms);
+		}
+	}
+
+	/**
+	 * parse the buffered data from buffer 0 to 4 
+	 * @param _buf0
+	 * @param _buf1
+	 * @param _buf2
+	 * @param _buf3
+	 * @param _buf4
+	 */
+	protected static void parse4GAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf3, 0);
 		HoTTbinReader.tmpClimb3 = (_buf3[4] & 0xFF);
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -1349,7 +1409,6 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGeneral[19] = (_buf2[3] & 0xFF) * 1000;
 			HoTTbinReader.pointsGeneral[20] = (_buf2[4] & 0xFF) * 1000;
 
-			HoTTbinReader.recordSetGeneral.addPoints(HoTTbinReader.pointsGeneral, HoTTbinReader.timeStep_ms);
 			HoTTbinReader.isJustParsed = true;
 		}
 	}
@@ -1363,7 +1422,24 @@ public class HoTTbinReader {
 	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddEAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+	protected static void parseAddEAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
+		HoTTbinReader.parse4EAM( _buf0,  _buf1,  _buf2,  _buf3,  _buf4) ;
+		if (!HoTTAdapter.isFilterEnabled
+				|| (HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600
+						&& Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
+			HoTTbinReader.recordSetElectric.addPoints(HoTTbinReader.pointsElectric, HoTTbinReader.timeStep_ms);
+		}
+	}
+
+	/**
+	 * parse the buffered data from buffer 0 to 4 
+	 * @param _buf0
+	 * @param _buf1
+	 * @param _buf2
+	 * @param _buf3
+	 * @param _buf4
+	 */
+	protected static void parse4EAM(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf3, 3);
 		HoTTbinReader.tmpClimb3 = (_buf4[3] & 0xFF);
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
@@ -1412,7 +1488,6 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsElectric[26] = (_buf3[2] & 0xFF) * 1000;
 			HoTTbinReader.pointsElectric[27] = DataParser.parse2Short(_buf4, 4) * 1000; //revolution
 
-			HoTTbinReader.recordSetElectric.addPoints(HoTTbinReader.pointsElectric, HoTTbinReader.timeStep_ms);
 			HoTTbinReader.isJustParsed = true;
 		}
 	}
@@ -1424,7 +1499,22 @@ public class HoTTbinReader {
 	 * @param _buf2
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddESC(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) throws DataInconsitsentException {
+	protected static void parseAddESC(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) throws DataInconsitsentException {
+		HoTTbinReader.parse4ESC( _buf0,  _buf1,  _buf2,  _buf3);
+		if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10
+				&& HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 20000
+				&& !(HoTTbinReader.pointsSpeedControl[6] != 0 && HoTTbinReader.pointsSpeedControl[6] / 1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
+		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
+		}
+	}
+
+	/**
+	 * parse the buffered data from buffer 0 to 4 and add points to record set
+	 * @param _buf0
+	 * @param _buf1
+	 * @param _buf2
+	 */
+	protected static void parse4ESC(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature1, 7=Temperature2
 		//8=Voltage_min, 9=Current_max, 10=Revolution_max, 11=Temperature1_max, 12=Temperature2_max
 		HoTTbinReader.tmpVoltage = DataParser.parse2Short(_buf1, 3);
@@ -1459,7 +1549,6 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsSpeedControl[11] = (_buf2[0] - 20) * 1000;
 			HoTTbinReader.pointsSpeedControl[12] = (_buf3[0] - 20) * 1000;
 		}
-		HoTTbinReader.recordSetSpeedControl.addPoints(HoTTbinReader.pointsSpeedControl, HoTTbinReader.timeStep_ms);
 		HoTTbinReader.isJustParsed = true;
 	}
 

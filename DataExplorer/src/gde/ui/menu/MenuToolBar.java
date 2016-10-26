@@ -425,6 +425,7 @@ public class MenuToolBar {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "objectSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								String previousObjectKey = MenuToolBar.this.activeObjectKey;
 								MenuToolBar.this.application.checkSaveObjectData();
 								int selectionIndex = MenuToolBar.this.objectSelectCombo.getSelectionIndex();
 								if (selectionIndex != 0) {
@@ -449,6 +450,8 @@ public class MenuToolBar {
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
 								if (MenuToolBar.this.application.getActiveDevice() != null)
 									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
+								if (!previousObjectKey.equals(MenuToolBar.this.activeObjectKey))
+									MenuToolBar.this.application.setupHistoWindows();
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
