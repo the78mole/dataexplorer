@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V29.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V30.xsd">
     <Device>
         <name implementation="gde.device.graupner.HoTTAdapter">HoTTAdapter</name>
         <manufacturer>Graupner</manufacturer>
@@ -105,6 +105,49 @@
                 <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
+            <Settlement>
+                <name>Zeitschritte</name>
+                <symbol></symbol>
+                <unit>hh:mm:ss</unit>
+                <active>true</active>
+                <score name="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
+                <score name="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
+                <score name="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
+                <score name="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
+                <score name="sumTimeStep_ms" value="Zeitdauer" type="String" description="Zeitdauer"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Settlement>
+            <Settlement>
+                <name>Paketverlustdauer</name>
+                <symbol></symbol>
+                <unit>ms</unit>
+                <active>true</active>
+                <score name="packagesLostAvg_ms" value="Mittel" type="String" description="Mittelwert"/>
+                <score name="packagesLostMin_ms" value="Minimum" type="String" description="Minimum"/>
+                <score name="packagesLostMax_ms" value="Maximum" type="String" description="Maximum"/>
+                <score name="packagesLostSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
+            </Settlement>
+            <Settlement>
+                <name>Wert</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score name="realSize" value="Anzahl Werte" type="String" description="Anzahl Werte"/>
+                <score name="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
+                <score name="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
+                <score name="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
+                <score name="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
+                <score name="sensors" value="Sensoren" type="String" description="Sensoren"/>
+            </Settlement>
+            <Settlement>
+                <name>Kennzahl</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <score name="packagesLostPerMille" value="Paketverlustquote" type="String" description="Paketverlustquote"/>
+                <property name="factor" value="1000" type="Integer" description="Promillewert"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Settlement>
         </Channel>
         <Channel name="Vario" type="TYPE_CONFIG">
             <Measurement>
@@ -442,6 +485,37 @@
                 <property name="reduction" value="20.0" type="Double" description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
+            <Settlement>
+                <name>Internal Resistance</name>
+                <symbol>Ri</symbol>
+                <unit>mOhm</unit>
+                <active>true</active>
+                <evaluation sum="false" first="true" last="true" min="true" max="true" avg="true" sigma="true" comment="definierbar in jedem channel">
+                    <calculation transitionId="0" calcType="ratioInverse" unsigned="true" refOrdinal="1" leveling="max" refOrdinalDivisor="2" divisorLeveling="min" isBasedOnRecovery = "true" comment="min(Strom@Reference - Strom@Threshold) / max(Spannung@Recovery - Spannung@Threshold) und das Ganze reziprok"/>
+                </evaluation>
+                <property name="factor" value="0.000001" type="Double" description="microOhm für Quotient mit Faktor"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Settlement>
+           <Settlement>
+                <name>engineClimb</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <evaluation sum="true" min="true" first="true" last="true" max="true" avg="true" sigma="true" comment="Summe Motorhöhe">
+                    <calculation transitionId="1" calcType="sum" unsigned="false" refOrdinal="13" comment="Höhe aufsummieren"/>
+                </evaluation>
+            </Settlement>
+            <Settlement>
+                <name>Kapazität pro Höhenmeter</name>
+                <symbol>vh</symbol>
+                <unit>mAh/m</unit>
+                <active>true</active>
+                <evaluation sum="false" first="true" last="true" min="true" max="true" avg="true" sigma="true" comment="climbCapacity">
+                    <calculation transitionId="1" calcType="ratio" unsigned="false" refOrdinal="3" refOrdinalDivisor="13" comment="delta Kapazität / delta Höhe"/>
+                </evaluation>
+            </Settlement>
+            <Transition transitionId="0" refOrdinal="2" isPeak="true" isGreater="false" isPercent="true" triggerLevel="90" recoveryLevel="10" referenceTimeMsec="5000" thresholdTimeMsec="7000" recoveryTimeMsec="5000" comment="Stromeinbruch auf min 10% mit Wiederanstieg auf min 90% über &lt; 7 Sekunden"/>
+            <Transition transitionId="1" refOrdinal="2" isPeak="false" isGreater="true" isPercent="false" triggerLevel="1500" recoveryLevel="1500" referenceTimeMsec="5000" thresholdTimeMsec="7000" recoveryTimeMsec="5000" comment="Steigen1 über 1,5 m/s über min 10 Sekunden"/>
         </Channel>
         <Channel name="Elektro" type="TYPE_CONFIG">
             <Measurement>
@@ -980,5 +1054,7 @@
         <property name="voltage_per_cell_tab" value="false"/>
         <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
         <property name="utility_device_tab" value="true" description="UTILITY_DEVICE_TAB"/>
+        <property name="histo_graphics_tab" value="true" description="HISTO_GRAPHICS_TAB"/>
+        <property name="histo_table_tab" value="true" description="HISTO_TABLE_TAB"/>
     </Desktop>
 </DeviceProperties>
