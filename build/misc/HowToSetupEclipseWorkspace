@@ -1,7 +1,7 @@
 How to setup eclipse workspace to build the DataExplorer
 
 == Prepare your system ==
-- Install the JDK
+- Install the JDK (prefer 64-Bit to enable full system heap usage)
 - Install Eclipse
 - Install ant-contrib from http://ant-contrib.sourceforge.net/ or use jar from build/ant folder after project import
 - Make sure that the ANT classpath (Window > Preferences > Ant > Runtime) is correct, containing...
@@ -28,7 +28,7 @@ How to setup eclipse workspace to build the DataExplorer
 - Open the properties editor of Eclipse
   - Enable project specific settings for "Clean Up" and "Formatter"
     - Import the settings from "build/setup" (code_cleanup_preferences.xml and code_format_preferences.xml)
-  - Java -> Compiler -> Compliance Level -> 1.6
+  - Java -> Compiler -> Compliance Level -> 1.8 
 - Build and update capabilities
   - Configure build/build.properties install.dir to your requirements (used by "clean dev-build install" to local directory, take care about permissions)
   (install.dir.windows=C:/Program\ Files\ (x86) )
