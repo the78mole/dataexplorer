@@ -34,7 +34,7 @@ How to setup eclipse workspace to build the DataExplorer
   (install.dir.windows=C:/Program\ Files\ (x86) )
 
 == Prepare stuff ==
-- In the "build" project, locate the file "build build.xml clean dist.launch"
+- In the "build" project, locate the file "build build.xml clean dev-build.launch"
   - Right-click on it and choose "Run as"
     - Select the first entry from the context menu to create all needed directories and files within
 
