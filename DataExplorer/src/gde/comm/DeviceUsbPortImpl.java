@@ -202,6 +202,8 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	@SuppressWarnings("unchecked")
 	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
 		for (UsbDevice device : (List<UsbDevice>) hub.getAttachedUsbDevices()) {
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.toString());
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, device.getUsbDeviceDescriptor().toString());
 			UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
 			if (desc.idVendor() == vendorId && desc.idProduct() == productId)
 				return device;
@@ -314,7 +316,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		else {
 			usbInterface.claim();
 		}
-		log.log(Level.OFF, "interface claimed");
+		log.log(Level.FINE, "interface claimed");
 		this.isConnected = true;
 		if (this.application != null) this.application.setPortConnected(true);
 		return usbInterface;
@@ -337,7 +339,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		}
 		if (usbInterface != null && usbInterface.isClaimed()) {
 			usbInterface.release();		
-			log.log(Level.OFF, "interface released");
+			log.log(Level.FINE, "interface released");
 		}
 		if (this.application != null) this.application.setPortConnected(false);
 	}
