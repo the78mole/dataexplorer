@@ -44,10 +44,10 @@ import javax.usb.UsbNotClaimedException;
  * Thread implementation to gather data from eStation device
  * @author Winfied Brügmann
  */
-public class GathererThread extends Thread {
+public class MC3000GathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
-	final static String	$CLASS_NAME									= GathererThread.class.getName();
-	final static Logger	log													= Logger.getLogger(GathererThread.class.getName());
+	final static String	$CLASS_NAME									= MC3000GathererThread.class.getName();
+	final static Logger	log													= Logger.getLogger(MC3000GathererThread.class.getName());
 	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
 
 	final DataExplorer	application;
@@ -69,7 +69,7 @@ public class GathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= GathererThread.WAIT_TIME_RETRYS;	//60 Min
+	int									retryCounter								= MC3000GathererThread.WAIT_TIME_RETRYS;	//60 Min
 
 	/**
 	 * data gatherer thread definition 
@@ -78,7 +78,7 @@ public class GathererThread extends Thread {
 	 * @throws UsbException 
 	 * @throws Exception 
 	 */
-	public GathererThread(DataExplorer currentApplication, MC3000 useDevice, MC3000UsbPort useSerialPort, int channelConfigNumber, MC3000Dialog useDialog) throws ApplicationConfigurationException,
+	public MC3000GathererThread(DataExplorer currentApplication, MC3000 useDevice, MC3000UsbPort useSerialPort, int channelConfigNumber, MC3000Dialog useDialog) throws ApplicationConfigurationException,
 			UsbDisconnectedException, UsbException {
 		super("dataGatherer");
 		this.application = currentApplication;
@@ -131,8 +131,8 @@ public class GathererThread extends Thread {
 			String recordSetKey5 = Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 
 			this.isCollectDataStopped = false;
-			if (GathererThread.log.isLoggable(Level.FINE))
-				GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+			if (MC3000GathererThread.log.isLoggable(Level.FINE))
+				MC3000GathererThread.log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 			lastCycleTime = System.nanoTime()/1000000;
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
@@ -247,15 +247,15 @@ public class GathererThread extends Thread {
 											slotChannel.applyTemplate(recordSetKey5, false);
 										else
 											slotChannel.applyTemplateBasics(recordSetKey5);
-										GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey5 + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
+										MC3000GathererThread.log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey5 + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 										recordSet5 = slotChannel.get(recordSetKey5);
 										recordSet5.setAllDisplayable();
 										String description = recordSet5.getRecordSetDescription();
-										recordSet5.setRecordSetDescription(description + GDE.LINE_SEPARATOR + this.device.getFirmwareString());
+										recordSet5.setRecordSetDescription(description + GDE.LINE_SEPARATOR + this.device.getHardwareString() + GDE.STRING_BLANK + this.device.getFirmwareString());
 									}
 								}
 								if (recordSet5 != null) recordSet5.addPoints(points5);
-								GathererThread.this.application.updateAllTabs(false);
+								MC3000GathererThread.this.application.updateAllTabs(false);
 								if (recordSet5 != null && (recordSet5.get(0).realSize() < 3 || recordSet5.get(0).realSize() % 10 == 0)) {
 									this.device.updateVisibilityStatus(recordSet5, true);
 								}
@@ -272,11 +272,11 @@ public class GathererThread extends Thread {
 								}
 							}
 							else
-								this.retryCounter	= GathererThread.WAIT_TIME_RETRYS;	//60 Min
+								this.retryCounter	= MC3000GathererThread.WAIT_TIME_RETRYS;	//60 Min
 						}
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
-							log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+							log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 
 							if (0 >= (retryCounter -= 1)) {
 								log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
@@ -294,8 +294,8 @@ public class GathererThread extends Thread {
 					// this case will be reached while data gathering enabled, but no data will be received
 					if (e instanceof TimeOutException) {
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
-						if (GathererThread.log.isLoggable(Level.FINE))
-							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
+						if (MC3000GathererThread.log.isLoggable(Level.FINE))
+							MC3000GathererThread.log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
 					}
 					else if (e instanceof UsbNotClaimedException) { //USB error detected, p.e. disconnect
 						stopDataGatheringThread(false, e);
@@ -306,7 +306,7 @@ public class GathererThread extends Thread {
 					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
 					else {
-						GathererThread.log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
+						MC3000GathererThread.log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
 						stopDataGatheringThread(true, e);
 					}
 				}
@@ -318,7 +318,7 @@ public class GathererThread extends Thread {
 				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("delay = %d", delay)); //$NON-NLS-1$
 			}
 			this.application.setStatusMessage(""); //$NON-NLS-1$
-			if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+			if (MC3000GathererThread.log.isLoggable(Level.FINE)) MC3000GathererThread.log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 
 			if (!this.isCollectDataStopped) {
 				this.stopDataGatheringThread(false, null);
@@ -328,11 +328,11 @@ public class GathererThread extends Thread {
 			try {
 				if (this.usbInterface != null) {
 					this.device.usbPort.closeUsbPort(this.usbInterface);
-					GathererThread.log.log(Level.FINE, "USB interface closed");
+					MC3000GathererThread.log.log(Level.FINE, "USB interface closed");
 				}
 			}
 			catch (UsbException e) {
-				GathererThread.log.log(Level.SEVERE, e.getMessage(), e);
+				MC3000GathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
@@ -354,13 +354,13 @@ public class GathererThread extends Thread {
 		//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
 		//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 		//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
-		int processModeNumber = this.device.getProcessingMode(dataBuffer);
+		int processModeNumber = this.device.getProcessingType(dataBuffer);
 		String processTypeName = this.device.getProcessingTypeName(dataBuffer);
 		//STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
 		String processStatusName = this.device.getProcessingStatusName(dataBuffer);
-		String processBatteryType = this.device.getProcessingBatteryType(dataBuffer);
-		if (GathererThread.log.isLoggable(Level.FINE)) {
-			GathererThread.log.log(Level.FINE, number + " : processTypeName = " + processTypeName + " - processStatusName = " + processStatusName);
+		String processBatteryType = this.device.getProcessingBatteryTypeName(dataBuffer);
+		if (MC3000GathererThread.log.isLoggable(Level.FINE)) {
+			MC3000GathererThread.log.log(Level.FINE, number + " : processTypeName = " + processTypeName + " - processStatusName = " + processStatusName);
 		}
 		Channel slotChannel = this.channels.get(number);
 		if (slotChannel != null) {
@@ -390,8 +390,8 @@ public class GathererThread extends Thread {
 					}
 				}
 				processRecordSetKey = String.format("%d) %s - %s %s", slotChannel.getNextRecordSetNumber(), processBatteryType, processTypeName, extend.toString());
-				if (GathererThread.log.isLoggable(Level.FINE)) {
-					GathererThread.log.log(Level.FINE, number + " : processRecordSetKey = " + processRecordSetKey);
+				if (MC3000GathererThread.log.isLoggable(Level.FINE)) {
+					MC3000GathererThread.log.log(Level.FINE, number + " : processRecordSetKey = " + processRecordSetKey);
 				}
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
@@ -402,7 +402,7 @@ public class GathererThread extends Thread {
 				else
 					slotChannel.applyTemplateBasics(processRecordSetKey);
 
-				GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
+				MC3000GathererThread.log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + slotChannel.getName()); //$NON-NLS-1$
 				recordSet = slotChannel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
 				recordSet.get(5).setUnit(device.getTemperatureUnit());
@@ -411,8 +411,8 @@ public class GathererThread extends Thread {
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(slotChannel.getNumber(), processRecordSetKey);
 				slotChannel.switchRecordSet(processRecordSetKey);
-				String description = String.format("%s%s%s; Memory # %02d", 
-						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getFirmwareString(), this.device.getBatteryMemoryNumber(number, this.usbInterface)); //$NON-NLS-1$
+				String description = String.format("%s%s%s %s; Memory # %02d", 
+						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getHardwareString(), this.device.getFirmwareString(), this.device.getBatteryMemoryNumber(number, this.usbInterface)); //$NON-NLS-1$
 				recordSet.setRecordSetDescription(description);
 			}
 
@@ -425,7 +425,7 @@ public class GathererThread extends Thread {
 
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 
-			GathererThread.this.application.updateAllTabs(false);
+			MC3000GathererThread.this.application.updateAllTabs(false);
 
 			if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
 				this.device.updateVisibilityStatus(recordSet, true);
@@ -445,20 +445,20 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			GathererThread.log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			MC3000GathererThread.log.logp(Level.WARNING, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
 
 		this.isCollectDataStopped = true;
 
 		if (this.usbPort != null && this.usbPort.getXferErrors() > 0) {
-			GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			MC3000GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.usbPort != null && this.usbPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.usbPort.isConnected()) {
 			try {
 				this.usbPort.closeUsbPort(null);
 			}
 			catch (UsbException e) {
-				GathererThread.log.log(Level.WARNING, e.getMessage(), e);
+				MC3000GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 //		if (this.dialog != null && !this.dialog.isDisposed()) {
@@ -488,7 +488,7 @@ public class GathererThread extends Thread {
 			this.usbPort.closeUsbPort(null);
 		}
 		catch (UsbException e) {
-			GathererThread.log.log(Level.WARNING, e.getMessage(), e);
+			MC3000GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 		}
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
@@ -499,7 +499,7 @@ public class GathererThread extends Thread {
 			this.application.updateDataTable(this.recordSetKey, false);
 
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
+			MC3000GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
 		}
 	}
 
@@ -517,7 +517,7 @@ public class GathererThread extends Thread {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateStatisticsData();
 				this.application.updateDataTable(this.recordSetKey, true);
-				this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
+				this.application.openMessageDialog(MC3000GathererThread.this.dialog.getDialogShell(), message);
 				//this.device.getDialog().resetButtons();
 			}
 			else {
@@ -525,10 +525,10 @@ public class GathererThread extends Thread {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
-						GathererThread.this.application.updateStatisticsData();
-						GathererThread.this.application.updateDataTable(useRecordSetKey, true);
-						GathererThread.this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
+						MC3000GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
+						MC3000GathererThread.this.application.updateStatisticsData();
+						MC3000GathererThread.this.application.updateDataTable(useRecordSetKey, true);
+						MC3000GathererThread.this.application.openMessageDialog(MC3000GathererThread.this.dialog.getDialogShell(), message);
 						//GathererThread.this.device.getDialog().resetButtons();
 					}
 				});

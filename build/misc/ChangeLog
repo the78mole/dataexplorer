@@ -1,6 +1,10 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.8 - yy xxx 2016
+Version 3.2.9 - yy xxx 2016
+Q200 SkyRC 4 channel charger 
+	- support added
+
+Version 3.2.8 - 05 Oct 2016
 - remove the restriction re-naming compressed OSD-Files
 - exchange the default value of data file path to user.home instead of using root, root causes errors for most OS due to no permissions
 MC3000

@@ -113,7 +113,7 @@ public class MC3000Dialog extends DeviceDialog {
 	static final String					MC3000_XSD							= "MC3000_V01.xsd";																//$NON-NLS-1$
 
 	Button											saveButton, helpButton, resetAllButton, closeButton;
-	GathererThread							dataGatherThread;
+	MC3000GathererThread				dataGatherThread;
 
 	final MC3000								device;																																		// get device specific things, get serial port, ...
 	final MC3000UsbPort					usbPort;																																		// open/close port execute getData()....

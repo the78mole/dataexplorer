@@ -62,9 +62,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected String[]		USAGE_MODE_LI;
 	protected String[]		USAGE_MODE_NI;
 	protected String[]		USAGE_MODE_ZN;
+	protected String[]		USAGE_MODE_PB;
 	protected String[]		BATTERY_TYPE;
-	//firmware 1.05+ power and energy comes direct from device
-	//protected int[]			resetEnergy = new int[] {5,5,5,5};
 	final static String[]	cellTypeNames				= { "LiIon", "LiFe", "LiIo4.35", "NiMH", "NiCd", "NiZn", "Eneloop", "RAM" };
 	final static String[]	cycleModeNames			= { "C>D", "C>D>C", "D>C", "D>C>D" };
 	final static String[]	operationModeLi			= { "Charge", "Refresh", "Storage", "Discharge", "Cycle" };
@@ -122,6 +121,14 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 
 		public int getFirmwareVersionAsInt() {
 			return Integer.valueOf(String.format("%d%02d", this.machineId[11], this.machineId[12])).intValue();
+		}
+
+		public String getHardwareVersion() {
+			return String.format("Firmware : %d.%d", this.machineId[13]/10, this.machineId[13]%10);
+		}
+
+		public int getHardwareVersionAsInt() {
+			return this.machineId[13];
 		}
 
 		public byte getCurrentSlotNumber() {
@@ -1195,7 +1202,6 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
-	@Override
 	public MC3000Dialog getDialog() {
 		return this.dialog;
 	}
@@ -1286,17 +1292,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//add implementation where data point are calculated
-		//do not forget to make record displayable -> record.setDisplayable(true);
-
-		//for the moment there are no calculations necessary
-		//String[] recordNames = recordSet.getRecordNames();
-		//for (int i=0; i<recordNames.length; ++i) {
-		//	MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
-		//	if (measurement.isCalculation()) {
-		//		log.log(Level.FINE, "do calculation for " + recordNames[i]); //$NON-NLS-1$
-		//	}
-		//}
+		//no implementation required
 	}
 
 	/**
@@ -1329,7 +1325,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				try {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
+						this.getDialog().dataGatherThread = new MC3000GathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
 						try {
 							if (this.getDialog().dataGatherThread != null && this.usbPort.isConnected()) {
 								this.systemSettings = new MC3000.SystemSettings(this.usbPort.getSystemSettings(this.getDialog().dataGatherThread.getUsbInterface()));
@@ -1416,11 +1412,11 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
-	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param dataBuffer byte array with the data to be converted
 	 */
 	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		int chargeCorrection = (this.getProcessingMode(dataBuffer) == 3 || ((this.getProcessingMode(dataBuffer) == 1 || this.getProcessingMode(dataBuffer) == 2 || this.getProcessingMode(dataBuffer) == 4) && this
+		int chargeCorrection = (this.getProcessingType(dataBuffer) == 3 || ((this.getProcessingType(dataBuffer) == 1 || this.getProcessingType(dataBuffer) == 2 || this.getProcessingType(dataBuffer) == 4) && this
 				.getProcessingStatus(dataBuffer) == 2)) ? -1 : 1;
 		//0=Voltage 1=Current 2=Capacity 3=power 4=Energy 5=Temperature 6=Resistence
 		points[0] = DataParser.parse2Short(dataBuffer[9], dataBuffer[8]) * 1000;
@@ -1617,7 +1613,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return
 	 */
-	public String getProcessingBatteryType(final byte[] dataBuffer) {
+	public String getProcessingBatteryTypeName(final byte[] dataBuffer) {
 		return this.BATTERY_TYPE[dataBuffer[2]];
 	}
 
@@ -1630,7 +1626,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer 
 	 * @return
 	 */
-	public int getProcessingMode(final byte[] dataBuffer) {
+	public int getProcessingType(final byte[] dataBuffer) {
 		return dataBuffer[3];
 	}
 
@@ -1661,16 +1657,16 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		case 0: //LiIon
 		case 1: //LiFe
 		case 2: //LiHv
-			processTypeName = this.USAGE_MODE_LI[this.getProcessingMode(dataBuffer)];
+			processTypeName = this.USAGE_MODE_LI[this.getProcessingType(dataBuffer)];
 			break;
 		case 3: //NiMH
 		case 4: //NiCD
 		case 6: //Eneloop
-			processTypeName = this.USAGE_MODE_NI[this.getProcessingMode(dataBuffer)];
+			processTypeName = this.USAGE_MODE_NI[this.getProcessingType(dataBuffer)];
 			break;
 		case 5: //NiZn
 		case 7: //RAM
-			processTypeName = this.USAGE_MODE_ZN[this.getProcessingMode(dataBuffer)];
+			processTypeName = this.USAGE_MODE_ZN[this.getProcessingType(dataBuffer)];
 			break;
 		}
 		return this.settings.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
@@ -1707,6 +1703,13 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		default:
 			return new int[] { -1, -1 };
 		}
+	}
+
+	/**
+	 * @return string containing firmware : major.minor
+	 */
+	public String getHardwareString() {
+		return this.systemSettings.getHardwareVersion();
 	}
 
 	/**
