@@ -276,25 +276,25 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		boolean doFullRead = initializeBlocks <= 0;
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsReceiver.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsReceiver.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetChannel = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsChannel.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsChannel.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetVario = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsVario.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsVario.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGPS = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsGPS.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGPS.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGeneral = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsGeneral.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGeneral.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetElectric = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsElectric.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsElectric.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetSpeedControl = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsSpeedControl.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsSpeedControl.length, 10);
 		}
 		// read all the data blocks from the file, parse only for the active channel
 		int initializeBlockLimit = initializeBlocks > 0 ? initializeBlocks : Integer.MAX_VALUE;
@@ -660,25 +660,25 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		boolean doFullRead = initializeBlocks <= 0;
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsReceiver.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsReceiver.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetChannel = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsChannel.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsChannel.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetVario = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsVario.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsVario.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGPS = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsGPS.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGPS.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGeneral = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsGeneral.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGeneral.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetElectric = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsElectric.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsElectric.length, 10);
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetSpeedControl = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(HoTTbinHistoReader.pointsSpeedControl.length, doFullRead);
+			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsSpeedControl.length, 10);
 		}
 		// read all the data blocks from the file, parse only for the active channel
 		int initializeBlockLimit = initializeBlocks > 0 ? initializeBlocks : Integer.MAX_VALUE;
