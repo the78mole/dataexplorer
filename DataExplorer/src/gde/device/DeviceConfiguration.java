@@ -1233,54 +1233,6 @@ public class DeviceConfiguration {
 	}
 	
 	/**
-	 * query if the histo graphics tab should be updated
-	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
-	 */
-	public boolean isHistoGraphicsTabRequested() {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
-	}
-	
-	/**
-	 * set the DesktopType.HISTO_GRAPHICS_TAB property to the given value
-	 * @param enable
-	 */
-	public void setHistoGraphicsTabRequested(boolean enable) {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB);
-		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB.name(), enable);
-		}
-		else {
-			property.setValue(enable);
-		}
-		this.isChangePropery = true;
-	}
-		
-	/**
-	 * query if the histo table tab should be updated
-	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
-	 */
-	public boolean isHistoTableTabRequested() {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
-	}
-	
-	/**
-	 * set the DesktopType.HISTO_TABLE_TAB property to the given value
-	 * @param enable
-	 */
-	public void setHistoTableTabRequested(boolean enable) {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB);
-		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB.name(), enable);
-		}
-		else {
-			property.setValue(enable);
-		}
-		this.isChangePropery = true;
-	}
-		
-	/**
 	 * query if the target measurement reference ordinal used by the given desktop type
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */

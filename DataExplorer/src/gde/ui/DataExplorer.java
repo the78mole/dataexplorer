@@ -821,8 +821,8 @@ public class DataExplorer extends Composite {
 	 * if a histo window is selected: determine histo files, read histo data and initialize window tab.
 	 */
 	public void setupHistoWindows() {
-		DataExplorer.application.setHistoGraphicsTabItemVisible(this.settings.isHistoActive() && ((DeviceConfiguration) application.getActiveDevice()).isHistoGraphicsTabRequested());
-		DataExplorer.application.setHistoTableTabItemVisible(this.settings.isHistoActive() && ((DeviceConfiguration) application.getActiveDevice()).isHistoTableTabRequested());
+		DataExplorer.application.setHistoGraphicsTabItemVisible(this.settings.isHistoActive() );
+		DataExplorer.application.setHistoTableTabItemVisible(this.settings.isHistoActive());
 		if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
 			DataExplorer.this.setupHistoGraphicsWindow();
 		} else if (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow) {
@@ -950,7 +950,7 @@ public class DataExplorer extends Composite {
 	 * @param recordSet 
 	 */
 	public synchronized void addHistoTableColumn(final RecordSet recordSet) {
-		if (recordSet != null && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && !((DeviceConfiguration) DataExplorer.this.getActiveDevice()).isHistoTableTabRequested()) {
+		if (recordSet != null && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed()) {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					DataExplorer.this.histoTableTabItem.addRecordSetColumn(recordSet);
