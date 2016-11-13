@@ -2030,12 +2030,20 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * update the histo tabs if visible.
+	 * @param readFromFiles if true then reload from files; if false then use histo vault data 
+	 */
+	public void updateHistoTabs(boolean readFromFiles) {
+		updateHistoTabs(true, true, true); // todo temporary change  -  must be set correctly later
+	}
+
+	/**
 	 * update all histo windows.
 	 */
 	public void updateHistoTabs(final boolean force, final boolean redrawCurveSelector, final boolean renewTrail) {
 		//TODO updateHistoTabs  take care of setupHistoWindows
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (renewTrail) {
+			if (renewTrail && this.histoSet.size() > 0) {
 				this.histoSet.getTrailRecordSet().addHisto(this.histoSet);
 					}
 			this.updateHistoGraphicsWindow(redrawCurveSelector);
