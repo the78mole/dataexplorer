@@ -21,12 +21,13 @@ package gde.ui.tab;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoRecordSet;
 import gde.data.HistoSet;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.log.Level;
+import gde.data.TrailRecord;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -39,6 +40,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Vector;
+import java.util.NavigableMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -70,24 +72,27 @@ import org.eclipse.swt.widgets.TableItem;
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	final static String				$CLASS_NAME						= HistoTableWindow.class.getName();
-	final static Logger				log										= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME						= HistoTableWindow.class.getName();
+	private final static Logger	log										= Logger.getLogger($CLASS_NAME);
 
-	Table											dataTable;
-	TableColumn								recordsColumn;
-	TableCursor								cursor;
-	Vector<Integer>						rowVector							= new Vector<Integer>(2);
-	Vector<Integer>						topindexVector				= new Vector<Integer>(2);
+	private final HistoSet			histoSet							= HistoSet.getInstance();
 
-	final DataExplorer				application;
-	final Channels						channels;
-	final Settings						settings;
-	final CTabFolder					tabFolder;
-	final Menu								popupmenu;
-	final TabAreaContextMenu	contextMenu;
+	Table												dataTable;
+	TableColumn									recordsColumn;
+	TableColumn									tableCurveTypeColumn;
+	TableCursor									cursor;
+	Vector<Integer>							rowVector							= new Vector<>(2);
+	Vector<Integer>							topindexVector				= new Vector<>(2);
 
-	final int									textExtentFactor			= 7;
-	final String							isoDateTimeDelimiter	= "T";															//$NON-NLS-1$
+	final DataExplorer					application;
+	final Channels							channels;
+	final Settings							settings;
+	final CTabFolder						tabFolder;
+	final Menu									popupmenu;
+	final TabAreaContextMenu		contextMenu;
+
+	final int										textExtentFactor			= 7;
+	final String								isoDateTimeDelimiter	= "T";															//$NON-NLS-1$
 
 	public HistoTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
@@ -104,7 +109,6 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	public void create() {
-		final HistoSet histoSet = HistoSet.getInstance();
 		this.dataTable = new Table(this.tabFolder, SWT.VIRTUAL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		this.setControl(this.dataTable);
 		this.dataTable.setLinesVisible(true);
@@ -278,13 +282,10 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addListener(SWT.SetData, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				if (histoSet.getMeasurements().size() > 0) {
-					HistoTableWindow.this.dataTable.setRedraw(true);
+				if (HistoTableWindow.this.histoSet.getTrailRecordSet().size() > 0) {
 					TableItem item = (TableItem) event.item;
-					log.log(Level.OFF, "index = " + HistoTableWindow.this.dataTable.indexOf(item));
-					String[] values = histoSet.getTableRow(HistoTableWindow.this.dataTable.indexOf(item));
-					item.setText(values);
-					log.log(java.util.logging.Level.OFF, "dataTable.addListener   table item columns: " + values.length); //$NON-NLS-1$
+					TrailRecord trailRecord = (TrailRecord) HistoTableWindow.this.histoSet.getTrailRecordSet().getVisibleAndDisplayableRecordsForTable().get(HistoTableWindow.this.dataTable.indexOf(item));
+					item.setText(trailRecord.getHistoTableRow());
 				}
 			}
 		});
@@ -354,6 +355,14 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	/**
+	 * query if this component is visible 
+	 * @return true if table window is visible
+	 */
+	public boolean isVisible() {
+		return this.dataTable.isVisible();
+	}
+
+	/**
 	 * Helper function for workaroundTableCursor()
 	 * @param row
 	 * @param topindex
@@ -372,82 +381,65 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	/**
-	 * set up new header column according device properties based on current histoSet contents.
-	 * add record set columns if HistoSet already holds record sets.
+	 * set up two header columns and columns for the trail recordsets of the histoSet timestamp range.
 	 */
 	public void setHeader() {
-		final HistoSet histoSet = HistoSet.getInstance();
+		// clean old header
 		this.dataTable.removeAll(); // prevent to display flickering (to some extent only)
 		for (TableColumn tableColumn : this.dataTable.getColumns()) {
 			tableColumn.dispose();
 		}
 		setRowCount(0); // ET required for Listener firing on setRowCount(xyz)
 
-		String time = Messages.getString(MessageIds.GDE_MSGT0436);
+		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0352);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.recordsColumn.setWidth(time.length() * (this.textExtentFactor));
-		this.recordsColumn.setText(time);
-		// final Combo combo = new Combo(this.dataTable, SWT.READ_ONLY);
-		// combo.setBounds(50, 50, 150, 65);
-		// String items[] = { "Item One", "Item Two", "Item Three", "Item Four",
-		// "Item Five" };
-		// combo.setItems(items);
-		// TableItem tableItem=new TableItem(this.dataTable,SWT.NONE);
-		// TableEditor editor = new TableEditor (this.dataTable);
-		// editor.minimumWidth = combo.getSize ().x;
-		// editor.horizontalAlignment = SWT.CENTER;
-		// editor.setEditor(combo, tableItem, 1);
+		this.recordsColumn.setWidth(recordTitle.length() * this.textExtentFactor * 30 / 10);
+		this.recordsColumn.setText(recordTitle);
 
-		for (List<HistoRecordSet> cachedRecordSets : histoSet.values()) {
-			for (RecordSet recordSet : cachedRecordSets) {
-				StringBuilder sb = new StringBuilder();
-				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(recordSet.getStartTimeStamp()), ZoneId.systemDefault());
-				sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
-				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-				column.setWidth(sb.length() * (int) (this.textExtentFactor * 0.9));
-				column.setText(sb.toString());
+		String curveTypeHeader = Messages.getString(MessageIds.GDE_MSGT0828);
+		this.recordsColumn = new TableColumn(this.dataTable, SWT.LEFT);
+		this.recordsColumn.setWidth(curveTypeHeader.length() * this.textExtentFactor * 15 / 10);
+		this.recordsColumn.setText(curveTypeHeader);
+
+		if (this.histoSet.size() > 0) {
+			// get the timestamp range and sort order
+			long minimumTimeStamp = this.histoSet.lastKey();
+			long maximumTimeStamp = this.histoSet.firstKey();
+			NavigableMap<Long, List<HistoRecordSet>> histoSubSet = this.histoSet.subMap(maximumTimeStamp, true, minimumTimeStamp, true);
+			if (!settings.isXAxisReversed()) {
+				histoSubSet = histoSubSet.descendingMap();
 			}
+
+			// set the data columns of the new header line
+			Channel activeChannel = this.channels.getActiveChannel();
+			if (activeChannel != null) {
+				if (histoSubSet.size() > 0) {
+					for (List<HistoRecordSet> cachedRecordSets : histoSubSet.values()) {
+						for (RecordSet recordSet : cachedRecordSets) {
+							StringBuilder sb = new StringBuilder();
+							ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(recordSet.getStartTimeStamp()), ZoneId.systemDefault());
+							sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
+							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+							column.setWidth(sb.length() * this.textExtentFactor * 8 / 10);
+							column.setText(sb.toString());
+						}
+					}
+				}
+				else {
+					if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //todo required??? add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+						column.setWidth(100);
+					}
+				}
+			}
+
 		}
 		log.log(java.util.logging.Level.FINER, "dataTable.getColumnCount() " + this.dataTable.getColumnCount()); //$NON-NLS-1$
-		setRowCount(histoSet.getMeasurements().size()); // triggers table items
-		log.log(java.util.logging.Level.FINER, "dataTable.getItems.size() " + this.dataTable.getItems().length); //$NON-NLS-1$
 	}
 
 	/**
-	 * inserts record set data in a new column which is placed according to the record set start timestamp.
-	 * @param requestingRecordSet
-	 */
-	public void addRecordSetColumn(RecordSet requestingRecordSet) {
-		final HistoSet histoSet = HistoSet.getInstance();
-		int insertColumnPosition = this.dataTable.getColumns().length;
-		StringBuilder sb = new StringBuilder();
-		ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(requestingRecordSet.getStartTimeStamp()), ZoneId.systemDefault());
-		sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
-		for (int j = 1; j < this.dataTable.getColumns().length; j++) {
-			TableColumn tableColumn = this.dataTable.getColumns()[j];
-			if (tableColumn.getText().compareTo(sb.toString()) < 0) {
-				insertColumnPosition = j;
-				log.log(java.util.logging.Level.INFO, (String.format("new column inserted at Position %d of %d columns", insertColumnPosition, this.dataTable.getColumns().length))); //$NON-NLS-1$
-				break;
-			}
-		}
-		TableColumn column = new TableColumn(this.dataTable, SWT.CENTER, insertColumnPosition);
-		column.setWidth(sb.length() * (int) (this.textExtentFactor * 0.9));
-		column.setText(sb.toString());
-
-		TableItem[] items = this.dataTable.getItems();
-		int visibleItemCount = (this.dataTable.getClientArea().height - this.dataTable.getHeaderHeight()) / this.dataTable.getItemHeight() + 1;
-		// fill only visible items in the virtual table - filling more items will prevent firing the SWT.Data event and leave the header column empty
-		for (int i = 0; i < Math.min(visibleItemCount, items.length); i++) {
-			Record record = requestingRecordSet.getRecord(histoSet.getMeasurements().get(i).getName());
-			double value = this.application.getActiveDevice().translateValue(record, record.getAvgValue()) / 1000.;
-			items[i].setText(insertColumnPosition, record.getDecimalFormat().format(value));
-		}
-		log.log(java.util.logging.Level.FINE, String.format("added column for %s  %s", requestingRecordSet.getName(), zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))); //$NON-NLS-1$
-	}
-
-	/**
-	 * @param count of record entries
+	 * triggers the table listener SWT.SetData based on the visible and displayable records.
+	 * @param count of visible (!) record entries
 	 */
 	public void setRowCount(int count) {
 		this.dataTable.setItemCount(count);
@@ -478,6 +470,10 @@ public class HistoTableWindow extends CTabItem {
 		imageGC.dispose();
 
 		return tabContentImage;
+	}
+
+	public int getTableLength() {
+		return this.dataTable.getItems().length;
 	}
 
 }

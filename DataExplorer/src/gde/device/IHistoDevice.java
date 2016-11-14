@@ -28,7 +28,7 @@ import java.io.IOException;
  * devices with history support implementations.
  * @author Thomas Eickert
  */
-public interface IHistoDevice { //TODO merging with IDevice later
+public interface IHistoDevice { //todo merging with IDevice later
 
 	/**
 	 * add record data size points from binary file to each measurement.
@@ -39,7 +39,23 @@ public interface IHistoDevice { //TODO merging with IDevice later
 	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
 	 * @param filePath 
 	 * @throws DataInconsitsentException 
+	 * @throws Exception 
 	 */
-	public void addBinFileAsRawDataPoints(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException;
+	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException, Exception;
+
+	/**
+	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param pointsLength number of non-calculation measurement points  
+	 */
+	public void setSampling(int pointsLength);
+
+	/**
+	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param maxPoints maximum values from the data buffer which are verified during sampling
+	 * @param minPoints minimum values from the data buffer which are verified during sampling
+	 * @throws DataInconsitsentException 
+	 */
+	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException ;
+
 
 }

@@ -44,22 +44,22 @@ import org.eclipse.swt.graphics.Rectangle;
  * @author Thomas Eickert
  */
 public class HistoGraphicsWindow extends CTabItem {
-	final static String		$CLASS_NAME					= HistoGraphicsWindow.class.getName();
-	final static Logger		log							= Logger.getLogger($CLASS_NAME);
+	final static String			$CLASS_NAME							= HistoGraphicsWindow.class.getName();
+	final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
-	final CTabFolder			tabFolder;
+	final CTabFolder				tabFolder;
 
-	SashForm						graphicSashForm;
-	boolean						isCurveSelectorEnabled	= true;
-	int[]							sashFormWeights			= new int[] { 100, 1000 };
+	SashForm								graphicSashForm;
+	boolean									isCurveSelectorEnabled	= true;
+	int[]										sashFormWeights					= new int[] { 100, 1000 };
 
 	HistoSelectorComposite	curveSelectorComposite;
-	HistoGraphicsComposite	histoGraphicsComposite;
+	HistoGraphicsComposite	graphicsComposite;
 
-	final DataExplorer		application;
+	final DataExplorer			application;
 	// ET final Channels channels;
-	final Settings				settings;
-	final String				tabName;
+	final Settings					settings;
+	final String						tabName;
 	// ET final int windowType;
 
 	public HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
@@ -79,7 +79,7 @@ public class HistoGraphicsWindow extends CTabItem {
 		this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
 		this.setControl(this.graphicSashForm);
 		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
-		this.histoGraphicsComposite = new HistoGraphicsComposite(this.graphicSashForm);
+		this.graphicsComposite = new HistoGraphicsComposite(this.graphicSashForm);
 		this.graphicSashForm.setWeights(new int[] { 117, GDE.shell.getClientArea().width - 117 });
 	}
 
@@ -88,7 +88,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @return true if graphics window is visible
 	 */
 	public boolean isVisible() {
-		return this.histoGraphicsComposite.isVisible();
+		return this.graphicsComposite.isVisible();
 	}
 
 	/**
@@ -96,17 +96,16 @@ public class HistoGraphicsWindow extends CTabItem {
 	 */
 	public void redrawGraphics(final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.histoGraphicsComposite.doRedrawGraphics();
-			this.histoGraphicsComposite.updateCaptions();
-			if (redrawCurveSelector)
-				this.curveSelectorComposite.doUpdateCurveSelectorTable();
-		} else {
+			this.graphicsComposite.doRedrawGraphics();
+			this.graphicsComposite.updateCaptions();
+			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
+		}
+		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					HistoGraphicsWindow.this.histoGraphicsComposite.doRedrawGraphics();
-					HistoGraphicsWindow.this.histoGraphicsComposite.updateCaptions();
-					if (redrawCurveSelector)
-						HistoGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					HistoGraphicsWindow.this.graphicsComposite.doRedrawGraphics();
+					HistoGraphicsWindow.this.graphicsComposite.updateCaptions();
+					if (redrawCurveSelector) HistoGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
 			});
 		}
@@ -117,11 +116,12 @@ public class HistoGraphicsWindow extends CTabItem {
 	*/
 	public void updateCaptions() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.histoGraphicsComposite.updateCaptions();
-		} else {
+			this.graphicsComposite.updateCaptions();
+		}
+		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					HistoGraphicsWindow.this.histoGraphicsComposite.updateCaptions();
+					HistoGraphicsWindow.this.graphicsComposite.updateCaptions();
 				}
 			});
 		}
@@ -133,7 +133,8 @@ public class HistoGraphicsWindow extends CTabItem {
 	public void updateCurveSelectorTable() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
-		} else {
+		}
+		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					HistoGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
@@ -162,11 +163,11 @@ public class HistoGraphicsWindow extends CTabItem {
 			this.sashFormWeights = newWeights;
 			try {
 				this.graphicSashForm.setWeights(this.sashFormWeights);
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 				log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e);
 			}
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth);
 		}
 	}
 
@@ -211,11 +212,11 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * enable display of graphics header
 	 */
 	public void enableGraphicsHeader(boolean enabled) {
-		this.histoGraphicsComposite.enableGraphicsHeader(enabled);
+		this.graphicsComposite.enableGraphicsHeader(enabled);
 	}
 
 	public void clearHeaderAndComment() {
-		this.histoGraphicsComposite.clearHeaderAndComment();
+		this.graphicsComposite.clearHeaderAndComment();
 	}
 
 	/**
@@ -223,7 +224,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
 	public void setModeState(int mode) {
-		this.histoGraphicsComposite.setModeState(mode);
+		this.graphicsComposite.setModeState(mode);
 	}
 
 	/**
@@ -237,7 +238,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @return the graphicsComposite
 	 */
 	public GraphicsComposite getGraphicsComposite() {
-		return this.histoGraphicsComposite;
+		return this.graphicsComposite;
 	}
 
 	/**
@@ -258,9 +259,8 @@ public class HistoGraphicsWindow extends CTabItem {
 		GC imageGC = new GC(tabContentImage);
 		this.graphicSashForm.print(imageGC);
 		if (GDE.IS_MAC) {
-			Image graphics = this.histoGraphicsComposite.getGraphicsPrintImage();
-			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.histoGraphicsComposite.getGraphicsPrintImage().getImageData())), bounds.width
-					- graphics.getBounds().width, 0);
+			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
+			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), bounds.width - graphics.getBounds().width, 0);
 		}
 		imageGC.dispose();
 
@@ -290,8 +290,8 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @param curveAreaBackground the curveAreaBackground to set
 	 */
 	public void setCurveAreaBackground(Color curveAreaBackground) {
-		this.histoGraphicsComposite.curveAreaBackground = curveAreaBackground;
-		this.histoGraphicsComposite.graphicCanvas.redraw();
+		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
+		this.graphicsComposite.graphicCanvas.redraw();
 	}
 
 	/**
@@ -299,8 +299,8 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @param borderColor the curveAreaBackground to set
 	 */
 	public void setCurveAreaBorderColor(Color borderColor) {
-		this.histoGraphicsComposite.curveAreaBorderColor = borderColor;
-		this.histoGraphicsComposite.graphicCanvas.redraw();
+		this.graphicsComposite.curveAreaBorderColor = borderColor;
+		this.graphicsComposite.graphicCanvas.redraw();
 	}
 
 	/**
@@ -308,11 +308,11 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @param surroundingBackground the surroundingBackground to set
 	 */
 	public void setSurroundingBackground(Color surroundingBackground) {
-		this.histoGraphicsComposite.surroundingBackground = surroundingBackground;
-		this.histoGraphicsComposite.setBackground(surroundingBackground);
-		this.histoGraphicsComposite.graphicsHeader.setBackground(surroundingBackground);
-		this.histoGraphicsComposite.recordSetComment.setBackground(surroundingBackground);
-		this.histoGraphicsComposite.doRedrawGraphics();
+		this.graphicsComposite.surroundingBackground = surroundingBackground;
+		this.graphicsComposite.setBackground(surroundingBackground);
+		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
+		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
+		this.graphicsComposite.doRedrawGraphics();
 	}
 
 }
