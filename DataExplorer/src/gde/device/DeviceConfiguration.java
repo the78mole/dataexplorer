@@ -19,24 +19,11 @@
 ****************************************************************************************/
 package gde.device;
 
-import gde.GDE;
-import gde.comm.IDeviceCommPort;
-import gde.config.Settings;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.CalculationThread;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -55,6 +42,20 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.swt.custom.CTabItem;
+
+import gde.GDE;
+import gde.comm.IDeviceCommPort;
+import gde.config.Settings;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -91,17 +92,18 @@ public class DeviceConfiguration {
 	public final static int										DEVICE_TYPE_RECEIVER			= 7;
 	public final static int										DEVICE_TYPE_MULTIMETER		= 8;
 	public final static int										DEVICE_TYPE_CONTROLLER		= 9;
-	
+
 	public final static int										HEIGHT_RELATIVE						= 0;
 	public final static int										HEIGHT_ABSOLUTE						= 1;
 	public final static int										HEIGHT_CLAMPTOGROUND			= 2;
-	
+
 	public static final String								UNIT_DEGREE_FAHRENHEIT		= "°F";
 	public static final String								UNIT_DEGREE_CELSIUS				= "°C";
-	
-	protected 					CalculationThread			calculationThread 				= null; // universal device calculation thread (slope)
-	protected						Integer								kmzMeasurementOrdinal			= null;
-	protected int sampledCounter;
+
+	protected CalculationThread								calculationThread					= null;																									// universal device calculation thread (slope)
+	protected Integer													kmzMeasurementOrdinal			= null;
+
+	private int[]															channelGroups;																																		// channelGroupIdentifier for each channel; -1 if channel does not belong to a group
 
 	/**
 	 * method to test this class
@@ -119,14 +121,14 @@ public class DeviceConfiguration {
 		String basePath = "C:/Documents and Settings/brueg/Application Data/DataExplorer/Devices/"; //$NON-NLS-1$
 
 		try {
-      Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V13.xsd")); //$NON-NLS-1$
+			Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V13.xsd")); //$NON-NLS-1$
 			JAXBContext jc = JAXBContext.newInstance("gde.device"); //$NON-NLS-1$
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema(schema);
 			JAXBElement<DevicePropertiesType> elememt;
-			
+
 			// simple test with Picolario.xml
-			elememt = (JAXBElement<DevicePropertiesType>)unmarshaller.unmarshal(new File (basePath + "Picolario.xml")); //$NON-NLS-1$
+			elememt = (JAXBElement<DevicePropertiesType>) unmarshaller.unmarshal(new File(basePath + "Picolario.xml")); //$NON-NLS-1$
 			DevicePropertiesType devProps = elememt.getValue();
 			DeviceType device = devProps.getDevice();
 			log.log(Level.ALL, "device.getName() = " + device.getName()); //$NON-NLS-1$
@@ -134,17 +136,14 @@ public class DeviceConfiguration {
 			log.log(Level.ALL, "serialPort.getPort() = " + serialPort.getPort()); //$NON-NLS-1$
 			serialPort.setPort("COM10"); //$NON-NLS-1$
 			log.log(Level.ALL, "serialPort.getPort() = " + serialPort.getPort()); //$NON-NLS-1$
-			
-			
-			
+
 			// store back manipulated XML
 			Marshaller marshaller = jc.createMarshaller();
-	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,  Boolean.valueOf(true));
-	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
+			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
 
-	    marshaller.marshal(elememt,
-	    	   new FileOutputStream(basePath + "jaxbOutput.xml")); //$NON-NLS-1$
-			
+			marshaller.marshal(elememt, new FileOutputStream(basePath + "jaxbOutput.xml")); //$NON-NLS-1$
+
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -167,7 +166,7 @@ public class DeviceConfiguration {
 		this.unmarshaller = this.settings.getUnmarshaller();
 		this.marshaller = this.settings.getMarshaller();
 
-		this.elememt = (JAXBElement<DevicePropertiesType>)this.unmarshaller.unmarshal(this.xmlFile);
+		this.elememt = (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(this.xmlFile);
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
@@ -177,7 +176,7 @@ public class DeviceConfiguration {
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
@@ -194,7 +193,7 @@ public class DeviceConfiguration {
 		this.unmarshaller = tmpUnmarshaller;
 		this.marshaller = null;
 
-		this.elememt = (JAXBElement<DevicePropertiesType>)this.unmarshaller.unmarshal(this.xmlFile);
+		this.elememt = (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(this.xmlFile);
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
@@ -204,7 +203,7 @@ public class DeviceConfiguration {
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
@@ -219,11 +218,11 @@ public class DeviceConfiguration {
 		this.elememt = deviceConfig.elememt;
 		this.deviceProps = deviceConfig.deviceProps;
 		this.device = deviceConfig.device;
-		this.serialPort = deviceConfig.serialPort;	
+		this.serialPort = deviceConfig.serialPort;
 		this.usbPort = this.deviceProps.getUsbPort();
 		this.dataBlock = deviceProps.dataBlock;
 		this.state = deviceProps.state;
-		this.timeBase = deviceConfig.timeBase;	
+		this.timeBase = deviceConfig.timeBase;
 		this.desktop = deviceProps.desktop;
 		this.isChangePropery = deviceConfig.isChangePropery;
 
@@ -236,7 +235,7 @@ public class DeviceConfiguration {
 	public void storeDeviceProperties() {
 		if (this.isChangePropery) {
 			try {
-				this.marshaller.marshal(this.elememt,  new FileOutputStream(this.xmlFile));
+				this.marshaller.marshal(this.elememt, new FileOutputStream(this.xmlFile));
 			}
 			catch (Throwable t) {
 				log.log(Level.SEVERE, t.getMessage(), t);
@@ -245,19 +244,18 @@ public class DeviceConfiguration {
 		}
 	}
 
-
 	/**
 	 * writes device properties XML to given full qualified file name
 	 * @param fullQualifiedFileName
 	 */
 	public void storeDeviceProperties(String fullQualifiedFileName) {
-			try {
-				this.marshaller.marshal(this.elememt,  new FileOutputStream(fullQualifiedFileName));
-			}
-			catch (Throwable t) {
-				log.log(Level.SEVERE, t.getMessage(), t);
-			}
-			this.isChangePropery = false;
+		try {
+			this.marshaller.marshal(this.elememt, new FileOutputStream(fullQualifiedFileName));
+		}
+		catch (Throwable t) {
+			log.log(Level.SEVERE, t.getMessage(), t);
+		}
+		this.isChangePropery = false;
 	}
 
 	/**
@@ -280,7 +278,7 @@ public class DeviceConfiguration {
 	public SerialPortType getSerialPortType() {
 		return this.serialPort;
 	}
-	
+
 	/**
 	 * remove the serialPort of the active device configuration
 	 */
@@ -295,7 +293,7 @@ public class DeviceConfiguration {
 	public UsbPortType getUsbPortType() {
 		return this.usbPort;
 	}
-	
+
 	/**
 	 * remove the serialPort of the active device configuration
 	 */
@@ -456,9 +454,7 @@ public class DeviceConfiguration {
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort() {
-		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() 
-				: this.serialPort != null ? this.serialPort.getPort() 
-						: this.getUsbPortType() != null ? "USB" : GDE.STRING_EMPTY;
+		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort != null ? this.serialPort.getPort() : this.getUsbPortType() != null ? "USB" : GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -477,7 +473,7 @@ public class DeviceConfiguration {
 	public Integer getBaudeRate() {
 		return this.serialPort != null ? this.serialPort.getBaudeRate() : 9800;
 	}
-	
+
 	public void setBaudeRate(Integer value) {
 		this.isChangePropery = true;
 		if (this.serialPort == null) createSerialPort();
@@ -569,7 +565,7 @@ public class DeviceConfiguration {
 		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setIsRTS(value);
 	}
-	
+
 	public int getReadTimeOut() {
 		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getReadTimeOut() : 0;
@@ -583,7 +579,7 @@ public class DeviceConfiguration {
 		}
 		this.serialPort.getTimeOut().setReadTimeOut(value);
 	}
-	
+
 	public int getReadStableIndex() {
 		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getReadStableIndex() : 0;
@@ -597,7 +593,7 @@ public class DeviceConfiguration {
 		}
 		this.serialPort.getTimeOut().setReadStableIndex(value);
 	}
-	
+
 	public int getWriteCharDelayTime() {
 		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWriteCharDelayTime() : 0;
@@ -611,7 +607,7 @@ public class DeviceConfiguration {
 		}
 		this.serialPort.getTimeOut().setWriteCharDelayTime(value);
 	}
-	
+
 	public int getWriteDelayTime() {
 		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWriteDelayTime() : 0;
@@ -625,7 +621,7 @@ public class DeviceConfiguration {
 		}
 		this.serialPort.getTimeOut().setWriteDelayTime(value);
 	}
-	
+
 	public void removeSerialPortTimeOut() {
 		this.isChangePropery = true;
 		if (this.serialPort == null) createSerialPort();
@@ -637,35 +633,35 @@ public class DeviceConfiguration {
 	public UsbInterfaceType getUsbInterfaceType() {
 		return this.usbPort.getUsbInterface();
 	}
-	
+
 	/**
 	 * @return the vendor ID of the USB port to be used for device communication
 	 */
 	public short getUsbVendorId() {
 		return Short.valueOf(this.usbPort.getVendorId().substring(2), 16);
 	}
-	
+
 	/**
 	 * @return the product ID of the device to be used for communication
 	 */
 	public short getUsbProductId() {
 		return Short.valueOf(this.usbPort.getProductId().substring(2), 16);
 	}
-	
+
 	/**
 	 * @return the interface address to be used for communication
 	 */
 	public byte getUsbInterface() {
 		return Byte.valueOf(this.usbPort.getUsbInterface().getInterface().getValue().substring(2), 16);
 	}
-	
+
 	/**
 	 * @return the end point address of the interface to be used for write communication 
 	 */
 	public byte getUsbEndpointIn() {
 		return Byte.valueOf(this.usbPort.getUsbInterface().getEndPointIn().substring(2), 16);
 	}
-	
+
 	/**
 	 * @return the end point address of the interface to be used for read communication
 	 */
@@ -673,7 +669,6 @@ public class DeviceConfiguration {
 		return Short.valueOf(this.usbPort.getUsbInterface().getEndPointOut().substring(2), 16).byteValue();
 	}
 
-	
 	/**
 	 * set a new desktop type
 	 * @param newDesktopType
@@ -683,7 +678,7 @@ public class DeviceConfiguration {
 		this.desktop = this.deviceProps.desktop;
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * get the desktop type
 	 * @return DesktopType
@@ -691,7 +686,7 @@ public class DeviceConfiguration {
 	public DesktopType getDesktopType() {
 		return this.desktop;
 	}
-	
+
 	/**
 	 * method to query desktop properties, like: table tab switched of, ...
 	 * @param dektopType
@@ -720,31 +715,31 @@ public class DeviceConfiguration {
 		}
 		return property;
 	}
-	
+
 	/**
 	 * set the desktop type value
 	 * @param desktopType
 	 * @param newValue
 	 */
 	public void setDesktopTypeValue(DesktopPropertyTypes desktopType, Boolean newValue) {
-			this.getDesktopProperty(desktopType).setValue(newValue);
-			this.isChangePropery = true;
+		this.getDesktopProperty(desktopType).setValue(newValue);
+		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * @return size of mode states
 	 */
 	public int getStateSize() {
 		return this.state.property.size();
 	}
-	
+
 	/**
 	 * @return actual StateType
 	 */
 	public StateType getStateType() {
 		return this.deviceProps.state;
 	}
-	
+
 	/**
 	 * remove optional mode state
 	 */
@@ -752,7 +747,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.state = this.deviceProps.state = null;
 	}
-	
+
 	/**
 	 * append a new mode state type property
 	 * @param newStateProperty
@@ -765,7 +760,7 @@ public class DeviceConfiguration {
 		this.deviceProps.state.getProperty().add(newStateProperty);
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * remove a mode state type property
 	 * @param removeStateProperty
@@ -774,7 +769,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.deviceProps.state.remove(removeStateProperty);
 	}
-	
+
 	/**
 	 * set a new mode state name
 	 * @param modeStateOrdinal
@@ -787,7 +782,7 @@ public class DeviceConfiguration {
 			tmpPoperty.setName(newName);
 		}
 	}
-	
+
 	/**
 	 * set a new mode state value
 	 * @param modeStateOrdinal
@@ -800,7 +795,7 @@ public class DeviceConfiguration {
 			tmpPoperty.setValue(StringHelper.verifyTypedInput(tmpPoperty.getType(), newValue));
 		}
 	}
-	
+
 	/**
 	 * set a new mode state description
 	 * @param modeStateOrdinal
@@ -813,7 +808,7 @@ public class DeviceConfiguration {
 			tmpPoperty.setDescription(newDescription);
 		}
 	}
-	
+
 	/**
 	 * method to query desktop properties, like: table tab switched of, ...
 	 * @param modeStateOrdinal
@@ -838,21 +833,21 @@ public class DeviceConfiguration {
 		}
 		return property;
 	}
-	
+
 	public DataBlockType getDataBlockType() {
 		return this.dataBlock;
 	}
-	
+
 	public void removeDataBlockType() {
 		this.isChangePropery = true;
 		this.dataBlock = this.deviceProps.dataBlock = null;
 	}
-	
+
 	public void addDataBlockType() {
 		this.isChangePropery = true;
 		this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
 	}
-	
+
 	/**
 	 * there are two data block format input types, 
 	 * - FILE_IO, where the data comes in most cases in character form
@@ -863,12 +858,11 @@ public class DeviceConfiguration {
 	public int getDataBlockSize(InputTypes inputType) {
 		int dataBlockSize = -1;
 		for (DataBlockType.Format format : this.dataBlock.getFormat()) {
-			if (format.getInputType() == inputType)
-				dataBlockSize = format.getSize();
+			if (format.getInputType() == inputType) dataBlockSize = format.getSize();
 		}
 		return dataBlockSize;
 	}
-	
+
 	/**
 	 * there are two data block format types, 
 	 * - VALUE, where the data comes in most cases in character form with file I/O and defines the number of values, example CSV file input
@@ -880,13 +874,12 @@ public class DeviceConfiguration {
 		int dataBlockSize = -1;
 		try {
 			for (DataBlockType.Format format : this.dataBlock.getFormat()) {
-				if (format.getType() == formatType)
-					dataBlockSize = format.getSize();
+				if (format.getType() == formatType) dataBlockSize = format.getSize();
 			}
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] {this.xmlFile.getName()}));
+			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getName() }));
 		}
 		return dataBlockSize;
 	}
@@ -926,7 +919,7 @@ public class DeviceConfiguration {
 			}
 		}
 	}
-	
+
 	/**
 	 * query the FormatTypes type according to the input format type
 	 * @param inputType
@@ -935,12 +928,11 @@ public class DeviceConfiguration {
 	public FormatTypes getDataBlockFormat(InputTypes inputType) {
 		FormatTypes dataBlockformat = inputType == InputTypes.FILE_IO ? FormatTypes.VALUE : inputType == InputTypes.SERIAL_IO ? FormatTypes.BYTE : FormatTypes.BINARY;
 		for (DataBlockType.Format format : this.dataBlock.getFormat()) {
-			if (format.getInputType() == inputType)
-				dataBlockformat = format.getType();
+			if (format.getInputType() == inputType) dataBlockformat = format.getType();
 		}
 		return dataBlockformat;
 	}
-	
+
 	/**
 	 * set the data block format specifying input type and format type
 	 * @param inputType
@@ -979,31 +971,31 @@ public class DeviceConfiguration {
 	public boolean isDataBlockCheckSumDefined() {
 		return this.dataBlock != null && this.dataBlock.getCheckSum() != null && (this.dataBlock.getCheckSum() != null && this.dataBlock.getCheckSum().getFormat() != null);
 	}
-	
+
 	public CheckSumTypes getDataBlockCheckSumType() {
-		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ? this.dataBlock.getCheckSum().getType(): null; 
+		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ? this.dataBlock.getCheckSum().getType() : null;
 	}
 
 	public void setDataBlockCheckSumType(CheckSumTypes value) {
 		this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		if (value == null)
 			this.dataBlock.setCheckSum(null);
 		else {
 			if (this.dataBlock.getCheckSum() == null) this.dataBlock.setCheckSum(new DataBlockType.CheckSum());
-			this.dataBlock.getCheckSum().setType(value); 
+			this.dataBlock.getCheckSum().setType(value);
 		}
 	}
-	
+
 	public FormatTypes getDataBlockCheckSumFormat() {
 		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ? this.dataBlock.getCheckSum().getFormat() : FormatTypes.BINARY;
 	}
-	
+
 	public void setDataBlockCheckSumFormat(FormatTypes value) {
 		this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		if (value == null)
@@ -1013,7 +1005,7 @@ public class DeviceConfiguration {
 			this.dataBlock.getCheckSum().setFormat(value);
 		}
 	}
-	
+
 	public String getDataBlockLeader() {
 		return this.dataBlock != null ? this.dataBlock.getLeader() : "$"; //$NON-NLS-1$
 	}
@@ -1025,7 +1017,7 @@ public class DeviceConfiguration {
 		else
 			this.dataBlock.setLeader(value);
 	}
-	
+
 	public byte[] getDataBlockEnding() {
 		return this.dataBlock != null ? this.dataBlock.getTrailer() : new HexBinaryAdapter().unmarshal("0D0A"); //$NON-NLS-1$
 	}
@@ -1036,7 +1028,7 @@ public class DeviceConfiguration {
 
 	public void setDataBlockEnding(String value) {
 		this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		if (value == null)
@@ -1051,7 +1043,7 @@ public class DeviceConfiguration {
 
 	public void setDataBlockTimeUnit(TimeUnitTypes value) {
 		this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		this.dataBlock.setTimeUnit(value);
@@ -1067,42 +1059,44 @@ public class DeviceConfiguration {
 
 	public void setDataBlockSeparator(CommaSeparatorTypes value) {
 		this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		this.dataBlock.setSeparator(value);
 	}
-	
+
 	public String getDataBlockPreferredDataLocation() {
-		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null && this.dataBlock.getPreferredDataLocation().length() != 0 ? this.dataBlock.getPreferredDataLocation() : this.settings.getDataFilePath()) : this.settings.getDataFilePath();
+		return this.dataBlock != null
+				? (this.dataBlock.getPreferredDataLocation() != null && this.dataBlock.getPreferredDataLocation().length() != 0 ? this.dataBlock.getPreferredDataLocation() : this.settings.getDataFilePath())
+				: this.settings.getDataFilePath();
 	}
 
 	public void setDataBlockPreferredDataLocation(String value) {
 		this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		this.dataBlock.setPreferredDataLocation(value != null ? value.trim() : GDE.STRING_EMPTY);
 	}
-	
+
 	public boolean isDataBlockPreferredFileExtentionDefined() {
 		return this.dataBlock != null && this.dataBlock.preferredFileExtention != null && this.dataBlock.preferredFileExtention.length() > 3;
 	}
-	
+
 	public String getDataBlockPreferredFileExtention() {
 		try {
 			return this.dataBlock.getPreferredFileExtention();
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] {this.xmlFile.getName()}));
+			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getName() }));
 		}
 		return "*.*";
 	}
 
 	public void setDataBlockPreferredFileExtention(String value) {
 		boolean isValidExt = this.isChangePropery = true;
-		if(this.dataBlock == null) {
+		if (this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		if (value != null) {
@@ -1113,7 +1107,7 @@ public class DeviceConfiguration {
 			else {
 				value = "*." + value; //$NON-NLS-1$
 			}
-		} 
+		}
 		this.dataBlock.setPreferredFileExtention(value != null && isValidExt ? value : this.dataBlock.getPreferredFileExtention());
 	}
 
@@ -1123,9 +1117,9 @@ public class DeviceConfiguration {
 	 */
 	public boolean isTableTabRequested() {
 		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE);
 	}
-	
+
 	/**
 	 * set the DesktopType.TYPE_TABLE_TAB property to the given value
 	 * @param enable
@@ -1140,16 +1134,16 @@ public class DeviceConfiguration {
 		}
 		this.isChangePropery = true;
 	}
-		
+
 	/**
 	 * query if the digital tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isDigitalTabRequested() {
 		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE);
 	}
-	
+
 	/**
 	 * set the DesktopType.TYPE_DIGITAL_TAB property to the given value
 	 * @param enable
@@ -1164,16 +1158,16 @@ public class DeviceConfiguration {
 		}
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * query if the analog tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isAnalogTabRequested() {
 		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE);
 	}
-	
+
 	/**
 	 * set the DesktopType.TYPE_ANALOG_TAB property to the given value
 	 * @param enable
@@ -1188,16 +1182,16 @@ public class DeviceConfiguration {
 		}
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * query if the voltage per cell tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isVoltagePerCellTabRequested() {
 		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE);
 	}
-	
+
 	/**
 	 * set the DesktopType.TYPE_VOLTAGE_PER_CELL_TAB property to the given value
 	 * @param enable
@@ -1213,82 +1207,34 @@ public class DeviceConfiguration {
 		}
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * query if the utility graphics tabulator should be displayed and updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isUtilityGraphicsTabRequested() {
 		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE);
 	}
-	
+
 	/**
 	 * query if the utility device tabulator should be displayed and updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isUtilityDeviceTabRequested() {
 		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.UTILITY_DEVICE_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE);
 	}
-	
-	/**
-	 * query if the histo graphics tab should be updated
-	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
-	 */
-	public boolean isHistoGraphicsTabRequested() {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
-	}
-	
-	/**
-	 * set the DesktopType.HISTO_GRAPHICS_TAB property to the given value
-	 * @param enable
-	 */
-	public void setHistoGraphicsTabRequested(boolean enable) {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB);
-		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.HISTO_GRAPHICS_TAB.name(), enable);
-		}
-		else {
-			property.setValue(enable);
-		}
-		this.isChangePropery = true;
-	}
-		
-	/**
-	 * query if the histo table tab should be updated
-	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
-	 */
-	public boolean isHistoTableTabRequested() {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB);
-		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
-	}
-	
-	/**
-	 * set the DesktopType.HISTO_TABLE_TAB property to the given value
-	 * @param enable
-	 */
-	public void setHistoTableTabRequested(boolean enable) {
-		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB);
-		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.HISTO_TABLE_TAB.name(), enable);
-		}
-		else {
-			property.setValue(enable);
-		}
-		this.isChangePropery = true;
-	}
-		
+
 	/**
 	 * query if the target measurement reference ordinal used by the given desktop type
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
 		DesktopPropertyType property = this.getDesktopProperty(desktopPropertyType);
-		return property != null ? property.getTargetReferenceOrdinal() != null ? property.getTargetReferenceOrdinal() : -1 : -1; 
+		return property != null ? property.getTargetReferenceOrdinal() != null ? property.getTargetReferenceOrdinal() : -1 : -1;
 	}
-	
+
 	/**
 	 * set a new desktop type description
 	 * @param desktopType
@@ -1298,7 +1244,7 @@ public class DeviceConfiguration {
 		this.getDesktopProperty(desktopType).setDescription(newDescription);
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * @return the channel count
 	 */
@@ -1335,7 +1281,7 @@ public class DeviceConfiguration {
 	public ChannelTypes getChannelTypes(int channelConfigNumber) {
 		return this.deviceProps.getChannels().channel.get(channelConfigNumber - 1).getType();
 	}
-	
+
 	/**
 	 * @return the channel types by given channel configuration key (name)
 	 */
@@ -1353,7 +1299,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.deviceProps.getChannels().channel.get(channelNumber - 1).setType(newChannleType);
 	}
-	
+
 	/**
 	 * add a new channel/config type
 	 * @param newChannelType
@@ -1362,7 +1308,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.deviceProps.getChannels().channel.add(newChannelType);
 	}
-	
+
 	/**
 	 * remove a channel/configuration type at index
 	 * @param channelNumber
@@ -1371,14 +1317,14 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.deviceProps.getChannels().channel.remove(channelNumber - 1);
 	}
-	
+
 	/**
 	 * @return the channel measurements by given channel configuration key (name)
 	 */
 	public List<MeasurementType> getChannelMeasuremts(int channelConfigNumber) {
 		return this.getChannel(channelConfigNumber).getMeasurement();
 	}
-	
+
 	/**
 	 * @return the channel measurements by given channel configuration key (name)
 	 */
@@ -1386,7 +1332,7 @@ public class DeviceConfiguration {
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey) {
 		return this.getChannel(channelConfigKey).getMeasurement();
 	}
-	
+
 	/**
 	 * @return the number of measurements of a channel by given channel number
 	 */
@@ -1401,7 +1347,7 @@ public class DeviceConfiguration {
 	public int getNumberOfMeasurements(String channelConfigKey) {
 		return this.getChannel(channelConfigKey).getMeasurement().size();
 	}
-	
+
 	/**
 	 * add (append) a new MeasurementType object to channel with channel number as given
 	 * @param channelNumber
@@ -1422,7 +1368,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getChannel(channelConfigKey).measurement.add(newMeasurementType);
 	}
-	
+
 	/**
 	 * remove a MeasurementType object from channel with channel number as given
 	 * @param channelConfigNumber
@@ -1432,7 +1378,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getChannel(channelConfigNumber).measurement.remove(removeMeasurementType);
 	}
-	
+
 	/**
 	 * remove a MeasurementType object from channel with channel/config key as given
 	 * @param channelConfigKey
@@ -1450,14 +1396,14 @@ public class DeviceConfiguration {
 	public List<SettlementType> getChannelSettlements(int channelConfigNumber) {
 		return this.getChannel(channelConfigNumber).getSettlement();
 	}
-	
+
 	/**
 	 * @return the number of settlements of a channel by given channel number
 	 */
 	public int getNumberOfSettlements(int channelConfigNumber) {
 		return this.getChannel(channelConfigNumber).getSettlement().size();
 	}
-	
+
 	/**
 	 * add (append) a new SettlementType object to channel with channel number as given
 	 * @param channelNumber
@@ -1467,7 +1413,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getChannel(channelNumber).settlement.add(newSettlementType);
 	}
-	
+
 	/**
 	 * remove a SettlementType object from channel with channel number as given
 	 * @param channelConfigNumber
@@ -1477,7 +1423,6 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getChannel(channelConfigNumber).settlement.remove(removeSettlementType);
 	}
-	
 
 	/**
 	 * get the channel type by given channel configuration key (name)
@@ -1497,7 +1442,7 @@ public class DeviceConfiguration {
 	public ChannelType getChannel(String channelConfigKey) {
 		ChannelType channel = null;
 		for (ChannelType c : this.deviceProps.getChannels().channel) {
-			if(c.getName().trim().startsWith(channelConfigKey)) {
+			if (c.getName().trim().startsWith(channelConfigKey)) {
 				channel = c;
 				break;
 			}
@@ -1512,7 +1457,8 @@ public class DeviceConfiguration {
 	 * @param isActive
 	 */
 	public void setMeasurementActive(int channelConfigNumber, int measurementOrdinal, boolean isActive) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setActive(isActive); //$NON-NLS-1$
 	}
@@ -1540,8 +1486,7 @@ public class DeviceConfiguration {
 		if (this.deviceProps.getChannels().channel.size() >= channelConfigNumber) {
 			try {
 				MeasurementType measurement = this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal);
-				if (measurement != null) 
-					return measurement;
+				if (measurement != null) return measurement;
 			}
 			catch (IndexOutOfBoundsException e) {
 				MeasurementType newMeasurement = this.getChannel(channelConfigNumber).getMeasurement().get(0).clone(); // this will clone statistics and properties as well
@@ -1550,7 +1495,7 @@ public class DeviceConfiguration {
 				this.isChangePropery = true;
 			}
 		}
-		return this.deviceProps.getChannels().channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal) 
+		return this.deviceProps.getChannels().channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal)
 				: this.getChannel(1).getMeasurement().get(measurementOrdinal);
 	}
 
@@ -1577,7 +1522,7 @@ public class DeviceConfiguration {
 		}
 		return measurement;
 	}
-	
+
 	/**
 	 * get the properties from a channel/configuration and record key name 
 	 * @param channelConfigNumber
@@ -1587,11 +1532,10 @@ public class DeviceConfiguration {
 	public List<PropertyType> getProperties(int channelConfigNumber, int measurementOrdinal) {
 		List<PropertyType> list = new ArrayList<PropertyType>();
 		MeasurementType measurement = this.getMeasurement(channelConfigNumber, measurementOrdinal);
-		if (measurement != null)
-			list = measurement.getProperty();
+		if (measurement != null) list = measurement.getProperty();
 		return list;
 	}
-	
+
 	/**
 	 * get the properties from a channel/configuration and record key name 
 	 * @param channelConfigKey
@@ -1602,8 +1546,7 @@ public class DeviceConfiguration {
 	public List<PropertyType> getProperties(String channelConfigKey, int measurementOrdinal) {
 		List<PropertyType> list = new ArrayList<PropertyType>();
 		MeasurementType measurement = this.getMeasurement(channelConfigKey, measurementOrdinal);
-		if (measurement != null)
-			list = measurement.getProperty();
+		if (measurement != null) list = measurement.getProperty();
 		return list;
 	}
 
@@ -1622,7 +1565,7 @@ public class DeviceConfiguration {
 		newProperty.setValue(GDE.STRING_EMPTY + value);
 		properties.add(newProperty);
 	}
-	
+
 	/**
 	 * set new name of specified measurement
 	 * @param channelConfigNumber
@@ -1630,11 +1573,12 @@ public class DeviceConfiguration {
 	 * @param name
 	 */
 	public void setMeasurementName(int channelConfigNumber, int measurementOrdinal, String name) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setName(name);
 	}
-	
+
 	/**
 	 * set new name of specified measurement
 	 * @param channelConfigKey
@@ -1647,7 +1591,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setName(name);
 	}
-	
+
 	/**
 	 * method to query the unit of measurement data unit by a given record key
 	 * @param channelConfigNumber
@@ -1655,10 +1599,11 @@ public class DeviceConfiguration {
 	 * @return dataUnit as string
 	 */
 	public String getMeasurementUnit(int channelConfigNumber, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getUnit(); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * method to query the unit of measurement data unit by a given record key
 	 * @param channelConfigKey
@@ -1678,7 +1623,8 @@ public class DeviceConfiguration {
 	 * @param unit
 	 */
 	public void setMeasurementUnit(int channelConfigNumber, int measurementOrdinal, String unit) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setUnit(unit);
 	}
@@ -1695,7 +1641,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setUnit(unit);
 	}
-	
+
 	/**
 	 * get the symbol of specified measurement
 	 * @param channelConfigNumber
@@ -1705,7 +1651,7 @@ public class DeviceConfiguration {
 	public String getMeasurementSymbol(int channelConfigNumber, int measurementOrdinal) {
 		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getSymbol();
 	}
-	
+
 	/**
 	 * get the symbol of specified measurement
 	 * @param channelConfigKey
@@ -1747,7 +1693,7 @@ public class DeviceConfiguration {
 	 * @return statistics, if statistics does not exist return null
 	 */
 	public StatisticsType getMeasurementStatistic(int channelConfigNumber, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getStatistics();
 	}
 
@@ -1759,7 +1705,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public StatisticsType getMeasurementStatistic(String channelConfigKey, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		return this.getMeasurement(channelConfigKey, measurementOrdinal).getStatistics();
 	}
 
@@ -1770,39 +1716,30 @@ public class DeviceConfiguration {
 	 */
 	public void removeStatisticsTypeFromMeasurement(int channelConfigNumber, int measurementOrdinal) {
 		this.isChangePropery = true;
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setStatistics(null);
 	}
-	
+
 	/**
-	 * @return the measurement and settlement names in device configuration order which conforms to the record ordinal sequence.
+	 * @return the measurement and settlement and scoregroup names in device configuration order which conforms to the record ordinal sequence.
 	 */
-	public String[] getMeasurementSettlementNames(int channelConfigNumber) {
+	public String[] getMeasurementSettlementScoregroupNames(int channelConfigNumber) {
 		StringBuilder sb = new StringBuilder();
 		ChannelType channel = this.getChannel(channelConfigNumber);
 		if (channel != null) {
-//			// display section 1: look for settlements at the top - settlements' ordinals start after measurements due to GraphicsTemplate compatibility
-//			for (SettlementType settlement : channel.getSettlement()) {
-//				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement");
-//				if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
-//					sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
-//				}
-//			}
-			// display section 2: all measurements
 			for (MeasurementType measurementType : channel.getMeasurement()) {
 				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
-			// display section 3: take remaining settlements
 			for (SettlementType settlement : channel.getSettlement()) {
-//				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement");
-//				if ( ! (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
-					sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
-//				}
+				sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
+			}
+			for (ScoregroupType scoregroup : channel.getScoregroup()) {
+				sb.append(scoregroup.getName()).append(GDE.STRING_SEMICOLON);
 			}
 		}
 		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
-	
+
 	/**
 	 * @return the sorted measurement names
 	 */
@@ -1815,9 +1752,9 @@ public class DeviceConfiguration {
 				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		return sb.toString().length()>1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
+		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
-	
+
 	/**
 	 * @return the sorted measurement names
 	 */
@@ -1831,7 +1768,7 @@ public class DeviceConfiguration {
 				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		return sb.toString().length()>1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
+		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
 
 	/**
@@ -1918,12 +1855,11 @@ public class DeviceConfiguration {
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
 	public double getMeasurementOffset(int channelConfigNumber, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET);
-		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
-		
+		if (property != null) value = new Double(property.getValue()).doubleValue();
+
 		return value;
 	}
 
@@ -1935,12 +1871,11 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public double getMeasurementOffset(String channelConfigKey, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
-		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
-		
+		if (property != null) value = new Double(property.getValue()).doubleValue();
+
 		return value;
 	}
 
@@ -1951,7 +1886,7 @@ public class DeviceConfiguration {
 	 * @param offset the offset to set
 	 */
 	public void setMeasurementOffset(int channelConfigNumber, int measurementOrdinal, double offset) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
@@ -1970,7 +1905,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementOffset(String channelConfigKey, int measurementOrdinal, double offset) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
@@ -1988,12 +1923,11 @@ public class DeviceConfiguration {
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
 	public double getMeasurementFactor(int channelConfigNumber, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR);
-		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
-		
+		if (property != null) value = new Double(property.getValue()).doubleValue();
+
 		return value;
 	}
 
@@ -2005,12 +1939,11 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public double getMeasurementFactor(String channelConfigKey, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
-		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
-		
+		if (property != null) value = new Double(property.getValue()).doubleValue();
+
 		return value;
 	}
 
@@ -2021,7 +1954,7 @@ public class DeviceConfiguration {
 	 * @param factor the offset to set
 	 */
 	public void setMeasurementFactor(int channelConfigNumber, int measurementOrdinal, double factor) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
@@ -2040,7 +1973,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementFactor(String channelConfigKey, int measurementOrdinal, double factor) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
@@ -2058,12 +1991,11 @@ public class DeviceConfiguration {
 	 * @return the reduction, if property does not exist return 0.0 as default value
 	 */
 	public double getMeasurementReduction(int channelConfigNumber, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION);
-		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
-		
+		if (property != null) value = new Double(property.getValue()).doubleValue();
+
 		return value;
 	}
 
@@ -2075,12 +2007,11 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public double getMeasurementReduction(String channelConfigKey, int measurementOrdinal) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
-		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
-		
+		if (property != null) value = new Double(property.getValue()).doubleValue();
+
 		return value;
 	}
 
@@ -2091,7 +2022,7 @@ public class DeviceConfiguration {
 	 * @param reduction of the direct measured value
 	 */
 	public void setMeasurementReduction(int channelConfigNumber, int measurementOrdinal, double reduction) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
@@ -2110,7 +2041,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementReduction(String channelConfigKey, int measurementOrdinal, double reduction) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
@@ -2145,7 +2076,7 @@ public class DeviceConfiguration {
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, propertyKey);
 		return property != null ? property.getValue() : GDE.STRING_EMPTY;
 	}
-	
+
 	/**
 	 * set new property value of specified measurement, if the property does not exist it will be created
 	 * @param channelConfigNumber
@@ -2171,10 +2102,10 @@ public class DeviceConfiguration {
 					property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
 			}
 		}
-		else 
+		else
 			this.removeMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
 	}
-	
+
 	/**
 	 * set new property value of specified measurement, if the property does not exist it will be created
 	 * @param channelConfigKey
@@ -2243,7 +2174,7 @@ public class DeviceConfiguration {
 		DesktopPropertyType newProperty = factory.createDesktopPropertyType();
 		newProperty.setName(DesktopPropertyTypes.fromValue(propertyKey));
 		newProperty.setValue(value);
-		
+
 		if (this.desktop == null) {
 			this.desktop = factory.createDesktopType();
 			this.deviceProps.setDesktop(this.desktop);
@@ -2266,7 +2197,7 @@ public class DeviceConfiguration {
 	public boolean isChangePropery() {
 		return this.isChangePropery;
 	}
-	
+
 	/**
 	 * method to modify open/close serial port menu toolbar button and device menu entry
 	 * this enable different naming instead open/close start/stop gathering data from device
@@ -2277,8 +2208,8 @@ public class DeviceConfiguration {
 	 */
 	public void configureSerialPortMenu(int useIconSet, String useToolTipOpen, String useTooTipClose) {
 		DataExplorer application = DataExplorer.getInstance();
-		if (application.getMenuBar() != null)	application.getMenuBar().setSerialPortIconSet(useIconSet);
-		if (application.getMenuToolBar() != null)	application.getMenuToolBar().setSerialPortIconSet(useIconSet, useToolTipOpen, useTooTipClose);
+		if (application.getMenuBar() != null) application.getMenuBar().setSerialPortIconSet(useIconSet);
+		if (application.getMenuToolBar() != null) application.getMenuToolBar().setSerialPortIconSet(useIconSet, useToolTipOpen, useTooTipClose);
 	}
 
 	/**
@@ -2287,15 +2218,15 @@ public class DeviceConfiguration {
 	public CalculationThread getCalculationThread() {
 		return this.calculationThread;
 	}
-	
+
 	/**
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
 	 */
 	public int[] getCellVoltageOrdinals() {
-		return new int[] {-1, -1};
+		return new int[] { -1, -1 };
 	}
-	
+
 	/**
 	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
 	 * specific curve calculated from point combinations or other specific dialog
@@ -2304,7 +2235,7 @@ public class DeviceConfiguration {
 	public CTabItem getUtilityGraphicsTabItem() {
 		return null;
 	}
-	
+
 	/**
 	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
 	 * specific curve calculated from point combinations or other specific dialog
@@ -2313,7 +2244,7 @@ public class DeviceConfiguration {
 	public CTabItem getUtilityDeviceTabItem() {
 		return null;
 	}
-	
+
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
@@ -2321,16 +2252,16 @@ public class DeviceConfiguration {
 	public boolean isActualRecordSetWithGpsData() {
 		return false;
 	}
-	
+
 	/**
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
 	 */
 	public String exportFile(String fileEndingType, boolean isExport2TmpDir) {
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fileEndingType = " + fileEndingType + ", isExport2TmpDir = "+ isExport2TmpDir);
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fileEndingType = " + fileEndingType + ", isExport2TmpDir = " + isExport2TmpDir);
 		return GDE.STRING_EMPTY;
 	}
-	
+
 	/**
 	 * query the jar name of the active device implementation
 	 * @return jar name of the active device
@@ -2338,21 +2269,21 @@ public class DeviceConfiguration {
 	public String getJarName() {
 		return this.getClass().getProtectionDomain().toString();
 	}
-	
+
 	/**
 	 * set the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
 	 */
 	public void setGPS2KMZMeasurementOrdinal(final Integer ordinal) {
 		this.kmzMeasurementOrdinal = ordinal;
 	}
-	
+
 	/**
 	 * @return the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
 	 */
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		return -1;
 	}
-	
+
 	/**
 	 * @return the translated latitude or longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
@@ -2360,15 +2291,16 @@ public class DeviceConfiguration {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName() + index + fixValidity + startAltitude + offsetAltitude);
 		return "DDMMmmmNDDDMMmmm0V000000000000";
 	}
-	
+
 	/**
 	 * query the default stem used as record set name
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return this.getStateType()!= null ? this.getStateType().getProperty() != null ? ") "+ this.getStateType().getProperty().get(0).getName() : Messages.getString(MessageIds.GDE_MSGT0272) : Messages.getString(MessageIds.GDE_MSGT0272);
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + this.getStateType().getProperty().get(0).getName() : Messages.getString(MessageIds.GDE_MSGT0272)
+				: Messages.getString(MessageIds.GDE_MSGT0272);
 	}
-	
+
 	/**
 	 * @return the device communication port
 	 */
@@ -2389,13 +2321,13 @@ public class DeviceConfiguration {
 	 * @return the last used channel number
 	 */
 	public void setLastChannelNumber(int channelNumber) {
-		if (this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1) && channelNumber <= this.deviceProps.getChannels().channel.size())  {
+		if (this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1) && channelNumber <= this.deviceProps.getChannels().channel.size()) {
 			this.isChangePropery = true;
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 		}
 		this.storeDeviceProperties();
 	}
-	
+
 	/**
 	 * query the channel properties if there are any
 	 * @return
@@ -2403,7 +2335,7 @@ public class DeviceConfiguration {
 	public List<ChannelPropertyType> getChannelProperties() {
 		return this.deviceProps.getChannels().getProperty();
 	}
-	
+
 	/**
 	 * query the channel property of specified type
 	 * @return property if exist or null if not exist
@@ -2411,15 +2343,14 @@ public class DeviceConfiguration {
 	public ChannelPropertyType getChannelProperty(ChannelPropertyTypes key) {
 		if (getChannelProperties() != null) {
 			for (ChannelPropertyType property : getChannelProperties()) {
-				if (property.name.equals(key)) 
-					return property;
+				if (property.name.equals(key)) return property;
 			}
 		}
 		ChannelPropertyType channelProperty = new ObjectFactory().createChannelPropertyType();
 		channelProperty.setName(key);
 		return channelProperty;
 	}
-	
+
 	/**
 	 * set a channel property value
 	 * @param key
@@ -2431,11 +2362,10 @@ public class DeviceConfiguration {
 		channelProperty.setType(type);
 		channelProperty.setValue(value);
 		List<ChannelPropertyType> properties = getChannelProperties();
-		if (!properties.contains(channelProperty)) 
-			properties.add(channelProperty);
+		if (!properties.contains(channelProperty)) properties.add(channelProperty);
 		this.isChangePropery = true;
 	}
-	
+
 	/**
 	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
 	 * @return true if curve point should be filtered, default implementation returns false
@@ -2443,7 +2373,7 @@ public class DeviceConfiguration {
 	public boolean isFilterEnabled() {
 		return false;
 	}
-	
+
 	/**
 	 * get the curve point device individual filtered if required
 	 */
@@ -2460,6 +2390,35 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * method to get the sorted active or in active record names as string array
+	 *  - records which does not have inactive or active flag are calculated from active or inactive
+	 *  - all records not calculated may have the active status and must be stored
+	 * @param channelConfigNumber
+	 * @param validMeasurementNames based on the current or any previous configuration
+	 * @return String[] containing record names 
+	 */
+	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames) {
+		final Vector<String> tmpCalculationRecords = new Vector<String>();
+		final String[] deviceMeasurements = this.getMeasurementNames(channelConfigNumber);
+		int deviceDataBlockSize = Math.abs(this.getDataBlockSize(FormatTypes.VALUE));
+		deviceDataBlockSize = this.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
+		// record names may not match device measurements, but device measurements might be more then existing records
+		for (int i = 0; i < deviceMeasurements.length && i < validMeasurementNames.length; ++i) {
+			final MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
+			if (!measurement.isCalculation()) { // active or inactive 
+				tmpCalculationRecords.add(validMeasurementNames[i]);
+			}
+			//else
+			//	System.out.println(measurement.getName());
+		}
+		//assume attached records are calculations like DataVario
+		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
+			tmpCalculationRecords.remove(deviceDataBlockSize);
+		}
+		return tmpCalculationRecords.toArray(new String[0]);
+	}
+
+	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
 	 * - calculated measurements could be later on added to the device properties XML
 	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
@@ -2472,19 +2431,19 @@ public class DeviceConfiguration {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //events ...
-				int i = 0;
-				for (; i < fileRecordsProperties.length; ++i) {
-					cleanedRecordNames.add(recordKeys[i]);
-				}
-				//cleanup recordSet
-				for (; i < recordKeys.length; ++i) {
-					recordSet.remove(recordKeys[i]);
-				}
+			int i = 0;
+			for (; i < fileRecordsProperties.length; ++i) {
+				cleanedRecordNames.add(recordKeys[i]);
+			}
+			//cleanup recordSet
+			for (; i < recordKeys.length; ++i) {
+				recordSet.remove(recordKeys[i]);
+			}
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}
 		return recordKeys;
 	}
-	
+
 	/**
 	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
 	 */
@@ -2520,7 +2479,7 @@ public class DeviceConfiguration {
 	public int getNumberOfLithiumCells(Object specificData) {
 		return 0;
 	}
-	
+
 	/**
 	 * query if the record set numbering should follow channel configuration numbering
 	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
@@ -2528,17 +2487,17 @@ public class DeviceConfiguration {
 	public boolean recordSetNumberFollowChannel() {
 		return this.getChannelTypes(1) == ChannelTypes.TYPE_OUTLET;
 	}
-	
+
 	/**
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
 	 * 2 current drop more or equal than 2 measurements 
 	 */
-	public int	getCurrentSmoothIndex() {
+	public int getCurrentSmoothIndex() {
 		return 0;
 	}
-	
+
 	/**
 	 * query if the measurements get build up dynamically while reading (import) the data 
 	 * the implementation must create measurementType while reading the import data, 
@@ -2549,8 +2508,32 @@ public class DeviceConfiguration {
 		return false;
 	}
 
-		public int getSampledCounter() {
-		return this.sampledCounter;
+	/**
+	 * compare channel measurement names and define channel groups with identical measurement names.
+	 * @param channelConfigNumberI
+	 * @param channelConfigNumberJ
+	 * @return true if the two channels have identical measurement names
+	 */
+	public boolean isPairOfChannels(int channelConfigNumberI, int channelConfigNumberJ) { //todo add to IDevice?
+		if (channelGroups == null) {
+			int tmpGroupIndex = -1;
+			channelGroups = new int[this.getChannelCount()];
+			Arrays.fill(channelGroups, -1);
+			for (int i = 0; i < this.deviceProps.getChannels().channel.size(); i++) {
+				String[] measurementNamesI = this.getMeasurementNames(i + 1);
+				Arrays.sort(measurementNamesI);
+				for (int j = i + 1; j < this.deviceProps.getChannels().channel.size(); j++) {
+					String[] measurementNamesJ = this.getMeasurementNames(j + 1);
+					Arrays.sort(measurementNamesJ);
+					if (Arrays.equals(measurementNamesI, measurementNamesJ)) {
+						if (channelGroups[i] == -1) {
+							channelGroups[i] = ++tmpGroupIndex;
+						}
+						channelGroups[j] = channelGroups[i];
+					}
+				}
+			}
+		}
+		return channelGroups[channelConfigNumberI - 1] > -1 && channelGroups[channelConfigNumberI - 1] == channelGroups[channelConfigNumberJ - 1];
 	}
-	
 }

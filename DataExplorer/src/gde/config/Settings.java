@@ -15,22 +15,9 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde.config;
-
-import gde.GDE;
-import gde.device.DeviceConfiguration;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.FileUtils;
-import gde.utils.RecordSetNameComparator;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -71,6 +58,20 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
+
+import gde.GDE;
+import gde.device.DeviceConfiguration;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.FileUtils;
+import gde.utils.RecordSetNameComparator;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * Settings class will read and write/update application settings, like window size and default path ....
@@ -141,6 +142,19 @@ public class Settings extends Properties {
 	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";																															//$NON-NLS-1$
 
 	final static String							IS_HISTO_ACTIVE									= "is_histo_active";																																							//$NON-NLS-1$
+	final static String							IS_QUANTILE_ACTIVE							= "is_quantile_active";																																						//$NON-NLS-1$
+	final static String							BOXPLOT_SCALE_ORDINAL						= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
+	final static String							BOXPLOT_SIZE_ADAPTATION_ORDINAL	= "boxplot_size_adaptation_ordinal";																															//$NON-NLS-1$
+	final static String							X_SPREAD_GRADE_ORDINAL					= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
+	final static String							IS_X_LOGARITHMIC_DISTANCE				= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
+	final static String							IS_X_REVERSED										= "is_x_reversed";																																								//$NON-NLS-1$
+	final static String							MAX_LOG_COUNT										= "max_log_count";																																								//$NON-NLS-1$
+	final static String							IS_SEARCH_IMPORT_PATH						= "is_search_import_path";																																				//$NON-NLS-1$
+	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
+	final static String							MAX_LOG_DURATION_MM							= "max_log_duration_mm";																																					//$NON-NLS-1$
+	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
+	final static String							SKIP_FILES_WITHOUT_OBJECT				= "skip_files_without_object";																																		//$NON-NLS-1$
+	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -662,6 +676,19 @@ public class Settings extends Properties {
 
 			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, this.isHistoActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_QUANTILE_ACTIVE, this.isQuantilesActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, this.getBoxplotScaleOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, this.getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, this.getXAxisSpreadOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, this.isXAxisLogarithmicDistance())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, this.isXAxisReversed())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_COUNT, this.getMaxLogCount())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SEARCH_IMPORT_PATH, this.isSearchImportPath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, this.isChannelMix())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_DURATION_MM, this.getMaxLogDuration_mm())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, this.skipFilesWithoutObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, this.skipFilesWithOtherObject())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -858,7 +885,7 @@ public class Settings extends Properties {
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "dataFilePath = " + dataPath); //$NON-NLS-1$
 		return dataPath.trim();
 	}
-	
+
 	/**
 	 * set the default dataFilePath
 	 */
@@ -2213,17 +2240,289 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set boolean value if the histo analysis tabs should be visible
-	 * @param isUseChannelConfigName
+	 * set boolean value if the history analysis tabs should be visible
+	 * @param isActive
 	 */
 	public void setHistoActive(boolean isActive) {
-		this.setProperty(Settings.IS_HISTO_ACTIVE, GDE.STRING_EMPTY + isActive);
+		this.setProperty(Settings.IS_HISTO_ACTIVE, String.valueOf(isActive));
 	}
 
 	/**
-	 * @return boolean value of true if the channel/configuration name should be used as leader of record name in curve compare
+	 * @return boolean true if the history labels should be visible if the current device supports the history 
 	 */
-	public boolean isHistoActive() { // TODO change default value
+	public boolean isHistoActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_HISTO_ACTIVE, "false")); //$NON-NLS-1$
 	}
+
+	/**
+	 * set boolean value if the history analysis contains quantile values
+	 * @param isActive
+	 */
+	public void setQuantilesActive(boolean isActive) {
+		this.setProperty(Settings.IS_QUANTILE_ACTIVE, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return boolean true if the history analysis contains quantile values
+	 */
+	public boolean isQuantilesActive() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_QUANTILE_ACTIVE, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return three boxplot graphics sizes as localized texts 
+	 */
+	public String[] getBoxplotScaleNomenclatures() {
+		return Messages.getString(MessageIds.GDE_MSGT0802).split(GDE.STRING_COMMA);
+	}
+
+	/**
+	 * set the boxplot size for the history 
+	 * @param scaleNomenclature
+	 */
+	public void setBoxplotScale(String scaleNomenclature) {
+		this.setProperty(Settings.BOXPLOT_SCALE_ORDINAL, String.valueOf(Arrays.asList(getBoxplotScaleNomenclatures()).indexOf(scaleNomenclature)));
+	}
+
+	/**
+	 * @return the boxplot size for the history (default is medium size)
+	 */
+	public String getBoxplotScale() {
+		return getBoxplotScaleNomenclatures()[getBoxplotScaleOrdinal()];
+	}
+
+	/**
+	 * @return the boxplot size ordinal for the history (default is medium size)
+	 */
+	public int getBoxplotScaleOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.BOXPLOT_SCALE_ORDINAL, String.valueOf(1)));
+	}
+
+	/**
+	 * @return four boxplot size adaptation levels as localized texts ranging from none to large. the adaptation is based on the log duration. 
+	 */
+	public String[] getBoxplotSizeAdaptationNomenclatures() {
+		return Messages.getString(MessageIds.GDE_MSGT0803).split(GDE.STRING_COMMA);
+	}
+
+	/**
+	 * set the boxplot size adaptation level for the history 
+	 * @param scaleNomenclature
+	 */
+	public void setBoxplotSizeAdaptation(String scaleNomenclature) {
+		this.setProperty(Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, String.valueOf(Arrays.asList(getBoxplotSizeAdaptationNomenclatures()).indexOf(scaleNomenclature)));
+	}
+
+	/**
+	 * @return the boxplot size adaptation level for the history (default is medium adaptation)
+	 */
+	public String getBoxplotSizeAdaptation() {
+		return getBoxplotSizeAdaptationNomenclatures()[getBoxplotSizeAdaptationOrdinal()];
+	}
+
+	/**
+	 * @return the ordinal of the boxplot size adaptation level for the history (default is medium adaptation)
+	 */
+	public int getBoxplotSizeAdaptationOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, String.valueOf(2)));
+	}
+
+	/**
+	 * @return six spreading labels starting with 0 to 5 for the history x axis
+	 */
+	public String[] getXAxisSpreadGradeNomenclatures() {
+		return Messages.getString(MessageIds.GDE_MSGT0823).split(GDE.STRING_COMMA);
+	}
+
+	/**
+	 * set the extent of logarithmic spreading of the x axis distances between trails 
+	 * @param gradeText
+	 */
+	public void setXAxisSpreadGrade(String gradeText) {
+		this.setProperty(Settings.X_SPREAD_GRADE_ORDINAL, String.valueOf(Arrays.asList(getXAxisSpreadGradeNomenclatures()).indexOf(gradeText)));
+	}
+
+	/**
+	 * @return the extent of logarithmic spreading of the x axis distances between timesteps (default is grade 2 which is just before the middle of six grades)
+	 */
+	public String getXAxisSpreadGrade() {
+		return getXAxisSpreadGradeNomenclatures()[getXAxisSpreadOrdinal()];
+	}
+
+	/**
+	 * @return the ordinal of the extent of logarithmic spreading of the x axis distances between trails (default is grade 2 which is just before the middle of six grades)
+	 */
+	public int getXAxisSpreadOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.X_SPREAD_GRADE_ORDINAL, String.valueOf(2)));
+	}
+
+	/**
+	 * set true if the history x axis distances between the timesteps are based on a logarithmic values
+	 * @param isActive
+	 */
+	public void setXAxisLogarithmicDistance(boolean isActive) {
+		this.setProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if the history x axis distances between the timesteps are based on a logarithmic values
+	 */
+	public boolean isXAxisLogarithmicDistance() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, "true"));
+	}
+
+	/**
+	 * set true if the history x axis starts with the most recent timesteps
+	 * @param isActive
+	 */
+	public void setXAxisReversed(boolean isActive) {
+		this.setProperty(Settings.IS_X_REVERSED, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if the history x axis starts with the most recent timesteps
+	 */
+	public boolean isXAxisReversed() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true"));
+	}
+
+	/**
+	 * set the maximum number of logs (recordsets) which are read for the history 
+	 * @param uintValue
+	 */
+	public void setMaxLogCount(String uintValue) {
+		try {
+			int value = Integer.parseUnsignedInt(uintValue.trim());
+			this.setProperty(Settings.MAX_LOG_COUNT, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @return the maximum number of logs (recordsets) which are read for the history (default is 333)
+	 */
+	public int getMaxLogCount() {
+		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_COUNT, String.valueOf(333)));
+	}
+
+	/**
+	 * @param isActive true if files from the device import directory are read for the history 
+	 */
+	public void setSearchImportPath(boolean isActive) {
+		this.setProperty(Settings.IS_SEARCH_IMPORT_PATH, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if files from the device import directory are read for the history 
+	 */
+	public boolean isSearchImportPath() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SEARCH_IMPORT_PATH, String.valueOf(false)));
+	}
+
+	/**
+	 * set the maximum duration of logs (recordsets) which are read for the history 
+	 * @param uintValue
+	 */
+	public void setMaxLogDuration_mm(String uintValue) {
+		try {
+			int value = Integer.parseUnsignedInt(uintValue.trim());
+			this.setProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @param isActive true if channels with identical measurements are selected for the history 
+	 */
+	public void setChannelMix(boolean isActive) {
+		this.setProperty(Settings.IS_CHANNEL_MIX, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true true if channels with identical measurements are selected for the history 
+	 */
+	public boolean isChannelMix() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_CHANNEL_MIX, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the maximum duration of logs (recordsets) which is read for the history (default is 5 hours)
+	 */
+	public int getMaxLogDuration_mm() {
+		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(3000))); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return sampling timespan values in seconds with seven values ranging from 0.001 to 10.0 based on the current locale 
+	 */
+	public String[] getSamplingTimespanValues() {
+		double[] values_ss = { 10., 5., 1., .5, .1, .05, .001 };
+		String[] textValues = new String[7];
+		for (int i = 0; i < values_ss.length; i++) {
+			textValues[i] = String.valueOf(values_ss[i]);
+		}
+		return textValues;
+	}
+
+	/**
+	 * set the sampling time which defines the timespan for one single sample value for the history 
+	 * @param valueText
+	 */
+	public void setSamplingTimespan_ms(String valueText) {
+		this.setProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(Arrays.asList(getSamplingTimespanValues()).indexOf(valueText)));
+	}
+
+	/**
+	 * repairs the properties file setting if it holds an invalid index value. 
+	 * @return the sampling time which defines the timespan for one single sample value for the history (default is 1 sec)
+	 */
+	public int getSamplingTimespan_ms() {
+		String textValue;
+		try {
+			textValue = getSamplingTimespanValues()[getSamplingTimespanOrdinal()];
+		}
+		catch (Exception e) {
+			setSamplingTimespan_ms(Double.toString(1.)); // one second
+			textValue = getSamplingTimespanValues()[getSamplingTimespanOrdinal()];
+		}
+		return (int) (Double.valueOf(textValue) * 1000.);
+	}
+
+	/**
+	 * @return the ordinal of the sampling time which defines the timespan for one single sample value for the history (default is 1 ms which is the value at index 4)
+	 */
+	public int getSamplingTimespanOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(4)));
+	}
+
+	/**
+	 * @param doSkip true if the history should skip files in the object directory which do not hold the object key internally 
+	 */
+	public void setFilesWithoutObject(boolean doSkip) {
+		this.setProperty(Settings.SKIP_FILES_WITHOUT_OBJECT, String.valueOf(doSkip));
+	}
+
+	/**
+	 * @return true if the history should skip files in the object directory which do not hold the object key internally 
+	 */
+	public boolean skipFilesWithoutObject() {
+		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITHOUT_OBJECT, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param doSkip true if the history should skip files in the object directory which hold a different object key internally 
+	 */
+	public void setFilesWithOtherObject(boolean doSkip) {
+		this.setProperty(Settings.SKIP_FILES_WITH_OTHER_OBJECT, String.valueOf(doSkip));
+	}
+
+	/**
+	 * @return true if the history should skip files in the object directory which hold a different object key internally 
+	 */
+	public boolean skipFilesWithOtherObject() {
+		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITH_OTHER_OBJECT, "true")); //$NON-NLS-1$
+	}
+
 }

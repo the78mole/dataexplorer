@@ -15,6 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							Thomas Eickert
 ****************************************************************************************/
 package gde.device;
 
@@ -36,20 +37,20 @@ import org.eclipse.swt.custom.CTabItem;
  */
 public interface IDevice {
 	// define some global constants for data calculation 
-	public static final String 	OFFSET 		= MeasurementPropertyTypes.OFFSET.value();
-	public static final String	FACTOR 		= MeasurementPropertyTypes.FACTOR.value();
-	public static final String	REDUCTION = MeasurementPropertyTypes.REDUCTION.value();
-	
+	public static final String	OFFSET		= MeasurementPropertyTypes.OFFSET.value();
+	public static final String	FACTOR		= MeasurementPropertyTypes.FACTOR.value();
+	public static final String	REDUCTION	= MeasurementPropertyTypes.REDUCTION.value();
+
 	/**
 	 * get the active device configuration for manipulation purpose
 	 */
 	public DeviceConfiguration getDeviceConfiguration();
-	
+
 	/**
 	 * get the active device configuration file name
 	 */
 	public String getPropertiesFileName();
-	
+
 	/**
 	 * @return true if a device property was changed
 	 */
@@ -59,32 +60,32 @@ public interface IDevice {
 	 * @return the device specific dialog instance
 	 */
 	public DeviceDialog getDialog();
-	
+
 	/**
 	 * @return the device communication port
 	 */
 	public IDeviceCommPort getCommunicationPort();
-	
+
 	/**
 	 * @return the device name
 	 */
-	public String	getName();
-	
+	public String getName();
+
 	/**
 	 * @param newName set a new device name
 	 */
 	public void setName(String newName);
-	
+
 	/**
 	 * @return usage device state
 	 */
 	public boolean isUsed();
-	
+
 	/**
 	 * @return device manufacturer
 	 */
 	public String getManufacturer();
-	
+
 	/**
 	 * @param name set a new manufacture name
 	 */
@@ -94,12 +95,12 @@ public interface IDevice {
 	 * @return device group
 	 */
 	public DeviceTypes getDeviceGroup();
-	
+
 	/**
 	 * @param name set a new manufacture name
 	 */
 	public void setDeviceGroup(DeviceTypes name);
-	
+
 	/**
 	 * @return link to manufacturer
 	 */
@@ -125,43 +126,43 @@ public interface IDevice {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isTableTabRequested();
-	
+
 	/**
 	 * set the DesktopType.TYPE_TABLE_TAB property to the given value
 	 * @param enable
 	 */
 	public void setTableTabRequested(boolean enable);
-	
+
 	/**
 	 * query if the digital tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isDigitalTabRequested();
-	
+
 	/**
 	 * set the DesktopType.TYPE_DIGITAL_TAB property to the given value
 	 * @param enable
 	 */
 	public void setDigitalTabRequested(boolean enable);
-	
+
 	/**
 	 * query if the analog tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isAnalogTabRequested();
-	
+
 	/**
 	 * set the DesktopType.TYPE_ANALOG_TAB property to the given value
 	 * @param enable
 	 */
 	public void setAnalogTabRequested(boolean enable);
-	
+
 	/**
 	 * query if the voltage per cell tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isVoltagePerCellTabRequested();
-	
+
 	/**
 	 * set the DesktopType.TYPE_VOLTAGE_PER_CELL_TAB property to the given value
 	 * @param enable
@@ -173,26 +174,26 @@ public interface IDevice {
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType);
-	
+
 	/**
 	 * query if the utility graphics tabulator should be displayed and updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
-	public boolean isUtilityGraphicsTabRequested(); 
-	
+	public boolean isUtilityGraphicsTabRequested();
+
 	/**
 	 * query if the utility device tabulator should be displayed and updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isUtilityDeviceTabRequested();
-	
+
 	/**
 	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
 	 * specific curve calculated from point combinations or other specific dialog
 	 * As default the function should return null which stands for no device custom tab item.  
 	 */
 	public CTabItem getUtilityGraphicsTabItem();
-	
+
 	/**
 	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
 	 * specific specific dialog
@@ -204,7 +205,7 @@ public interface IDevice {
 	 * @return time step in ms
 	 */
 	public double getTimeStep_ms();
-	
+
 	/**
 	 * set new average time step in ms
 	 */
@@ -214,7 +215,7 @@ public interface IDevice {
 	 * @return average time step in ms (this is an optional element, keep this in mind to have a workaround if it does not exist)
 	 */
 	public Double getAverageTimeStep_ms();
-	
+
 	/**
 	 * set new time step in ms
 	 */
@@ -229,7 +230,7 @@ public interface IDevice {
 	 * set new UTC delta time in hours
 	 */
 	public void setUTCdelta(int newUTCdelta);
-	
+
 	/**
 	 * @return the serial port type, optional configure for the device
 	 */
@@ -239,52 +240,52 @@ public interface IDevice {
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort();
-	
+
 	/**
 	 * @param newPort - set a new port string for the device
 	 */
 	public void setPort(String newPort);
-	
+
 	/**
 	 * @return the baude rate of the device
 	 */
 	public Integer getBaudeRate();
-	
+
 	/**
 	 * @return the data bit configuration of the device
 	 */
 	public DataBitsTypes getDataBits();
-	
+
 	/**
 	 * @return the stop bit configuration of the device
 	 */
 	public StopBitsTypes getStopBits();
-	
+
 	/**
 	 * @return the flow control configuration of the device
 	 */
 	public int getFlowCtrlMode();
-	
+
 	/**
 	 * @return the parity bit configuration of the device
 	 */
 	public ParityTypes getParity();
-	
+
 	/**
 	 * @return  the DTR configuration of the device
 	 */
 	public boolean isDTR();
-	
+
 	/**
 	 * @return  the RTS configuration of the device
 	 */
 	public boolean isRTS();
-	
+
 	/**
 	 * @return the current data block size by given input format type
 	 */
 	public int getDataBlockSize(InputTypes inputType);
-	
+
 	/**
 	 * @return the current data block size by given format type
 	 */
@@ -297,17 +298,17 @@ public interface IDevice {
 	 * @param newSize
 	 */
 	public void setDataBlockSize(InputTypes useInputType, FormatTypes useFormat, Integer newSize);
-	
+
 	/**
 	 * @return the format type of the data block ASCII(text) or BINARY(hex)
 	 */
 	public FormatTypes getDataBlockFormat(InputTypes inputType);
-	
+
 	/**
 	 * @param value set a new format type of the data block ASCII(text) or BINARY(hex)
 	 */
 	public void setDataBlockFormat(InputTypes inputType, FormatTypes value);
-	
+
 	/**
 	 * @return the checksum type of the data block XOR, ADD, ..
 	 */
@@ -317,27 +318,27 @@ public interface IDevice {
 	 * @param value set a new date block size/length
 	 */
 	public void setDataBlockCheckSumType(CheckSumTypes value);
-	
+
 	/**
 	 * @return the format type of the data block checksum ASCII(text) or BINARY(hex)
 	 */
 	public FormatTypes getDataBlockCheckSumFormat();
-	
+
 	/**
 	 * @param value set a new date block checksum format type ASCII(text) or BINARY(hex)
 	 */
 	public void setDataBlockCheckSumFormat(FormatTypes value);
-	
+
 	/**
 	 * @param value set the time unit as defined in TimeUnitTypes, msec --> timeUnitFactor = 1; sec --> timeUnitFactor = 1000
 	 */
 	public void setDataBlockTimeUnit(TimeUnitTypes value);
-	
+
 	/**
 	 * @return query the time factor, needed for CVS 2 serial data parser, time steps are internal used in msec. 
 	 */
 	public int getDataBlockTimeUnitFactor();
-	
+
 	/**
 	 * @return the data block leader character
 	 */
@@ -346,8 +347,8 @@ public interface IDevice {
 	/**
 	 * @param value set a new character to be used as data line leading edge character
 	 */
-	public void setDataBlockLeader(String value);	
-	
+	public void setDataBlockLeader(String value);
+
 	/**
 	 * @return the data block value separator as CommaSeparatorTypes
 	 */
@@ -378,7 +379,7 @@ public interface IDevice {
 	 * @param value set a new full qualified data path location
 	 */
 	public void setDataBlockPreferredDataLocation(String value);
-	
+
 	/**
 	 * @return the preferred file extension used in file selection dialog
 	 */
@@ -393,7 +394,7 @@ public interface IDevice {
 	 * @return actual StateType
 	 */
 	public StateType getStateType();
-	
+
 	/**
 	 * @return the channel count
 	 */
@@ -404,7 +405,7 @@ public interface IDevice {
 	 * @return the channel name
 	 */
 	public String getChannelName(int channelNumber);
-	
+
 	/**
 	 * @param channelName - size should not exceed 15 char length - this is the key to get access
 	 * @param channelNumber
@@ -416,12 +417,12 @@ public interface IDevice {
 	 * @return the channel type
 	 */
 	public ChannelTypes getChannelTypes(int channelNumber);
-	
+
 	/**
 	 * @return the channel measurements by given channel configuration number
 	 */
 	public List<MeasurementType> getChannelMeasuremts(int channelConfigNumber);
-	
+
 	/**
 	 * @return the channel measurements by given channel configuration key (name)
 	 */
@@ -455,7 +456,7 @@ public interface IDevice {
 	 */
 	@Deprecated
 	public int getNumberOfMeasurements(String channelConfigKey);
-	
+
 	/**
 	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
 	 * @param channelConfigNumber
@@ -463,7 +464,7 @@ public interface IDevice {
 	 * @return PropertyType object
 	 */
 	public MeasurementType getMeasurement(int channelConfigNumber, int measurementOrdinal);
-	
+
 	/**
 	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
 	 * @param channelConfigKey
@@ -480,12 +481,12 @@ public interface IDevice {
 	 * @param isActive
 	 */
 	public void setMeasurementActive(int channelConfigNumber, int measurementOrdinal, boolean isActive);
-	
+
 	/**
 	 * @return the sorted measurement names
 	 */
 	public String[] getMeasurementNames(int channelConfigNumber);
-	
+
 	/**
 	 * @return the sorted measurement names
 	 */
@@ -574,7 +575,7 @@ public interface IDevice {
 	 */
 	@Deprecated
 	public void setMeasurementSymbol(String channelConfigKey, int measurementOrdinal, String symbol);
-	
+
 	/**
 	 * get the statistics type of the specified measurement
 	 * @param channelConfigNumber
@@ -582,7 +583,7 @@ public interface IDevice {
 	 * @return statistics, if statistics does not exist return null
 	 */
 	public StatisticsType getMeasurementStatistic(int channelConfigNumber, int measurementOrdinal);
-	
+
 	/**
 	 * get the statistics type of the specified measurement
 	 * @param channelConfigKey
@@ -730,13 +731,13 @@ public interface IDevice {
 	 * @return the last used channel number
 	 */
 	public void setLastChannelNumber(int channelNumber);
-	
+
 	/**
 	 * query the default stem used as record set name
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName();
-	
+
 	/**
 	 * load the mapping exist between lov file configuration keys and GDE keys
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
@@ -752,12 +753,12 @@ public interface IDevice {
 	 * @return adapted record configuration as delimited string
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber);
-	
+
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	public int getLovDataByteSize();
-	
+
 	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
@@ -794,7 +795,7 @@ public interface IDevice {
 	 * @return pointer to filled data table row with formated values
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] tableRow, int rowIndex);
-	
+
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
@@ -832,21 +833,21 @@ public interface IDevice {
 	 * writes updated device properties XML if isChangePropery == true;
 	 */
 	public void storeDeviceProperties();
-	
+
 	/**
 	 * query for all the property keys this device has in use
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
 	public String[] getUsedPropertyKeys();
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
-	public void open_closeCommPort(); 
-	
+	public void open_closeCommPort();
+
 	/**
 	 * method to modify open/close serial port menu toolbar button and device menu entry
 	 * this enable different naming instead open/close start/stop gathering data from device
@@ -855,86 +856,95 @@ public interface IDevice {
 	 * @param useToolTipOpen
 	 * @param useToolTipClose
 	 */
-	void configureSerialPortMenu(int useIconSet, String useToolTipOpen, String useTooTipClose); 
-	
+	void configureSerialPortMenu(int useIconSet, String useToolTipOpen, String useTooTipClose);
+
 	/**
 	 * get calculation thread to enable join , isAlive, ...
 	 */
 	public CalculationThread getCalculationThread();
-	
+
 	/**
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
 	 */
 	public int[] getCellVoltageOrdinals();
-	
+
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * @return true|false
 	 */
 	public boolean isActualRecordSetWithGpsData();
-	
+
 	/**
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
 	 */
 	public String exportFile(String fileEndingType, boolean isExportTmpDir);
-	
+
 	/**
 	 * query the jar name of the active device implementation
 	 * @return jar name of the active device
 	 */
 	public String getJarName();
-	
+
 	/**
 	 * set the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
 	 */
 	public void setGPS2KMZMeasurementOrdinal(final Integer ordinal);
-	
+
 	/**
 	 * @return the measurement ordinal to be used for limits as well as the colors which are specified to display in Google Earth
 	 */
 	public Integer getGPS2KMZMeasurementOrdinal();
-	
+
 	/**
 	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
 	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude);
 
 	/**
-	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
-	 * - calculated measurements could be later on added to the device properties XML
-	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
-	 * @param fileRecordsProperties - all the record describing properties stored in the file
-	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
-	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 * method to get the sorted active or in active record names as string array
+	 *  - records which does not have inactive or active flag are calculated from active or inactive
+	 *  - all records not calculated may have the active status and must be stored
+	 * @param channelConfigNumber
+	 * @param validMeasurementNames based on the current or any previous configuration
+	 * @return String[] containing record names 
 	 */
+	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames);
+
+	/**
+	* check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	* - calculated measurements could be later on added to the device properties XML
+	* - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	* @param fileRecordsProperties - all the record describing properties stored in the file
+	* @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	* @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	*/
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet);
-	
+
 	/**
 	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
 	 */
 	public void resetMeasurements();
-	
+
 	/**
 	 * remove a MeasurementType object from channel with channel number as given
 	 * @param channelConfigNumber
 	 * @param removeMeasurementType
 	 */
 	public void removeMeasurementFromChannel(int activeChannelConfigNumber, MeasurementType measurement);
-	
+
 	/**
 	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
 	 * @return true if curve point should be filtered
 	 */
 	public boolean isFilterEnabled();
-	
+
 	/**
 	 * get the curve point device individual filtered if required
 	 */
 	public Integer getFilteredPoint(int channelNumber, Record record, int index);
-	
-	
+
 	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
@@ -950,58 +960,58 @@ public interface IDevice {
 	 * @return 9 for this example
 	 */
 	public int getMeasurementOrdinalFirstLithiumCell(RecordSet recordSet);
-	
+
 	/**
 	 * query the number of Lithium cells if any
 	 * @param specificData
 	 * @return cell count if any
 	 */
 	public int getNumberOfLithiumCells(Object specificData);
-	
+
 	/**
 	 * query if the record set numbering should follow channel configuration numbering
 	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
 	 */
 	public boolean recordSetNumberFollowChannel();
-	
+
 	/**
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
 	 * 2 current drop more or equal than 2 measurements 
 	 */
-	public int	getCurrentSmoothIndex();
-	
+	public int getCurrentSmoothIndex();
+
 	/**
 	 * @return the vendor ID of the USB port to be used for device communication
 	 */
 	public short getUsbVendorId();
-	
+
 	/**
 	 * @return the product ID of the device to be used for communication
 	 */
 	public short getUsbProductId();
-	
+
 	/**
 	 * @return the interface address to be used for communication
 	 */
 	public byte getUsbInterface();
-	
+
 	/**
 	 * @return the end point address of the interface to be used for write communication 
 	 */
 	public byte getUsbEndpointIn();
-	
+
 	/**
 	 * @return the end point address of the interface to be used for read communication
 	 */
-	public byte getUsbEndpointOut();	
-	
+	public byte getUsbEndpointOut();
+
 	/**
 	 * query if the measurements get build up dynamically while reading (import) the data 
 	 * the implementation must create measurementType while reading the import data, 
 	 * refer to Weatronic-Telemetry implementation DataHeader
 	 * @return true|false, default is false and we have a constant measurement size defined in device XML
 	 */
-	public boolean isVariableMeasurementSize();	
+	public boolean isVariableMeasurementSize();
 }
