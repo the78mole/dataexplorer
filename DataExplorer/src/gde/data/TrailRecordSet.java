@@ -107,9 +107,9 @@ public class TrailRecordSet extends RecordSet {
 	 */
 	public static TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
 		DeviceConfiguration deviceConfiguration = (DeviceConfiguration) device;
-		String[] names = deviceConfiguration.getMeasurementSettlementNames(channelConfigNumber);
+		String[] names = deviceConfiguration.getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		if (names.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
-			names = deviceConfiguration.getMeasurementSettlementNames(channelConfigNumber = 1);
+			names = deviceConfiguration.getMeasurementSettlementScoregroupNames(channelConfigNumber = 1);
 		}
 		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.name + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$

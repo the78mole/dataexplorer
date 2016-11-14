@@ -14,17 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    Copyright (c) 2016 Thomas Eickert
 ****************************************************************************************/
+
 package gde.data;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.CalculationType;
-import gde.device.CalculationType.CalcType;
+import gde.device.CalculationTypes;
 import gde.device.DataTypes;
 import gde.device.EvaluationType;
 import gde.device.IDevice;
+import gde.device.LevelingTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.SettlementType;
@@ -178,7 +180,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		public static List<String> getValuesAsList() {
 			List<String> dataTypeValues = new ArrayList<String>();
 			for (DataType type : DataType.values()) {
-				dataTypeValues.add(type.value);
+				dataTypeValues.add(type.value());
 			}
 			return dataTypeValues;
 		}
@@ -308,13 +310,13 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
 		Record calculationRecord = this.parent.get(this.parent.recordNames[calculation.getRefOrdinal()]);
 		double calculationValue;
-		if (calculation.getCalcType().equals(CalcType.COUNT.value)) {
+		if (calculation.getCalcType().equals(CalculationTypes.COUNT.value())) {
 			calculationValue = transition.thresholdSize * 1000.; // all internal values are multiplied by 1000
 		}
-		else if (calculation.getCalcType().equals(CalcType.TIMESUM_MS.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.TIME_SUM_MS.value())) {
 			calculationValue = (calculationRecord.getTime_ms(transition.recoveryStartIndex) - calculationRecord.getTime_ms(transition.thresholdStartIndex)) * 10.;
 		}
-		else if (calculation.getCalcType().equals(CalcType.MIN.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MIN.value())) {
 			calculationValue = Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
 				if (calculationRecord.get(j) != null) {
@@ -322,7 +324,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					calculationValue = Math.min(calculationValue, calculation.isUnsigned() ? Math.abs(calculationTranslateValue) : calculationTranslateValue);
 				}
 		}
-		else if (calculation.getCalcType().equals(CalcType.MAX.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MAX.value())) {
 			calculationValue = calculation.isUnsigned() ? Double.MAX_VALUE : -Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
 				if (calculationRecord.get(j) != null) {
@@ -330,7 +332,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					calculationValue = Math.max(calculationValue, calculation.isUnsigned() ? Math.abs(calculationTranslateValue) : calculationTranslateValue);
 				}
 		}
-		else if (calculation.getCalcType().equals(CalcType.AVG.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.AVG.value())) {
 			double sum = 0;
 			int skipCount = 0;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
@@ -343,7 +345,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 				}
 			calculationValue = sum / (double) (transition.thresholdSize - skipCount);
 		}
-		else if (calculation.getCalcType().equals(CalcType.SIGMA.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SIGMA.value())) {
 			double avg = 0, q = 0, value = 0;
 			int skipCount = 0;
 			calculationValue = 0;
@@ -360,7 +362,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 				}
 			calculationValue = Math.sqrt(q / (transition.thresholdSize - skipCount));
 		}
-		else if (calculation.getCalcType().equals(CalcType.SUM.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SUM.value())) {
 			calculationValue = 0;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
 				if (calculationRecord.get(j) != null) {
@@ -385,7 +387,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @param transition
 	 * @return peak spread value as translatedValue
 	 */
-	private double calculateDelta4Peak(Record record, String leveling, Transition transition) {
+	private double calculateDelta4Peak(Record record, LevelingTypes leveling, Transition transition) {
 		double deltaValue = 0;
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
 		double referenceExtremum = 0;
@@ -593,39 +595,39 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		log.log(Level.SEVERE, record.getName() + " values   " //$NON-NLS-1$
 				+ record.subList(transition.startIndex, transition.endIndex + 1));
 		final double calculationValue;
-		if (calculation.getCalcType().equals(CalcType.RATIO.value) || calculation.getCalcType().equals(CalcType.RATIOINVERSE.value)) {
+		if (calculation.getCalcType().equals(CalculationTypes.RATIO.value()) || calculation.getCalcType().equals(CalculationTypes.RATIO_INVERSE.value())) {
 			final double denominator = calculateDelta4Peak(record, calculation.getLeveling(), transition);
 			final Record divisorRecord = calculation.getRefOrdinalDivisor() != null ? this.parent.get(this.parent.recordNames[calculation.getRefOrdinalDivisor()]) : null;
 			// if (log.isLoggable(Level.FINE))
 			log.log(Level.SEVERE, divisorRecord.getName() + " divisors " //$NON-NLS-1$
 					+ divisorRecord.subList(transition.startIndex, transition.endIndex + 1));
 			final double divisor = calculateDelta4Peak(divisorRecord, calculation.getDivisorLeveling(), transition);
-			if (calculation.getCalcType().equals(CalcType.RATIO.value)) {
+			if (calculation.getCalcType().equals(CalculationTypes.RATIO.value())) {
 				calculationValue = calculation.isUnsigned() ? Math.abs(1000. * denominator / divisor) : 1000. * denominator / divisor; // all internal values are multiplied by 1000
 			}
 			else {
 				calculationValue = calculation.isUnsigned() ? Math.abs(1000. * divisor / denominator) : 1000. * divisor / denominator; // all internal values are multiplied by 1000
 			}
 		}
-		else if (calculation.getCalcType().equals(CalcType.COUNT.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.COUNT.value())) {
 			calculationValue = 1000. * transition.thresholdSize; // all internal values are multiplied by 1000
 		}
-		else if (calculation.getCalcType().equals(CalcType.TIMESUM_MS.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.TIME_SUM_MS.value())) {
 			calculationValue = (record.getTime_ms(transition.recoveryStartIndex) - record.getTime_ms(transition.thresholdStartIndex));
 		}
-		else if (calculation.getCalcType().equals(CalcType.MIN.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MIN.value())) {
 			double value = Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
 				if (record.get(j) != null) value = Math.min(value, calculation.isUnsigned() ? Math.abs(this.device.translateValue(record, record.get(j))) : this.device.translateValue(record, record.get(j)));
 			calculationValue = value;
 		}
-		else if (calculation.getCalcType().equals(CalcType.MAX.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MAX.value())) {
 			double value = calculation.isUnsigned() ? 0. : -Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
 				if (record.get(j) != null) value = Math.max(value, calculation.isUnsigned() ? Math.abs(this.device.translateValue(record, record.get(j))) : this.device.translateValue(record, record.get(j)));
 			calculationValue = value;
 		}
-		else if (calculation.getCalcType().equals(CalcType.AVG.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.AVG.value())) {
 			double sum = 0;
 			int skipCount = 0;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
@@ -636,7 +638,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					skipCount++;
 			calculationValue = sum / (double) (transition.thresholdSize - skipCount);
 		}
-		else if (calculation.getCalcType().equals(CalcType.SIGMA.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SIGMA.value())) {
 			// https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
 			double avg = 0, q = 0, value = 0;
 			int skipCount = 0;
@@ -653,7 +655,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					skipCount++;
 			calculationValue = Math.sqrt(q / (transition.thresholdSize - skipCount));
 		}
-		else if (calculation.getCalcType().equals(CalcType.SUM.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SUM.value())) {
 			double sum = 0;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
 				sum += calculation.isUnsigned() ? Math.abs(this.device.translateValue(record, record.get(j))) : this.device.translateValue(record, record.get(j));
@@ -2028,12 +2030,12 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		double offset;
 		double reduction;
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
-		if (calculation.getCalcType().equals(CalcType.RATIO.value) || calculation.getCalcType().equals(CalcType.RATIOINVERSE.value)) {
+		if (calculation.getCalcType().equals(CalculationTypes.RATIO.value()) || calculation.getCalcType().equals(CalculationTypes.RATIO_INVERSE.value())) {
 			factor = .001; // internal representation in per mille
 			offset = 0; // != 0 if a unit translation is required
 			reduction = 0; // != 0 if a unit translation is required
 		}
-		else if (calculation.getCalcType().equals(CalcType.COUNT.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.COUNT.value())) {
 			factor = 1; // internal representation in ea
 			offset = 0; // != 0 if a unit translation is required
 			reduction = 0; // != 0 if a unit translation is required

@@ -148,7 +148,6 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // TODO merging this
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, false);
 					boolean isSettlement = true; // TODO device settings
 					recordSet.setReadingsCounter(recordDataSize);
-					recordSet.setSampledCounter(((DeviceConfiguration) recordSet.getDevice()).getSampledCounter());
 					application.isHistoInProgress = true; // TODO find better solution for screen updates --- IDevice addition?
 					// TODO not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(recordSet);
 					application.isHistoInProgress = false; // TODO find better solution for screen updates --- IDevice addition?
