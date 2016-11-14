@@ -15,8 +15,12 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
+
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.device.ChannelTypes;
@@ -25,21 +29,18 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
-import java.util.HashMap;
-import java.util.logging.Logger;
-
 /**
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
  * @author Winfried Brügmann
  */
 public class Channels extends HashMap<Integer, Channel> {
-	final static long							serialVersionUID		= 26031957;
-	final static Logger						log									= Logger.getLogger(Channels.class.getName());
+	final static long		serialVersionUID		= 26031957;
+	final static Logger	log									= Logger.getLogger(Channels.class.getName());
 
-	static Channels								channles								= null;
-	int														activeChannelNumber			= 1;		// default at least one channel must exist
-	String[]											channelNames 						= new String[1];
-	final DataExplorer						application;
+	static Channels			channles						= null;
+	int									activeChannelNumber	= 1;																					// default at least one channel must exist
+	String[]						channelNames				= new String[1];
+	final DataExplorer	application;
 
 	/**
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application
@@ -79,7 +80,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		super(initialCapacity);
 		this.application = currentApplication;
 	}
-		
+
 	/**
 	 * query the channel number by given string, if string not found channel number 1 is returned 
 	 * @param channelName
@@ -87,24 +88,24 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public int getChannelNumber(String channelName) {
 		int searchedNumber = 1;
-		
+
 		if (channelName != null && channelName.length() > 5) {
 			// "2 : Outlet", use the first digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_COLON) && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
 				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());
 			}
 			else // old file content "Outlet 2" use the last digit to calculate the channel number
-				if (channelName.contains(GDE.STRING_BLANK) && channelName.split(GDE.STRING_BLANK).length > 1 && Character.isDigit(channelName.split(GDE.STRING_BLANK)[1].trim().charAt(0))) {
-					try {
-						return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
+			if (channelName.contains(GDE.STRING_BLANK) && channelName.split(GDE.STRING_BLANK).length > 1 && Character.isDigit(channelName.split(GDE.STRING_BLANK)[1].trim().charAt(0))) {
+				try {
+					return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
+				}
+				catch (NumberFormatException e) {
+					if (channelName.split(GDE.STRING_BLANK)[1].trim().contains("+")) {
+						String tmpNum = channelName.split(GDE.STRING_BLANK)[1].trim();
+						log.log(Level.WARNING, "channel name = " + channelName);
+						return new Integer(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + new Integer(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS) + 1));
 					}
-					catch (NumberFormatException e) {
-						if(channelName.split(GDE.STRING_BLANK)[1].trim().contains("+")) {
-							String tmpNum = channelName.split(GDE.STRING_BLANK)[1].trim();
-							log.log(Level.WARNING, "channel name = " + channelName);
-							return new Integer(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + new Integer(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS)+1));
-						}
-					}
+				}
 			}
 			else {
 				for (String name : this.getChannelNames()) {
@@ -151,7 +152,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	public void switchChannel(String channelName) {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.resetZoomAndMeasurement();
-		
+
 		this.switchChannel(new Integer(channelName.split(GDE.STRING_COLON)[0].trim()).intValue(), GDE.STRING_EMPTY);
 	}
 
@@ -161,21 +162,21 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param recordSetKey or empty string if switched to first record set
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switching to channel " + channelNumber);		 //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switching to channel " + channelNumber); //$NON-NLS-1$
 		this.application.checkUpdateFileComment();
 		this.application.checkUpdateRecordSetComment();
-			
+
 		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
 				this.setActiveChannelNumber(channelNumber);
 				this.application.getMenuToolBar().updateChannelToolItems();
 				if (recordSetKey == null || recordSetKey.length() < 1)
-					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getLastActiveRecordSetName()); 
+					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getLastActiveRecordSetName());
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
-				
+
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET) {
-						this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 				this.application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
 			}
@@ -191,8 +192,7 @@ public class Channels extends HashMap<Integer, Channel> {
 						recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), true);
 					}
 					recordSet.resetZoomAndMeasurement();
-					if (recordSet.isRecalculation)
-						recordSet.checkAllDisplayable(); // updates graphics window
+					if (recordSet.isRecalculation) recordSet.checkAllDisplayable(); // updates graphics window
 					recordSet.updateVisibleAndDisplayableRecordsForTable();
 				}
 				this.application.resetGraphicsWindowZoomAndMeasurement();
@@ -202,13 +202,13 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateMenusRegardingGPSData();
 				this.application.updateAllTabs(true);
-				
+
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				this.application.setupHistoWindows();
+				this.application.updateHistoTabs(false); // file paths will determine which scope of histo data update is appropriate
 			}
 		}
 		else
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0006)); 
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0006));
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * method to cleanup all child and dependent
 	 */
 	public void cleanup() {
-		this.activeChannelNumber	= 1;		// default at least one channel must exist
+		this.activeChannelNumber = 1; // default at least one channel must exist
 		this.channelNames = new String[1];
 		try {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -253,7 +253,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		// use super.size instead of this.size to enable only one channel for multiple channel configurations
-		for (int i = 1; i <= super.size(); i++) { 
+		for (int i = 1; i <= super.size(); i++) {
 			Channel channel = this.get(i);
 			channel.setFileName(GDE.STRING_EMPTY);
 			channel.setSaved(false);
@@ -265,7 +265,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		this.clear(); // clear channel
 		log.log(Level.FINE, "visited"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * method checking all channels has saved record set
 	 * @return string array of record sets not saved, length == 0 for all record sets saved
@@ -287,7 +287,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					}
 				}
 			}
-		}		
+		}
 		return sb.toString();
 	}
 }

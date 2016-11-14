@@ -15,6 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde;
 
@@ -73,286 +74,284 @@ import org.eclipse.swt.widgets.Shell;
  *  - class defines also generic constants used for DataExplorer (GDE)
  */
 public class GDE {
-	public static final String		STRING_WITHIN_ECLIPSE						= "/classes/";
-	final static String						$CLASS_NAME											= GDE.class.getName();
-	public final static long			StartTime												= new Date().getTime();
-	public static Handler					logHandler											= null;
-	public static Display					display;
-	public static Shell						shell;
-
+	public static final String							STRING_WITHIN_ECLIPSE							= "/classes/";
+	final static String											$CLASS_NAME												= GDE.class.getName();
+	public final static long								StartTime													= new Date().getTime();
+	public static Handler										logHandler												= null;
+	public static Display										display;
+	public static Shell											shell;
 
 	// ****** begin global constants section *******
 	public static final String		VERSION													= "Version 3.2.8";																																																						//$NON-NLS-1$
-	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
-	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V30";																																																										//$NON-NLS-1$
-	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V08";																																																										//$NON-NLS-1$
-	public final static String		CLEAN_SETTINGS_WHILE_SHUTDOWN 	= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
-	public final static String		TEMP_FILE_STEM 									= "~TempFile";
+	public static final String							NAME_SHORT												= "GDE";																																																										//$NON-NLS-1$
+	public static final String							NAME_LONG													= "DataExplorer";																																																						//$NON-NLS-1$
+	public final static String							DEVICE_PROPERTIES_XSD_VERSION			= "_V30";																																																										//$NON-NLS-1$
+	public final static String							GRAPHICS_TEMPLATES_XSD_VERSION		= "_V08";																																																										//$NON-NLS-1$
+	public final static String							CLEAN_SETTINGS_WHILE_SHUTDOWN			= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
+	public final static String							TEMP_FILE_STEM										= "~TempFile";
 
-	public static final boolean		IS_WINDOWS											= System.getProperty("os.name").toLowerCase().startsWith("windows");																													//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean		IS_LINUX												= System.getProperty("os.name").toLowerCase().startsWith("linux");																														//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean		IS_MAC													= System.getProperty("os.name").toLowerCase().startsWith("mac");																															//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean		IS_MAC_COCOA										= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");				//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean		IS_ARCH_DATA_MODEL_64						= System.getProperty("sun.arch.data.model").equals("64");																																			//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean							IS_WINDOWS												= System.getProperty("os.name").toLowerCase().startsWith("windows");																												//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean							IS_LINUX													= System.getProperty("os.name").toLowerCase().startsWith("linux");																													//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean							IS_MAC														= System.getProperty("os.name").toLowerCase().startsWith("mac");																														//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean							IS_MAC_COCOA											= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");			//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean							IS_ARCH_DATA_MODEL_64							= System.getProperty("sun.arch.data.model").equals("64");																																		//$NON-NLS-1$ //$NON-NLS-2$
 
-	public static final String		STRING_BASE_PACKAGE							= "gde";																																																											//$NON-NLS-1$
+	public static final String							STRING_BASE_PACKAGE								= "gde";																																																										//$NON-NLS-1$
 
-	public static final String		BIT_MODE												= System.getProperty("sun.arch.data.model") != null //$NON-NLS-1$
-																																? System.getProperty("sun.arch.data.model") //$NON-NLS-1$
-																																		: System.getProperty("com.ibm.vm.bitmode");																																							//$NON-NLS-1$
-	public static final String		FILE_SEPARATOR_UNIX							= "/";																																																												//$NON-NLS-1$
-	public static final String		FILE_SEPARATOR_WINDOWS					= "\\";																																																											//$NON-NLS-1$
-	public static final String		FILE_SEPARATOR									= System.getProperty("file.separator");																																											//$NON-NLS-1$
-	public static final String		JAVA_IO_TMPDIR									= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) //$NON-NLS-1$
-																																		? System.getProperty("java.io.tmpdir") //$NON-NLS-1$
-																																		: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;																															//$NON-NLS-1$
+	public static final String							BIT_MODE													= System.getProperty("sun.arch.data.model") != null																																					//$NON-NLS-1$
+			? System.getProperty("sun.arch.data.model")																																																																												//$NON-NLS-1$
+			: System.getProperty("com.ibm.vm.bitmode");																																																																												//$NON-NLS-1$
+	public static final String							FILE_SEPARATOR_UNIX								= "/";																																																											//$NON-NLS-1$
+	public static final String							FILE_SEPARATOR_WINDOWS						= "\\";																																																											//$NON-NLS-1$
+	public static final String							FILE_SEPARATOR										= System.getProperty("file.separator");																																											//$NON-NLS-1$
+	public static final String							JAVA_IO_TMPDIR										= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)																													//$NON-NLS-1$
+			? System.getProperty("java.io.tmpdir")																																																																														//$NON-NLS-1$
+			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;																																																																			//$NON-NLS-1$
 
-	public final static int				SIZE_BYTES_INTEGER							= Integer.SIZE / 8;																																																					// 32 bits / 8 bits per byte 
-	public final static int				SIZE_BYTES_LONG									= Long.SIZE / 8;																																																							// 64 bits / 8 bits per byte 
-	public final static int				SIZE_UTF_SIGNATURE							= 2;																																																													// 2 byte UTF line header
-	public final static long			ONE_HOUR_MS											= 1 * 60 * 60 * 1000;
+	public final static int									SIZE_BYTES_INTEGER								= Integer.SIZE / 8;																																																					// 32 bits / 8 bits per byte 
+	public final static int									SIZE_BYTES_LONG										= Long.SIZE / 8;																																																						// 64 bits / 8 bits per byte 
+	public final static int									SIZE_UTF_SIGNATURE								= 2;																																																												// 2 byte UTF line header
+	public final static long								ONE_HOUR_MS												= 1 * 60 * 60 * 1000;
 
+	public final static String							STRING_NEW_LINE										= "\n";																																																											// is OS dependent //$NON-NLS-1$
+	public final static String							STRING_RETURN											= "\r";																																																											// is OS dependent //$NON-NLS-1$
+	public static final String							STRING_MESSAGE_CONCAT							= " - ";																																																										//$NON-NLS-1$
+	public static final String							STRING_DASH												= "-";																																																											//$NON-NLS-1$
+	public static final String							STRING_UNDER_BAR									= "_";																																																											//$NON-NLS-1$
+	public static final String							STRING_EMPTY											= "";																																																												//$NON-NLS-1$
+	public static final String							STRING_BLANK											= " ";																																																											//$NON-NLS-1$
+	public static final String							STRING_URL_BLANK									= "%20";																																																										//$NON-NLS-1$
+	public static final String							STRING_COLON											= ":";																																																											//$NON-NLS-1$
+	public static final String							STRING_BLANK_COLON_BLANK					= " : ";																																																										//$NON-NLS-1$
+	public static final String							STRING_COMMA											= ",";																																																											//$NON-NLS-1$
+	public static final String							STRING_SEMICOLON									= ";";																																																											//$NON-NLS-1$
+	public static final String							STRING_DOT												= ".";																																																											//$NON-NLS-1$
+	public static final String							STRING_EQUAL											= "=";																																																											//$NON-NLS-1$
+	public static final String							STRING_STAR												= "*";																																																											//$NON-NLS-1$
+	public static final String							STRING_LEFT_PARENTHESIS						= "(";																																																											//$NON-NLS-1$
+	public static final String							STRING_RIGHT_PARENTHESIS					= ")";																																																											//$NON-NLS-1$
+	public static final String							STRING_RIGHT_PARENTHESIS_BLANK		= ") ";																																																											//$NON-NLS-1$
+	public static final String							STRING_BLANK_LEFT_BRACKET					= " [";																																																											//$NON-NLS-1$
+	public static final String							STRING_LEFT_BRACKET								= "[";																																																											//$NON-NLS-1$
+	public static final String							STRING_RIGHT_BRACKET							= "]";																																																											//$NON-NLS-1$
+	public static final String							STRING_RIGHT_BRACKET_COMMA				= "], ";																																																										//$NON-NLS-1$
+	public static final String							STRING_OR													= "|";																																																											//$NON-NLS-1$
+	public static final String							STRING_DOLLAR											= "$";																																																											//$NON-NLS-1$
+	public static final String							STRING_OS_NAME										= "os.name";																																																								//$NON-NLS-1$
+	public static final String							STRING_UTF_8											= "UTF-8";																																																									//$NON-NLS-1$
+	public static final String							STRING_ISO_8895_1									= "ISO-8859-1";																																																							//$NON-NLS-1$
+	public static final String							STRING_PLUS												= "+";																																																											//$NON-NLS-1$
+	public static final String							STRING_MINUS											= "-";																																																											//$NON-NLS-1$
+	public static final String							STRING_TRUE												= "true";																																																										//$NON-NLS-1$
+	public static final String							STRING_FALSE											= "false";																																																									//$NON-NLS-1$
+	public static final String							STRING_SINGLE_QUOAT								= "'";																																																											//$NON-NLS-1$
+	public static final String							STRING_ENTRY											= "entry - ";																																																								//$NON-NLS-1$
+	public static final String							STRING_EXIT												= "exit - ";																																																								//$NON-NLS-1$
 
-	public final static String		STRING_NEW_LINE									= "\n";																																																											// is OS dependent //$NON-NLS-1$
-	public final static String		STRING_RETURN										= "\r";																																																											// is OS dependent //$NON-NLS-1$
-	public static final String		STRING_MESSAGE_CONCAT						= " - ";																																																											//$NON-NLS-1$
-	public static final String		STRING_DASH											= "-";																																																												//$NON-NLS-1$
-	public static final String		STRING_UNDER_BAR								= "_";																																																												//$NON-NLS-1$
-	public static final String		STRING_EMPTY										= "";																																																												//$NON-NLS-1$
-	public static final String		STRING_BLANK										= " ";																																																												//$NON-NLS-1$
-	public static final String		STRING_URL_BLANK								= "%20";																																																											//$NON-NLS-1$
-	public static final String		STRING_COLON										= ":";																																																												//$NON-NLS-1$
-	public static final String		STRING_BLANK_COLON_BLANK				= " : ";																																																											//$NON-NLS-1$
-	public static final String		STRING_COMMA										= ",";																																																												//$NON-NLS-1$
-	public static final String		STRING_SEMICOLON								= ";";																																																												//$NON-NLS-1$
-	public static final String		STRING_DOT											= ".";																																																												//$NON-NLS-1$
-	public static final String		STRING_EQUAL										= "=";																																																												//$NON-NLS-1$
-	public static final String		STRING_STAR											= "*";																																																												//$NON-NLS-1$
-	public static final String		STRING_LEFT_PARENTHESIS					= "(";																																																												//$NON-NLS-1$
-	public static final String		STRING_RIGHT_PARENTHESIS				= ")";																																																												//$NON-NLS-1$
-	public static final String		STRING_RIGHT_PARENTHESIS_BLANK	= ") ";																																																												//$NON-NLS-1$
-	public static final String		STRING_BLANK_LEFT_BRACKET				= " [";																																																												//$NON-NLS-1$
-	public static final String		STRING_LEFT_BRACKET							= "[";																																																												//$NON-NLS-1$
-	public static final String		STRING_RIGHT_BRACKET						= "]";																																																												//$NON-NLS-1$
-	public static final String		STRING_RIGHT_BRACKET_COMMA			= "], ";																																																												//$NON-NLS-1$
-	public static final String		STRING_OR												= "|";																																																												//$NON-NLS-1$
-	public static final String		STRING_DOLLAR										= "$";																																																												//$NON-NLS-1$
-	public static final String		STRING_OS_NAME									= "os.name";																																																									//$NON-NLS-1$
-	public static final String		STRING_UTF_8										= "UTF-8";																																																										//$NON-NLS-1$
-	public static final String		STRING_ISO_8895_1								= "ISO-8859-1";																																																							//$NON-NLS-1$
-	public static final String		STRING_PLUS											= "+";																																																												//$NON-NLS-1$
-	public static final String		STRING_MINUS										= "-";																																																												//$NON-NLS-1$
-	public static final String		STRING_TRUE											= "true";																																																										//$NON-NLS-1$
-	public static final String		STRING_FALSE										= "false";																																																										//$NON-NLS-1$
-	public static final String		STRING_SINGLE_QUOAT							= "'";																																																												//$NON-NLS-1$
-	public static final String		STRING_ENTRY										= "entry - ";																																																												//$NON-NLS-1$
-	public static final String		STRING_EXIT											= "exit - ";																																																												//$NON-NLS-1$
+	public static final String[]						STRING_ARRAY_TRUE_FALSE						= new String[] { "true", "false" };																																													//$NON-NLS-1$ //$NON-NLS-2$
 
-	public static final String[]	STRING_ARRAY_TRUE_FALSE					= new String[] { "true", "false" };																																													//$NON-NLS-1$ //$NON-NLS-2$
+	public static final String							STRING_WINDOWS_APP_OPEN						= "rundll32.exe";																																																						//$NON-NLS-1$
+	public static final String							STRING_WINDOWS_EXTERN_DEF_DIR			= "G:\\";																																																										//$NON-NLS-1$
+	public static final String							STRING_WINDOWS_EXTERN_MEDIA_DIR		= ":";																																																											//$NON-NLS-1$
 
-	public static final String		STRING_WINDOWS_APP_OPEN					= "rundll32.exe";																																																										//$NON-NLS-1$
-	public static final String		STRING_WINDOWS_EXTERN_DEF_DIR		= "G:\\";																																																										//$NON-NLS-1$
-	public static final String		STRING_WINDOWS_EXTERN_MEDIA_DIR	= ":";																																																										//$NON-NLS-1$
+	public static final String							STRING_LINUX_APP_OPEN							= "xdg-open";																																																								//$NON-NLS-1$
+	public static final String							STRING_LINUX_EXTERN_MEDIA_DIR			= "/media";																																																									//$NON-NLS-1$
 
-	public static final String		STRING_LINUX_APP_OPEN						= "xdg-open";																																																										//$NON-NLS-1$
-	public static final String		STRING_LINUX_EXTERN_MEDIA_DIR		= "/media";																																																										//$NON-NLS-1$
+	public static final String							STRING_MAC_APP_BASE_PATH					= "/Applications/";																																																					//$NON-NLS-1$
+	public static final String							STRING_MAC_DOT_APP								= ".app";																																																										//$NON-NLS-1$
+	public static final String							STRING_MAC_APP_EXE_PATH						= "/Contents/MacOS/";																																																				//$NON-NLS-1$
+	public static final String							STRING_MAC_APP_RES_PATH						= "/Contents/Resources";																																																		//$NON-NLS-1$
+	public static final String							STRING_MAC_APP_OPEN								= "open";																																																										//$NON-NLS-1$
+	public static final String							STRING_MAC_EXTERN_MEDIA_DIR				= "/Volumes";																																																								//$NON-NLS-1$
 
-	public static final String		STRING_MAC_APP_BASE_PATH				= "/Applications/";																																																					//$NON-NLS-1$
-	public static final String		STRING_MAC_DOT_APP							= ".app";																																																										//$NON-NLS-1$
-	public static final String		STRING_MAC_APP_EXE_PATH					= "/Contents/MacOS/";																																																				//$NON-NLS-1$
-	public static final String		STRING_MAC_APP_RES_PATH					= "/Contents/Resources";																																																			//$NON-NLS-1$
-	public static final String		STRING_MAC_APP_OPEN							= "open";																																																										//$NON-NLS-1$
-	public static final String		STRING_MAC_EXTERN_MEDIA_DIR			= "/Volumes";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_LOV							= "*.lov";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_OSD							= "*.osd";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_CSV							= "*.csv";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_IGC							= "*.igc";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_JPG							= "*.jpg";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_PNG							= "*.png";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_GIF							= "*.gif";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_XML							= "*.xml";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_KMZ							= "*.kmz";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_GPX							= "*.gpx";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_HEX							= "*.hex";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_INI							= "*.ini";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_TXT							= "*.txt";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_LOG							= "*.log";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_BIN							= "*.bin";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_JML							= "*.jml";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_STAR							= "*.*";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_JAR								= ".jar";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_LOV								= ".lov";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_OSD								= ".osd";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_CSV								= ".csv";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_IGC								= ".igc";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_NMEA							= ".nmea";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_JPG								= ".jpg";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_PNG								= ".png";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_GIF								= ".gif";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_TXT								= ".txt";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_LOG								= ".log";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_STF								= ".stf";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_ZIP								= ".zip";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_BAK								= ".bak";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_TMP								= ".tmp";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_XML								= ".xml";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_XSD								= ".xsd";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_HEX								= ".hex";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_KMZ								= ".kmz";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_GPX								= ".gpx";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_KML								= ".kml";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_EXE								= ".exe";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_INI								= ".ini";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_BIN								= ".bin";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_JML								= ".jml";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_LOV										= "lov";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_OSD										= "osd";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_CSV										= "csv";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_IGC										= "igc";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_NMEA									= "nmea";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_XML										= "xml";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_JPG										= "jpg";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_PNG										= "png";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_GIF										= "gif";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_BAK										= "bak";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_TMP										= "tmp";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_KMZ										= "kmz";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_GPX										= "gpx";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR									= "*";																																																											//$NON-NLS-1$
+	public static final String							FILE_ENDING_HEX										= "hex";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_EXE										= "exe";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_INI										= "ini";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_BIN										= "bin";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_LOG										= "log";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_JML										= "jml";																																																										//$NON-NLS-1$
 
-	public static final String		FILE_ENDING_STAR_LOV						= "*.lov";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_OSD						= "*.osd";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_CSV						= "*.csv";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_IGC						= "*.igc";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_JPG						= "*.jpg";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_PNG						= "*.png";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_GIF						= "*.gif";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_XML						= "*.xml";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_KMZ						= "*.kmz";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_GPX						= "*.gpx";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_HEX						= "*.hex";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_INI						= "*.ini";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_TXT						= "*.txt";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_LOG						= "*.log";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_BIN						= "*.bin";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_JML						= "*.jml";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_STAR						= "*.*";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_JAR							= ".jar";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_LOV							= ".lov";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_OSD							= ".osd";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_CSV							= ".csv";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_IGC							= ".igc";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_NMEA						= ".nmea";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_JPG							= ".jpg";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_PNG							= ".png";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_GIF							= ".gif";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_TXT							= ".txt";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_LOG							= ".log";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_STF							= ".stf";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_ZIP							= ".zip";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_BAK							= ".bak";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_TMP							= ".tmp";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_XML							= ".xml";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_XSD							= ".xsd";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_HEX							= ".hex";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_KMZ							= ".kmz";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_GPX							= ".gpx";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_KML							= ".kml";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_EXE							= ".exe";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_INI							= ".ini";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_BIN							= ".bin";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_JML							= ".jml";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_LOV									= "lov";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_OSD									= "osd";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_CSV									= "csv";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_IGC									= "igc";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_NMEA								= "nmea";																																																										//$NON-NLS-1$
-	public static final String		FILE_ENDING_XML									= "xml";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_JPG									= "jpg";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_PNG									= "png";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_GIF									= "gif";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_BAK									= "bak";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_TMP									= "tmp";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_KMZ									= "kmz";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_GPX									= "gpx";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR								= "*";																																																												//$NON-NLS-1$
-	public static final String		FILE_ENDING_HEX									= "hex";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_EXE									= "exe";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_INI									= "ini";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_BIN									= "bin";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_LOG									= "log";																																																											//$NON-NLS-1$
-	public static final String		FILE_ENDING_JML									= "jml";																																																											//$NON-NLS-1$
+	public final static String							LINE_SEPARATOR										= System.getProperty("line.separator");																																											// is OS dependent //$NON-NLS-1$
 
-	public final static String		LINE_SEPARATOR									= System.getProperty("line.separator");																																											// is OS dependent //$NON-NLS-1$
+	public static final String							BOOTSTRAP_LOG											= "/bootstrap.log";																																																					//$NON-NLS-1$
+	public static final String							ECLIPSE_STRING										= "ECLIPSE";																																																								//$NON-NLS-1$
+	public static final String[]						MOD1															= new String[] { GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl" };
+	public static final String[]						MOD2															= new String[] { Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift" };
+	public static final String[]						MOD3															= new String[] { "Alt" };
 
-	public static final String		BOOTSTRAP_LOG										= "/bootstrap.log";																																																					//$NON-NLS-1$
-	public static final String		ECLIPSE_STRING									= "ECLIPSE";																																																									//$NON-NLS-1$
-	public static final String[] 	MOD1 														= new String[] {GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl"};
-	public static final String[] 	MOD2 														= new String[] {Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift"};
-	public static final String[] 	MOD3 														= new String[] {"Alt"};
-
-	public static int							WIDGET_FONT_SIZE;
-	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : GDE.IS_MAC ? "Lucida Grande" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
+	public static int												WIDGET_FONT_SIZE;
+	public final static String							WIDGET_FONT_NAME									= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : GDE.IS_MAC ? "Lucida Grande" : "Sans Serif";																		//$NON-NLS-1$ //$NON-NLS-2$
 
 	// number ranges for message IDs 
-	public static final int				NUMBER_RANGE_MIN_GDE							= 0;
-	public static final int				NUMBER_RANGE_MAX_GDE							= 1000;
-	public static final int				NUMBER_RANGE_MIN_SAMPLE_SIM				= 1001; 
-	public static final int				NUMBER_RANGE_MAX_SAMPLE_SIM				= 1099; 
-	public static final int				NUMBER_RANGE_MIN_AKKUMASTER				= 1100; 
-	public static final int				NUMBER_RANGE_MAX_AKKUMASTER				= 1199; 
-	public static final int				NUMBER_RANGE_MIN_PICOLARIO				= 1200; 
-	public static final int				NUMBER_RANGE_MAX_PICOLARIO				= 1299; 
-	public static final int				NUMBER_RANGE_MIN_UNILOG						= 1300; 
-	public static final int				NUMBER_RANGE_MAX_UNILOG						= 1399; 
-	public static final int				NUMBER_RANGE_MIN_ESTATION					= 1400; 
-	public static final int				NUMBER_RANGE_MAX_ESTATION					= 1499; 
-	public static final int				NUMBER_RANGE_MIN_VC800						= 1500; 
-	public static final int				NUMBER_RANGE_MAX_VC800						= 1599; 
-	public static final int				NUMBER_RANGE_MIN_LIPOWATCH				= 1600; 
-	public static final int				NUMBER_RANGE_MAX_LIPOWATCH				= 1699; 
-	public static final int				NUMBER_RANGE_MIN_CSV2SERIAL				= 1700; 
-	public static final int				NUMBER_RANGE_MAX_CSV2SERIAL				= 1799; 
-	public static final int				NUMBER_RANGE_MIN_WSTECHVARIO			= 1800; 
-	public static final int				NUMBER_RANGE_MAX_WSTECHVARIO			= 1899; 
-	public static final int				NUMBER_RANGE_MIN_QC_COPTER				= 1900; 
-	public static final int				NUMBER_RANGE_MAX_QC_COPTER				= 1999; 
-	public static final int				NUMBER_RANGE_MIN_GPS_LOGGER				= 2000; 
-	public static final int				NUMBER_RANGE_MAX_GPS_LOGGER				= 2099; 
-	public static final int				NUMBER_RANGE_MIN_NMEA_ADAPTER			= 2100; 
-	public static final int				NUMBER_RANGE_MAX_NMEA_ADAPTER			= 2199; 
-	public static final int				NUMBER_RANGE_MIN_ULTRAMAT_DUOPLUS	= 2200; 
-	public static final int				NUMBER_RANGE_MAX_ULTRAMAT_DUOPLUS	= 2399; 
-	public static final int				NUMBER_RANGE_MIN_HOTTADAPTER			= 2400; 
-	public static final int				NUMBER_RANGE_MAX_HOTTADAPTER			= 2499; 
-	public static final int				NUMBER_RANGE_MIN_UNILOG2					= 2500; 
-	public static final int				NUMBER_RANGE_MAX_UNILOG2					= 2599; 
-	public static final int				NUMBER_RANGE_MIN_ICHARGER					= 2600; 
-	public static final int				NUMBER_RANGE_MAX_ICHARGER					= 2699; 
-	public static final int				NUMBER_RANGE_MIN_FLIGHTRECORDER		= 2700; 
-	public static final int				NUMBER_RANGE_MAX_FLIGHTRECORDER		= 2799; 
-	public static final int				NUMBER_RANGE_MIN_JLOG2						= 2800; 
-	public static final int				NUMBER_RANGE_MAX_JLOG2						= 2899; 
-	public static final int				NUMBER_RANGE_MIN_JETIADAPTER			= 2900; 
-	public static final int				NUMBER_RANGE_MAX_JETIADAPTER			= 2999; 
+	public static final int									NUMBER_RANGE_MIN_GDE							= 0;
+	public static final int									NUMBER_RANGE_MAX_GDE							= 1000;
+	public static final int									NUMBER_RANGE_MIN_SAMPLE_SIM				= 1001;
+	public static final int									NUMBER_RANGE_MAX_SAMPLE_SIM				= 1099;
+	public static final int									NUMBER_RANGE_MIN_AKKUMASTER				= 1100;
+	public static final int									NUMBER_RANGE_MAX_AKKUMASTER				= 1199;
+	public static final int									NUMBER_RANGE_MIN_PICOLARIO				= 1200;
+	public static final int									NUMBER_RANGE_MAX_PICOLARIO				= 1299;
+	public static final int									NUMBER_RANGE_MIN_UNILOG						= 1300;
+	public static final int									NUMBER_RANGE_MAX_UNILOG						= 1399;
+	public static final int									NUMBER_RANGE_MIN_ESTATION					= 1400;
+	public static final int									NUMBER_RANGE_MAX_ESTATION					= 1499;
+	public static final int									NUMBER_RANGE_MIN_VC800						= 1500;
+	public static final int									NUMBER_RANGE_MAX_VC800						= 1599;
+	public static final int									NUMBER_RANGE_MIN_LIPOWATCH				= 1600;
+	public static final int									NUMBER_RANGE_MAX_LIPOWATCH				= 1699;
+	public static final int									NUMBER_RANGE_MIN_CSV2SERIAL				= 1700;
+	public static final int									NUMBER_RANGE_MAX_CSV2SERIAL				= 1799;
+	public static final int									NUMBER_RANGE_MIN_WSTECHVARIO			= 1800;
+	public static final int									NUMBER_RANGE_MAX_WSTECHVARIO			= 1899;
+	public static final int									NUMBER_RANGE_MIN_QC_COPTER				= 1900;
+	public static final int									NUMBER_RANGE_MAX_QC_COPTER				= 1999;
+	public static final int									NUMBER_RANGE_MIN_GPS_LOGGER				= 2000;
+	public static final int									NUMBER_RANGE_MAX_GPS_LOGGER				= 2099;
+	public static final int									NUMBER_RANGE_MIN_NMEA_ADAPTER			= 2100;
+	public static final int									NUMBER_RANGE_MAX_NMEA_ADAPTER			= 2199;
+	public static final int									NUMBER_RANGE_MIN_ULTRAMAT_DUOPLUS	= 2200;
+	public static final int									NUMBER_RANGE_MAX_ULTRAMAT_DUOPLUS	= 2399;
+	public static final int									NUMBER_RANGE_MIN_HOTTADAPTER			= 2400;
+	public static final int									NUMBER_RANGE_MAX_HOTTADAPTER			= 2499;
+	public static final int									NUMBER_RANGE_MIN_UNILOG2					= 2500;
+	public static final int									NUMBER_RANGE_MAX_UNILOG2					= 2599;
+	public static final int									NUMBER_RANGE_MIN_ICHARGER					= 2600;
+	public static final int									NUMBER_RANGE_MAX_ICHARGER					= 2699;
+	public static final int									NUMBER_RANGE_MIN_FLIGHTRECORDER		= 2700;
+	public static final int									NUMBER_RANGE_MAX_FLIGHTRECORDER		= 2799;
+	public static final int									NUMBER_RANGE_MIN_JLOG2						= 2800;
+	public static final int									NUMBER_RANGE_MAX_JLOG2						= 2899;
+	public static final int									NUMBER_RANGE_MIN_JETIADAPTER			= 2900;
+	public static final int									NUMBER_RANGE_MAX_JETIADAPTER			= 2999;
 	// ****** end global constants section *******
 
 	// begin OSD file format
-	public static final String		DATA_EXPLORER_FILE_VERSION			= "DataExplorer version : ";																																																	//$NON-NLS-1$
-	public static final String		LEGACY_FILE_VERSION							= "OpenSerialData version : ";																																																//$NON-NLS-1$
-	public static final String		DATA_EXPLORER_FILE							= "DataExplorer";																																																						//$NON-NLS-1$
-	public static final String		LEGACY_OSDE_FILE								= "OpenSerialData";																																																					//$NON-NLS-1$
-	public static final int				DATA_EXPLORER_FILE_VERSION_INT	= 4;																																																													// actual version
+	public static final String							DATA_EXPLORER_FILE_VERSION				= "DataExplorer version : ";																																																//$NON-NLS-1$
+	public static final String							LEGACY_FILE_VERSION								= "OpenSerialData version : ";																																															//$NON-NLS-1$
+	public static final String							DATA_EXPLORER_FILE								= "DataExplorer";																																																						//$NON-NLS-1$
+	public static final String							LEGACY_OSDE_FILE									= "OpenSerialData";																																																					//$NON-NLS-1$
+	public static final int									DATA_EXPLORER_FILE_VERSION_INT		= 4;																																																												// actual version
 
-	public static final String		CREATION_TIME_STAMP							= "Created : ";																																																							//$NON-NLS-1$
-	public static final String		LAST_UPDATE_TIME_STAMP					= "Updated : ";																																																							//$NON-NLS-1$
-	public static final String		FILE_COMMENT										= "FileComment : ";																																																					//$NON-NLS-1$
-	public static final String		DEVICE_NAME											= "DeviceName : ";																																																						//$NON-NLS-1$
-	public static final String		CHANNEL_CONFIG_TYPE							= "Channel/Configuration Type : ";																																														//$NON-NLS-1$
-	public static final String		RECORD_SET_SIZE									= "NumberRecordSets : ";																																																			//$NON-NLS-1$
-	public static final String		RECORD_SET_NAME									= "RecordSetName : ";																																																				//$NON-NLS-1$
-	public static final String		CHANNEL_CONFIG_NUMBER						= "Channel/Configuration Number : ";																																													//$NON-NLS-1$
+	public static final String							CREATION_TIME_STAMP								= "Created : ";																																																							//$NON-NLS-1$
+	public static final String							LAST_UPDATE_TIME_STAMP						= "Updated : ";																																																							//$NON-NLS-1$
+	public static final String							FILE_COMMENT											= "FileComment : ";																																																					//$NON-NLS-1$
+	public static final String							DEVICE_NAME												= "DeviceName : ";																																																					//$NON-NLS-1$
+	public static final String							CHANNEL_CONFIG_TYPE								= "Channel/Configuration Type : ";																																													//$NON-NLS-1$
+	public static final String							RECORD_SET_SIZE										= "NumberRecordSets : ";																																																		//$NON-NLS-1$
+	public static final String							RECORD_SET_NAME										= "RecordSetName : ";																																																				//$NON-NLS-1$
+	public static final String							CHANNEL_CONFIG_NUMBER							= "Channel/Configuration Number : ";																																												//$NON-NLS-1$
 
-	public static final String		DATA_DELIMITER									= "||::||";																																																									//$NON-NLS-1$
-	public static final String		CHANNEL_CONFIG_NAME							= "Channel/Configuration Name: ";																																														//$NON-NLS-1$
-	public static final String		OBJECT_KEY											= "ObjectKey : ";																																																						//$NON-NLS-1$
+	public static final String							DATA_DELIMITER										= "||::||";																																																									//$NON-NLS-1$
+	public static final String							CHANNEL_CONFIG_NAME								= "Channel/Configuration Name: ";																																														//$NON-NLS-1$
+	public static final String							OBJECT_KEY												= "ObjectKey : ";																																																						//$NON-NLS-1$
 
-	public static final String		RECORD_SET_COMMENT							= "RecordSetComment : ";																																																			//$NON-NLS-1$
-	public static final String		RECORD_SET_PROPERTIES						= "RecordSetProperties : ";																																																	//$NON-NLS-1$
-	public static final String		RECORDS_PROPERTIES							= "RecordProperties : ";																																																			//$NON-NLS-1$
-	public static final String		RECORD_DATA_SIZE								= "RecordDataSize : ";																																																				//$NON-NLS-1$
-	public static final String		RECORD_SET_DATA_POINTER					= "RecordSetDataPointer : ";																																																	//$NON-NLS-1$
-	public static final String		RECORD_SET_DATA_BYTES						= "RecordSetDataBytes : ";																																																		//$NON-NLS-1$
+	public static final String							RECORD_SET_COMMENT								= "RecordSetComment : ";																																																		//$NON-NLS-1$
+	public static final String							RECORD_SET_PROPERTIES							= "RecordSetProperties : ";																																																	//$NON-NLS-1$
+	public static final String							RECORDS_PROPERTIES								= "RecordProperties : ";																																																		//$NON-NLS-1$
+	public static final String							RECORD_DATA_SIZE									= "RecordDataSize : ";																																																			//$NON-NLS-1$
+	public static final String							RECORD_SET_DATA_POINTER						= "RecordSetDataPointer : ";																																																//$NON-NLS-1$
+	public static final String							RECORD_SET_DATA_BYTES							= "RecordSetDataBytes : ";																																																	//$NON-NLS-1$
 
-	public static final String[]	OSD_FORMAT_HEADER_KEYS					= new String[] { GDE.CREATION_TIME_STAMP, GDE.FILE_COMMENT, GDE.DEVICE_NAME, GDE.OBJECT_KEY, GDE.CHANNEL_CONFIG_TYPE,
-			GDE.RECORD_SET_SIZE																			};
-	public static final String[]	OSD_FORMAT_DATA_KEYS						= new String[] { GDE.CHANNEL_CONFIG_NAME, GDE.RECORD_SET_NAME, GDE.RECORD_SET_COMMENT, GDE.RECORD_SET_PROPERTIES,
+	public static final String[]						OSD_FORMAT_HEADER_KEYS						= new String[] { GDE.CREATION_TIME_STAMP, GDE.FILE_COMMENT, GDE.DEVICE_NAME, GDE.OBJECT_KEY, GDE.CHANNEL_CONFIG_TYPE,
+			GDE.RECORD_SET_SIZE };
+	public static final String[]						OSD_FORMAT_DATA_KEYS							= new String[] { GDE.CHANNEL_CONFIG_NAME, GDE.RECORD_SET_NAME, GDE.RECORD_SET_COMMENT, GDE.RECORD_SET_PROPERTIES,
 			GDE.RECORDS_PROPERTIES, GDE.RECORD_DATA_SIZE, GDE.RECORD_SET_DATA_POINTER };
 	// begin OSD file format
 
 	// begin LogView file format
-	public static final String		LOV_CONFIG_DATA									= "logview_config_data";																																																			//$NON-NLS-1$
+	public static final String							LOV_CONFIG_DATA										= "logview_config_data";																																																		//$NON-NLS-1$
 
-	public static final String		DATA_POINTER_POS								= "Data_Pointer_Pos : ";																																																			//$NON-NLS-1$
-	public static final String		LOV_HEADER_SIZE									= "Header_Size : ";																																																					//$NON-NLS-1$
-	public static final String		LOV_FORMAT_VERSION							= "Format_Version : ";																																																				//$NON-NLS-1$
-	public static final String		LOV_SSTREAM_VERSION							= "String_Stream_Version : ";																																																//$NON-NLS-1$
-	public static final String		LOV_STREAM_VERSION							= "Stream_Version : ";																																																				//$NON-NLS-1$
+	public static final String							DATA_POINTER_POS									= "Data_Pointer_Pos : ";																																																		//$NON-NLS-1$
+	public static final String							LOV_HEADER_SIZE										= "Header_Size : ";																																																					//$NON-NLS-1$
+	public static final String							LOV_FORMAT_VERSION								= "Format_Version : ";																																																			//$NON-NLS-1$
+	public static final String							LOV_SSTREAM_VERSION								= "String_Stream_Version : ";																																																//$NON-NLS-1$
+	public static final String							LOV_STREAM_VERSION								= "Stream_Version : ";																																																			//$NON-NLS-1$
 
-	public static final String		LOV_TIME_STEP										= "TimeStep_ms=";																																																						//$NON-NLS-1$
-	public static final String		LOV_NUM_MEASUREMENTS						= "WerteAnzahl=";																																																						//$NON-NLS-1$
+	public static final String							LOV_TIME_STEP											= "TimeStep_ms=";																																																						//$NON-NLS-1$
+	public static final String							LOV_NUM_MEASUREMENTS							= "WerteAnzahl=";																																																						//$NON-NLS-1$
 
-	public static final String[]	LOV_FORMAT_HEADER_KEYS					= new String[] { GDE.CREATION_TIME_STAMP, GDE.FILE_COMMENT, GDE.DEVICE_NAME, GDE.CHANNEL_CONFIG_TYPE, GDE.RECORD_SET_SIZE };
-	public static final String[]	LOV_FORMAT_DATA_KEYS						= new String[] { GDE.CHANNEL_CONFIG_NAME, GDE.RECORD_SET_NAME, GDE.RECORD_SET_COMMENT, GDE.RECORD_SET_PROPERTIES,
+	public static final String[]						LOV_FORMAT_HEADER_KEYS						= new String[] { GDE.CREATION_TIME_STAMP, GDE.FILE_COMMENT, GDE.DEVICE_NAME, GDE.CHANNEL_CONFIG_TYPE, GDE.RECORD_SET_SIZE };
+	public static final String[]						LOV_FORMAT_DATA_KEYS							= new String[] { GDE.CHANNEL_CONFIG_NAME, GDE.RECORD_SET_NAME, GDE.RECORD_SET_COMMENT, GDE.RECORD_SET_PROPERTIES,
 			GDE.RECORDS_PROPERTIES, GDE.RECORD_DATA_SIZE, GDE.RECORD_SET_DATA_POINTER, GDE.RECORD_SET_DATA_BYTES, RecordSet.TIME_STEP_MS, GDE.LOV_NUM_MEASUREMENTS };
 	// end LogView file format
 
 	// begin CSV file format
-	public static final String		CSV_DATA_HEADER									= "CSV_data_header : ";																																																			//$NON-NLS-1$
-	public static final String		CSV_DATA_HEADER_MEASUREMENTS		= "CSV_data_header_measurements : ";																																													//$NON-NLS-1$
-	public static final String		CSV_DATA_HEADER_UNITS						= "CSV_data_header_units : ";																																																//$NON-NLS-1$
-	public static final String		CSV_DATA_TYPE										= "CSV_data_type : ";																																																				//$NON-NLS-1$
-	public static final String		CSV_DATA_TYPE_RAW								= "raw";																																																											//$NON-NLS-1$
-	public static final String		CSV_DATA_TYPE_ABS								= "abs";																																																											//$NON-NLS-1$
-	public static final String		CSV_DATA_IGNORE_INDEX						= "CSV_data_ignore_index : ";																																																				//$NON-NLS-1$
+	public static final String							CSV_DATA_HEADER										= "CSV_data_header : ";																																																			//$NON-NLS-1$
+	public static final String							CSV_DATA_HEADER_MEASUREMENTS			= "CSV_data_header_measurements : ";																																												//$NON-NLS-1$
+	public static final String							CSV_DATA_HEADER_UNITS							= "CSV_data_header_units : ";																																																//$NON-NLS-1$
+	public static final String							CSV_DATA_TYPE											= "CSV_data_type : ";																																																				//$NON-NLS-1$
+	public static final String							CSV_DATA_TYPE_RAW									= "raw";																																																										//$NON-NLS-1$
+	public static final String							CSV_DATA_TYPE_ABS									= "abs";																																																										//$NON-NLS-1$
+	public static final String							CSV_DATA_IGNORE_INDEX							= "CSV_data_ignore_index : ";																																																//$NON-NLS-1$
 	// begin CSV file format
 
-	final static Logger						log															= Logger.getLogger(GDE.class.getName());
-	static Logger									rootLogger;
-	static Vector<String>					initErrors											= new Vector<String>(0);
-	static SplashScreen						startSplash											= null;
-	public static Shell						splash;
-	public static ProgressBar			progBar;
+	final static Logger											log																= Logger.getLogger(GDE.class.getName());
+	static Logger														rootLogger;
+	static Vector<String>										initErrors												= new Vector<String>(0);
+	static SplashScreen											startSplash												= null;
+	public static Shell											splash;
+	public static ProgressBar								progBar;
 
-	static final String						DEVICES_PLUG_IN_DIR							= "devices/";																																																								//$NON-NLS-1$
-	static final String						JAVA_EXT_DIR										= "java/ext/";																																																								//$NON-NLS-1$
+	static final String											DEVICES_PLUG_IN_DIR								= "devices/";																																																								//$NON-NLS-1$
+	static final String											JAVA_EXT_DIR											= "java/ext/";																																																							//$NON-NLS-1$
 
-	public final static Map<String,String>					deviceMap = new HashMap<String,String>();
+	public final static Map<String, String>	deviceMap													= new HashMap<String, String>();
 	static { // initialize device mapping to enable opening files saved on android app
 		GDE.deviceMap.put("HoTTViewerAdapter", "HoTTViewer"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("HoTTAdapter3", "HoTTAdapter2"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -361,6 +360,7 @@ public class GDE {
 		GDE.deviceMap.put("GPS-Logger2 (UL)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger2 (UL2)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
 	/**
 	 * main method to start the DataExplorer application
 	 * @param args
@@ -372,13 +372,13 @@ public class GDE {
 			Display.setAppName(GDE.NAME_LONG);
 			Display.setAppVersion(GDE.VERSION);
 			GDE.WIDGET_FONT_SIZE = (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);
-			
+
 			Settings.getInstance();
 			//DeviceData	data = new DeviceData();
 			//data.tracking = true;
-			GDE.display = Display.getDefault(); 
+			GDE.display = Display.getDefault();
 			GDE.shell = GDE.display.getActiveShell() == null ? new Shell(GDE.display) : GDE.display.getActiveShell();
-			
+
 			GDE.showSplash();
 			//Sleak sleak = new Sleak();
 			//sleak.open();
@@ -396,7 +396,6 @@ public class GDE {
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class object loaded successfully");
 			//Object o = c.getMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class instance loaded successfully");
-
 
 			DataExplorer application = DataExplorer.getInstance();
 			for (int i = 0; i < args.length; ++i) {
@@ -460,21 +459,19 @@ public class GDE {
 				throw new ApplicationConfigurationException(Messages.getString(MessageIds.GDE_MSGE0001, new Object[] { basePath }));
 			}
 			for (String path : files) {
-				if (!path.startsWith(GDE.STRING_DOT)) 
-					if (new File(basePath + path + GDE.STRING_WITHIN_ECLIPSE).exists())
-						urls.add(new URL("file:" + basePath + path + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
-					else if (new File(basePath + path + "/lib").exists()) {
-						try {
-							List<File> jarFiles = FileUtils.getFileListing(new File(basePath + path + "/lib/"), 1);
-							for (File jarFile : jarFiles) {
-								if (jarFile.getName().startsWith("HoTT") && jarFile.getName().endsWith(GDE.FILE_ENDING_DOT_JAR))
-									urls.add(new URL("file:" + basePath + path + "/lib/" + jarFile.getName())); //$NON-NLS-1$
-							}
-						}
-						catch (FileNotFoundException e) {
-							// ignore and skip
+				if (!path.startsWith(GDE.STRING_DOT)) if (new File(basePath + path + GDE.STRING_WITHIN_ECLIPSE).exists())
+					urls.add(new URL("file:" + basePath + path + GDE.STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
+				else if (new File(basePath + path + "/lib").exists()) {
+					try {
+						List<File> jarFiles = FileUtils.getFileListing(new File(basePath + path + "/lib/"), 1);
+						for (File jarFile : jarFiles) {
+							if (jarFile.getName().startsWith("HoTT") && jarFile.getName().endsWith(GDE.FILE_ENDING_DOT_JAR)) urls.add(new URL("file:" + basePath + path + "/lib/" + jarFile.getName())); //$NON-NLS-2$
 						}
 					}
+					catch (FileNotFoundException e) {
+						// ignore and skip
+					}
+				}
 			}
 		}
 		else { // started outside java -jar *.jar
@@ -494,7 +491,7 @@ public class GDE {
 					log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
 				}
 			}
-			
+
 			//add the jars located below java/ext
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + GDE.JAVA_EXT_DIR;
@@ -609,24 +606,24 @@ public class GDE {
 		bar.setSelection(40);
 		bar.setSize(355, 15);
 		splashShell.pack();
-		
+
 		//with java 1.6 update 26 this part needs to be comment out since the file dialog will not open anymore ???
 		//decide to make all versions equal and disable -splash: option while launching java
-//		GDE.startSplash = SplashScreen.getSplashScreen();
-//		if (GDE.startSplash != null) {
-//			java.awt.Rectangle splashRect = GDE.startSplash.getBounds();
-//			splashShell.setLocation(splashRect.x, splashRect.y);
-//		}
-//		else {
-			Rectangle primaryMonitorBounds = GDE.display.getPrimaryMonitor().getBounds();
-			Point splashRect = new Point(primaryMonitorBounds.width / 2 - 185, primaryMonitorBounds.height / 2 - 103);
-			splashShell.setLocation(splashRect.x, splashRect.y);
-//		}
-		
+		//		GDE.startSplash = SplashScreen.getSplashScreen();
+		//		if (GDE.startSplash != null) {
+		//			java.awt.Rectangle splashRect = GDE.startSplash.getBounds();
+		//			splashShell.setLocation(splashRect.x, splashRect.y);
+		//		}
+		//		else {
+		Rectangle primaryMonitorBounds = GDE.display.getPrimaryMonitor().getBounds();
+		Point splashRect = new Point(primaryMonitorBounds.width / 2 - 185, primaryMonitorBounds.height / 2 - 103);
+		splashShell.setLocation(splashRect.x, splashRect.y);
+		//		}
+
 		splashShell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
 				if (GDE.splash != null && !GDE.splash.isDisposed()) GDE.splash.close();
-				if (GDE.startSplash != null) 	GDE.startSplash.close();
+				if (GDE.startSplash != null) GDE.startSplash.close();
 				GDE.splash = null;
 				GDE.startSplash = null;
 			}

@@ -20,7 +20,6 @@ package gde.data;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
@@ -764,25 +763,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names 
 	 */
-	public String[] getNoneCalculationRecordNames() {
-		final Vector<String> tmpCalculationRecords = new Vector<String>();
-		final String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
-		int deviceDataBlockSize = Math.abs(this.device.getDataBlockSize(FormatTypes.VALUE));
-		deviceDataBlockSize = this.device.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
-		// record names may not match device measurements, but device measurements might be more then existing records
-		for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) {
-			final MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
-			if (!measurement.isCalculation()) { // active or inactive 
-				tmpCalculationRecords.add(this.recordNames[i]);
-			}
-			//else
-			//	System.out.println(measurement.getName());
-		}
-		//assume attached records are calculations like DataVario
-		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
-			tmpCalculationRecords.remove(deviceDataBlockSize);
-		}
-		this.noneCalculationRecords = tmpCalculationRecords.toArray(new String[0]);
+	public String[] getNoneCalculationRecordNames() { // TODO make this private
+		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
 
