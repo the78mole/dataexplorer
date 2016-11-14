@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 public class HoTTbinReader {
 	final static String													$CLASS_NAME						= HoTTbinReader.class.getName();
 	final static Logger													log										= Logger.getLogger(HoTTbinReader.$CLASS_NAME);
-	protected static final int							LOG_RECORD_SCAN_START		= 4000;																															// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 6000)
+	protected static final int							LOG_RECORD_SCAN_START		= 4000;																															// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 4000)
 	protected static final int							NUMBER_LOG_RECORDS_TO_SCAN	= 1500;
 	protected static final int							NUMBER_LOG_RECORDS_MIN		= 7000;
 
@@ -117,7 +117,7 @@ public class HoTTbinReader {
 			fileInfo = new HashMap<String, String>();
 			fileInfo.put(HoTTAdapter.FILE_PATH, file.getPath());						
 			file_input = new FileInputStream(file);
-			data_in = new DataInputStream(file_input);
+			data_in = new DataInputStream(file_input); // MARK ### see below
 			
 			//begin evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
 			data_in.read(buffer);
@@ -175,6 +175,7 @@ public class HoTTbinReader {
 				HoTTAdapter.isSensorType[i] = false;
 			}
 			
+			if (data_in != null) data_in.close(); //ET MARK ### not sure if there is a resource leak without this line
 			file_input = new FileInputStream(file);
 			data_in = new DataInputStream(file_input);
 			data_in.read(buffer);
@@ -234,7 +235,6 @@ public class HoTTbinReader {
 		}
 		finally {
 			if (data_in != null) data_in.close();
-			if (file_input != null) file_input.close();
 		}
 		return fileInfo;
 	}
@@ -264,21 +264,14 @@ public class HoTTbinReader {
 	 * @throws Exception 
 	 */
 	public static synchronized void read(String filePath) throws Exception {
-		File file = null;
-		try {
-			HashMap<String, String> header = getFileInfo(new File(filePath));
+		HashMap<String, String> header = getFileInfo(new File(filePath));
 
-			if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-				HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
-				readSingle(file = new File(header.get(HoTTAdapter.FILE_PATH)));
-			}
-			else
-				readMultiple(file = new File(header.get(HoTTAdapter.FILE_PATH)));
+		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
+			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
 		}
-		finally {
-			if (file != null && file.getName().startsWith("~") && file.exists())
-				file.delete();
-		}
+		else
+			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)));
 	}
 
 	/**
@@ -688,25 +681,34 @@ public class HoTTbinReader {
 	 * @return
 	 */
 	protected static String getRecordSetExtend(File file) {
+		return getRecordSetExtend(file.getName());
+	}
+
+		/**
+	 * compose the record set extend to give capability to identify source of this record set
+	 * @param fileName
+	 * @return
+	 */
+	protected static String getRecordSetExtend(String fileName) {
 		String recordSetNameExtend = GDE.STRING_EMPTY;
-		if (file.getName().contains(GDE.STRING_UNDER_BAR)) {
+		if (fileName.contains(GDE.STRING_UNDER_BAR)) {
 			try {
-				Integer.parseInt(file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 			catch (Exception e) {
-				if (file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}
 		else {
 			try {
-				Integer.parseInt(file.getName().substring(0, 4));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
+				Integer.parseInt(fileName.substring(0, 4));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
 			}
 			catch (Exception e) {
-				if (file.getName().substring(0, file.getName().length()).length() <= 8 + 4)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().length() - 4) + GDE.STRING_RIGHT_BRACKET;
+				if (fileName.substring(0, fileName.length()).length() <= 8 + 4)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}
 		return recordSetNameExtend;
@@ -1209,7 +1211,7 @@ public class HoTTbinReader {
 	 * @param _buf1
 	 * @param _buf2
 	 */
-	protected static int parse4Vario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2)  { //TODO re-activate LogVersion for histo data?
+	protected static int parse4Vario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2)  { //todo re-activate LogVersion for histo data?
 		//		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
 		//		switch (sdLogVersion) {
 		//		case 3:
