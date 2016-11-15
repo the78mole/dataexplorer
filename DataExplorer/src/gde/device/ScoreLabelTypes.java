@@ -113,6 +113,11 @@ public enum ScoreLabelTypes {
     ELAPSED_HISTO_VAULT_WRITE_MS("elapsedHistoVaultWrite_ms");
     private final String value;
 
+		/**
+		 * use this to avoid repeatedly cloning actions instead of values()
+		 */
+		public final static ScoreLabelTypes	values[]	= values();	
+
     ScoreLabelTypes(String v) {
         value = v;
     }

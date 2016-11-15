@@ -14,8 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
-    					2016 Thomas Eickert
+    Copyright (c) 2016 Thomas Eickert
 ****************************************************************************************/
 
 package gde.data;
@@ -63,7 +62,7 @@ public class TrailRecordSet extends RecordSet {
 
 	final static int										initialRecordCapacity	= 111;														// vector capacity values are crucial for the overall performance
 
-	private final int[]									linkedOrdinals; // allows getting a trail record by ordinal without iterating the linked hashmap  
+	private final int[]									linkedOrdinals;																					// allows getting a trail record by ordinal without iterating the linked hashmap  
 	private final HistoGraphicsTemplate	template;																								// graphics template holds view configuration
 	private final List<Integer>					durations_mm					= new ArrayList<>();
 	private double											averageDuration_mm		= 0;
@@ -328,7 +327,7 @@ public class TrailRecordSet extends RecordSet {
 		this.cleanup();
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().histoVaults.entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
-				int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM);
+				int duration_mm = histoVault.getScores()[ScoreLabelTypes.DURATION_MM.ordinal()];
 				this.durations_mm.add(duration_mm);
 				this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getCreationTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
@@ -346,7 +345,7 @@ public class TrailRecordSet extends RecordSet {
 	 * the record takes the selected trail type / score data from the trail record vault and populates its data. 
 	 * @param recordOrdinal
 	 */
-	public void setPoints( int recordOrdinal) {
+	public void setPoints(int recordOrdinal) {
 		TrailRecord trailRecord = (TrailRecord) super.get(recordOrdinal);
 		trailRecord.clear();
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().histoVaults.entrySet()) {
@@ -633,6 +632,5 @@ public class TrailRecordSet extends RecordSet {
 	public double getAverageDuration_mm() {
 		return averageDuration_mm;
 	}
-
 
 }

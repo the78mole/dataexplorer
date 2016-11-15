@@ -117,6 +117,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		}
 		catch (InvalidObjectException e) {
 			// so any anther exception is propagated to the caller
+		} finally {
+			if (file != null && file.getName().startsWith("~") && file.exists())
+				file.delete();
 		}
 	}
 

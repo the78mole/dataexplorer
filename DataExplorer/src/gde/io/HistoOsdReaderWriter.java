@@ -14,8 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
-    					2016 Thomas Eickert
+    Copyright (c) 2016 Thomas Eickert
 ****************************************************************************************/
 package gde.io;
 
@@ -93,7 +92,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(path.toFile()));
 		ZipEntry zip_entry = zip_input.getNextEntry();
 		InputStream inputStream;
-		if (zip_entry != null && path.getFileName().equals(Paths.get(zip_entry.getName()))) {
+		if (zip_entry != null) {
 			inputStream = (InputStream) zip_input;
 		}
 		else {

@@ -20,9 +20,12 @@ package gde.data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +37,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.eclipse.swt.SWT;
 
@@ -335,12 +344,13 @@ public class HistoSet extends TreeMap<Long, List<HistoRecordSet>> {
 							histoRecordSet.setElapsedHistoRecordSet_ns((nanoTimeHistoRecordSetSum - nanoTime) / histoRecordSets.size());
 							HistoVault histoVault = histoRecordSet.createHistoVault(filePath);
 							if (this.histoVaults.containsKey(histoRecordSet.getStartTimeStamp())) {
-								log.log(Level.WARNING, String.format("WARNING  startTimeStamp=%s :: recordSet with identical start time : %s", StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss",histoRecordSet.getStartTimeStamp()), filePath)); //$NON-NLS-1$
+								log.log(Level.WARNING, String.format("WARNING  startTimeStamp=%s :: recordSet with identical start time : %s", //$NON-NLS-1$
+										StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", histoRecordSet.getStartTimeStamp()), filePath));
 							}
 							else {
 								this.histoVaults.put(histoRecordSet.getStartTimeStamp(), new ArrayList<HistoVault>());
 							}
-						  this.histoVaults.get(histoRecordSet.getStartTimeStamp()).add(histoVault);
+							this.histoVaults.get(histoRecordSet.getStartTimeStamp()).add(histoVault);
 							histoRecordSet.cleanup(); // reduce memory consumption in advance to the garbage collection
 							recordSetCount++;
 						}
@@ -659,6 +669,23 @@ public class HistoSet extends TreeMap<Long, List<HistoRecordSet>> {
 
 	public TreeMap<Long, Path> getHistoFilePaths() {
 		return this.histoFilePaths;
+	}
+
+	public void storeHistoVaults(HistoVault histoVault) throws JAXBException, IOException {
+		Marshaller marshaller = JAXBContext.newInstance(HistoVault.class).createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+		Path fullQualifiedFilePath = Paths.get("C:\\_Thomas\\Desktop\\VaultWoExtension"); // replace with one of the key options below
+		PrintWriter pw = null;
+		try (ZipOutputStream file_out = new ZipOutputStream(new FileOutputStream(fullQualifiedFilePath.toFile()))) {
+			file_out.putNextEntry(new ZipEntry(fullQualifiedFilePath.getFileName().toString()));
+			pw = new PrintWriter(file_out);
+			marshaller.marshal(histoVault, pw);
+		}
+		finally {
+			pw.flush();
+			pw.close();
+			pw = null;
+		}
 	}
 
 	public void clearMeasurementModes() {

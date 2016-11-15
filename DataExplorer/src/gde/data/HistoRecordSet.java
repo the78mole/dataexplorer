@@ -22,6 +22,7 @@ package gde.data;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -340,9 +341,9 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * @return list of rows with index measurement type number. each row holds the points associated to the trail types with the ordinal as index.
 	 */
-	private Hashtable<Integer, Integer[]> getMeasurementsPoints() {
+	private HashMap<Integer, Integer[]> getMeasurementsPoints() {
 		List<MeasurementType> channelMeasurements = device.getChannelMeasuremts(super.getChannelConfigNumber());
-		Hashtable<Integer, Integer[]> measurementsPoints = new Hashtable<Integer, Integer[]>(channelMeasurements.size());
+		HashMap<Integer, Integer[]> measurementsPoints = new HashMap<Integer, Integer[]>(channelMeasurements.size());
 		for (int i = 0; i < channelMeasurements.size(); i++) {
 			MeasurementType measurementType = channelMeasurements.get(i);
 			Integer[] trailTypePoints = new Integer[TrailType.getPrimitives().size()];
@@ -440,9 +441,9 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * @return list of rows with index settlementId. each row holds the points associated to the trail types with the ordinal as index.
 	 */
-	private Hashtable<Integer, Integer[]> getSettlementsPoints() {
+	private HashMap<Integer, Integer[]> getSettlementsPoints() {
 		List<SettlementType> channelSettlements = ((DeviceConfiguration) device).getChannelSettlements(super.getChannelConfigNumber());
-		Hashtable<Integer, Integer[]> settlementsPoints = new Hashtable<Integer, Integer[]>(channelSettlements.size());
+		HashMap<Integer, Integer[]> settlementsPoints = new HashMap<Integer, Integer[]>(channelSettlements.size());
 		for (int i = 0; i < channelSettlements.size(); i++) {
 			SettlementType settlementType = channelSettlements.get(i);
 			Integer[] trailTypePoints = new Integer[TrailType.getPrimitives().size()];

@@ -87,7 +87,7 @@ public class OsdReaderWriter {
 			filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 	    zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
 	    ZipEntry zip_entry = zip_input.getNextEntry();
-	    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+	    if (zip_entry != null) {
 	  		data_in = new DataInputStream(zip_input);
 	  		return readHeader(filePath, data_in);
 	    }
@@ -141,7 +141,7 @@ public class OsdReaderWriter {
 			boolean isHeaderComplete = false;
 			while (!isHeaderComplete && headerCounter-- > 0) {
 				line = data_in.readUTF();
-				line = line.substring(0, line.length() - 1);
+				line = line.substring(0, (line.length() > 0 ? line.length() - 1 : 0));
 				log.log(Level.FINE, line);
 				for (String headerKey : GDE.OSD_FORMAT_HEADER_KEYS) {
 					if (line.startsWith(headerKey)) {
@@ -205,7 +205,7 @@ public class OsdReaderWriter {
     ZipEntry zip_entry = zip_input.getNextEntry();
     FileInputStream file_input = null;
     DataInputStream data_in = null;
-    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+    if (zip_entry != null) {
   		data_in = new DataInputStream(zip_input);
     }
     else {
@@ -724,7 +724,7 @@ public class OsdReaderWriter {
 			int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
 			byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
 			
-	    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+	    if (zip_entry != null) {
 	  		data_in = new DataInputStream(zip_input);
 	  		data_in.skip(recordSetFileDataPointer);
 	  		data_in.readFully(buffer);

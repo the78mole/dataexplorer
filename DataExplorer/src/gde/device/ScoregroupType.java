@@ -9,6 +9,7 @@
 package gde.device;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -212,7 +213,145 @@ public class ScoregroupType {
         return this.property;
     }
 
-    /**
+  	/**
+  	 * @param propertyKey
+  	 * @param type
+  	 * @param value
+  	 */
+  	private void createProperty(String propertyKey, DataTypes type, Object value) {
+  		ObjectFactory factory = new ObjectFactory();
+  		PropertyType newProperty = factory.createPropertyType();
+  		newProperty.setName(propertyKey);
+  		newProperty.setType(type);
+  		newProperty.setValue("" + value); //$NON-NLS-1$
+  		this.getProperty().add(newProperty);
+  	}
+
+  	/**
+  	 * remove all property types
+  	 * @param propertyKey
+  	 * @return PropertyType object
+  	 */
+  	public void removeProperties() {
+  		Iterator<PropertyType> iterator = this.getProperty().iterator();
+
+  		while (iterator.hasNext()) {
+  			iterator.next();
+  			iterator.remove();
+  		}
+  	}
+
+  	/**
+  	 * remove property type with given key (IDevice.OFFSET, ...)
+  	 * @param propertyKey
+  	 * @return PropertyType object
+  	 */
+  	public void removeProperty(String propertyKey) {
+  		Iterator<PropertyType> iterator = this.getProperty().iterator();
+
+  		while (iterator.hasNext()) {
+  			PropertyType tmpProp = iterator.next();
+  			if (tmpProp.name.equals(propertyKey))
+  				iterator.remove();
+  		}
+  	}
+
+  	/**
+  	 * get property type with given key (IDevice.OFFSET, ...)
+  	 * @param propertyKey
+  	 * @return PropertyType object
+  	 */
+  	public PropertyType getProperty(String propertyKey) {
+  		PropertyType tmpProperty = null;
+  		List<PropertyType> properties = this.getProperty();
+  		for (PropertyType propertyType : properties) {
+  			if (propertyType.getName().equals(propertyKey)) {
+  				tmpProperty = propertyType;
+  				break;
+  			}
+  		}
+  		return tmpProperty;
+  	}
+
+  	/**
+  	 * get the offset value
+  	 * @return the offset, if property does not exist return 0.0 as default value
+  	 */
+  	public double getOffset() {
+  		double value = 0.0;
+  		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
+  		if (tmpProperty != null)
+  			value = new Double(tmpProperty.getValue()).doubleValue();
+
+  		return value;
+  	}
+
+  	/**
+  	 * set new value for offset
+  	 * @param offset the offset to set
+  	 */
+  	public void setOffset(double offset) {
+  		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
+  		if (tmpProperty == null) {
+  			createProperty(IDevice.OFFSET, DataTypes.DOUBLE, offset);
+  		} else {
+  			tmpProperty.setValue("" + offset); //$NON-NLS-1$
+  		}
+  	}
+
+  	/**
+  	 * get the reduction value
+  	 * @return the offset, if property does not exist return 0.0 as default value
+  	 */
+  	public double getReduction() {
+  		double value = 0.0;
+  		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
+  		if (tmpProperty != null)
+  			value = new Double(tmpProperty.getValue()).doubleValue();
+
+  		return value;
+  	}
+
+  	/**
+  	 * set new value for reduction
+  	 * @param reduction the offset to set
+  	 */
+  	public void setReduction(double reduction) {
+  		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
+  		if (tmpProperty == null) {
+  			createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
+  		} else {
+  			tmpProperty.setValue("" + reduction); //$NON-NLS-1$
+  		}
+  	}
+
+  	/**
+  	 * get the factor value
+  	 * @return the factor, if property does not exist return 1.0 as default value
+  	 */
+  	public double getFactor() {
+  		double value = 1.0;
+  		PropertyType tmpProperty = getProperty(IDevice.FACTOR);
+  		if (tmpProperty != null)
+  			value = new Double(tmpProperty.getValue()).doubleValue();
+
+  		return value;
+  	}
+
+  	/**
+  	 * set new value for factor
+  	 * @param factor the offset to set
+  	 */
+  	public void setFactor(double factor) {
+  		PropertyType tmpProperty = this.getProperty(IDevice.FACTOR);
+  		if (tmpProperty == null) {
+  			createProperty(IDevice.FACTOR, DataTypes.DOUBLE, factor);
+  		} else {
+  			tmpProperty.setValue("" + factor); //$NON-NLS-1$
+  		}
+  	}
+
+  	/**
      * Gets the value of the scoregroupId property.
      * 
      */

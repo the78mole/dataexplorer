@@ -15,6 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
 
@@ -91,7 +92,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	boolean														isCompareSet										= false;
 	boolean														isUtilitySet										= false;
 	double														maxTime													= 0.0;																																																									//compare set -> each record will have its own timeSteps_ms, 
-												//so the biggest record in view point of time will define the time scale
+	//so the biggest record in view point of time will define the time scale
 	double														maxValue												= Integer.MIN_VALUE;
 	double														minValue												= Integer.MAX_VALUE;																																																		//min max value
 
@@ -153,7 +154,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	//	boolean												isSyncRecordSelected					= false;
 	//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 
-	private final String[]						propertyKeys										= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
+	public final static String[]			propertyKeys										= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
 			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
 
 	int																configuredDisplayable						= 0;																																																										// number of record which must be displayable before table calculation begins

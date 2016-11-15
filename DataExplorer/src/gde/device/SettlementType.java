@@ -427,4 +427,20 @@ public class SettlementType {
 			tmpProperty.setValue("" + factor); //$NON-NLS-1$
 		}
 	}
+
+  /**
+   * Gets the value of the settlementId property.
+   * 
+   */
+  public int getSettlementId() {
+      return settlementId;
+  }
+
+  /**
+   * Sets the value of the settlementId property.
+   * 
+   */
+  public void setSettlementId(int value) {
+      this.settlementId = value;
+  }
 }
