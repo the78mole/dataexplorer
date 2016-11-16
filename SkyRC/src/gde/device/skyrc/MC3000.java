@@ -1605,7 +1605,15 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public String getProcessingStatusName(final byte[] dataBuffer) {
-		return this.settings.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : this.STATUS_MODE[dataBuffer[5]];
+		return this.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : this.STATUS_MODE[dataBuffer[5]];
+	}
+
+	
+	/**
+	 * @return true if setting is configured to continuous record set data gathering
+	 */
+	protected boolean isContinuousRecordSet() {
+		return this.settings.isContinuousRecordSet() || this.application.getActiveDevice().getName().contains("-Set");
 	}
 
 	/**
@@ -1669,7 +1677,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			processTypeName = this.USAGE_MODE_ZN[this.getProcessingType(dataBuffer)];
 			break;
 		}
-		return this.settings.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
+		return this.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
 	}
 
 	/**
