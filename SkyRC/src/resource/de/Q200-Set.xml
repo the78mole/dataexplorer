@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V30.xsd">
     <Device>
-        <name implementation="gde.device.skyrc.Q200">Q200</name>
+        <name implementation="gde.device.skyrc.Q200">Q200-Set</name>
         <manufacturer>SKYRC</manufacturer>
         <manufacturerURL>http://www.skyrc.com</manufacturerURL>
         <group>charger</group>
@@ -28,58 +28,58 @@
         <checkSum format="BINARY" type="ADD"/>
     </DataBlock>
     <Channels lastUseOrdinal="1">
-        <Channel name="Channel A" type="TYPE_OUTLET">
+        <Channel name="Ausgang A" type="TYPE_CONFIG">
             <Measurement>
-                <name>Voltage</name>
+                <name>Spannung</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Current</name>
+                <name>Strom</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Capacity</name>
+                <name>Ladung</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Power</name>
+                <name>Leistung</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Energy</name>
+                <name>Energie</name>
                 <symbol>E</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Ext</name>
+                <name>Temperatur Ext</name>
                 <symbol>Te</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Int</name>
+                <name>Temperatur Int</name>
                 <symbol>Ti</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>BatteryRi</name>
+                <name>BatteríeRi</name>
                 <symbol>r</symbol>
                 <unit>mΩ</unit>
                 <active>true</active>
@@ -93,105 +93,105 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 1</name>
+                <name>ZellenSpannung 1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 2</name>
+                <name>ZellenSpannung 2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 3</name>
+                <name>ZellenSpannung 3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 4</name>
+                <name>ZellenSpannung 4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 5</name>
+                <name>ZellenSpannung 5</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 6</name>
+                <name>ZellenSpannung 6</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
-        <Channel name="Channel B" type="TYPE_OUTLET">
+        <Channel name="Ausgang B" type="TYPE_CONFIG">
             <Measurement>
-                <name>Voltage</name>
+                <name>Spannung</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Current</name>
+                <name>Strom</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Capacity</name>
+                <name>Ladung</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Power</name>
+                <name>Leistung</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Energy</name>
+                <name>Energie</name>
                 <symbol>E</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Ext</name>
+                <name>Temperatur Ext</name>
                 <symbol>Te</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Int</name>
+                <name>Temperatur Int</name>
                 <symbol>Ti</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>BatteryRi</name>
+                <name>BatteríeRi</name>
                 <symbol>r</symbol>
                 <unit>mΩ</unit>
                 <active>true</active>
@@ -205,105 +205,105 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 1</name>
+                <name>ZellenSpannung 1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 2</name>
+                <name>ZellenSpannung 2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 3</name>
+                <name>ZellenSpannung 3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 4</name>
+                <name>ZellenSpannung 4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 5</name>
+                <name>ZellenSpannung 5</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 6</name>
+                <name>ZellenSpannung 6</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
-        <Channel name="Channel C" type="TYPE_OUTLET">
+        <Channel name="Ausgang C" type="TYPE_CONFIG">
             <Measurement>
-                <name>Voltage</name>
+                <name>Spannung</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Current</name>
+                <name>Strom</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Capacity</name>
+                <name>Ladung</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Power</name>
+                <name>Leistung</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Energy</name>
+                <name>Energie</name>
                 <symbol>E</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Ext</name>
+                <name>Temperatur Ext</name>
                 <symbol>Te</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Int</name>
+                <name>Temperatur Int</name>
                 <symbol>Ti</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>BatteryRi</name>
+                <name>BatteríeRi</name>
                 <symbol>r</symbol>
                 <unit>mΩ</unit>
                 <active>true</active>
@@ -317,105 +317,105 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 1</name>
+                <name>ZellenSpannung 1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 2</name>
+                <name>ZellenSpannung 2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 3</name>
+                <name>ZellenSpannung 3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 4</name>
+                <name>ZellenSpannung 4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 5</name>
+                <name>ZellenSpannung 5</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 6</name>
+                <name>ZellenSpannung 6</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
-        <Channel name="Channel D" type="TYPE_OUTLET">
+        <Channel name="Ausgang D" type="TYPE_CONFIG">
             <Measurement>
-                <name>Voltage</name>
+                <name>Spannung</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Current</name>
+                <name>Strom</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
             <Measurement>
-                <name>Capacity</name>
+                <name>Ladung</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Power</name>
+                <name>Leistung</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Energy</name>
+                <name>Energie</name>
                 <symbol>E</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Ext</name>
+                <name>Temperatur Ext</name>
                 <symbol>Te</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Temperature Int</name>
+                <name>Temperatur Int</name>
                 <symbol>Ti</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>BatteryRi</name>
+                <name>BatteríeRi</name>
                 <symbol>r</symbol>
                 <unit>mΩ</unit>
                 <active>true</active>
@@ -429,51 +429,51 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 1</name>
+                <name>ZellenSpannung 1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 2</name>
+                <name>ZellenSpannung 2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 3</name>
+                <name>ZellenSpannung 3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 4</name>
+                <name>ZellenSpannung 4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 5</name>
+                <name>ZellenSpannung 5</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>CellVoltage 6</name>
+                <name>ZellenSpannung 6</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
     </Channels>

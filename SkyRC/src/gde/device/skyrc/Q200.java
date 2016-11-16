@@ -391,7 +391,7 @@ public class Q200 extends MC3000 implements IDevice {
 		}
 		points[5] = dataBuffer[13] * 1000;
 		points[6] = dataBuffer[14] * 1000;
-		points[7] = DataParser.parse2Short(dataBuffer[16], dataBuffer[15]) * (dataBuffer[0] <= 3 ? 100 : 100); //Ni battery type 1/10 of Li????
+		points[7] = DataParser.parse2Short(dataBuffer[16], dataBuffer[15]) * (dataBuffer[0] <= 3 ? 1000 : 100); //Ni battery type 1/10 of Li????
 		
 		if (dataBuffer[0] <= 3) { // exclude Ni PB batteries
 			//9=CellVoltage1....14=CellVoltage6
@@ -527,7 +527,7 @@ public class Q200 extends MC3000 implements IDevice {
 		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, "isProcessing = " + dataBuffer[4]);
 		if (dataBuffer == null) // initial processing type query
 			return channelBuffer[4] == 0x01;
-		return dataBuffer[4] == 0x01 && (channelBuffer[5] == 4 || channelBuffer[5] == 5) && !this.settings.isContinuousRecordSet() && this.settings.isReduceChargeDischarge() && this.getProcessSubType(channelBuffer, dataBuffer) == 2 
+		return dataBuffer[4] == 0x01 && (channelBuffer[5] == 4 || channelBuffer[5] == 5) && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge() && this.getProcessSubType(channelBuffer, dataBuffer) == 2 
 				? false 
 				: dataBuffer[4] == 0x01;
 	}
@@ -538,7 +538,7 @@ public class Q200 extends MC3000 implements IDevice {
 	 * @return
 	 */
 	public String getProcessingStatusName(final byte[] dataBuffer) {
-		return this.settings.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : this.STATUS_MODE[dataBuffer[5]];
+		return this.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : this.STATUS_MODE[dataBuffer[5]];
 	}
 
 	/**
@@ -599,7 +599,7 @@ public class Q200 extends MC3000 implements IDevice {
 			processTypeName = this.USAGE_MODE_PB[channelBuffer[7]];
 			break;
 		}
-		return this.settings.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
+		return this.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
 	}
 
 	/**
@@ -625,12 +625,24 @@ public class Q200 extends MC3000 implements IDevice {
 
 	/**
 	 * query the sub process name if in cycle
+	 * LI battery： 		0=BALACE-CHARGE 1=CHARGE 2=DISCHARGE 3=STORAGE 4=FAST-CHARGE
+	 * Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
+	 * Pb battery:		0=CHARGE 1=DISCHARGE
+	 * battery type:  0:LiPo 1:LiIo 2:LiFe 3:LiHv 4:NiMH 5:NiCd 6:PB
 	 * @param dataBuffer
 	 * @return
 	 */
 	public String getProcessSubTypeName(final byte[] channelBuffer, final byte[] dataBuffer) {
-		if (this.settings.isContinuousRecordSet() || (channelBuffer[5] != 4 && channelBuffer[5] != 5))
+		switch (this.getBatteryType(channelBuffer)) {
+		default:
 			return GDE.STRING_EMPTY;
+			
+		case 4: //NiMH
+		case 5: //NiCd
+			if (this.isContinuousRecordSet() || this.getProcessingType(channelBuffer) != 4) 
+				return GDE.STRING_EMPTY;			
+			break;
+		}
 		
 		switch (dataBuffer[17]) {
 		default:

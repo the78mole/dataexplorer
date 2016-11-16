@@ -1,8 +1,11 @@
 Development history / change log, please read from bottom up
 
 Version 3.2.9 - yy xxx 2016
+MC3000 SkyRC
+	- switch to continous data gathering for all slots by selecting MC3000-Set
 Q200 SkyRC 4 channel charger 
-	- support added
+	- support for 4 individual batteries added by Q200
+	- support for 4 synchronized batteries added by Q200-Set
 
 Version 3.2.8 - 05 Oct 2016
 - remove the restriction re-naming compressed OSD-Files

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V30.xsd">
     <Device>
-        <name implementation="gde.device.skyrc.Q200">Q200</name>
+        <name implementation="gde.device.skyrc.Q200">Q200-Set</name>
         <manufacturer>SKYRC</manufacturer>
         <manufacturerURL>http://www.skyrc.com</manufacturerURL>
         <group>charger</group>
@@ -28,7 +28,7 @@
         <checkSum format="BINARY" type="ADD"/>
     </DataBlock>
     <Channels lastUseOrdinal="1">
-        <Channel name="Channel A" type="TYPE_OUTLET">
+        <Channel name="Channel A" type="TYPE_CONFIG">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -140,7 +140,7 @@
                 <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
             </Measurement>
         </Channel>
-        <Channel name="Channel B" type="TYPE_OUTLET">
+        <Channel name="Channel B" type="TYPE_CONFIG">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -252,7 +252,7 @@
                 <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
             </Measurement>
         </Channel>
-        <Channel name="Channel C" type="TYPE_OUTLET">
+        <Channel name="Channel C" type="TYPE_CONFIG">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
@@ -364,7 +364,7 @@
                 <property name="scale_sync_ref_ordinal" value="9" type="Integer" description="Scale synchronisation measurement reference ordinal as integer"/>
             </Measurement>
         </Channel>
-        <Channel name="Channel D" type="TYPE_OUTLET">
+        <Channel name="Channel D" type="TYPE_CONFIG">
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
