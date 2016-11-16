@@ -18,12 +18,12 @@
 ****************************************************************************************/
 package gde.data;
 
-import gde.log.Level;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
+
+import gde.log.Level;
 
 /**
  * TimeSteps class handles all the time steps of a record set or a record of part of compare set
@@ -45,8 +45,7 @@ public class TimeSteps extends Vector<Long> {
 	 * @param newTimeStep_ms
 	 */
 	public TimeSteps(double newTimeStep_ms) {
-		super(newTimeStep_ms < 0 ? 5555 : 5, 11111); // TODO find better solution; has 20-30% better performance (test data: 113,366 timeSteps, 23 measurements), reason is the vector doubling mechanism
-		// mein Vorschlag wäre: super(newTimeStep_ms < 0 ? 9999 : 5);
+		super(newTimeStep_ms < 0 ? 5555 : 5); 
 		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
@@ -189,7 +188,7 @@ public class TimeSteps extends Vector<Long> {
 	 */
 	public double getAverageTimeStep_ms() {
 		try {
-			return this.isConstant ? this.getTime_ms(1) : (this.elementCount > 2 ? (double) this.lastElement() / (elementCount - 1) / 10.0 : this.get(1) / 10.0);
+			return this.isConstant ? this.getTime_ms(1) : (double) this.lastElement() / elementCount / 10.0 ; 
 		}
 		catch (Exception e) {
 			// a redraw event where the record set has no records 
@@ -198,59 +197,66 @@ public class TimeSteps extends Vector<Long> {
 	}
 
 	/**
-	 * @return the minimum time step in msec
+	 * @return the minimum time step (timespan) in msec
 	 */
 	public double getMinimumTimeStep_ms() {
-		if (this.isConstant || this.elementCount < 2) {
-			return this.getTime_ms(1);
+		if (this.isConstant) {
+			return (long) this.getTime_ms(1);
 		}
-		else {
-			double minimumTimeStep = Double.MAX_VALUE;
-			for (double timeStep : this) {
-				if (minimumTimeStep > timeStep) {
-					minimumTimeStep = timeStep;
-				}
-			}
-			return minimumTimeStep / 10.;
-		}
-	}
-
-	/**
-	 * @return the maximum time step in msec
-	 */
-	public double getMaximumTimeStep_ms() {
-		if (this.isConstant || this.elementCount < 2) {
-			return this.getTime_ms(1);
-		}
-		else {
-			double maximumTimeStep = -Double.MAX_VALUE;
-			for (double timeStep : this) {
-				if (maximumTimeStep > timeStep) {
-					maximumTimeStep = timeStep;
-				}
-			}
-			return maximumTimeStep / 10.;
-		}
-	}
-
-	/**
-	 * @return the standard deviation of the time step population in msec
-	 */
-	public double getSigmaTimeStep_ms() {
-		if (this.isConstant || this.elementCount < 2) {
+		else if (this.size() == 0) {
 			return 0;
 		}
 		else {
-			double avg = 0, q = 0;
-			for (int i = 0; i < this.size(); i++) {
-				double timeStep = this.get(i);
-				// https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
-				double deltaAvg = timeStep - avg;
-				avg += deltaAvg / i;
-				q += deltaAvg * (timeStep - avg);
+			long minValue = this.get(0) - 0;
+			for (int i = 1; i < this.elementCount; i++) {
+				long diff = this.get(i) - this.get(i - 1);
+				if (minValue > diff) minValue = diff;
 			}
-			log.log(Level.FINE, String.format("SD=%f", Math.sqrt(q / this.size()))); //$NON-NLS-1$
-			return Math.sqrt(q / this.size()) / 10.;
+			log.log(Level.FINE, String.format("min=%d  avg=%f", minValue / 10, getAverageTimeStep_ms())); //$NON-NLS-1$
+			return minValue / 10.;
+		}
+	}
+
+	/**
+	 * @return the maximum time step (timespan) in msec
+	 */
+	public double getMaximumTimeStep_ms() {
+		if (this.isConstant) {
+			return (long) this.getTime_ms(1);
+		}
+		else if (this.size() == 0) {
+			return 0;
+		}
+		else {
+			long maxValue = this.get(0) - 0;
+			for (int i = 1; i < this.elementCount; i++) {
+				long diff = this.get(i) - this.get(i - 1);
+				if (maxValue < diff) maxValue = diff;
+			}
+			log.log(Level.FINE, String.format("max=%d  avg=%f", maxValue / 10, getAverageTimeStep_ms())); //$NON-NLS-1$
+			return maxValue / 10.;
+		}
+	}
+
+	/**
+	 * @return the standard deviation of the time steps (timespans)in msec
+	 */
+	public double getSigmaTimeStep_ms() {
+		if (this.isConstant) {
+			return 0;
+		}
+		else if (this.size() <= 1) {
+			return 0;
+		}
+		else {
+			long baseTimeSpan = (long) (getAverageTimeStep_ms());
+			double sqSum = (this.get(0) - 0 - baseTimeSpan) * (this.get(0) - 0 - baseTimeSpan);
+			for (int i = 1; i < this.elementCount; i++) {
+				long diff = this.get(i) - this.get(i - 1);
+				sqSum += (diff - baseTimeSpan) * (diff - baseTimeSpan);
+			}
+			log.log(Level.FINE, String.format("avg=%f  sigma=%f", getAverageTimeStep_ms(), Math.sqrt(sqSum / (this.elementCount - 1)) / 10)); //$NON-NLS-1$
+			return Math.sqrt(sqSum / (this.elementCount - 1)) / 10.;
 		}
 	}
 

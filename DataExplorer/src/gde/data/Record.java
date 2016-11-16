@@ -284,8 +284,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Record(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties,
 			int initialCapacity) {
-		super(initialCapacity, 11111); //TODO find better solution; 11.111 has 20-30% better performance (test data: 113,366 timeSteps, 23 measurements), reason is the vector doubling mechanism
-		// mein Vorschlag wäre: 		super(initialCapacity); und Aufruf mit initialCapacity = 9999 im Normalfall
+		super(initialCapacity); 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newName + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)"); //$NON-NLS-1$
 		this.device = newDevice;
 		this.ordinal = newOrdinal;
@@ -621,7 +620,7 @@ public class Record extends Vector<Integer> {
 	@Override
 	public synchronized Integer set(int index, Integer point) {
 		final String $METHOD_NAME = "set"; //$NON-NLS-1$
-		// ET: histoRecords support null values
+		// ET: histoRecord support null values
 		if (point != null) {
 			if (super.size() == 0) {
 				this.minValue = this.maxValue = point;

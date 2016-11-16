@@ -252,7 +252,10 @@ public class FileHandler {
 		String devicePath = GDE.FILE_SEPARATOR_UNIX;
 		if (this.application.getActiveDevice() != null) {
 			if (this.application.getActiveDevice().getName().startsWith("MC3000")) {
-				devicePath = GDE.FILE_SEPARATOR_UNIX + "MC3000";
+				devicePath = GDE.FILE_SEPARATOR_UNIX + "MC3000"; //store MC3000-Set record set as well in MC3000 directory
+			}
+			else if (this.application.getActiveDevice().getName().startsWith("Q200")) {
+				devicePath = GDE.FILE_SEPARATOR_UNIX + "Q200";	//store Q00-Set record set as well in Q200 directory
 			}
 			else
 			 devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName();

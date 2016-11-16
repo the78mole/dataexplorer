@@ -16,5 +16,5 @@
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.GDE"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms64M -Xmx1024m -DECLIPSE=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms64M -Xmx3096m -DECLIPSE=true"/>
 </launchConfiguration>

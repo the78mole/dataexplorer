@@ -92,7 +92,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	boolean														isCompareSet										= false;
 	boolean														isUtilitySet										= false;
 	double														maxTime													= 0.0;																																																									//compare set -> each record will have its own timeSteps_ms, 
-												//so the biggest record in view point of time will define the time scale
+	//so the biggest record in view point of time will define the time scale
 	double														maxValue												= Integer.MIN_VALUE;
 	double														minValue												= Integer.MAX_VALUE;																																																		//min max value
 
@@ -154,8 +154,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	//	boolean												isSyncRecordSelected					= false;
 	//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 
-	private final String[]						propertyKeys										= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
-			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
+	public static final String[]			propertyKeys										= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
+			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };				//ET propertyKeys of class Record are public static as well
 
 	int																configuredDisplayable						= 0;																																																										// number of record which must be displayable before table calculation begins
 
@@ -764,25 +764,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names 
 	 */
-	public String[] getNoneCalculationRecordNames() {
-		final Vector<String> tmpCalculationRecords = new Vector<String>();
-		final String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
-		int deviceDataBlockSize = Math.abs(this.device.getDataBlockSize(FormatTypes.VALUE));
-		deviceDataBlockSize = this.device.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
-		// record names may not match device measurements, but device measurements might be more then existing records
-		for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) {
-			final MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
-			if (!measurement.isCalculation()) { // active or inactive 
-				tmpCalculationRecords.add(this.recordNames[i]);
-			}
-			//else
-			//	System.out.println(measurement.getName());
-		}
-		//assume attached records are calculations like DataVario
-		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
-			tmpCalculationRecords.remove(deviceDataBlockSize);
-		}
-		this.noneCalculationRecords = tmpCalculationRecords.toArray(new String[0]);
+	public String[] getNoneCalculationRecordNames() { // TODO make this private
+		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
 

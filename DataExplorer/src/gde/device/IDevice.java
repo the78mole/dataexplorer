@@ -902,6 +902,16 @@ public interface IDevice {
 	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude);
 
 	/**
+	 * method to get the sorted active or in active record names as string array
+	 *  - records which does not have inactive or active flag are calculated from active or inactive
+	 *  - all records not calculated may have the active status and must be stored
+	 * @param channelConfigNumber
+	 * @param validMeasurementNames based on the current or any previous configuration
+	 * @return String[] containing record names 
+	 */
+	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames);
+
+	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
 	 * - calculated measurements could be later on added to the device properties XML
 	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
