@@ -46,6 +46,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +58,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -359,6 +365,23 @@ public class FileUtils {
 	}
 
 	/**
+	 * delete cache files and folders down to a maximum directory level of 99.
+	 */
+	public static void cleanDirectories(Path fileBasePath, Path[] excludeFiles) {
+		List<Path> excludeFilesList = Arrays.asList(excludeFiles);
+		try {
+			List<File> fileList = FileUtils.getFileListingNoSort(fileBasePath.toFile(), 99);
+			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "number of files = " + fileList.size()); //$NON-NLS-1$ //$NON-NLS-2$
+			for (File file : fileList) {
+				if (!excludeFilesList.contains(file.toPath())) FileUtils.cleanFile(file.getAbsolutePath());
+			}
+		}
+		catch (Exception e) {
+			FileUtils.log.log(Level.WARNING, e.getMessage(), e);
+		}
+	}
+
+	/**
 	 * extract a file from source jar file to target file while replace a given placeholder key with a replacement
 	 * supported character set encoding :
 	 * US-ASCII 	Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
@@ -417,8 +440,8 @@ public class FileUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static void copyFileWhileReplaceKey(String placeHolderKey, String replacement, String sourceFilePath, String targetFilePath) throws UnsupportedEncodingException, FileNotFoundException,
-			IOException {
+	public static void copyFileWhileReplaceKey(String placeHolderKey, String replacement, String sourceFilePath, String targetFilePath)
+			throws UnsupportedEncodingException, FileNotFoundException, IOException {
 		BufferedReader reader;
 		BufferedWriter writer;
 		String line;
@@ -528,8 +551,8 @@ public class FileUtils {
 	public static boolean extract(Class<?> runtimeInstance, String sourceFileName, String targetFileName, String jarInternalSourceDirectory, String targetDirectory, String unixPermissions) {
 		boolean isRenamed = false;
 		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory
-				+ GDE.FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory
+				: jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory + GDE.FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
 		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		targetDirectory = targetDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + GDE.FILE_SEPARATOR_UNIX : targetDirectory;
 		FileUtils.extract(runtimeInstance, sourceFileName, jarInternalSourceDirectory, targetDirectory, unixPermissions);
@@ -560,8 +583,8 @@ public class FileUtils {
 		fileName = fileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		fileName = fileName.startsWith(GDE.FILE_SEPARATOR_UNIX) ? fileName.substring(1) : fileName;
 		jarSourceDirectory = jarSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		jarSourceDirectory = jarSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarSourceDirectory : jarSourceDirectory.length() > 1 ? jarSourceDirectory + GDE.FILE_SEPARATOR_UNIX
-				: jarSourceDirectory;
+		jarSourceDirectory = jarSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarSourceDirectory
+				: jarSourceDirectory.length() > 1 ? jarSourceDirectory + GDE.FILE_SEPARATOR_UNIX : jarSourceDirectory;
 		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		targetDirectory = targetDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + GDE.FILE_SEPARATOR_UNIX : targetDirectory;
 
@@ -796,8 +819,8 @@ public class FileUtils {
 			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(GDE.FILE_SEPARATOR_UNIX);
 			if (isStartedWithinEclipse) {
 				FileUtils.log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
-				String fullQualifiedPropertiesTargetFileName = findDeviceProjectDirectoryPath(deviceConfig)
-						+ "/src/resource/" + Settings.getInstance().getLocale() + GDE.FILE_SEPARATOR_UNIX + devicePropsFileName; //$NON-NLS-1$
+				String fullQualifiedPropertiesTargetFileName = findDeviceProjectDirectoryPath(deviceConfig) + "/src/resource/" + Settings.getInstance().getLocale() + GDE.FILE_SEPARATOR_UNIX //$NON-NLS-1$
+						+ devicePropsFileName;
 				FileUtils.log.log(Level.INFO, "fullQualifiedImageTargetFileName = " + fullQualifiedPropertiesTargetFileName); //$NON-NLS-1$
 				deviceConfig.storeDeviceProperties(fullQualifiedPropertiesTargetFileName);
 			}
@@ -861,8 +884,8 @@ public class FileUtils {
 	 * @throws InvocationTargetException
 	 * @throws NoClassDefFoundError
 	 */
-	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-			InvocationTargetException, NoClassDefFoundError {
+	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig)
+			throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
 		String deviceJarFileName = null;
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		IDevice newInst = null;
@@ -1233,8 +1256,7 @@ public class FileUtils {
 		Iterator<File> itherator = result.iterator();
 		while (itherator.hasNext()) {
 			File file = itherator.next();
-			if (!file.getName().contains(filter))
-				itherator.remove();
+			if (!file.getName().contains(filter)) itherator.remove();
 		}
 		Collections.sort(result);
 		return result;
@@ -1344,8 +1366,8 @@ public class FileUtils {
 
 		try {
 			if (GDE.IS_WINDOWS) {
-				String[] commandArray = new String[] {
-						"\"" + System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils" };//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+				String[] commandArray = new String[] { "\"" + System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+						"-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils" };//$NON-NLS-1$ //$NON-NLS-2$
 				//if (log.isLoggable(Level.FINE)) {
 				//	StringBuilder sb = new StringBuilder();
 				//	for (int i = 0; i < commandArray.length; i++) {
@@ -1356,11 +1378,8 @@ public class FileUtils {
 				Runtime.getRuntime().exec(commandArray);
 			}
 			else
-				Runtime
-						.getRuntime()
-						.exec(
-								new String[] {
-										"java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				Runtime.getRuntime().exec(new String[] { "java", "-classpath", jarFilePath, //$NON-NLS-1$//$NON-NLS-2$
+						"-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		catch (Exception e) {
 			FileUtils.log.log(Level.SEVERE, "failed executing cleanup settings "); //$NON-NLS-1$
@@ -1399,7 +1418,7 @@ public class FileUtils {
 	/**
 	 * query the import data directory in dependency of search directory, object, etc
 	 * @param searchDirectory
-	 * @param objectKey
+	 * @param ouiObjectKey
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage) {
@@ -1416,10 +1435,11 @@ public class FileUtils {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage,
+				new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
 
-		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented()) && !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented())
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1427,7 +1447,7 @@ public class FileUtils {
 	/**
 	 * query the import data directory in dependency of search directory, object, etc
 	 * @param searchDirectory
-	 * @param objectKey
+	 * @param ouiObjectKey
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, String[] fileExtensions) {
@@ -1446,7 +1466,8 @@ public class FileUtils {
 		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, fileExtensions, searchDirectory, null, SWT.MULTI);
 
-		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented()) && !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented())
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1454,7 +1475,7 @@ public class FileUtils {
 	/**
 	 * query the import data directory in dependency of search directory, object, etc
 	 * @param searchDirectory
-	 * @param objectKey
+	 * @param ouiObjectKey
 	 * @param baseDirectory name of directory where object data directories are located
 	 * @return
 	 */
@@ -1478,10 +1499,11 @@ public class FileUtils {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-				(GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR) }, searchDirectory, null, SWT.MULTI);
+		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage,
+				new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(), (GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR) }, searchDirectory, null, SWT.MULTI);
 
-		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented()) && !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented())
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1570,4 +1592,42 @@ public class FileUtils {
 			}
 		}
 	}
+
+	/** 
+	 * Attempts to calculate the size of a file or directory.
+	 * <p> Since the operation is non-atomic, the returned value may be inaccurate. 
+	 * However, this method is quick and does its best.
+	 * http://stackoverflow.com/a/19877372
+	 */
+	public static long size(Path path) {
+		final AtomicLong size = new AtomicLong(0);
+		try {
+			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+					size.addAndGet(attrs.size());
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFileFailed(Path file, IOException exc) {
+					FileUtils.log.log(Level.SEVERE, "skipped: " + file + " (" + exc + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+					// Skip folders that can't be traversed
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+					if (exc != null) FileUtils.log.log(Level.SEVERE, "had trouble traversing: " + dir + " (" + exc + ")");
+					// Ignore errors traversing a folder
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+		catch (IOException e) {
+			throw new AssertionError("walkFileTree will not throw IOException if the FileVisitor does not");
+		}
+		return size.get();
+	}
+
 }

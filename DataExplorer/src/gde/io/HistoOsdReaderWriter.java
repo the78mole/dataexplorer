@@ -111,7 +111,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			else if (application.getActiveObject() != null && objectKey.equalsIgnoreCase(GDE.STRING_EMPTY) && settings.skipFilesWithoutObject()) {
 				log.log(Level.INFO, "SKIP FILE : objectKey empty    " + path.toString());
 			}
-			else if (application.getActiveObject() != null && objectKey.equalsIgnoreCase(application.getActiveObject().getKey()) && settings.skipFilesWithOtherObject()) {
+			else if (application.getActiveObject() != null && objectKey.equalsIgnoreCase(application.getObjectKey()) && settings.skipFilesWithOtherObject()) {
 				log.log(INFO, "SKIP FILE : objectKey differs  " + path.toString());
 			}
 			else {
@@ -150,10 +150,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					else {
 						byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
 						data_in.readFully(buffer);
-						HistoRecordSet recordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo);
+						HistoRecordSet recordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, path);
 						recordSets.add(recordSet);
 						recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
-						recordSet.setRecordedKeys(header.get(GDE.DEVICE_NAME), channelConfigNumber, objectKey);
+						recordSet.setRecordedKeys(channelConfigNumber, objectKey);
 
 						log.log(Level.FINE, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME) + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$
 								+ "  numberRecordAndTimeStamp=" + numberRecordAndTimeStamp);
@@ -206,8 +206,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 						// todo not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(recordSet);
 					}
 				}
-				if (recordSets.size() > 0)
-				log.log(Level.TIME,
+				if (recordSets.size() > 0) log.log(Level.TIME,
 						String.format("%3d of%3d recordsets in%,7d ms  from %s", recordSets.size(), recordSetsInfo.size(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNs), path.toString())); //$NON-NLS-1$
 			}
 		}
@@ -250,9 +249,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 
 	/**
 	 * parse recordSetInfo from osd file. channel is determined without user interaction.
+	 * @param path 
 	 * @return null if this recordSet is not valid for histo (channel not allowed for histo).
 	 */
-	private static HistoRecordSet buildRecordSet(HashMap<String, String> recordSetInfo) {
+	private static HistoRecordSet buildRecordSet(HashMap<String, String> recordSetInfo, Path path) {
 		final String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
 		String recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
@@ -289,8 +289,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		}
 
 		final double tmpTimeStep_ms = application.getActiveDevice().getTimeStep_ms();
-		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(recordSetName, application.getActiveDevice(), recordSetInfoChannel.getNumber(), recordNames, recordSymbols, recordUnits, tmpTimeStep_ms,
-				true, true);
+		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(path, application.getActiveDevice(), recordSetInfoChannel.getNumber(), recordNames, recordSymbols, recordUnits, tmpTimeStep_ms, true,
+				true);
 		recordSet.setRecordSetDescription(recordSetComment);
 
 		String[] recordKeys = application.getActiveDevice().crossCheckMeasurements(recordsProperties, recordSet);

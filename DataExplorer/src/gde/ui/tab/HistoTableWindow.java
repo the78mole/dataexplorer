@@ -27,6 +27,7 @@ import gde.data.HistoSet;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
+import gde.histocache.HistoVault;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -404,7 +405,7 @@ public class HistoTableWindow extends CTabItem {
 			// get the timestamp range and sort order
 			long minimumTimeStamp = this.histoSet.lastKey();
 			long maximumTimeStamp = this.histoSet.firstKey();
-			NavigableMap<Long, List<HistoRecordSet>> histoSubSet = this.histoSet.subMap(maximumTimeStamp, true, minimumTimeStamp, true);
+			NavigableMap<Long, List<HistoVault>> histoSubSet = this.histoSet.subMap(maximumTimeStamp, true, minimumTimeStamp, true);
 			if (!settings.isXAxisReversed()) {
 				histoSubSet = histoSubSet.descendingMap();
 			}
@@ -413,10 +414,10 @@ public class HistoTableWindow extends CTabItem {
 			Channel activeChannel = this.channels.getActiveChannel();
 			if (activeChannel != null) {
 				if (histoSubSet.size() > 0) {
-					for (List<HistoRecordSet> cachedRecordSets : histoSubSet.values()) {
-						for (RecordSet recordSet : cachedRecordSets) {
+					for (List<HistoVault> vaults : histoSubSet.values()) {
+						for (HistoVault histoVault : vaults) {
 							StringBuilder sb = new StringBuilder();
-							ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(recordSet.getStartTimeStamp()), ZoneId.systemDefault());
+							ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(histoVault.getLogStartTimestamp_ms()), ZoneId.systemDefault());
 							sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
 							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 							column.setWidth(sb.length() * this.textExtentFactor * 8 / 10);

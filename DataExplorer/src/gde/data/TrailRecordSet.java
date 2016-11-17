@@ -45,6 +45,7 @@ import gde.device.ScoreLabelTypes;
 import gde.device.ScoregroupType;
 import gde.device.SettlementType;
 import gde.exception.DataInconsitsentException;
+import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -293,31 +294,32 @@ public class TrailRecordSet extends RecordSet {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * clears and fills the aggregated values into the trailRecords associated with the measurement or settlement.
-	 * takes time steps and data from all histo record sets for the current channel.
-	 * takes only those aggregated values which are assigned to the selected trail type.
-	 * @param histoSet
-	 */
-	public void addHistoSetPoints(HistoSet histoSet) {
-		//		long nanoTime = System.nanoTime();
-		for (Map.Entry<Long, List<HistoRecordSet>> entry : histoSet.entrySet()) {
-			for (HistoRecordSet histoRecordSet : entry.getValue()) {
-				long nanoTimeHistoVaultRead = System.nanoTime();
-				this.durations_mm.add((int) (histoRecordSet.getMaxTime_ms() / 60000. + .5));
-				this.averageDuration_mm += (this.durations_mm.get(this.durations_mm.size() - 1) - this.averageDuration_mm) / this.durations_mm.size();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoRecordSet.getStartTimeStamp(), entry.getKey())); //$NON-NLS-1$
-				super.timeStep_ms.addRaw(histoRecordSet.getStartTimeStamp() * 10);
-				for (String recordName : super.getRecordNames()) {
-					((TrailRecord) super.get(recordName)).addHistoSetPoints(histoRecordSet);
-				}
-				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("recordSet  time=%,d ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTimeHistoVaultRead))); //$NON-NLS-1$
-			}
-		}
-		syncScaleOfSyncableRecords();
-		//		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d trails        build and populate time=%,6d [ms]  ::  per second:%5d", HistoSet.me.size(), //$NON-NLS-1$
-		//				TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime), HistoSet.me.size() > 0 ? HistoSet.me.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) : 0));
-	}
+//	/**
+//	 * clears and fills the aggregated values into the trailRecords associated with the measurement or settlement.
+//	 * takes time steps and data from all histo record sets for the current channel.
+//	 * takes only those aggregated values which are assigned to the selected trail type.
+//	 * @param histoSet
+//	 */
+//	@Deprecated
+//	public void addHistoSetPoints(HistoSet histoSet) {
+//		//		long nanoTime = System.nanoTime();
+//		for (Map.Entry<Long, List<HistoRecordSet>> entry : histoSet.entrySet()) {
+//			for (HistoRecordSet histoRecordSet : entry.getValue()) {
+//				long nanoTimeHistoVaultRead = System.nanoTime();
+//				this.durations_mm.add((int) (histoRecordSet.getMaxTime_ms() / 60000. + .5));
+//				this.averageDuration_mm += (this.durations_mm.get(this.durations_mm.size() - 1) - this.averageDuration_mm) / this.durations_mm.size();
+//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoRecordSet.getStartTimeStamp(), entry.getKey())); //$NON-NLS-1$
+//				super.timeStep_ms.addRaw(histoRecordSet.getStartTimeStamp() * 10);
+//				for (String recordName : super.getRecordNames()) {
+//					((TrailRecord) super.get(recordName)).addHistoSetPoints(histoRecordSet);
+//				}
+//				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("recordSet  time=%,d ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTimeHistoVaultRead))); //$NON-NLS-1$
+//			}
+//		}
+//		syncScaleOfSyncableRecords();
+//		//		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d trails        build and populate time=%,6d [ms]  ::  per second:%5d", HistoSet.me.size(), //$NON-NLS-1$
+//		//				TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime), HistoSet.me.size() > 0 ? HistoSet.me.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) : 0));
+//	}
 
 	/**
 	 * set time steps for the trail recordset and the data points for all trail records.
@@ -325,13 +327,13 @@ public class TrailRecordSet extends RecordSet {
 	 */
 	public void setPoints() {
 		this.cleanup();
-		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().histoVaults.entrySet()) {
+		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
-				int duration_mm = histoVault.getScores()[ScoreLabelTypes.DURATION_MM.ordinal()];
+				int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
 				this.durations_mm.add(duration_mm);
 				this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getCreationTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
-				this.timeStep_ms.addRaw(histoVault.getCreationTimestamp_ms() * 10);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getLogStartTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
+				this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10);
 				for (String recordName : this.getRecordNames()) {
 					((TrailRecord) this.get(recordName)).add(histoVault);
 				}
@@ -348,20 +350,9 @@ public class TrailRecordSet extends RecordSet {
 	public void setPoints(int recordOrdinal) {
 		TrailRecord trailRecord = (TrailRecord) super.get(recordOrdinal);
 		trailRecord.clear();
-		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().histoVaults.entrySet()) {
+		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				trailRecord.add(histoVault);
-			}
-		}
-		syncScaleOfSyncableRecords();
-	}
-
-	public void updateRecord(HistoSet histoSet, int recordOrdinal) {
-		TrailRecord trailRecord = (TrailRecord) super.get(recordOrdinal);
-		trailRecord.clear();
-		for (Map.Entry<Long, List<HistoRecordSet>> entry : histoSet.entrySet()) {
-			for (HistoRecordSet histoRecordSet : entry.getValue()) {
-				trailRecord.addHistoSetPoints(histoRecordSet);
 			}
 		}
 		syncScaleOfSyncableRecords();

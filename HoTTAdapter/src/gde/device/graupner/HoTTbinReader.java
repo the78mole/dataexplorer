@@ -36,6 +36,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -113,9 +114,11 @@ public class HoTTbinReader {
 	 *            byte array containing the first 64 byte to analyze the header
 	 * @return hash map containing header data as string accessible by public
 	 *         header keys
+	 * @throws IOException 
+	 * @throws DataTypeException 
 	 * @throws Exception
 	 */
-	public static HashMap<String, String> getFileInfo(File file) throws Exception {
+	public static HashMap<String, String> getFileInfo(File file) throws IOException, DataTypeException  {
 		final String $METHOD_NAME = "getFileInfo";
 		FileInputStream file_input = null;
 		DataInputStream data_in = null;

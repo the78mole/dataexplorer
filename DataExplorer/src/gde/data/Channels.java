@@ -204,7 +204,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateAllTabs(true);
 
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				this.application.updateHistoTabs(false); // file paths will determine which scope of histo data update is appropriate
+				this.application.setupHistoWindows();
 			}
 		}
 		else

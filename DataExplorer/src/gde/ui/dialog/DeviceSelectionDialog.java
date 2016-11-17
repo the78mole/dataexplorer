@@ -1077,18 +1077,19 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
-		IDevice activeDevice = this.application.getActiveDevice();
+		IDevice previousActiveDevice = this.application.getActiveDevice();
 		// check if any thing to clean up
-		if (activeDevice != null) { // there is an previous active device
-			checkAndStoreDeviceConfiguration(activeDevice);
-			if (activeDevice.getDialog() != null && !activeDevice.getDialog().isDisposed()) {
-				activeDevice.getDialog().dispose();
+		if (previousActiveDevice != null) { 
+			checkAndStoreDeviceConfiguration(previousActiveDevice);
+			if (previousActiveDevice.getDialog() != null && !previousActiveDevice.getDialog().isDisposed()) {
+				previousActiveDevice.getDialog().dispose();
 			}
 		}
 		// cleanup menuBar for device specific entries
 		this.application.getMenuBar().cleanup();
 
 		// prepare every thing for the new device
+		IDevice activeDevice = this.application.getActiveDevice();
 		if ((activeDevice = getInstanceOfDevice()) != null) {
 			this.application.setActiveDevice(activeDevice);
 			this.application.setDataTableTabItemVisible(activeDevice.isTableTabRequested());
@@ -1098,6 +1099,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.setUtilGraphicsWindowVisible(activeDevice.isUtilityGraphicsTabRequested(), GDE.STRING_EMPTY);
 			this.application.registerCustomTabItem(activeDevice.isUtilityDeviceTabRequested() ? activeDevice.getUtilityDeviceTabItem() : null);
 			setupDataChannels(activeDevice);
+			// compare names because the device is re-instantiated when the deviceSelectionDialog is opened
+			if (previousActiveDevice == null || ! activeDevice.getName().equals(previousActiveDevice.getName())) {
+				this.application.setupHistoWindows(); // always full setup as this is passed during application startup
+			}
 			this.application.setupDataTableHeader();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();

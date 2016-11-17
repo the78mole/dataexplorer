@@ -29,6 +29,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -68,6 +70,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.ui.dialog.SettingsDialog;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
@@ -155,6 +158,7 @@ public class Settings extends Properties {
 	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
 	final static String							SKIP_FILES_WITHOUT_OBJECT				= "skip_files_without_object";																																		//$NON-NLS-1$
 	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
+	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -228,12 +232,16 @@ public class Settings extends Properties {
 	public final static String			GRAPHICS_TEMPLATES_XSD_NAME			= "GraphicsTemplates" + GDE.GRAPHICS_TEMPLATES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;							//$NON-NLS-1$
 	public final static String			GRAPHICS_TEMPLATES_EXTENSION		= GDE.FILE_ENDING_STAR_XML;
 
+	public final static String			HISTO_CACHE_ENTRIES_DIR_NAME		= "Cache";																																												//$NON-NLS-1$
+	public final static String			HISTO_CACHE_ENTRIES_XSD_NAME		= "HistoVault" + GDE.HISTO_CACHE_ENTRIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;										//$NON-NLS-1$
+
 	BufferedReader									reader;																																																														// to read the application settings
 	BufferedWriter									writer;																																																														// to write the application settings
 
 	boolean													isDevicePropertiesUpdated				= false;
 	boolean													isDevicePropertiesReplaced			= false;
 	boolean													isGraphicsTemplateUpdated				= false;
+	boolean													isHistocacheTemplateUpdated			= false;
 
 	Rectangle												window;
 	boolean													isWindowMaximized								= false;
@@ -389,6 +397,12 @@ public class Settings extends Properties {
 		}
 		checkDeviceTemplates(templateDirectory + GDE.FILE_SEPARATOR_UNIX);
 
+		String histoCacheDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
+		if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
+			resetHistoCache();
+			this.isHistocacheTemplateUpdated = true;
+		}
+
 		FileUtils.checkDirectoryAndCreate(this.applHomePath + GDE.FILE_SEPARATOR_UNIX + "Logs"); //$NON-NLS-1$
 
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, String.format("settingsFilePath = %s", this.settingsFilePath)); //$NON-NLS-1$
@@ -404,6 +418,20 @@ public class Settings extends Properties {
 			this.window = new Rectangle(50, 50, 950, 600);
 
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
+	}
+
+	public String resetHistoCache() {
+		final String $METHOD_NAME = "resetHistoCache"; //$NON-NLS-1$
+
+		Path histoCacheDirectory = Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+		if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory.toString(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
+			FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory.toString(), Settings.PERMISSION_555);
+		}
+		int initialSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
+		FileUtils.cleanDirectories(histoCacheDirectory, new Path[] { histoCacheDirectory.resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME) });
+		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, FileUtils.size(histoCacheDirectory) / 1024, histoCacheDirectory });
+		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
+		return message;
 	}
 
 	/**
@@ -683,6 +711,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, this.isXAxisLogarithmicDistance())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, this.isXAxisReversed())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_COUNT, this.getMaxLogCount())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, this.getRetrospectMonths())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SEARCH_IMPORT_PATH, this.isSearchImportPath())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, this.isChannelMix())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_DURATION_MM, this.getMaxLogDuration_mm())); //$NON-NLS-1$
@@ -1592,6 +1621,13 @@ public class Settings extends Properties {
 	 */
 	public boolean isGraphicsTemplateUpdated() {
 		return this.isGraphicsTemplateUpdated;
+	}
+
+	/**
+	 * @return 
+	 */
+	public boolean isHistoCacheTemplateUpdated() {
+		return this.isHistocacheTemplateUpdated;
 	}
 
 	/**
@@ -2523,6 +2559,25 @@ public class Settings extends Properties {
 	 */
 	public boolean skipFilesWithOtherObject() {
 		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITH_OTHER_OBJECT, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the maximum number of full calendar months which is used for history log selection (default is 12) 
+	 */
+	public int getRetrospectMonths() {
+		return Integer.valueOf(this.getProperty(Settings.RETROSPECT_MONTHS, String.valueOf(12))); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param uintValue the maximum number of full calendar months which is used for history log selection
+	 */
+		public void setRetrospectMonths(String uintValue) {
+		try {
+			int value = Integer.parseUnsignedInt(uintValue.trim());
+			this.setProperty(Settings.RETROSPECT_MONTHS, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
 	}
 
 }

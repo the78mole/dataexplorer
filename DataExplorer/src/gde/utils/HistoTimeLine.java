@@ -24,6 +24,7 @@ import gde.config.Settings;
 import gde.data.HistoRecordSet;
 import gde.data.HistoSet;
 import gde.data.RecordSet;
+import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -271,7 +272,7 @@ public class HistoTimeLine {
 		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
 		long lastTimeStamp = 0;
 		long applicableDistancesSum = 0;
-		for (Entry<Long, List<HistoRecordSet>> entry : this.histoSet.subMap(this.leftmostTimeStamp, true, this.rightmostTimeStamp, true).entrySet()) {
+		for (Entry<Long, List<HistoVault>> entry : this.histoSet.subMap(this.leftmostTimeStamp, true, this.rightmostTimeStamp, true).entrySet()) {
 			long currentTimeStamp = entry.getKey();
 			if (HistoTimeLine.log.isLoggable(Level.FINER)) {
 				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());

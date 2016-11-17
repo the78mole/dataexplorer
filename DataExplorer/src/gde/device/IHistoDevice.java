@@ -22,6 +22,7 @@ import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -41,7 +42,7 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @throws DataInconsitsentException 
 	 * @throws Exception 
 	 */
-	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException, Exception;
+	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws DataInconsitsentException, FileNotFoundException, IOException, DataTypeException;
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .

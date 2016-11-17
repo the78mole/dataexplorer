@@ -462,18 +462,20 @@ public class OsdReaderWriter {
 			try { // try to get channel startsWith configuration name : 'Channel/Configuration Name: 1 : Receiver'
 				channel = channels.get(Integer.valueOf(channelConfig.split(GDE.STRING_BLANK)[0]));
 				// channelConfigKey = channel.getChannelConfigKey();
-			} catch (NullPointerException e) {
+			} catch (NullPointerException | NumberFormatException e) {
 				// ignore and keep channel as null
 			}
 		}
 		if (channel == null) { // 3.rd try channelConfiguration not found
+			// ET 20161121 reactivated for '2008_04-05_ASW27_Motor_Test_Akku_Vergleich.osd' and similar files
 			// do not rely on channel nomenclature
 			// "3 : Motor"
-			// channelConfigKey = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
+			String channelConfigKey;
+			channelConfigKey = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
 			// "Motor 3"
-			// channelConfigKey = channelConfigKey.contains(GDE.STRING_BLANK) ? channelConfigKey.split(GDE.STRING_BLANK)[0].trim() : channelConfigKey.trim();
+			channelConfigKey = channelConfigKey.contains(GDE.STRING_BLANK) ? channelConfigKey.split(GDE.STRING_BLANK)[0].trim() : channelConfigKey.trim();
 			// "Motor"
-			// channel = channels.get(channels.getChannelNumber(channelConfigKey));
+			channel = channels.get(channels.getChannelNumber(channelConfigKey));
 		}
 		return channel;
 	}

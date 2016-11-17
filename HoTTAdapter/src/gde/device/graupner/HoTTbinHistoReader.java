@@ -22,6 +22,7 @@ package gde.device.graupner;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.nio.file.Path;
@@ -104,11 +105,12 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	 * provide data in a histo recordSet.
 	 * @param recordSet is filled with file data
 	 * @param filePath
+	 * @throws FileNotFoundException 
 	 * @throws IOException
 	 * @throws DataTypeException
 	 * @throws DataInconsitsentException
 	 */
-	public static synchronized void read(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException, Exception {
+	public static synchronized void read(RecordSet recordSet, String filePath) throws FileNotFoundException, IOException, DataTypeException, DataInconsitsentException  {
 		HoTTbinHistoReader.tmpRecordSet = recordSet;
 		File file = new File(filePath);
 		HoTTbinHistoReader.fileLength = file.length();
@@ -133,7 +135,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	 * @throws DataTypeException
 	 * @throws DataInconsitsentException
 	 */
-	private static synchronized void read(BufferedInputStream data_in, Path path, long startTimeStamp_ms) throws IOException, DataTypeException, DataInconsitsentException, Exception {
+	private static synchronized void read(BufferedInputStream data_in, Path path, long startTimeStamp_ms) throws IOException, DataTypeException, DataInconsitsentException  {
 		final String $METHOD_NAME = "read";
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
@@ -143,7 +145,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		tmpRecordSet.descriptionAppendFilename(path.getFileName().toString());
 		tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 		if (tmpRecordSet instanceof HistoRecordSet) {
-			((HistoRecordSet ) tmpRecordSet).setRecordedKeys(device.getName(),activeChannel.getNumber(),path.getParent().getFileName().toString());
+			((HistoRecordSet ) tmpRecordSet).setRecordedKeys(activeChannel.getNumber(),path.getParent().getFileName().toString());
 		}
 		String recordSetName = activeChannel.getNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + activeChannel.getName() + HoTTbinHistoReader.getRecordSetExtend(path.getFileName().toString());
 		activeChannel.applyTemplate(recordSetName, false);

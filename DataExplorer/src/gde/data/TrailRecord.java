@@ -37,6 +37,7 @@ import gde.device.ScoregroupType;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
 import gde.exception.DataInconsitsentException;
+import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -477,11 +478,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		else {
 			if (this.trailRecordSuite.length == 1) {
 				if (this.isMeasurement())
-					super.add(histoVault.getMeasurements(this.ordinal)[this.getTrailOrdinal()]);
+					super.add(histoVault.getMeasurement(this.ordinal, this.getTrailOrdinal()));
 				else if (this.isSettlement())
-					super.add(histoVault.getSettlements(this.settlementType.getSettlementId())[this.getTrailOrdinal()]);
+					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
 				else if (this.isScoregroup())
-					super.add(histoVault.getScores()[this.getTrailOrdinal()]);
+					super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
 				else
 					throw new UnsupportedOperationException("length == 1");
 			}
@@ -493,11 +494,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					TrailRecord trailRecord = this.trailRecordSuite[i];
 					Integer point;
 					if (this.isMeasurement())
-						point = histoVault.getMeasurements(this.ordinal)[this.getTrailOrdinal()];
+						point = histoVault.getMeasurement(this.ordinal, this.getTrailOrdinal());
 					else if (this.isSettlement())
-						point = histoVault.getSettlements(this.settlementType.getSettlementId())[this.getTrailOrdinal()];
+						point = histoVault.getSettlement(this.settlementType.getSettlementId(), this.getTrailOrdinal());
 					else if (this.isScoregroup())
-						point = histoVault.getScores()[this.getTrailOrdinal()];
+						point = histoVault.getScorePoint(this.getTrailOrdinal());
 					else
 						throw new UnsupportedOperationException("length > 1");
 

@@ -87,7 +87,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		List<String> problemFileNames = getProblemFileNames();
 		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
 
-		this.setDataPath();
+		this.setDataPath(DataSource.TESTDATA);
 		String fileRootDir = this.dataPath.getAbsolutePath();
 		// >>> take one of these optional data sources for the test <<<
 		//		Path dirPath = FileSystems.getDefault().getPath(fileRootDir, "_Thomas", "DataExplorer");  // use with empty datafilepath in DataExplorer.properties

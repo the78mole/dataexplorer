@@ -938,8 +938,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
 	 * @param filePath 
 	 * @throws DataInconsitsentException 
+	 * @throws DataTypeException 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException, Exception {
+	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws DataInconsitsentException, FileNotFoundException, IOException, DataTypeException  {
 		final String $METHOD_NAME = "addImportFileAsRawDataPoints"; //$NON-NLS-1$
 		log.log(Level.INFO, "start " + filePath); //$NON-NLS-1$
 		if (recordSet.getNoneCalculationRecordNames().length != recordSet.size()) {

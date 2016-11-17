@@ -87,6 +87,7 @@ public class GDE {
 	public static final String							NAME_LONG													= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String							DEVICE_PROPERTIES_XSD_VERSION			= "_V30";																																																										//$NON-NLS-1$
 	public final static String							GRAPHICS_TEMPLATES_XSD_VERSION		= "_V08";																																																										//$NON-NLS-1$
+	public final static String							HISTO_CACHE_ENTRIES_XSD_VERSION		= "_V00";																																																										//$NON-NLS-1$
 	public final static String							CLEAN_SETTINGS_WHILE_SHUTDOWN			= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 	public final static String							TEMP_FILE_STEM										= "~TempFile";
 

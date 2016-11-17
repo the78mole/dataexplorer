@@ -33,6 +33,9 @@ import gde.device.ChannelTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
+import gde.exception.NotSupportedFileFormatException;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -63,6 +66,7 @@ import gde.utils.WaitTimer;
 import gde.utils.WebBrowser;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -406,12 +410,14 @@ public class DataExplorer extends Composite {
 				this.taskBarItem = taskBar.getItem(GDE.shell) != null ? taskBar.getItem(GDE.shell) : taskBar.getItem(null);
 			}
 
-			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isDevicePropertiesReplaced()) {
+			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isHistoCacheTemplateUpdated() || this.settings.isDevicePropertiesReplaced()) {
 				StringBuilder sb = new StringBuilder();
 				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0016)).append(GDE.STRING_NEW_LINE);
 				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0017)).append(GDE.STRING_NEW_LINE);
 				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.GDE_MSGI0028)).append(GDE.STRING_NEW_LINE);
 				application.openMessageDialog(GDE.shell, sb.toString());
+				if (this.settings.isHistoCacheTemplateUpdated()) // shut up in this case
+					 sb.append(Messages.getString(MessageIds.GDE_MSGI0068)).append(GDE.STRING_NEW_LINE);
 			}
 
 			GDE.shell.addControlListener(new ControlListener() {
@@ -804,10 +810,6 @@ public class DataExplorer extends Composite {
 				this.deviceSelectionDialog.setupDevice();
 			}
 
-			// now the device including channel and the objectKey are ready which are prerequisites for using the HistoSet
-			this.histoSet = HistoSet.getInstance();
-			this.histoSet.initialize();
-
 			if (inputFilePath.length() > 5) {
 				if (inputFilePath.endsWith(GDE.FILE_ENDING_OSD))
 					this.fileHandler.openOsdFile(inputFilePath);
@@ -830,6 +832,9 @@ public class DataExplorer extends Composite {
 	 */
 	public void setupHistoWindows() {
 		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("started")); //$NON-NLS-1$
+		this.histoSet = HistoSet.getInstance();
+		this.histoSet.initialize();
+
 		DataExplorer.this.setHistoGraphicsTabItemVisible(this.settings.isHistoActive());
 		DataExplorer.this.setHistoTableTabItemVisible(this.settings.isHistoActive());
 		// no rebuild steps as the rebuild will be triggered by the file path analysis
@@ -1971,7 +1976,16 @@ public class DataExplorer extends Composite {
 			if ((this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed()
 					&& histoGraphicsTabItem.isVisible())
 					|| (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
-				boolean isRebuilt = DataExplorer.this.histoSet.rebuildNew(rebuildStep, isWithUi);
+				boolean isRebuilt = false;
+				try {
+					isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
+				}
+				catch (Exception  e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					if (isWithUi) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 					this.updateHistoGraphicsWindow(true);
@@ -2005,7 +2019,16 @@ public class DataExplorer extends Composite {
 							 && histoGraphicsTabItem.isVisible())
 							|| (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed()
 									 && histoTableTabItem.isVisible())) {
-						boolean isRebuilt = DataExplorer.this.histoSet.rebuildNew(rebuildStep, isWithUi);
+						boolean isRebuilt = false;
+						try {
+							isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
+						}
+						catch (Exception  e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
+							if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
 						if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 							DataExplorer.this.updateHistoGraphicsWindow(true);
