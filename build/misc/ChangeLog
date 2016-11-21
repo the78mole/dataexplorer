@@ -1,6 +1,7 @@
 Development history / change log, please read from bottom up
 
 Version 3.2.9 - yy xxx 2016
++++++ important update Java Runtime Version prerequisite to 1.8 +++++
 MC3000 SkyRC
 	- switch to continous data gathering for all slots by selecting MC3000-Set
 Q200 SkyRC 4 channel charger 
