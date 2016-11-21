@@ -6,7 +6,7 @@ same ‘.java’ source files in the source release. It does include online docu
 to the binary release. The purpose of the binary release is just to save you time and 
 trouble of compiling the sources.
 
-The binary release depends on certain "Java 6" features corresponding to JDK 1.6. 
+The binary release depends on certain "Java 6" features corresponding to JDK 1.8. 
 
 The binary release comes as a .zip or tar.gz archive which contains several .jar files. 
 Extract this archive to some suitable location, such as /usr/local/DataExplorer.

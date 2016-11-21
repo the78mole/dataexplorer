@@ -1,27 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>DataExplorer.jar</jar>
-  <outfile>F:\workspaces\gnu\build\misc\DataExplorer.exe</outfile>
+  <outfile>C:\Users\Winfried\git\dataexplorer\build\misc\DataExplorer32.exe</outfile>
   <errTitle>DataExplorer - Exception</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl>http://savannah.nongnu.org/projects/dataexplorer</supportUrl>
-  <customProcName>false</customProcName>
-  <stayAlive>true</stayAlive>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>F:\workspaces\gnu\build\misc\DataExplorer.ico</icon>
+  <icon>C:\Users\Winfried\git\dataexplorer\build\misc\DataExplorer.ico</icon>
   <classPath>
     <mainClass>gde.GDE</mainClass>
     <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>
     <path></path>
-    <minVersion>1.6.0</minVersion>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>32</runtimeBits>
     <initialHeapSize>64</initialHeapSize>
     <maxHeapSize>1024</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>

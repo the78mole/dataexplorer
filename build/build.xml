@@ -425,9 +425,9 @@
 	<!-- create internal temporay file structure -->
 	<target name="copy-files" depends="package,create_HoTTMdlViewer_lib">
 		<!-- programm directory -->
+		<copy file="build/misc/DataExplorer32.exe" tofile="${output.windows32.program}/DataExplorer.exe" />
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer.exe" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
@@ -442,9 +442,9 @@
 			</fileset>
 		</copy>
 
+		<copy file="build/misc/DataExplorer64.exe" tofile="${output.windows64.program}/DataExplorer.exe" />
 		<copy todir="${output.windows64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer.exe" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />

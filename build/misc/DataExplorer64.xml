@@ -3,19 +3,19 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>DataExplorer.jar</jar>
-  <outfile>C:\Users\Winfried\git\dataexplorer\build\misc\DevicePropertiesEditor.exe</outfile>
-  <errTitle>DevicePropertiesEditor - Exception</errTitle>
+  <outfile>C:\Users\Winfried\git\dataexplorer\build\misc\DataExplorer64.exe</outfile>
+  <errTitle>DataExplorer - Exception</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
+  <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl>http://savannah.nongnu.org/projects/dataexplorer</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\Winfried\git\dataexplorer\build\misc\DevicePropertiesEditor.ico</icon>
+  <icon>C:\Users\Winfried\git\dataexplorer\build\misc\DataExplorer.ico</icon>
   <classPath>
-    <mainClass>gde.ui.dialog.edit.DevicePropertiesEditor</mainClass>
+    <mainClass>gde.GDE</mainClass>
     <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>
@@ -25,9 +25,9 @@
     <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
-    <runtimeBits>64/32</runtimeBits>
-    <initialHeapSize>32</initialHeapSize>
-    <maxHeapSize>512</maxHeapSize>
+    <runtimeBits>64</runtimeBits>
+    <initialHeapSize>64</initialHeapSize>
+    <maxHeapSize>3092</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
   </jre>
   <messages>
