@@ -5,6 +5,6 @@ export LIBOVERLAY_SCROLLBAR=0
 #fix GTK3 SWT incompatibility
 export SWT_GTK3=0
 
-echo java -Dfile.encoding=UTF-8 -Xms32m -Xmx256m -classpath ./DataExplorer.jar gde.ui.dialog.edit.DevicePropertiesEditor
-java -Dfile.encoding=UTF-8 -Xms32m -Xmx256m -classpath ./DataExplorer.jar gde.ui.dialog.edit.DevicePropertiesEditor
+echo java -Dfile.encoding=UTF-8 -Xms32m -Xmx512m -classpath ./DataExplorer.jar gde.ui.dialog.edit.DevicePropertiesEditor
+java -Dfile.encoding=UTF-8 -Xms32m -Xmx512m -classpath ./DataExplorer.jar gde.ui.dialog.edit.DevicePropertiesEditor
 

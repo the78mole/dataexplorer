@@ -280,7 +280,7 @@
 		<!-- exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}" / -->
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
-	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer${sun.arch.data.model}"/>
 	    </exec>
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
@@ -295,7 +295,7 @@
 		<!-- exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}" / -->
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
-	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer${sun.arch.data.model}"/>
 	    </exec>
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
@@ -425,9 +425,9 @@
 	<!-- create internal temporay file structure -->
 	<target name="copy-files" depends="package,create_HoTTMdlViewer_lib">
 		<!-- programm directory -->
+		<copy file="build/misc/DataExplorer32.exe" tofile="${output.windows32.program}/DataExplorer.exe" />
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer.exe" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
@@ -442,9 +442,9 @@
 			</fileset>
 		</copy>
 
+		<copy file="build/misc/DataExplorer64.exe" tofile="${output.windows64.program}/DataExplorer.exe" />
 		<copy todir="${output.windows64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer.exe" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
