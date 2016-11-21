@@ -280,7 +280,7 @@
 		<!-- exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}" / -->
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
-	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer${sun.arch.data.model}"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer"/>
 	    </exec>
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
@@ -295,7 +295,7 @@
 		<!-- exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}" / -->
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
-	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer${sun.arch.data.model}"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer"/>
 	    </exec>
 	    <exec executable="chmod" os="Linux" failonerror="true">
 	      <arg value="+x"/>
@@ -459,12 +459,12 @@
 			</fileset>
 		</copy>
 
+		<copy file="build/misc/DataExplorer32" tofile="${output.gnulinux32.program}/DataExplorer" />
 		<copy todir="${output.gnulinux32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
 			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
 			<fileset file="build/misc/DataExplorer.xpm" />
-			<fileset file="build/misc/DataExplorer" />
 			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DataExplorer.desktop" />
 			<fileset file="build/misc/DevicePropertiesEditor" />
@@ -477,12 +477,12 @@
 			</fileset>
 		</copy>
 
+		<copy file="build/misc/DataExplorer64" tofile="${output.gnulinux64.program}/DataExplorer" />
 		<copy todir="${output.gnulinux64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
 			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
 			<fileset file="build/misc/DataExplorer.xpm" />
-			<fileset file="build/misc/DataExplorer" />
 			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DataExplorer.desktop" />
 			<fileset file="build/misc/DevicePropertiesEditor" />
