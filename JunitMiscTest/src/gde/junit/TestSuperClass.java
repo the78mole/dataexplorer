@@ -37,6 +37,8 @@ import gde.utils.TimeLine;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -44,6 +46,8 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.naming.OperationNotSupportedException;
 
 import junit.framework.TestCase;
 
@@ -152,8 +156,7 @@ public class TestSuperClass extends TestCase {
 
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
-				// loop through all device properties XML and check if device
-				// used
+				// loop through all device properties XML and check if device used
 				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
 					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR + files[i]);
@@ -237,6 +240,38 @@ public class TestSuperClass extends TestCase {
 			}
 			this.channels.setChannelNames(channelNames);
 		}
+	}
+
+	/**
+	 * reflect user GUI settings required for history tabs.
+	 * copied from 'setDevice', 'setupDataChannels'
+	 * @param activeDevice
+	 * @param activeChannelNumber
+	 * @param activeObjectKey
+	 */
+	protected void setupDeviceChannelObject(String fileDeviceName, int activeChannelNumber, String activeObjectKey) {
+		// device : from setDevice
+		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
+		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) throw new OperationNotSupportedException("hottviewer | mpu");
+		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+		if (deviceConfig == null) new OperationNotSupportedException("deviceConfig == null");
+		IDevice device = this.getInstanceOfDevice(deviceConfig);
+		this.application.setActiveDeviceWoutUI(device);
+
+		// channel : from setupDataChannels
+		this.channels.cleanup();
+		String[] channelNames = new String[device.getChannelCount()];
+		// buildup new structure - set up the channels
+		for (int i = 1; i <= device.getChannelCount(); i++) {
+			Channel newChannel = new Channel(device.getChannelName(i), device.getChannelTypes(i));
+			// newChannel.setObjectKey(this.application.getObjectKey()); now in  application.selectObjectKey
+			this.channels.put(Integer.valueOf(i), newChannel);
+			channelNames[i - 1] = i + " : " + device.getChannelName(i);
+		}
+		this.channels.setChannelNames(channelNames);
+
+		// object key : 
+		this.application.selectObjectKey(activeObjectKey); 
 	}
 
 	/**
@@ -453,14 +488,10 @@ public class TestSuperClass extends TestCase {
 	}
 
 	protected File setDataPath() {
-		return setDataPath(DataSource.SETTINGS);
-	}
-
-	protected File setDataPath(DataSource dataSource) {
 		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
 		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
 
-		if (dataSource == DataSource.SETTINGS && settingsPropertiesExist && isDataPathConfigured) {
+		if (settingsPropertiesExist && isDataPathConfigured) {
 			this.dataPath = new File(this.settings.getDataFilePath());
 		}
 		else {
@@ -478,7 +509,35 @@ public class TestSuperClass extends TestCase {
 		}
 
 		this.settings.setDataFilePath(this.dataPath.getPath());
-		System.out.println("this.devicePath = " + this.dataPath.getPath());
+		System.out.println("this.dataPath = " + this.dataPath.getPath());
 		return this.dataPath;
 	}
+
+	protected File setDataPath(DataSource dataSource, Path subPath) {
+		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
+		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
+
+		if (dataSource == DataSource.SETTINGS && settingsPropertiesExist && isDataPathConfigured) {
+			this.dataPath = Paths.get(this.settings.getDataFilePath()).resolve(subPath).toFile();
+		}
+		else {
+			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			else if (srcDataPath.indexOf("classes") > -1) { // ET running inside eclipse in Debug mode
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			else {
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			// this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile(); Error because of leading slash: /C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer // this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile();
+			this.dataPath = (new File(srcDataPath)).toPath().resolve(subPath).toFile();
+		}
+
+		this.settings.setDataFilePath(this.dataPath.getPath());
+		System.out.println("this.dataPath = " + this.dataPath.getPath());
+		return this.dataPath;
+	}
+
 }

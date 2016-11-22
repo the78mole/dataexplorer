@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -46,6 +47,8 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoRecordSet;
+import gde.data.HistoSet;
+import gde.data.HistoSet.RebuildStep;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -81,17 +84,56 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		return problemFileNames;
 	}
 
+	public void testBuildHistoSet() {
+		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
+
+		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
+		String fileRootDir = this.dataPath.getAbsolutePath();
+
+		FileUtils.checkDirectoryAndCreate(fileRootDir);
+		String[] directories = new File(fileRootDir).list(new FilenameFilter() {
+			@Override
+			public boolean accept(File current, String name) {
+				return new File(current, name).isDirectory();
+			}
+		});
+		System.out.println(Arrays.toString(directories));
+
+		for (int i = 0; i < directories.length; i++) {
+			this.setDataPath(DataSource.TESTDATA, Paths.get(directories[i]));
+			IDevice device = setDevice(directories[i]);
+			setupDataChannels(device);
+			for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
+				this.channels.setActiveChannelNumber(channelEntry.getKey());
+				try {
+				HistoSet.getInstance().rebuild(RebuildStep.A_HISTOSET, false);}
+				catch (Exception e) {
+					e.printStackTrace();
+					failures.put("file.getAbsolutePath()", e);
+				}
+			}
+		}
+
+		System.out.println(String.format("%,11d files processed from  %s", HistoSetTest.count, fileRootDir));
+		StringBuilder sb = new StringBuilder();
+		for (Entry<String, Exception> failure : failures.entrySet()) {
+			sb.append(failure).append("\n");
+		}
+		//			System.out.println(sb);
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
 	public void testReadBinOsdFiles() {
 		System.out
 				.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
 		List<String> problemFileNames = getProblemFileNames();
 		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
 
-		this.setDataPath(DataSource.TESTDATA);
+		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
 		String fileRootDir = this.dataPath.getAbsolutePath();
 		// >>> take one of these optional data sources for the test <<<
-		//		Path dirPath = FileSystems.getDefault().getPath(fileRootDir, "_Thomas", "DataExplorer");  // use with empty datafilepath in DataExplorer.properties
-		//		Path dirPath = FileSystems.getDefault().getPath(fileRootDir, "_Winfried", "DataExplorer"); // use with empty datafilepath in DataExplorer.properties
+		//		Path dirPath = Paths.get(fileRootDir, "_Thomas", "DataExplorer");  // use with empty datafilepath in DataExplorer.properties
+		//		Path dirPath = Paths.get(fileRootDir, "_Winfried", "DataExplorer"); // use with empty datafilepath in DataExplorer.properties
 		Path dirPath = FileSystems.getDefault().getPath(fileRootDir); // takes all Files from datafilepath in DataExplorer.properties or from DataFilesTestSamples if empty datafilepath
 
 		FileUtils.checkDirectoryAndCreate(dirPath.toString());
@@ -187,7 +229,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		for (Entry<String, Exception> failure : failures.entrySet()) {
 			sb.append(failure).append("\n");
 		}
-//		System.out.println(sb);
+		//		System.out.println(sb);
 		if (failures.size() > 0) fail(sb.toString());
 	}
 
