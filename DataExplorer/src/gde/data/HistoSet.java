@@ -616,7 +616,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		Path path = null;
 		String tmpHistoDataDirPath = this.settings.getDataFilePath();
 		if (!(tmpHistoDataDirPath == null || tmpHistoDataDirPath.trim().isEmpty() || tmpHistoDataDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
-			path = FileSystems.getDefault().getPath(tmpHistoDataDirPath);
+			path = Paths.get(tmpHistoDataDirPath);
 			if (path.getFileName().toString().equalsIgnoreCase(this.application.getActiveDevice().getName())) {
 				path = path.getParent();
 			}
