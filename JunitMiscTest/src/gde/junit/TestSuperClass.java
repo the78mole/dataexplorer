@@ -252,26 +252,12 @@ public class TestSuperClass extends TestCase {
 	protected void setupDeviceChannelObject(String fileDeviceName, int activeChannelNumber, String activeObjectKey) {
 		// device : from setDevice
 		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
-		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) throw new OperationNotSupportedException("hottviewer | mpu");
+		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) throw new UnsupportedOperationException("hottviewer | mpu");
 		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
-		if (deviceConfig == null) new OperationNotSupportedException("deviceConfig == null");
+		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
-		this.application.setActiveDeviceWoutUI(device);
-
-		// channel : from setupDataChannels
-		this.channels.cleanup();
-		String[] channelNames = new String[device.getChannelCount()];
-		// buildup new structure - set up the channels
-		for (int i = 1; i <= device.getChannelCount(); i++) {
-			Channel newChannel = new Channel(device.getChannelName(i), device.getChannelTypes(i));
-			// newChannel.setObjectKey(this.application.getObjectKey()); now in  application.selectObjectKey
-			this.channels.put(Integer.valueOf(i), newChannel);
-			channelNames[i - 1] = i + " : " + device.getChannelName(i);
-		}
-		this.channels.setChannelNames(channelNames);
-
-		// object key : 
-		this.application.selectObjectKey(activeObjectKey); 
+		
+		this.application.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
 	}
 
 	/**

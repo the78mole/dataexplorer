@@ -101,12 +101,12 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 
 		for (int i = 0; i < directories.length; i++) {
 			this.setDataPath(DataSource.TESTDATA, Paths.get(directories[i]));
-			IDevice device = setDevice(directories[i]);
-			setupDataChannels(device);
+			setupDeviceChannelObject(directories[i], 1, "");
 			for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
-				this.channels.setActiveChannelNumber(channelEntry.getKey());
+				setupDeviceChannelObject(directories[i], channelEntry.getKey(), "");
 				try {
-				HistoSet.getInstance().rebuild(RebuildStep.A_HISTOSET, false);}
+					HistoSet.getInstance().rebuild(RebuildStep.A_HISTOSET, false);
+				}
 				catch (Exception e) {
 					e.printStackTrace();
 					failures.put("file.getAbsolutePath()", e);

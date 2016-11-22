@@ -45,6 +45,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.validation.SchemaFactory;
@@ -96,6 +97,7 @@ import gde.utils.StringHelper;
  * the vault object cache key is based on versions (dataExplorer and device xml), on current UI settings and on logging data (channel, object, filename and file modified date).
  * @author Thomas Eickert
  */
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "histoVault", propOrder = {
     "cacheKey",
@@ -191,11 +193,11 @@ public class HistoVault {
 		this.logStartTimestampMs = logStartTimestamp_ms;
 
 		this.cacheKey = HistoVault.getCacheKey(filePath, fileLastModified_ms).toString();
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-				String.format("HistoVault(Path, long, long, int, String)  path=%s  lastModified=%s  startTimestamp_ms=%,d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
+		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE,
+				String.format("HistoVault(Path, long, long, int, String)  path=%s  lastModified=%s  startTimestamp_ms=%s   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
 						filePath.getFileName().toString(), StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", fileLastModified_ms),
 						StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", logStartTimestamp_ms), logChannelNumber, logObjectKey));
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("this.cacheKey=%s", this.cacheKey));
+		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, String.format("this.cacheKey=%s", this.cacheKey));
 	}
 
 	/**
@@ -299,7 +301,7 @@ public class HistoVault {
 			//			HistoVault.jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			HistoVault.jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			try {
-				HistoVault.jaxbUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+				HistoVault.jaxbMarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
 						.newSchema(Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME).toFile()));
 			}
 			catch (Exception e) {

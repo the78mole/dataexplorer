@@ -365,23 +365,6 @@ public class FileUtils {
 	}
 
 	/**
-	 * delete cache files and folders down to a maximum directory level of 99.
-	 */
-	public static void cleanDirectories(Path fileBasePath, Path[] excludeFiles) {
-		List<Path> excludeFilesList = Arrays.asList(excludeFiles);
-		try {
-			List<File> fileList = FileUtils.getFileListingNoSort(fileBasePath.toFile(), 99);
-			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "number of files = " + fileList.size()); //$NON-NLS-1$ //$NON-NLS-2$
-			for (File file : fileList) {
-				if (!excludeFilesList.contains(file.toPath())) FileUtils.cleanFile(file.getAbsolutePath());
-			}
-		}
-		catch (Exception e) {
-			FileUtils.log.log(Level.WARNING, e.getMessage(), e);
-		}
-	}
-
-	/**
 	 * extract a file from source jar file to target file while replace a given placeholder key with a replacement
 	 * supported character set encoding :
 	 * US-ASCII 	Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
