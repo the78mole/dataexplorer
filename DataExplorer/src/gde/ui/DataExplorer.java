@@ -19,62 +19,12 @@
 ****************************************************************************************/
 package gde.ui;
 
-import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
-import gde.comm.IDeviceCommPort;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.HistoSet;
-import gde.data.HistoSet.RebuildStep;
-import gde.data.ObjectData;
-import gde.data.RecordSet;
-import gde.device.ChannelTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.DeviceDialog;
-import gde.device.IDevice;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.exception.NotSupportedFileFormatException;
-import gde.io.OsdReaderWriter;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.dialog.AboutDialog;
-import gde.ui.dialog.DeviceSelectionDialog;
-import gde.ui.dialog.FontSizeDialog;
-import gde.ui.dialog.HelpInfoDialog;
-import gde.ui.dialog.SettingsDialog;
-import gde.ui.menu.MenuBar;
-import gde.ui.menu.MenuToolBar;
-import gde.ui.tab.AnalogWindow;
-import gde.ui.tab.CellVoltageWindow;
-import gde.ui.tab.DataTableWindow;
-import gde.ui.tab.DigitalWindow;
-import gde.ui.tab.FileCommentWindow;
-import gde.ui.tab.GraphicsComposite;
-import gde.ui.tab.GraphicsWindow;
-import gde.ui.tab.HistoGraphicsWindow;
-import gde.ui.tab.HistoTableWindow;
-import gde.ui.tab.ObjectDescriptionWindow;
-import gde.ui.tab.StatisticsWindow;
-import gde.utils.FileUtils;
-import gde.utils.OperatingSystemHelper;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
-import gde.utils.WebBrowser;
-
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -127,6 +77,48 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
+
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.comm.IDeviceCommPort;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.HistoSet;
+import gde.data.HistoSet.RebuildStep;
+import gde.data.ObjectData;
+import gde.data.RecordSet;
+import gde.device.ChannelTypes;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.io.OsdReaderWriter;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.dialog.AboutDialog;
+import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.FontSizeDialog;
+import gde.ui.dialog.HelpInfoDialog;
+import gde.ui.dialog.SettingsDialog;
+import gde.ui.menu.MenuBar;
+import gde.ui.menu.MenuToolBar;
+import gde.ui.tab.AnalogWindow;
+import gde.ui.tab.CellVoltageWindow;
+import gde.ui.tab.DataTableWindow;
+import gde.ui.tab.DigitalWindow;
+import gde.ui.tab.FileCommentWindow;
+import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.HistoGraphicsWindow;
+import gde.ui.tab.HistoTableWindow;
+import gde.ui.tab.ObjectDescriptionWindow;
+import gde.ui.tab.StatisticsWindow;
+import gde.utils.FileUtils;
+import gde.utils.OperatingSystemHelper;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
+import gde.utils.WebBrowser;
 
 /**
  * Main application class of DataExplorer
@@ -417,7 +409,7 @@ public class DataExplorer extends Composite {
 				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.GDE_MSGI0028)).append(GDE.STRING_NEW_LINE);
 				application.openMessageDialog(GDE.shell, sb.toString());
 				if (this.settings.isHistoCacheTemplateUpdated()) // shut up in this case
-					 sb.append(Messages.getString(MessageIds.GDE_MSGI0068)).append(GDE.STRING_NEW_LINE);
+					sb.append(Messages.getString(MessageIds.GDE_MSGI0068)).append(GDE.STRING_NEW_LINE);
 			}
 
 			GDE.shell.addControlListener(new ControlListener() {
@@ -948,8 +940,7 @@ public class DataExplorer extends Composite {
 	private synchronized void updateHistoTable(boolean forceClean) {
 		//		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 		//				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
-		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed()
-				&& histoTableTabItem.isVisible()) {
+		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible()) {
 			if (forceClean) {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
@@ -1360,6 +1351,26 @@ public class DataExplorer extends Composite {
 			this.deviceSelectionDialog.getActiveConfig().setPort(newPort);
 			this.updateTitleBar(this.getObjectKey(), this.settings.getActiveDevice(), this.settings.getSerialPort());
 		}
+	}
+
+	public void initiateUnitTestEnvironment(IDevice device, Channels channels, String objectKey) {
+		//device :
+		setActiveDeviceWoutUI(device);
+
+		// channel : from setupDataChannels
+		this.channels = Channels.getInstance();
+		this.channels.cleanup();
+		String[] channelNames = new String[device.getChannelCount()];
+		// buildup new structure - set up the channels
+		for (int i = 1; i <= device.getChannelCount(); i++) {
+			Channel newChannel = new Channel(device.getChannelName(i), device.getChannelTypes(i));
+			// newChannel.setObjectKey(this.application.getObjectKey()); now in  application.selectObjectKey
+			this.channels.put(Integer.valueOf(i), newChannel);
+			channelNames[i - 1] = i + " : " + device.getChannelName(i);
+		}
+		this.channels.setChannelNames(channelNames);
+
+		selectObjectKey(objectKey);
 	}
 
 	/**
@@ -1955,7 +1966,7 @@ public class DataExplorer extends Composite {
 	 * @param recordOrdinal this single record is updated from the histo recordset
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
-		DataExplorer.this.histoSet.getTrailRecordSet().setPoints( recordOrdinal);
+		DataExplorer.this.histoSet.getTrailRecordSet().setPoints(recordOrdinal);
 		DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi);
 	}
 
@@ -1964,7 +1975,7 @@ public class DataExplorer extends Composite {
 	 * @param readFromFiles if true then reload from files; if false then use histo vault data 
 	 */
 	public void updateHistoTabs(boolean readFromFiles) {
-		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTORECORDSETS :  RebuildStep.E_USER_INTERFACE, true);
+		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTORECORDSETS : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	/**
@@ -1973,14 +1984,13 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if ((this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed()
-					&& histoGraphicsTabItem.isVisible())
+			if ((this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible())
 					|| (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
 				boolean isRebuilt = false;
 				try {
 					isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
 				}
-				catch (Exception  e) {
+				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					if (isWithUi) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 					// TODO Auto-generated catch block
@@ -2015,15 +2025,13 @@ public class DataExplorer extends Composite {
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					if ((DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed()
-							 && histoGraphicsTabItem.isVisible())
-							|| (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed()
-									 && histoTableTabItem.isVisible())) {
+					if ((DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible())
+							|| (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
 						boolean isRebuilt = false;
 						try {
 							isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
 						}
-						catch (Exception  e) {
+						catch (Exception e) {
 							log.log(Level.SEVERE, e.getMessage(), e);
 							if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 							// TODO Auto-generated catch block
@@ -2047,9 +2055,11 @@ public class DataExplorer extends Composite {
 						// determine the rebuild action for the invisible histo tabs or those which are not selected
 						RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTORECORDSETS : rebuildStep;
 						// determine the maximum rebuild priority from the past updates
-						RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab : performedRebuildStep;
+						RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab
+								: performedRebuildStep;
 						// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
-						DataExplorer.this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE : RebuildStep.F_FILE_CHECK;
+						DataExplorer.this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE
+								: RebuildStep.F_FILE_CHECK;
 						if (log.isLoggable(Level.FINER))
 							log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
 									DataExplorer.this.rebuildStepInvisibleTab));
@@ -2064,8 +2074,7 @@ public class DataExplorer extends Composite {
 	 * @param rebuildSteps
 	 */
 	private void updateHistoGraphicsWindow(boolean redrawGraphics) {
-		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed()
-				&& histoGraphicsTabItem.isVisible()) {
+		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 					if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {

@@ -70,7 +70,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.dialog.SettingsDialog;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
@@ -424,13 +423,11 @@ public class Settings extends Properties {
 
 	public String resetHistoCache() {
 		final String $METHOD_NAME = "resetHistoCache"; //$NON-NLS-1$
-
 		Path histoCacheDirectory = Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
-		if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory.toString(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
-			FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory.toString(), Settings.PERMISSION_555);
-		}
 		int initialSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
-		FileUtils.cleanDirectories(histoCacheDirectory, new Path[] { histoCacheDirectory.resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME) });
+		FileUtils.deleteDirectory(histoCacheDirectory.toString());
+		FileUtils.checkDirectoryAndCreate(histoCacheDirectory.toString());
+		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory.toString(), Settings.PERMISSION_555);
 		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, FileUtils.size(histoCacheDirectory) / 1024, histoCacheDirectory });
 		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
 		return message;

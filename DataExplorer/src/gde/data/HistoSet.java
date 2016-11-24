@@ -342,10 +342,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum), HistoSet.this.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum),
 									this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
 					int remaining = HistoSet.this.getHistoFilePaths().size() - HistoSet.this.size();
-					int progressStart = DataExplorer.application.getProgressPercentage();
+					double progressCycle = 0.;
+					int progressStart = 0;
+					if (isWithUi) {
+						progressStart = DataExplorer.application.getProgressPercentage();
 					int progressEstimation = progressStart - (int) ((95 - progressStart) * HistoSet.this.size() / (double) (HistoSet.this.size() + 333 * remaining)); // 333 is the estimated processing time ratio between reading from files and reading from cache
-					if (isWithUi) application.setProgress(progressEstimation, sThreadId);
-					double progressCycle = (95 - progressEstimation) / (double) remaining;
+						application.setProgress(progressEstimation, sThreadId);
+						progressCycle = (95 - progressEstimation) / (double) remaining;
+					}
 
 					// step: transform log files from workload map into vaults and put them into the histoSet map
 					int filesCounter = 0, recordSetCounter = HistoSet.this.size();
@@ -479,7 +483,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
 				while (zf.entries().hasMoreElements() && HistoSet.this.size() <= settings.getMaxLogCount()) {
 					ZipEntry histoVaultEntry = zf.entries().nextElement();
-					if (cacheKeyWorkload.containsKey(histoVaultEntry.getName())) {
+					if (cacheKeyWorkload.containsKey(histoVaultEntry.getName()) && histoVaultEntry.getSize() > 0) { // todo histoVaultEntry.getSize() > 0 for test only
 						HistoVault histoVault = HistoVault.load(zf.getInputStream(histoVaultEntry));
 						if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, String.format("%s  %s", histoVault.getCacheKey(), cacheFilePath.toString()));
 						if (histoVault.getLogStartTimestamp_ms() > LocalDate.now().minusMonths(settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) {
@@ -513,6 +517,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultSubDirectory());
 		FileUtils.cleanFile(cacheFilePath.toString());
 
+		if (this.size() > 0) {
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(cacheFilePath.toString())))) {
 			for (Map.Entry<Long, List<HistoVault>> listEntry : this.entrySet()) {
 				for (HistoVault histoVault : listEntry.getValue()) {
@@ -523,6 +528,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 			}
 			zipOutputStream.flush();
+		}
 		}
 		return cacheFilePath.toFile().length();
 	}
