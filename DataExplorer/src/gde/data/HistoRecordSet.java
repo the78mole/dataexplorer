@@ -19,7 +19,6 @@
 
 package gde.data;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,11 +29,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
+import gde.GDE;
 import gde.data.TrailRecord.TrailType;
 import gde.device.ChannelType;
 import gde.device.DeviceConfiguration;
@@ -74,23 +69,27 @@ public class HistoRecordSet extends RecordSet {
 
 	private Integer[]																scorePoints;
 	private Path																		filePathOrigin;
-	private int																			recordedChannelNumber;
-	private String																	recordedObjectKey;
+	private int																			logChannelNumber;
+	private String																	logObjectKey;
 	private long																		elapsedHistoRecordSet_ns;
 	private long																		elapsedHistoVaultWrite_ns;
 
 	/**
 	 * record set data buffers according the size of given names array, where the name is the key to access the data buffer
-	 * @param channelNumber the channel number to be used
+	 * @param uiDevice
+	 * @param uiChannelNumber the channel number to be used
+	 * @param newName for the recordset like "1) Laden" 
 	 * @param filePathOrigin source file path
 	 * @param recordNames array of the device supported measurement and settlement names
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	public HistoRecordSet(IDevice useDevice, int channelNumber, Path filePathOrigin, String[] recordNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
-		super(useDevice, channelNumber, filePathOrigin.getFileName().toString(), recordNames, newTimeStep_ms, isRawValue, isFromFileValue);
+	public HistoRecordSet(IDevice uiDevice, int uiChannelNumber, String newName, String logObjectKey, Path filePathOrigin, String[] recordNames, double newTimeStep_ms, boolean isRawValue,
+			boolean isFromFileValue) {
+		super(uiDevice, uiChannelNumber, newName, recordNames, newTimeStep_ms, isRawValue, isFromFileValue);
 		this.filePathOrigin = filePathOrigin.toAbsolutePath();
+		this.logObjectKey = logObjectKey;
 		ChannelType channelType = ((DeviceConfiguration) this.device).getChannel(super.getChannelConfigNumber());
 		for (SettlementType settlementType : channelType.getSettlement()) {
 			HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, this, initialSettlementCapacity);
@@ -98,23 +97,6 @@ public class HistoRecordSet extends RecordSet {
 		}
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.getName() + " HistoRecordSet(IDevice, int, Path, String[], double, boolean, boolean"); //$NON-NLS-1$
 	}
-
-	// /**
-	// * record set data buffers according the size of given names array, where the name is the key to access the data buffer
-	// * @param channelNumber the channel number to be used
-	// * @param newName for the records like "1) Laden"
-	// * @param measurementNames array of the device supported measurement names
-	// * @param newTimeStep_ms time in msec of device measures points
-	// * @param isRawValue specified if dependent values has been calculated
-	// * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
-	// */
-	// private HistoRecordSet(IDevice useDevice, int channelNumber, String newName, String[] recordNames, double newTimeStep_ms, boolean isRawValue,
-	// boolean isFromFileValue) {
-	// super(useDevice, channelNumber, newName, recordNames, newTimeStep_ms, isRawValue, isFromFileValue);
-	// if (log.isLoggable(Level.FINE))
-	// log.log(Level.FINE, newName + " HistoRecordSet(IDevice, int, String, String[], double, boolean, boolean"); //$NON-NLS-1$
-	//
-	// }
 
 	/**
 	 * copy constructor - used to copy a record set during, where the configuration coming from the device properties file
@@ -164,30 +146,32 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * method to create a histo record set containing records according the device channel configuration
 	 * which are loaded from device properties file.
+	 * @param uiDevice the instance of the device 
+	 * @param uiChannelConfigNumber (number of the outlet or configuration)
+	 * @param newName for the recordset like "1) Laden" 
 	 * @param filePathOrigin source file path
-	 * @param device the instance of the device 
-	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(Path filePathOrigin, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile) {
-		String[] recordNames = device.getMeasurementNames(channelConfigNumber);
-		HistoRecordSet newRecordSet = new HistoRecordSet(device, channelConfigNumber, filePathOrigin, recordNames, device.getTimeStep_ms(), isRaw, isFromFile);
+	public static HistoRecordSet createRecordSet(IDevice uiDevice, int uiChannelConfigNumber, String newName, Path filePathOrigin, boolean isRaw, boolean isFromFile) {
+		String[] recordNames = uiDevice.getMeasurementNames(uiChannelConfigNumber);
+		HistoRecordSet newRecordSet = new HistoRecordSet(uiDevice, uiChannelConfigNumber, newName, GDE.STRING_EMPTY, filePathOrigin, recordNames, uiDevice.getTimeStep_ms(), isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms(), initialRecordCapacity);
+		newRecordSet.timeStep_ms = new TimeSteps(uiDevice.getTimeStep_ms(), initialRecordCapacity);
 
 		String[] recordSymbols = new String[recordNames.length];
 		String[] recordUnits = new String[recordNames.length];
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
+			MeasurementType measurement = uiDevice.getMeasurement(uiChannelConfigNumber, i);
 			recordSymbols[i] = measurement.getSymbol();
 			recordUnits[i] = measurement.getUnit();
 		}
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), initialRecordCapacity);
+			MeasurementType measurement = uiDevice.getMeasurement(uiChannelConfigNumber, i);
+			Record tmpRecord = new Record(uiDevice, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(),
+					initialRecordCapacity);
 			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added record for %s - %d", recordNames[i], newRecordSet.size())); //$NON-NLS-1$
@@ -197,35 +181,46 @@ public class HistoRecordSet extends RecordSet {
 	}
 
 	/**
-	 * method to create a histo record set containing records according the given record names, symbols and units.
-	 * active status as well as statistics and properties are used from device properties.
+	 * @param uiDevice
+	 * @param uiChannelNumber the channel number to be used
+	 * @param newName for the recordset like "1) Laden" 
 	 * @param filePathOrigin source file path
-	 * @param device the instance of the device 
-	 * @param channelConfigNumber (name of the outlet or configuration)
-	 * @param recordNames array of names to be used for created records
-	 * @param recordSymbols array of symbols to be used for created records
-	 * @param recordUnits array of units to be used for created records
-	 * @param timeStep_ms 
+	 * @param recordNames array of the device supported measurement and settlement names
+	 * @param recordSymbols
+	 * @param recordUnits
+	 * @param timeStep_ms time in msec of device measures points
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(Path filePathOrigin, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
-			boolean isRaw, boolean isFromFile) {
-		HistoRecordSet newRecordSet = new HistoRecordSet(device, channelConfigNumber, filePathOrigin, recordNames, timeStep_ms, isRaw, isFromFile);
+	public static HistoRecordSet createRecordSet(IDevice uiDevice, int uiChannelConfigNumber, String newName, String logObjectKey, Path filePathOrigin, String[] recordNames, String[] recordSymbols,
+			String[] recordUnits, double timeStep_ms, boolean isRaw, boolean isFromFile) {
+		HistoRecordSet newRecordSet = new HistoRecordSet(uiDevice, uiChannelConfigNumber, newName, logObjectKey, filePathOrigin, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms(), initialRecordCapacity);
+		newRecordSet.timeStep_ms = new TimeSteps(uiDevice.getTimeStep_ms(), initialRecordCapacity);
 
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), initialRecordCapacity);
+			MeasurementType measurement = uiDevice.getMeasurement(uiChannelConfigNumber, i);
+			Record tmpRecord = new Record(uiDevice, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(),
+					initialRecordCapacity);
 			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added record for %s - %d", recordNames[i], newRecordSet.size())); //$NON-NLS-1$
 		}
 		newRecordSet.syncScaleOfSyncableRecords();
 		return newRecordSet;
+	}
+
+	@Deprecated
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile) {
+		return null;
+	}
+
+	@Deprecated
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
+			boolean isRaw, boolean isFromFile) {
+		return null;
 	}
 
 	/**
@@ -332,66 +327,9 @@ public class HistoRecordSet extends RecordSet {
 	 * @throws IOException  relates to the active device xml
 	 */
 	public HistoVault getHistoVault(Path filePath) {
-		return HistoVault.createHistoVault(filePath, filePath.toFile().lastModified(), this.getStartTimeStamp(), application.getActiveChannelNumber(), application.getObjectKey(),
+		int recordSetNumber = Integer.parseInt(this.getName().split(GDE.STRING_RIGHT_PARENTHESIS_BLANK)[0]);
+		return HistoVault.createHistoVault(filePath, filePath.toFile().lastModified(), recordSetNumber, this.getName(), this.getStartTimeStamp(), this.getChannelConfigNumber(), this.logObjectKey,
 				getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
-	}
-
-	//	public HistoVault createHistoVault(Path filePath) {
-	//		long nanoTimeHistoVault = System.nanoTime();
-	//		HistoVault histoVault = null;
-	//		try {
-	//			histoVault = new HistoVault(this.recordedChannelNumber, this.recordedObjectKey, filePath, filePath.toFile().lastModified(), this.getStartTimeStamp());
-	//		}
-	//		catch (IOException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-	//		histoVault.setMeasurements(this.getMeasurementsPoints());
-	//		histoVault.setSettlements(this.getSettlementsPoints());
-	//		this.setElapsedHistoVaultWrite_ns(System.nanoTime() - nanoTimeHistoVault);
-	//		this.enhanceScorePoints(); // includes ElapsedHistoVaultWrite_ns
-	//		histoVault.setScores(this.getScorePoints());
-	//		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("HistoVault populated for startTimeStamp %s", StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()))); //$NON-NLS-1$
-	//		return histoVault;
-	//	}
-
-	public HistoVault createHistoVault(Path filePath) throws FileNotFoundException, IOException {
-		HistoVault histoVault = HistoVault.createHistoVault(filePath, filePath.toFile().lastModified(), this.getStartTimeStamp(), application.getActiveChannelNumber(),
-				application.getObjectKey(), getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
-		try {
-			File file = new File("C:\\_Thomas\\Eigene Dokumente\\2016\\cache1.xml");
-			JAXBContext jaxbContext = JAXBContext.newInstance(gde.histocache.HistoVault.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			// output pretty printed
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			jaxbMarshaller.marshal(histoVault, file);
-			jaxbMarshaller.marshal(histoVault, System.out);
-		}
-		catch (JAXBException e) {
-			e.printStackTrace();
-		}
-		gde.histocache.HistoVault histoVaultRead;
-		try {
-			File file = new File("C:\\_Thomas\\Eigene Dokumente\\2016\\cache1.xml");
-			JAXBContext jaxbContext = JAXBContext.newInstance(gde.histocache.HistoVault.class);
-			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			histoVaultRead = (gde.histocache.HistoVault) jaxbUnmarshaller.unmarshal(file);
-			System.out.println(histoVaultRead);
-		}
-		catch (JAXBException e) {
-			e.printStackTrace();
-		}
-
-		return histoVault;
-	}
-
-	/**
-	 * @param recordedChannelNumber channel config number (may differ from UI settings in case of channel mix)
-	 * @param recordedObjectKey empty or object key or parent directory name (may differ from UI settings: empty in OSD files, parent directory name for bin files)
-	 */
-	public void setRecordedKeys(int recordedChannelNumber, String recordedObjectKey) {
-		this.recordedChannelNumber = recordedChannelNumber;
-		this.recordedObjectKey = recordedObjectKey;
 	}
 
 	/**

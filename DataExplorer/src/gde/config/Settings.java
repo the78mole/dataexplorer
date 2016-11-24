@@ -152,12 +152,14 @@ public class Settings extends Properties {
 	final static String							IS_X_LOGARITHMIC_DISTANCE				= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
 	final static String							IS_X_REVERSED										= "is_x_reversed";																																								//$NON-NLS-1$
 	final static String							MAX_LOG_COUNT										= "max_log_count";																																								//$NON-NLS-1$
-	final static String							IS_SEARCH_IMPORT_PATH						= "is_search_import_path";																																				//$NON-NLS-1$
+	final static String							SEARCH_IMPORT_PATH						= "search_import_path";																																				//$NON-NLS-1$
+	final static String							SEARCH_DATAPATH_IMPORTS			= "search_datapath_imports";																																		//$NON-NLS-1$
 	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
 	final static String							MAX_LOG_DURATION_MM							= "max_log_duration_mm";																																					//$NON-NLS-1$
 	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
 	final static String							SKIP_FILES_WITHOUT_OBJECT				= "skip_files_without_object";																																		//$NON-NLS-1$
 	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
+	final static String							USE_FOLDER_IF_WITHOUT_OBJECT		= "folder_if_without_object";																																			//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
@@ -712,12 +714,14 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, this.isXAxisReversed())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_COUNT, this.getMaxLogCount())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, this.getRetrospectMonths())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SEARCH_IMPORT_PATH, this.isSearchImportPath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_IMPORT_PATH, this.getSearchImportPath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, this.getSearchDataPathImports())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, this.isChannelMix())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_DURATION_MM, this.getMaxLogDuration_mm())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, this.skipFilesWithoutObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, this.skipFilesWithOtherObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_FOLDER_IF_WITHOUT_OBJECT, this.useFolderIfWithoutObject())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2446,14 +2450,28 @@ public class Settings extends Properties {
 	 * @param isActive true if files from the device import directory are read for the history 
 	 */
 	public void setSearchImportPath(boolean isActive) {
-		this.setProperty(Settings.IS_SEARCH_IMPORT_PATH, String.valueOf(isActive));
+		this.setProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if import files from the data directory are read for the history 
+	 */
+	public boolean getSearchImportPath() {
+		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(false)));
+	}
+
+	/**
+	 * @param isActive true if import files from the data directory are read for the history 
+	 */
+	public void setSearchDataPathImports(boolean isActive) {
+		this.setProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(isActive));
 	}
 
 	/**
 	 * @return true if files from the device import directory are read for the history 
 	 */
-	public boolean isSearchImportPath() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_SEARCH_IMPORT_PATH, String.valueOf(false)));
+	public boolean getSearchDataPathImports() {
+		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(false)));
 	}
 
 	/**
@@ -2571,13 +2589,27 @@ public class Settings extends Properties {
 	/**
 	 * @param uintValue the maximum number of full calendar months which is used for history log selection
 	 */
-		public void setRetrospectMonths(String uintValue) {
+	public void setRetrospectMonths(String uintValue) {
 		try {
 			int value = Integer.parseUnsignedInt(uintValue.trim());
 			this.setProperty(Settings.RETROSPECT_MONTHS, String.valueOf(value));
 		}
 		catch (Exception e) {
 		}
+	}
+
+	/**
+	 * @return true if the object for a log file without object shall be set to the folder name
+	 */
+	public boolean useFolderIfWithoutObject() {
+		return Boolean.valueOf(this.getProperty(Settings.USE_FOLDER_IF_WITHOUT_OBJECT, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param value true if the object for a log file without object shall be set to the folder name
+	 */
+	public void setUseFolderIfWithoutObject(boolean value) {
+		this.setProperty(Settings.USE_FOLDER_IF_WITHOUT_OBJECT, String.valueOf(value));
 	}
 
 }

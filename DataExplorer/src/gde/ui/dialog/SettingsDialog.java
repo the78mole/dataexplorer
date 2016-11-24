@@ -1089,7 +1089,7 @@ public class SettingsDialog extends Dialog {
 								this.histoSearchImportPath.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSearchImportPath.setText(Messages.getString(MessageIds.GDE_MSGT0824));
 								this.histoSearchImportPath.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0825));
-								this.histoSearchImportPath.setSelection(this.settings.isSearchImportPath());
+								this.histoSearchImportPath.setSelection(this.settings.getSearchImportPath());
 								this.histoSearchImportPath.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {

@@ -18,6 +18,25 @@
 ****************************************************************************************/
 package gde.io;
 
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -28,43 +47,10 @@ import gde.device.DeviceConfiguration;
 import gde.device.DeviceTypes;
 import gde.device.IHistoDevice;
 import gde.device.ScoreLabelTypes;
-import gde.device.ScoreType;
-import gde.device.ScoregroupType;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.utils.StringHelper;
-
-import static java.util.logging.Level.INFO;
-
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
-import java.util.zip.InflaterOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 /**
  * reads the DataExplorer file format into histo recordsets.
@@ -112,12 +98,12 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 				log.log(Level.INFO, "SKIP FILE : objectKey empty    " + path.toString());
 			}
 			else if (application.getActiveObject() != null && objectKey.equalsIgnoreCase(application.getObjectKey()) && settings.skipFilesWithOtherObject()) {
-				log.log(INFO, "SKIP FILE : objectKey differs  " + path.toString());
+				log.log(Level.INFO, "SKIP FILE : objectKey differs  " + path.toString());
 			}
 			else {
 				while (!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
 					log.log(Level.FINEST, "skip"); //$NON-NLS-1$
-				final List<HashMap<String, String>> recordSetsInfo = readRecordSetsInfo4AllVersions(data_in, header);
+				final List<HashMap<String, String>> recordSetsInfo = OsdReaderWriter.readRecordSetsInfo4AllVersions(data_in, header);
 
 				long startTimeNs = System.nanoTime();
 				for (int i = 0; i < recordSetsInfo.size(); i++) {
@@ -150,10 +136,9 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					else {
 						byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
 						data_in.readFully(buffer);
-						HistoRecordSet recordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, path);
+						HistoRecordSet recordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, path, objectKey);
 						recordSets.add(recordSet);
 						recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
-						recordSet.setRecordedKeys(channelConfigNumber, objectKey);
 
 						log.log(Level.FINE, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME) + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$
 								+ "  numberRecordAndTimeStamp=" + numberRecordAndTimeStamp);
@@ -252,11 +237,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 	 * @param path 
 	 * @return null if this recordSet is not valid for histo (channel not allowed for histo).
 	 */
-	private static HistoRecordSet buildRecordSet(HashMap<String, String> recordSetInfo, Path path) {
+	private static HistoRecordSet buildRecordSet(HashMap<String, String> recordSetInfo, Path path, String objectKey) {
 		final String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
 		String recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-		final String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
 		final String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		final String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 		// recordSetDataPointer = Long.valueOf(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
@@ -289,9 +273,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		}
 
 		final double tmpTimeStep_ms = application.getActiveDevice().getTimeStep_ms();
-		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(path, application.getActiveDevice(), recordSetInfoChannel.getNumber(), recordNames, recordSymbols, recordUnits, tmpTimeStep_ms, true,
-				true);
-		recordSet.setRecordSetDescription(recordSetComment);
+		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(application.getActiveDevice(), application.getActiveChannelNumber(), recordSetName, objectKey, path, recordNames, recordSymbols,
+				recordUnits, tmpTimeStep_ms, true, true);
 
 		String[] recordKeys = application.getActiveDevice().crossCheckMeasurements(recordsProperties, recordSet);
 		// check if the file content fits measurements form device properties XML which was used to create the record set
@@ -388,40 +371,6 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			}
 		}
 		return values;
-	}
-
-	/**
-	 * take RecordedTS from RecordSetComment, FileCreatedTS if RecordedTS not available.
-	 * @param recordSetComment
-	 * @return null if parsing was not successful.
-	 */
-	@Deprecated
-	private static Date getRecordSetTimestamp(HashMap<String, String> recordSetInfo) {
-		Date recordSetTimestamp = null;
-		String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
-		String recordedTag = Messages.getString(MessageIds.GDE_MSGT0129);
-		int idx = recordSetComment.indexOf(recordedTag);
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
-		if (idx > 0) {
-			idx += recordedTag.length();
-			try {
-				recordSetTimestamp = simpleDateFormat.parse(recordSetComment.substring(idx, idx + simpleDateFormat.toPattern().length()));
-			}
-			catch (ParseException ex) {
-				// ignore and keep recordSetTimestamp as null
-			}
-		}
-		if (recordSetTimestamp == null) {
-			simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd" + ' ' + " HH:mm:ss");
-			try {
-				recordSetTimestamp = simpleDateFormat.parse(recordSetInfo.get(GDE.CREATION_TIME_STAMP));
-			}
-			catch (ParseException ex) {
-				// ignore and keep recordSetTimestamp as null
-			}
-			// recordSetTimestamp = recordSetInfo.get(GDE.CREATION_TIME_STAMP);
-		}
-		return recordSetTimestamp;
 	}
 
 }

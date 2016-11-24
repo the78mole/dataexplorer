@@ -23,6 +23,7 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.HistoRecordSet;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
@@ -57,6 +58,7 @@ import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +77,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 /**
  * Graupner HoTT device base class
@@ -928,31 +932,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		this.histoRandomSample = new HistoRandomSample(this, maxPoints,  minPoints, recordTimespan_ms);
 	}
 
-	/**
-	 * add record data size points from binary file to each measurement.
-	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
-	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
-	 * since this is a long term operation the progress bar should be updated to signal business to user. 
-	 * collects life data if device setting |isLiveDataActive| is true.
-	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
-	 * @param filePath 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	/* (non-Javadoc)
+	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
-	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws DataInconsitsentException, FileNotFoundException, IOException, DataTypeException  {
-		final String $METHOD_NAME = "addImportFileAsRawDataPoints"; //$NON-NLS-1$
-		log.log(Level.INFO, "start " + filePath); //$NON-NLS-1$
-		if (recordSet.getNoneCalculationRecordNames().length != recordSet.size()) {
-			throw new DataInconsitsentException(
-					Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, recordSet.size(), recordSet.getNoneCalculationRecordNames().length }));
-			// log.log(Level.SEVERE, "RecordSet.size = " + pointsLength + " not equal to recordSet.getNoneCalculationRecordNames().length " + recordSet.getNoneCalculationRecordNames().length); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		log.log(Level.FINER, String.format("%s holds %d measurements (columns)", recordSet.getChannelConfigName(), recordSet.size())); //$NON-NLS-1$
-
-		HoTTbinHistoReader.read(recordSet, filePath);
+	public HistoRecordSet getRecordSetFromImportFile(int channelNumber,  Path filePath) throws DataInconsitsentException, IOException, DataTypeException  {
+		log.log(Level.INFO, String.format("start channel %d  %s", channelNumber,  filePath)); //$NON-NLS-1$
+		return HoTTbinHistoReader.read(filePath);
 	}
 
 	/**

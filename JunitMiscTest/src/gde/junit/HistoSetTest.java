@@ -109,8 +109,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 						for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 							this.channels.setActiveChannelNumber(channelEntry.getKey());
 							try {
-								RecordSet recordSet = HistoRecordSet.createRecordSet(file.toPath().getFileName().toString(), device, this.channels.getActiveChannelNumber(), true, true);
-								HoTTbinHistoReader.read(recordSet, file.getAbsolutePath());
+								HistoRecordSet recordSet = HoTTbinHistoReader.read(file.toPath());
 								maxTime_sec = recordSet.getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSet.getMaxTime_ms() / 1000 : maxTime_sec;
 								System.out.println(String.format("binFile processed      channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", this.channels.getActiveChannelNumber(), (int) recordSet.getMaxTime_ms() / 1000,
 										file.length(), file.toPath().toAbsolutePath().toString()));

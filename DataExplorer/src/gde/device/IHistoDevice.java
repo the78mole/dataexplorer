@@ -18,12 +18,14 @@
 ****************************************************************************************/
 package gde.device;
 
+import gde.data.HistoRecordSet;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * devices with history support implementations.
@@ -32,17 +34,20 @@ import java.io.IOException;
 public interface IHistoDevice { //todo merging with IDevice later
 
 	/**
-	 * add record data size points from binary file to each measurement.
+	 * create history recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
 	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
+	 * @param channelNumber 
 	 * @param filePath 
 	 * @throws DataInconsitsentException 
-	 * @throws Exception 
+	 * @throws DataTypeException 
+	 * @throws IOException 
+	 * @return 
 	 */
-	public void addImportFileAsRawDataPoints(RecordSet recordSet, String filePath) throws DataInconsitsentException, FileNotFoundException, IOException, DataTypeException;
+	public HistoRecordSet getRecordSetFromImportFile(int channelNumber, Path filePath) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
@@ -56,7 +61,6 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @param minPoints minimum values from the data buffer which are verified during sampling
 	 * @throws DataInconsitsentException 
 	 */
-	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException ;
-
+	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
 
 }
