@@ -5,7 +5,7 @@
         <manufacturer>SKYRC</manufacturer>
         <manufacturerURL>http://www.skyrc.com</manufacturerURL>
         <group>charger</group>
-        <image>MC3000.png</image>
+        <image>Q200.png</image>
         <usage>false</usage>
     </Device>
     <UsbPort>
