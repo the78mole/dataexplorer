@@ -235,7 +235,7 @@ public class FileUtils {
 			}
 		}
 		else {
-			FileUtils.log.log(Level.WARNING, "no delete permission on " + dir.getAbsolutePath()); //$NON-NLS-1$
+			FileUtils.log.log(Level.WARNING, "directory does not exist or no delete permission on " + dir.getAbsolutePath()); //$NON-NLS-1$
 		}
 		return exist;
 	}

@@ -1503,7 +1503,7 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 		String displayPointValue;
 		// scales are all synchronized in viewpoint of end values (min/max)
 		// PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-		// if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+		// if (syncProperty != null && !syncProperty.getValue().isEmpty()) {
 		// Record syncRecord = this.parent.get(this.ordinal);
 		// displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue + ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		// }

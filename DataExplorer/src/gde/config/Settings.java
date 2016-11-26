@@ -62,6 +62,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
 import gde.GDE;
+import gde.data.HistoSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
@@ -151,8 +152,8 @@ public class Settings extends Properties {
 	final static String							IS_X_LOGARITHMIC_DISTANCE				= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
 	final static String							IS_X_REVERSED										= "is_x_reversed";																																								//$NON-NLS-1$
 	final static String							MAX_LOG_COUNT										= "max_log_count";																																								//$NON-NLS-1$
-	final static String							SEARCH_IMPORT_PATH						= "search_import_path";																																				//$NON-NLS-1$
-	final static String							SEARCH_DATAPATH_IMPORTS			= "search_datapath_imports";																																		//$NON-NLS-1$
+	final static String							SEARCH_IMPORT_PATH							= "search_import_path";																																						//$NON-NLS-1$
+	final static String							SEARCH_DATAPATH_IMPORTS					= "search_datapath_imports";																																			//$NON-NLS-1$
 	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
 	final static String							MAX_LOG_DURATION_MM							= "max_log_duration_mm";																																					//$NON-NLS-1$
 	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
@@ -795,6 +796,22 @@ public class Settings extends Properties {
 		this.setProperty(Settings.ACTIVE_DEVICE, activeDeviceString.trim());
 	}
 
+	/**
+	 * @param objectKey is supposed to be a valid object key
+	 * @return empty string or the validated object key in the correct case sensitive format
+	 */
+	public String validateObjectKey(String objectKey) {
+		String validatedObjectKey = GDE.STRING_EMPTY;
+		String key = objectKey.trim();
+		for (String tmpObjectKey : getObjectList()) {
+			if (tmpObjectKey.equalsIgnoreCase(key)) {
+				validatedObjectKey = tmpObjectKey; 
+				break;
+			}
+		}
+		return validatedObjectKey;
+	}
+	
 	public String getObjectListAsString() {
 		return this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200));
 	}
@@ -2430,6 +2447,7 @@ public class Settings extends Properties {
 	public void setMaxLogCount(String uintValue) {
 		try {
 			int value = Integer.parseUnsignedInt(uintValue.trim());
+			if (value < 1 || value > 1000) value = 300;
 			this.setProperty(Settings.MAX_LOG_COUNT, String.valueOf(value));
 		}
 		catch (Exception e) {
@@ -2440,7 +2458,7 @@ public class Settings extends Properties {
 	 * @return the maximum number of logs (recordsets) which are read for the history (default is 333)
 	 */
 	public int getMaxLogCount() {
-		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_COUNT, String.valueOf(333)));
+		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_COUNT, String.valueOf(300)));
 	}
 
 	/**
@@ -2478,10 +2496,18 @@ public class Settings extends Properties {
 	public void setMaxLogDuration_mm(String uintValue) {
 		try {
 			int value = Integer.parseUnsignedInt(uintValue.trim());
+			if (value < 1 || value > 6000) value = 3000;
 			this.setProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(value));
 		}
 		catch (Exception e) {
 		}
+	}
+
+	/**
+	 * @return the maximum duration of logs (recordsets) which is read for the history (default is 5 hours)
+	 */
+	public int getMaxLogDuration_mm() {
+		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(3000))); //$NON-NLS-1$
 	}
 
 	/**
@@ -2496,13 +2522,6 @@ public class Settings extends Properties {
 	 */
 	public boolean isChannelMix() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_CHANNEL_MIX, "false")); //$NON-NLS-1$
-	}
-
-	/**
-	 * @return the maximum duration of logs (recordsets) which is read for the history (default is 5 hours)
-	 */
-	public int getMaxLogDuration_mm() {
-		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(3000))); //$NON-NLS-1$
 	}
 
 	/**
@@ -2589,6 +2608,7 @@ public class Settings extends Properties {
 	public void setRetrospectMonths(String uintValue) {
 		try {
 			int value = Integer.parseUnsignedInt(uintValue.trim());
+			if (value < 1 || value > 60) value = 12;
 			this.setProperty(Settings.RETROSPECT_MONTHS, String.valueOf(value));
 		}
 		catch (Exception e) {

@@ -138,7 +138,8 @@ public class SettingsDialog extends Dialog {
 	Text																histoMaxLogCount;
 	CLabel															histoRetrospectLabel;
 	Text																histoRetrospectMonths;
-	Button															histoSearchImportPath;
+	Button															histoSearchImportPath; 
+	Button															histoSearchDataPathImports; 
 	Button															histoChannelMix;
 	Group																histoXAxisGroup;
 	CLabel															histoSpreadLabel;
@@ -1081,10 +1082,29 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.histoSearchImportPath = new Button(this.histoScreeningGroup, SWT.CHECK);
+								this.histoSearchDataPathImports = new Button(this.histoScreeningGroup, SWT.CHECK);
 								FormData formData = new FormData();
 								formData.left = new FormAttachment(0, 5);
 								formData.top = new FormAttachment(this.histoMaxLogCount, 7);
+								this.histoSearchDataPathImports.setLayoutData(formData);
+								this.histoSearchDataPathImports.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSearchDataPathImports.setText(Messages.getString(MessageIds.GDE_MSGT0834));
+								this.histoSearchDataPathImports.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0835));
+								this.histoSearchDataPathImports.setSelection(this.settings.getSearchDataPathImports());
+								this.histoSearchDataPathImports.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
+										application.updateHistoTabs(true);
+									}
+								});
+							}
+							{
+								this.histoSearchImportPath = new Button(this.histoScreeningGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								formData.top = new FormAttachment(this.histoSearchDataPathImports, 7);
 								this.histoSearchImportPath.setLayoutData(formData);
 								this.histoSearchImportPath.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSearchImportPath.setText(Messages.getString(MessageIds.GDE_MSGT0824));

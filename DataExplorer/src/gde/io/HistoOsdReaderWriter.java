@@ -272,9 +272,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			recordUnits[i] = recordProperties.get(Record.UNIT);
 		}
 
-		final double tmpTimeStep_ms = application.getActiveDevice().getTimeStep_ms();
-		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(application.getActiveDevice(), application.getActiveChannelNumber(), recordSetName, objectKey, path, recordNames, recordSymbols,
-				recordUnits, tmpTimeStep_ms, true, true);
+		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(recordSetName, recordSetInfoChannel.getNumber(), objectKey, path, recordNames, recordSymbols,
+				recordUnits, true, true);
 
 		String[] recordKeys = application.getActiveDevice().crossCheckMeasurements(recordsProperties, recordSet);
 		// check if the file content fits measurements form device properties XML which was used to create the record set

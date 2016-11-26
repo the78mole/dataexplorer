@@ -956,7 +956,7 @@ public class DataExplorer extends Composite {
 			});
 		}
 		else {
-			//			if (activeRecordSet == null || requestingRecordSetName.equals(GDE.STRING_EMPTY)) {
+			//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
 			if (false) { //todo cleaning the table is not supported currently
 				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 					if (this.histoTableTabItem != null) {
@@ -1993,7 +1993,7 @@ public class DataExplorer extends Composite {
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					if (isWithUi) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
-					// TODO Auto-generated catch block
+					// TODO where to go on in case of error? NullPointerException lead to next error
 					e.printStackTrace();
 				}
 

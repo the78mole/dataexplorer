@@ -935,8 +935,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/* (non-Javadoc)
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
-	public HistoRecordSet getRecordSetFromImportFile(int channelNumber,  Path filePath) throws DataInconsitsentException, IOException, DataTypeException  {
-		log.log(Level.INFO, String.format("start channel %d  %s", channelNumber,  filePath)); //$NON-NLS-1$
+	public HistoRecordSet getRecordSetFromImportFile(int channelNumber, String objectKey,  Path filePath) throws DataInconsitsentException, IOException, DataTypeException  {
+		log.log(Level.INFO, String.format("start channel=%d  objectKey=%s  %s", channelNumber, objectKey, filePath)); //$NON-NLS-1$
 		return HoTTbinHistoReader.read(filePath);
 	}
 

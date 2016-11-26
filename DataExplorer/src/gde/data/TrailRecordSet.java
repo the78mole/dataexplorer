@@ -536,7 +536,7 @@ public class TrailRecordSet extends RecordSet {
 			// ET overridden method implemented final PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) : this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 			final TrailRecord tmpRecord = (TrailRecord) this.get(i);
 			final PropertyType syncProperty = tmpRecord.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+			if (syncProperty != null && !syncProperty.getValue().isEmpty()) {
 				final int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
 				if (syncMasterRecordOrdinal >= 0) {
 					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {

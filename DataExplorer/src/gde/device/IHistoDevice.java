@@ -40,14 +40,15 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * since this is a long term operation the progress bar should be updated to signal business to user. 
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param channelNumber 
+	 * @param channelNumber to select the channel data from the bin file
+	 * @param objectKey to inform the histoSet about the object which created the log
 	 * @param filePath 
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 * @throws IOException 
 	 * @return 
 	 */
-	public HistoRecordSet getRecordSetFromImportFile(int channelNumber, Path filePath) throws DataInconsitsentException, IOException, DataTypeException;
+	public HistoRecordSet getRecordSetFromImportFile(int channelNumber, String objectKey,  Path filePath) throws DataInconsitsentException, IOException, DataTypeException  ;
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
