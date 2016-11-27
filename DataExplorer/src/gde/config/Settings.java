@@ -161,6 +161,7 @@ public class Settings extends Properties {
 	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
 	final static String							USE_FOLDER_IF_WITHOUT_OBJECT		= "folder_if_without_object";																																			//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
+	final static String							ZIPPED_CACHE										= "zipped_cache";																																									//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -427,9 +428,10 @@ public class Settings extends Properties {
 		Path histoCacheDirectory = Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 		int initialSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
 		FileUtils.deleteDirectory(histoCacheDirectory.toString());
+		int deletedSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
 		FileUtils.checkDirectoryAndCreate(histoCacheDirectory.toString());
 		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory.toString(), Settings.PERMISSION_555);
-		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, FileUtils.size(histoCacheDirectory) / 1024, histoCacheDirectory });
+		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, histoCacheDirectory });
 		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
 		return message;
 	}
@@ -805,13 +807,13 @@ public class Settings extends Properties {
 		String key = objectKey.trim();
 		for (String tmpObjectKey : getObjectList()) {
 			if (tmpObjectKey.equalsIgnoreCase(key)) {
-				validatedObjectKey = tmpObjectKey; 
+				validatedObjectKey = tmpObjectKey;
 				break;
 			}
 		}
 		return validatedObjectKey;
 	}
-	
+
 	public String getObjectListAsString() {
 		return this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200));
 	}
@@ -2627,6 +2629,20 @@ public class Settings extends Properties {
 	 */
 	public void setUseFolderIfWithoutObject(boolean value) {
 		this.setProperty(Settings.USE_FOLDER_IF_WITHOUT_OBJECT, String.valueOf(value));
+	}
+
+	/**
+	 * @return true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
+	 */
+	public boolean isZippedCache() {
+		return Boolean.valueOf(this.getProperty(Settings.ZIPPED_CACHE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param value true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
+	 */
+	public void setZippedCache(boolean value) {
+		this.setProperty(Settings.ZIPPED_CACHE, String.valueOf(value));
 	}
 
 }

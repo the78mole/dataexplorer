@@ -34,11 +34,13 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -264,9 +266,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					// step: transform log files from workload map into vaults and put them into the histoSet map
 					long nanoTimeReadRecordSetSum = -System.nanoTime();
 					ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
-					// get set in the same order but without path duplicates arising from files with multiple recordsets
+					// get set holding the remaining workload in the same order but without path duplicates arising from files with multiple recordsets
 					LinkedHashSet<Path> workloadPaths = new LinkedHashSet<Path>(cacheKeyWorkload.values());
 					int i = 0;
+					long x = nanoTimeReadRecordSetSum + System.nanoTime();
 					for (Path filePath : workloadPaths) {
 						newVaults.addAll(loadVaultsFromFile(filePath));
 						this.fileSizeSum_B += filePath.toFile().length();
@@ -275,6 +278,15 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 							break;
 					}
 					nanoTimeReadRecordSetSum += System.nanoTime();
+					if (newVaults.size() > 0)
+						log.log(Level.TIME,
+								String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,5d MB/s", newVaults.size(), //$NON-NLS-1$
+										TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
+										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
+					else if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum) > 0) log.log(Level.TIME,
+							String.format("%,5d files          read w/o data      time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,5d MB/s", workloadPaths.size(), //$NON-NLS-1$
+									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), workloadPaths.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
+									(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
 
 					// step: save vaults on the file system
 					long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
@@ -282,10 +294,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						cacheSize_B = storeVaultsInCache(newVaults);
 					}
 					nanoTimeWriteVaultSum += System.nanoTime();
-					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum) > 0) log.log(Level.TIME,
-							String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,5d MB/s", newVaults.size(), //$NON-NLS-1$
-									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
-									(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
 					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
 							String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,5d MB/s", newVaults.size(), //$NON-NLS-1$
 									TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
@@ -334,7 +342,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws DataTypeException 
 	 * @throws DataInconsitsentException 
 	 * @throws NotSupportedFileFormatException 
-	 * @throws IOException 
+	 * @throws IOException 	
 	 * @throws FileNotFoundException 
 	 * @return the vaults extracted from the file
 	 */
@@ -386,74 +394,89 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	/**
 	 * put cached vaults into the histoSet map and reduce workload map.
 	 * @param cacheKeyWorkload cache key and the file path of the log source file
-	 * @return total length (bytes) of the original log files which were the sources of those vaults which were put into the histoset 
+	 * @return total length (bytes) of the original log files of those vaults which were put into the histoset 
 	 * @throws IOException origin is opening or traversing the zip file
 	 */
 	private long loadVaultsFromCache(Map<String, Path> cacheKeyWorkload) throws IOException {
-		long nanoTimeStart = System.nanoTime(), nanoTimeSumFile = 0;
 		long fileSizeSum_B = 0;
 		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultSubDirectory());
-		FileUtils.checkDirectoryAndCreate(cacheFilePath.getParent().resolve("ET").toString());
-		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, String.format("cacheFilePath=%s", cacheFilePath.toString()));
-		if (FileUtils.checkFileExist(cacheFilePath.toString())) {
-			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
-				for (Enumeration<? extends ZipEntry> e = zf.entries(); e.hasMoreElements() && HistoSet.this.size() <= settings.getMaxLogCount();) {
-					ZipEntry histoVaultEntry = e.nextElement();
-					if (cacheKeyWorkload.containsKey(histoVaultEntry.getName())) {
-						HistoVault histoVault = HistoVault.load(new BufferedInputStream(zf.getInputStream(histoVaultEntry)));
-						{
-							nanoTimeSumFile -= System.nanoTime();
-							// todo do it the other way round: loop cacheKeyWorkload 
-							histoVault = HistoVault.load(new BufferedInputStream(new FileInputStream(cacheFilePath.getParent().resolve("ET").resolve(histoVaultEntry.getName()).toFile())));
-							nanoTimeSumFile += System.nanoTime();
-						}
-						if (histoVault.getLogStartTimestamp_ms() > LocalDate.now().minusMonths(settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) {
-							boolean alreadyExists = false;
-							if (this.containsKey(histoVault.getLogStartTimestamp_ms())) {
-								// some devices create multiple recordsets which might have identical timestamp values
-								for (HistoVault tmpHistoVault : this.get(histoVault.getLogStartTimestamp_ms())) {
-									if (histoVault.getUiChannelNumber() == tmpHistoVault.getUiChannelNumber() && histoVault.getLogChannelNumber() == tmpHistoVault.getLogChannelNumber() // 
-											&& histoVault.getUiDeviceName().equals(tmpHistoVault.getUiDeviceName())) {
-										if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("duplicate vault was discarded: device = %s  channelConfigNumber = %d  timestamp = %,d  histoFilePath = %s", //$NON-NLS-1$
-												tmpHistoVault.getUiDeviceName(), tmpHistoVault.getLogChannelNumber(), tmpHistoVault.getLogStartTimestamp_ms(), tmpHistoVault.getFilePath()));
-										alreadyExists = true;
-										break;
-									}
-								}
-								if (!alreadyExists) {
-									if (log.isLoggable(Level.INFO)) log.log(Level.WARNING,
-											String.format("WARN same startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
-													StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(),
-													histoVault.getUiDeviceName(), histoVault.getLogChannelNumber()));
-								}
-							}
-							else {
-								this.put(histoVault.getLogStartTimestamp_ms(), new ArrayList<HistoVault>());
-							}
-							// put the vault into the histoSet map
-							if (!alreadyExists) {
-								// put the vault into the histoSet map and sum up the file length
-								this.get(histoVault.getLogStartTimestamp_ms()).add(histoVault);
-								fileSizeSum_B += cacheKeyWorkload.get(histoVaultEntry.getName()).toFile().length();
-								if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE,
-										String.format("added   startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
-												StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
-												histoVault.getLogChannelNumber()));
-							}
-						}
-						else {
-							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST,
-									String.format("too late startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
-											StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
-											histoVault.getLogChannelNumber()));
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("cacheFilePath=%s", cacheFilePath.toString()));
+		if (HistoSet.this.settings.isZippedCache()) {
+			if (FileUtils.checkFileExist(cacheFilePath.toString())) {
+				try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
+					Iterator<Map.Entry<String, Path>> iter = cacheKeyWorkload.entrySet().iterator();
+					while (iter.hasNext()) {
+						Map.Entry<String, Path> workloadEntry = iter.next();
+						if ( zf.getEntry(workloadEntry.getKey()) != null) {
+							HistoVault histoVault = HistoVault.load(new BufferedInputStream(zf.getInputStream( zf.getEntry(workloadEntry.getKey()))));
+							if (processVault(histoVault)) fileSizeSum_B += cacheKeyWorkload.get(workloadEntry.getKey()).toFile().length();
+							iter.remove();
 						}
 					}
-					cacheKeyWorkload.remove(histoVaultEntry.getName());
 				}
 			}
 		}
-		log.log(Level.TIME, String.format("zip=%d  file=%d", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTimeStart), TimeUnit.NANOSECONDS.toMillis(nanoTimeSumFile)));
+		else {
+			if (FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
+				Iterator<Map.Entry<String, Path>> iter = cacheKeyWorkload.entrySet().iterator();
+				while (iter.hasNext()) {
+					Map.Entry<String, Path> workloadEntry = iter.next();
+					if (FileUtils.checkFileExist(cacheFilePath.resolve(workloadEntry.getKey()).toString())) {
+						HistoVault histoVault = HistoVault.load(new BufferedInputStream(new FileInputStream(cacheFilePath.resolve(workloadEntry.getKey()).toFile())));
+						if (processVault(histoVault)) fileSizeSum_B += cacheKeyWorkload.get(workloadEntry.getKey()).toFile().length();
+						iter.remove();
+					}
+				}
+			}
+		}
 		return fileSizeSum_B;
+	}
+
+	/**
+	 * @param histoVault
+	 * @return true if the vault was added to the vaults list
+	 */
+	private boolean processVault(HistoVault histoVault) {
+		boolean fileTakenFromCache = true;
+		if (histoVault.getLogStartTimestamp_ms() > LocalDate.now().minusMonths(settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) {
+			if (this.containsKey(histoVault.getLogStartTimestamp_ms())) {
+				// some devices create multiple recordsets which might have identical timestamp values
+				for (HistoVault tmpHistoVault : this.get(histoVault.getLogStartTimestamp_ms())) {
+					if (histoVault.getUiChannelNumber() == tmpHistoVault.getUiChannelNumber() && histoVault.getLogChannelNumber() == tmpHistoVault.getLogChannelNumber() // 
+							&& histoVault.getUiDeviceName().equals(tmpHistoVault.getUiDeviceName())) {
+						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("duplicate vault was discarded: device = %s  channelConfigNumber = %d  timestamp = %,d  histoFilePath = %s", //$NON-NLS-1$
+								tmpHistoVault.getUiDeviceName(), tmpHistoVault.getLogChannelNumber(), tmpHistoVault.getLogStartTimestamp_ms(), tmpHistoVault.getFilePath()));
+						fileTakenFromCache = false;
+						break;
+					}
+				}
+				if (fileTakenFromCache) {
+					if (log.isLoggable(Level.INFO)) log.log(Level.WARNING,
+							String.format("WARN same startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
+									StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
+									histoVault.getLogChannelNumber()));
+				}
+			}
+			else {
+				this.put(histoVault.getLogStartTimestamp_ms(), new ArrayList<HistoVault>());
+			}
+			// put the vault into the histoSet map
+			if (fileTakenFromCache) {
+				// put the vault into the histoSet map and sum up the file length
+				this.get(histoVault.getLogStartTimestamp_ms()).add(histoVault);
+				if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE,
+						String.format("added   startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
+								StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
+								histoVault.getLogChannelNumber()));
+			}
+		}
+		else {
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST,
+					String.format("too late startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
+							StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
+							histoVault.getLogChannelNumber()));
+		}
+		return fileTakenFromCache;
 	}
 
 	/**
@@ -465,33 +488,33 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	private long storeVaultsInCache(List<HistoVault> newVaults) throws IOException {
 		long nanoTimeStart = System.nanoTime();
 		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultSubDirectory());
-		// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
-		Map<String, String> env = new HashMap<>();
-		env.put("create", "true");
-		try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) {
-			for (HistoVault histoVault : newVaults) {
-				// name the file inside the zip file 
-				Path filePath = zipFileSystem.getPath(histoVault.getCacheKey());
-				if (!FileUtils.checkFileExist(filePath.toString())) {
-					//					if (!filePath.toFile().exists()) {
-					try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-						histoVault.store(zipOutputStream);
-						if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, String.format("%s  %s", histoVault.getCacheKey(), cacheFilePath.toString()));
+		if (HistoSet.this.settings.isZippedCache()) {
+			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
+			Map<String, String> env = new HashMap<>();
+			env.put("create", "true");
+			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) {
+				for (HistoVault histoVault : newVaults) {
+					// name the file inside the zip file 
+					Path filePath = zipFileSystem.getPath(histoVault.getCacheKey());
+					if (!FileUtils.checkFileExist(filePath.toString())) {
+						//					if (!filePath.toFile().exists()) {
+						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
+							histoVault.store(zipOutputStream);
+							if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, String.format("%s  %s", histoVault.getCacheKey(), cacheFilePath.toString()));
+						}
 					}
 				}
 			}
 		}
-		long nanoTimeFile = System.nanoTime();
-		{
-			FileUtils.checkDirectoryAndCreate(cacheFilePath.getParent().resolve("ET").toString());
+		else {
+			FileUtils.checkDirectoryAndCreate(cacheFilePath.toString());
 			for (HistoVault histoVault : newVaults) {
-				Path filePath = cacheFilePath.getParent().resolve("ET").resolve(histoVault.getCacheKey());
+				Path filePath = cacheFilePath.resolve(histoVault.getCacheKey());
 				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
 					histoVault.store(outputStream);
 				}
 			}
 		}
-		log.log(Level.TIME, String.format("zip=%d  file=%d", TimeUnit.NANOSECONDS.toMillis(nanoTimeFile - nanoTimeStart), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTimeFile)));
 		return cacheFilePath.toFile().length();
 	}
 
@@ -509,7 +532,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		List<HistoRecordSet> histoRecordSets = new ArrayList<>();
 		long nanoTime = System.nanoTime();
 		if (histoFile.toString().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-			String logObjectKey = this.application.getObjectKey().isEmpty() ? 	logObjectKey = this.settings.validateObjectKey(histoFile.getParent().getFileName().toString()) : this.application.getObjectKey();
+			String logObjectKey = this.application.getObjectKey().isEmpty() ? logObjectKey = this.settings.validateObjectKey(histoFile.getParent().getFileName().toString())
+					: this.application.getObjectKey();
 			HistoRecordSet recordSet = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(this.application.getActiveChannelNumber(), logObjectKey, histoFile);
 			if (recordSet.getRecordDataSize(true) > 0) {
 				histoRecordSets.add(recordSet);
@@ -675,8 +699,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	*/
 	private LinkedHashMap<String, Path> getCacheKeyWorkload() throws IOException, NotSupportedFileFormatException {
 		LinkedHashMap<String, Path> cacheKeyWorkload = new LinkedHashMap<String, Path>();
-		final int binFileRecordSetNumber = 1;
-
 		for (Map.Entry<Long, List<Path>> pathListEntry : this.histoFilePaths.entrySet()) {
 			for (Path path : pathListEntry.getValue()) {
 				File file = path.toFile();
@@ -743,7 +765,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					}
 				}
 				else if (file.getName().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-					cacheKeyWorkload.put(HistoVault.getCacheKey(file.toPath(), file.lastModified(), binFileRecordSetNumber).toString(), file.toPath()); // recordSetNumber is 1
+					cacheKeyWorkload.put(HistoVault.getCacheKey(file.toPath(), file.lastModified(), this.application.getActiveChannelNumber()).toString(), file.toPath()); // recordSetNumber is 1
 				}
 			}
 		}
