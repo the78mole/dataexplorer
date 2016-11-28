@@ -512,13 +512,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 				HistoRecordSet recordSet = (HistoRecordSet) tmpRecordSet;
 				final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
 				// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
+				// scores for duration and timestep values are filled in by the HistoRecordSet
 				scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
 				scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) fileLength / HoTTbinHistoReader.dataBlockSize;
-				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = null;
-				scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = null;
-				scores[ScoreLabelTypes.LOG_DATA_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
-				scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-				scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000;
 				if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 					scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = countPackageLoss;
 					scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = tmpRecordSet.getMaxTime_ms() > 0 ? (int) (countPackageLoss / tmpRecordSet.getMaxTime_ms() * 1000. * recordTimespan_ms) * 1000
@@ -534,6 +530,12 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 					scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
 					scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
 				}
+				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_DATA_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
+				scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
+				scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000;
+				// scores for elapsed times are filled in by the HistoRecordSet
 				recordSet.setScorePoints(scores);
 				// no display tmpRecordSet.syncScaleOfSyncableRecords();
 			}
@@ -889,13 +891,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 				HistoRecordSet recordSet = (HistoRecordSet) tmpRecordSet;
 				final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
 				// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
+				// scores for duration and timestep values are filled in by the HistoRecordSet
 				scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
 				scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) fileLength / HoTTbinHistoReader.dataBlockSize;
-				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = null;
-				scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = null;
-				scores[ScoreLabelTypes.LOG_DATA_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
-				scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-				scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000;
 				if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 					scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = countPackageLoss;
 					scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = tmpRecordSet.getMaxTime_ms() > 0 ? (int) (countPackageLoss / tmpRecordSet.getMaxTime_ms() * 1000. * recordTimespan_ms) * 1000
@@ -911,6 +909,12 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 					scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
 					scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
 				}
+				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_DATA_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
+				scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
+				scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000;
+				// scores for elapsed times are filled in by the HistoRecordSet
 				recordSet.setScorePoints(scores);
 				// no display tmpRecordSet.syncScaleOfSyncableRecords();
 			}

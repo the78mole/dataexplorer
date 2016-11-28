@@ -2635,7 +2635,7 @@ public class Settings extends Properties {
 	 * @return true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
 	 */
 	public boolean isZippedCache() {
-		return Boolean.valueOf(this.getProperty(Settings.ZIPPED_CACHE, "true")); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(Settings.ZIPPED_CACHE, "false")); //$NON-NLS-1$
 	}
 
 	/**

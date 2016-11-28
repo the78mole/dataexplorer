@@ -566,7 +566,7 @@ public class HistoVault {
 	public static Path getVaultSubDirectory() {
 		String tmpSubDirectoryLongKey = String.format("%d%s%d%d%d", HistoVault.activeDataExplorerVersion, getActiveDeviceKey(), DataExplorer.getInstance().getActiveChannelNumber(),
 				Settings.getInstance().getSamplingTimespan_ms(), Settings.getInstance().getMaxLogDuration_mm());
-			return Paths.get(HistoVault.sha1(tmpSubDirectoryLongKey));
+		return Paths.get(HistoVault.sha1(tmpSubDirectoryLongKey));
 
 	}
 
@@ -649,11 +649,11 @@ public class HistoVault {
 	}
 
 	public List<Point> getMeasurements(int measurementOrdinal) {
-		return this.measurements.getEntryPoints().get(measurementOrdinal).getPoints();
+			return this.measurements.getEntryPoints().get(measurementOrdinal).getPoints();
 	}
 
 	public Integer getMeasurement(int measurementOrdinal, int trailOrdinal) {
-		if (this.measurements.getEntryPoints().get(measurementOrdinal).getPoints() == null) {
+		if (this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().size() == 0) {
 			return null;
 		}
 		else {
@@ -662,11 +662,11 @@ public class HistoVault {
 	}
 
 	public List<Point> getSettlements(int settlementId) {
-		return this.settlements.getEntryPoints().get(settlementId).getPoints();
+			return this.settlements.getEntryPoints().get(settlementId).getPoints();
 	}
 
 	public Integer getSettlement(int settlementId, int trailOrdinal) {
-		if (this.settlements.getEntryPoints().get(settlementId).getPoints() == null) {
+		if (this.settlements.getEntryPoints().get(settlementId).getPoints().size() == 0) {
 			return null;
 		}
 		else {

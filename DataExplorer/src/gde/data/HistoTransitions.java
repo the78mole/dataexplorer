@@ -462,9 +462,12 @@ public class HistoTransitions extends Vector<Transition> {
 		int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
 		int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
 		int recoveryDequeSize = (int) (transitionType.getRecoveryTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
-		// if (log.isLoggable(Level.FINE))
-		log.log(Level.FINE, transitionRecord.parent.name + " " + transitionRecord.parent.description.substring(0, transitionRecord.parent.description.indexOf("\r"))
-				+ String.format("%s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
+		// if (log.isLoggable(Level.FINE)) {
+		int descriptionCutPoint = transitionRecord.parent.description.indexOf("\r");
+		if (descriptionCutPoint < 0) descriptionCutPoint = transitionRecord.parent.description.length();
+		log.log(Level.FINE, transitionRecord.parent.name + " " + transitionRecord.parent.description.substring(0, descriptionCutPoint)
+				+ String.format(" %s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
+	 // }
 		if (transitionType.isPercent()) {
 			TriggerState triggerState = TriggerState.UNDEFINED;
 			for (int i = 0; i < transitionRecord.size(); i++) {

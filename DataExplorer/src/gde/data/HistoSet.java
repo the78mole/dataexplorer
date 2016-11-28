@@ -464,14 +464,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			if (fileTakenFromCache) {
 				// put the vault into the histoSet map and sum up the file length
 				this.get(histoVault.getLogStartTimestamp_ms()).add(histoVault);
-				if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE,
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
 						String.format("added   startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
 								StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
 								histoVault.getLogChannelNumber()));
 			}
 		}
 		else {
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST,
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
 					String.format("too late startTimeStamp=%s  %s ::  %s   device = %s  channelConfigNumber = %d", //$NON-NLS-1$
 							StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoVault.getLogStartTimestamp_ms()), histoVault.getCacheKey(), histoVault.getFilePath(), histoVault.getUiDeviceName(),
 							histoVault.getLogChannelNumber()));

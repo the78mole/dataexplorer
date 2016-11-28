@@ -165,26 +165,28 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 						final Double logDataExplorerVersion = parseDataExplorerVersion(header);
 						final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
 						// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
+						// scores for duration and timestep values are filled in by the HistoRecordSet
 						scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = recordDataSize;
 						scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[0] != null && packagesLost[1] != null && packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
-						scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : null;
-						scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = logDataExplorerVersion != null ? (int) (logDataExplorerVersion * 1000.) : null;
+						//todo recalculating the following scores from raw data would be feasible
+						scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = packagesLost[0] != null ? (int) (packagesLost[0].intValue()) : 0;
+						scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = packagesLost[1] != null ? (int) (packagesLost[1] * 10. * 1000.) : 0; // percent -> per mille
+						scores[ScoreLabelTypes.LOST_PACKAGES_AVG_MS.ordinal()] = packagesLost[4] != null ? (int) (packagesLost[4] * 1000000.) : 0; // sec -> ms
+						scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = packagesLost[3] != null ? (int) (packagesLost[3] * 1000000.) : 0; // sec -> ms
+						scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = packagesLost[2] != null ? (int) (packagesLost[2] * 1000000.) : 0; // sec -> ms
+						scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = packagesLost[5] != null ? (int) (packagesLost[5] * 1000000.) : 0; // sec -> ms
+						scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensors.length - 1) > 0 ? (sensors.length - 1) * 1000 : 0; // subtract Receiver
+						scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = Arrays.asList(sensors).contains("VARIO") ? 1000 : 0;
+						scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = Arrays.asList(sensors).contains("GPS") ? 1000 : 0;
+						scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : 0;
+						scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : 0;
+						scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : 0;
+						scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0;
+						scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = logDataExplorerVersion != null ? (int) (logDataExplorerVersion * 1000.) : 0;
 						scores[ScoreLabelTypes.LOG_DATA_BYTES.ordinal()] = GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize;
 						scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) path.toFile().length();
 						scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (int) (Double.parseDouble(header.get(GDE.RECORD_SET_SIZE)) * 1000.);
-						//todo recalculating the following scores from raw data would be feasible
-						scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = packagesLost[0] != null ? (int) (packagesLost[0].intValue()) : null;
-						scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = packagesLost[1] != null ? (int) (packagesLost[1] * 10. * 1000.) : null; // percent -> per mille
-						scores[ScoreLabelTypes.LOST_PACKAGES_AVG_MS.ordinal()] = packagesLost[4] != null ? (int) (packagesLost[4] * 1000000.) : null; // sec -> ms
-						scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = packagesLost[3] != null ? (int) (packagesLost[3] * 1000000.) : null; // sec -> ms
-						scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = packagesLost[2] != null ? (int) (packagesLost[2] * 1000000.) : null; // sec -> ms
-						scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = packagesLost[5] != null ? (int) (packagesLost[5] * 1000000.) : null; // sec -> ms
-						scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensors.length - 1) > 0 ? (sensors.length - 1) * 1000 : null; // subtract Receiver
-						scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = Arrays.asList(sensors).contains("VARIO") ? 1000 : null;
-						scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = Arrays.asList(sensors).contains("GPS") ? 1000 : null;
-						scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : null;
-						scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : null;
-						scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : null;
+						// scores for elapsed times are filled in by the HistoRecordSet
 						recordSet.setScorePoints(scores);
 						log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME), //$NON-NLS-1$
 								StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", recordSet.getStartTimeStamp()), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));

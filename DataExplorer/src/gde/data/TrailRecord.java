@@ -302,7 +302,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	@Override
-	@Deprecated 
+	@Deprecated
 	public synchronized Integer set(int index, Integer point) {
 		throw new UnsupportedOperationException(" " + index + " " + point);
 	}
@@ -481,8 +481,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					super.add(histoVault.getMeasurement(this.ordinal, this.getTrailOrdinal()));
 				else if (this.isSettlement())
 					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
-				else if (this.isScoregroup())
+				else if (this.isScoregroup()) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getCacheKey(), histoVault.getFilePath()));
 					super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
+				}
 				else
 					throw new UnsupportedOperationException("length == 1");
 			}
@@ -497,8 +499,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						point = histoVault.getMeasurement(this.ordinal, this.getTrailOrdinal());
 					else if (this.isSettlement())
 						point = histoVault.getSettlement(this.settlementType.getSettlementId(), this.getTrailOrdinal());
-					else if (this.isScoregroup())
+					else if (this.isScoregroup()) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getFilePath()));
 						point = histoVault.getScorePoint(this.getTrailOrdinal());
+					}
 					else
 						throw new UnsupportedOperationException("length > 1");
 

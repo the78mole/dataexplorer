@@ -479,7 +479,17 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * @return points associated to the scores with the label ordinal as index.
 	 */
-	public EntryPoints getScorePoints() {
+	private EntryPoints getScorePoints() {
+		// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
+		this.scorePoints[ScoreLabelTypes.DURATION_MM.ordinal()] = (int) (this.getMaxTime_ms() / 60000. * 1000. + .5);
+		this.scorePoints[ScoreLabelTypes.AVERAGE_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getAverageTimeStep_ms() * 1000.);
+		this.scorePoints[ScoreLabelTypes.MAXIMUM_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getMaximumTimeStep_ms() * 1000.);
+		this.scorePoints[ScoreLabelTypes.MINIMUM_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getMinimumTimeStep_ms() * 1000.);
+		this.scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getSigmaTimeStep_ms() * 1000.);
+		this.scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = this.getRecordDataSize(true);
+		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoRecordSet_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
+		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_VAULT_WRITE_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoVaultWrite_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
+
 		EntryPoints entryPoints = new EntryPoints("All", 0);
 		StringBuilder sb = new StringBuilder();
 		for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
@@ -496,21 +506,6 @@ public class HistoRecordSet extends RecordSet {
 
 	public void setScorePoints(Integer[] scorePoints) {
 		this.scorePoints = scorePoints;
-	}
-
-	/**
-	 * update with score values which are available in this histoSet object only.
-	 */
-	private void enhanceScorePoints() {
-		// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
-		this.scorePoints[ScoreLabelTypes.DURATION_MM.ordinal()] = (int) (this.getMaxTime_ms() / 60000. * 1000. + .5);
-		this.scorePoints[ScoreLabelTypes.AVERAGE_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getAverageTimeStep_ms() * 1000.);
-		this.scorePoints[ScoreLabelTypes.MAXIMUM_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getMaximumTimeStep_ms() * 1000.);
-		this.scorePoints[ScoreLabelTypes.MINIMUM_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getMinimumTimeStep_ms() * 1000.);
-		this.scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getSigmaTimeStep_ms() * 1000.);
-		this.scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = this.getRecordDataSize(true);
-		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoRecordSet_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
-		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_VAULT_WRITE_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoVaultWrite_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
 	}
 
 	@Deprecated // does not set the recordSetNumber
