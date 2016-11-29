@@ -1867,276 +1867,276 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					});
 				}
 				//Höhe, Vario, Drehzahl, Energie, Leistung, Lufdruck, Impuls Ein, Impuls Aus, Zelle Min, Zelle Min#, A1, A2, A3, Temp int, Höhengeweinn
-			}
-			{
-				this.measurement5 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement5.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement5.setText(this.jetiValueNames[5]);
-				this.measurement5.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement5.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement5.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFDF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000020;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement6 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement6.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement6.setText(this.jetiValueNames[6]);
-				this.measurement6.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement6.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement6.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFBF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000040;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement7 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement7.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement7.setText(this.jetiValueNames[7]);
-				this.measurement7.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement7.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement7.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFF7F
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000080;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement8 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement8.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement8.setText(this.jetiValueNames[8]);
-				this.measurement8.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement8.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement8.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFEFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000100;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement9 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement9.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement9.setText(this.jetiValueNames[9]);
-				this.measurement9.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement9.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement9.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFDFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000200;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement10 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement10.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement10.setText(this.jetiValueNames[10]);
-				this.measurement10.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement10.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement10.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFBFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000400;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement11 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement11.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement11.setText(this.jetiValueNames[11]);
-				this.measurement11.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement11.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement11.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFF7FF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000800;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement12 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement12.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement12.setText(this.jetiValueNames[12]);
-				this.measurement12.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement12.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement12.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFEFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00001000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement13 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement13.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement13.setText(this.jetiValueNames[13]);
-				this.measurement13.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement13.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement13.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFDFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00002000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement14 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement14.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement14.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement14.setText(this.jetiValueNames[14]);
-				this.measurement14.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement14.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement14.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFBFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00004000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement15 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement15.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement15.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement15.setText(this.jetiValueNames[15]);
-				this.measurement15.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement15.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement15.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFF7FFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00008000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement16 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement16.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement16.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement16.setText(this.jetiValueNames[16]);
-				this.measurement16.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement16.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement16.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFEFFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00010000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement17 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement17.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement17.setText(this.jetiValueNames[17]);
-				this.measurement17.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement17.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement17.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFDFFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00020000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement18 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement18.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement18.setText(this.jetiValueNames[18]);
-				this.measurement18.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement18.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement18.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFBFFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00040000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
-			}
-			{
-				this.measurement19 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
-				RowData analogAlarm1DirectionButtonLData = new RowData();
-				analogAlarm1DirectionButtonLData.width = 142;
-				analogAlarm1DirectionButtonLData.height = 19;
-				this.measurement19.setLayoutData(analogAlarm1DirectionButtonLData);
-				this.measurement19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.measurement19.setText(this.jetiValueNames[19]);
-				this.measurement19.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent evt) {
-						UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement19.widgetSelected, event=" + evt); //$NON-NLS-1$
-						UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement19.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFF7FFFF
-								: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00080000;
-						UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-					}
-				});
+				{
+					this.measurement5 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement5.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement5.setText(this.jetiValueNames[5]);
+					this.measurement5.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement5.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement5.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFDF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000020;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement6 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement6.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement6.setText(this.jetiValueNames[6]);
+					this.measurement6.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement6.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement6.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFBF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000040;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement7 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement7.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement7.setText(this.jetiValueNames[7]);
+					this.measurement7.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement7.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement7.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFF7F
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000080;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement8 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement8.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement8.setText(this.jetiValueNames[8]);
+					this.measurement8.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement8.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement8.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFEFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000100;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement9 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement9.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement9.setText(this.jetiValueNames[9]);
+					this.measurement9.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement9.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement9.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFDFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000200;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement10 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement10.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement10.setText(this.jetiValueNames[10]);
+					this.measurement10.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement10.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement10.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFBFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000400;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement11 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement11.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement11.setText(this.jetiValueNames[11]);
+					this.measurement11.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement11.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement11.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFF7FF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000800;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement12 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement12.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement12.setText(this.jetiValueNames[12]);
+					this.measurement12.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement12.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement12.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFEFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00001000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement13 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement13.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement13.setText(this.jetiValueNames[13]);
+					this.measurement13.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement13.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement13.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFDFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00002000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement14 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement14.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement14.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement14.setText(this.jetiValueNames[14]);
+					this.measurement14.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement14.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement14.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFBFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00004000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement15 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement15.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement15.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement15.setText(this.jetiValueNames[15]);
+					this.measurement15.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement15.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement15.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFF7FFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00008000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement16 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement16.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement16.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement16.setText(this.jetiValueNames[16]);
+					this.measurement16.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement16.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement16.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFEFFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00010000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement17 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement17.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement17.setText(this.jetiValueNames[17]);
+					this.measurement17.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement17.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement17.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFDFFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00020000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement18 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement18.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement18.setText(this.jetiValueNames[18]);
+					this.measurement18.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement18.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement18.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFBFFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00040000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement19 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement19.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement19.setText(this.jetiValueNames[19]);
+					this.measurement19.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement19.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement19.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFF7FFFF
+									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00080000;
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
 			}
 			this.layout();
 		}

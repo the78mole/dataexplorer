@@ -97,7 +97,7 @@ public class UniLog2SetupReaderWriter {
 	short							dataRate								= 2;							// 3 0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
 	short							startModus							= 1;							// 4 AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
 	short							startCurrent						= 3;							// 5 1 - 50 A
-	short							startRx									= 15;						// 6 value/10 msec
+	short							startRx									= 15;							// 6 value/10 msec
 	short							startTime								= 5;							// 7 5 - 90 sec
 	short							currentSensorType				= 1;							// 8 0=20A, 1=40/80A, 2=150A, 3=400A
 	short							modusA1									= 0;							// 9 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
@@ -108,7 +108,7 @@ public class UniLog2SetupReaderWriter {
 	short							varioThreshold					= 5;							// 14 value/10 m/sec
 	short							varioTon								= 0;							// 15 0=off, 1=up/down, 2=up, 3=down
 	short							limiterModus						= 0;							// 16 0=off, 1=F1Q, 2=F5D, 3=F5B, 4= F5J
-	short							energyLimit							= 1000;					// 17 1 - 2000 Wmin
+	short							energyLimit							= 1000;						// 17 1 - 2000 Wmin
 	short							minMaxRx								= 0;							// 18 0=off, 1=on
 	short							stopModus								= 0;							// 19 0=off, 1=on
 	short							varioThresholdSink			= 5;							// 20 value/10 m/sec
@@ -117,20 +117,20 @@ public class UniLog2SetupReaderWriter {
 	short							capacityReset						= 0;							// 23 capacity keep=0, reset=1
 	short							currentOffset						= 0;							// 24 current always=0, never=1
 	short							varioOffMotor						= 0;							// 25 Vario_aus_bei_Motor
-	int								jetiValueVisibility			= 0xFFFFFFFF;		// 26/27 Jeti_EX_Ausblenden
+	int								jetiValueVisibility			= 0xFFFFFFFF;			// 26/27 Jeti_EX_Ausblenden
 	short							varioFactor							= 0;							// 28 Vario Faktor
 	short							serialNumberFix					= 0;							// 29 fixe_Seriennummer;
 	short							setTime									= 0;							// 30 Zeit_setzen
 	short							varioFilter							= 1;							// 31 Vario filter
-	//short[] A = new short[6]; 																																							// 32-37
-	short							telemetryAlarms					= 0x0000;				// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
+	//short[] A = new short[6]; 																// 32-37
+	short							telemetryAlarms					= 0x0000;					// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
 	short							currentAlarm						= 100;						// 39 1A --> 400A
 	short							voltageStartAlarm				= 124;						// 40 10V/10 --> 600V/10
 	short							voltageAlarm						= 100;						// 41 10V/10 --> 600V/10
-	short							capacityAlarm						= 2000;					// 42 100mAh --> 30000mAh
+	short							capacityAlarm						= 2000;						// 42 100mAh --> 30000mAh
 	short							heightAlarm							= 200;						// 43 10m --> 4000m step 50
 	short							voltageRxAlarm					= 450;						// 44 300 --> 800 V/100
-	short							cellVoltageAlarm				= 30;						// 45 20 - 40 V/10 
+	short							cellVoltageAlarm				= 30;							// 45 20 - 40 V/10 
 	short							analogAlarm1						= 100;						// 46 -100 to 3000
 	short							analogAlarm2						= 100;						// 47 -100 to 3000
 	short							analogAlarm3						= 100;						// 48 -100 to 3000
@@ -138,7 +138,7 @@ public class UniLog2SetupReaderWriter {
 	short							analogAlarm2Direct			= 0;							// 50 0 = >; 1 = <
 	short							analogAlarm3Direct			= 0;							// 51 0 = >; 1 = <
 	short							energyAlarm							= 0;							// 52 0 = >; 1 = <
-	//short[] B = new short[12]; 																																							// 53-64
+	//short[] B = new short[12]; 																// 53-64
 	byte							mLinkAddressVoltage			= 0;							// 
 	byte							mLinkAddressCurrent			= 1;							// 65 0 - 15, "--"
 	byte							mLinkAddressRevolution	= 2;							// 
@@ -148,18 +148,18 @@ public class UniLog2SetupReaderWriter {
 	byte							mLinkAddressA1					= 7;							// 
 	byte							mLinkAddressA2					= 8;							// 68 0 - 15, "--"
 	byte							mLinkAddressA3					= 9;							// 
-	byte							mLinkAddressCellMinimum	= 10;						// 69
-	byte							mLinkAddressCell1				= 11;						// 70 0 - 15, "--"
-	byte							mLinkAddressCell2				= 12;						// 
-	byte							mLinkAddressCell3				= 13;						// 71 0 - 15, "--"
-	byte							mLinkAddressCell4				= 14;						// 
-	byte							mLinkAddressCell5				= 15;						// 72 0 - 15, "--"
-	byte							mLinkAddressCell6				= 15;						//
+	byte							mLinkAddressCellMinimum	= 10;							// 69
+	byte							mLinkAddressCell1				= 11;							// 70 0 - 15, "--"
+	byte							mLinkAddressCell2				= 12;							// 
+	byte							mLinkAddressCell3				= 13;							// 71 0 - 15, "--"
+	byte							mLinkAddressCell4				= 14;							// 
+	byte							mLinkAddressCell5				= 15;							// 72 0 - 15, "--"
+	byte							mLinkAddressCell6				= 15;							//
 	byte							mLinkAddressHeightGain	= 6;							// 73
-	byte							mLinkAddressEnergy			= 15;						// 
+	byte							mLinkAddressEnergy			= 15;							// 
 	byte[]						sbusStartSlot						= new byte[8];		// 74 - 77
 	//short[] C = new short[190/2 - 77]; 																																			// 77-95
-	short							checkSum;																// 96
+	short							checkSum;																	// 96
 
 	byte[]						setupData								= new byte[192];
 

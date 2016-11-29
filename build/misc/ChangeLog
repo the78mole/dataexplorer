@@ -3,8 +3,13 @@ Development history / change log, please read from bottom up
 Version 3.2.9 - yy xxx 2016
 +++++ important update Java Runtime Version prerequisite to 1.8 +++++
 +++++ important update Java 32 Bit -Xmx1024m, 64 Bit -Xmx3096m  +++++
+SM GPS-Logger 1/2 
+	- update configuration support firmware 1.16
+SM UniLog 2 
+	- minor code update configuration support FW 1.12
 MC3000 SkyRC
 	- switch to continous data gathering for all slots by selecting MC3000-Set
+	- remove automatic program start/stop, form now gathering rely on manual start/stop of processing
 Q200 SkyRC 4 channel charger 
 	- support for 4 individual batteries added by Q200
 	- support for 4 synchronized batteries added by Q200-Set

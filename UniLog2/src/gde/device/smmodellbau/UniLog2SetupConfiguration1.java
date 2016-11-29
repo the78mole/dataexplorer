@@ -213,30 +213,6 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.autoStopCombo.select(this.configuration.stopModus);
 
 		changeVisibility();
-		//		if (telemetrieTypeCombo.getSelectionIndex() == 8) {
-		//			frskyIdCombo.setVisible(true);
-		//			frskyIdLabel.setVisible(true);
-		//		}
-		//		else {
-		//			frskyIdCombo.setVisible(false);
-		//			frskyIdLabel.setVisible(false);
-		//		}
-		//		
-		//
-		//		if (UniLog2SetupConfiguration2.mLinkGroupStatic != null && !UniLog2SetupConfiguration2.mLinkGroupStatic.isDisposed()) {
-		//			if (telemetrieTypeCombo.getSelectionIndex() == 7)
-		//				UniLog2SetupConfiguration2.mLinkGroupStatic.setVisible(true);
-		//			else
-		//				UniLog2SetupConfiguration2.mLinkGroupStatic.setVisible(false);
-		//		}
-		//
-		//		if (UniLog2SetupConfiguration2.jetiExGroupStatic != null && !UniLog2SetupConfiguration2.jetiExGroupStatic.isDisposed()) {
-		//			if (telemetrieTypeCombo.getSelectionIndex() == 6)
-		//				UniLog2SetupConfiguration2.jetiExGroupStatic.setVisible(true);
-		//			else
-		//				UniLog2SetupConfiguration2.jetiExGroupStatic.setVisible(false);
-		//		}
-		//		
 	}
 
 	void initGUI() {
@@ -288,7 +264,6 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration1.log.log(Level.FINEST, "telemetrieTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.telemetrieType = (short) (UniLog2SetupConfiguration1.this.telemetrieTypeCombo.getSelectionIndex());
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
-
 							changeVisibility();
 						}
 					});
