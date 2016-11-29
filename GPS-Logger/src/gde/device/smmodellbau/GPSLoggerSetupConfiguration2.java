@@ -62,22 +62,31 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	final DataExplorer		  application;
 
 	Composite								fillerComposite;
-
-	Group										unilogTelemtryAlarmsGroup;
-	CLabel									addressLabel1UL, addressLabel2UL, addressLabel3UL, addressLabel4UL;
-	Text										addressText1UL, addressText2UL, addressText3UL, addressText4UL;
-	Slider									addressSlider1UL, addressSlider2UL, addressSlider3UL, addressSlider4UL;
-	Button									currentButton, voltageStartButton, voltageButton, capacityButton;
-	CCombo									currentCombo, voltageStartCombo, voltageCombo, capacityCombo;
-	CLabel									currentLabel, voltageStartLabel, voltageLabel, capacityLabel;
+	
 	final int								fillerWidth					= 15;
+	final int								fillerHeight				= 25;
 	final int								buttonWidth					= 115;
 	final int								comboWidth					= 83;
 
 	Group										mLinkAddressesGroup;
-	CLabel									addressLabel1, addressLabel2, addressLabel2max, addressLabel3, addressLabel3max, addressLabel4, addressLabel5, addressLabel6, addressLabel7, addressLabel8, addressLabel9;
-	Text										addressText1, addressText2, addressText2max, addressText3, addressText3max, addressText4, addressText5, addressText6, addressText7, addressText8, addressText9;
-	Slider									addressSlider1, addressSlider2, addressSlider2max, addressSlider3, addressSlider3max, addressSlider4, addressSlider5, addressSlider6, addressSlider7, addressSlider8, addressSlider9;
+	static Group						mLinkGroupStatic;
+	CLabel									addressLabel1, addressLabel2, addressLabel2max, addressLabel3, addressLabel3max, addressLabel4, addressLabel5, addressLabel6, addressLabel7, addressLabel8, addressLabel9, addressLabel10, addressLabel11, addressLabel12, addressLabel13;
+	Text										addressText1, addressText2, addressText2max, addressText3, addressText3max, addressText4, addressText5, addressText6, addressText7, addressText8, addressText9, addressText10, addressText11, addressText12, addressText13;
+	Slider									addressSlider1, addressSlider2, addressSlider2max, addressSlider3, addressSlider3max, addressSlider4, addressSlider5, addressSlider6, addressSlider7, addressSlider8, addressSlider9, addressSlider10, addressSlider11, addressSlider12, addressSlider13;
+
+	Group										jetiExGroup;
+	static Group						jetiExGroupStatic;
+	Button									measurement1, measurement2, measurement3, measurement4, measurement5, measurement6, measurement7, measurement8, measurement9, measurement10, measurement11,
+			measurement12, measurement13, measurement14, measurement15, measurement16, measurement17, measurement18, measurement19, measurement20, measurement21, measurement22, measurement23, measurement24, measurement25, measurement26, measurement27, measurement28, measurement29, measurement30;
+	final String[]					jetiValueNames					= Messages.getString(MessageIds.GDE_MSGT2083).split(GDE.STRING_COMMA);
+	CLabel									jetiExSelectionLabel;
+
+	Group										unilogTelemtryAlarmsGroup;
+	static Group						unilogTelemtryAlarmsGroupStatic;
+	Button									currentButton, voltageStartButton, voltageButton, capacityButton;
+	CCombo									currentCombo, voltageStartCombo, voltageCombo, capacityCombo;
+	CLabel									currentLabel, voltageStartLabel, voltageLabel, capacityLabel, jetiUniLogAlarmsLabel;
+	
 	final int								labelWidth					= 115;
 	final int								textWidth						= 25;
 	final int								sliderWidth					= 125;
@@ -138,14 +147,23 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.addressSlider9.setSelection(this.configuration.mLinkAddressIntHeight);
 		this.addressText9.setText(sliderValues[this.configuration.mLinkAddressIntHeight]);
 
-		this.addressSlider1UL.setSelection(this.configuration.mLinkAddressVoltageUL);
-		this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
-		this.addressSlider2UL.setSelection(this.configuration.mLinkAddressCurrentUL);
-		this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
-		this.addressSlider3UL.setSelection(this.configuration.mLinkAddressRevolutionUL);
-		this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
-		this.addressSlider4UL.setSelection(this.configuration.mLinkAddressCapacityUL);
-		this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
+		this.addressSlider10.setSelection(this.configuration.mLinkAddressIntHeight);
+		this.addressText10.setText(sliderValues[this.configuration.mLinkAddressIntHeight]);
+		this.addressSlider11.setSelection(this.configuration.mLinkAddressIntHeight);
+		this.addressText11.setText(sliderValues[this.configuration.mLinkAddressIntHeight]);
+		this.addressSlider12.setSelection(this.configuration.mLinkAddressIntHeight);
+		this.addressText12.setText(sliderValues[this.configuration.mLinkAddressIntHeight]);
+		this.addressSlider13.setSelection(this.configuration.mLinkAddressIntHeight);
+		this.addressText13.setText(sliderValues[this.configuration.mLinkAddressIntHeight]);
+
+//		this.addressSlider1UL.setSelection(this.configuration.mLinkAddressVoltageUL);
+//		this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
+//		this.addressSlider2UL.setSelection(this.configuration.mLinkAddressCurrentUL);
+//		this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
+//		this.addressSlider3UL.setSelection(this.configuration.mLinkAddressRevolutionUL);
+//		this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
+//		this.addressSlider4UL.setSelection(this.configuration.mLinkAddressCapacityUL);
+//		this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
 
 		this.currentButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_CURRENT_UL) > 0);
 		this.currentCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.currentUlAlarm)); //$NON-NLS-1$
@@ -155,6 +173,38 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.voltageCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.voltageUlAlarm / 10.0)); //$NON-NLS-1$
 		this.capacityButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_CAPACITY_UL) > 0);
 		this.capacityCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.capacityUlAlarm)); //$NON-NLS-1$
+		
+		this.measurement1.setSelection((this.configuration.jetiExMask  & 0x00000002) == 0);
+		this.measurement2.setSelection((this.configuration.jetiExMask  & 0x00000004) == 0);
+		this.measurement3.setSelection((this.configuration.jetiExMask  & 0x00000008) == 0);
+		this.measurement4.setSelection((this.configuration.jetiExMask  & 0x00000010) == 0);
+		this.measurement5.setSelection((this.configuration.jetiExMask  & 0x00000020) == 0);
+		this.measurement6.setSelection((this.configuration.jetiExMask  & 0x00000040) == 0);
+		this.measurement7.setSelection((this.configuration.jetiExMask  & 0x00000080) == 0);
+		this.measurement8.setSelection((this.configuration.jetiExMask  & 0x00000100) == 0);
+		this.measurement9.setSelection((this.configuration.jetiExMask  & 0x00000200) == 0);
+		this.measurement10.setSelection((this.configuration.jetiExMask & 0x00000400) == 0);
+		this.measurement11.setSelection((this.configuration.jetiExMask & 0x00000800) == 0);
+		this.measurement12.setSelection((this.configuration.jetiExMask & 0x00001000) == 0);
+		this.measurement13.setSelection((this.configuration.jetiExMask & 0x00002000) == 0);
+		this.measurement14.setSelection((this.configuration.jetiExMask & 0x00004000) == 0);
+		this.measurement15.setSelection((this.configuration.jetiExMask & 0x00008000) == 0);
+		this.measurement16.setSelection((this.configuration.jetiExMask & 0x00010000) == 0);
+		this.measurement17.setSelection((this.configuration.jetiExMask & 0x00020000) == 0);
+		this.measurement18.setSelection((this.configuration.jetiExMask & 0x00040000) == 0);
+		this.measurement19.setSelection((this.configuration.jetiExMask & 0x00080000) == 0);
+		this.measurement20.setSelection((this.configuration.jetiExMask & 0x00100000) == 0);
+		this.measurement21.setSelection((this.configuration.jetiExMask & 0x00200000) == 0);
+		this.measurement22.setSelection((this.configuration.jetiExMask & 0x00400000) == 0);
+		this.measurement23.setSelection((this.configuration.jetiExMask & 0x00800000) == 0);
+		this.measurement24.setSelection((this.configuration.jetiExMask & 0x01000000) == 0);
+		this.measurement25.setSelection((this.configuration.jetiExMask & 0x02000000) == 0);
+		this.measurement26.setSelection((this.configuration.jetiExMask & 0x04000000) == 0);
+		this.measurement27.setSelection((this.configuration.jetiExMask & 0x08000000) == 0);
+		this.measurement28.setSelection((this.configuration.jetiExMask & 0x10000000) == 0);
+		this.measurement29.setSelection((this.configuration.jetiExMask & 0x20000000) == 0);
+		this.measurement30.setSelection((this.configuration.jetiExMask & 0x40000000) == 0);
+
 	}
 
 	void initGUI() {
@@ -168,12 +218,13 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 			});
 			{
 				this.mLinkAddressesGroup = new Group(this, SWT.NONE);
+				GPSLoggerSetupConfiguration2.mLinkGroupStatic = this.mLinkAddressesGroup;
 				RowLayout mLinkAddressesGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.mLinkAddressesGroup.setLayout(mLinkAddressesGroupLayout);
 				FormData mLinkAddressesGroupLData = new FormData();
-				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 10);
+				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 2);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = GDE.IS_MAC ? 265 : 270;
+				mLinkAddressesGroupLData.bottom = new FormAttachment(1000, 1000, -5);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -183,7 +234,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = labelWidth;
-					addressLabel1LData.height = 21;
+					addressLabel1LData.height = 20;
 					this.addressLabel1.setLayoutData(addressLabel1LData);
 					this.addressLabel1.setText(Messages.getString(MessageIds.GDE_MSGT2059));
 				}
@@ -192,7 +243,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1LData = new RowData();
 					addressText1LData.width = textWidth;
-					addressText1LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText1LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText1.setLayoutData(addressText1LData);
 					this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
 					this.addressText1.setEditable(false);
@@ -223,7 +274,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel2LData = new RowData();
 					addressLabel2LData.width = labelWidth;
-					addressLabel2LData.height = 21;
+					addressLabel2LData.height = 20;
 					this.addressLabel2.setLayoutData(addressLabel2LData);
 					this.addressLabel2.setText(Messages.getString(MessageIds.GDE_MSGT2060));
 				}
@@ -232,7 +283,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2LData = new RowData();
 					addressText2LData.width = textWidth;
-					addressText2LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText2LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2.setLayoutData(addressText2LData);
 					this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
 					this.addressText2.setEditable(false);
@@ -263,7 +314,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel2max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel2maxLData = new RowData();
 					addressLabel2maxLData.width = labelWidth;
-					addressLabel2maxLData.height = 21;
+					addressLabel2maxLData.height = 20;
 					this.addressLabel2max.setLayoutData(addressLabel2maxLData);
 					this.addressLabel2max.setText(Messages.getString(MessageIds.GDE_MSGT2060) + "_max");
 				}
@@ -272,7 +323,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText2max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2maxLData = new RowData();
 					addressText2maxLData.width = textWidth;
-					addressText2maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText2maxLData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2max.setLayoutData(addressText2maxLData);
 					this.addressText2max.setText(sliderValues[this.configuration.mLinkAddressSpeedMax]);
 					this.addressText2max.setEditable(false);
@@ -303,7 +354,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel3LData = new RowData();
 					addressLabel3LData.width = labelWidth;
-					addressLabel3LData.height = 21;
+					addressLabel3LData.height = 20;
 					this.addressLabel3.setLayoutData(addressLabel3LData);
 					this.addressLabel3.setText(Messages.getString(MessageIds.GDE_MSGT2061));
 				}
@@ -312,7 +363,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3LData = new RowData();
 					addressText3LData.width = textWidth;
-					addressText3LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText3LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3.setLayoutData(addressText3LData);
 					this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
 					this.addressText3.setEditable(false);
@@ -343,7 +394,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel3max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel3maxLData = new RowData();
 					addressLabel3maxLData.width = labelWidth;
-					addressLabel3maxLData.height = 21;
+					addressLabel3maxLData.height = 20;
 					this.addressLabel3max.setLayoutData(addressLabel3maxLData);
 					this.addressLabel3max.setText(Messages.getString(MessageIds.GDE_MSGT2061) + "_max");
 				}
@@ -352,7 +403,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText3max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3maxLData = new RowData();
 					addressText3maxLData.width = textWidth;
-					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText3maxLData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3max.setLayoutData(addressText3maxLData);
 					this.addressText3max.setText(sliderValues[this.configuration.mLinkAddressHeightMax]);
 					this.addressText3max.setEditable(false);
@@ -383,7 +434,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel4LData = new RowData();
 					addressLabel4LData.width = labelWidth;
-					addressLabel4LData.height = 21;
+					addressLabel4LData.height = 20;
 					this.addressLabel4.setLayoutData(addressLabel4LData);
 					this.addressLabel4.setText(Messages.getString(MessageIds.GDE_MSGT2062));
 				}
@@ -392,7 +443,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText4LData = new RowData();
 					addressText4LData.width = textWidth;
-					addressText4LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText4LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText4.setLayoutData(addressText4LData);
 					this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
 					this.addressText4.setEditable(false);
@@ -423,7 +474,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel5LData = new RowData();
 					addressLabel5LData.width = labelWidth;
-					addressLabel5LData.height = 21;
+					addressLabel5LData.height = 20;
 					this.addressLabel5.setLayoutData(addressLabel5LData);
 					this.addressLabel5.setText(Messages.getString(MessageIds.GDE_MSGT2063));
 				}
@@ -432,7 +483,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText5LData = new RowData();
 					addressText5LData.width = textWidth;
-					addressText5LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText5LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText5.setLayoutData(addressText5LData);
 					this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
 					this.addressText5.setEditable(false);
@@ -463,7 +514,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel6LData = new RowData();
 					addressLabel6LData.width = labelWidth;
-					addressLabel6LData.height = 21;
+					addressLabel6LData.height = 20;
 					this.addressLabel6.setLayoutData(addressLabel6LData);
 					this.addressLabel6.setText(Messages.getString(MessageIds.GDE_MSGT2028));
 				}
@@ -472,7 +523,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText6LData = new RowData();
 					addressText6LData.width = textWidth;
-					addressText6LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText6LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText6.setLayoutData(addressText6LData);
 					this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressFlightDirection]);
 					this.addressText6.setEditable(false);
@@ -503,7 +554,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel7LData = new RowData();
 					addressLabel7LData.width = labelWidth;
-					addressLabel7LData.height = 21;
+					addressLabel7LData.height = 20;
 					this.addressLabel7.setLayoutData(addressLabel7LData);
 					this.addressLabel7.setText(Messages.getString(MessageIds.GDE_MSGT2029));
 				}
@@ -512,7 +563,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText7LData = new RowData();
 					addressText7LData.width = textWidth;
-					addressText7LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText7LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText7.setLayoutData(addressText7LData);
 					this.addressText7.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDirectionRel]);
 					this.addressText7.setEditable(false);
@@ -543,7 +594,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel8LData = new RowData();
 					addressLabel8LData.width = labelWidth;
-					addressLabel8LData.height = 21;
+					addressLabel8LData.height = 20;
 					this.addressLabel8.setLayoutData(addressLabel8LData);
 					this.addressLabel8.setText(Messages.getString(MessageIds.GDE_MSGT2064));
 				}
@@ -552,7 +603,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText8LData = new RowData();
 					addressText8LData.width = textWidth;
-					addressText8LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText8LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText8.setLayoutData(addressText8LData);
 					this.addressText8.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
 					this.addressText8.setEditable(false);
@@ -583,7 +634,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressLabel9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel9LData = new RowData();
 					addressLabel9LData.width = labelWidth;
-					addressLabel9LData.height = 21;
+					addressLabel9LData.height = 20;
 					this.addressLabel9.setLayoutData(addressLabel9LData);
 					this.addressLabel9.setText(Messages.getString(MessageIds.GDE_MSGT2076));
 				}
@@ -592,7 +643,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText9LData = new RowData();
 					addressText9LData.width = textWidth;
-					addressText9LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					addressText9LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText9.setLayoutData(addressText9LData);
 					this.addressText9.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
 					this.addressText9.setEditable(false);
@@ -618,15 +669,748 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						}
 					});
 				}
+				{
+					this.addressLabel10 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel10LData = new RowData();
+					addressLabel10LData.width = labelWidth;
+					addressLabel10LData.height = 20;
+					this.addressLabel10.setLayoutData(addressLabel10LData);
+					this.addressLabel10.setText(Messages.getString(MessageIds.GDE_MSGT2084));
+				}
+				{
+					this.addressText10 =new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText10LData = new RowData();
+					addressText10LData.width = textWidth;
+					addressText10LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
+					this.addressText10.setLayoutData(addressText10LData);
+					this.addressText10.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
+					this.addressText10.setEditable(false);
+					this.addressText10.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				{
+					this.addressSlider10 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider10.setMinimum(sliderMinimum);
+					this.addressSlider10.setMaximum(sliderMaximum);
+					this.addressSlider10.setIncrement(sliderIncrement);
+					RowData addressSlider10LData = new RowData();
+					addressSlider10LData.width = sliderWidth;
+					addressSlider10LData.height = 17;
+					this.addressSlider10.setLayoutData(addressSlider10LData);
+					this.addressSlider10.setSelection(this.configuration.mLinkAddressTripLength);
+					this.addressSlider10.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider10.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider10.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText10.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel11 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel11LData = new RowData();
+					addressLabel11LData.width = labelWidth;
+					addressLabel11LData.height = 20;
+					this.addressLabel11.setLayoutData(addressLabel11LData);
+					this.addressLabel11.setText(Messages.getString(MessageIds.GDE_MSGT2085));
+				}
+				{
+					this.addressText11 =new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText11LData = new RowData();
+					addressText11LData.width = textWidth;
+					addressText11LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
+					this.addressText11.setLayoutData(addressText11LData);
+					this.addressText11.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
+					this.addressText11.setEditable(false);
+					this.addressText11.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				{
+					this.addressSlider11 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider11.setMinimum(sliderMinimum);
+					this.addressSlider11.setMaximum(sliderMaximum);
+					this.addressSlider11.setIncrement(sliderIncrement);
+					RowData addressSlider11LData = new RowData();
+					addressSlider11LData.width = sliderWidth;
+					addressSlider11LData.height = 17;
+					this.addressSlider11.setLayoutData(addressSlider11LData);
+					this.addressSlider11.setSelection(this.configuration.mLinkAddressTripLength);
+					this.addressSlider11.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider11.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider11.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText11.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel12 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel12LData = new RowData();
+					addressLabel12LData.width = labelWidth;
+					addressLabel12LData.height = 20;
+					this.addressLabel12.setLayoutData(addressLabel12LData);
+					this.addressLabel12.setText(Messages.getString(MessageIds.GDE_MSGT2086));
+				}
+				{
+					this.addressText12 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText12LData = new RowData();
+					addressText12LData.width = textWidth;
+					addressText12LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
+					this.addressText12.setLayoutData(addressText12LData);
+					this.addressText12.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
+					this.addressText12.setEditable(false);
+					this.addressText12.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				{
+					this.addressSlider12 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider12.setMinimum(sliderMinimum);
+					this.addressSlider12.setMaximum(sliderMaximum);
+					this.addressSlider12.setIncrement(sliderIncrement);
+					RowData addressSlider12LData = new RowData();
+					addressSlider12LData.width = sliderWidth;
+					addressSlider12LData.height = 17;
+					this.addressSlider12.setLayoutData(addressSlider12LData);
+					this.addressSlider12.setSelection(this.configuration.mLinkAddressTripLength);
+					this.addressSlider12.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider12.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider12.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText12.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel13 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel13LData = new RowData();
+					addressLabel13LData.width = labelWidth;
+					addressLabel13LData.height = 20;
+					this.addressLabel13.setLayoutData(addressLabel13LData);
+					this.addressLabel13.setText(Messages.getString(MessageIds.GDE_MSGT2087));
+				}
+				{
+					this.addressText13 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText13LData = new RowData();
+					addressText13LData.width = textWidth;
+					addressText13LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
+					this.addressText13.setLayoutData(addressText13LData);
+					this.addressText13.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressIntHeight]);
+					this.addressText13.setEditable(false);
+					this.addressText13.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				{
+					this.addressSlider13 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider13.setMinimum(sliderMinimum);
+					this.addressSlider13.setMaximum(sliderMaximum);
+					this.addressSlider13.setIncrement(sliderIncrement);
+					RowData addressSlider13LData = new RowData();
+					addressSlider13LData.width = sliderWidth;
+					addressSlider13LData.height = 17;
+					this.addressSlider13.setLayoutData(addressSlider13LData);
+					this.addressSlider13.setSelection(this.configuration.mLinkAddressTripLength);
+					this.addressSlider13.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider13.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider13.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText13.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+			}
+			{
+				this.jetiExGroup = new Group(this, SWT.NONE);
+				GPSLoggerSetupConfiguration2.jetiExGroupStatic = this.jetiExGroup;
+				RowLayout mLinkAddressesGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				this.jetiExGroup.setLayout(mLinkAddressesGroupLayout);
+				FormData mLinkAddressesGroupLData = new FormData();
+				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 5);
+				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
+				mLinkAddressesGroupLData.width = 290;
+				mLinkAddressesGroupLData.height = GDE.IS_MAC ? 355 : 360;
+				this.jetiExGroup.setLayoutData(mLinkAddressesGroupLData);
+				this.jetiExGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.jetiExGroup.setText("Jeti EX ");
+				{
+					this.fillerComposite = new Composite(this.mLinkAddressesGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 280;
+					fillerCompositeRA1LData.height = 2;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					this.measurement1 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement1.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement1.setText(this.jetiValueNames[1]);
+					this.measurement1.setEnabled(false);
+					this.measurement1.setSelection(true);
+					//this.measurement1.addSelectionListener(new SelectionAdapter() {
+					//	@Override
+					//	public void widgetSelected(SelectionEvent evt) {
+					//		log.log(Level.FINEST, "measurement1.widgetSelected, event=" + evt); //$NON-NLS-1$
+					//		GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = measurement1.getSelection() ? configuration.jetiExMask & 0xFFFFFFFD : configuration.jetiExMask + 0x00000002;
+					//		GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+					//	}
+					//});
+				}
+				{
+					this.measurement2 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement2.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement2.setText(this.jetiValueNames[2]);
+					this.measurement2.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement2.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement2.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFFB
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000004;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement3 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement3.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement3.setText(this.jetiValueNames[3]);
+					this.measurement3.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement3.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement3.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFF7
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000008;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement4 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement4.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement4.setText(this.jetiValueNames[4]);
+					this.measurement4.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement4.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement4.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFEF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000010;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				//Höhe, Vario, Drehzahl, Energie, Leistung, Lufdruck, Impuls Ein, Impuls Aus, Zelle Min, Zelle Min#, A1, A2, A3, Temp int, Höhengeweinn
+				{
+					this.measurement5 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement5.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement5.setText(this.jetiValueNames[5]);
+					this.measurement5.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement5.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement5.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFDF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000020;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement6 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement6.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement6.setText(this.jetiValueNames[6]);
+					this.measurement6.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement6.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement6.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFBF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000040;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement7 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement7.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement7.setText(this.jetiValueNames[7]);
+					this.measurement7.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement7.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement7.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFF7F
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000080;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement8 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement8.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement8.setText(this.jetiValueNames[8]);
+					this.measurement8.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement8.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement8.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFEFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000100;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement9 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement9.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement9.setText(this.jetiValueNames[9]);
+					this.measurement9.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement9.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement9.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFDFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000200;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement10 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement10.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement10.setText(this.jetiValueNames[10]);
+					this.measurement10.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement10.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement10.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFBFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000400;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement11 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement11.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement11.setText(this.jetiValueNames[11]);
+					this.measurement11.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement11.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement11.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFF7FF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000800;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement12 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement12.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement12.setText(this.jetiValueNames[12]);
+					this.measurement12.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement12.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement12.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFEFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00001000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement13 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement13.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement13.setText(this.jetiValueNames[13]);
+					this.measurement13.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement13.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement13.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFDFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00002000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement14 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement14.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement14.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement14.setText(this.jetiValueNames[14]);
+					this.measurement14.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement14.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement14.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFBFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00004000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement15 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement15.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement15.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement15.setText(this.jetiValueNames[15]);
+					this.measurement15.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement15.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement15.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFF7FFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00008000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement16 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement16.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement16.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement16.setText(this.jetiValueNames[16]);
+					this.measurement16.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement16.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement16.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFEFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00010000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement17 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement17.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement17.setText(this.jetiValueNames[17]);
+					this.measurement17.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement17.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement17.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFDFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00020000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement18 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement18.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement18.setText(this.jetiValueNames[18]);
+					this.measurement18.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement18.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement18.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFBFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00040000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement19 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement19.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement19.setText(this.jetiValueNames[19]);
+					this.measurement19.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement19.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement19.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFF7FFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00080000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement20 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement20.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement20.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement20.setText(this.jetiValueNames[20]);
+					this.measurement20.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement20.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement20.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFEFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00100000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement21 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement21.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement21.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement21.setText(this.jetiValueNames[21]);
+					this.measurement21.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement21.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement21.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFDFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00200000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement22 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement22.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement22.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement22.setText(this.jetiValueNames[22]);
+					this.measurement22.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement22.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement22.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFBFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00400000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement23 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement23.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement23.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement23.setText(this.jetiValueNames[23]);
+					this.measurement23.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement23.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement23.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFF7FFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00800000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement24 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement24.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement24.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement24.setText(this.jetiValueNames[24]);
+					this.measurement24.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement24.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement24.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFEFFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x01000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement25 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement25.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement25.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement25.setText(this.jetiValueNames[25]);
+					this.measurement25.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement25.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement25.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFDFFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x02000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement26 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement26.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement26.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement26.setText(this.jetiValueNames[26]);
+					this.measurement26.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement26.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement26.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFBFFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x04000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement27 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement27.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement27.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement27.setText(this.jetiValueNames[27]);
+					this.measurement27.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement27.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement27.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xF7FFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x08000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement28 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement28.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement28.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement28.setText(this.jetiValueNames[28]);
+					this.measurement28.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement28.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement28.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xEFFFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x10000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement29 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement29.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement29.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement29.setText(this.jetiValueNames[29]);
+					this.measurement29.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement29.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement29.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xDFFFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x20000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.measurement30 = new Button(this.jetiExGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 142;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.measurement30.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.measurement30.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.measurement30.setText(this.jetiValueNames[30]);
+					this.measurement30.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement30.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement30.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xBFFFFFFF
+									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x40000000;
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.jetiExSelectionLabel = new CLabel(this.jetiExGroup, SWT.CENTER);
+					this.jetiExSelectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData jetiExSelectionLData = new RowData();
+					jetiExSelectionLData.width = 285;
+					jetiExSelectionLData.height = 25;
+					this.jetiExSelectionLabel.setLayoutData(jetiExSelectionLData);
+					this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088));
+				}
 			}
 			{
 				this.unilogTelemtryAlarmsGroup = new Group(this, SWT.NONE);
+				GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic = this.unilogTelemtryAlarmsGroup;
 				RowLayout unilogTelemtryAlarmsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.unilogTelemtryAlarmsGroup.setLayout(unilogTelemtryAlarmsGroupLayout);
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.width = 290;
-				unilogTelemtryAlarmsGroupLData.height = 200;
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 300);
+				unilogTelemtryAlarmsGroupLData.height = 143;
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 390);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -634,182 +1418,15 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 280;
-					fillerCompositeRA1LData.height = 2;
-					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					this.addressLabel1UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
-					this.addressLabel1UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel1ULLData = new RowData();
-					addressLabel1ULLData.width = labelWidth;
-					addressLabel1ULLData.height = 21;
-					this.addressLabel1UL.setLayoutData(addressLabel1ULLData);
-					this.addressLabel1UL.setText(Messages.getString(MessageIds.GDE_MSGT2054));
-				}
-				{
-					this.addressText1UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText1UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText1ULLData = new RowData();
-					addressText1ULLData.width = textWidth;
-					addressText1ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
-					this.addressText1UL.setLayoutData(addressText1ULLData);
-					this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
-					this.addressText1UL.setEditable(false);
-					this.addressText1UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				}
-				{
-					this.addressSlider1UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
-					this.addressSlider1UL.setMinimum(sliderMinimum);
-					this.addressSlider1UL.setMaximum(sliderMaximum);
-					this.addressSlider1UL.setIncrement(sliderIncrement);
-					RowData addressSlider1ULLData = new RowData();
-					addressSlider1ULLData.width = sliderWidth;
-					addressSlider1ULLData.height = 17;
-					this.addressSlider1UL.setLayoutData(addressSlider1ULLData);
-					this.addressSlider1UL.setSelection(this.configuration.mLinkAddressVoltageUL);
-					this.addressSlider1UL.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider1UL.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVoltageUL = GPSLoggerSetupConfiguration2.this.addressSlider1UL.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText1UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVoltageUL]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel2UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
-					this.addressLabel2UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel2ULLData = new RowData();
-					addressLabel2ULLData.width = labelWidth;
-					addressLabel2ULLData.height = 21;
-					this.addressLabel2UL.setLayoutData(addressLabel2ULLData);
-					this.addressLabel2UL.setText(Messages.getString(MessageIds.GDE_MSGT2066));
-				}
-				{
-					this.addressText2UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText2UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText2ULLData = new RowData();
-					addressText2ULLData.width = textWidth;
-					addressText2ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
-					this.addressText2UL.setLayoutData(addressText2ULLData);
-					this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
-					this.addressText2UL.setEditable(false);
-					this.addressText2UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				}
-				{
-					this.addressSlider2UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
-					this.addressSlider2UL.setMinimum(sliderMinimum);
-					this.addressSlider2UL.setMaximum(sliderMaximum);
-					this.addressSlider2UL.setIncrement(sliderIncrement);
-					RowData addressSlider2ULLData = new RowData();
-					addressSlider2ULLData.width = sliderWidth;
-					addressSlider2ULLData.height = 17;
-					this.addressSlider2UL.setLayoutData(addressSlider2ULLData);
-					this.addressSlider2UL.setSelection(this.configuration.mLinkAddressCurrentUL);
-					this.addressSlider2UL.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider2UL.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCurrentUL = GPSLoggerSetupConfiguration2.this.addressSlider2UL.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText2UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCurrentUL]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel3UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
-					this.addressLabel3UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel3ULLData = new RowData();
-					addressLabel3ULLData.width = labelWidth;
-					addressLabel3ULLData.height = 21;
-					this.addressLabel3UL.setLayoutData(addressLabel3ULLData);
-					this.addressLabel3UL.setText(Messages.getString(MessageIds.GDE_MSGT2067));
-				}
-				{
-					this.addressText3UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText3UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText3ULLData = new RowData();
-					addressText3ULLData.width = textWidth;
-					addressText3ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
-					this.addressText3UL.setLayoutData(addressText3ULLData);
-					this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
-					this.addressText3UL.setEditable(false);
-					this.addressText3UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				}
-				{
-					this.addressSlider3UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
-					this.addressSlider3UL.setMinimum(sliderMinimum);
-					this.addressSlider3UL.setMaximum(sliderMaximum);
-					this.addressSlider3UL.setIncrement(sliderIncrement);
-					RowData addressSlider3ULLData = new RowData();
-					addressSlider3ULLData.width = sliderWidth;
-					addressSlider3ULLData.height = 17;
-					this.addressSlider3UL.setLayoutData(addressSlider3ULLData);
-					this.addressSlider3UL.setSelection(this.configuration.mLinkAddressRevolutionUL);
-					this.addressSlider3UL.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider3UL.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressRevolutionUL = GPSLoggerSetupConfiguration2.this.addressSlider3UL.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText3UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressRevolutionUL]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel4UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
-					this.addressLabel4UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel4ULLData = new RowData();
-					addressLabel4ULLData.width = labelWidth;
-					addressLabel4ULLData.height = 21;
-					this.addressLabel4UL.setLayoutData(addressLabel4ULLData);
-					this.addressLabel4UL.setText(Messages.getString(MessageIds.GDE_MSGT2056));
-				}
-				{
-					this.addressText4UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText4UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText4ULLData = new RowData();
-					addressText4ULLData.width = textWidth;
-					addressText4ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
-					this.addressText4UL.setLayoutData(addressText4ULLData);
-					this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
-					this.addressText4UL.setEditable(false);
-					this.addressText4UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				}
-				{
-					this.addressSlider4UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
-					this.addressSlider4UL.setMinimum(sliderMinimum);
-					this.addressSlider4UL.setMaximum(sliderMaximum);
-					this.addressSlider4UL.setIncrement(sliderIncrement);
-					RowData addressSlider4ULLData = new RowData();
-					addressSlider4ULLData.width = sliderWidth;
-					addressSlider4ULLData.height = 17;
-					this.addressSlider4UL.setLayoutData(addressSlider4ULLData);
-					this.addressSlider4UL.setSelection(this.configuration.mLinkAddressCapacityUL);
-					this.addressSlider4UL.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider4UL.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCapacityUL = GPSLoggerSetupConfiguration2.this.addressSlider4UL.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText4UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCapacityUL]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = fillerHeight;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
 					this.currentButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData currentButtonLData = new RowData();
 					currentButtonLData.width = buttonWidth;
-					currentButtonLData.height = 21;
+					currentButtonLData.height = 20;
 					this.currentButton.setLayoutData(currentButtonLData);
 					this.currentButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentButton.setText(Messages.getString(MessageIds.GDE_MSGT2066));
@@ -875,7 +1492,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.currentLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER);
 					RowData currentLabelLData = new RowData();
 					currentLabelLData.width = 50;
-					currentLabelLData.height = 22;
+					currentLabelLData.height = 20;
 					this.currentLabel.setLayoutData(currentLabelLData);
 					this.currentLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentLabel.setText(Messages.getString(MessageIds.GDE_MSGT2051));
@@ -884,14 +1501,14 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = fillerHeight;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
 					this.voltageStartButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageStartButtonLData = new RowData();
 					voltageStartButtonLData.width = buttonWidth;
-					voltageStartButtonLData.height = 21;
+					voltageStartButtonLData.height = 20;
 					this.voltageStartButton.setLayoutData(voltageStartButtonLData);
 					this.voltageStartButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageStartButton.setText(Messages.getString(MessageIds.GDE_MSGT2052));
@@ -956,7 +1573,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageStartLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData voltageStartLabelLData = new RowData();
 					voltageStartLabelLData.width = 50;
-					voltageStartLabelLData.height = 22;
+					voltageStartLabelLData.height = 20;
 					this.voltageStartLabel.setLayoutData(voltageStartLabelLData);
 					this.voltageStartLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageStartLabel.setText(Messages.getString(MessageIds.GDE_MSGT2053));
@@ -965,14 +1582,14 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = fillerHeight;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
 					this.voltageButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageButtonLData = new RowData();
 					voltageButtonLData.width = buttonWidth;
-					voltageButtonLData.height = 21;
+					voltageButtonLData.height = 20;
 					this.voltageButton.setLayoutData(voltageButtonLData);
 					this.voltageButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageButton.setText(Messages.getString(MessageIds.GDE_MSGT2054));
@@ -1036,7 +1653,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					RowData voltageLabelLData = new RowData();
 					voltageLabelLData.width = 50;
-					voltageLabelLData.height = 22;
+					voltageLabelLData.height = 20;
 					this.voltageLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					this.voltageLabel.setLayoutData(voltageLabelLData);
 					this.voltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1046,14 +1663,14 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = fillerHeight;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
 					this.capacityButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageRxULButtonLData = new RowData();
 					voltageRxULButtonLData.width = buttonWidth;
-					voltageRxULButtonLData.height = 21;
+					voltageRxULButtonLData.height = 20;
 					this.capacityButton.setLayoutData(voltageRxULButtonLData);
 					this.capacityButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityButton.setText(Messages.getString(MessageIds.GDE_MSGT2056));
@@ -1118,10 +1735,19 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.capacityLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData voltageRxULLabelLData = new RowData();
 					voltageRxULLabelLData.width = 50;
-					voltageRxULLabelLData.height = 22;
+					voltageRxULLabelLData.height = 20;
 					this.capacityLabel.setLayoutData(voltageRxULLabelLData);
 					this.capacityLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityLabel.setText(Messages.getString(MessageIds.GDE_MSGT2057));
+				}
+				{
+					this.jetiUniLogAlarmsLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER);
+					this.jetiUniLogAlarmsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData jetiUniLogAlarmsLData = new RowData();
+					jetiUniLogAlarmsLData.width = 285;
+					jetiUniLogAlarmsLData.height = 30;
+					this.jetiUniLogAlarmsLabel.setLayoutData(jetiUniLogAlarmsLData);
+					this.jetiUniLogAlarmsLabel.setText(Messages.getString(MessageIds.GDE_MSGT2089));
 				}
 			}
 			this.layout();

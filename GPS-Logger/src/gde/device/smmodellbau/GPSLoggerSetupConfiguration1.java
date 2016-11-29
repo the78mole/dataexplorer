@@ -60,17 +60,17 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 	final GPSLoggerDialog		dialog;
 	final DataExplorer		  application;
 
-	Composite								fillerComposite;
+	Composite								fillerComposite, addonComposite;
 
 	Group										gpsLoggerGroup;
-	CLabel									serialNumberLabel, firmwareLabel, dataRatecLabel, startModusLabel, stopModusLabel, timeZoneLabel, timeAutoLabel, varioLimitClimbLabel, varioLimitSinkLabel, varioTonLabel, timeZoneUnitLabel, varioLimitUnitLabel, modusIgcLabel, modusDistanceLabel,telemetryTypeLabel;
+	CLabel									serialNumberLabel,firmwareLabel,dataRatecLabel,startModusLabel,stopModusLabel,timeZoneLabel,timeAutoLabel,varioLimitClimbLabel,varioLimitSinkLabel,varioTonLabel,timeZoneUnitLabel,varioLimitUnitLabel,modusIgcLabel,modusDistanceLabel,telemetryTypeLabel,varioFactorLabel,minMaxRxLabel;
 	Text										serialNumberText, firmwareText;
-	CCombo									dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo;
+	CCombo									dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo, varioFactorCombo, minMaxRxCombo;
 
 	Group										gpsTelemertieGroup;
-	Button									heightButton, velocityButton, distanceButton, tripLengthButton, voltageRxButton;
-	CCombo									heightCombo, velocityCombo, distanceCombo, tripLengthCombo, voltageRxCombo;
-	CLabel									heightLabel, velocityLabel, distanceLabel, tripLengthLabel, voltageRxLabel;
+	Button									heightButton, velocityButton, distanceMaxButton, distanceMinButton, tripLengthButton, voltageRxButton;
+	CCombo									heightCombo, velocityCombo, distanceMaxCombo, distanceMinCombo, tripLengthCombo, voltageRxCombo;
+	CLabel									heightLabel, velocityLabel, distanceMaxLabel, distanceMinLabel, tripLengthLabel, voltageRxLabel;
 
 	final SetupReaderWriter	configuration;
 	final String[]					dataRateValues	= Messages.getString(MessageIds.GDE_MSGT2020).split(GDE.STRING_COMMA);
@@ -94,7 +94,8 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			"  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05", "  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" }; //$NON-NLS-*$
 	final String[]					igcModes				= Messages.getString(MessageIds.GDE_MSGT2069).split(GDE.STRING_COMMA);
 	final String[]					distanceModes		= Messages.getString(MessageIds.GDE_MSGT2071).split(GDE.STRING_COMMA);
-	final String[]					telemetrieTypes	= { " Jeti | HoTT | M-Link", "  FASST", "  JR DMSS"};
+	final String[]					telemetrieTypes	= { " - - - ", " Futaba", " JR DMSS", " HoTT", " JetiDuplex", " M-Link", " FrSky" };
+	final String[]					varioFactors;
 
 	/**
 	 * constructor configuration panel 1
@@ -109,6 +110,11 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		this.dialog = useDialog;
 		this.configuration = useConfiguration;
 		this.application = DataExplorer.getInstance();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 41; i++) {
+			sb.append(String.format(Locale.ENGLISH, " %2.1f ,", 1 + i / 10.0));
+		}
+		this.varioFactors = sb.toString().split(GDE.STRING_COMMA);
 		initGUI();
 		updateValues();
 	}
@@ -125,20 +131,55 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		this.varioLimitClimbCombo.select(this.configuration.varioThreshold);
 		this.varioLimitSinkCombo.select(this.configuration.varioThresholdSink);
 		this.varioToneCombo.select(this.configuration.varioTon);
+		this.varioFactorCombo.select(this.configuration.varioFactor);
 		this.modusIgcCombo.select(this.configuration.modusIGC);
 		this.modusDistanceCombo.select(this.configuration.modusDistance);
 		this.telemetryTypeCombo.select(this.configuration.telemetryType);
+		this.minMaxRxCombo.select(this.configuration.rxControl);
 
 		this.heightButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_HEIGHT) > 0);
 		this.heightCombo.setText(String.format("%5d", this.configuration.heightAlarm)); //$NON-NLS-1$
 		this.velocityButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_SPEED) > 0);
 		this.velocityCombo.setText(String.format("%5d", this.configuration.speedAlarm)); //$NON-NLS-1$
-		this.distanceButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE) > 0);
-		this.distanceCombo.setText(String.format("%5d", this.configuration.distanceAlarm)); //$NON-NLS-1$
+		this.distanceMaxButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE_MAX) > 0);
+		this.distanceMinButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE_MIN) > 0);
+		this.distanceMaxCombo.setText(String.format("%5d", this.configuration.distanceMaxAlarm)); //$NON-NLS-1$
 		this.tripLengthButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_TRIP_LENGTH) > 0);
 		this.tripLengthCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.tripLengthAlarm / 10.0)); //$NON-NLS-1$
 		this.voltageRxButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_VOLTAGE_RX) > 0);
 		this.voltageRxCombo.setText(String.format(Locale.ENGLISH, "%6.2f", this.configuration.voltageRxAlarm / 100.0)); //$NON-NLS-1$
+
+		this.changeVisibility();
+	}
+	
+	private void changeVisibility() {
+		if (GPSLoggerSetupConfiguration2.mLinkGroupStatic != null && !GPSLoggerSetupConfiguration2.mLinkGroupStatic.isDisposed()) {
+			GPSLoggerSetupConfiguration2.mLinkGroupStatic.setVisible(false);
+		}
+		if (GPSLoggerSetupConfiguration2.jetiExGroupStatic != null && !GPSLoggerSetupConfiguration2.jetiExGroupStatic.isDisposed()) {
+			GPSLoggerSetupConfiguration2.jetiExGroupStatic.setVisible(false);
+		}
+		if (GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic != null && !GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic.isDisposed()) {
+			GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic.setVisible(false);
+		}
+
+		if (this.gpsLoggerGroup != null && !this.gpsLoggerGroup.isDisposed()) {
+		//0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky
+			switch (this.telemetryTypeCombo.getSelectionIndex()) {
+			case 5: //M-Link
+				if (GPSLoggerSetupConfiguration2.mLinkGroupStatic != null) {
+					GPSLoggerSetupConfiguration2.mLinkGroupStatic.setVisible(true);
+				}
+				break;
+			case 4: //JetiDuplex
+				if (GPSLoggerSetupConfiguration2.jetiExGroupStatic != null) {
+					GPSLoggerSetupConfiguration2.jetiExGroupStatic.setVisible(true);
+					GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic.setVisible(true);				}
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	void initGUI() {
@@ -153,10 +194,10 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			{
 				this.gpsLoggerGroup = new Group(this, SWT.NONE);
 				FormData gpsLoggerGroupLData = new FormData();
-				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 15);
-				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 10);
+				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 10);
+				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 5);
 				gpsLoggerGroupLData.width = 290;
-				gpsLoggerGroupLData.height = GDE.IS_MAC ? 325 : 330;
+				gpsLoggerGroupLData.height = GDE.IS_MAC ? 355 : 360;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
 				this.gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
@@ -170,19 +211,49 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 //					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 //				}
 				{
+					this.telemetryTypeLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData telemetryTypeLabelLData = new RowData();
+					telemetryTypeLabelLData.width = 130;
+					telemetryTypeLabelLData.height = 20;
+					this.telemetryTypeLabel.setLayoutData(telemetryTypeLabelLData);
+					this.telemetryTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2075));
+				}
+				{
+					this.telemetryTypeCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
+					RowData telemetryTypeComboLData = new RowData();
+					telemetryTypeComboLData.width = 130;
+					telemetryTypeComboLData.height = 17;
+					this.telemetryTypeCombo.setLayoutData(telemetryTypeComboLData);
+					this.telemetryTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryTypeCombo.setItems(this.telemetrieTypes);
+					this.telemetryTypeCombo.select(this.configuration.telemetryType);
+					this.telemetryTypeCombo.setEditable(false);
+					this.telemetryTypeCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.telemetryTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "telemetryTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.telemetryType = GPSLoggerSetupConfiguration1.this.telemetryTypeCombo.getSelectionIndex();
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							changeVisibility();
+						}
+					});
+				}
+				{
 					this.serialNumberLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData serialNumberLabelLData = new RowData();
 					serialNumberLabelLData.width = 130;
-					serialNumberLabelLData.height = 22;
+					serialNumberLabelLData.height = 20;
 					this.serialNumberLabel.setLayoutData(serialNumberLabelLData);
 					this.serialNumberLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.serialNumberLabel.setText(Messages.getString(MessageIds.GDE_MSGT2032));
 				}
 				{
-					this.serialNumberText = new Text(this.gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
+					this.serialNumberText = new Text(this.gpsLoggerGroup, SWT.CENTER | SWT.BORDER);
 					RowData serialNumberTextLData = new RowData();
-					serialNumberTextLData.width = 83;
-					serialNumberTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					serialNumberTextLData.width = 67;
+					serialNumberTextLData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 12;
 					this.serialNumberText.setLayoutData(serialNumberTextLData);
 					this.serialNumberText.setEditable(false);
 					this.serialNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -192,16 +263,16 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.firmwareLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData firmwareLabelLData = new RowData();
 					firmwareLabelLData.width = 130;
-					firmwareLabelLData.height = 22;
+					firmwareLabelLData.height = 20;
 					this.firmwareLabel.setLayoutData(firmwareLabelLData);
 					this.firmwareLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.firmwareLabel.setText(Messages.getString(MessageIds.GDE_MSGT2033));
 				}
 				{
-					this.firmwareText = new Text(this.gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
+					this.firmwareText = new Text(this.gpsLoggerGroup, SWT.CENTER | SWT.BORDER);
 					RowData firmwareTextLData = new RowData();
-					firmwareTextLData.width = 83;
-					firmwareTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					firmwareTextLData.width = 67;
+					firmwareTextLData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 12;
 					this.firmwareText.setLayoutData(firmwareTextLData);
 					this.firmwareText.setEditable(false);
 					this.firmwareText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -211,7 +282,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.dataRatecLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData dataRatecLabelLData = new RowData();
 					dataRatecLabelLData.width = 130;
-					dataRatecLabelLData.height = 22;
+					dataRatecLabelLData.height = 20;
 					this.dataRatecLabel.setLayoutData(dataRatecLabelLData);
 					this.dataRatecLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.dataRatecLabel.setText(Messages.getString(MessageIds.GDE_MSGT2034));
@@ -240,7 +311,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.startModusLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData startModusLabelLData = new RowData();
 					startModusLabelLData.width = 130;
-					startModusLabelLData.height = 22;
+					startModusLabelLData.height = 20;
 					this.startModusLabel.setLayoutData(startModusLabelLData);
 					this.startModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.startModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2035));
@@ -269,7 +340,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.stopModusLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData stopModusLabelLData = new RowData();
 					stopModusLabelLData.width = 130;
-					stopModusLabelLData.height = 22;
+					stopModusLabelLData.height = 20;
 					this.stopModusLabel.setLayoutData(stopModusLabelLData);
 					this.stopModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.stopModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2026));
@@ -298,7 +369,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeZoneLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData timeZoneLabelLData = new RowData();
 					timeZoneLabelLData.width = 130;
-					timeZoneLabelLData.height = 22;
+					timeZoneLabelLData.height = 20;
 					this.timeZoneLabel.setLayoutData(timeZoneLabelLData);
 					this.timeZoneLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeZoneLabel.setText(Messages.getString(MessageIds.GDE_MSGT2036));
@@ -328,7 +399,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeZoneUnitLabel = new CLabel(this.gpsLoggerGroup, SWT.CENTER);
 					RowData timeZoneUnitLabelLData = new RowData();
 					timeZoneUnitLabelLData.width = 79;
-					timeZoneUnitLabelLData.height = 22;
+					timeZoneUnitLabelLData.height = 20;
 					this.timeZoneUnitLabel.setLayoutData(timeZoneUnitLabelLData);
 					this.timeZoneUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeZoneUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2037));
@@ -337,7 +408,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeAutoLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData timeZoneLabelLData = new RowData();
 					timeZoneLabelLData.width = 130;
-					timeZoneLabelLData.height = 22;
+					timeZoneLabelLData.height = 20;
 					this.timeAutoLabel.setLayoutData(timeZoneLabelLData);
 					this.timeAutoLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeAutoLabel.setText(Messages.getString(MessageIds.GDE_MSGT2073));
@@ -366,7 +437,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitClimbLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioLimitLabelLData = new RowData();
 					varioLimitLabelLData.width = 130;
-					varioLimitLabelLData.height = 22;
+					varioLimitLabelLData.height = 20;
 					this.varioLimitClimbLabel.setLayoutData(varioLimitLabelLData);
 					this.varioLimitClimbLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitClimbLabel.setText(Messages.getString(MessageIds.GDE_MSGT2038));
@@ -395,7 +466,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitUnitLabel = new CLabel(this.gpsLoggerGroup, SWT.CENTER);
 					RowData varioLimitUnitLabelLData = new RowData();
 					varioLimitUnitLabelLData.width = 79;
-					varioLimitUnitLabelLData.height = 22;
+					varioLimitUnitLabelLData.height = 20;
 					this.varioLimitUnitLabel.setLayoutData(varioLimitUnitLabelLData);
 					this.varioLimitUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2039));
@@ -404,7 +475,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitSinkLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioLimitLabelLData = new RowData();
 					varioLimitLabelLData.width = 130;
-					varioLimitLabelLData.height = 22;
+					varioLimitLabelLData.height = 20;
 					this.varioLimitSinkLabel.setLayoutData(varioLimitLabelLData);
 					this.varioLimitSinkLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitSinkLabel.setText(Messages.getString(MessageIds.GDE_MSGT2074));
@@ -433,7 +504,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitUnitLabel = new CLabel(this.gpsLoggerGroup, SWT.CENTER);
 					RowData varioLimitUnitLabelLData = new RowData();
 					varioLimitUnitLabelLData.width = 79;
-					varioLimitUnitLabelLData.height = 22;
+					varioLimitUnitLabelLData.height = 20;
 					this.varioLimitUnitLabel.setLayoutData(varioLimitUnitLabelLData);
 					this.varioLimitUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2039));
@@ -442,7 +513,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioTonLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioTonLabelLData = new RowData();
 					varioTonLabelLData.width = 130;
-					varioTonLabelLData.height = 22;
+					varioTonLabelLData.height = 20;
 					this.varioTonLabel.setLayoutData(varioTonLabelLData);
 					this.varioTonLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioTonLabel.setText(Messages.getString(MessageIds.GDE_MSGT2040));
@@ -468,10 +539,38 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					});
 				}
 				{
+					this.varioFactorLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData varioFactorLabelLData = new RowData();
+					varioFactorLabelLData.width = 130;
+					varioFactorLabelLData.height = 20;
+					this.varioFactorLabel.setLayoutData(varioFactorLabelLData);
+					this.varioFactorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2078));
+					this.varioFactorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.varioFactorCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER | SWT.CENTER);
+					RowData varioFactorComboLData = new RowData();
+					varioFactorComboLData.width = 84;
+					varioFactorComboLData.height = GDE.IS_MAC ? 17 : 14;
+					this.varioFactorCombo.setLayoutData(varioFactorComboLData);
+					this.varioFactorCombo.setItems(this.varioFactors);
+					this.varioFactorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.varioFactorCombo.setEditable(false);
+					this.varioFactorCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.varioFactorCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration1.log.log(Level.FINEST, "varioFactorCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.varioFactor = (short) (GPSLoggerSetupConfiguration1.this.varioFactorCombo.getSelectionIndex());
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
 					this.modusIgcLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData modusIgcLabelLData = new RowData();
 					modusIgcLabelLData.width = 130;
-					modusIgcLabelLData.height = 22;
+					modusIgcLabelLData.height = 20;
 					this.modusIgcLabel.setLayoutData(modusIgcLabelLData);
 					this.modusIgcLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.modusIgcLabel.setText(Messages.getString(MessageIds.GDE_MSGT2068));
@@ -500,7 +599,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.modusDistanceLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData modusDistanceLabelLData = new RowData();
 					modusDistanceLabelLData.width = 130;
-					modusDistanceLabelLData.height = 22;
+					modusDistanceLabelLData.height = 20;
 					this.modusDistanceLabel.setLayoutData(modusDistanceLabelLData);
 					this.modusDistanceLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.modusDistanceLabel.setText(Messages.getString(MessageIds.GDE_MSGT2027));
@@ -526,30 +625,29 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					});
 				}
 				{
-					this.telemetryTypeLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
-					RowData telemetryTypeLabelLData = new RowData();
-					telemetryTypeLabelLData.width = 130;
-					telemetryTypeLabelLData.height = 22;
-					this.telemetryTypeLabel.setLayoutData(telemetryTypeLabelLData);
-					this.telemetryTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.telemetryTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2075));
+					this.minMaxRxLabel = new CLabel(this.gpsLoggerGroup, SWT.NONE);
+					RowData minMaxRxLabelLData = new RowData();
+					minMaxRxLabelLData.width = 130;
+					minMaxRxLabelLData.height = 20;
+					this.minMaxRxLabel.setLayoutData(minMaxRxLabelLData);
+					this.minMaxRxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2080));
+					this.minMaxRxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
-					this.telemetryTypeCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
-					RowData telemetryTypeComboLData = new RowData();
-					telemetryTypeComboLData.width = 130;
-					telemetryTypeComboLData.height = 17;
-					this.telemetryTypeCombo.setLayoutData(telemetryTypeComboLData);
-					this.telemetryTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.telemetryTypeCombo.setItems(this.telemetrieTypes);
-					this.telemetryTypeCombo.select(this.configuration.telemetryType);
-					this.telemetryTypeCombo.setEditable(false);
-					this.telemetryTypeCombo.setBackground(DataExplorer.COLOR_WHITE);
-					this.telemetryTypeCombo.addSelectionListener(new SelectionAdapter() {
+					this.minMaxRxCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
+					RowData minMaxRxComboLData = new RowData();
+					minMaxRxComboLData.width = 104;
+					minMaxRxComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.minMaxRxCombo.setLayoutData(minMaxRxComboLData);
+					this.minMaxRxCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2081).split(GDE.STRING_COMMA));
+					this.minMaxRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.minMaxRxCombo.setEditable(false);
+					this.minMaxRxCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.minMaxRxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "telemetryTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.telemetryType = GPSLoggerSetupConfiguration1.this.telemetryTypeCombo.getSelectionIndex();
+							GPSLoggerSetupConfiguration1.log.log(Level.FINEST, "minMaxRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.rxControl = (short) (GPSLoggerSetupConfiguration1.this.minMaxRxCombo.getSelectionIndex());
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -557,10 +655,10 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			}
 			{
 				FormData gpsTelemertieGroupLData = new FormData();
-				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 15);
-				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 360);
+				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 10);
+				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 390);
 				gpsTelemertieGroupLData.width = 290;
-				gpsTelemertieGroupLData.height = 140;
+				gpsTelemertieGroupLData.height = 143;
 				this.gpsTelemertieGroup = new Group(this, SWT.NONE);
 				RowLayout gpsTelemertieGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsTelemertieGroup.setLayout(gpsTelemertieGroupLayout);
@@ -570,21 +668,21 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				{
 					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 280;
+					fillerCompositeRALData.width = 275;
 					fillerCompositeRALData.height = 5;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
 					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 20;
+					fillerCompositeRALData.width = 15;
 					fillerCompositeRALData.height = 20;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
 					this.heightButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
 					RowData heightButtonLData = new RowData();
-					heightButtonLData.width = 95;
+					heightButtonLData.width = 100;
 					heightButtonLData.height = 16;
 					this.heightButton.setLayoutData(heightButtonLData);
 					this.heightButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -650,7 +748,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.heightLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
 					RowData heightLabelLData = new RowData();
 					heightLabelLData.width = 89;
-					heightLabelLData.height = 22;
+					heightLabelLData.height = 20;
 					this.heightLabel.setLayoutData(heightLabelLData);
 					this.heightLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.heightLabel.setText(Messages.getString(MessageIds.GDE_MSGT2042));
@@ -658,14 +756,14 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				{
 					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 20;
+					fillerCompositeRALData.width = 15;
 					fillerCompositeRALData.height = 20;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
 					this.velocityButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
 					RowData velocityButtonLData = new RowData();
-					velocityButtonLData.width = 95;
+					velocityButtonLData.width = 100;
 					velocityButtonLData.height = 16;
 					this.velocityButton.setLayoutData(velocityButtonLData);
 					this.velocityButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -731,7 +829,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.velocityLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
 					RowData velocityLabelLData = new RowData();
 					velocityLabelLData.width = 89;
-					velocityLabelLData.height = 22;
+					velocityLabelLData.height = 20;
 					this.velocityLabel.setLayoutData(velocityLabelLData);
 					this.velocityLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.velocityLabel.setText(Messages.getString(MessageIds.GDE_MSGT2044));
@@ -739,65 +837,65 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				{
 					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 20;
+					fillerCompositeRALData.width = 15;
 					fillerCompositeRALData.height = 20;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
-					this.distanceButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
+					this.distanceMaxButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
 					RowData distanceButtonLData = new RowData();
-					distanceButtonLData.width = 95;
+					distanceButtonLData.width = 100;
 					distanceButtonLData.height = 16;
-					this.distanceButton.setLayoutData(distanceButtonLData);
-					this.distanceButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.distanceButton.setText(Messages.getString(MessageIds.GDE_MSGT2045));
-					this.distanceButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE) > 0);
-					this.distanceButton.addSelectionListener(new SelectionAdapter() {
+					this.distanceMaxButton.setLayoutData(distanceButtonLData);
+					this.distanceMaxButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.distanceMaxButton.setText(Messages.getString(MessageIds.GDE_MSGT2045));
+					this.distanceMaxButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE_MAX) > 0);
+					this.distanceMaxButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "distanceButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPSLoggerSetupConfiguration1.this.heightButton.getSelection()) {
-								GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms = GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms | SetupReaderWriter.TEL_ALARM_DISTANCE;
+								GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms = GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms | SetupReaderWriter.TEL_ALARM_DISTANCE_MAX;
 							}
 							else {
-								GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms = GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms ^ SetupReaderWriter.TEL_ALARM_DISTANCE;
+								GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms = GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms ^ SetupReaderWriter.TEL_ALARM_DISTANCE_MAX;
 							}
-							GPSLoggerSetupConfiguration1.this.distanceButton.setSelection((GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE) > 0);
+							GPSLoggerSetupConfiguration1.this.distanceMaxButton.setSelection((GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE_MAX) > 0);
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 				}
 				{
-					this.distanceCombo = new CCombo(this.gpsTelemertieGroup, SWT.BORDER);
+					this.distanceMaxCombo = new CCombo(this.gpsTelemertieGroup, SWT.BORDER);
 					RowData distanceCComboLData = new RowData();
 					distanceCComboLData.width = 70;
 					distanceCComboLData.height = 17;
-					this.distanceCombo.setLayoutData(distanceCComboLData);
-					this.distanceCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.distanceCombo.setItems(this.distanceValues);
-					this.distanceCombo.setText(String.format("%5d", this.configuration.distanceAlarm)); //$NON-NLS-1$
-					this.distanceCombo.addSelectionListener(new SelectionAdapter() {
+					this.distanceMaxCombo.setLayoutData(distanceCComboLData);
+					this.distanceMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.distanceMaxCombo.setItems(this.distanceValues);
+					this.distanceMaxCombo.setText(String.format("%5d", this.configuration.distanceMaxAlarm)); //$NON-NLS-1$
+					this.distanceMaxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "distanceCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceCombo.getText().trim());
+							GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceMaxCombo.getText().trim());
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
-					this.distanceCombo.addVerifyListener(new VerifyListener() {
+					this.distanceMaxCombo.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "distanceCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
 						}
 					});
-					this.distanceCombo.addKeyListener(new KeyAdapter() {
+					this.distanceMaxCombo.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "distanceCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							try {
-								GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceCombo.getText().trim());
-								GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm < 10 ? 10
-										: GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm; 
+								GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceMaxCombo.getText().trim());
+								GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm < 10 ? 10
+										: GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm; 
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -807,25 +905,104 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					});
 				}
 				{
-					this.distanceLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
+					this.distanceMaxLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
 					RowData distanceLabelLData = new RowData();
 					distanceLabelLData.width = 89;
-					distanceLabelLData.height = 22;
-					this.distanceLabel.setLayoutData(distanceLabelLData);
-					this.distanceLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.distanceLabel.setText(Messages.getString(MessageIds.GDE_MSGT2046));
+					distanceLabelLData.height = 20;
+					this.distanceMaxLabel.setLayoutData(distanceLabelLData);
+					this.distanceMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.distanceMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2046));
 				}
 				{
 					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 20;
+					fillerCompositeRALData.width = 15;
+					fillerCompositeRALData.height = 20;
+					this.fillerComposite.setLayoutData(fillerCompositeRALData);
+				}
+				{
+					this.distanceMinButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
+					RowData distanceButtonLData = new RowData();
+					distanceButtonLData.width = 100;
+					distanceButtonLData.height = 16;
+					this.distanceMinButton.setLayoutData(distanceButtonLData);
+					this.distanceMinButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.distanceMinButton.setText(Messages.getString(MessageIds.GDE_MSGT2082));
+					this.distanceMinButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE_MIN) > 0);
+					this.distanceMinButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "distanceMinButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (GPSLoggerSetupConfiguration1.this.distanceMinButton.getSelection()) {
+								GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms = GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms | SetupReaderWriter.TEL_ALARM_DISTANCE_MIN;
+							}
+							else {
+								GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms = GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms ^ SetupReaderWriter.TEL_ALARM_DISTANCE_MIN;
+							}
+							GPSLoggerSetupConfiguration1.this.distanceMinButton.setSelection((GPSLoggerSetupConfiguration1.this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE_MIN) > 0);
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.distanceMinCombo = new CCombo(this.gpsTelemertieGroup, SWT.BORDER);
+					RowData distanceCComboLData = new RowData();
+					distanceCComboLData.width = 70;
+					distanceCComboLData.height = 17;
+					this.distanceMinCombo.setLayoutData(distanceCComboLData);
+					this.distanceMinCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.distanceMinCombo.setItems(this.distanceValues);
+					this.distanceMinCombo.setText(String.format("%5d", this.configuration.distanceMinAlarm)); //$NON-NLS-1$
+					this.distanceMinCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "distanceMinCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceMinCombo.getText().trim());
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+					this.distanceMinCombo.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent verifyevent) {
+							log.log(Level.FINEST, "distanceMinCombo.verify, event=" + verifyevent); //$NON-NLS-1$
+							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
+						}
+					});
+					this.distanceMinCombo.addKeyListener(new KeyAdapter() {
+						@Override
+						public void keyReleased(KeyEvent keyevent) {
+							log.log(Level.FINEST, "distanceMinCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
+							try {
+								GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceMinCombo.getText().trim());
+								GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm < 0 ? 0
+										: GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm; 
+								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
+						}
+					});
+				}
+				{
+					this.distanceMinLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
+					RowData distanceLabelLData = new RowData();
+					distanceLabelLData.width = 89;
+					distanceLabelLData.height = 20;
+					this.distanceMinLabel.setLayoutData(distanceLabelLData);
+					this.distanceMinLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.distanceMinLabel.setText(Messages.getString(MessageIds.GDE_MSGT2046));
+				}
+				{
+					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
+					RowData fillerCompositeRALData = new RowData();
+					fillerCompositeRALData.width = 15;
 					fillerCompositeRALData.height = 20;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
 					this.tripLengthButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
 					RowData pathLengthButtonLData = new RowData();
-					pathLengthButtonLData.width = 95;
+					pathLengthButtonLData.width = 100;
 					pathLengthButtonLData.height = 16;
 					this.tripLengthButton.setLayoutData(pathLengthButtonLData);
 					this.tripLengthButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -865,13 +1042,13 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
-					this.distanceCombo.addVerifyListener(new VerifyListener() {
+					this.distanceMaxCombo.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "tripLengthCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
 						}
 					});
-					this.distanceCombo.addKeyListener(new KeyAdapter() {
+					this.distanceMaxCombo.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "tripLengthCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
@@ -891,7 +1068,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.tripLengthLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
 					RowData pathLengthLabelLData = new RowData();
 					pathLengthLabelLData.width = 89;
-					pathLengthLabelLData.height = 22;
+					pathLengthLabelLData.height = 20;
 					this.tripLengthLabel.setLayoutData(pathLengthLabelLData);
 					this.tripLengthLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tripLengthLabel.setText(Messages.getString(MessageIds.GDE_MSGT2048));
@@ -899,14 +1076,14 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				{
 					this.fillerComposite = new Composite(this.gpsTelemertieGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 20;
+					fillerCompositeRALData.width = 15;
 					fillerCompositeRALData.height = 20;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
 					this.voltageRxButton = new Button(this.gpsTelemertieGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageRxButtonLData = new RowData();
-					voltageRxButtonLData.width = 95;
+					voltageRxButtonLData.width = 100;
 					voltageRxButtonLData.height = 16;
 					this.voltageRxButton.setLayoutData(voltageRxButtonLData);
 					this.voltageRxButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -972,7 +1149,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.voltageRxLabel = new CLabel(this.gpsTelemertieGroup, SWT.CENTER);
 					RowData voltageRxLabelLData = new RowData();
 					voltageRxLabelLData.width = 89;
-					voltageRxLabelLData.height = 22;
+					voltageRxLabelLData.height = 20;
 					this.voltageRxLabel.setLayoutData(voltageRxLabelLData);
 					this.voltageRxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageRxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2050));

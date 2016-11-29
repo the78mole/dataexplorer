@@ -24,6 +24,7 @@ package gde.device.smmodellbau.gpslogger;
  */ 
 public class MessageIds { 
 
+	public final static String	GDE_MSGW2000 = "GDE_MSGW2000";
 	public final static String	GDE_MSGI2000 = "GDE_MSGI2000";
 	public final static String	GDE_MSGT2000 = "GDE_MSGT2000";
 	public final static String	GDE_MSGT2001 = "GDE_MSGT2001";
@@ -100,5 +101,17 @@ public class MessageIds {
 	public final static String	GDE_MSGT2074 = "GDE_MSGT2074";
 	public final static String	GDE_MSGT2075 = "GDE_MSGT2075";
 	public final static String	GDE_MSGT2076 = "GDE_MSGT2076";
+	public final static String	GDE_MSGT2078 = "GDE_MSGT2078";
+	public final static String	GDE_MSGT2079 = "GDE_MSGT2079";
+	public final static String	GDE_MSGT2080 = "GDE_MSGT2080";
+	public final static String	GDE_MSGT2081 = "GDE_MSGT2081";
+	public final static String	GDE_MSGT2082 = "GDE_MSGT2082";
+	public final static String	GDE_MSGT2083 = "GDE_MSGT2083";
+	public final static String	GDE_MSGT2084 = "GDE_MSGT2084";
+	public final static String	GDE_MSGT2085 = "GDE_MSGT2085";
+	public final static String	GDE_MSGT2086 = "GDE_MSGT2086";
+	public final static String	GDE_MSGT2087 = "GDE_MSGT2087";
+	public final static String	GDE_MSGT2088 = "GDE_MSGT2088";
+	public final static String	GDE_MSGT2089 = "GDE_MSGT2089";
 
  }
