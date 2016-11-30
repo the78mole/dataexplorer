@@ -68,7 +68,8 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 
 	final static String		SM_GPS_LOGGER_INI				= "SM GPS-Logger.ini";													//$NON-NLS-1$
 	final static String		SM_GPS_LOGGER_INI_DIR		= "SM GPS-Logger setup";												//$NON-NLS-1$
-	final static String		SM_GPS_LOGGER_DIR_STUB	= "SM GPS-Logger";															//$NON-NLS-1$
+	final static String		SM_GPS_LOGGER_DIR_STUB	= "GPS-Logger";																	//$NON-NLS-1$
+	static String					selectedSetupFilePath;																									//path to setup ini file
 
 	final DataExplorer		application;
 	final Channels				channels;
@@ -695,17 +696,27 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	}
 	
 	String getConfigurationFileDirecotry() {
-		String searchPath = this.getDataBlockPreferredDataLocation();
-		if (searchPath.contains(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) {
-			searchPath = searchPath.substring(0, searchPath.indexOf(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+		if (GPSLogger.selectedSetupFilePath == null) {
+			String searchPath = GDE.OBJECT_KEY == null 
+					? this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)
+					: FileUtils.getDeviceImportDirectory(this);
+			if (searchPath.contains(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) {
+				searchPath = searchPath.substring(0, searchPath.indexOf(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+			}
+			else {
+				String dataFilePath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX;
+				if (searchPath.equals(dataFilePath)) {
+					searchPath = searchPath + this.getName() + GDE.FILE_SEPARATOR_UNIX;
+				}
+
+				if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
+					searchPath = searchPath + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+				else 
+					searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+			}
+			return searchPath;
 		}
-		else {
-			if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
-				searchPath = searchPath + GPSLogger.SM_GPS_LOGGER_INI_DIR;
-			else 
-				searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + GPSLogger.SM_GPS_LOGGER_INI_DIR;
-		}
-		return searchPath;
+		return GPSLogger.selectedSetupFilePath.substring(0, GPSLogger.selectedSetupFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
 	}
 	
 	/**

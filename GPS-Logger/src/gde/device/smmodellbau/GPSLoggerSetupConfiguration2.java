@@ -204,7 +204,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.measurement28.setSelection((this.configuration.jetiExMask & 0x10000000) == 0);
 		this.measurement29.setSelection((this.configuration.jetiExMask & 0x20000000) == 0);
 		this.measurement30.setSelection((this.configuration.jetiExMask & 0x40000000) == 0);
-		this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
+		this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {this.configuration.getJetiMeasurementCount()}));
 	}
 
 	void initGUI() {

@@ -65,7 +65,7 @@ public class UniLog2SetupReaderWriter {
 	final static int		AUTO_START_CURRENT			= 0x0001;
 	final static int		AUTO_START_RX						= 0x0002;
 	final static int		AUTO_START_TIME					= 0x0004;
-
+	
 	public enum Sensor {
 		GAM("GAM"), EAM("EAM"), ESC("ESC");
 		private final String	value;
@@ -171,12 +171,12 @@ public class UniLog2SetupReaderWriter {
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2501), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName(), SWT.SINGLE);
-		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
+		UniLog2.selectedSetupFilePath = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + UniLog2.selectedSetupFilePath); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
 			try {
-				FileInputStream file_input = new FileInputStream(new File(selectedSetupFile));
+				FileInputStream file_input = new FileInputStream(new File(UniLog2.selectedSetupFilePath));
 				DataInputStream data_in = new DataInputStream(file_input);
 				byte[] buffer = new byte[192];
 				int size = data_in.read(buffer);
@@ -418,5 +418,13 @@ public class UniLog2SetupReaderWriter {
 				UniLog2SetupReaderWriter.log.log(java.util.logging.Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
 		}
+	}
+	
+	public int getJetiMeasurementCount() {
+		int count = 19;
+		for (int i = 0; i < GDE.SIZE_BYTES_INTEGER * 8; i++) {
+			count -= (this.jetiValueVisibility >> i) & 0x00000001;
+		}
+		return count;
 	}
 }

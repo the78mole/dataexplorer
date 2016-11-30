@@ -84,6 +84,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 	static Group										jetiExGroupStatic;
 	Button													measurement1, measurement2, measurement3, measurement4, measurement5, measurement6, measurement7, measurement8, measurement9, measurement10, measurement11,
 			measurement12, measurement13, measurement14, measurement15, measurement16, measurement17, measurement18, measurement19;
+	CLabel 													jetiExSelectionLabel;
 
 	Group														mLinkAddressesGroup;
 	static Group										mLinkGroupStatic;
@@ -220,7 +221,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		this.measurement17.setSelection((this.configuration.jetiValueVisibility & 0x20000) == 0);
 		this.measurement18.setSelection((this.configuration.jetiValueVisibility & 0x40000) == 0);
 		this.measurement19.setSelection((this.configuration.jetiValueVisibility & 0x80000) == 0);
-
+		this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {this.configuration.getJetiMeasurementCount()}));
 	}
 
 	public void updateAnalogAlarmUnits() {
@@ -1826,6 +1827,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement2.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement2.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFFB
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000004;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1844,6 +1846,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement3.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement3.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFF7
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000008;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1862,6 +1865,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement4.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement4.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFEF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000010;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1881,6 +1885,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement5.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement5.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFDF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000020;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1899,6 +1904,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement6.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement6.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFFBF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000040;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1917,6 +1923,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement7.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement7.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFF7F
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000080;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1935,6 +1942,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement8.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement8.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFEFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000100;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1953,6 +1961,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement9.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement9.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFDFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000200;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1971,6 +1980,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement10.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement10.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFFBFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000400;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1989,6 +1999,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement11.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement11.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFF7FF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00000800;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2007,6 +2018,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement12.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement12.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFEFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00001000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2025,6 +2037,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement13.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement13.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFDFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00002000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2043,6 +2056,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement14.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement14.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFFBFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00004000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2061,6 +2075,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement15.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement15.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFF7FFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00008000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2079,6 +2094,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement16.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement16.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFEFFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00010000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2097,6 +2113,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement17.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement17.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFDFFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00020000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2115,6 +2132,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement18.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement18.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFFBFFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00040000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2133,9 +2151,19 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement19.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility = UniLog2SetupConfiguration2.this.measurement19.getSelection() ? UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility & 0xFFF7FFFF
 									: UniLog2SetupConfiguration2.this.configuration.jetiValueVisibility + 0x00080000;
+							UniLog2SetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
+				}
+				{
+					this.jetiExSelectionLabel = new CLabel(this.jetiExGroup, SWT.CENTER);
+					this.jetiExSelectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData jetiExSelectionLData = new RowData();
+					jetiExSelectionLData.width = 285;
+					jetiExSelectionLData.height = 25;
+					this.jetiExSelectionLabel.setLayoutData(jetiExSelectionLData);
+					this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2590, new Object[] {UniLog2SetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 				}
 			}
 			this.layout();

@@ -63,9 +63,10 @@ import org.eclipse.swt.widgets.MenuItem;
 public class UniLog2 extends DeviceConfiguration implements IDevice {
 	final static Logger	log										= Logger.getLogger(UniLog2.class.getName());
 
-	final static String	SM_UNILOG_2_INI				= "SM UniLog 2.ini";													//$NON-NLS-1$
-	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 setup";												//$NON-NLS-1$
-	final static String	SM_UNILOG_2_DIR_STUB	= "SM UniLog 2";															//$NON-NLS-1$
+	final static String			SM_UNILOG_2_INI				= "SM UniLog 2.ini";													//$NON-NLS-1$
+	final static String			SM_UNILOG_2_INI_PATH	= "SM UniLog 2 setup";												//$NON-NLS-1$
+	final static String			SM_UNILOG_2_DIR_STUB	= "UniLog";																		//$NON-NLS-1$
+	static String						selectedSetupFilePath;																							//path to setup ini file
 
 	final DataExplorer			application;
 	final Channels					channels;
@@ -663,17 +664,27 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	}
 	
 	String getConfigurationFileDirecotry() {
-		String searchPath = this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		if (searchPath.contains(UniLog2.SM_UNILOG_2_DIR_STUB)) {
-			searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
+		if (UniLog2.selectedSetupFilePath == null) {
+			String searchPath = GDE.OBJECT_KEY == null 
+					? this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)
+					: FileUtils.getDeviceImportDirectory(this);
+			if (searchPath.contains(UniLog2.SM_UNILOG_2_DIR_STUB)) {
+				searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
+			}
+			else {
+				String dataFilePath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX;
+				if (searchPath.equals(dataFilePath)) { //check if retrieved search path is equals to configured data file base path
+					searchPath = searchPath + this.getName() + GDE.FILE_SEPARATOR_UNIX;
+				}
+
+				if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
+					searchPath = searchPath + UniLog2.SM_UNILOG_2_INI_PATH;
+				else 
+					searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + UniLog2.SM_UNILOG_2_INI_PATH;
+			}
+			return searchPath;
 		}
-		else {
-			if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
-				searchPath = searchPath + UniLog2.SM_UNILOG_2_INI_PATH;
-			else 
-				searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + UniLog2.SM_UNILOG_2_INI_PATH;
-		}
-		return searchPath;
+		return UniLog2.selectedSetupFilePath.substring(0, UniLog2.selectedSetupFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
 	}
 	
 	/**
