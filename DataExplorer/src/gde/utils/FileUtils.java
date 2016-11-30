@@ -1246,6 +1246,28 @@ public class FileUtils {
 	}
 
 	/**
+	  * @param rootDirectory
+	  * @return unsorted list of directories without sub-level directories
+	  * @throws FileNotFoundException if the param is not a directory 
+	  */
+	public static List<File> getDirectories(File rootDirectory) throws FileNotFoundException {
+		validateDirectory(rootDirectory);
+		List<File> result = new ArrayList<File>();
+		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
+			File[] filesAndDirs = rootDirectory.listFiles();
+			if (filesAndDirs != null) {
+				for (File file : filesAndDirs) {
+					if (file.isDirectory()) {
+						if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, file.getAbsolutePath());
+						result.add(file);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
 	  * Recursively walk a directory tree and return a List of all files found.
 	  * @param rootDirectory is a valid directory
 	  * @return List<File> sorted using File.compareTo()

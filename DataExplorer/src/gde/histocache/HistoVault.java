@@ -652,12 +652,14 @@ public class HistoVault {
 			return this.measurements.getEntryPoints().get(measurementOrdinal).getPoints();
 	}
 
-	public Integer getMeasurement(int measurementOrdinal, int trailOrdinal) {
+	public Integer getMeasurement(int measurementOrdinal, int trailTextSelectedIndex) {
 		if (this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().size() == 0) {
 			return null;
 		}
 		else {
-			return this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().get(trailOrdinal).getValue();
+			if (trailTextSelectedIndex > this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().size())
+				throw new UnsupportedOperationException();
+			return this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().get(trailTextSelectedIndex).getValue();
 		}
 	}
 
@@ -665,12 +667,14 @@ public class HistoVault {
 			return this.settlements.getEntryPoints().get(settlementId).getPoints();
 	}
 
-	public Integer getSettlement(int settlementId, int trailOrdinal) {
+	public Integer getSettlement(int settlementId, int trailTextSelectedIndex) {
 		if (this.settlements.getEntryPoints().get(settlementId).getPoints().size() == 0) {
 			return null;
 		}
 		else {
-			return this.settlements.getEntryPoints().get(settlementId).getPoints().get(trailOrdinal).getValue();
+			if (trailTextSelectedIndex >= this.measurements.getEntryPoints().get(settlementId).getPoints().size())
+				throw new UnsupportedOperationException();
+			return this.settlements.getEntryPoints().get(settlementId).getPoints().get(trailTextSelectedIndex).getValue();
 		}
 	}
 
@@ -683,6 +687,8 @@ public class HistoVault {
 			return null;
 		}
 		else {
+			if (scoreLabelOrdinal >= scores.getPoints().size())
+				throw new UnsupportedOperationException();
 			return this.scores.getPoints().get(scoreLabelOrdinal).getValue();
 		}
 	}

@@ -58,11 +58,11 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	final private static Logger	log					= Logger.getLogger(HoTTbinHistoReader.$CLASS_NAME);
 
 	private static enum TimeMark {
-		ADDED, PICKED, READ, REVIEWED
+		INITIATED, ADDED, PICKED, READ, REVIEWED, FINISHED
 	};
 
 	private static int				recordTimespan_ms	= 10;																					// HoTT logs data rate defined by the channel log
-	private static long				currentTime, readTime, reviewTime, addTime, pickTime, lastTime;
+	private static long				currentTime, initiateTime, readTime, reviewTime, addTime, pickTime, finishTime, lastTime;
 	private static Path				filePath;
 	private static RecordSet	tmpRecordSet;
 
@@ -89,6 +89,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	 * @return 
 	 */
 	public static synchronized HistoRecordSet read(Path filePath) throws IOException, DataTypeException, DataInconsitsentException {
+		HoTTbinHistoReader.initiateTime = HoTTbinHistoReader.readTime = HoTTbinHistoReader.reviewTime = HoTTbinHistoReader.addTime = HoTTbinHistoReader.pickTime = HoTTbinHistoReader.finishTime = 0;
+		HoTTbinHistoReader.lastTime = System.nanoTime();
 		HoTTbinHistoReader.filePath = filePath;
 		File file = HoTTbinHistoReader.filePath.toFile();
 		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {// performs better than DataInputStream due to reasonable io sizes
@@ -167,8 +169,6 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	*/
 	private static HistoRandomSample readSingle(BufferedInputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
 		final String $METHOD_NAME = "readSingle";
-		HoTTbinHistoReader.readTime = HoTTbinHistoReader.addTime = HoTTbinHistoReader.reviewTime = HoTTbinHistoReader.pickTime = 0;
-		HoTTbinHistoReader.lastTime = System.nanoTime();
 		HoTTbinHistoReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinHistoReader.recordSetGeneral = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinHistoReader.recordSetElectric = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
@@ -232,6 +232,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		// read all the data blocks from the file, parse only for the active channel
+		setTimeMarks(TimeMark.INITIATED);
 		boolean isChannelsChannel = activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
 		boolean doFullRead = initializeBlocks <= 0;
 		int datablocksLimit = initializeBlocks > 0 ? initializeBlocks : Settings.getInstance().getMaxLogDuration_mm() <= 0 ? Integer.MAX_VALUE : Settings.getInstance().getMaxLogDuration_mm() * 100 * 60;
@@ -545,8 +546,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			device.updateVisibilityStatus(tmpRecordSet, true);
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), fileLength //$NON-NLS-1$
 					/ HoTTbinHistoReader.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
-			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("readTime: %,9d  reviewTime: %,9d  addTime: %,9d  pickTime: %,9d", TimeUnit.NANOSECONDS.toMillis(readTime), //$NON-NLS-1$
-					TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime)));
+			HoTTbinHistoReader.setTimeMarks(TimeMark.FINISHED);
+			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("initiateTime: %,7d  readTime: %,7d  reviewTime: %,7d  addTime: %,7d  pickTime: %,7d  finishTime: %,7d", TimeUnit.NANOSECONDS.toMillis(initiateTime), TimeUnit.NANOSECONDS.toMillis(readTime), //$NON-NLS-1$
+					TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime), TimeUnit.NANOSECONDS.toMillis(finishTime)));
 			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO,
 						String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
@@ -573,8 +575,6 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	*/
 	private static HistoRandomSample readMultiple(BufferedInputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
-		HoTTbinHistoReader.readTime = HoTTbinHistoReader.reviewTime = HoTTbinHistoReader.addTime = HoTTbinHistoReader.pickTime = 0;
-		HoTTbinHistoReader.lastTime = System.nanoTime();
 		HoTTbinHistoReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinHistoReader.recordSetGeneral = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinHistoReader.recordSetElectric = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
@@ -641,6 +641,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		// read all the data blocks from the file, parse only for the active channel
+		setTimeMarks(TimeMark.INITIATED);
 		boolean doFullRead = initializeBlocks <= 0;
 		int initializeBlockLimit = initializeBlocks > 0 ? initializeBlocks : Integer.MAX_VALUE;
 		long fileLength = HoTTbinHistoReader.filePath.toFile().length();
@@ -924,8 +925,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			device.updateVisibilityStatus(tmpRecordSet, true);
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), fileLength //$NON-NLS-1$
 					/ HoTTbinHistoReader.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
-			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("readTime: %,9d  reviewTime: %,9d  addTime: %,9d  pickTime: %,9d", TimeUnit.NANOSECONDS.toMillis(readTime), //$NON-NLS-1$
-					TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime)));
+			HoTTbinHistoReader.setTimeMarks(TimeMark.FINISHED);
+			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("initiateTime: %,7d  readTime: %,7d  reviewTime: %,7d  addTime: %,7d  pickTime: %,7d  finishTime: %,7d", TimeUnit.NANOSECONDS.toMillis(initiateTime), TimeUnit.NANOSECONDS.toMillis(readTime), //$NON-NLS-1$
+					TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime), TimeUnit.NANOSECONDS.toMillis(finishTime)));
 			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO,
 						String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
@@ -941,7 +943,10 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 	private static void setTimeMarks(TimeMark mark) {
 		HoTTbinHistoReader.currentTime = System.nanoTime();
-		if (mark == TimeMark.READ) {
+		if (mark == TimeMark.INITIATED) {
+			HoTTbinHistoReader.initiateTime+= HoTTbinHistoReader.currentTime - HoTTbinHistoReader.lastTime;
+		}
+		else if (mark == TimeMark.READ) {
 			HoTTbinHistoReader.readTime += HoTTbinHistoReader.currentTime - HoTTbinHistoReader.lastTime;
 		}
 		else if (mark == TimeMark.REVIEWED) {
@@ -952,6 +957,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		}
 		else if (mark == TimeMark.PICKED) {
 			HoTTbinHistoReader.pickTime += HoTTbinHistoReader.currentTime - HoTTbinHistoReader.lastTime;
+		}
+		else if (mark == TimeMark.FINISHED) {
+			HoTTbinHistoReader.finishTime += HoTTbinHistoReader.currentTime - HoTTbinHistoReader.lastTime;
 		}
 		HoTTbinHistoReader.lastTime = HoTTbinHistoReader.currentTime;
 	}

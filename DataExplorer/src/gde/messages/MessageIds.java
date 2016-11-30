@@ -189,6 +189,8 @@ public class MessageIds {
 	public final static String	GDE_MSGI0066 = "GDE_MSGI0066";
 	public final static String	GDE_MSGI0067 = "GDE_MSGI0067";
 	public final static String	GDE_MSGI0068 = "GDE_MSGI0068";
+	public final static String	GDE_MSGI0069 = "GDE_MSGI0069";
+	public final static String	GDE_MSGI0070 = "GDE_MSGI0070";
 	public final static String	GDE_MSGT0000 = "GDE_MSGT0000";
 	public final static String	GDE_MSGT0001 = "GDE_MSGT0001";
 	public final static String	GDE_MSGT0002 = "GDE_MSGT0002";
@@ -1003,4 +1005,6 @@ public class MessageIds {
 	public final static String	GDE_MSGT0833 = "GDE_MSGT0833";
 	public final static String	GDE_MSGT0834 = "GDE_MSGT0834";
 	public final static String	GDE_MSGT0835 = "GDE_MSGT0835";
+	public final static String	GDE_MSGT0836 = "GDE_MSGT0836";
+	public final static String	GDE_MSGT0837 = "GDE_MSGT0837";
  }

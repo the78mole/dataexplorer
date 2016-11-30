@@ -1979,13 +1979,13 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * update the histo tabs if visible.
+	 * update a histo tab in case it has the focus.
 	 * @param rebuildStep
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if ((this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible())
-					|| (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
+			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible()) //
+					|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
 				boolean isRebuilt = false;
 				try {
 					isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
@@ -2025,8 +2025,10 @@ public class DataExplorer extends Composite {
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					if ((DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible())
-							|| (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
+					if ((DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow //
+							&& DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible())
+							|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow //
+									&& DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
 						boolean isRebuilt = false;
 						try {
 							isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);

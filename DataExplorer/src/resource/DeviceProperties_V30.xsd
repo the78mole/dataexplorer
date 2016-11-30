@@ -938,11 +938,10 @@
 			<xs:enumeration value="sensorEsc" />
 			<xs:enumeration value="logDataVersion" />
 			<xs:enumeration value="logDataExplorerVersion" />
-			<xs:enumeration value="logDataBytes" />
+			<xs:enumeration value="logRecordSetBytes" />
 			<xs:enumeration value="logFileBytes" />
 			<xs:enumeration value="logFileRecordSets" />
 			<xs:enumeration value="elapsedHistoRecordSet_ms" />
-			<xs:enumeration value="elapsedHistoVaultWrite_ms" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

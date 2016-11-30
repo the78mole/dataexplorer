@@ -73,7 +73,6 @@ public class HistoRecordSet extends RecordSet {
 	private int																			logChannelNumber;
 	private String																	logObjectKey;
 	private long																		elapsedHistoRecordSet_ns;
-	private long																		elapsedHistoVaultWrite_ns;
 
 	/**
 	 * record set data buffers according the size of given names array, where the name is the key to access the data buffer
@@ -318,14 +317,6 @@ public class HistoRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @param nanoTimeSpan
-	 */
-	public void setElapsedHistoVaultWrite_ns(long nanoTimeSpan) {
-		this.elapsedHistoVaultWrite_ns = nanoTimeSpan;
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timeSpan=%,7d ms", TimeUnit.NANOSECONDS.toMillis(nanoTimeSpan))); //$NON-NLS-1$
-	}
-
-	/**
 	 * @return
 	 */
 	public HistoVault getHistoVault() {
@@ -417,11 +408,16 @@ public class HistoRecordSet extends RecordSet {
 				}
 			}
 			else {
-				// todo stops here for 'Batt Low'
-				// new UnsupportedOperationException();
+				// these trail types might act as default trails
+				for (TrailType trailType : TrailType.getSubstitutes()) {
+					if (trailType == TrailType.REAL_FIRST)
+						entryPoints.addPoint(TrailType.REAL_FIRST.name(), TrailType.REAL_FIRST.ordinal(), record.realRealGet(0));
+					else if (trailType == TrailType.REAL_LAST)
+						entryPoints.addPoint(TrailType.REAL_LAST.name(), TrailType.REAL_LAST.ordinal(), record.realRealGet(record.size() - 1));
+					else
+						throw new UnsupportedOperationException(record.getName());
+				}
 			}
-			entryPoints.addPoint(TrailType.REAL_FIRST.name(), TrailType.REAL_FIRST.ordinal(), record.get(0));
-			entryPoints.addPoint(TrailType.REAL_LAST.name(), TrailType.REAL_LAST.ordinal(), record.get(record.size() - 1));
 			if (settings.isQuantilesActive()) {
 				Quantile quantile = new Quantile(record, this.isSampled() ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
 				entryPoints.addPoint(TrailType.Q0.name(), TrailType.Q0.ordinal(), (int) quantile.getQuartile0());
@@ -467,8 +463,15 @@ public class HistoRecordSet extends RecordSet {
 					if (settlementEvaluations.isSum()) entryPoints.addPoint(TrailType.REAL_SUM.name(), TrailType.REAL_SUM.ordinal(), record.getSumValue());
 				}
 				else {
-					// todo check why UltraTrioPlus internal resistance has no elements
-					//throw new UnsupportedOperationException();
+					// these trail types might act as default trails
+					for (TrailType trailType : TrailType.getSubstitutes()) {
+						if (trailType == TrailType.REAL_FIRST)
+							entryPoints.addPoint(TrailType.REAL_FIRST.name(), TrailType.REAL_FIRST.ordinal(), record.realRealGet(0));
+						else if (trailType == TrailType.REAL_LAST)
+							entryPoints.addPoint(TrailType.REAL_LAST.name(), TrailType.REAL_LAST.ordinal(), record.realRealGet(record.size() - 1));
+						else
+							throw new UnsupportedOperationException(record.getName());
+					}
 				}
 			}
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data " + entries.toString()); //$NON-NLS-1$
@@ -488,7 +491,6 @@ public class HistoRecordSet extends RecordSet {
 		this.scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (this.timeStep_ms.getSigmaTimeStep_ms() * 1000.);
 		this.scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = this.getRecordDataSize(true);
 		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoRecordSet_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
-		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_VAULT_WRITE_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoVaultWrite_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
 
 		EntryPoints entryPoints = new EntryPoints("All", 0);
 		StringBuilder sb = new StringBuilder();

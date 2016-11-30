@@ -31,14 +31,22 @@ import gde.ui.DataExplorer;
 import gde.ui.ParameterConfigControl;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.LogLevelSelectionContextMenu;
+import gde.utils.FileUtils;
 import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
+import static gde.messages.MessageIds.GDE_MSGT0829;
+
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -138,8 +146,8 @@ public class SettingsDialog extends Dialog {
 	Text																histoMaxLogCount;
 	CLabel															histoRetrospectLabel;
 	Text																histoRetrospectMonths;
-	Button															histoSearchImportPath; 
-	Button															histoSearchDataPathImports; 
+	Button															histoSearchImportPath;
+	Button															histoSearchDataPathImports;
 	Button															histoChannelMix;
 	Group																histoXAxisGroup;
 	CLabel															histoSpreadLabel;
@@ -164,7 +172,7 @@ public class SettingsDialog extends Dialog {
 	Button															cleanObjectReferecesButton;
 	Button															removeMimeAssocButton;
 	Group																miscDiagGroup;
-	Button															resourceConsumptionButton, cleanSettingsButton, clearHistoCacheButton;
+	Button															resourceConsumptionButton, cleanSettingsButton, clearHistoCacheButton, createObjectsFromDirectoriesButton;
 	Button															assocMimeTypeButton;
 	Button															removeLauncherButton;
 	Button															createLauncherButton;
@@ -320,7 +328,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.timeFormatCombo = new CCombo(this.groupTimeFormat, SWT.BORDER);
 								this.timeFormatCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.timeFormatCombo.setItems(new String[]{Messages.getString(MessageIds.GDE_MSGT0684), Messages.getString(MessageIds.GDE_MSGT0359)});
+								this.timeFormatCombo.setItems(new String[] { Messages.getString(MessageIds.GDE_MSGT0684), Messages.getString(MessageIds.GDE_MSGT0359) });
 								this.timeFormatCombo.select(getTimeFormatIndex());
 								this.timeFormatCombo.setBounds(115, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 20, 125, GDE.IS_LINUX ? 22 : 20);
 								this.timeFormatCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0683));
@@ -418,7 +426,7 @@ public class SettingsDialog extends Dialog {
 								this.writeTmpFiles = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.writeTmpFiles.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.writeTmpFiles.setText(Messages.getString(MessageIds.GDE_MSGT0674));
-								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[]{this.settings.getApplHomePath()}));
+								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[] { this.settings.getApplHomePath() }));
 								this.writeTmpFiles.setBounds(370, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 20, 95, 16);
 								this.writeTmpFiles.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -624,7 +632,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 18, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text.trim()));
+										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
 										e.doit = StringHelper.verifyPortInput(e.text.trim());
 									}
 								});
@@ -1262,7 +1270,7 @@ public class SettingsDialog extends Dialog {
 										}
 									});
 								}
-							{
+								{
 									this.histoSkipFilesWithOtherObject = new Button(this.histoForceObjectGroup, SWT.CHECK);
 									this.histoSkipFilesWithOtherObject.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoSkipFilesWithOtherObject.setText(Messages.getString(MessageIds.GDE_MSGT0797));
@@ -1276,7 +1284,7 @@ public class SettingsDialog extends Dialog {
 											application.setupHistoWindows();
 										}
 									});
-							}
+								}
 							} // end histoForceObjectGroup
 						} // end histoScreening group
 					} // end miscComposite
@@ -1738,8 +1746,8 @@ public class SettingsDialog extends Dialog {
 							RowLayout miscDiagGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							miscDiagGroupLayout.center = true;
 							miscDiagGroupLayout.marginTop = 10;
-							miscDiagGroupLayout.marginWidth = 40;
-							miscDiagGroupLayout.spacing = 20;
+							miscDiagGroupLayout.marginLeft = 55;
+							miscDiagGroupLayout.spacing = 10;
 							this.miscDiagGroup.setLayout(miscDiagGroupLayout);
 							this.miscDiagGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.miscDiagGroup.setText(Messages.getString(MessageIds.GDE_MSGT0209));
@@ -1757,7 +1765,8 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SWTResourceManager.listResourceStatus(this.getClass().getSimpleName());
-										SettingsDialog.log.log(Level.WARNING, String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
+										SettingsDialog.log.log(Level.WARNING, String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(),
+												Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
 									}
 								});
 							}
@@ -1797,7 +1806,42 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
-			}
+							{
+								this.createObjectsFromDirectoriesButton = new Button(this.miscDiagGroup, SWT.PUSH | SWT.CENTER);
+								this.createObjectsFromDirectoriesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.createObjectsFromDirectoriesButton.setText(Messages.getString(MessageIds.GDE_MSGT0836));
+								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837));
+								RowData createObjectsFromDirectoriesButtonLData = new RowData();
+								createObjectsFromDirectoriesButtonLData.width = 180;
+								createObjectsFromDirectoriesButtonLData.height = 30;
+								this.createObjectsFromDirectoriesButton.setLayoutData(createObjectsFromDirectoriesButtonLData);
+								this.createObjectsFromDirectoriesButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "createObjectsFromDirectoriesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										Set<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
+										if (objectCandidates.size() > 0) {
+											String message = Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() });
+											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(message)) {
+												List<String> objectList = Arrays.asList(SettingsDialog.this.settings.getObjectList());
+												if (objectList.addAll(objectCandidates)) {
+													for (String tmpObjectKey : objectCandidates) {
+														Path objectKeyDirPath = Paths.get(SettingsDialog.this.settings.getDataFilePath()).resolve(tmpObjectKey);
+														FileUtils.checkDirectoryAndCreate(objectKeyDirPath.toString());
+													}
+													SettingsDialog.this.settings.setObjectList(objectCandidates.toArray(new String[objectCandidates.size()]), SettingsDialog.this.settings.getActiveObject());
+													SettingsDialog.this.application.setObjectList(objectCandidates.toArray(new String[objectCandidates.size()]), SettingsDialog.this.settings.getActiveObject());
+													log.log(Level.FINE, "object list updated and directories created for object keys : " + objectCandidates.toString()); //$NON-NLS-1$
+												}
+											}
+										}
+										else {
+											SettingsDialog.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0070));
+										}
+									}
+								});
+							}
+						}
 					}
 				}
 				{ // begin analysis tab item

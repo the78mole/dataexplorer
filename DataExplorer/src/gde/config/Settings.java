@@ -36,9 +36,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.jar.JarEntry;
@@ -62,7 +65,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
 import gde.GDE;
-import gde.data.HistoSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
@@ -71,6 +73,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.ui.dialog.SettingsDialog;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
@@ -161,7 +164,7 @@ public class Settings extends Properties {
 	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
 	final static String							USE_FOLDER_IF_WITHOUT_OBJECT		= "folder_if_without_object";																																			//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
-	final static String							ZIPPED_CACHE										= "zipped_cache";																																									//$NON-NLS-1$
+	final static String							IS_ZIPPED_CACHE									= "zipped_cache";																																									//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -428,8 +431,8 @@ public class Settings extends Properties {
 		Path histoCacheDirectory = Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 		int initialSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
 		FileUtils.deleteDirectory(histoCacheDirectory.toString());
-		int deletedSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
 		FileUtils.checkDirectoryAndCreate(histoCacheDirectory.toString());
+		int deletedSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
 		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory.toString(), Settings.PERMISSION_555);
 		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, histoCacheDirectory });
 		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
@@ -722,6 +725,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, this.skipFilesWithoutObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, this.skipFilesWithOtherObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_FOLDER_IF_WITHOUT_OBJECT, this.useFolderIfWithoutObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, this.isZippedCache())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -799,19 +803,51 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param objectKey is supposed to be a valid object key
-	 * @return empty string or the validated object key in the correct case sensitive format
+	 * scan the sub-directories in the data and import file paths.
+	 * @return all sub-directories which neither represent devices nor objects
 	 */
-	public String validateObjectKey(String objectKey) {
-		String validatedObjectKey = GDE.STRING_EMPTY;
-		String key = objectKey.trim();
-		for (String tmpObjectKey : getObjectList()) {
-			if (tmpObjectKey.equalsIgnoreCase(key)) {
-				validatedObjectKey = tmpObjectKey;
-				break;
+	public Set<String> getObjectKeyCandidates() {
+		Set<String> result = new HashSet<>();
+		TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
+		String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation()
+				: null;
+		ArrayList<String> dirPaths = new ArrayList<String>();
+		dirPaths.add(getDataFilePath());
+		if (getSearchImportPath() && tmpImportDirPath != null) dirPaths.add(tmpImportDirPath);
+		for (String tmpDataDirPath : dirPaths) {
+			if (!(tmpDataDirPath == null || tmpDataDirPath.trim().isEmpty() || tmpDataDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
+				Path path = Paths.get(tmpDataDirPath);
+				// ignore object if path ends with a valid object
+				String directoryName = path.getFileName().toString();
+				path = validateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+				// ignore device if path ends with a valid device
+				String directoryName2 = path.getFileName().toString();
+				path = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
+				List<File> directories = new ArrayList<File>();
+				try {
+					directories = FileUtils.getDirectories(path.toFile());
+				}
+				catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				List<String> actualObjects = Arrays.asList(getObjectList());
+				for (File file : directories) {
+					if (!actualConfigurations.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
+						result.add(file.getName());
+					}
+				}
 			}
 		}
-		return validatedObjectKey;
+		return result;
+	}
+
+	/**
+	 * @param objectKey is supposed to be a valid object key
+	 * @return empty or the validated object key in the correct case sensitive format
+	 */
+	public Optional<String> validateObjectKey(String objectKey) {
+		String key = objectKey.trim();
+		return Arrays.asList(getObjectList()).stream().filter(s -> s.equalsIgnoreCase(key)).findFirst();
 	}
 
 	public String getObjectListAsString() {
@@ -2474,7 +2510,7 @@ public class Settings extends Properties {
 	 * @return true if import files from the data directory are read for the history 
 	 */
 	public boolean getSearchImportPath() {
-		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(false)));
+		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(true)));
 	}
 
 	/**
@@ -2488,7 +2524,7 @@ public class Settings extends Properties {
 	 * @return true if files from the device import directory are read for the history 
 	 */
 	public boolean getSearchDataPathImports() {
-		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(false)));
+		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(true)));
 	}
 
 	/**
@@ -2523,7 +2559,7 @@ public class Settings extends Properties {
 	 * @return true true if channels with identical measurements are selected for the history 
 	 */
 	public boolean isChannelMix() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_CHANNEL_MIX, "false")); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(Settings.IS_CHANNEL_MIX, "true")); //$NON-NLS-1$
 	}
 
 	/**
@@ -2566,7 +2602,7 @@ public class Settings extends Properties {
 	 * @return the ordinal of the sampling time which defines the timespan for one single sample value for the history (default is 1 ms which is the value at index 4)
 	 */
 	public int getSamplingTimespanOrdinal() {
-		return Integer.parseInt(this.getProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(4)));
+		return Integer.parseInt(this.getProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(2)));
 	}
 
 	/**
@@ -2635,14 +2671,14 @@ public class Settings extends Properties {
 	 * @return true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
 	 */
 	public boolean isZippedCache() {
-		return Boolean.valueOf(this.getProperty(Settings.ZIPPED_CACHE, "false")); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(Settings.IS_ZIPPED_CACHE, "false")); //$NON-NLS-1$
 	}
 
 	/**
 	 * @param value true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
 	 */
 	public void setZippedCache(boolean value) {
-		this.setProperty(Settings.ZIPPED_CACHE, String.valueOf(value));
+		this.setProperty(Settings.IS_ZIPPED_CACHE, String.valueOf(value));
 	}
 
 }

@@ -1100,9 +1100,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.registerCustomTabItem(activeDevice.isUtilityDeviceTabRequested() ? activeDevice.getUtilityDeviceTabItem() : null);
 			setupDataChannels(activeDevice);
 			// compare names because the device is re-instantiated when the deviceSelectionDialog is opened
-			if (previousActiveDevice == null || ! activeDevice.getName().equals(previousActiveDevice.getName())) {
-				this.application.setupHistoWindows(); // always full setup as this is passed during application startup
-			}
+//			if (previousActiveDevice == null) { // this would result in calling setupHistoWindows twice :  || ! activeDevice.getName().equals(previousActiveDevice.getName())) {
+//				this.application.setupHistoWindows(); // always full setup as this is passed during application startup
+//			}
 			this.application.setupDataTableHeader();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
