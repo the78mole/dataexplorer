@@ -204,7 +204,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.measurement28.setSelection((this.configuration.jetiExMask & 0x10000000) == 0);
 		this.measurement29.setSelection((this.configuration.jetiExMask & 0x20000000) == 0);
 		this.measurement30.setSelection((this.configuration.jetiExMask & 0x40000000) == 0);
-
+		this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 	}
 
 	void initGUI() {
@@ -883,6 +883,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement2.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement2.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFFB
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000004;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -901,6 +902,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement3.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement3.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFF7
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000008;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -919,6 +921,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement4.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement4.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFEF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000010;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -938,6 +941,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement5.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement5.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFDF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000020;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -956,6 +960,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement6.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement6.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFFBF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000040;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -974,6 +979,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement7.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement7.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFF7F
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000080;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -992,6 +998,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement8.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement8.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFEFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000100;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1010,6 +1017,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement9.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement9.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFDFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000200;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1028,6 +1036,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement10.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement10.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFFBFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000400;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1046,6 +1055,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement11.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement11.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFF7FF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00000800;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1064,6 +1074,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement12.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement12.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFEFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00001000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1082,6 +1093,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement13.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement13.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFDFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00002000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1100,6 +1112,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement14.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement14.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFFBFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00004000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1118,6 +1131,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement15.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement15.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFF7FFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00008000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1136,6 +1150,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement16.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement16.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFEFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00010000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1154,6 +1169,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement17.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement17.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFDFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00020000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1172,6 +1188,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement18.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement18.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFFBFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00040000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1190,6 +1207,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement19.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement19.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFF7FFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00080000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1208,6 +1226,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement20.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement20.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFEFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00100000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1226,6 +1245,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement21.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement21.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFDFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00200000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1244,6 +1264,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement22.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement22.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFFBFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00400000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1262,6 +1283,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement23.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement23.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFF7FFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x00800000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1280,6 +1302,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement24.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement24.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFEFFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x01000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1298,6 +1321,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement25.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement25.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFDFFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x02000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1316,6 +1340,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement26.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement26.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xFBFFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x04000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1334,6 +1359,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement27.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement27.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xF7FFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x08000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1352,6 +1378,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement28.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement28.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xEFFFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x10000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1370,6 +1397,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement29.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement29.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xDFFFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x20000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1388,6 +1416,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "measurement30.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.jetiExMask = GPSLoggerSetupConfiguration2.this.measurement30.getSelection() ? GPSLoggerSetupConfiguration2.this.configuration.jetiExMask & 0xBFFFFFFF
 									: GPSLoggerSetupConfiguration2.this.configuration.jetiExMask + 0x40000000;
+							GPSLoggerSetupConfiguration2.this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -1399,7 +1428,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					jetiExSelectionLData.width = 285;
 					jetiExSelectionLData.height = 25;
 					this.jetiExSelectionLabel.setLayoutData(jetiExSelectionLData);
-					this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088));
+					this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {GPSLoggerSetupConfiguration2.this.configuration.getJetiMeasurementCount()}));
 				}
 			}
 			{

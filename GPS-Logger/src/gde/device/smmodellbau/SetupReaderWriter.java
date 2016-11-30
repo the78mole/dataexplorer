@@ -79,7 +79,7 @@ public class SetupReaderWriter {
 	int									telemetryAlarms							= 0x0013;																								// 18 
 	int									heightAlarm									= 200;																									// 19 10m --> 4000m step 50
 	int									speedAlarm									= 200;																									// 20 10km/h --> 1000km/h
-	int									distanceMaxAlarm								= 500;																									// 21 10m --> 5000m
+	int									distanceMaxAlarm						= 500;																									// 21 10m --> 5000m
 	int									voltageRxAlarm							= 450;																									// 22 300 --> 800 V/100
 	int									tripLengthAlarm							= 50;																										// 23 10km/10 --> 999km/10
 	int									currentUlAlarm							= 100;																									// 24 1A --> 400A
@@ -327,5 +327,13 @@ public class SetupReaderWriter {
 				log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
 		}
+	}
+	
+	public int getJetiMeasurementCount() {
+		int count = 30;
+		for (int i = 0; i < GDE.SIZE_BYTES_INTEGER * 8; i++) {
+			count -= (this.jetiExMask >> i) & 0x00000001;
+		}
+		return count;
 	}
 }
