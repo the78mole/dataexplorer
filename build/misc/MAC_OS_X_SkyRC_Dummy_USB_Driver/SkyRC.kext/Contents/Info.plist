@@ -1,6 +1,6 @@
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <!-- This is a dummy driver which binds to SKYRC MC3000  -->
+    <!-- This is a dummy driver which binds to SKYRC devices -->
     <!-- contains no actual code; its only purpose is to     -->
     <!-- prevent Apple's USBHID driver from exclusively      -->
     <!-- opening the device.                                 -->
@@ -11,7 +11,7 @@
         <key>CFBundleIconFile</key>
         <string></string>
         <key>CFBundleIdentifier</key>
-        <string>com.mc3000.driver.dummy</string>
+        <string>com.skyrc.driver.dummy</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundlePackageType</key>
@@ -22,8 +22,8 @@
         <string>1.0.0d1</string>
         <key>IOKitPersonalities</key>
         <dict>
-            <!-- The SkyRC MC3000 USB interface -->
-            <key>MC3000</key>
+            <!-- The SkyRC MC3000/Q200 USB interface -->
+            <key>SkyRC</key>
             <dict>
                 <key>CFBundleIdentifier</key>
                 <string>com.apple.kpi.iokit</string>
