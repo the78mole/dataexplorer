@@ -124,7 +124,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		}
 
 		public String getHardwareVersion() {
-			return String.format("Firmware : %d.%d", this.machineId[13]/10, this.machineId[13]%10);
+			return String.format("Hardware : %d.%d", this.machineId[13]/10, this.machineId[13]%10);
 		}
 
 		public int getHardwareVersionAsInt() {
@@ -1334,6 +1334,9 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 								WaitTimer.delay(100);
 								this.getDialog().dataGatherThread.start();
 							}
+							else {
+								this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+							}
 						}
 						catch (Throwable e) {
 							MC3000.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
@@ -1577,7 +1580,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		//		
 		//		this.resetEnergy[outletNum-1] = dataBuffer[5];
 
-		if (this.settings.isReduceChargeDischarge()) return dataBuffer[5] > 0 && dataBuffer[5] < 3;
+		if (this.settings.isReduceChargeDischarge() && !this.isContinuousRecordSet()) return dataBuffer[5] > 0 && dataBuffer[5] < 3;
 		return dataBuffer[5] > 0;
 	}
 

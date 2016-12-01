@@ -346,7 +346,7 @@ public class Q200GathererThread extends Thread {
 
 				// record set does not exist or is out dated, build a new name and create
 				StringBuilder extend = new StringBuilder();
-				if (!this.settings.isContinuousRecordSet()) {
+				if (!this.device.isContinuousRecordSet()) {
 					//LI battery： 	0=BALACE-CHARGE 1=CHARGE 2=DISCHARGE 3=STORAGE 4=FAST-CHARGE
 					//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
 					//Pb battery:		0=CHARGE 1=DISCHARGE

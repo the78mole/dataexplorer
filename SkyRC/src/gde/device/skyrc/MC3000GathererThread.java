@@ -370,7 +370,7 @@ public class MC3000GathererThread extends Thread {
 
 				// record set does not exist or is out dated, build a new name and create
 				StringBuilder extend = new StringBuilder();
-				if (!this.settings.isContinuousRecordSet()) {
+				if (!this.device.isContinuousRecordSet()) {
 					//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
 					//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
 					//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
