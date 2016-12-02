@@ -417,7 +417,7 @@ public class MC3000GathererThread extends Thread {
 			}
 
 			// STATUS:     0=standby 1=charge 2=discharge 3=resting 4=finish 0x80--0xff：error code
-			if (this.settings.isReduceChargeDischarge() && this.device.getProcessingStatus(dataBuffer) == 3) { //pause will not be recorded
+			if (this.settings.isReduceChargeDischarge() && !this.device.isContinuousRecordSet() && this.device.getProcessingStatus(dataBuffer) == 3) { //pause will not be recorded
 				result[0] = recordSet;
 				result[1] = processRecordSetKey;
 				return result;

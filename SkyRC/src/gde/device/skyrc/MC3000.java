@@ -1580,7 +1580,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		//		
 		//		this.resetEnergy[outletNum-1] = dataBuffer[5];
 
-		if (this.settings.isReduceChargeDischarge() && !this.isContinuousRecordSet()) return dataBuffer[5] > 0 && dataBuffer[5] < 3;
+		if (this.settings.isReduceChargeDischarge() && !this.isContinuousRecordSet()) 
+			return dataBuffer[5] > 0 && dataBuffer[5] < 3;
 		return dataBuffer[5] > 0;
 	}
 
