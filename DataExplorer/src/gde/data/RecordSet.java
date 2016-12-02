@@ -20,7 +20,6 @@ package gde.data;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
@@ -764,7 +763,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names 
 	 */
-	public String[] getNoneCalculationRecordNames() { // TODO make this private
+	public String[] getNoneCalculationRecordNames() { 
 		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
@@ -1688,7 +1687,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param serializedRecordSetProperties
 	 */
 	public void setDeserializedProperties(String serializedRecordSetProperties) {
-		HashMap<String, String> recordSetProps = StringHelper.splitString(serializedRecordSetProperties, Record.DELIMITER, this.propertyKeys);
+		HashMap<String, String> recordSetProps = StringHelper.splitString(serializedRecordSetProperties, Record.DELIMITER, RecordSet.propertyKeys);
 		String tmpValue = null;
 		try {
 			tmpValue = recordSetProps.get(TIME_STEP_MS);
