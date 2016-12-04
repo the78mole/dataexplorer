@@ -73,7 +73,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.dialog.SettingsDialog;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
@@ -158,11 +157,9 @@ public class Settings extends Properties {
 	final static String							SEARCH_IMPORT_PATH							= "search_import_path";																																						//$NON-NLS-1$
 	final static String							SEARCH_DATAPATH_IMPORTS					= "search_datapath_imports";																																			//$NON-NLS-1$
 	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
-	final static String							MAX_LOG_DURATION_MM							= "max_log_duration_mm";																																					//$NON-NLS-1$
 	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
 	final static String							SKIP_FILES_WITHOUT_OBJECT				= "skip_files_without_object";																																		//$NON-NLS-1$
 	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
-	final static String							USE_FOLDER_IF_WITHOUT_OBJECT		= "folder_if_without_object";																																			//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
 	final static String							IS_ZIPPED_CACHE									= "zipped_cache";																																									//$NON-NLS-1$
 
@@ -547,7 +544,7 @@ public class Settings extends Properties {
 			}
 			//BufferedInputStream stream = new BufferedReader(new InputStreamReader(new FileInputStream(propertyFilePath), "UTF-8")); //$NON-NLS-1$
 			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(propertyFilePath)));
-			measurementProperties.loadFromXML(stream);
+			this.measurementProperties.loadFromXML(stream);
 			stream.close();
 		}
 		catch (Exception e) {
@@ -707,25 +704,23 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_IO_LOG_LEVEL, getLogLevel(Settings.FILE_IO_LOG_LEVEL))); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SERIAL_IO_LOG_LEVEL, getLogLevel(Settings.SERIAL_IO_LOG_LEVEL))); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Einstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, this.isHistoActive())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_QUANTILE_ACTIVE, this.isQuantilesActive())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, this.getBoxplotScaleOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, this.getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, this.getXAxisSpreadOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, this.isXAxisLogarithmicDistance())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, this.isXAxisReversed())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_COUNT, this.getMaxLogCount())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, this.getRetrospectMonths())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_IMPORT_PATH, this.getSearchImportPath())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, this.getSearchDataPathImports())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, this.isChannelMix())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_DURATION_MM, this.getMaxLogDuration_mm())); //$NON-NLS-1$
+			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_QUANTILE_ACTIVE, isQuantilesActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, getBoxplotScaleOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, isXAxisLogarithmicDistance())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, isXAxisReversed())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_COUNT, getMaxLogCount())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, getRetrospectMonths())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_IMPORT_PATH, getSearchImportPath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, isChannelMix())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, this.skipFilesWithoutObject())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, this.skipFilesWithOtherObject())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_FOLDER_IF_WITHOUT_OBJECT, this.useFolderIfWithoutObject())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, this.isZippedCache())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, skipFilesWithoutObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, skipFilesWithOtherObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -803,11 +798,30 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * @return standard data directory path with trailing device and / or object stripped off
+	 */
+	public Path getDataBaseDir() {
+		Path path = null;
+		String tmpDataDirPath = getDataFilePath();
+		if (!(tmpDataDirPath == null || tmpDataDirPath.trim().isEmpty() || tmpDataDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
+			path = Paths.get(tmpDataDirPath);
+			// ignore object if path ends with a valid object
+			String directoryName = path.getFileName().toString();
+			path = getValidateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+			// ignore device if path ends with a valid device
+			String directoryName2 = path.getFileName().toString();
+			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
+		}
+		log.log(Level.INFO, "DataBaseDir " + path); //$NON-NLS-1$
+		return path;
+	}
+
+	/**
 	 * scan the sub-directories in the data and import file paths.
 	 * @return all sub-directories which neither represent devices nor objects
 	 */
 	public Set<String> getObjectKeyCandidates() {
-		Set<String> result = new HashSet<>();
+		Set<String> result = new HashSet<String>();
 		TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
 		String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation()
 				: null;
@@ -819,7 +833,7 @@ public class Settings extends Properties {
 				Path path = Paths.get(tmpDataDirPath);
 				// ignore object if path ends with a valid object
 				String directoryName = path.getFileName().toString();
-				path = validateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+				path = getValidateObjectKey(directoryName).isPresent() ? path.getParent() : path;
 				// ignore device if path ends with a valid device
 				String directoryName2 = path.getFileName().toString();
 				path = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
@@ -845,7 +859,7 @@ public class Settings extends Properties {
 	 * @param objectKey is supposed to be a valid object key
 	 * @return empty or the validated object key in the correct case sensitive format
 	 */
-	public Optional<String> validateObjectKey(String objectKey) {
+	public Optional<String> getValidateObjectKey(String objectKey) {
 		String key = objectKey.trim();
 		return Arrays.asList(getObjectList()).stream().filter(s -> s.equalsIgnoreCase(key)).findFirst();
 	}
@@ -1441,6 +1455,7 @@ public class Settings extends Properties {
 			java.util.logging.Level globalLogLevel = java.util.logging.Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim()); //$NON-NLS-1$
 			setIndividualLogLevel("gde.ui", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.data", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.histocache", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.config", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.device", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.utils", globalLogLevel); //$NON-NLS-1$
@@ -1458,6 +1473,7 @@ public class Settings extends Properties {
 			setGlobalLogLevel(java.util.logging.Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim())); //$NON-NLS-1$
 			setIndividualLogLevel("gde.ui", getLogLevel(Settings.UI_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.data", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.histocache", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.config", getLogLevel(Settings.CONFIG_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.device", getLogLevel(Settings.DEVICE_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.utils", getLogLevel(Settings.UTILS_LOG_LEVEL)); //$NON-NLS-1$
@@ -2493,7 +2509,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the maximum number of logs (recordsets) which are read for the history (default is 333)
+	 * @return the maximum number of logs (recordsets) which are read for the history (default is 300)
 	 */
 	public int getMaxLogCount() {
 		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_COUNT, String.valueOf(300)));
@@ -2507,7 +2523,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if import files from the data directory are read for the history 
+	 * @return true if import files from the data directory are read for the history
 	 */
 	public boolean getSearchImportPath() {
 		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(true)));
@@ -2521,31 +2537,10 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if files from the device import directory are read for the history 
+	 * @return true if files from the device import directory are read for the history
 	 */
 	public boolean getSearchDataPathImports() {
 		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(true)));
-	}
-
-	/**
-	 * set the maximum duration of logs (recordsets) which are read for the history 
-	 * @param uintValue
-	 */
-	public void setMaxLogDuration_mm(String uintValue) {
-		try {
-			int value = Integer.parseUnsignedInt(uintValue.trim());
-			if (value < 1 || value > 6000) value = 3000;
-			this.setProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(value));
-		}
-		catch (Exception e) {
-		}
-	}
-
-	/**
-	 * @return the maximum duration of logs (recordsets) which is read for the history (default is 5 hours)
-	 */
-	public int getMaxLogDuration_mm() {
-		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_DURATION_MM, String.valueOf(3000))); //$NON-NLS-1$
 	}
 
 	/**
@@ -2613,7 +2608,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if the history should skip files in the object directory which do not hold the object key internally 
+	 * @return true if the history should skip files in the object directory which do not hold the object key internally
 	 */
 	public boolean skipFilesWithoutObject() {
 		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITHOUT_OBJECT, "true")); //$NON-NLS-1$
@@ -2627,7 +2622,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if the history should skip files in the object directory which hold a different object key internally 
+	 * @return true if the history should skip files in the object directory which hold a different object key internally
 	 */
 	public boolean skipFilesWithOtherObject() {
 		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITH_OTHER_OBJECT, "true")); //$NON-NLS-1$
@@ -2637,7 +2632,7 @@ public class Settings extends Properties {
 	 * @return the maximum number of full calendar months which is used for history log selection (default is 12) 
 	 */
 	public int getRetrospectMonths() {
-		return Integer.valueOf(this.getProperty(Settings.RETROSPECT_MONTHS, String.valueOf(12))); //$NON-NLS-1$
+		return Integer.valueOf(this.getProperty(Settings.RETROSPECT_MONTHS, String.valueOf(12)));
 	}
 
 	/**
@@ -2646,7 +2641,7 @@ public class Settings extends Properties {
 	public void setRetrospectMonths(String uintValue) {
 		try {
 			int value = Integer.parseUnsignedInt(uintValue.trim());
-			if (value < 1 || value > 60) value = 12;
+			if (value < 1 || value > 120) value = 12;
 			this.setProperty(Settings.RETROSPECT_MONTHS, String.valueOf(value));
 		}
 		catch (Exception e) {
@@ -2654,28 +2649,14 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if the object for a log file without object shall be set to the folder name
-	 */
-	public boolean useFolderIfWithoutObject() {
-		return Boolean.valueOf(this.getProperty(Settings.USE_FOLDER_IF_WITHOUT_OBJECT, "true")); //$NON-NLS-1$
-	}
-
-	/**
-	 * @param value true if the object for a log file without object shall be set to the folder name
-	 */
-	public void setUseFolderIfWithoutObject(boolean value) {
-		this.setProperty(Settings.USE_FOLDER_IF_WITHOUT_OBJECT, String.valueOf(value));
-	}
-
-	/**
-	 * @return true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
+	 * @return true if the history cache directories are zip files (performs better for more than about 100 directory entries)
 	 */
 	public boolean isZippedCache() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_ZIPPED_CACHE, "false")); //$NON-NLS-1$
 	}
 
 	/**
-	 * @param value true if the history cache directories are zip files (performs better for more than 50 to 100 directory entries)
+	 * @param value true if the history cache directories are zip files (performs better for more than about 100 directory entries)
 	 */
 	public void setZippedCache(boolean value) {
 		this.setProperty(Settings.IS_ZIPPED_CACHE, String.valueOf(value));

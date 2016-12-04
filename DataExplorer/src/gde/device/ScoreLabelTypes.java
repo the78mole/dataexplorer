@@ -43,11 +43,10 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="sensorEsc"/>
  *     &lt;enumeration value="logDataVersion"/>
  *     &lt;enumeration value="logDataExplorerVersion"/>
- *     &lt;enumeration value="logDataBytes"/>
+ *     &lt;enumeration value="logRecordSetBytes"/>
  *     &lt;enumeration value="logFileBytes"/>
  *     &lt;enumeration value="logFileRecordSets"/>
  *     &lt;enumeration value="elapsedHistoRecordSet_ms"/>
- *     &lt;enumeration value="elapsedHistoVaultWrite_ms"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -101,16 +100,14 @@ public enum ScoreLabelTypes {
     LOG_DATA_VERSION("logDataVersion"),
     @XmlEnumValue("logDataExplorerVersion")
     LOG_DATA_EXPLORER_VERSION("logDataExplorerVersion"),
-    @XmlEnumValue("logDataBytes")
-    LOG_DATA_BYTES("logDataBytes"),
+    @XmlEnumValue("logRecordSetBytes")
+    LOG_RECORD_SET_BYTES("logRecordSetBytes"),
     @XmlEnumValue("logFileBytes")
     LOG_FILE_BYTES("logFileBytes"),
     @XmlEnumValue("logFileRecordSets")
     LOG_FILE_RECORD_SETS("logFileRecordSets"),
     @XmlEnumValue("elapsedHistoRecordSet_ms")
-    ELAPSED_HISTO_RECORD_SET_MS("elapsedHistoRecordSet_ms"),
-    @XmlEnumValue("elapsedHistoVaultWrite_ms")
-    ELAPSED_HISTO_VAULT_WRITE_MS("elapsedHistoVaultWrite_ms");
+    ELAPSED_HISTO_RECORD_SET_MS("elapsedHistoRecordSet_ms");
     private final String value;
 
 		/**

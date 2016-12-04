@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.eclipse.swt.graphics.Point;
 
@@ -62,17 +60,17 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public enum TrailType {
 		REAL_AVG(0, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0750), false), // average
 		//		REAL_COUNT_OBS(11, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0751)), // counter
-		REAL_FIRST(3, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0752), true), //
-		REAL_LAST(4, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0753), false), //
 		REAL_MAX(1, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0754), false), //
 		REAL_MIN(2, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0755), false), //
 		REAL_SD(5, true, 1, false, Messages.getString(MessageIds.GDE_MSGT0756), false), //
-		REAL_COUNT_TRIGGERED(10, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0757), false), //
 		REAL_SUM_TRIGGERED(6, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0758), false), //
-		REAL_TIME_SUM_TRIGGERED(7, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0759), false), //
 		REAL_AVG_RATIO_TRIGGERED(8, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0760), false), //
 		REAL_MAX_RATIO_TRIGGERED(9, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0761), false), //
+		REAL_TIME_SUM_TRIGGERED(7, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0759), false), //
+		REAL_COUNT_TRIGGERED(10, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0757), false), //
 		REAL_SUM(12, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0762), false), //
+		REAL_FIRST(3, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0752), true), //
+		REAL_LAST(4, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0753), false), //
 		//		SCORE(13, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0763)),
 		//		AVG(14, false, false, false, Messages.getString(MessageIds.GDE_MSGT0764)), //
 		//		SUM(15, false, false, false, Messages.getString(MessageIds.GDE_MSGT0765)), //
@@ -137,7 +135,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 
 		public static EnumSet<TrailType> getSubstitutes() {
-			if (substitutes.size()  == 0) {
+			if (substitutes.size() == 0) {
 				for (TrailType trailType : values) {
 					if (trailType.isSubstitute) substitutes.add(trailType);
 				}
@@ -146,7 +144,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 
 		public static EnumSet<TrailType> getPrimitives() {
-			List<TrailType> trailTypes = new ArrayList<>();
+			List<TrailType> trailTypes = new ArrayList<TrailType>();
 			for (TrailType type : TrailType.values) {
 				if (!type.isSuite()) trailTypes.add(type);
 			}
@@ -154,7 +152,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 
 		private static EnumSet<TrailType> getSuites() {
-			List<TrailType> trailTypes = new ArrayList<>();
+			List<TrailType> trailTypes = new ArrayList<TrailType>();
 			for (TrailType type : TrailType.values) {
 				if (type.isSuite()) trailTypes.add(type);
 			}
@@ -162,7 +160,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 
 		public static EnumSet<TrailType> getSuite(TrailType trailType) {
-			List<TrailType> trailTypes = new ArrayList<>();
+			List<TrailType> trailTypes = new ArrayList<TrailType>();
 			if (trailType.isSuite()) {
 				if (trailType.equals(SUITE_REAL_AVG_SD)) {
 					trailTypes.add(REAL_AVG); // master record for adding sd must be in front of the sd records
@@ -289,19 +287,19 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	@Override
 	@Deprecated
 	public synchronized Record clone() {
-		throw new UnsupportedOperationException("clone");
+		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
 	}
 
 	@Override
 	@Deprecated
 	public Record clone(String newName) {
-		throw new UnsupportedOperationException("clone");
+		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
 	}
 
 	@Override
 	@Deprecated
 	public Record clone(int dataIndex, boolean isFromBegin) {
-		throw new UnsupportedOperationException("clone");
+		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -319,7 +317,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	@Override
 	@Deprecated
 	public synchronized Integer set(int index, Integer point) {
-		throw new UnsupportedOperationException(" " + index + " " + point);
+		throw new UnsupportedOperationException(" " + index + " " + point); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -328,8 +326,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @param histoVault
 	 */
 	public void add(HistoVault histoVault) {
-		if (applicableTrailsOrdinals.size() != applicableTrailsTexts.size()) {
-			throw new UnsupportedOperationException(String.format("%,3d %,3d %,3d", applicableTrailsOrdinals.size(), TrailType.getPrimitives().size(), applicableTrailsTexts.size()));
+		if (this.applicableTrailsOrdinals.size() != this.applicableTrailsTexts.size()) {
+			throw new UnsupportedOperationException(String.format("%,3d %,3d %,3d", this.applicableTrailsOrdinals.size(), TrailType.getPrimitives().size(), this.applicableTrailsTexts.size())); //$NON-NLS-1$
 		}
 		if (this.trailRecordSuite == null) { // ???
 			super.add(null);
@@ -337,33 +335,33 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		else {
 			if (this.trailRecordSuite.length == 1) {
 				if (this.isMeasurement())
-					super.add(histoVault.getMeasurement(this.ordinal, this.trailTextSelectedIndex));
+					super.add(histoVault.getMeasurement(this.ordinal, this.trailTextSelectedIndex, this.getTrailOrdinal()));
 				else if (this.isSettlement())
-					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.trailTextSelectedIndex));
+					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.trailTextSelectedIndex, this.getTrailOrdinal()));
 				else if (this.isScoregroup()) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getCacheKey(), histoVault.getFilePath()));
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultKey(), histoVault.getFilePath())); //$NON-NLS-1$
 					super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
 				}
 				else
-					throw new UnsupportedOperationException("length == 1");
+					throw new UnsupportedOperationException("length == 1"); //$NON-NLS-1$
 			}
 			else {
-				int minValue = Integer.MAX_VALUE, maxValue = Integer.MIN_VALUE; // min/max depends on all values of the suite
+				int minVal = Integer.MAX_VALUE, maxVal = Integer.MIN_VALUE; // min/max depends on all values of the suite
 				int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
 				boolean summationSign = false; // false means subtract, true means add
 				for (int i = 0; i < this.trailRecordSuite.length; i++) {
 					TrailRecord trailRecord = this.trailRecordSuite[i];
 					Integer point;
 					if (this.isMeasurement())
-						point = histoVault.getMeasurement(this.ordinal,  this.trailTextSelectedIndex);
+						point = histoVault.getMeasurement(trailRecord.ordinal, trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
 					else if (this.isSettlement())
-						point = histoVault.getSettlement(this.settlementType.getSettlementId(),  this.trailTextSelectedIndex);
+						point = histoVault.getSettlement(trailRecord.settlementType.getSettlementId(), trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
 					else if (this.isScoregroup()) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getFilePath()));
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getFilePath())); //$NON-NLS-1$
 						point = histoVault.getScorePoint(this.getTrailOrdinal());
 					}
 					else
-						throw new UnsupportedOperationException("length > 1");
+						throw new UnsupportedOperationException("length > 1"); //$NON-NLS-1$
 
 					if (point != null) { // trailRecord.getMinValue() is zero if trailRecord.size() == 0 or only nulls have been added
 						if (trailRecord.isSuiteForSummation()) {
@@ -375,17 +373,17 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 							summationSign = false;
 						}
 						trailRecord.add(point);
-						minValue = Math.min(minValue, trailRecord.getRealMinValue());
-						maxValue = Math.max(maxValue, trailRecord.getRealMaxValue());
+						minVal = Math.min(minVal, trailRecord.getRealMinValue());
+						maxVal = Math.max(maxVal, trailRecord.getRealMaxValue());
 					}
 					else {
 						trailRecord.add(point);
 					}
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, trailRecord.getName() + " trail " + trailRecord.toString()); //$NON-NLS-1$
 				}
-				if (minValue != Integer.MAX_VALUE && maxValue != Integer.MIN_VALUE) {
-					this.setMinMax(minValue, maxValue);
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + minValue + "," + maxValue); //$NON-NLS-1$
+				if (minVal != Integer.MAX_VALUE && maxVal != Integer.MIN_VALUE) {
+					this.setMinMax(minVal, maxVal);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + minVal + "," + maxVal); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -435,7 +433,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						yDisplayOffset - Double.valueOf((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue).intValue());
 			}
 		}
-		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, "yPos = " + Arrays.toString(points));
+		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
 		return points;
 		// int grad = super.get(measurementPointIndex) / 1000000;
 		// return new Point(xDisplayOffset + Double.valueOf(super.getTime_ms(measurementPointIndex) * super.displayScaleFactorTime).intValue(), yDisplayOffset
@@ -450,15 +448,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public String[] getHistoTableRow() {
 		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
 		String[] dataTableRow = new String[masterRecord.size() + 2];
-		dataTableRow[0] = this.getUnit().length() > 0 ? this.getName() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET : this.getName();
-		dataTableRow[1] = this.getTrailText();
+		dataTableRow[0] = this.getUnit().length() > 0 ? (this.getName() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET).intern() : this.getName().intern();
+		dataTableRow[1] = this.getTrailText().intern();
 		double factor = getFactor();
 		double offset = getOffset();
 		double reduction = getReduction();
 		if (this.getTrailRecordSuite().length == 1) { // standard curve
 			for (int i = 0; i < masterRecord.size(); i++) {
 				if (masterRecord.realRealGet(i) != null) {
-					dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(i) / 1000. - reduction) * factor + offset);
+					dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(i) / 1000. - reduction) * factor + offset).intern();
 				}
 			}
 		}
@@ -473,7 +471,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
 						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((medianRecord.get(i) / 1000. - reduction) * factor + offset));
 						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
-						dataTableRow[i + 2] = sb.toString();
+						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
 			}
@@ -487,7 +485,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						sb.append(this.getDecimalFormat().format((lowerRecord.get(i) / 1000. - reduction) * factor + offset));
 						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((middleRecord.get(i) / 1000. - reduction) * factor + offset));
 						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperRecord.get(i) / 1000. - reduction) * factor + offset));
-						dataTableRow[i + 2] = sb.toString();
+						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
 			}
@@ -521,9 +519,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			StatisticsType measurementStatistics = getStatistics();
 			if (measurementStatistics != null) {
 				applicablePrimitiveTrails[TrailType.REAL_AVG.ordinal()] = measurementStatistics.isAvg();
-				applicablePrimitiveTrails[TrailType.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
-				applicablePrimitiveTrails[TrailType.REAL_MIN.ordinal()] = measurementStatistics.isMin();
 				applicablePrimitiveTrails[TrailType.REAL_MAX.ordinal()] = measurementStatistics.isMax();
+				applicablePrimitiveTrails[TrailType.REAL_MIN.ordinal()] = measurementStatistics.isMin();
 				applicablePrimitiveTrails[TrailType.REAL_SD.ordinal()] = measurementStatistics.isSigma();
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					applicablePrimitiveTrails[TrailType.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
@@ -535,10 +532,21 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				}
 				applicablePrimitiveTrails[TrailType.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null
 						&& measurementStatistics.getSumTriggerTimeText().length() > 1);
+				applicablePrimitiveTrails[TrailType.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
 			}
-			applicablePrimitiveTrails[TrailType.REAL_FIRST.ordinal()] = false; // in settlements only
-			applicablePrimitiveTrails[TrailType.REAL_LAST.ordinal()] = false; // in settlements only
+			else {
+				// these trail types might act as default trails
+				for (TrailType trailType : TrailType.getSubstitutes()) {
+					if (trailType == TrailType.REAL_FIRST)
+						applicablePrimitiveTrails[TrailType.REAL_FIRST.ordinal()] = true;
+					else if (trailType == TrailType.REAL_LAST)
+						applicablePrimitiveTrails[TrailType.REAL_LAST.ordinal()] = true;
+					else
+						throw new UnsupportedOperationException(this.getName());
+				}
+			}
 			applicablePrimitiveTrails[TrailType.REAL_SUM.ordinal()] = false; // in settlements only
+
 			if (settings.isQuantilesActive()) {
 				//				applicablePrimitiveTrails[TrailType.AVG.ordinal()] = true;
 				applicablePrimitiveTrails[TrailType.Q0.ordinal()] = true;
@@ -550,19 +558,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				applicablePrimitiveTrails[TrailType.Q_975_PERMILLE.ordinal()] = true;
 				applicablePrimitiveTrails[TrailType.Q_LOWER_WHISKER.ordinal()] = true;
 				applicablePrimitiveTrails[TrailType.Q_UPPER_WHISKER.ordinal()] = true;
-			}
-			// set at least one trail if no trail is applicable
-			boolean containsTrue = false;
-			for (boolean value : applicablePrimitiveTrails) {
-				if (value) {
-					containsTrue = true;
-					break;
-				}
-			}
-			if (!containsTrue) {
-				for (TrailType trailType : TrailType.getSubstitutes()) {
-					applicablePrimitiveTrails[trailType.ordinal()] = true;
-				}
 			}
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " " + measurementStatistics.toString()); //$NON-NLS-1$
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
@@ -592,7 +587,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						applicablePrimitiveTrails[trailType.ordinal()] = true;
 					}
 				}
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " " + settlementEvaluation.toString()); // $NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " " + settlementEvaluation.toString()); // $NON-NLS-1$ //$NON-NLS-1$
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
 			}
 		}
@@ -600,17 +595,17 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			applicablePrimitiveTrails = new boolean[0]; // not required
 		}
 		else {
-			throw new UnsupportedOperationException(" >>> no trails found <<< ");
+			throw new UnsupportedOperationException(" >>> no trails found <<< "); //$NON-NLS-1$
 		}
 
 		// step 2: build applicable trail type lists for display purposes
 		{
-			this.applicableTrailsOrdinals = new ArrayList<>();
-			this.applicableTrailsTexts = new ArrayList<>();
+			this.applicableTrailsOrdinals = new ArrayList<Integer>();
+			this.applicableTrailsTexts = new ArrayList<String>();
 			if (this.scoregroupType != null) {
 				for (int i = 0; i < this.scoregroupType.getScore().size(); i++) {
 					this.applicableTrailsOrdinals.add(this.scoregroupType.getScore().get(i).getLabel().ordinal());
-					this.applicableTrailsTexts.add(this.scoregroupType.getScore().get(i).getValue());
+					this.applicableTrailsTexts.add(this.scoregroupType.getScore().get(i).getValue().intern());
 				}
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " score "); //$NON-NLS-1$
 			}
@@ -622,25 +617,25 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						TrailType trailType = TrailType.values[i];
 						if (trailType.isTriggered) {
 							if (trailType.equals(TrailType.REAL_COUNT_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getCountTriggerText());
+								this.applicableTrailsTexts.add(getStatistics().getCountTriggerText().intern());
 							}
 							else if (trailType.equals(TrailType.REAL_SUM_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getSumTriggerText());
+								this.applicableTrailsTexts.add(getStatistics().getSumTriggerText().intern());
 							}
 							else if (trailType.equals(TrailType.REAL_TIME_SUM_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getSumTriggerTimeText());
+								this.applicableTrailsTexts.add(getStatistics().getSumTriggerTimeText().intern());
 							}
 							else if (trailType.equals(TrailType.REAL_AVG_RATIO_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getRatioText());
+								this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
 							}
 							else if (trailType.equals(TrailType.REAL_MAX_RATIO_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getRatioText());
+								this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
 							}
 							else
-								throw new UnsupportedOperationException("trailType.isTriggered");
+								throw new UnsupportedOperationException("trailType.isTriggered"); //$NON-NLS-1$
 						}
 						else {
-							this.applicableTrailsTexts.add(trailType.displayName);
+							this.applicableTrailsTexts.add(trailType.displayName.intern());
 						}
 					}
 				}
@@ -652,12 +647,12 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					}
 					if (bb) {
 						this.applicableTrailsOrdinals.add(setTrailType.ordinal());
-						this.applicableTrailsTexts.add(setTrailType.displayName);
+						this.applicableTrailsTexts.add(setTrailType.displayName.intern());
 					}
 				}
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts);
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals);
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
 		}
 	}
 
@@ -694,15 +689,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				int i = 0;
 				for (TrailType trailType : suite) {
 					if (this.measurementType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, trailType.ordinal() + 1000, "suite" + trailType.ordinal(), this.measurementType, this.parentTrail, this.size());
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.ordinal(), this.measurementType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
 					}
 					else if (this.settlementType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, trailType.ordinal() + 1000, "suite" + trailType.ordinal(), this.settlementType, this.parentTrail, this.size());
+						this.trailRecordSuite[i] = new TrailRecord(this.device,this.ordinal, "suite" + trailType.ordinal(), this.settlementType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
 					}
 					else if (this.scoregroupType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, trailType.ordinal() + 1000, "suite" + trailType.ordinal(), this.scoregroupType, this.parentTrail, this.size());
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.ordinal(), this.scoregroupType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
 					}
 					else {

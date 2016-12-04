@@ -18,29 +18,14 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.HistoRecordSet;
-import gde.data.HistoSet;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.data.TrailRecord;
-import gde.histocache.HistoVault;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Vector;
 import java.util.NavigableMap;
+import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -67,6 +52,20 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.HistoSet;
+import gde.data.TrailRecord;
+import gde.data.TrailRecordSet;
+import gde.histocache.HistoVault;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+
 /**
  * Histo display class, displays the histo in table form.
  * @author Thomas Eickert
@@ -81,8 +80,8 @@ public class HistoTableWindow extends CTabItem {
 	TableColumn									recordsColumn;
 	TableColumn									tableCurveTypeColumn;
 	TableCursor									cursor;
-	Vector<Integer>							rowVector							= new Vector<>(2);
-	Vector<Integer>							topindexVector				= new Vector<>(2);
+	Vector<Integer>							rowVector							= new Vector<Integer>(2);
+	Vector<Integer>							topindexVector				= new Vector<Integer>(2);
 
 	final DataExplorer					application;
 	final Channels							channels;
@@ -264,7 +263,7 @@ public class HistoTableWindow extends CTabItem {
 			// This is called as the user navigates around the table
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, "cursor.widgetSelected " + event); //$NON-NLS-1$
+				if (HistoTableWindow.log.isLoggable(Level.FINEST)) HistoTableWindow.log.log(Level.FINEST, "cursor.widgetSelected " + event); //$NON-NLS-1$
 				if (HistoTableWindow.this.cursor.getRow() != null) {
 					updateVector(HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()), HistoTableWindow.this.dataTable.getTopIndex());
 				}
@@ -275,17 +274,25 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addHelpListener(new HelpListener() {
 			@Override
 			public void helpRequested(HelpEvent evt) {
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINER)) HistoTableWindow.log.log(java.util.logging.Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
+				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		this.dataTable.addListener(SWT.SetData, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				if (HistoTableWindow.this.histoSet.getTrailRecordSet().size() > 0) {
+				TrailRecordSet trailRecordSet = HistoTableWindow.this.histoSet.getTrailRecordSet();
+				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
-					TrailRecord trailRecord = (TrailRecord) HistoTableWindow.this.histoSet.getTrailRecordSet().getVisibleAndDisplayableRecordsForTable().get(HistoTableWindow.this.dataTable.indexOf(item));
-					item.setText(trailRecord.getHistoTableRow());
+					if (HistoTableWindow.this.dataTable.indexOf(item) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
+						int index = HistoTableWindow.this.dataTable.indexOf(item);
+						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
+						item.setText(trailRecord.getHistoTableRow());
+					}
+					else {
+						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
+						item.setText(trailRecordSet.getTagTableRow(index));
+					}
 				}
 			}
 		});

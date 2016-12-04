@@ -18,6 +18,32 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -47,38 +73,6 @@ import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.LinearRegression;
 import gde.utils.WaitTimer;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 /**
  * Graupner HoTT device base class
@@ -150,7 +144,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		 * @return names of the sensors which are available
 		 */
 		public static List<String> getSensorNames(boolean[] isSensorType) {
-			List<String> sensors = new ArrayList<>();
+			List<String> sensors = new ArrayList<String>();
 			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
 				if (HoTTAdapter.isSensorType[i]) sensors.add(HoTTAdapter.Sensor.fromOrdinal(i).name());
 			}
@@ -935,8 +929,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/* (non-Javadoc)
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
-	public HistoRecordSet getRecordSetFromImportFile(int channelNumber, String objectKey,  Path filePath) throws DataInconsitsentException, IOException, DataTypeException  {
-		log.log(Level.INFO, String.format("start channel=%d  objectKey=%s  %s", channelNumber, objectKey, filePath)); //$NON-NLS-1$
+	public HistoRecordSet getRecordSetFromImportFile(Path filePath) throws DataInconsitsentException, IOException, DataTypeException  {
+		log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
 		return HoTTbinHistoReader.read(filePath);
 	}
 

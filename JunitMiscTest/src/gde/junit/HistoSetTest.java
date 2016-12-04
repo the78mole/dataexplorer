@@ -105,7 +105,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 			for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 				setupDeviceChannelObject(directories[i], channelEntry.getKey(), "");
 				try {
-					HistoSet.getInstance().rebuild(RebuildStep.A_HISTOSET, false);
+					HistoSet.getInstance().rebuild4Screening(RebuildStep.A_HISTOSET, false);
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -191,7 +191,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 									this.channels.setActiveChannelNumber(channelEntry.getKey());
 									try {
 										List<HistoRecordSet> recordSets = new ArrayList<>();
-										HistoOsdReaderWriter.readHisto(recordSets, file.toPath());
+										HistoOsdReaderWriter.readHisto(recordSets, file.toPath(), Arrays.asList(new Integer[] { application.getActiveChannelNumber() }), "fakeObjectKey");
 										if (recordSets.size() > 0) {
 											maxTime_sec = recordSets.get(recordSets.size() - 1).getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSets.get(recordSets.size() - 1).getMaxTime_ms() / 1000 : maxTime_sec;
 											System.out.println(String.format("osdFile processed %3d  channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", recordSets.size(), this.channels.getActiveChannelNumber(),

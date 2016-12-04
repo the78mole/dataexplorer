@@ -88,6 +88,7 @@ import gde.data.HistoSet;
 import gde.data.HistoSet.RebuildStep;
 import gde.data.ObjectData;
 import gde.data.RecordSet;
+import gde.data.TrailRecordSet;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
@@ -940,7 +941,7 @@ public class DataExplorer extends Composite {
 	private synchronized void updateHistoTable(boolean forceClean) {
 		//		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 		//				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
-		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible()) {
+		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()) {
 			if (forceClean) {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
@@ -951,7 +952,8 @@ public class DataExplorer extends Composite {
 			GDE.display.asyncExec(new Runnable() {
 
 				public void run() {
-					DataExplorer.this.histoTableTabItem.setRowCount(DataExplorer.this.histoSet.getTrailRecordSet().getVisibleAndDisplayableRecordsForTable().size());
+					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
+					DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
 				}
 			});
 		}
@@ -1984,11 +1986,11 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible()) //
-					|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
+			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
+					|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible())) {
 				boolean isRebuilt = false;
 				try {
-					isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
+					isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -2005,9 +2007,12 @@ public class DataExplorer extends Composite {
 				this.setProgress(100, sThreadId);
 				if (isWithUi && (isRebuilt || rebuildStep == RebuildStep.B_HISTORECORDSETS)) {
 					if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
-						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+						String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? DataExplorer.this.getActiveDevice().getName() : DataExplorer.this.getObjectKey();
+						String importDir = DataExplorer.this.histoSet.getValidatedImportDir() != null ? "\n" + DataExplorer.this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY;
+						this.openMessageDialog(
+								Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, DataExplorer.this.histoSet.getValidatedDataDir(),  importDir }));
 					}
-					else if (DataExplorer.this.histoSet.size() >= settings.getMaxLogCount()) {
+					else if (DataExplorer.this.histoSet.size() >= this.settings.getMaxLogCount()) {
 						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0067));
 					}
 				}
@@ -2026,12 +2031,12 @@ public class DataExplorer extends Composite {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					if ((DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow //
-							&& DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible())
+							&& DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible())
 							|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow //
-									&& DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && histoTableTabItem.isVisible())) {
+									&& DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible())) {
 						boolean isRebuilt = false;
 						try {
-							isRebuilt = DataExplorer.this.histoSet.rebuild(rebuildStep, isWithUi);
+							isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 						}
 						catch (Exception e) {
 							log.log(Level.SEVERE, e.getMessage(), e);
@@ -2050,7 +2055,7 @@ public class DataExplorer extends Composite {
 							if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
 								DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
 							}
-							else if (DataExplorer.this.histoSet.size() >= settings.getMaxLogCount()) {
+							else if (DataExplorer.this.histoSet.size() >= DataExplorer.this.settings.getMaxLogCount()) {
 								DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0067));
 							}
 						}
@@ -2076,7 +2081,7 @@ public class DataExplorer extends Composite {
 	 * @param rebuildSteps
 	 */
 	private void updateHistoGraphicsWindow(boolean redrawGraphics) {
-		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && histoGraphicsTabItem.isVisible()) {
+		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 					if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {

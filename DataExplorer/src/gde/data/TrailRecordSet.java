@@ -19,24 +19,20 @@
 
 package gde.data;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-
-import javax.naming.OperationNotSupportedException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.config.HistoGraphicsTemplate;
-import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
@@ -61,12 +57,21 @@ public class TrailRecordSet extends RecordSet {
 	private final static long						serialVersionUID			= -1580283867987273535L;
 	private final static Logger					log										= Logger.getLogger($CLASS_NAME);
 
-	final static int										initialRecordCapacity	= 111;														// vector capacity values are crucial for the overall performance
+	final static int										initialRecordCapacity	= 111;																					// vector capacity values are crucial for the overall performance
 
-	private final int[]									linkedOrdinals;																					// allows getting a trail record by ordinal without iterating the linked hashmap  
-	private final HistoGraphicsTemplate	template;																								// graphics template holds view configuration
-	private final List<Integer>					durations_mm					= new ArrayList<>();
+	private final HistoGraphicsTemplate	template;																															// graphics template holds view configuration
+	private final int[]									linkedOrdinals;																												// allows getting a trail record by ordinal without iterating the linked hashmap  
+
+	private final List<Integer>					durations_mm					= new ArrayList<Integer>(initialRecordCapacity);
 	private double											averageDuration_mm		= 0;
+	private final List<String>					fileNames							= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					directoryNames				= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					basePaths							= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logChannelNumbers			= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logObjectKeys					= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logRecordSetNumbers		= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logRecordsetNames			= new ArrayList<String>(initialRecordCapacity);
+	private final List<List<String>>		logTags								= new ArrayList<List<String>>();
 
 	/**
 	 * holds trail records for measurements, settlements and scores.
@@ -80,6 +85,14 @@ public class TrailRecordSet extends RecordSet {
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		this.linkedOrdinals = new int[recordNames.length];
 		if (this.template != null) this.template.load();
+
+		this.logTags.add(this.fileNames);
+		this.logTags.add(this.directoryNames);
+		this.logTags.add(this.basePaths);
+		this.logTags.add(this.logChannelNumbers);
+		this.logTags.add(this.logObjectKeys);
+		this.logTags.add(this.logRecordSetNumbers);
+		this.logTags.add(this.logRecordsetNames);
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
@@ -116,14 +129,13 @@ public class TrailRecordSet extends RecordSet {
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
 	public static TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
-		DeviceConfiguration deviceConfiguration = (DeviceConfiguration) device;
-		String[] names = deviceConfiguration.getMeasurementSettlementScoregroupNames(channelConfigNumber);
+		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.name + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 		newTrailRecordSet.timeStep_ms = new TimeSteps(-1, initialRecordCapacity);
-		List<MeasurementType> channelMeasurements = deviceConfiguration.getChannelMeasuremts(channelConfigNumber);
-		List<SettlementType> channelSettlements = deviceConfiguration.getChannel(channelConfigNumber).getSettlement();
-		List<ScoregroupType> channelScoregroups = deviceConfiguration.getChannel(channelConfigNumber).getScoregroup();
+		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
+		List<SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlement();
+		List<ScoregroupType> channelScoregroups = device.getDeviceConfiguration().getChannel(channelConfigNumber).getScoregroup();
 
 		// display section 0: look for scores at the top - scores' ordinals start after measurements + settlements due to GraphicsTemplate compatibility
 		for (int i = 0, myIndex = channelMeasurements.size() + channelSettlements.size(); i < channelScoregroups.size(); i++) { // myIndex is used as recordOrdinal
@@ -236,6 +248,16 @@ public class TrailRecordSet extends RecordSet {
 		for (String recordName : super.getRecordNames()) {
 			((TrailRecord) super.get(recordName)).clear();
 		}
+		this.durations_mm.clear();
+		this.averageDuration_mm = 0;
+		
+		this.fileNames.clear();
+		this.directoryNames.clear();
+		this.basePaths.clear();
+		this.logChannelNumbers.clear();
+		this.logObjectKeys.clear();
+		this.logRecordSetNumbers.clear();
+		this.logRecordsetNames.clear();
 	}
 
 	/**
@@ -294,39 +316,11 @@ public class TrailRecordSet extends RecordSet {
 		throw new UnsupportedOperationException();
 	}
 
-//	/**
-//	 * clears and fills the aggregated values into the trailRecords associated with the measurement or settlement.
-//	 * takes time steps and data from all histo record sets for the current channel.
-//	 * takes only those aggregated values which are assigned to the selected trail type.
-//	 * @param histoSet
-//	 */
-//	@Deprecated
-//	public void addHistoSetPoints(HistoSet histoSet) {
-//		//		long nanoTime = System.nanoTime();
-//		for (Map.Entry<Long, List<HistoRecordSet>> entry : histoSet.entrySet()) {
-//			for (HistoRecordSet histoRecordSet : entry.getValue()) {
-//				long nanoTimeHistoVaultRead = System.nanoTime();
-//				this.durations_mm.add((int) (histoRecordSet.getMaxTime_ms() / 60000. + .5));
-//				this.averageDuration_mm += (this.durations_mm.get(this.durations_mm.size() - 1) - this.averageDuration_mm) / this.durations_mm.size();
-//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoRecordSet.getStartTimeStamp(), entry.getKey())); //$NON-NLS-1$
-//				super.timeStep_ms.addRaw(histoRecordSet.getStartTimeStamp() * 10);
-//				for (String recordName : super.getRecordNames()) {
-//					((TrailRecord) super.get(recordName)).addHistoSetPoints(histoRecordSet);
-//				}
-//				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("recordSet  time=%,d ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTimeHistoVaultRead))); //$NON-NLS-1$
-//			}
-//		}
-//		syncScaleOfSyncableRecords();
-//		//		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d trails        build and populate time=%,6d [ms]  ::  per second:%5d", HistoSet.me.size(), //$NON-NLS-1$
-//		//				TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime), HistoSet.me.size() > 0 ? HistoSet.me.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) : 0));
-//	}
-
 	/**
 	 * set time steps for the trail recordset and the data points for all trail records.
 	 * every record takes the selected trail type / score data from the history vault and populates its data. 
 	 */
 	public void setPoints() {
-		this.cleanup();
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
@@ -356,6 +350,23 @@ public class TrailRecordSet extends RecordSet {
 			}
 		}
 		syncScaleOfSyncableRecords();
+	}
+
+	/**
+	 * sets tagging information for the trail entries.
+	 */
+	public void setTags() {
+		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
+			for (HistoVault histoVault : entry.getValue()) {
+				this.fileNames.add(Paths.get(histoVault.getFilePath()).getFileName().toString());
+				this.directoryNames.add(Paths.get(histoVault.getFilePath()).getParent().getFileName().toString().intern());
+				this.basePaths.add(Paths.get(histoVault.getFilePath()).getParent().getParent().toString().intern());
+				this.logChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
+				this.logObjectKeys.add(histoVault.getLogObjectKey().intern());
+				this.logRecordSetNumbers.add(String.valueOf(histoVault.getLogRecordSetNumber()).intern());
+				this.logRecordsetNames.add(histoVault.getLogRecordsetName().intern());
+			}
+		}
 	}
 
 	/**
@@ -497,7 +508,7 @@ public class TrailRecordSet extends RecordSet {
 				updateVisibilityStatus(true);
 			}
 			// if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-			this.application.updateGraphicsWindow();
+			this.application.updateGraphicsWindow(); // todo histoGraphicsWindow
 			// }
 		}
 
@@ -582,7 +593,7 @@ public class TrailRecordSet extends RecordSet {
 	@Override // reason is: 1. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
 	// 2. 
 	public Record[] getRecordsSortedForDisplay() {
-		Vector<Record> displayRecords = new Vector<>();
+		Vector<Record> displayRecords = new Vector<Record>();
 		// add the record with horizontal grid
 		for (Record record : this.values()) {
 			log.log(Level.FINER, record.name);
@@ -621,7 +632,46 @@ public class TrailRecordSet extends RecordSet {
 	 * @return the average of the individual durations for all trails
 	 	 */
 	public double getAverageDuration_mm() {
-		return averageDuration_mm;
+		return this.averageDuration_mm;
+	}
+
+	/**
+	 * get all tags for all recordsets / vaults.
+	 * @param logTagOrdinal
+	 * @return empty record name and tag description as a trail text replacement followed by the string array
+	 */
+	public String[] getTagTableRow(int logTagOrdinal) {
+		String[] dataTableRow = new String[this.get(0).size() + 2];
+
+		if (logTagOrdinal == 0)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0838);
+		else if (logTagOrdinal == 1)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0839);
+		else if (logTagOrdinal == 2)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
+		else if (logTagOrdinal == 3)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0841);
+		else if (logTagOrdinal == 4)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
+		else if (logTagOrdinal == 5)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843);
+		else if (logTagOrdinal == 6)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
+		else
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
+
+		List<String> logTag = this.logTags.get(logTagOrdinal);
+		for (int i = 0; i < this.get(0).size(); i++) {
+			dataTableRow[i + 2] = logTag.get(i);
+		}
+		return dataTableRow;
+	}
+
+	/**
+	 * @return the logTags
+	 */
+	public List<List<String>> getLogTags() {
+		return logTags;
 	}
 
 }

@@ -22,6 +22,8 @@ package gde.device;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -103,7 +105,14 @@ public class DeviceConfiguration {
 	protected CalculationThread								calculationThread					= null;																									// universal device calculation thread (slope)
 	protected Integer													kmzMeasurementOrdinal			= null;
 
-	private int[]															channelGroups;																																		// channelGroupIdentifier for each channel; -1 if channel does not belong to a group
+	/**
+	 * holds group index numbers for those channels which have identical measurement names.
+	 * the array length is equal to the channel count; the value '-1' denotes a channel without a group assignment.
+	 * example: [-1, 0, 0, -1, 1, 1, -1, 1] holds two groups.
+	 * the 1st group is identified by the group index '0' and consists of the 2nd and 3rd channel.
+	 * the 2nd group is identified by the group index '1' and consists of the 5th, 6th and 8th channel.
+	 */
+	private int[]															channelGroups;																														
 
 	/**
 	 * method to test this class
@@ -2509,31 +2518,74 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * compare channel measurement names and define channel groups with identical measurement names.
 	 * @param channelConfigNumberI
 	 * @param channelConfigNumberJ
 	 * @return true if the two channels have identical measurement names
 	 */
-	public boolean isPairOfChannels(int channelConfigNumberI, int channelConfigNumberJ) { //todo add to IDevice?
-		if (channelGroups == null) {
-			int tmpGroupIndex = -1;
-			channelGroups = new int[this.getChannelCount()];
-			Arrays.fill(channelGroups, -1);
-			for (int i = 0; i < this.deviceProps.getChannels().channel.size(); i++) {
-				String[] measurementNamesI = this.getMeasurementNames(i + 1);
-				Arrays.sort(measurementNamesI);
-				for (int j = i + 1; j < this.deviceProps.getChannels().channel.size(); j++) {
-					String[] measurementNamesJ = this.getMeasurementNames(j + 1);
-					Arrays.sort(measurementNamesJ);
-					if (Arrays.equals(measurementNamesI, measurementNamesJ)) {
-						if (channelGroups[i] == -1) {
-							channelGroups[i] = ++tmpGroupIndex;
-						}
-						channelGroups[j] = channelGroups[i];
+	public boolean isPairOfChannels(int channelConfigNumberI, int channelConfigNumberJ) {
+		if (this.channelGroups == null) {
+			initChannelGroups();
+		}
+		return this.channelGroups[channelConfigNumberI - 1] > -1 && this.channelGroups[channelConfigNumberI - 1] == this.channelGroups[channelConfigNumberJ - 1];
+	}
+
+	/**
+	 * @param channelConfigNumber
+	 * @return the config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
+	 */
+	public List<Integer> getChannelBundle(int channelConfigNumber) {
+		List <Integer> result = new ArrayList<Integer>(); 
+		if (this.channelGroups == null) {
+			initChannelGroups();
+		}
+		if (this.channelGroups[channelConfigNumber] > -1) {
+			for (int i = 0; i < this.channelGroups.length; i++) {
+				if (this.channelGroups[i] != -1 && this.channelGroups[i] == this.channelGroups[channelConfigNumber]) result.add(i);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * compare channel measurement names and define channel groups with identical measurement names.
+	 */
+	private void initChannelGroups() {
+		int tmpGroupIndex = -1;
+		this.channelGroups = new int[this.getChannelCount()];
+		Arrays.fill(this.channelGroups, -1);
+		for (int i = 0; i < this.deviceProps.getChannels().channel.size(); i++) {
+			String[] measurementNamesI = this.getMeasurementNames(i + 1);
+			Arrays.sort(measurementNamesI);
+			for (int j = i + 1; j < this.deviceProps.getChannels().channel.size(); j++) {
+				String[] measurementNamesJ = this.getMeasurementNames(j + 1);
+				Arrays.sort(measurementNamesJ);
+				if (Arrays.equals(measurementNamesI, measurementNamesJ)) {
+					if (this.channelGroups[i] == -1) {
+						this.channelGroups[i] = ++tmpGroupIndex;
 					}
+					this.channelGroups[j] = this.channelGroups[i];
 				}
 			}
 		}
-		return channelGroups[channelConfigNumberI - 1] > -1 && channelGroups[channelConfigNumberI - 1] == channelGroups[channelConfigNumberJ - 1];
 	}
+
+	/**
+	 * @return null or import path with trailing device and / or object stripped off
+	 */
+	public Path getImportBaseDir() {
+		Path path = null;
+		String tmpImportDirPath = getDataBlockType().getPreferredDataLocation() ;
+		if (!(tmpImportDirPath == null || tmpImportDirPath.trim().isEmpty() || tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
+			path = Paths.get(tmpImportDirPath);
+			// ignore object if path ends with a valid object
+			String directoryName = path.getFileName().toString();
+			path = Settings.getInstance().getValidateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+			// ignore device if path ends with a valid device
+			String directoryName2 = path.getFileName().toString();
+			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
+		}
+		log.log(Level.FINER, "ImportBaseDir " + path); //$NON-NLS-1$
+		return path;
+	}
+
 }

@@ -195,7 +195,7 @@ public class HistoSelectorComposite extends Composite {
 	 * executes the update of the curve selector table
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
-		HistoSelectorComposite.log.log(Level.FINE, "start");
+		HistoSelectorComposite.log.log(Level.FINE, "start"); //$NON-NLS-1$
 		this.curveSelectorTable.removeAll();
 		for (TableEditor editor : this.editors) {
 			if (editor != null) { // non displayable records
@@ -220,7 +220,7 @@ public class HistoSelectorComposite extends Composite {
 			if (record.isDisplayable()) {
 				TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 				item.setForeground(record.getColor());
-				item.setText(record.getName());
+				item.setText(record.getName().intern());
 
 				this.editors[i] = new TableEditor(this.curveSelectorTable);
 				selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
