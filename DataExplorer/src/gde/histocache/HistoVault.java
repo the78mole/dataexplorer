@@ -71,19 +71,21 @@ import gde.utils.StringHelper;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="vaultKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="dataExplorerVersion" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="deviceKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="uiDeviceName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="uiChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="uiObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="samplingTimespan_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="filePath" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="fileLastModified_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="logChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="logObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultRelativePath" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultDataExplorerVersion" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="vaultDeviceKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultDeviceName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="vaultObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultSamplingTimespan_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="logFilePath" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logFileLastModified" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="logObjectDirectory" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="logRecordSetNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="logRecordsetName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logDeviceName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="logObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="logStartTimestamp_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="measurements" type="{}entries"/>
  *         &lt;element name="settlements" type="{}entries"/>
@@ -98,30 +100,14 @@ import gde.utils.StringHelper;
  */
 /**
  * suitable for history persistence and xml serialization.
- * find the constructors and non-xsd code a good way down for simplified merging from JAXB generated class.  
+ * find the constructors and non-xsd code a good way down for simplified merging with JAXB generated class.  
  * @author Thomas Eickert
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "histoVault", propOrder = {
-    "vaultKey",
-    "dataExplorerVersion",
-    "deviceKey",
-    "uiDeviceName",
-    "uiChannelNumber",
-    "uiObjectKey",
-    "samplingTimespanMs",
-    "filePath",
-    "fileLastModifiedMs",
-    "logChannelNumber",
-    "logObjectKey",
-    "logRecordSetNumber",
-    "logRecordsetName",
-    "logStartTimestampMs",
-    "measurements",
-    "settlements",
-    "scores"
-})
+@XmlType(name = "histoVault", propOrder = { "vaultRelativePath", "vaultDataExplorerVersion", "vaultDeviceKey", "vaultDeviceName", "vaultChannelNumber", "vaultObjectKey", "vaultSamplingTimespanMs",
+		"logFilePath", "logFileLastModified", "logObjectDirectory", "logRecordSetNumber", "logRecordsetName", "logDeviceName", "logChannelNumber", "logObjectKey", "logStartTimestampMs", "measurements",
+		"settlements", "scores" })
 public class HistoVault {
 	final private static String	$CLASS_NAME								= HistoVault.class.getName();
 	final private static Logger	log												= Logger.getLogger($CLASS_NAME);
@@ -142,27 +128,30 @@ public class HistoVault {
 	private final IDevice				device										= this.application.getActiveDevice();
 
 	@XmlElement(required = true)
-    protected String vaultKey;
-	protected int								dataExplorerVersion;
+	protected String						vaultRelativePath;
+	protected int								vaultDataExplorerVersion;
 	@XmlElement(required = true)
-	protected String						deviceKey;
+	protected String						vaultDeviceKey;
 	@XmlElement(required = true)
-	protected String						uiDeviceName;
-	protected int								uiChannelNumber;
+	protected String						vaultDeviceName;
+	protected int								vaultChannelNumber;
 	@XmlElement(required = true)
-	protected String						uiObjectKey;
-	@XmlElement(name = "samplingTimespan_ms")
-	protected long							samplingTimespanMs;
+	protected String						vaultObjectKey;
+	@XmlElement(name = "vaultSamplingTimespan_ms")
+	protected long							vaultSamplingTimespanMs;
 	@XmlElement(required = true)
-	protected String						filePath;
-	@XmlElement(name = "fileLastModified_ms")
-	protected long							fileLastModifiedMs;
-	protected int								logChannelNumber;
+	protected String						logFilePath;
+	protected long							logFileLastModified;
 	@XmlElement(required = true)
-	protected String						logObjectKey;
+	protected String						logObjectDirectory;
 	protected int								logRecordSetNumber;
 	@XmlElement(required = true)
 	protected String						logRecordsetName;
+	@XmlElement(required = true)
+	protected String						logDeviceName;
+	protected int								logChannelNumber;
+	@XmlElement(required = true)
+	protected String						logObjectKey;
 	@XmlElement(name = "logStartTimestamp_ms")
 	protected long							logStartTimestampMs;
 	@XmlElement(required = true)
@@ -173,95 +162,139 @@ public class HistoVault {
 	protected EntryPoints				scores;
 
 	/**
-     * Gets the value of the vaultKey property.
+	   * Gets the value of the vaultRelativePath property.
 	 * 
 	 * @return
 	 *     possible object is
 	 *     {@link String }
 	 *     
 	 */
-	public String getVaultKey() {
-		return vaultKey;
+	public String getVaultRelativePath() {
+		return vaultRelativePath;
 	}
 
 	/**
-	 * Gets the value of the dataExplorerVersion property.
-	 * 
-	 */
-	public int getDataExplorerVersion() {
-		return dataExplorerVersion;
-	}
-
-	/**
-	 * Gets the value of the deviceKey property.
-	 * 
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	   * Gets the value of the vaultDataExplorerVersion property.
 	 *     
 	 */
-	public String getDeviceKey() {
-		return deviceKey;
+	public int getVaultDataExplorerVersion() {
+		return vaultDataExplorerVersion;
 	}
 
 	/**
-	 * Gets the value of the uiDeviceName property.
-	 * 
-	 * @return
-	 *     possible object is
-	 *     {@link String }
-	 *     
-	 */
-	public String getUiDeviceName() {
-		return uiDeviceName;
-	}
-
-	/**
-	   * Gets the value of the uiChannelNumber property.
-	 * 
-	 */
-	public int getUiChannelNumber() {
-		return uiChannelNumber;
-	}
-
-	/**
-	   * Gets the value of the uiObjectKey property.
+	   * Gets the value of the vaultDeviceKey property.
 	 * 
 	 * @return
 	 *     possible object is
 	   *     {@link String }
 	 *     
 	 */
-	public String getUiObjectKey() {
-		return uiObjectKey;
+	public String getVaultDeviceKey() {
+		return vaultDeviceKey;
 	}
 
 	/**
-	 * Gets the value of the samplingTimespanMs property.
-	 * 
-	 */
-	public long getSamplingTimespan_ms() {
-		return samplingTimespanMs;
-	}
-
-	/**
-	   * Gets the value of the filePath property.
+	   * Gets the value of the vaultDeviceName property.
 	   * 
 	   * @return
 	   *     possible object is
 	   *     {@link String }
 	   * 
 	   */
-	public String getFilePath() {
-		return filePath;
+	public String getVaultDeviceName() {
+		return vaultDeviceName;
 	}
 
 	/**
-	 * Gets the value of the fileLastModifiedMs property.
+	   * Gets the value of the vaultChannelNumber property.
 	 * 
 	 */
-	public long getFileLastModified_ms() {
-		return fileLastModifiedMs;
+	public int getVaultChannelNumber() {
+		return vaultChannelNumber;
+	}
+
+	/**
+	   * Gets the value of the vaultObjectKey property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getVaultObjectKey() {
+		return vaultObjectKey;
+	}
+
+	/**
+	 * Gets the value of the vaultSamplingTimespanMs property.
+	 * 
+	 */
+	public long getVaultSamplingTimespan_ms() {
+		return vaultSamplingTimespanMs;
+	}
+
+	/**
+	 * Gets the value of the logFilePath property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getLogFilePath() {
+		return logFilePath;
+	}
+
+	/**
+	 * Gets the value of the logFileLastModified property.
+	 * 
+	 */
+	public long getLogFileLastModified() {
+		return logFileLastModified;
+	}
+
+	/**
+	 * Gets the value of the logObjectDirectory property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getLogObjectDirectory() {
+		return logObjectDirectory;
+	}
+
+	/**
+	 * Gets the value of the logRecordSetNumber property.
+	 * 
+	 */
+	public int getLogRecordSetNumber() {
+		return logRecordSetNumber;
+	}
+
+	/**
+	 * Gets the value of the logRecordsetName property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getLogRecordsetName() {
+		return logRecordsetName;
+	}
+
+	/**
+	 * Gets the value of the logDeviceName property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getLogDeviceName() {
+		return logDeviceName;
 	}
 
 	/**
@@ -282,26 +315,6 @@ public class HistoVault {
 	 */
 	public String getLogObjectKey() {
 		return logObjectKey;
-	}
-
-	/**
-	 * Gets the value of the logRecordsetNumber property.
-	*     
-	*/
-	public int getLogRecordSetNumber() {
-		return logRecordSetNumber;
-	}
-
-	/**
-	 * Gets the value of the logRecordsetName property.
-	 * 
-	 * @return
-	 *     possible object is
-	 *     {@link String }
-	 *     
-	 */
-	public String getLogRecordsetName() {
-		return logRecordsetName;
 	}
 
 	/**
@@ -389,55 +402,93 @@ public class HistoVault {
 	}
 
 	/**
+	 * @param objectDirectory validated object key
 	 * @param filePath file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
 	 * @param fileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
 	 * @param logRecordSetNumber identifies multiple recordsets within on single file
-	 * @param logRecordSetName 
+	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
+	 * @param logDeviceName 
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
-	 * @param logObjectKey may differ from UI settings (empty in OSD files, parent path for bin files)
+	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 */
-	private HistoVault(Path filePath, long fileLastModified_ms, int logRecordSetNumber, String logRecordSetName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
-		this.dataExplorerVersion = HistoVault.activeDataExplorerVersion;
-		this.deviceKey = HistoVault.getActiveDeviceKey();
-		this.uiDeviceName = this.application.getActiveDevice().getName();
-		this.uiChannelNumber = this.application.getActiveChannelNumber();
-		this.uiObjectKey = this.application.getObjectKey();
+	private HistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, int logRecordSetNumber, String logRecordSetBaseName, String logDeviceName, long logStartTimestamp_ms,
+			int logChannelNumber, String logObjectKey) {
+		this.vaultDataExplorerVersion = HistoVault.activeDataExplorerVersion;
+		this.vaultDeviceKey = HistoVault.getActiveDeviceKey();
+		this.vaultDeviceName = this.application.getActiveDevice().getName();
+		this.vaultChannelNumber = this.application.getActiveChannelNumber();
+		this.vaultObjectKey = this.application.getObjectKey();
+		this.vaultSamplingTimespanMs = this.settings.getSamplingTimespan_ms();
+		this.logFilePath = filePath.toString(); // toString due to avoid 'Object' during marshalling
+		this.logFileLastModified = fileLastModified_ms;
+		this.logObjectDirectory = objectDirectory;
+		this.logRecordSetNumber = logRecordSetNumber;
+		this.logRecordsetName = logRecordSetBaseName;
+		this.logDeviceName = logDeviceName;
 		this.logChannelNumber = logChannelNumber;
 		this.logObjectKey = logObjectKey;
-		this.samplingTimespanMs = this.settings.getSamplingTimespan_ms();
-		this.filePath = filePath.toString(); // toString due to avoid 'Object' during marshalling
-		this.fileLastModifiedMs = fileLastModified_ms;
-		this.logRecordSetNumber = logRecordSetNumber;
-		this.logRecordsetName = logRecordSetName;
 		this.logStartTimestampMs = logStartTimestamp_ms;
 
-		this.vaultKey = HistoVault.getVaultKey(filePath, fileLastModified_ms, logRecordSetNumber).toString();
+		this.vaultRelativePath = HistoVault.getVaultRelativePath(filePath, fileLastModified_ms, logRecordSetNumber).toString();
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
-				String.format("HistoVault.ctor  path=%s  lastModified=%s  recordsetName=%s  startTimestamp_ms=%s   channelConfigNumber=%d   objectKey=%s", filePath.getFileName().toString(), logRecordSetName, //$NON-NLS-1$
-						StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", fileLastModified_ms), StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", logStartTimestamp_ms), logChannelNumber, logObjectKey)); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("this.cacheKey=%s", this.vaultKey)); //$NON-NLS-1$
+				String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetNumber=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s",
+						objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, getOriginLastModifiedFormatted(), getStartTimeStampFormatted(), logChannelNumber, logObjectKey));
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("this.vaultRelativePath=%s", this.vaultRelativePath)); //$NON-NLS-1$
 	}
 
 	/**
+	 * @param objectDirectory validated object key
 	 * @param filePath file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
 	 * @param fileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
 	 * @param logRecordSetNumber identifies multiple recordsets within on single file
-	 * @param logRecordsetName 
+	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
+	 * @param logDeviceName 
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
-	 * @param logObjectKey may differ from UI settings (empty in OSD files, parent path for bin files)
+	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @param measurementEntries
 	 * @param settlementEntries
 	 * @param scorePoints
 	 * @return new instance with a full set of data
 	 */
-	public static HistoVault createHistoVault(Path filePath, long fileLastModified_ms, int logRecordSetNumber, String logRecordsetName, long logStartTimestamp_ms, int logChannelNumber,
-			String logObjectKey, Entries measurementEntries, Entries settlementEntries, EntryPoints scorePoints) {
-		HistoVault newHistoVault = new HistoVault(filePath, fileLastModified_ms, logRecordSetNumber, logRecordsetName, logStartTimestamp_ms, logChannelNumber, logObjectKey);
+	public static HistoVault createHistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, int logRecordSetNumber, String logRecordsetBaseName, String logDeviceName,
+			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, Entries measurementEntries, Entries settlementEntries, EntryPoints scorePoints) {
+		HistoVault newHistoVault = new HistoVault(objectDirectory, filePath, fileLastModified_ms, logRecordSetNumber, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber,
+				logObjectKey);
 		newHistoVault.setMeasurements(measurementEntries);
 		newHistoVault.setSettlements(settlementEntries);
 		newHistoVault.setScores(scorePoints);
+		return newHistoVault;
+	}
+
+	/**
+	 * @param objectDirectory validated object key
+	 * @param filePath file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
+	 * @param fileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
+	 * @param logRecordSetNumber identifies multiple recordsets within on single file
+	 * @param logRecordsetBaseName the base name without recordset number
+	 * @param logStartTimestamp_ms of the log or recordset
+	 * @param logDeviceName 
+	 * @param logChannelNumber may differ from UI settings in case of channel mix
+	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
+	 * @return new instance with a basic set of data
+	 */
+	public static HistoVault createTruss(String objectDirectory, Path filePath, long fileLastModified_ms, int logRecordSetNumber, String logRecordsetBaseName, String logDeviceName,
+			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
+		HistoVault newHistoVault = new HistoVault(objectDirectory, filePath, fileLastModified_ms, logRecordSetNumber, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber,
+				logObjectKey);
+		return newHistoVault;
+	}
+
+	/**
+	 * @param objectDirectory validated object key
+	 * @param file bin log file
+	 * @param logChannelNumber may differ from UI settings in case of channel mix
+	 * @return new instance with a basic set of data
+	 */
+	public static HistoVault createTruss(String objectDirectory, File file, int logChannelNumber) {
+		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), 1, file.getName(), "native", file.lastModified(), logChannelNumber, objectDirectory);
 		return newHistoVault;
 	}
 
@@ -551,7 +602,7 @@ public class HistoVault {
 	 * @return true if the vault object conforms to current versions of the Data Explorer / device XML, to current user settings (e.g. sampling timespan) and to various additional attributes
 	 */
 	public boolean isValid() {
-		return this.vaultKey.equals(HistoVault.getVaultKey(Paths.get(this.filePath), this.fileLastModifiedMs, this.getLogRecordSetNumber()));
+		return this.vaultRelativePath.equals(HistoVault.getVaultRelativePath(Paths.get(this.logFilePath), this.logFileLastModified, this.logRecordSetNumber));
 	}
 
 	/**
@@ -561,28 +612,29 @@ public class HistoVault {
 	 * @return true if the vault object conforms to current versions of the Data Explorer / device XML, to current user settings (e.g. sampling timespan) and to various additional attributes
 	 */
 	public boolean isValid(String newLogFileName, long newFileLastModified_ms, int newLogRecordSetNumber) {
-		return this.vaultKey.equals(HistoVault.getVaultKey(Paths.get(newLogFileName), newFileLastModified_ms, newLogRecordSetNumber));
+		return this.vaultRelativePath.equals(HistoVault.getVaultRelativePath(Paths.get(newLogFileName), newFileLastModified_ms, newLogRecordSetNumber));
 	}
 
 	/**
-	 * @return sub-directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus channel number and some settings values
+	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus channel number and some settings values
 	 */
-	public static Path getVaultSubDirectory() {
+	public static String getVaultDirectory() {
 		String tmpSubDirectoryLongKey = String.format("%d%s%d%d", HistoVault.activeDataExplorerVersion, HistoVault.getActiveDeviceKey(), DataExplorer.getInstance().getActiveChannelNumber(), //$NON-NLS-1$
 				Settings.getInstance().getSamplingTimespan_ms());
-		return Paths.get(HistoVault.sha1(tmpSubDirectoryLongKey));
+		return HistoVault.sha1(tmpSubDirectoryLongKey);
 
 	}
 
 	/**
 	 * @param fileName
 	 * @param fileLastModified_ms
-	 * @param logRecordSetNumber identifies multiple recordsets in one single file
+	 * @param recordSetNumber identifies multiple recordsets in one single file
 	 * @return the full path with filename as a unique identifier (sha1)
 	 */
-	public static Path getVaultKey(Path fileName, long fileLastModified_ms, int logRecordSetNumber) {
+	public static Path getVaultRelativePath(Path fileName, long fileLastModified_ms, int recordSetNumber) {
 		// do not include as these attributes are determined after reading the histoset: logChannelNumber, logObjectKey, logStartTimestampMs
-		return Paths.get(HistoVault.sha1(HistoVault.getVaultSubDirectory() + String.format("%s%d%d", fileName.getFileName(), fileLastModified_ms, logRecordSetNumber))); //$NON-NLS-1$
+		Path subDirectory = Paths.get(HistoVault.getVaultDirectory());
+		return subDirectory.resolve(sha1(subDirectory + String.format("%s%d%d", fileName.getFileName(), fileLastModified_ms, recordSetNumber))); //$NON-NLS-1$
 	}
 
 	/**
@@ -670,7 +722,7 @@ public class HistoVault {
 			if (trailTextSelectedIndex > this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().size()) //
 				throw new UnsupportedOperationException();
 			if (this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().get(trailTextSelectedIndex).getId() != trailOrdinal) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", measurementOrdinal,  trailTextSelectedIndex,  trailOrdinal)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", measurementOrdinal, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
 				for (Point point : this.measurements.getEntryPoints().get(measurementOrdinal).getPoints()) {
 					if (point.getId() == trailOrdinal) {
 						return point.getValue();
@@ -699,7 +751,7 @@ public class HistoVault {
 			if (trailTextSelectedIndex >= this.settlements.getEntryPoints().get(settlementId).getPoints().size()) //
 				throw new UnsupportedOperationException();
 			if (this.settlements.getEntryPoints().get(settlementId).getPoints().get(trailTextSelectedIndex).getId() != trailOrdinal) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", settlementId,  trailTextSelectedIndex,  trailOrdinal)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", settlementId, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
 				for (Point point : this.settlements.getEntryPoints().get(settlementId).getPoints()) {
 					if (point.getId() == trailOrdinal) {
 						return point.getValue();
@@ -728,4 +780,32 @@ public class HistoVault {
 		}
 	}
 
+	public String getOriginLastModifiedFormatted() {
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.getLogFileLastModified());
+	}
+
+	public String getStartTimeStampFormatted() {
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getLogStartTimestamp_ms());
+	}
+
+	public Path getVaultDirectoryPath() {
+		return Paths.get(this.vaultRelativePath).getParent();
+	}
+
+	public Path getVaultFileName() {
+		return Paths.get(this.vaultRelativePath).getFileName();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.vaultRelativePath).append("\n");
+		sb.append(this.logFilePath).append("\n");
+		sb.append("logRecordSetNumber=").append(this.logRecordSetNumber);
+		sb.append("logRecordsetName=").append(this.logRecordsetName);
+		sb.append("logChannelNumber=").append(this.logChannelNumber);
+		sb.append("logObjectKey=").append(this.logObjectKey);
+		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs);
+		return sb.toString();
+	}
 }

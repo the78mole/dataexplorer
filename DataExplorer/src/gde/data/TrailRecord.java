@@ -339,7 +339,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				else if (this.isSettlement())
 					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.trailTextSelectedIndex, this.getTrailOrdinal()));
 				else if (this.isScoregroup()) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultKey(), histoVault.getFilePath())); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
 					super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
 				}
 				else
@@ -357,7 +357,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					else if (this.isSettlement())
 						point = histoVault.getSettlement(trailRecord.settlementType.getSettlementId(), trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
 					else if (this.isScoregroup()) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getFilePath())); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
 						point = histoVault.getScorePoint(this.getTrailOrdinal());
 					}
 					else

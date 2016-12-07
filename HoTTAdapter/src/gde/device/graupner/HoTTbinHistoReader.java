@@ -26,10 +26,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -39,6 +41,7 @@ import gde.device.HistoRandomSample;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
+import gde.histocache.HistoVault;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
@@ -87,13 +90,13 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 * @return 
 	 */
-	public static synchronized HistoRecordSet read(Path filePath) throws IOException, DataTypeException, DataInconsitsentException {
+	public static synchronized HistoRecordSet read(HistoVault truss) throws IOException, DataTypeException, DataInconsitsentException {
 		HoTTbinHistoReader.initiateTime = HoTTbinHistoReader.readTime = HoTTbinHistoReader.reviewTime = HoTTbinHistoReader.addTime = HoTTbinHistoReader.pickTime = HoTTbinHistoReader.finishTime = 0;
 		HoTTbinHistoReader.lastTime = System.nanoTime();
-		HoTTbinHistoReader.filePath = filePath;
+		HoTTbinHistoReader.filePath = Paths.get(truss.getLogFilePath());
 		File file = HoTTbinHistoReader.filePath.toFile();
 		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {// performs better than DataInputStream due to reasonable io sizes
-			HoTTbinHistoReader.read(data_in);
+			HoTTbinHistoReader.read(data_in, truss);
 		}
 		catch (InvalidObjectException e) {
 			// so any anther exception is propagated to the caller
@@ -114,21 +117,21 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	 * @throws DataTypeException
 	 * @throws DataInconsitsentException
 	 */
-	private static synchronized void read(BufferedInputStream data_in) throws IOException, DataTypeException, DataInconsitsentException {
+	private static synchronized void read(BufferedInputStream data_in, HistoVault truss) throws IOException, DataTypeException, DataInconsitsentException {
 		final String $METHOD_NAME = "read";
 		File file = HoTTbinHistoReader.filePath.toFile();
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
 		Channel activeChannel = device.channels.getActiveChannel(); //  // HoTTbinHistoReader.application.getActiveChannel();
 		int activeChannelNumber = device.channels.getActiveChannelNumber(); // HoTTbinHistoReader.application.getActiveChannel().getNumber();
-		String recordSetName = activeChannelNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + activeChannel.getName()
-				+ HoTTbinHistoReader.getRecordSetExtend(HoTTbinHistoReader.filePath.getFileName().toString());
-		tmpRecordSet = HistoRecordSet.createRecordSet(recordSetName, activeChannelNumber, HoTTbinHistoReader.filePath.getParent().getFileName().toString(), HoTTbinHistoReader.filePath, true, true);
+		String recordSetBaseName = activeChannel.getChannelConfigKey() + HoTTbinHistoReader.getRecordSetExtend(HoTTbinHistoReader.filePath.getFileName().toString());
+		tmpRecordSet = HistoRecordSet.createRecordSet(truss.getLogObjectDirectory(), truss.getLogRecordSetNumber(), recordSetBaseName, truss.getLogDeviceName(), activeChannelNumber,
+				truss.getLogObjectDirectory(), HoTTbinHistoReader.filePath, true, true);
 		tmpRecordSet.setStartTimeStamp(file.lastModified());
 		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(tmpRecordSet.getStartTimeStamp()));
 		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader.filePath.getFileName().toString());
-		activeChannel.applyTemplate(recordSetName, false);
-		if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetName=" + recordSetName);
+		if (HoTTbinHistoReader.log.isLoggable(Level.FINE))
+			HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetName=" + activeChannelNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetBaseName);
 
 		if (file.length() > NUMBER_LOG_RECORDS_MIN * dataBlockSize) {
 			header = HoTTbinReader.getFileInfo(HoTTbinHistoReader.filePath.toFile());
@@ -235,7 +238,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		boolean isChannelsChannel = activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
 		long fileLength = HoTTbinHistoReader.filePath.toFile().length();
 		boolean doFullRead = initializeBlocks <= 0;
-		int datablocksLimit = ( doFullRead ? (int) fileLength / HoTTbinHistoReader.dataBlockSize : initializeBlocks ) / (HoTTbinHistoReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
+		int datablocksLimit = (doFullRead ? (int) fileLength / HoTTbinHistoReader.dataBlockSize : initializeBlocks) / (HoTTbinHistoReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
 		for (int i = 0; i < datablocksLimit; i++) {
 			// if (log.isLoggable(Level.TIME))
 			// log.log(Level.TIME, String.format("markpos: %,9d i: %,9d ", data_in.markpos, i));

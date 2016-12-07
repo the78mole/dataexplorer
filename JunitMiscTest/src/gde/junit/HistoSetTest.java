@@ -56,6 +56,7 @@ import gde.device.graupner.HoTTbinHistoReader;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
+import gde.histocache.HistoVault;
 import gde.io.HistoOsdReaderWriter;
 import gde.io.OsdReaderWriter;
 import gde.utils.FileUtils;
@@ -151,7 +152,9 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 						for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 							this.channels.setActiveChannelNumber(channelEntry.getKey());
 							try {
-								HistoRecordSet recordSet = HoTTbinHistoReader.read(file.toPath());
+								String objectDirectory = this.settings.getValidatedObjectKey(file.toPath().getParent().getFileName().toString()).orElse(GDE.STRING_EMPTY).intern();
+							HistoVault truss = HistoVault.createTruss(objectDirectory, file.toPath(), file.lastModified(), 1, file.getName(), objectDirectory, file.lastModified(), this.application.getActiveChannelNumber(), objectDirectory);
+								HistoRecordSet recordSet = HoTTbinHistoReader.read(truss);
 								maxTime_sec = recordSet.getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSet.getMaxTime_ms() / 1000 : maxTime_sec;
 								System.out.println(String.format("binFile processed      channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", this.channels.getActiveChannelNumber(), (int) recordSet.getMaxTime_ms() / 1000,
 										file.length(), file.toPath().toAbsolutePath().toString()));

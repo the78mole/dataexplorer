@@ -112,7 +112,7 @@ public class DeviceConfiguration {
 	 * the 1st group is identified by the group index '0' and consists of the 2nd and 3rd channel.
 	 * the 2nd group is identified by the group index '1' and consists of the 5th, 6th and 8th channel.
 	 */
-	private int[]															channelGroups;																														
+	private int[]															channelGroups;
 
 	/**
 	 * method to test this class
@@ -2530,18 +2530,20 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param channelConfigNumber
-	 * @return the config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
+	 * @param channelConfigNumber is a 1-based number
+	 * @return the 1-based config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
 	 */
 	public List<Integer> getChannelBundle(int channelConfigNumber) {
-		List <Integer> result = new ArrayList<Integer>(); 
+		List<Integer> result = new ArrayList<Integer>();
 		if (this.channelGroups == null) {
 			initChannelGroups();
 		}
-		if (this.channelGroups[channelConfigNumber] > -1) {
+		if (this.channelGroups[channelConfigNumber - 1] > -1) {
 			for (int i = 0; i < this.channelGroups.length; i++) {
-				if (this.channelGroups[i] != -1 && this.channelGroups[i] == this.channelGroups[channelConfigNumber]) result.add(i);
+				if (this.channelGroups[i] != -1 && this.channelGroups[i] == this.channelGroups[channelConfigNumber - 1]) result.add(i + 1); // 1-based
 			}
+		} else {
+			result.add(channelConfigNumber);
 		}
 		return result;
 	}
@@ -2574,12 +2576,12 @@ public class DeviceConfiguration {
 	 */
 	public Path getImportBaseDir() {
 		Path path = null;
-		String tmpImportDirPath = getDataBlockType().getPreferredDataLocation() ;
+		String tmpImportDirPath = getDataBlockType().getPreferredDataLocation();
 		if (!(tmpImportDirPath == null || tmpImportDirPath.trim().isEmpty() || tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
 			path = Paths.get(tmpImportDirPath);
 			// ignore object if path ends with a valid object
 			String directoryName = path.getFileName().toString();
-			path = Settings.getInstance().getValidateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+			path = Settings.getInstance().getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
 			// ignore device if path ends with a valid device
 			String directoryName2 = path.getFileName().toString();
 			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;

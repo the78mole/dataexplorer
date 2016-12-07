@@ -18,22 +18,28 @@
 ****************************************************************************************/
 package gde.io;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -46,6 +52,7 @@ import gde.device.IHistoDevice;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
+import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.StringHelper;
 
@@ -58,49 +65,30 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
-	 * @param header of an osd file
-	 * @param validChannelNumbers holds more than one channel in case of channel mix
-	 * @return true if none of the osd file recordsets is assigned to a valid channel number
-	 */
-	public static boolean isOutOfScope(HashMap<String, String> header, List<Integer> validChannelNumbers) {
-		boolean result = true;
-		final List<HashMap<String, String>> recordSetsInfo = HistoOsdReaderWriter.getRecordSetsInfo(header);
-		for (int i = 0; i < recordSetsInfo.size(); i++) {
-			HashMap<String, String> recordSetInfo = recordSetsInfo.get(i);
-			String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
-			if (validChannelNumbers.contains(channels.getChannelNumber(channelConfig))) {
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
+		 * the vault truss holds the key values only.
+		 *  but gets enhanced values for the start timestamp and the log object key.
+		 * @param filePath
+		 * @param objectDirectory holds the validated object key from the parent directory or is empty 
+		 * @return the empty vaults created from the recordsets
+		 * @throws NotSupportedFileFormatException 
+		 * @throws IOException 
+		 */
+	public static List<HistoVault> getTrusses(Path filePath, String objectDirectory) throws IOException, NotSupportedFileFormatException {
+		List<HistoVault> trusses = new ArrayList<HistoVault>();
+		final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(filePath.toString());
+		final String logObjectKey = header.containsKey(GDE.OBJECT_KEY) ? header.get(GDE.OBJECT_KEY).intern() : GDE.STRING_EMPTY;
 
-	/**
-	 * @param header of an osd file
-	 * @param validChannelNumbers holds more than one channel in case of channel mix
-	 * @param minTimeStamp_ms is the lower limit for valid recordsets
-	 * @return true if none of the osd file recordsets is assigned to a valid channel number and has a recent start timestamp
-	 */
-	public static boolean isOutOfScope(HashMap<String, String> header, List<Integer> validChannelNumbers, long minTimeStamp_ms) {
-		boolean result = true;
-		final List<HashMap<String, String>> recordSetsInfo = HistoOsdReaderWriter.getRecordSetsInfo(header);
-		for (int i = 0; i < recordSetsInfo.size(); i++) {
-			HashMap<String, String> recordSetInfo = recordSetsInfo.get(i);
-			String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
-			if (validChannelNumbers.contains(channels.getChannelNumber(channelConfig))) {
-				HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetInfo.get(GDE.RECORD_SET_PROPERTIES), Record.DELIMITER, RecordSet.propertyKeys);
-				if (!recordSetProps.containsKey(RecordSet.START_TIME_STAMP)) { // osd version 1 and 2 do not carry a recordset start timestamp
-					result = false;
-					break;
-				}
-				else if (recordSetProps.get(RecordSet.START_TIME_STAMP).length() > 0 && Long.parseLong(recordSetProps.get(RecordSet.START_TIME_STAMP).trim()) > minTimeStamp_ms) {
-					result = false;
-					break;
-				}
-			}
+		final List<HashMap<String, String>> recordSetsProps = HistoOsdReaderWriter.getRecordSetsInfo(header);
+		for (int i = 0; i < recordSetsProps.size(); i++) {
+			HashMap<String, String> recordSetInfo = recordSetsProps.get(i);
+			final long enhancedStartTimeStamp_ms = HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo);
+			final int channelConfigNumber = channels.getChannelNumber(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
+			final String recordSetName = String.format("%3." + RecordSet.MAX_NAME_LENGTH + "s", header.get(i + 1 + GDE.STRING_BLANK + GDE.RECORD_SET_NAME)); //$NON-NLS-1$ //$NON-NLS-2$
+			final String[] nameParts = recordSetName.replace(GDE.DATA_DELIMITER, GDE.STRING_RIGHT_PARENTHESIS_BLANK).split(Pattern.quote(GDE.STRING_RIGHT_PARENTHESIS_BLANK));
+			trusses.add(HistoVault.createTruss(objectDirectory, filePath, filePath.toFile().lastModified(), Integer.parseInt(nameParts[0]), nameParts[1], header.get(GDE.DEVICE_NAME),
+					enhancedStartTimeStamp_ms, channelConfigNumber, logObjectKey));
 		}
-		return result;
+		return trusses;
 	}
 
 	/**
@@ -113,10 +101,140 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		List<HashMap<String, String>> recordSetsInfo = new ArrayList<HashMap<String, String>>();
 		for (int i = 1; i < Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue() + 1; ++i) {
 			StringBuilder sb = new StringBuilder();
-			line = header.get(sb.append(i).append(GDE.STRING_EMPTY).append(GDE.RECORD_SET_NAME).toString());
+			line = header.get(sb.append(i).append(GDE.STRING_BLANK).append(GDE.RECORD_SET_NAME).toString());
 			recordSetsInfo.add(getRecordSetProperties(line));
 		}
 		return recordSetsInfo;
+	}
+
+	/**
+	 * read one single histo record set. 
+	 * @param path
+	 * @param recordSetNumber references the recordset number which is the first element in the recordset name
+	 * @param pathObjectKey holds the validated object key from the parent directory or is empty 
+	 * @return null or valid histo recordset
+	 * @throws IOException
+	 * @throws NotSupportedFileFormatException
+	 * @throws DataInconsitsentException
+	 */
+	public static HistoRecordSet readHisto(HistoVault truss) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
+		HistoRecordSet histoRecordSet = null;
+		log.log(Level.INFO, "start " + truss.getLogFilePath()); //$NON-NLS-1$
+		File file = new File(truss.getLogFilePath());
+		ZipInputStream zip_input = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
+		ZipEntry zip_entry = zip_input.getNextEntry();
+		InputStream inputStream;
+		if (zip_entry != null) {
+			inputStream = (InputStream) zip_input;
+		}
+		else {
+			zip_input.close();
+			zip_input = null;
+			inputStream = (InputStream) new BufferedInputStream(new FileInputStream(file));
+		}
+
+		try (DataInputStream data_in = new DataInputStream((InputStream) inputStream)) {
+			final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(truss.getLogFilePath());
+			final double logDataExplorerVersion = header.containsKey(GDE.DATA_EXPLORER_FILE_VERSION) ? Double.parseDouble(header.get(GDE.DATA_EXPLORER_FILE_VERSION)) : 1.; // OpenSerialData version : 1
+			final int numberRecordSets = Integer.parseInt(header.get(GDE.RECORD_SET_SIZE));
+
+			while (!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
+				log.log(Level.FINEST, "skip"); //$NON-NLS-1$
+			final List<HashMap<String, String>> recordSetsInfo = OsdReaderWriter.readRecordSetsInfo4AllVersions(data_in, header);
+
+			long startTimeNs = System.nanoTime();
+			for (int i = 0; i < recordSetsInfo.size() && histoRecordSet == null; i++) {
+				HashMap<String, String> recordSetInfo = recordSetsInfo.get(i);
+				String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
+				//			  String recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
+				//				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+				//				String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
+				final String recordSetName = String.format("%3." + RecordSet.MAX_NAME_LENGTH + "s", recordSetInfo.get(GDE.RECORD_SET_NAME)); //$NON-NLS-1$ //$NON-NLS-2$
+				final String[] nameParts = recordSetName.replace(GDE.DATA_DELIMITER, GDE.STRING_RIGHT_PARENTHESIS_BLANK).split(Pattern.quote(GDE.STRING_RIGHT_PARENTHESIS_BLANK));
+				String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
+				String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
+				int recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
+				long recordSetDataPointer = Long.parseLong(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER));
+				int channelConfigNumber = channels.getChannelNumber(channelConfig);
+				HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetProperties, Record.DELIMITER, RecordSet.propertyKeys);
+				String[] cleanedMeasurementNames = getMeasurementNames(recordsProperties, channelConfigNumber);
+				String[] noneCalculationMeasurementNames = HistoOsdReaderWriter.application.getActiveDevice().getNoneCalculationMeasurementNames(channelConfigNumber, cleanedMeasurementNames);
+				int numberRecordAndTimeStamp = recordSetProps.containsKey(RecordSet.TIME_STEP_MS) && recordSetProps.get(RecordSet.TIME_STEP_MS).length() > 0
+						&& Double.parseDouble(recordSetProps.get(RecordSet.TIME_STEP_MS).trim()) < 0 ? noneCalculationMeasurementNames.length + 1 : noneCalculationMeasurementNames.length;
+
+				if (Integer.parseInt(nameParts[0]) != truss.getLogRecordSetNumber()) {
+					int toSkip = GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize;
+					while (toSkip > 0) { // The skip method may, for a variety of reasons, end up skipping over some smaller number of bytes, possibly 0. The actual number of bytes skipped is returned.
+						toSkip -= data_in.skip(toSkip);
+						if (toSkip > 0) {
+							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "toSkip=" + toSkip); //$NON-NLS-1$
+							if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size"); //$NON-NLS-1$
+						}
+					}
+				}
+				else {
+					byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
+					data_in.readFully(buffer);
+					histoRecordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, truss);
+					histoRecordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
+
+					log.log(Level.FINE, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME) + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$ //$NON-NLS-2$
+							+ "  numberRecordAndTimeStamp=" + numberRecordAndTimeStamp); //$NON-NLS-1$
+					if (histoRecordSet.getDevice() instanceof IHistoDevice) {
+						int[] maxPoints = new int[noneCalculationMeasurementNames.length];
+						int[] minPoints = new int[noneCalculationMeasurementNames.length];
+						List<String> noneCalculationMeasurementNameList = Arrays.asList(noneCalculationMeasurementNames);
+						for (int j = 0; j < recordsProperties.length; j++) {
+							int index = noneCalculationMeasurementNameList.indexOf(cleanedMeasurementNames[j]);
+							if (index > -1) {
+								HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+								maxPoints[index] = Integer.parseInt(recordProperties.get(Record.MAX_VALUE).trim());
+								minPoints[index] = Integer.parseInt(recordProperties.get(Record.MIN_VALUE).trim());
+							}
+						}
+						((IHistoDevice) histoRecordSet.getDevice()).setSampling(maxPoints, minPoints);
+					}
+					histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
+					// extract additional data
+					final String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
+					final Double[] packagesLost = parsePackageLoss(recordSetComment);
+					final String[] sensors = parseSensors(recordSetComment);
+					final Double logDataVersion = parseFirmware(recordSetComment);
+					final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
+					// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
+					// scores for duration and timestep values are filled in by the HistoRecordSet
+					scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = recordDataSize;
+					scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[0] != null && packagesLost[1] != null && packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
+					//todo recalculating the following scores from raw data would be feasible
+					scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = packagesLost[0] != null ? (int) (packagesLost[0].intValue()) : 0;
+					scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = packagesLost[1] != null ? (int) (packagesLost[1] * 10. * 1000.) : 0; // percent -> per mille
+					scores[ScoreLabelTypes.LOST_PACKAGES_AVG_MS.ordinal()] = packagesLost[4] != null ? (int) (packagesLost[4] * 1000000.) : 0; // sec -> ms
+					scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = packagesLost[3] != null ? (int) (packagesLost[3] * 1000000.) : 0; // sec -> ms
+					scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = packagesLost[2] != null ? (int) (packagesLost[2] * 1000000.) : 0; // sec -> ms
+					scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = packagesLost[5] != null ? (int) (packagesLost[5] * 1000000.) : 0; // sec -> ms
+					scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensors.length - 1) > 0 ? (sensors.length - 1) * 1000 : 0; // subtract Receiver
+					scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = Arrays.asList(sensors).contains("VARIO") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = Arrays.asList(sensors).contains("GPS") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0;
+					scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = (int) (logDataExplorerVersion * 1000.);
+					scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize;
+					scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) file.length();
+					scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = numberRecordSets * 1000;
+					// scores for elapsed times are filled in by the HistoRecordSet
+					histoRecordSet.setScorePoints(scores);
+					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME), //$NON-NLS-1$
+							StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoRecordSet.getStartTimeStamp()), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); //$NON-NLS-1$
+					// todo not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(histoRecordSet);
+				}
+			}
+			if (histoRecordSet != null) log.log(Level.TIME, String.format("1 of%3d recordsets in%,7d ms  recordSetNumber=%d from %s", recordSetsInfo.size(), //$NON-NLS-1$
+					TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNs), truss.getLogRecordSetNumber(), truss.getLogFilePath()));
+		}
+		if (histoRecordSet == null) log.log(Level.WARNING, String.format("recordsetNumber=%d not found %s", truss.getLogRecordSetNumber(), truss.getLogFilePath())); //$NON-NLS-1$
+		return histoRecordSet;
 	}
 
 	/**
@@ -126,16 +244,16 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 	 * @param recordSets destination for appending file data.
 	 * @param path
 	 * @param validChannelNumbers holds more than one channel in chase of channel mix
-	 * @param logPathObjectKey holds the validated object key from the parent directory or is empty 
-	 * @throws FileNotFoundException
+	 * @param objectDirectory holds the validated object key from the parent directory or is empty 
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	 * @throws DataInconsitsentException
 	 */
-	public static void readHisto(List<HistoRecordSet> recordSets, Path path, List<Integer> validChannelNumbers, String logPathObjectKey)
-			throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
+	public static void readHisto(List<HistoRecordSet> recordSets, Path path, List<Integer> validChannelNumbers, String objectDirectory)
+			throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
 		log.log(Level.INFO, "start " + path.toString()); //$NON-NLS-1$
-		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(path.toFile()));
+		File file = path.toFile();
+		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(file));
 		ZipEntry zip_entry = zip_input.getNextEntry();
 		InputStream inputStream;
 		if (zip_entry != null) {
@@ -144,14 +262,14 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		else {
 			zip_input.close();
 			zip_input = null;
-			inputStream = (InputStream) new FileInputStream(path.toFile());
+			inputStream = (InputStream) new FileInputStream(file);
 		}
 
 		try (DataInputStream data_in = new DataInputStream((InputStream) inputStream)) {
 			// build the data structure for the subset which holds channels relevant for histo
 			final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(path.toString());
 			final double logDataExplorerVersion = header.containsKey(GDE.DATA_EXPLORER_FILE_VERSION) ? Double.parseDouble(header.get(GDE.DATA_EXPLORER_FILE_VERSION)) : 1.; // OpenSerialData version : 1
-			final String objectKey = header.containsKey(GDE.OBJECT_KEY) ? header.get(GDE.OBJECT_KEY) : GDE.STRING_EMPTY;
+			final String objectKey = header.containsKey(GDE.OBJECT_KEY) ? header.get(GDE.OBJECT_KEY).intern() : GDE.STRING_EMPTY;
 			final int numberRecordSets = Integer.parseInt(header.get(GDE.RECORD_SET_SIZE));
 
 			while (!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
@@ -165,6 +283,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 				//			  String recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
 				//				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 				//				String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
+				final String recordSetName = String.format("%3." + RecordSet.MAX_NAME_LENGTH + "s", recordSetInfo.get(GDE.RECORD_SET_NAME)); //$NON-NLS-1$ //$NON-NLS-2$
+				final String[] nameParts = recordSetName.replace(GDE.DATA_DELIMITER, GDE.STRING_RIGHT_PARENTHESIS_BLANK).split(Pattern.quote(GDE.STRING_RIGHT_PARENTHESIS_BLANK));
 				String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 				String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 				int recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
@@ -181,20 +301,22 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					while (toSkip > 0) { // The skip method may, for a variety of reasons, end up skipping over some smaller number of bytes, possibly 0. The actual number of bytes skipped is returned.
 						toSkip -= data_in.skip(toSkip);
 						if (toSkip > 0) {
-							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "toSkip=" + toSkip);
-							if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size");
+							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "toSkip=" + toSkip); //$NON-NLS-1$
+							if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size"); //$NON-NLS-1$
 						}
 					}
 				}
 				else {
 					byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
 					data_in.readFully(buffer);
-					HistoRecordSet recordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, path, objectKey.isEmpty() ? logPathObjectKey : objectKey);
+					HistoVault truss = HistoVault.createTruss(objectDirectory, path, file.lastModified(), Integer.parseInt(nameParts[0]), nameParts[1], header.get(GDE.DEVICE_NAME),
+							HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo), channelConfigNumber, objectKey);
+					HistoRecordSet recordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, truss);
 					recordSets.add(recordSet);
 					recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
 
-					log.log(Level.FINE, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME) + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$
-							+ "  numberRecordAndTimeStamp=" + numberRecordAndTimeStamp);
+					log.log(Level.FINE, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME) + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$ //$NON-NLS-2$
+							+ "  numberRecordAndTimeStamp=" + numberRecordAndTimeStamp); //$NON-NLS-1$
 					if (recordSet.getDevice() instanceof IHistoDevice) {
 						int[] maxPoints = new int[noneCalculationMeasurementNames.length];
 						int[] minPoints = new int[noneCalculationMeasurementNames.length];
@@ -228,20 +350,20 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = packagesLost[2] != null ? (int) (packagesLost[2] * 1000000.) : 0; // sec -> ms
 					scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = packagesLost[5] != null ? (int) (packagesLost[5] * 1000000.) : 0; // sec -> ms
 					scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensors.length - 1) > 0 ? (sensors.length - 1) * 1000 : 0; // subtract Receiver
-					scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = Arrays.asList(sensors).contains("VARIO") ? 1000 : 0;
-					scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = Arrays.asList(sensors).contains("GPS") ? 1000 : 0;
-					scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : 0;
-					scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : 0;
-					scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : 0;
+					scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = Arrays.asList(sensors).contains("VARIO") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = Arrays.asList(sensors).contains("GPS") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : 0; //$NON-NLS-1$
+					scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : 0; //$NON-NLS-1$
 					scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0;
 					scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = (int) (logDataExplorerVersion * 1000.);
 					scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize;
-					scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) path.toFile().length();
+					scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) file.length();
 					scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = numberRecordSets * 1000;
 					// scores for elapsed times are filled in by the HistoRecordSet
 					recordSet.setScorePoints(scores);
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME), //$NON-NLS-1$
-							StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", recordSet.getStartTimeStamp()), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));
+							StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", recordSet.getStartTimeStamp()), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); //$NON-NLS-1$
 					// todo not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(recordSet);
 				}
 			}
@@ -269,10 +391,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 	 * @param path 
 	 * @return null if this recordSet is not valid for histo (channel not allowed for histo).
 	 */
-	private static HistoRecordSet buildRecordSet(HashMap<String, String> recordSetInfo, Path path, String objectKey) {
+	private static HistoRecordSet buildRecordSet(HashMap<String, String> recordSetInfo, HistoVault truss) {
 		final String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
-		String recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
-		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 		final String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		final String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 		// recordSetDataPointer = Long.valueOf(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
@@ -286,10 +406,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 
 		// determine channel number in file and compare with activeChannel
 		final Channel recordSetInfoChannel = getChannel(channelConfig);
-		final String channelName = (recordSetInfoChannel == null ? "unknown" : recordSetInfoChannel.getName());
+		final String channelName = (recordSetInfoChannel == null ? "unknown" : recordSetInfoChannel.getName()); //$NON-NLS-1$
 		recordSetInfo.put(GDE.CHANNEL_CONFIG_NAME, channelName); // todo GDE.CHANNEL_CONFIG_NUMBER ???
 		if (log.isLoggable(Level.FINER)) {
-			StringBuilder sb = new StringBuilder().append(GDE.CHANNEL_CONFIG_NAME).append(GDE.STRING_MESSAGE_CONCAT).append(channelName); //$NON-NLS-1$
+			StringBuilder sb = new StringBuilder().append(GDE.CHANNEL_CONFIG_NAME).append(GDE.STRING_MESSAGE_CONCAT).append(channelName);
 			log.log(Level.FINER, sb.toString());
 		}
 
@@ -304,7 +424,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			recordUnits[i] = recordProperties.get(Record.UNIT);
 		}
 
-		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(recordSetName, recordSetInfoChannel.getNumber(), objectKey, path, recordNames, recordSymbols, recordUnits, true, true);
+		HistoRecordSet recordSet = HistoRecordSet.createRecordSet(truss.getLogObjectDirectory(), truss.getLogRecordSetNumber(), truss.getLogRecordsetName(), channelName, recordSetInfoChannel.getNumber(),
+				truss.getLogObjectKey(), Paths.get(truss.getLogFilePath()), recordNames, recordSymbols, recordUnits, true, true);
 
 		String[] recordKeys = application.getActiveDevice().crossCheckMeasurements(recordsProperties, recordSet);
 		// check if the file content fits measurements form device properties XML which was used to create the record set
@@ -315,6 +436,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
 		}
 		recordSet.setDeserializedProperties(recordSetProperties);
+		// setDeserializedProperties does not take all possibilities to set the timestamp
+		if (log.isLoggable(Level.SEVERE) && recordSet.getStartTimeStamp() != HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo))
+			log.log(Level.SEVERE, HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo) + "  " + recordSet.getStartTimeStamp()); //$NON-NLS-1$
+		recordSet.setStartTimeStamp(HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo));
 		recordSet.setSaved(true);
 		return recordSet;
 	}
@@ -327,7 +452,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		int idx1 = recordSetComment.indexOf(GDE.STRING_LEFT_BRACKET);
 		int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
 		if (idx1 > 0 && idx2 > idx1) {
-			return recordSetComment.substring(idx1 + 1, idx2).split(",");
+			return recordSetComment.substring(idx1 + 1, idx2).split(","); //$NON-NLS-1$
 		}
 		else {
 			return new String[0];
@@ -339,12 +464,12 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 	 * @return null if parsing was not successful.
 	 */
 	private static Double parseFirmware(String recordSetComment) {
-		final String label = "Firmware";
+		final String label = "Firmware"; //$NON-NLS-1$
 		int idx1 = recordSetComment.indexOf(label);
 		// int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
 		if (idx1 > 0) {
 			try {
-				return Double.parseDouble(recordSetComment.substring(idx1 + label.length(), recordSetComment.length()).replace(',', '.').replaceAll("[^0-9.]", "")); // change comma to dot and take digits, dots and signs only
+				return Double.parseDouble(recordSetComment.substring(idx1 + label.length(), recordSetComment.length()).replace(',', '.').replaceAll("[^0-9.]", "")); // change comma to dot and take digits, dots and signs only //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				return null;
@@ -385,20 +510,20 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		// todo calculate Verlorene Rückkanalpakete from raw data
 		// GDE_MSGI2404=\nVerlorene Rückkanalpakete = {0} ~ {1} % ({2})
 		// "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec"
-		int idx0 = recordSetComment.indexOf("\n");
-		int idx1 = recordSetComment.indexOf("=");
-		int idx2 = recordSetComment.indexOf("~", idx1);
-		int idx3 = recordSetComment.indexOf("%", idx2);
+		int idx0 = recordSetComment.indexOf("\n"); //$NON-NLS-1$
+		int idx1 = recordSetComment.indexOf("="); //$NON-NLS-1$
+		int idx2 = recordSetComment.indexOf("~", idx1); //$NON-NLS-1$
+		int idx3 = recordSetComment.indexOf("%", idx2); //$NON-NLS-1$
 		if (idx0 > 0 && idx1 > idx0 && idx2 > idx1 && idx3 > idx2) {
 			try {
 				values[0] = Double.parseDouble(recordSetComment.substring(idx1 + 2, idx2 - 1)); // integer
 				values[1] = doubleFormat.parse(recordSetComment.substring(idx2 + 2, idx3 - 1)).doubleValue();
-				String[] times = (recordSetComment.substring(idx3 + 1)).split("=");
+				String[] times = (recordSetComment.substring(idx3 + 1)).split("="); //$NON-NLS-1$
 				if (times.length > 1) { // time statistics is available
-					values[2] = doubleFormat.parse(times[1].substring(0, times[1].indexOf(" "))).doubleValue();
-					values[3] = doubleFormat.parse(times[2].substring(0, times[2].indexOf(" "))).doubleValue();
-					values[4] = doubleFormat.parse(times[3].substring(0, times[3].indexOf(" "))).doubleValue();
-					values[5] = doubleFormat.parse(times[4].substring(0, times[4].indexOf(" "))).doubleValue();
+					values[2] = doubleFormat.parse(times[1].substring(0, times[1].indexOf(" "))).doubleValue(); //$NON-NLS-1$
+					values[3] = doubleFormat.parse(times[2].substring(0, times[2].indexOf(" "))).doubleValue(); //$NON-NLS-1$
+					values[4] = doubleFormat.parse(times[3].substring(0, times[3].indexOf(" "))).doubleValue(); //$NON-NLS-1$
+					values[5] = doubleFormat.parse(times[4].substring(0, times[4].indexOf(" "))).doubleValue(); //$NON-NLS-1$
 				}
 			}
 			catch (ParseException e) {
@@ -406,6 +531,62 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			}
 		}
 		return values;
+	}
+
+	/**
+	 * @param recordSetInfo
+	 * @return start timestamp from recordset properties, alternatively take RecordedTS from RecordSetComment, alternatively FileCreatedTS
+	 */
+	private static long getStartTimestamp_ms(HashMap<String, String> recordSetInfo) {
+		long startTimestamp_ms = 0;
+
+		HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetInfo.get(GDE.RECORD_SET_PROPERTIES), Record.DELIMITER, RecordSet.propertyKeys);
+		// try 1: osd version >= 3 only --- V 1 and 2 do not carry a recordset start timestamp
+		if (recordSetProps.containsKey(RecordSet.START_TIME_STAMP) && recordSetProps.get(RecordSet.START_TIME_STAMP).length() > 0) {
+			startTimestamp_ms = Long.parseLong(recordSetProps.get(RecordSet.START_TIME_STAMP).trim());
+		}
+		else { // copied from gde.data.RecordSet.setDeserializedProperties(String)
+			try {
+				// try 2: check if the original time stamp in the recordset comment is available
+				String recordSetDescription = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
+				Pattern datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}"); //$NON-NLS-1$
+				Matcher dateMatcher = datePattern.matcher(recordSetDescription);
+				Pattern timePattern = Pattern.compile("\\d{2}:\\d{2}:\\d{2}"); //$NON-NLS-1$
+				Matcher timeMatcher = timePattern.matcher(recordSetDescription);
+				if (dateMatcher.find() && timeMatcher.find()) {
+					String date = dateMatcher.group();
+					String time = timeMatcher.group();
+
+					String[] strValueDate = date.split(GDE.STRING_DASH);
+					int year = Integer.parseInt(strValueDate[0]);
+					int month = Integer.parseInt(strValueDate[1]);
+					int day = Integer.parseInt(strValueDate[2]);
+
+					String[] strValueTime = time.split(GDE.STRING_COLON);
+					int hour = Integer.parseInt(strValueTime[0]);
+					int minute = Integer.parseInt(strValueTime[1]);
+					int second = Integer.parseInt(strValueTime[2]);
+
+					GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+					startTimestamp_ms = calendar.getTimeInMillis();
+				}
+			}
+			catch (Exception e) {
+				// ignore and keep startTimestamp_ms = 0
+			}
+		}
+		// try 3: take the osd file creation timestamp
+		if (startTimestamp_ms == 0) {
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd" + ' ' + " HH:mm:ss"); //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				startTimestamp_ms = simpleDateFormat.parse(recordSetInfo.get(GDE.CREATION_TIME_STAMP)).getTime();
+			}
+			catch (ParseException ex) {
+				// startTimestamp_ms = System.currentTimeMillis();
+			}
+		}
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "startTimestamp_ms=" + startTimestamp_ms); //$NON-NLS-1$
+		return startTimestamp_ms;
 	}
 
 }

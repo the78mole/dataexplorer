@@ -62,6 +62,7 @@ import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
+import gde.histocache.HistoVault;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -929,9 +930,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/* (non-Javadoc)
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
-	public HistoRecordSet getRecordSetFromImportFile(Path filePath) throws DataInconsitsentException, IOException, DataTypeException  {
-		log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
-		return HoTTbinHistoReader.read(filePath);
+	public HistoRecordSet getRecordSetFromImportFile(HistoVault truss) throws DataInconsitsentException, IOException, DataTypeException  {
+		log.log(Level.INFO, String.format("start  %s", truss.getLogFilePath())); //$NON-NLS-1$
+		return HoTTbinHistoReader.read(truss);
 	}
 
 	/**

@@ -21,7 +21,6 @@ package gde.utils;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.HistoRecordSet;
 import gde.data.HistoSet;
 import gde.data.RecordSet;
 import gde.histocache.HistoVault;
@@ -232,7 +231,7 @@ public class HistoTimeLine {
 		TreeMap<Long, Integer> position = new TreeMap<>(Collections.reverseOrder());
 		int leftMargin;
 		int rightMargin;
-		if (settings.isXAxisLogarithmicDistance() || this.density == Density.LOW || this.relativeTimeScale.size() <= 2) {
+		if (this.settings.isXAxisLogarithmicDistance() || this.density == Density.LOW || this.relativeTimeScale.size() <= 2) {
 			// bigger margins present the data in a more harmonic manner
 			int remainingWidthPerItem = (this.width - this.density.boxWidth) / this.relativeTimeScale.size();
 			if (remainingWidthPerItem > 2 * Density.LOW.boxWidth) {
@@ -251,7 +250,7 @@ public class HistoTimeLine {
 			leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
 		}
 		int netWidth = this.width - leftMargin - rightMargin;
-		HistoTimeLine.log.log(Level.FINER, String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", width, leftMargin, rightMargin, netWidth)); //$NON-NLS-1$
+		HistoTimeLine.log.log(Level.FINER, String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", this.width, leftMargin, rightMargin, netWidth)); //$NON-NLS-1$
 
 		for (Entry<Long, Double> entry : this.relativeTimeScale.entrySet()) {
 			position.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
@@ -292,7 +291,7 @@ public class HistoTimeLine {
 
 		//pass 2: build the relative timeScale list from relative distances
 		TreeMap<Long, Double> relativeTimeScale = new TreeMap<>();
-		if (settings.isXAxisReversed()) {
+		if (this.settings.isXAxisReversed()) {
 			relativeTimeScale = new TreeMap<>(Collections.reverseOrder());
 			relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
 		}
@@ -308,7 +307,7 @@ public class HistoTimeLine {
 				double relativeDistance = entry.getValue() / applicableDistancesTotal;
 				// relativeDistances.add(relativeDistance);
 				relativeTimeScaleSum += relativeDistance;
-				if (settings.isXAxisReversed())
+				if (this.settings.isXAxisReversed())
 					relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
 				else
 					relativeTimeScale.put(entry.getKey(), 1. - relativeTimeScaleSum);
@@ -325,7 +324,7 @@ public class HistoTimeLine {
 			double normalizedDistancesSum = 0.;
 			for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
 				double normalizedDistance;
-				if (settings.isXAxisLogarithmicDistance())
+				if (this.settings.isXAxisLogarithmicDistance())
 					normalizedDistance = Math.log(entry.getValue() / applicableDistancesTotal);
 				else
 					normalizedDistance = entry.getValue() / applicableDistancesTotal;
@@ -340,7 +339,7 @@ public class HistoTimeLine {
 
 			// pass 2.2: take logDistanceMin as a reference and scale to the final position range which is 0 to 1
 			// high spread values result in a rather equidistant placement of timesteps (distant timestamps move close together which results in more space for timesteps with small distances)
-			double logBaseDivisor = Math.log(1 + Math.pow(10, settings.getXAxisSpreadOrdinal() - 3)); // so we get reasonable adjustments for spreadValues from 0 to 5
+			double logBaseDivisor = Math.log(1 + Math.pow(10, this.settings.getXAxisSpreadOrdinal() - 3)); // so we get reasonable adjustments for spreadValues from 0 to 5
 			double scaleConstant = normalizedDistancesSum / logBaseDivisor + (1 - normalizedDistancesMin / logBaseDivisor) * normalizedDistances.size();
 			double relativeTimeScaleSum = 0.;
 			for (Entry<Long, Double> entry2 : normalizedDistances.entrySet()) {
@@ -348,7 +347,7 @@ public class HistoTimeLine {
 				double relativeDistance = (1. + (entry2.getValue() - normalizedDistancesMin) / logBaseDivisor) / scaleConstant;
 				// relativeDistances.add(relativeDistance);
 				relativeTimeScaleSum += relativeDistance;
-				if (settings.isXAxisReversed())
+				if (this.settings.isXAxisReversed())
 					relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
 				else
 					relativeTimeScale.put(entry2.getKey(), 1. - relativeTimeScaleSum);
@@ -403,7 +402,7 @@ public class HistoTimeLine {
 		else {
 			Collections.sort(relativeDistances);
 			// a high distanceQuantile value indicates that there is plenty of space between the x-axis points
-			double distanceQuantile = relativeDistances.get(relativeDistances.size() * (2 + 2 * (settings.getBoxplotScaleOrdinal() + 1)) / 10); // use relative distance and calculate lower or higher quantile according to user's priorities
+			double distanceQuantile = relativeDistances.get(relativeDistances.size() * (2 + 2 * (this.settings.getBoxplotScaleOrdinal() + 1)) / 10); // use relative distance and calculate lower or higher quantile according to user's priorities
 			int absoluteDistance = (int) (this.width * distanceQuantile);
 			// use the box size as a standard of comparison
 			if (absoluteDistance >= Density.LOW.boxWidth)
@@ -415,7 +414,7 @@ public class HistoTimeLine {
 			else
 				this.density = Density.EXTREME;
 			if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("absoluteDistance=%d  boxType=%s   relativeDistancesMin=%f relativeDistancesMax=%f",
-					absoluteDistance, density.toString(), relativeDistances.get(0), relativeDistances.get(relativeDistances.size() - 1)));
+					absoluteDistance, this.density.toString(), relativeDistances.get(0), relativeDistances.get(relativeDistances.size() - 1)));
 		}
 		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, String.format("density = %s  ", this.density.toString()));
 	}
@@ -440,15 +439,15 @@ public class HistoTimeLine {
 		for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed -> important for next if
 			int xPos = x0 + entry.getValue();
 			String text = StringHelper.getFormatedTime(timePattern, entry.getKey());
-			if ((settings.isXAxisReversed() && lastXPosLabel + pt.x + labelGap < xPos && !lastText.equals(text))
-					|| (!settings.isXAxisReversed() && lastXPosLabel - pt.x - labelGap > xPos && !lastText.equals(text))) {
-				gc.drawLine(xPos, y0, xPos, y0 + tickLength);
+			if ((this.settings.isXAxisReversed() && lastXPosLabel + pt.x + labelGap < xPos && !lastText.equals(text))
+					|| (!this.settings.isXAxisReversed() && lastXPosLabel - pt.x - labelGap > xPos && !lastText.equals(text))) {
+				gc.drawLine(xPos, y0 + 1, xPos, y0 + tickLength);
 				GraphicsUtils.drawTextCentered(text, xPos, y0 + tickLength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 				lastText = text;
 				lastXPosLabel = xPos;
 			}
 			else {
-				gc.drawLine(xPos, y0, xPos, y0 + tickLength / 2);
+				gc.drawLine(xPos, y0 + 1, xPos, y0 + tickLength / 2);
 			}
 		}
 	}

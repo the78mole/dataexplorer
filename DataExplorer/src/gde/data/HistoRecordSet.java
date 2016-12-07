@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import gde.GDE;
 import gde.data.TrailRecord.TrailType;
@@ -45,6 +44,7 @@ import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Quantile;
+import gde.utils.StringHelper;
 import gde.utils.Quantile.Fixings;
 
 /**
@@ -66,29 +66,36 @@ public class HistoRecordSet extends RecordSet {
 	private LinkedHashMap<String, HistoSettlement>	histoSettlements					= new LinkedHashMap<String, HistoSettlement>();	//todo a better solution would be a common base class for Record, HistoSettlement and HistoScoregroup or a common interface
 
 	private Integer[]																scorePoints;
+	private String																	logObjectDirectory;
 	private int																			recordSetNumber;
-	private Path																		filePathOrigin;
+	private Path																		logFilePath;
+	private String																	logDeviceName;
 	private int																			logChannelNumber;
 	private String																	logObjectKey;
 	private long																		elapsedHistoRecordSet_ns;
 
 	/**
 	 * record set data buffers according the size of given names array, where the name is the key to access the data buffer
-	 * @param uiDevice
-	 * @param uiChannelNumber the channel number to be used
-	 * @param recordSetNumber for the recordset from "1) Laden" 
-	 * @param shortName for the recordset from "1) Laden" 
+	 * @param objectDirectory validated object key
+	 * @param recordSetNumber for the recordset from "1) Laden" or "6) Channels [1234]"
+	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
+	 * @param logDeviceName 
+	 * @param logChannelNumber may differ from UI settings in case of channel mix
+	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @param filePathOrigin source file path
 	 * @param recordNames array of the device supported measurement and settlement names
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	private HistoRecordSet(IDevice uiDevice, int uiChannelNumber, int recordSetNumber, String shortName, int logChannelNumber, String logObjectKey, Path filePathOrigin, String[] recordNames,
-			boolean isRawValue, boolean isFromFileValue) {
-		super(uiDevice, uiChannelNumber, shortName, recordNames, DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), isRawValue, isFromFileValue);
+	private HistoRecordSet(String objectDirectory, int recordSetNumber, String recordSetBaseName, String logDeviceName, int logChannelNumber, String logObjectKey, Path filePathOrigin,
+			String[] recordNames, boolean isRawValue, boolean isFromFileValue) {
+		super(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), recordSetBaseName, recordNames,
+				DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), isRawValue, isFromFileValue);
+		this.logObjectDirectory = objectDirectory;
 		this.recordSetNumber = recordSetNumber;
-		this.filePathOrigin = filePathOrigin.toAbsolutePath();
+		this.logFilePath = filePathOrigin.toAbsolutePath();
+		this.logDeviceName = logDeviceName;
 		this.logChannelNumber = logChannelNumber;
 		this.logObjectKey = logObjectKey;
 		ChannelType channelType = this.device.getDeviceConfiguration().getChannel(super.getChannelConfigNumber());
@@ -147,7 +154,10 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * method to create a histo record set containing records according the device channel configuration
 	 * which are loaded from device properties file.
-	 * @param newName for the recordset like "1) Laden" 
+	 * @param objectDirectory validated object key
+	 * @param recordSetNumber for the recordset from "1) Laden" or "6) Channels [1234]"
+	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
+	 * @param logDeviceName 
 	 * @param logChannelNumber from the log file
 	 * @param logObjectKey from the log file
 	 * @param filePathOrigin source file path
@@ -155,13 +165,11 @@ public class HistoRecordSet extends RecordSet {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(String newName, int logChannelNumber, String logObjectKey, Path filePathOrigin, boolean isRaw, boolean isFromFile) {
+	public static HistoRecordSet createRecordSet(String objectDirectory, int recordSetNumber, String recordSetBaseName, String logDeviceName, int logChannelNumber, String logObjectKey,
+			Path filePathOrigin, boolean isRaw, boolean isFromFile) {
 		String[] recordNames = DataExplorer.getInstance().getActiveDevice().getMeasurementNames(DataExplorer.getInstance().getActiveChannelNumber());
-		String[] nameParts = newName.split(Pattern.quote(GDE.STRING_RIGHT_PARENTHESIS_BLANK));
-		String[] sub1Parts = nameParts[1].split(GDE.STRING_BLANK_COLON_BLANK);
-		nameParts[1] = sub1Parts.length > 0 ? sub1Parts[1].trim() : sub1Parts[0].trim();
-		HistoRecordSet newRecordSet = new HistoRecordSet(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), Integer.parseInt(nameParts[0]), nameParts[1],
-				logChannelNumber, logObjectKey, filePathOrigin, recordNames, isRaw, isFromFile);
+		HistoRecordSet newRecordSet = new HistoRecordSet(objectDirectory, recordSetNumber, recordSetBaseName, logDeviceName, logChannelNumber, logObjectKey, filePathOrigin, recordNames, isRaw,
+				isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		newRecordSet.timeStep_ms = new TimeSteps(DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), initialRecordCapacity);
@@ -186,10 +194,13 @@ public class HistoRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @param newName for the recordset like "1) Laden" 
-	 * @param filePathOrigin source file path
+	 * @param objectDirectory validated object key
+	 * @param recordSetNumber for the recordset from "1) Laden" or "6) Channels [1234]"
+	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
+	 * @param logDeviceName 
 	 * @param logChannelNumber from the log file
 	 * @param logObjectKey from the log file
+	 * @param filePathOrigin source file path
 	 * @param recordNames array of the device supported measurement and settlement names
 	 * @param recordSymbols
 	 * @param recordUnits
@@ -197,13 +208,10 @@ public class HistoRecordSet extends RecordSet {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(String newName, int logChannelNumber, String logObjectKey, Path filePathOrigin, String[] recordNames, String[] recordSymbols, String[] recordUnits,
-			boolean isRaw, boolean isFromFile) {
-		String[] nameParts = newName.split(Pattern.quote(GDE.STRING_RIGHT_PARENTHESIS_BLANK));
-		String[] sub1Parts = nameParts[1].split(GDE.STRING_BLANK_COLON_BLANK);
-		nameParts[1] = sub1Parts.length > 1 ? sub1Parts[1].trim() : sub1Parts[0].trim();
-		HistoRecordSet newRecordSet = new HistoRecordSet(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), Integer.parseInt(nameParts[0]), nameParts[1],
-				logChannelNumber, logObjectKey, filePathOrigin, recordNames, isRaw, isFromFile);
+	public static HistoRecordSet createRecordSet(String objectDirectory, int recordSetNumber, String recordSetBaseName, String logDeviceName, int logChannelNumber, String logObjectKey,
+			Path filePathOrigin, String[] recordNames, String[] recordSymbols, String[] recordUnits, boolean isRaw, boolean isFromFile) {
+		HistoRecordSet newRecordSet = new HistoRecordSet(objectDirectory, recordSetNumber, recordSetBaseName, logDeviceName, logChannelNumber, logObjectKey, filePathOrigin, recordNames, isRaw,
+				isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		newRecordSet.timeStep_ms = new TimeSteps(DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), initialRecordCapacity);
@@ -321,11 +329,11 @@ public class HistoRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @return
+	 * @return the fully populated history vault
 	 */
 	public HistoVault getHistoVault() {
-		return HistoVault.createHistoVault(this.filePathOrigin, this.filePathOrigin.toFile().lastModified(), this.recordSetNumber, this.getName(), this.getStartTimeStamp(), this.logChannelNumber,
-				this.logObjectKey, getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
+		return HistoVault.createHistoVault(this.logObjectDirectory, this.logFilePath, this.logFilePath.toFile().lastModified(), this.recordSetNumber, this.getName(), this.logDeviceName,
+				this.getStartTimeStamp(), this.logChannelNumber, this.logObjectKey, getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
 	}
 
 	/**
@@ -421,18 +429,16 @@ public class HistoRecordSet extends RecordSet {
 						throw new UnsupportedOperationException(record.getName());
 				}
 			}
-			if (this.settings.isQuantilesActive()) {
-				Quantile quantile = new Quantile(record, this.isSampled() ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
-				entryPoints.addPoint(TrailType.Q0.name(), TrailType.Q0.ordinal(), (int) quantile.getQuartile0());
-				entryPoints.addPoint(TrailType.Q1.name(), TrailType.Q1.ordinal(), (int) quantile.getQuartile1());
-				entryPoints.addPoint(TrailType.Q2.name(), TrailType.Q2.ordinal(), (int) quantile.getQuartile2());
-				entryPoints.addPoint(TrailType.Q3.name(), TrailType.Q3.ordinal(), (int) quantile.getQuartile3());
-				entryPoints.addPoint(TrailType.Q4.name(), TrailType.Q4.ordinal(), (int) quantile.getQuartile4());
-				entryPoints.addPoint(TrailType.Q_25_PERMILLE.name(), TrailType.Q_25_PERMILLE.ordinal(), (int) quantile.getQuantile(.025));
-				entryPoints.addPoint(TrailType.Q_975_PERMILLE.name(), TrailType.Q_975_PERMILLE.ordinal(), (int) quantile.getQuantile(.975));
-				entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.name(), TrailType.Q_LOWER_WHISKER.ordinal(), (int) quantile.getQuantileLowerWhisker());
-				entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.name(), TrailType.Q_UPPER_WHISKER.ordinal(), (int) quantile.getQuantileUpperWhisker());
-			}
+			Quantile quantile = new Quantile(record, this.isSampled() ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
+			entryPoints.addPoint(TrailType.Q0.name(), TrailType.Q0.ordinal(), (int) quantile.getQuartile0());
+			entryPoints.addPoint(TrailType.Q1.name(), TrailType.Q1.ordinal(), (int) quantile.getQuartile1());
+			entryPoints.addPoint(TrailType.Q2.name(), TrailType.Q2.ordinal(), (int) quantile.getQuartile2());
+			entryPoints.addPoint(TrailType.Q3.name(), TrailType.Q3.ordinal(), (int) quantile.getQuartile3());
+			entryPoints.addPoint(TrailType.Q4.name(), TrailType.Q4.ordinal(), (int) quantile.getQuartile4());
+			entryPoints.addPoint(TrailType.Q_25_PERMILLE.name(), TrailType.Q_25_PERMILLE.ordinal(), (int) quantile.getQuantile(.025));
+			entryPoints.addPoint(TrailType.Q_975_PERMILLE.name(), TrailType.Q_975_PERMILLE.ordinal(), (int) quantile.getQuantile(.975));
+			entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.name(), TrailType.Q_LOWER_WHISKER.ordinal(), (int) quantile.getQuantileLowerWhisker());
+			entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.name(), TrailType.Q_UPPER_WHISKER.ordinal(), (int) quantile.getQuantileUpperWhisker());
 
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data " + entryPoints.toString()); //$NON-NLS-1$
 		}
@@ -454,7 +460,7 @@ public class HistoRecordSet extends RecordSet {
 			entries.getEntryPoints().add(entryPoints);
 
 			HistoSettlement record = this.histoSettlements.get(settlementType.getName());
-			if (settlementType.getEvaluation() != null) { // evaluation and scores are choices
+			if (record.size() > 0 && settlementType.getEvaluation() != null) { 
 				EvaluationType settlementEvaluations = settlementType.getEvaluation();
 				if (record.hasReasonableData()) {
 					if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValue());
@@ -493,7 +499,7 @@ public class HistoRecordSet extends RecordSet {
 		this.scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = this.getRecordDataSize(true);
 		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoRecordSet_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
 
-		EntryPoints entryPoints = new EntryPoints("All", 0);
+		EntryPoints entryPoints = new EntryPoints("All", 0); //$NON-NLS-1$
 		StringBuilder sb = new StringBuilder();
 		for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
 			if (this.scorePoints[scoreLabelTypes.ordinal()] != null) {
@@ -515,6 +521,10 @@ public class HistoRecordSet extends RecordSet {
 	@Override
 	public void setName(String newName) {
 		super.setName(newName);
+	}
+
+	public String getStartTimeStampFormatted() {
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()); //$NON-NLS-1$
 	}
 
 }

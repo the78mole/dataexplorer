@@ -807,7 +807,7 @@ public class Settings extends Properties {
 			path = Paths.get(tmpDataDirPath);
 			// ignore object if path ends with a valid object
 			String directoryName = path.getFileName().toString();
-			path = getValidateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+			path = getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
 			// ignore device if path ends with a valid device
 			String directoryName2 = path.getFileName().toString();
 			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
@@ -833,7 +833,7 @@ public class Settings extends Properties {
 				Path path = Paths.get(tmpDataDirPath);
 				// ignore object if path ends with a valid object
 				String directoryName = path.getFileName().toString();
-				path = getValidateObjectKey(directoryName).isPresent() ? path.getParent() : path;
+				path = getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
 				// ignore device if path ends with a valid device
 				String directoryName2 = path.getFileName().toString();
 				path = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
@@ -859,7 +859,7 @@ public class Settings extends Properties {
 	 * @param objectKey is supposed to be a valid object key
 	 * @return empty or the validated object key in the correct case sensitive format
 	 */
-	public Optional<String> getValidateObjectKey(String objectKey) {
+	public Optional<String> getValidatedObjectKey(String objectKey) {
 		String key = objectKey.trim();
 		return Arrays.asList(getObjectList()).stream().filter(s -> s.equalsIgnoreCase(key)).findFirst();
 	}
