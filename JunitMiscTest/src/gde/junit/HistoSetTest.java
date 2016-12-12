@@ -29,9 +29,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +63,7 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.histocache.HistoVault;
 import gde.io.HistoOsdReaderWriter;
 import gde.io.OsdReaderWriter;
+import gde.ui.dialog.SettingsDialog;
 import gde.utils.FileUtils;
 
 public class HistoSetTest extends TestSuperClass { // TODO for junit tests in general it may be better to choose another directory structure: http://stackoverflow.com/a/2388285
@@ -124,6 +129,52 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		if (failures.size() > 0) fail(sb.toString());
 	}
 
+	public void testBuildHistoSet4TestSamples() {
+		System.out
+				.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
+		List<String> problemFileNames = getProblemFileNames();
+		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
+
+		HistoSet histoSet = HistoSet.getInstance();
+		
+		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
+		String fileRootDir = this.dataPath.getAbsolutePath();
+		// >>> take one of these optional data sources for the test <<<
+		//		Path dirPath = Paths.get(fileRootDir, "_Thomas", "DataExplorer");  // use with empty datafilepath in DataExplorer.properties
+		//		Path dirPath = Paths.get(fileRootDir, "_Winfried", "DataExplorer"); // use with empty datafilepath in DataExplorer.properties
+		Path dirPath = FileSystems.getDefault().getPath(fileRootDir); // takes all Files from datafilepath in DataExplorer.properties or from DataFilesTestSamples if empty datafilepath
+
+		FileUtils.checkDirectoryAndCreate(dirPath.toString());
+			histoSet.initialize();
+		try {
+			histoSet.setHistoFilePaths4Test(dirPath, 11);
+
+			for (Entry<String, DeviceConfiguration> deviceEntry : this.deviceConfigurations.entrySet()) {
+				IDevice device = setDevice(deviceEntry.getKey());
+				setupDataChannels(device);
+				setupDeviceChannelObject(deviceEntry.getKey(), 1, "");
+				for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
+					this.channels.setActiveChannelNumber(channelEntry.getKey());
+					histoSet.rebuild4Test();
+					System.out.println(String.format("Device=%3.33s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
+				}
+			}
+		}
+		catch (Exception  e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		System.out.println(String.format("%,11d files processed from  %s", HistoSetTest.count, dirPath.toString()));
+		StringBuilder sb = new StringBuilder();
+		for (Entry<String, Exception> failure : failures.entrySet()) {
+			sb.append(failure).append("\n");
+		}
+		//		System.out.println(sb);
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
 	public void testReadBinOsdFiles() {
 		System.out
 				.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
@@ -153,7 +204,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 							this.channels.setActiveChannelNumber(channelEntry.getKey());
 							try {
 								String objectDirectory = this.settings.getValidatedObjectKey(file.toPath().getParent().getFileName().toString()).orElse(GDE.STRING_EMPTY).intern();
-							HistoVault truss = HistoVault.createTruss(objectDirectory, file.toPath(), file.lastModified(), 1, file.getName(), objectDirectory, file.lastModified(), this.application.getActiveChannelNumber(), objectDirectory);
+								HistoVault truss = HistoVault.createTruss(objectDirectory, file);
 								HistoRecordSet recordSet = HoTTbinHistoReader.read(truss);
 								maxTime_sec = recordSet.getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSet.getMaxTime_ms() / 1000 : maxTime_sec;
 								System.out.println(String.format("binFile processed      channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", this.channels.getActiveChannelNumber(), (int) recordSet.getMaxTime_ms() / 1000,
@@ -193,17 +244,12 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 								for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 									this.channels.setActiveChannelNumber(channelEntry.getKey());
 									try {
-										List<HistoRecordSet> recordSets = new ArrayList<>();
-										HistoOsdReaderWriter.readHisto(recordSets, file.toPath(), Arrays.asList(new Integer[] { application.getActiveChannelNumber() }), "fakeObjectKey");
-										if (recordSets.size() > 0) {
-											maxTime_sec = recordSets.get(recordSets.size() - 1).getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSets.get(recordSets.size() - 1).getMaxTime_ms() / 1000 : maxTime_sec;
-											System.out.println(String.format("osdFile processed %3d  channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", recordSets.size(), this.channels.getActiveChannelNumber(),
-													(int) recordSets.get(recordSets.size() - 1).getMaxTime_ms() / 1000, file.length(), file.toPath().toAbsolutePath().toString()));
-										}
-										else {
-											System.out.println(String.format("osdFile w/o recordsets channel=%d                         Bytes=%,11d %s", this.channels.getActiveChannelNumber(), file.length(),
-													file.toPath().toAbsolutePath().toString()));
-										}
+										String objectDirectory = this.settings.getValidatedObjectKey(file.toPath().getParent().getFileName().toString()).orElse(GDE.STRING_EMPTY).intern();
+										HistoVault truss = HistoVault.createTruss(objectDirectory, file.toPath(), file.lastModified(), 0, file.getName(), objectDirectory, file.lastModified(),
+												this.application.getActiveChannelNumber(), objectDirectory);
+										// todo HistoRecordSet recordSet = HistoOsdReaderWriter.readHisto(truss);
+//										System.out.println(String.format("osdFile processed  channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", this.channels.getActiveChannelNumber(), (int) recordSet.getMaxTime_ms() / 1000,
+//												file.length(), file.toPath().toAbsolutePath().toString()));
 									}
 									catch (Exception e) {
 										System.out.println(file.getAbsolutePath());
@@ -241,7 +287,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 	 */
 	private IDevice setDevice(String fileDeviceName) {
 		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
-		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) return null;
+		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) return null; // iCharger308DUO gde.device.UsbPortType missing
 		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 		if (deviceConfig == null) return null;
 		IDevice device = this.getInstanceOfDevice(deviceConfig);

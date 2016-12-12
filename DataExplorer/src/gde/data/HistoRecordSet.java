@@ -20,6 +20,7 @@
 package gde.data;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ public class HistoRecordSet extends RecordSet {
 
 	private Integer[]																scorePoints;
 	private String																	logObjectDirectory;
-	private int																			recordSetNumber;
+	private int																			recordSetOrdinal;
 	private Path																		logFilePath;
 	private String																	logDeviceName;
 	private int																			logChannelNumber;
@@ -76,28 +77,20 @@ public class HistoRecordSet extends RecordSet {
 
 	/**
 	 * record set data buffers according the size of given names array, where the name is the key to access the data buffer
-	 * @param objectDirectory validated object key
-	 * @param recordSetNumber for the recordset from "1) Laden" or "6) Channels [1234]"
+	 * @param truss holds the base data for the forthcoming history vault
 	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
-	 * @param logDeviceName 
-	 * @param logChannelNumber may differ from UI settings in case of channel mix
-	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
-	 * @param filePathOrigin source file path
 	 * @param recordNames array of the device supported measurement and settlement names
 	 * @param newTimeStep_ms time in msec of device measures points
-	 * @param isRawValue specified if dependent values has been calculated
-	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	private HistoRecordSet(String objectDirectory, int recordSetNumber, String recordSetBaseName, String logDeviceName, int logChannelNumber, String logObjectKey, Path filePathOrigin,
-			String[] recordNames, boolean isRawValue, boolean isFromFileValue) {
+	private HistoRecordSet(HistoVault truss, String recordSetBaseName, String[] recordNames) {
 		super(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), recordSetBaseName, recordNames,
-				DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), isRawValue, isFromFileValue);
-		this.logObjectDirectory = objectDirectory;
-		this.recordSetNumber = recordSetNumber;
-		this.logFilePath = filePathOrigin.toAbsolutePath();
-		this.logDeviceName = logDeviceName;
-		this.logChannelNumber = logChannelNumber;
-		this.logObjectKey = logObjectKey;
+				DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), true, true);
+		this.logObjectDirectory = truss.getLogObjectDirectory();
+		this.recordSetOrdinal = truss.getLogRecordSetOrdinal();
+		this.logFilePath = Paths.get(truss.getLogFilePath());
+		this.logDeviceName = truss.getLogDeviceName();
+		this.logChannelNumber = truss.getLogChannelNumber();
+		this.logObjectKey = truss.getLogObjectKey();
 		ChannelType channelType = this.device.getDeviceConfiguration().getChannel(super.getChannelConfigNumber());
 		for (SettlementType settlementType : channelType.getSettlement()) {
 			HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, this, initialSettlementCapacity);
@@ -154,22 +147,13 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * method to create a histo record set containing records according the device channel configuration
 	 * which are loaded from device properties file.
-	 * @param objectDirectory validated object key
-	 * @param recordSetNumber for the recordset from "1) Laden" or "6) Channels [1234]"
+	 * @param truss holds the base data for the forthcoming history vault
 	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
-	 * @param logDeviceName 
-	 * @param logChannelNumber from the log file
-	 * @param logObjectKey from the log file
-	 * @param filePathOrigin source file path
-	 * @param isRaw defines if the data needs translation using device specific properties
-	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(String objectDirectory, int recordSetNumber, String recordSetBaseName, String logDeviceName, int logChannelNumber, String logObjectKey,
-			Path filePathOrigin, boolean isRaw, boolean isFromFile) {
+	public static HistoRecordSet createRecordSet(HistoVault truss, String recordSetBaseName) {
 		String[] recordNames = DataExplorer.getInstance().getActiveDevice().getMeasurementNames(DataExplorer.getInstance().getActiveChannelNumber());
-		HistoRecordSet newRecordSet = new HistoRecordSet(objectDirectory, recordSetNumber, recordSetBaseName, logDeviceName, logChannelNumber, logObjectKey, filePathOrigin, recordNames, isRaw,
-				isFromFile);
+		HistoRecordSet newRecordSet = new HistoRecordSet(truss, recordSetBaseName, recordNames);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		newRecordSet.timeStep_ms = new TimeSteps(DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), initialRecordCapacity);
@@ -195,23 +179,15 @@ public class HistoRecordSet extends RecordSet {
 
 	/**
 	 * @param objectDirectory validated object key
-	 * @param recordSetNumber for the recordset from "1) Laden" or "6) Channels [1234]"
+	 * @param truss holds the base data for the forthcoming history vault
 	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
-	 * @param logDeviceName 
-	 * @param logChannelNumber from the log file
-	 * @param logObjectKey from the log file
-	 * @param filePathOrigin source file path
 	 * @param recordNames array of the device supported measurement and settlement names
 	 * @param recordSymbols
 	 * @param recordUnits
-	 * @param isRaw defines if the data needs translation using device specific properties
-	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(String objectDirectory, int recordSetNumber, String recordSetBaseName, String logDeviceName, int logChannelNumber, String logObjectKey,
-			Path filePathOrigin, String[] recordNames, String[] recordSymbols, String[] recordUnits, boolean isRaw, boolean isFromFile) {
-		HistoRecordSet newRecordSet = new HistoRecordSet(objectDirectory, recordSetNumber, recordSetBaseName, logDeviceName, logChannelNumber, logObjectKey, filePathOrigin, recordNames, isRaw,
-				isFromFile);
+	public static HistoRecordSet createRecordSet(HistoVault truss, String recordSetBaseName, String[] recordNames, String[] recordSymbols, String[] recordUnits) {
+		HistoRecordSet newRecordSet = new HistoRecordSet(truss, recordSetBaseName, recordNames);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		newRecordSet.timeStep_ms = new TimeSteps(DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), initialRecordCapacity);
@@ -239,29 +215,29 @@ public class HistoRecordSet extends RecordSet {
 		return null;
 	}
 
-	/**
-	 * method to add a series of points to none calculation records (records active or inactive)
-	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException 
-	 */
-	@Deprecated
-	@Override
-	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * method to add a series of points to none calculation records (records active or inactive)
-	 * @param points as int[], where the length must fit records.size()
-	 * @param time_ms
-	 * @throws DataInconsitsentException 
-	 */
-	@Deprecated
-	@Override
-	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
-		throw new UnsupportedOperationException();
-	}
-
+	//	/**
+	//	 * method to add a series of points to none calculation records (records active or inactive)
+	//	 * @param points as int[], where the length must fit records.size()
+	//	 * @throws DataInconsitsentException 
+	//	 */
+	//	@Deprecated
+	//	@Override
+	//	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
+	//		throw new UnsupportedOperationException();
+	//	}
+	//
+	//	/**
+	//	 * method to add a series of points to none calculation records (records active or inactive)
+	//	 * @param points as int[], where the length must fit records.size()
+	//	 * @param time_ms
+	//	 * @throws DataInconsitsentException 
+	//	 */
+	//	@Deprecated
+	//	@Override
+	//	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
+	//		throw new UnsupportedOperationException();
+	//	}
+	//
 	/**
 	 * add a new time step to the time steps vector
 	 * @param timeValue
@@ -332,7 +308,7 @@ public class HistoRecordSet extends RecordSet {
 	 * @return the fully populated history vault
 	 */
 	public HistoVault getHistoVault() {
-		return HistoVault.createHistoVault(this.logObjectDirectory, this.logFilePath, this.logFilePath.toFile().lastModified(), this.recordSetNumber, this.getName(), this.logDeviceName,
+		return HistoVault.createHistoVault(this.logObjectDirectory, this.logFilePath, this.logFilePath.toFile().lastModified(), this.recordSetOrdinal, this.getName(), this.logDeviceName,
 				this.getStartTimeStamp(), this.logChannelNumber, this.logObjectKey, getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
 	}
 
@@ -351,96 +327,104 @@ public class HistoRecordSet extends RecordSet {
 			entries.getEntryPoints().add(entryPoints);
 
 			Record record = this.get(measurementType.getName());
-			StatisticsType measurementStatistics = measurementType.getStatistics();
-			if (measurementStatistics != null) { // todo this creates trail types mismatch  :  && record.hasReasonableData()) {
-				int triggerRefOrdinal = -1;
-				if (measurementStatistics.getTriggerRefOrdinal() != null) {
-					int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
-					if (record != null && record.isDisplayable()) {
-						triggerRefOrdinal = tmpOrdinal;
-					}
-				}
-				boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
-				boolean isGpsCoordinates = this.device.isGPSCoordinates(record);
-				if (measurementStatistics.isAvg()) {
-					if (isTriggerLevel)
-						entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValueTriggered());
-					else if (isGpsCoordinates)
-						entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValue());
-					else
-						entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
-				}
-				if (measurementStatistics.isMax()) {
-					if (isTriggerLevel)
-						entryPoints.addPoint(TrailType.REAL_MAX.name(), TrailType.REAL_MAX.ordinal(), record.getMaxValueTriggered());
-					else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) if (isGpsCoordinates)
-						entryPoints.addPoint(TrailType.REAL_MAX.name(), TrailType.REAL_MAX.ordinal(), record.getRealMaxValue());
-					else
-						entryPoints.addPoint(TrailType.REAL_MAX.name(), TrailType.REAL_MAX.ordinal(), triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
-				}
-				if (measurementStatistics.isMin()) {
-					if (isTriggerLevel)
-						entryPoints.addPoint(TrailType.REAL_MIN.name(), TrailType.REAL_MIN.ordinal(), record.getMinValueTriggered());
-					else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) if (isGpsCoordinates)
-						entryPoints.addPoint(TrailType.REAL_MIN.name(), TrailType.REAL_MIN.ordinal(), record.getRealMinValue());
-					else
-						entryPoints.addPoint(TrailType.REAL_MIN.name(), TrailType.REAL_MIN.ordinal(), triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
-				}
-				if (measurementStatistics.isSigma()) {
-					if (isTriggerLevel)
-						entryPoints.addPoint(TrailType.REAL_SD.name(), TrailType.REAL_SD.ordinal(), record.getSigmaValueTriggered());
-					else
-						entryPoints.addPoint(TrailType.REAL_SD.name(), TrailType.REAL_SD.ordinal(),
-								triggerRefOrdinal < 0 ? (Integer) record.getSigmaValue() : (Integer) record.getSigmaValueTriggered(triggerRefOrdinal));
-				}
-				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-					if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1)
-						entryPoints.addPoint(TrailType.REAL_SUM_TRIGGERED.name(), TrailType.REAL_SUM_TRIGGERED.ordinal(), record.getSumTriggeredRange());
-					else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-						entryPoints.addPoint(TrailType.REAL_SUM_TRIGGERED.name(), TrailType.REAL_SUM_TRIGGERED.ordinal(), record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal()));
-					}
-					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-						Record referencedRecord = this.get(measurementStatistics.getRatioRefOrdinal().intValue());
-						StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
-						if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax()))
-							// todo trigger ratio is multiplied by 1000 (per mille)
-							if (referencedStatistics.isAvg())
-							entryPoints.addPoint(TrailType.REAL_AVG_RATIO_TRIGGERED.name(), TrailType.REAL_AVG_RATIO_TRIGGERED.ordinal(), (int) Math.round(referencedRecord.getAvgValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
-							else if (referencedStatistics.isMax()) //
-								entryPoints.addPoint(TrailType.REAL_MAX_RATIO_TRIGGERED.name(), TrailType.REAL_MAX_RATIO_TRIGGERED.ordinal(),
-										(int) Math.round(referencedRecord.getMaxValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
-					}
-				}
-				if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
-					entryPoints.addPoint(TrailType.REAL_TIME_SUM_TRIGGERED.name(), TrailType.REAL_TIME_SUM_TRIGGERED.ordinal(), record.getTimeSumTriggeredRange_ms());
-				}
-				if (measurementStatistics.isCountByTrigger() != null) {
-					entryPoints.addPoint(TrailType.REAL_COUNT_TRIGGERED.name(), TrailType.REAL_COUNT_TRIGGERED.ordinal(), record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0);
-				}
+			if (record == null) {
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.logFilePath)); //$NON-NLS-1$
 			}
 			else {
-				// these trail types might act as default trails
-				for (TrailType trailType : TrailType.getSubstitutes()) {
-					if (trailType == TrailType.REAL_FIRST)
-						entryPoints.addPoint(TrailType.REAL_FIRST.name(), TrailType.REAL_FIRST.ordinal(), record.realRealGet(0));
-					else if (trailType == TrailType.REAL_LAST)
-						entryPoints.addPoint(TrailType.REAL_LAST.name(), TrailType.REAL_LAST.ordinal(), record.realRealGet(record.size() - 1));
-					else
-						throw new UnsupportedOperationException(record.getName());
+				StatisticsType measurementStatistics = measurementType.getStatistics();
+				if (measurementStatistics != null) { // todo this creates trail types mismatch  :  && record.hasReasonableData()) {
+					int triggerRefOrdinal = -1;
+					if (measurementStatistics.getTriggerRefOrdinal() != null) {
+						int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
+						if (record != null && record.isDisplayable()) {
+							triggerRefOrdinal = tmpOrdinal;
+						}
+					}
+					boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
+					boolean isGpsCoordinates = this.device.isGPSCoordinates(record);
+					if (measurementStatistics.isAvg()) {
+						if (isTriggerLevel)
+							entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValueTriggered() != Integer.MIN_VALUE? record.getAvgValueTriggered():0);
+						else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
+							if (isGpsCoordinates)
+							entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValue());
+							else
+							entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
+					}
+					if (measurementStatistics.isMax()) {
+						if (isTriggerLevel)
+							entryPoints.addPoint(TrailType.REAL_MAX.name(), TrailType.REAL_MAX.ordinal(), record.getMaxValueTriggered());
+						else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
+							if (isGpsCoordinates)
+							entryPoints.addPoint(TrailType.REAL_MAX.name(), TrailType.REAL_MAX.ordinal(), record.getRealMaxValue());
+							else
+							entryPoints.addPoint(TrailType.REAL_MAX.name(), TrailType.REAL_MAX.ordinal(), triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
+					}
+					if (measurementStatistics.isMin()) {
+						if (isTriggerLevel)
+							entryPoints.addPoint(TrailType.REAL_MIN.name(), TrailType.REAL_MIN.ordinal(), record.getMinValueTriggered());
+						else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) //
+							if (isGpsCoordinates)
+							entryPoints.addPoint(TrailType.REAL_MIN.name(), TrailType.REAL_MIN.ordinal(), record.getRealMinValue());
+							else
+							entryPoints.addPoint(TrailType.REAL_MIN.name(), TrailType.REAL_MIN.ordinal(), triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
+					}
+					if (measurementStatistics.isSigma()) {
+						if (isTriggerLevel)
+							entryPoints.addPoint(TrailType.REAL_SD.name(), TrailType.REAL_SD.ordinal(), record.getSigmaValueTriggered());
+						else if (triggerRefOrdinal < 0 || record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
+							entryPoints.addPoint(TrailType.REAL_SD.name(), TrailType.REAL_SD.ordinal(),
+									triggerRefOrdinal < 0 ? (Integer) record.getSigmaValue() : (Integer) record.getSigmaValueTriggered(triggerRefOrdinal));
+					}
+					if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+						if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1)
+							entryPoints.addPoint(TrailType.REAL_SUM_TRIGGERED.name(), TrailType.REAL_SUM_TRIGGERED.ordinal(), record.getSumTriggeredRange());
+						else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+							entryPoints.addPoint(TrailType.REAL_SUM_TRIGGERED.name(), TrailType.REAL_SUM_TRIGGERED.ordinal(), record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal()));
+						}
+						if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
+							Record referencedRecord = this.get(measurementStatistics.getRatioRefOrdinal().intValue());
+							StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
+							if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax()))
+								// todo trigger ratio is multiplied by 1000 (per mille)
+								if (referencedStatistics.isAvg())
+								entryPoints.addPoint(TrailType.REAL_AVG_RATIO_TRIGGERED.name(), TrailType.REAL_AVG_RATIO_TRIGGERED.ordinal(), (int) Math.round(referencedRecord.getAvgValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
+								else if (referencedStatistics.isMax()) //
+									entryPoints.addPoint(TrailType.REAL_MAX_RATIO_TRIGGERED.name(), TrailType.REAL_MAX_RATIO_TRIGGERED.ordinal(),
+											(int) Math.round(referencedRecord.getMaxValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
+						}
+					}
+					if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
+						entryPoints.addPoint(TrailType.REAL_TIME_SUM_TRIGGERED.name(), TrailType.REAL_TIME_SUM_TRIGGERED.ordinal(), record.getTimeSumTriggeredRange_ms());
+					}
+					if (measurementStatistics.isCountByTrigger() != null) {
+						entryPoints.addPoint(TrailType.REAL_COUNT_TRIGGERED.name(), TrailType.REAL_COUNT_TRIGGERED.ordinal(), record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0);
+					}
 				}
-			}
-			Quantile quantile = new Quantile(record, this.isSampled() ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
-			entryPoints.addPoint(TrailType.Q0.name(), TrailType.Q0.ordinal(), (int) quantile.getQuartile0());
-			entryPoints.addPoint(TrailType.Q1.name(), TrailType.Q1.ordinal(), (int) quantile.getQuartile1());
-			entryPoints.addPoint(TrailType.Q2.name(), TrailType.Q2.ordinal(), (int) quantile.getQuartile2());
-			entryPoints.addPoint(TrailType.Q3.name(), TrailType.Q3.ordinal(), (int) quantile.getQuartile3());
-			entryPoints.addPoint(TrailType.Q4.name(), TrailType.Q4.ordinal(), (int) quantile.getQuartile4());
-			entryPoints.addPoint(TrailType.Q_25_PERMILLE.name(), TrailType.Q_25_PERMILLE.ordinal(), (int) quantile.getQuantile(.025));
-			entryPoints.addPoint(TrailType.Q_975_PERMILLE.name(), TrailType.Q_975_PERMILLE.ordinal(), (int) quantile.getQuantile(.975));
-			entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.name(), TrailType.Q_LOWER_WHISKER.ordinal(), (int) quantile.getQuantileLowerWhisker());
-			entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.name(), TrailType.Q_UPPER_WHISKER.ordinal(), (int) quantile.getQuantileUpperWhisker());
+				else {
+					// these trail types might act as default trails
+					for (TrailType trailType : TrailType.getSubstitutes()) {
+						if (trailType == TrailType.REAL_FIRST)
+							entryPoints.addPoint(TrailType.REAL_FIRST.name(), TrailType.REAL_FIRST.ordinal(), record.realRealGet(0));
+						else if (trailType == TrailType.REAL_LAST)
+							entryPoints.addPoint(TrailType.REAL_LAST.name(), TrailType.REAL_LAST.ordinal(), record.realRealGet(record.size() - 1));
+						else
+							throw new UnsupportedOperationException(record.getName());
+					}
+				}
+				Quantile quantile = new Quantile(record, this.isSampled() ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
+				entryPoints.addPoint(TrailType.Q0.name(), TrailType.Q0.ordinal(), (int) quantile.getQuartile0());
+				entryPoints.addPoint(TrailType.Q1.name(), TrailType.Q1.ordinal(), (int) quantile.getQuartile1());
+				entryPoints.addPoint(TrailType.Q2.name(), TrailType.Q2.ordinal(), (int) quantile.getQuartile2());
+				entryPoints.addPoint(TrailType.Q3.name(), TrailType.Q3.ordinal(), (int) quantile.getQuartile3());
+				entryPoints.addPoint(TrailType.Q4.name(), TrailType.Q4.ordinal(), (int) quantile.getQuartile4());
+				entryPoints.addPoint(TrailType.Q_25_PERMILLE.name(), TrailType.Q_25_PERMILLE.ordinal(), (int) quantile.getQuantile(.025));
+				entryPoints.addPoint(TrailType.Q_975_PERMILLE.name(), TrailType.Q_975_PERMILLE.ordinal(), (int) quantile.getQuantile(.975));
+				entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.name(), TrailType.Q_LOWER_WHISKER.ordinal(), (int) quantile.getQuantileLowerWhisker());
+				entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.name(), TrailType.Q_UPPER_WHISKER.ordinal(), (int) quantile.getQuantileUpperWhisker());
 
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data " + entryPoints.toString()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data " + entryPoints.toString()); //$NON-NLS-1$
+			}
 		}
 		return entries;
 	}
@@ -460,7 +444,7 @@ public class HistoRecordSet extends RecordSet {
 			entries.getEntryPoints().add(entryPoints);
 
 			HistoSettlement record = this.histoSettlements.get(settlementType.getName());
-			if (record.size() > 0 && settlementType.getEvaluation() != null) { 
+			if (record.size() > 0 && settlementType.getEvaluation() != null) {
 				EvaluationType settlementEvaluations = settlementType.getEvaluation();
 				if (record.hasReasonableData()) {
 					if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValue());
@@ -500,16 +484,12 @@ public class HistoRecordSet extends RecordSet {
 		this.scorePoints[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(this.elapsedHistoRecordSet_ns); // do not multiply by 1000 as usual, this is the conversion from ns to ms
 
 		EntryPoints entryPoints = new EntryPoints("All", 0); //$NON-NLS-1$
-		StringBuilder sb = new StringBuilder();
 		for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
 			if (this.scorePoints[scoreLabelTypes.ordinal()] != null) {
 				entryPoints.addPoint(scoreLabelTypes.toString(), scoreLabelTypes.ordinal(), this.scorePoints[scoreLabelTypes.ordinal()]);
-				if (log.isLoggable(Level.FINE)) {
-					sb.append(scoreLabelTypes.toString().toLowerCase()).append(GDE.STRING_EQUAL).append(this.scorePoints[scoreLabelTypes.ordinal()]).append(GDE.STRING_BLANK);
-				}
 			}
 		}
-		log.log(Level.SEVERE, entryPoints.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, entryPoints.toString());
 		return entryPoints;
 	}
 

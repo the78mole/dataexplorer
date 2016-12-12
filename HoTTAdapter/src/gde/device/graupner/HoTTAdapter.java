@@ -26,10 +26,12 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -844,7 +846,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		if (this.histoRandomSample != null) {
-		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize, histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize,
+					histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
 		}
 		recordSet.syncScaleOfSyncableRecords();
 	}
@@ -908,15 +911,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param pointsLength number of non-calculation measurement points  
-	 */
-	public void setSampling(int pointsLength) {
-		int recordTimespan_ms = 10;
-		this.histoRandomSample = new HistoRandomSample(this, pointsLength, recordTimespan_ms);
-	}
-
-	/**
-	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param maxPoints maximum values from the data buffer which are verified during sampling
 	 * @param minPoints minimum values from the data buffer which are verified during sampling
 	 * @throws DataInconsitsentException 
@@ -924,15 +918,27 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points");
 		int recordTimespan_ms = 10;
-		this.histoRandomSample = new HistoRandomSample(this, maxPoints,  minPoints, recordTimespan_ms);
+		this.histoRandomSample = new HistoRandomSample(this, maxPoints, minPoints, recordTimespan_ms);
 	}
 
 	/* (non-Javadoc)
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
-	public HistoRecordSet getRecordSetFromImportFile(HistoVault truss) throws DataInconsitsentException, IOException, DataTypeException  {
-		log.log(Level.INFO, String.format("start  %s", truss.getLogFilePath())); //$NON-NLS-1$
-		return HoTTbinHistoReader.read(truss);
+	public List<HistoRecordSet> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+		log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
+		if (this.getClass().equals(HoTTAdapter.class)) {
+			List<HistoRecordSet> histoRecordSets = new ArrayList<HistoRecordSet>();
+			for (HistoVault truss : trusses) {
+				if (truss.getLogFilePath().equals(filePath.toString()))
+					histoRecordSets.add(HoTTbinHistoReader.read(truss));
+				else
+					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
+			}
+			return histoRecordSets;
+		}
+		else
+			// todo implement HoTTbinHistoReader for subclasses
+			return null;
 	}
 
 	/**

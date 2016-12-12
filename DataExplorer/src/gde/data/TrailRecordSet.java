@@ -53,25 +53,25 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public class TrailRecordSet extends RecordSet {
-	private final static String					$CLASS_NAME						= TrailRecordSet.class.getName();
-	private final static long						serialVersionUID			= -1580283867987273535L;
-	private final static Logger					log										= Logger.getLogger($CLASS_NAME);
+	private final static String					$CLASS_NAME							= TrailRecordSet.class.getName();
+	private final static long						serialVersionUID				= -1580283867987273535L;
+	private final static Logger					log											= Logger.getLogger($CLASS_NAME);
 
-	final static int										initialRecordCapacity	= 111;																					// vector capacity values are crucial for the overall performance
+	final static int										initialRecordCapacity		= 111;																					// vector capacity values are crucial for the overall performance
 
-	private final HistoGraphicsTemplate	template;																															// graphics template holds view configuration
-	private final int[]									linkedOrdinals;																												// allows getting a trail record by ordinal without iterating the linked hashmap  
+	private final HistoGraphicsTemplate	template;																																// graphics template holds view configuration
+	private final int[]									linkedOrdinals;																													// allows getting a trail record by ordinal without iterating the linked hashmap  
 
-	private final List<Integer>					durations_mm					= new ArrayList<Integer>(initialRecordCapacity);
-	private double											averageDuration_mm		= 0;
-	private final List<String>					fileNames							= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					directoryNames				= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					basePaths							= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logChannelNumbers			= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logObjectKeys					= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logRecordSetNumbers		= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logRecordsetNames			= new ArrayList<String>(initialRecordCapacity);
-	private final List<List<String>>		logTags								= new ArrayList<List<String>>();
+	private final List<Integer>					durations_mm						= new ArrayList<Integer>(initialRecordCapacity);
+	private double											averageDuration_mm			= 0;
+	private final List<String>					fileNames								= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					directoryNames					= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					basePaths								= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logChannelNumbers				= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logRecordsetBaseNames		= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>					logRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
+	private final List<List<String>>		logTags									= new ArrayList<List<String>>();
 
 	/**
 	 * holds trail records for measurements, settlements and scores.
@@ -90,9 +90,9 @@ public class TrailRecordSet extends RecordSet {
 		this.logTags.add(this.directoryNames);
 		this.logTags.add(this.basePaths);
 		this.logTags.add(this.logChannelNumbers);
-		this.logTags.add(this.logObjectKeys);
-		this.logTags.add(this.logRecordSetNumbers);
-		this.logTags.add(this.logRecordsetNames);
+		this.logTags.add(this.logRectifiedObjectKeys);
+		this.logTags.add(this.logRecordsetBaseNames);
+		// for test only		this.logTags.add(this.logRecordSetOrdinals);
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
@@ -250,14 +250,14 @@ public class TrailRecordSet extends RecordSet {
 		}
 		this.durations_mm.clear();
 		this.averageDuration_mm = 0;
-		
+
 		this.fileNames.clear();
 		this.directoryNames.clear();
 		this.basePaths.clear();
 		this.logChannelNumbers.clear();
-		this.logObjectKeys.clear();
-		this.logRecordSetNumbers.clear();
-		this.logRecordsetNames.clear();
+		this.logRectifiedObjectKeys.clear();
+		this.logRecordSetOrdinals.clear();
+		this.logRecordsetBaseNames.clear();
 	}
 
 	/**
@@ -362,9 +362,9 @@ public class TrailRecordSet extends RecordSet {
 				this.directoryNames.add(Paths.get(histoVault.getLogFilePath()).getParent().getFileName().toString().intern());
 				this.basePaths.add(Paths.get(histoVault.getLogFilePath()).getParent().getParent().toString().intern());
 				this.logChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
-				this.logObjectKeys.add(histoVault.getLogObjectKey().intern());
-				this.logRecordSetNumbers.add(String.valueOf(histoVault.getLogRecordSetNumber()).intern());
-				this.logRecordsetNames.add(histoVault.getLogRecordsetName().intern());
+				this.logRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
+				this.logRecordSetOrdinals.add(String.valueOf(histoVault.getLogRecordSetOrdinal()).intern());
+				this.logRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
 			}
 		}
 	}
@@ -638,7 +638,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * get all tags for all recordsets / vaults.
 	 * @param logTagOrdinal
-	 * @return empty record name and tag description as a trail text replacement followed by the string array
+	 * @return empty record name and tag description as a trail text replacement followed by the tag values
 	 */
 	public String[] getTagTableRow(int logTagOrdinal) {
 		String[] dataTableRow = new String[this.get(0).size() + 2];
@@ -654,9 +654,9 @@ public class TrailRecordSet extends RecordSet {
 		else if (logTagOrdinal == 4)
 			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
 		else if (logTagOrdinal == 5)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843);
-		else if (logTagOrdinal == 6)
 			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
+		else if (logTagOrdinal == 6)
+			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843); // for test only
 		else
 			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
 
@@ -671,7 +671,7 @@ public class TrailRecordSet extends RecordSet {
 	 * @return the logTags
 	 */
 	public List<List<String>> getLogTags() {
-		return logTags;
+		return this.logTags;
 	}
 
 }

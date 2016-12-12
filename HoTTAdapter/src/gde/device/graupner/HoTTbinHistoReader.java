@@ -24,14 +24,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -44,7 +43,6 @@ import gde.exception.DataTypeException;
 import gde.histocache.HistoVault;
 import gde.io.DataParser;
 import gde.log.Level;
-import gde.messages.Messages;
 import gde.utils.StringHelper;
 
 /**
@@ -95,14 +93,14 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.lastTime = System.nanoTime();
 		HoTTbinHistoReader.filePath = Paths.get(truss.getLogFilePath());
 		File file = HoTTbinHistoReader.filePath.toFile();
-		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {// performs better than DataInputStream due to reasonable io sizes
+		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {
 			HoTTbinHistoReader.read(data_in, truss);
 		}
 		catch (InvalidObjectException e) {
 			// so any anther exception is propagated to the caller
 		}
 		finally {
-			if (HoTTbinHistoReader.filePath.getFileName().startsWith("~") && file.exists()) file.delete();
+			if (HoTTbinHistoReader.filePath.getFileName().startsWith("~") && file.exists()) file.delete(); // 'GRAUPNER SD LOG8'
 		}
 		return (HistoRecordSet) HoTTbinHistoReader.tmpRecordSet;
 	}
@@ -123,21 +121,25 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
 		Channel activeChannel = device.channels.getActiveChannel(); //  // HoTTbinHistoReader.application.getActiveChannel();
-		int activeChannelNumber = device.channels.getActiveChannelNumber(); // HoTTbinHistoReader.application.getActiveChannel().getNumber();
 		String recordSetBaseName = activeChannel.getChannelConfigKey() + HoTTbinHistoReader.getRecordSetExtend(HoTTbinHistoReader.filePath.getFileName().toString());
-		tmpRecordSet = HistoRecordSet.createRecordSet(truss.getLogObjectDirectory(), truss.getLogRecordSetNumber(), recordSetBaseName, truss.getLogDeviceName(), activeChannelNumber,
-				truss.getLogObjectDirectory(), HoTTbinHistoReader.filePath, true, true);
+		tmpRecordSet = HistoRecordSet.createRecordSet(truss, recordSetBaseName);
 		tmpRecordSet.setStartTimeStamp(file.lastModified());
-		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(tmpRecordSet.getStartTimeStamp()));
+		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + ((HistoRecordSet) tmpRecordSet).getStartTimeStampFormatted());
 		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader.filePath.getFileName().toString());
 		if (HoTTbinHistoReader.log.isLoggable(Level.FINE))
-			HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetName=" + activeChannelNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetBaseName);
+			HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + recordSetBaseName);
 
 		if (file.length() > NUMBER_LOG_RECORDS_MIN * dataBlockSize) {
-			header = HoTTbinReader.getFileInfo(HoTTbinHistoReader.filePath.toFile());
-			if (header.size() > 0) {
-				if (!header.get(HoTTAdapter.FILE_PATH).equals(HoTTbinHistoReader.filePath.toString())) { //don't take temp file which was extracted from the LOG8 container 
-					throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
+			try {
+				header = HoTTbinReader.getFileInfo(HoTTbinHistoReader.filePath.toFile());
+			}
+			catch (DataTypeException e) {
+				HoTTbinHistoReader.log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), HoTTbinHistoReader.filePath)); // 'GRAUPNER SD LOG8'
+			}
+			if (header != null && header.size() > 0) {
+				if (!header.get(HoTTAdapter.FILE_PATH).equals(HoTTbinHistoReader.filePath.toString())) {
+					// accept this 'GRAUPNER SD LOG8' file, extracted file starts with '~'
+					HoTTbinHistoReader.filePath = Paths.get(header.get(HoTTAdapter.FILE_PATH));
 				}
 				int readLimitMark = (LOG_RECORD_SCAN_START + NUMBER_LOG_RECORDS_TO_SCAN) * dataBlockSize + 1;
 				if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
@@ -169,7 +171,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	* @throws DataInconsitsentException 
 	* @return
 	*/
-	private static HistoRandomSample readSingle(BufferedInputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
+	private static HistoRandomSample readSingle(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
 		final String $METHOD_NAME = "readSingle";
 		HoTTbinHistoReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinHistoReader.recordSetGeneral = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
@@ -579,7 +581,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	* @throws IOException 
 	* @throws DataInconsitsentException 
 	*/
-	private static HistoRandomSample readMultiple(BufferedInputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
+	private static HistoRandomSample readMultiple(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
 		HoTTbinHistoReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinHistoReader.recordSetGeneral = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2

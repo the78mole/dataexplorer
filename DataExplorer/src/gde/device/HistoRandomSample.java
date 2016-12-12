@@ -32,7 +32,7 @@ import gde.log.Level;
  * this may result in a small number of additional samples in areas with new min/max values.
  * b) the min/max points are identified on the basis of full sets of points.
  * so it is not sure that all individual min/max points to appear in the samples.
- * c) the algorithm may be tought with a selection of sample points to avoid areas with new min/max values which results in oversampling. 
+ * c) the algorithm may be taught with a selection of sample points to avoid areas with new min/max values which results in oversampling. 
  * a sufficient number of representative points from the same population will build an internal min/max estimation.
  * d) the samples are selected randomly. 
  * so multiple runs will neither select the same samples nor the same number of samples.
@@ -87,7 +87,7 @@ public class HistoRandomSample {
 		this.lastTimeStep = new TimeStepValues();
 		device.getDataBlockPreferredDataLocation();
 		this.recordTimespan_ms = recordTimespan_ms;
-		this.samplingTimespan_ms = Math.max(settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
+		this.samplingTimespan_ms = Math.max(this.settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", pointsLength)); //$NON-NLS-1$
 	}
 
@@ -104,8 +104,8 @@ public class HistoRandomSample {
 		this.lastTimeStep = new TimeStepValues();
 		device.getDataBlockPreferredDataLocation();
 		this.recordTimespan_ms = recordTimespan_ms;
-		this.samplingTimespan_ms = Math.max(settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", pointsLength)); //$NON-NLS-1$
+		this.samplingTimespan_ms = Math.max(this.settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", this.pointsLength)); //$NON-NLS-1$
 	}
 
 	private enum Action {

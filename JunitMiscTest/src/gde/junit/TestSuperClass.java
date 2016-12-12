@@ -252,10 +252,15 @@ public class TestSuperClass extends TestCase {
 	protected void setupDeviceChannelObject(String fileDeviceName, int activeChannelNumber, String activeObjectKey) {
 		// device : from setDevice
 		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
-		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) throw new UnsupportedOperationException("hottviewer | mpu");
+		if (fileDeviceName.toLowerCase().contains("charger308duo") || fileDeviceName.toLowerCase().contains("charger308duo")) {
+			System.out.println("skip fileDeviceName=" + fileDeviceName);
+		}
 		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
+		this.application.setActiveDeviceWoutUI(device);
+		
+		setupDataChannels(device);
 		
 		this.application.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
 	}

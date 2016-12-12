@@ -27,6 +27,9 @@ import gde.histocache.HistoVault;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * devices with history support implementations.
@@ -41,19 +44,14 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * since this is a long term operation the progress bar should be updated to signal business to user. 
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param truss vault skeleton holding the key data
+	 * @param filePath 
+	 * @param trusses referencing a subset of the recordsets in the file
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 * @throws IOException 
-	 * @return the recordset collected for the active device and active channel
+	 * @return the recordset list collected for the active device and active channel
 	 */
-	public HistoRecordSet getRecordSetFromImportFile(HistoVault truss) throws DataInconsitsentException, IOException, DataTypeException;
-
-	/**
-	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param pointsLength number of non-calculation measurement points  
-	 */
-	public void setSampling(int pointsLength);
+	public List<HistoRecordSet>  getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
