@@ -84,7 +84,7 @@ public class HistoTimeLine {
 	}
 
 	enum Density {
-		EXTREME(4), HIGH(6), MEDIUM(10), LOW(16);
+		EXTREME(4), HIGH(8), MEDIUM(10), LOW(16);
 
 		private final Settings			settings					= Settings.getInstance();
 		public final int						boxWidthAmplitude	= 2;											// box may grow or shrink by this value based on log duration
@@ -403,13 +403,13 @@ public class HistoTimeLine {
 			Collections.sort(relativeDistances);
 			// a high distanceQuantile value indicates that there is plenty of space between the x-axis points
 			double distanceQuantile = relativeDistances.get(relativeDistances.size() * (2 + 2 * (this.settings.getBoxplotScaleOrdinal() + 1)) / 10); // use relative distance and calculate lower or higher quantile according to user's priorities
-			int absoluteDistance = (int) (this.width * distanceQuantile);
+			int absoluteDistance = (int) (this.width * distanceQuantile + .5);
 			// use the box size as a standard of comparison
-			if (absoluteDistance >= Density.LOW.boxWidth)
+			if (absoluteDistance > Density.LOW.boxWidth)
 				this.density = Density.LOW;
-			else if (absoluteDistance >= Density.MEDIUM.boxWidth)
+			else if (absoluteDistance > Density.MEDIUM.boxWidth)
 				this.density = Density.MEDIUM;
-			else if (absoluteDistance >= Density.HIGH.boxWidth)
+			else if (absoluteDistance > Density.HIGH.boxWidth)
 				this.density = Density.HIGH;
 			else
 				this.density = Density.EXTREME;

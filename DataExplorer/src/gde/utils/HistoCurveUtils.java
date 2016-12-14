@@ -244,7 +244,7 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 							qLowerWhiskerY = newSuitePoints[5].y, qUpperWhiskerY = newSuitePoints[6].y;
 					final int interQuartileRange = q1PosY - q3PosY;
 					int halfBoxWidth = (int) (boxWidth
-							* (1. + (Math.sqrt(durations_mm.get(j) / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.) / 2.); // divison by 3 is the best fit divisor; 2 results in bigger modulation rates
+							* (1. + (Math.sqrt(durations_mm.get(j) / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0) / 2.); // divison by 3 is the best fit divisor; 2 results in bigger modulation rates
 					halfBoxWidth = halfBoxWidth < 1 ? 1 : halfBoxWidth;
 					// draw main box
 					gc.drawRectangle(posX - halfBoxWidth, q3PosY, halfBoxWidth * 2, interQuartileRange);

@@ -49,9 +49,9 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 * @throws IOException 
-	 * @return the recordset list collected for the active device and active channel
+	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
-	public List<HistoRecordSet>  getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException;
+	public List<HistoVault>  getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .

@@ -88,6 +88,8 @@ import gde.utils.StringHelper;
  *         &lt;element name="logFilePath" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="logFileLastModified" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="logObjectDirectory" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logFileVersion" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="logRecordSetSize" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="logRecordSetOrdinal" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="logRecordsetBaseName" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="logDeviceName" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -113,8 +115,8 @@ import gde.utils.StringHelper;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "histoVault", propOrder = { "vaultName", "vaultDirectory", "vaultCreatedMs", "vaultDataExplorerVersion", "vaultDeviceKey", "vaultDeviceName", "vaultChannelNumber", "vaultObjectKey",
-		"vaultSamplingTimespanMs", "logFilePath", "logFileLastModified", "logObjectDirectory", "logRecordSetOrdinal", "logRecordsetBaseName", "logDeviceName", "logChannelNumber", "logObjectKey",
-		"logStartTimestampMs", "measurements", "settlements", "scores" })
+		"vaultSamplingTimespanMs", "logFilePath", "logFileLastModified", "logObjectDirectory", "logFileVersion", "logRecordSetSize", "logRecordSetOrdinal", "logRecordsetBaseName", "logDeviceName",
+		"logChannelNumber", "logObjectKey", "logStartTimestampMs", "measurements", "settlements", "scores" })
 public class HistoVault {
 	final private static String	$CLASS_NAME	= HistoVault.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
@@ -155,6 +157,8 @@ public class HistoVault {
 	protected long							logFileLastModified;
 	@XmlElement(required = true)
 	protected String						logObjectDirectory;
+	protected int								logFileVersion;
+	protected int								logRecordSetSize;
 	protected int								logRecordSetOrdinal;
 	@XmlElement(required = true)
 	protected String						logRecordsetBaseName;
@@ -301,6 +305,22 @@ public class HistoVault {
 	}
 
 	/**
+	 * Gets the value of the logFileVersion property.
+	 * 
+	 */
+	public int getLogFileVersion() {
+		return logFileVersion;
+	}
+
+	/**
+	 * Gets the value of the logRecordSetSize property.
+	 * 
+	 */
+	public int getLogRecordSetSize() {
+		return logRecordSetSize;
+	}
+
+	/**
 	 * Gets the value of the logRecordSetOrdinal property.
 	 * 
 	 */
@@ -440,6 +460,8 @@ public class HistoVault {
 	 * @param objectDirectory validated object key
 	 * @param filePath file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
 	 * @param fileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
+	 * @param fileVersion is the version of the log origin file
+	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordSetOrdinal identifies multiple recordsets within on single file
 	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
@@ -447,8 +469,8 @@ public class HistoVault {
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 */
-	private HistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, long logStartTimestamp_ms,
-			int logChannelNumber, String logObjectKey) {
+	private HistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName,
+			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
 		this.vaultDataExplorerVersion = GDE.VERSION;
 		this.vaultDeviceKey = HistoVault.getActiveDeviceKey();
 		this.vaultDeviceName = this.application.getActiveDevice().getName();
@@ -457,6 +479,8 @@ public class HistoVault {
 		this.vaultSamplingTimespanMs = this.settings.getSamplingTimespan_ms();
 		this.logFilePath = filePath.toString(); // toString due to avoid 'Object' during marshalling
 		this.logFileLastModified = fileLastModified_ms;
+		this.logFileVersion = fileVersion;
+		this.logRecordSetSize = logRecordSetSize;
 		this.logObjectDirectory = objectDirectory;
 		this.logRecordSetOrdinal = logRecordSetOrdinal;
 		this.logRecordsetBaseName = logRecordSetBaseName;
@@ -475,34 +499,24 @@ public class HistoVault {
 	}
 
 	/**
-	 * @param objectDirectory validated object key
-	 * @param filePath file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param fileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param logRecordSetOrdinal identifies multiple recordsets within on single file
-	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
-	 * @param logDeviceName 
-	 * @param logChannelNumber may differ from UI settings in case of channel mix
-	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @param measurementEntries
 	 * @param settlementEntries
 	 * @param scorePoints
-	 * @return new instance with a full set of data
 	 */
-	public static HistoVault createHistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, int logRecordSetOrdinal, String logRecordsetBaseName, String logDeviceName,
-			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, Entries measurementEntries, Entries settlementEntries, EntryPoints scorePoints) {
-		HistoVault newHistoVault = new HistoVault(objectDirectory, filePath, fileLastModified_ms, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber,
-				logObjectKey);
-		newHistoVault.setMeasurements(measurementEntries);
-		newHistoVault.setSettlements(settlementEntries);
-		newHistoVault.setScores(scorePoints);
-		return newHistoVault;
+	public void complementTruss(long newStartTimestamp_ms, Entries measurementEntries, Entries settlementEntries, EntryPoints scorePoints) {
+		this.logStartTimestampMs = newStartTimestamp_ms;
+
+		this.setMeasurements(measurementEntries);
+		this.setSettlements(settlementEntries);
+		this.setScores(scorePoints);
 	}
 
 	/**
 	 * @param objectDirectory validated object key
-	 * @param filePath file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param fileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
+	 * @param file is the log origin file (not a link file)
+	 * @param fileVersion is the version of the log origin file
+	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordSetOrdinal identifies multiple recordsets within on single file
 	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
@@ -511,21 +525,30 @@ public class HistoVault {
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @return new instance with a basic set of data
 	 */
-	public static HistoVault createTruss(String objectDirectory, Path filePath, long fileLastModified_ms, int logRecordSetOrdinal, String logRecordsetBaseName, String logDeviceName,
+	public static HistoVault createTruss(String objectDirectory, File file, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal, String logRecordsetBaseName, String logDeviceName,
 			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
-		HistoVault newHistoVault = new HistoVault(objectDirectory, filePath, fileLastModified_ms, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber,
-				logObjectKey);
+		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName,
+				logStartTimestamp_ms, logChannelNumber, logObjectKey);
+		newHistoVault.setMeasurements(new Entries());
+		newHistoVault.setSettlements(new Entries());
+		newHistoVault.setScores(new EntryPoints("truss", 0));
 		return newHistoVault;
 	}
 
 	/**
 	 * @param objectDirectory validated object key
-	 * @param file bin log file
+	 * @param file is the bin origin file (not a link file)
+	 * @param fileVersion is the version of the log origin file
+	 * @param logRecordSetSize is the number of recordsets in the log origin file
+	 * @param logRecordsetBaseName the base name without recordset number
 	 * @return new instance with a basic set of data
 	 */
-	public static HistoVault createTruss(String objectDirectory, File file) {
-		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), 0, file.getName(), "native", file.lastModified(),
+	public static HistoVault createTruss(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName) {
+		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(),
 				DataExplorer.getInstance().getActiveChannelNumber(), objectDirectory);
+		newHistoVault.setMeasurements(new Entries());
+		newHistoVault.setSettlements(new Entries());
+		newHistoVault.setScores(new EntryPoints("truss", 0));
 		return newHistoVault;
 	}
 
@@ -657,8 +680,8 @@ public class HistoVault {
 		if (this.vaultName.equals(HistoVault.getVaultName(Paths.get(this.logFilePath), file.lastModified(), this.logRecordSetOrdinal))) {
 			List<HistoVault> trusses = new ArrayList<HistoVault>();
 			trusses.add(this);
-			List<HistoRecordSet> histoRecordSets = HistoOsdReaderWriter.readHisto(file.toPath(), trusses);
-			return this.getVaultName().equals(histoRecordSets.get(0).getHistoVault().getVaultName());
+			List<HistoVault> histoRecordSets = HistoOsdReaderWriter.readHisto(file.toPath(), trusses);
+			return this.getVaultName().equals(histoRecordSets.get(0).getVaultName());
 		}
 		else {
 			return false;
@@ -847,15 +870,22 @@ public class HistoVault {
 	/**
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
+	public String getVaultCreatedFormatted() {
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.vaultCreatedMs);
+	}
+
+	/**
+	 * @return yyyy-MM-dd HH:mm:ss
+	 */
 	public String getOriginLastModifiedFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.getLogFileLastModified());
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.logFileLastModified);
 	}
 
 	/**
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
 	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getLogStartTimestamp_ms());
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs);
 	}
 
 	/**
@@ -870,10 +900,22 @@ public class HistoVault {
 	}
 
 	/**
-	 * @return the validated object directory in case the log file's object key is empty
+	 * @return the non-validated object key or alternatively (if empty) the non-validated object directory
 	 */
 	public String getRectifiedObjectKey() {
 		return this.logObjectKey.isEmpty() ? this.logObjectDirectory : this.logObjectKey;
+	}
+
+	/**
+	 * @return the validated object key or alternatively (if empty) the validated object directory
+	 */
+	public String getValidatedObjectKey() {
+		String validObjectKey = this.settings.getValidatedObjectKey(this.logObjectKey).orElse(GDE.STRING_EMPTY);
+		return this.logObjectKey.isEmpty() ? this.settings.getValidatedObjectKey(this.logObjectKey).orElse(GDE.STRING_EMPTY) : validObjectKey;
+	}
+
+	public boolean isTruss() {
+		return this.measurements.entryPoints == null;
 	}
 
 	@Override
@@ -887,6 +929,7 @@ public class HistoVault {
 		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(GDE.STRING_COMMA);
 		sb.append(this.logFilePath).append(GDE.STRING_COMMA);
 		sb.append("vaultDirectory=").append(this.vaultDirectory);
+		sb.append("isTruss=").append(isTruss());
 		return sb.toString();
 	}
 }

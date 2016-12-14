@@ -85,11 +85,13 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 
 		final List<HashMap<String, String>> recordSetsProps = HistoOsdReaderWriter.getRecordSetsInfo(header);
 		for (int i = 0; i < recordSetsProps.size(); i++) {
+			final int fileVersion = Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION).trim()).intValue();
+			final int recordSetSize = Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
 			HashMap<String, String> recordSetInfo = recordSetsProps.get(i);
 			final String logRecordSetBaseName = String.format("%s | %s", recordSetInfo.get(GDE.RECORD_SET_NAME), recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME)).intern();
 			final long enhancedStartTimeStamp_ms = HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo);
 			final int channelConfigNumber = channels.getChannelNumber(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
-			trusses.add(HistoVault.createTruss(objectDirectory, file.toPath(), file.lastModified(), i, logRecordSetBaseName, header.get(GDE.DEVICE_NAME), enhancedStartTimeStamp_ms, channelConfigNumber,
+			trusses.add(HistoVault.createTruss(objectDirectory, file, fileVersion, recordSetSize, i, logRecordSetBaseName, header.get(GDE.DEVICE_NAME), enhancedStartTimeStamp_ms, channelConfigNumber,
 					logObjectKey));
 		}
 		return trusses;
@@ -115,13 +117,13 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 	 * read histo record sets from one single file. 
 	 * @param filePath 
 	 * @param trusses referencing a subset of the recordsets in the file
-	 * @return histo recordset list
+	 * @return histo vault list (may contain vaults without measurements, settlements and scores)
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	 * @throws DataInconsitsentException
 	 */
-	public static List<HistoRecordSet> readHisto(Path filePath, Collection<HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
-		List<HistoRecordSet> histoRecordSets = new ArrayList<HistoRecordSet>();
+	public static List<HistoVault> readHisto(Path filePath, Collection<HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
+		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
 		log.log(Level.FINE, "start " + filePath); //$NON-NLS-1$
 		// build job list consisting of recordset ordinal and the corresponding truss
 		Map<Integer, HistoVault> recordSetTrusses = new TreeMap<Integer, HistoVault>();
@@ -183,10 +185,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					}
 				}
 				else {
+					long nanoTime = System.nanoTime();
 					byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
 					data_in.readFully(buffer);
 					HistoRecordSet histoRecordSet = HistoOsdReaderWriter.buildRecordSet(recordSetInfo, recordSetTrusses.get(i));
-					histoRecordSets.add(histoRecordSet);
 
 					histoRecordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
 					log.log(Level.FINE, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME) + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$ //$NON-NLS-2$
@@ -236,15 +238,27 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = numberRecordSets * 1000;
 					// scores for elapsed times are filled in by the HistoRecordSet
 					histoRecordSet.setScorePoints(scores);
+					histoRecordSet.setElapsedHistoRecordSet_ns(System.nanoTime() - nanoTime);
+					if (histoRecordSet.getRecordDataSize(true) > 0) {
+						histoRecordSet.addSettlements();
+						// put all aggregated data and scores into the history vault
+						HistoVault histoVault = histoRecordSet.getHistoVault();
+						histoVaults.add(histoVault);
+					} else {
+						histoVaults.add(recordSetTrusses.get(i));
+					}
+					// reduce memory consumption in advance to the garbage collection
+					histoRecordSet.cleanup();
+
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME), //$NON-NLS-1$
 							StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", histoRecordSet.getStartTimeStamp()), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); //$NON-NLS-1$
 					// todo not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(histoRecordSet);
 				}
 			}
-			log.log(Level.TIME, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoRecordSets.size(), recordSetsInfo.size(), //$NON-NLS-1$
+			log.log(Level.TIME, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoVaults.size(), recordSetsInfo.size(), //$NON-NLS-1$
 					TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNs), recordSetTrusses.keySet().toString(), filePath));
 		}
-		return histoRecordSets;
+		return histoVaults;
 	}
 
 	/**
@@ -300,10 +314,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 				recordSymbols[i] = recordProperties.get(Record.SYMBOL) == null ? GDE.STRING_EMPTY : recordProperties.get(Record.SYMBOL);
 				recordUnits[i] = recordProperties.get(Record.UNIT) == null ? GDE.STRING_EMPTY : recordProperties.get(Record.UNIT);
 			}
-			recordSet = HistoRecordSet.createRecordSet(truss, truss.getLogRecordsetBaseName(), recordNames, recordSymbols, recordUnits);
+			recordSet = HistoRecordSet.createRecordSet(truss, recordNames, recordSymbols, recordUnits);
 		}
 		else {
-			recordSet = HistoRecordSet.createRecordSet(truss, truss.getLogRecordsetBaseName());
+			recordSet = HistoRecordSet.createRecordSet(truss);
 		}
 
 		String[] recordKeys = application.getActiveDevice().crossCheckMeasurements(recordsProperties, recordSet);
@@ -325,16 +339,17 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 
 	/**
 	 * @param recordSetComment
-	 * @return empty string if parsing was not successful.
+	 * @return names of the sensors; RECEIVER if parsing was not successful.
 	 */
 	private static String[] parseSensors(String recordSetComment) {
+		// todo calculate Sensors from raw data
 		int idx1 = recordSetComment.indexOf(GDE.STRING_LEFT_BRACKET);
 		int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
 		if (idx1 > 0 && idx2 > idx1) {
 			return recordSetComment.substring(idx1 + 1, idx2).split(","); //$NON-NLS-1$
 		}
 		else {
-			return new String[0];
+			return new String[] { "RECEIVER"};
 		}
 	}
 

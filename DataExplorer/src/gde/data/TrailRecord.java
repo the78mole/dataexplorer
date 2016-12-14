@@ -159,7 +159,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			return EnumSet.copyOf(trailTypes);
 		}
 
-		public static EnumSet<TrailType> getSuite(TrailType trailType) {
+		public static List<TrailType> getSuite(TrailType trailType) {
 			List<TrailType> trailTypes = new ArrayList<TrailType>();
 			if (trailType.isSuite()) {
 				if (trailType.equals(SUITE_REAL_AVG_SD)) {
@@ -191,12 +191,12 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					trailTypes.add(Q_975_PERMILLE);
 				}
 				else if (trailType.equals(SUITE_Q0_Q2_Q4)) {
-					trailTypes.add(Q2);
+					trailTypes.add(Q2); // master record 
 					trailTypes.add(Q0);
 					trailTypes.add(Q4);
 				}
 				else if (trailType.equals(SUITE_Q1_Q2_Q3)) {
-					trailTypes.add(Q2);
+					trailTypes.add(Q2); // master record 
 					trailTypes.add(Q1);
 					trailTypes.add(Q3);
 				}
@@ -206,7 +206,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			else {
 				trailTypes.add(trailType);
 			}
-			return EnumSet.copyOf(trailTypes);
+			return trailTypes;
 		}
 
 		public boolean isRangePlot() {
@@ -339,7 +339,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				else if (this.isSettlement())
 					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.trailTextSelectedIndex, this.getTrailOrdinal()));
 				else if (this.isScoregroup()) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST))
+						log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
 					super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
 				}
 				else
@@ -441,6 +442,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		// * this.displayScaleFactorValue).intValue());
 	}
 
+	public String getHistoTableRowText() {
+		return this.getUnit().length() > 0 ? (this.getName() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET).intern() : this.getName().intern();
+	}
+	
 	/**
 	 * get all calculated and formated data table points.
 	 * @return record name and trail text followed by formatted values as string array
@@ -448,16 +453,19 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public String[] getHistoTableRow() {
 		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
 		String[] dataTableRow = new String[masterRecord.size() + 2];
-		dataTableRow[0] = this.getUnit().length() > 0 ? (this.getName() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET).intern() : this.getName().intern();
+		dataTableRow[0] = getHistoTableRowText();
 		dataTableRow[1] = this.getTrailText().intern();
 		double factor = getFactor();
 		double offset = getOffset();
 		double reduction = getReduction();
 		if (this.getTrailRecordSuite().length == 1) { // standard curve
-			for (int i = 0; i < masterRecord.size(); i++) {
-				if (masterRecord.realRealGet(i) != null) {
-					dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(i) / 1000. - reduction) * factor + offset).intern();
-				}
+			if (this.settings.isXAxisReversed()) {
+				for (int i = 0; i < masterRecord.size(); i++)
+					if (masterRecord.realRealGet(i) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(i) / 1000. - reduction) * factor + offset).intern();
+			}
+			else {
+				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
+					if (masterRecord.realRealGet(j) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(j) / 1000. - reduction) * factor + offset).intern();
 			}
 		}
 		else {
@@ -465,28 +473,52 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				final TrailRecord lowerWhiskerRecord = this.getTrailRecordSuite()[5];
 				final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
 				final TrailRecord upperWhiskerRecord = this.getTrailRecordSuite()[6];
-				for (int i = 0; i < masterRecord.size(); i++) {
-					if (masterRecord.realRealGet(i) != null) {
-						StringBuilder sb = new StringBuilder();
-						sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
-						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((medianRecord.get(i) / 1000. - reduction) * factor + offset));
-						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
-						dataTableRow[i + 2] = sb.toString().intern();
+				if (this.settings.isXAxisReversed()) {
+					for (int i = 0; i < masterRecord.size(); i++) {
+						if (masterRecord.realRealGet(i) != null) {
+							StringBuilder sb = new StringBuilder();
+							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((medianRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
+							dataTableRow[i + 2] = sb.toString().intern();
+						}
 					}
+				}
+				else {
+					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
+						if (masterRecord.realRealGet(j) != null) {
+							StringBuilder sb = new StringBuilder();
+							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((medianRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
+							dataTableRow[i + 2] = sb.toString().intern();
+						}
 				}
 			}
 			else if (this.getTrailRecordSuite().length > 2) { // envelope		
 				final TrailRecord lowerRecord = this.getTrailRecordSuite()[1];
 				final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
 				final TrailRecord upperRecord = this.getTrailRecordSuite()[2];
-				for (int i = 0; i < masterRecord.size(); i++) {
-					if (masterRecord.realRealGet(i) != null) {
-						StringBuilder sb = new StringBuilder();
-						sb.append(this.getDecimalFormat().format((lowerRecord.get(i) / 1000. - reduction) * factor + offset));
-						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((middleRecord.get(i) / 1000. - reduction) * factor + offset));
-						sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperRecord.get(i) / 1000. - reduction) * factor + offset));
-						dataTableRow[i + 2] = sb.toString().intern();
+				if (this.settings.isXAxisReversed()) {
+					for (int i = 0; i < masterRecord.size(); i++) {
+						if (masterRecord.realRealGet(i) != null) {
+							StringBuilder sb = new StringBuilder();
+							sb.append(this.getDecimalFormat().format((lowerRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((middleRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperRecord.get(i) / 1000. - reduction) * factor + offset));
+							dataTableRow[i + 2] = sb.toString().intern();
+						}
 					}
+				}
+				else {
+					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
+						if (masterRecord.realRealGet(j) != null) {
+							StringBuilder sb = new StringBuilder();
+							sb.append(this.getDecimalFormat().format((lowerRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((middleRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperRecord.get(j) / 1000. - reduction) * factor + offset));
+							dataTableRow[i + 2] = sb.toString().intern();
+						}
 				}
 			}
 		}
@@ -684,20 +716,20 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			this.trailTextSelectedIndex = value;
 
 			if (isTrailSuite()) {
-				EnumSet<TrailType> suite = TrailType.getSuite(TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)));
+				List<TrailType> suite = TrailType.getSuite(TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)));
 				this.trailRecordSuite = new TrailRecord[suite.size()];
 				int i = 0;
 				for (TrailType trailType : suite) {
 					if (this.measurementType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.ordinal(), this.measurementType, this.parentTrail, this.size()); //$NON-NLS-1$
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.displaySequence, this.measurementType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
 					}
 					else if (this.settlementType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device,this.ordinal, "suite" + trailType.ordinal(), this.settlementType, this.parentTrail, this.size()); //$NON-NLS-1$
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.displaySequence, this.settlementType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
 					}
 					else if (this.scoregroupType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.ordinal(), this.scoregroupType, this.parentTrail, this.size()); //$NON-NLS-1$
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.displaySequence, this.scoregroupType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
 					}
 					else {
@@ -869,6 +901,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.trailRecordSuite;
 	}
 
-	// todo a bunch of base class methods is not applicable for this class (e.g. trigger): Use common base class for Trail and Record or remove inheritance from Trail and copy code from Record.
+	// todo a bunch of base class methods is not applicable for this class (e.g. trigger): Use common base class for TrailRecord and Record
 
 }

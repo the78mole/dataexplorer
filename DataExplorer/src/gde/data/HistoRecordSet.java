@@ -64,15 +64,10 @@ public class HistoRecordSet extends RecordSet {
 	final static int																initialRecordCapacity			= 5555;																					// vector capacity values are crucial for performance
 	final static int																initialSettlementCapacity	= 22;																						// vector capacity values are crucial for performance
 
-	private LinkedHashMap<String, HistoSettlement>	histoSettlements					= new LinkedHashMap<String, HistoSettlement>();	//todo a better solution would be a common base class for Record, HistoSettlement and HistoScoregroup or a common interface
+	private LinkedHashMap<String, HistoSettlement>	histoSettlements					= new LinkedHashMap<String, HistoSettlement>();
 
 	private Integer[]																scorePoints;
-	private String																	logObjectDirectory;
-	private int																			recordSetOrdinal;
-	private Path																		logFilePath;
-	private String																	logDeviceName;
-	private int																			logChannelNumber;
-	private String																	logObjectKey;
+	private HistoVault															truss;
 	private long																		elapsedHistoRecordSet_ns;
 
 	/**
@@ -85,12 +80,7 @@ public class HistoRecordSet extends RecordSet {
 	private HistoRecordSet(HistoVault truss, String recordSetBaseName, String[] recordNames) {
 		super(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), recordSetBaseName, recordNames,
 				DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), true, true);
-		this.logObjectDirectory = truss.getLogObjectDirectory();
-		this.recordSetOrdinal = truss.getLogRecordSetOrdinal();
-		this.logFilePath = Paths.get(truss.getLogFilePath());
-		this.logDeviceName = truss.getLogDeviceName();
-		this.logChannelNumber = truss.getLogChannelNumber();
-		this.logObjectKey = truss.getLogObjectKey();
+		this.truss = truss;
 		ChannelType channelType = this.device.getDeviceConfiguration().getChannel(super.getChannelConfigNumber());
 		for (SettlementType settlementType : channelType.getSettlement()) {
 			HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, this, initialSettlementCapacity);
@@ -148,12 +138,11 @@ public class HistoRecordSet extends RecordSet {
 	 * method to create a histo record set containing records according the device channel configuration
 	 * which are loaded from device properties file.
 	 * @param truss holds the base data for the forthcoming history vault
-	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(HistoVault truss, String recordSetBaseName) {
+	public static HistoRecordSet createRecordSet(HistoVault truss) {
 		String[] recordNames = DataExplorer.getInstance().getActiveDevice().getMeasurementNames(DataExplorer.getInstance().getActiveChannelNumber());
-		HistoRecordSet newRecordSet = new HistoRecordSet(truss, recordSetBaseName, recordNames);
+		HistoRecordSet newRecordSet = new HistoRecordSet(truss, truss.getLogRecordsetBaseName(), recordNames);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		newRecordSet.timeStep_ms = new TimeSteps(DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), initialRecordCapacity);
@@ -180,14 +169,13 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * @param objectDirectory validated object key
 	 * @param truss holds the base data for the forthcoming history vault
-	 * @param recordSetBaseName for the recordset from "1) Laden"  or "6) Channels [1234]"
 	 * @param recordNames array of the device supported measurement and settlement names
 	 * @param recordSymbols
 	 * @param recordUnits
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static HistoRecordSet createRecordSet(HistoVault truss, String recordSetBaseName, String[] recordNames, String[] recordSymbols, String[] recordUnits) {
-		HistoRecordSet newRecordSet = new HistoRecordSet(truss, recordSetBaseName, recordNames);
+	public static HistoRecordSet createRecordSet(HistoVault truss, String[] recordNames, String[] recordSymbols, String[] recordUnits) {
+		HistoRecordSet newRecordSet = new HistoRecordSet(truss, truss.getLogRecordsetBaseName(), recordNames);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createHistoRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		newRecordSet.timeStep_ms = new TimeSteps(DataExplorer.getInstance().getActiveDevice().getTimeStep_ms(), initialRecordCapacity);
@@ -305,11 +293,12 @@ public class HistoRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @return the fully populated history vault
+	 * @return the populated history vault
 	 */
 	public HistoVault getHistoVault() {
-		return HistoVault.createHistoVault(this.logObjectDirectory, this.logFilePath, this.logFilePath.toFile().lastModified(), this.recordSetOrdinal, this.getName(), this.logDeviceName,
-				this.getStartTimeStamp(), this.logChannelNumber, this.logObjectKey, getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
+		if (this.getRecordDataSize(true) > 0)
+			this.truss.complementTruss(this.getStartTimeStamp(), getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
+		return this.truss;
 	}
 
 	/**
@@ -328,7 +317,7 @@ public class HistoRecordSet extends RecordSet {
 
 			Record record = this.get(measurementType.getName());
 			if (record == null) {
-				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.logFilePath)); //$NON-NLS-1$
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.truss.getLogFilePath())); //$NON-NLS-1$
 			}
 			else {
 				StatisticsType measurementStatistics = measurementType.getStatistics();
@@ -344,7 +333,7 @@ public class HistoRecordSet extends RecordSet {
 					boolean isGpsCoordinates = this.device.isGPSCoordinates(record);
 					if (measurementStatistics.isAvg()) {
 						if (isTriggerLevel)
-							entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValueTriggered() != Integer.MIN_VALUE? record.getAvgValueTriggered():0);
+							entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0);
 						else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
 							if (isGpsCoordinates)
 							entryPoints.addPoint(TrailType.REAL_AVG.name(), TrailType.REAL_AVG.ordinal(), record.getAvgValue());

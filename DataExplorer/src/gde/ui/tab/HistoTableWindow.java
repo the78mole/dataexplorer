@@ -71,17 +71,17 @@ import gde.ui.menu.TabAreaContextMenu;
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	private final static String	$CLASS_NAME						= HistoTableWindow.class.getName();
-	private final static Logger	log										= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME				= HistoTableWindow.class.getName();
+	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	private final HistoSet			histoSet							= HistoSet.getInstance();
+	private final HistoSet			histoSet					= HistoSet.getInstance();
 
 	Table												dataTable;
 	TableColumn									recordsColumn;
 	TableColumn									tableCurveTypeColumn;
 	TableCursor									cursor;
-	Vector<Integer>							rowVector							= new Vector<Integer>(2);
-	Vector<Integer>							topindexVector				= new Vector<Integer>(2);
+	Vector<Integer>							rowVector					= new Vector<Integer>(2);
+	Vector<Integer>							topindexVector		= new Vector<Integer>(2);
 
 	final DataExplorer					application;
 	final Channels							channels;
@@ -90,8 +90,7 @@ public class HistoTableWindow extends CTabItem {
 	final Menu									popupmenu;
 	final TabAreaContextMenu		contextMenu;
 
-	final int										textExtentFactor			= 7;
-	final String								isoDateTimeDelimiter	= "T";															//$NON-NLS-1$
+	final int										textExtentFactor	= 7;
 
 	public HistoTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
@@ -387,6 +386,46 @@ public class HistoTableWindow extends CTabItem {
 		this.topindexVector.addElement(topindex);
 	}
 
+	public boolean isHeaderTextValid() {
+		String[] tableHeaderRow = this.histoSet.getTrailRecordSet().getTableHeaderRow();
+		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
+			boolean isValid = true;
+			for (int i = 0; i < tableHeaderRow.length; i++) {
+				String string = tableHeaderRow[i];
+				if (!tableHeaderRow[i].equals(this.dataTable.getColumn(i + 2).getText())) {
+					isValid = false;
+					break;
+				}
+			}
+			return isValid;
+		}
+		else
+			return false;
+	}
+
+	public boolean isRowTextAndTrailValid() {
+		boolean isValid = false;
+		final TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+		for (int j = 0; j < this.dataTable.getItems().length; j++) {
+			TableItem tableItem = this.dataTable.getItems()[j];
+			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
+			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
+				TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
+				if (!tableItem.getText().equals(trailRecord.getHistoTableRowText()) || !tableItem.getText(1).equals(trailRecord.getTrailText())) {
+					isValid = false;
+					break;
+				} else isValid = true;
+			}
+			else {
+				if (!tableItem.getText().isEmpty()) {
+					isValid = false;
+					break;
+				}else isValid = true;
+			}
+		}
+		return isValid;
+	}
+
 	/**
 	 * set up two header columns and columns for the trail recordsets of the histoSet timestamp range.
 	 */
@@ -408,38 +447,23 @@ public class HistoTableWindow extends CTabItem {
 		this.recordsColumn.setWidth(curveTypeHeader.length() * this.textExtentFactor * 15 / 10);
 		this.recordsColumn.setText(curveTypeHeader);
 
-		if (this.histoSet.size() > 0) {
-			// get the timestamp range and sort order
-			long minimumTimeStamp = this.histoSet.lastKey();
-			long maximumTimeStamp = this.histoSet.firstKey();
-			NavigableMap<Long, List<HistoVault>> histoSubSet = this.histoSet.subMap(maximumTimeStamp, true, minimumTimeStamp, true);
-			if (!settings.isXAxisReversed()) {
-				histoSubSet = histoSubSet.descendingMap();
-			}
-
-			// set the data columns of the new header line
-			Channel activeChannel = this.channels.getActiveChannel();
-			if (activeChannel != null) {
-				if (histoSubSet.size() > 0) {
-					for (List<HistoVault> vaults : histoSubSet.values()) {
-						for (HistoVault histoVault : vaults) {
-							StringBuilder sb = new StringBuilder();
-							ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(histoVault.getLogStartTimestamp_ms()), ZoneId.systemDefault());
-							sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
-							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-							column.setWidth(sb.length() * this.textExtentFactor * 8 / 10);
-							column.setText(sb.toString());
-						}
-					}
-				}
-				else {
-					if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //todo required??? add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-						column.setWidth(100);
-					}
+		// set the data columns of the new header line
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			String[] tableHeaderRow = this.histoSet.getTrailRecordSet().getTableHeaderRow();
+			if (tableHeaderRow.length > 0) {
+				for (String headerString : tableHeaderRow) {
+					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+					column.setWidth(headerString.length() * this.textExtentFactor * 8 / 10);
+					column.setText(headerString.intern());
 				}
 			}
-
+			else {
+				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //todo required??? add additional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+					column.setWidth(100);
+				}
+			}
 		}
 		log.log(java.util.logging.Level.FINER, "dataTable.getColumnCount() " + this.dataTable.getColumnCount()); //$NON-NLS-1$
 	}

@@ -22,6 +22,7 @@ package gde.ui.dialog;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -1742,7 +1743,15 @@ public class SettingsDialog extends Dialog {
 								this.createObjectsFromDirectoriesButton = new Button(this.objectKeyGroup, SWT.PUSH | SWT.CENTER);
 								this.createObjectsFromDirectoriesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.createObjectsFromDirectoriesButton.setText(Messages.getString(MessageIds.GDE_MSGT0836));
-								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837));
+								String toolTipExtension = String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0523), this.settings.getDataFilePath());
+								if (this.application.getActiveDevice() != null && this.settings.getSearchImportPath()) {
+									Path importPath = this.application.getActiveDevice().getDeviceConfiguration().getImportBaseDir();
+									if (importPath != null && !importPath.toString().isEmpty()) {
+										toolTipExtension += String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0846), importPath);
+									}
+								}
+								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837, new Object[] { toolTipExtension }));
+								this.cleanObjectReferecesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0221, new Object[] { this.settings.getDataFilePath() }));
 								RowData createObjectsFromDirectoriesButtonLData = new RowData();
 								createObjectsFromDirectoriesButtonLData.width = 180;
 								createObjectsFromDirectoriesButtonLData.height = 30;
@@ -1755,14 +1764,14 @@ public class SettingsDialog extends Dialog {
 										if (objectCandidates.size() > 0) {
 											String message = Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() });
 											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(message)) {
-												List<String> objectList = Arrays.asList(SettingsDialog.this.settings.getObjectList());
-												objectList.remove(0); // device oriented / gerätebezogen
-												if (objectList.addAll(objectCandidates)) {
+												List<String> objectListClone = new ArrayList<String>(Arrays.asList(SettingsDialog.this.settings.getObjectList()));
+												objectListClone.remove(0); // device oriented / gerätebezogen
+												if (objectListClone.addAll(objectCandidates)) {
 													for (String tmpObjectKey : objectCandidates) {
 														Path objectKeyDirPath = Paths.get(SettingsDialog.this.settings.getDataFilePath()).resolve(tmpObjectKey);
 														FileUtils.checkDirectoryAndCreate(objectKeyDirPath.toString());
 													}
-													SettingsDialog.this.settings.setObjectList(objectCandidates.toArray(new String[objectCandidates.size()]), SettingsDialog.this.settings.getActiveObject());
+													SettingsDialog.this.settings.setObjectList(objectListClone.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
 													SettingsDialog.this.application.setObjectList(SettingsDialog.this.settings.getObjectList(), SettingsDialog.this.settings.getActiveObject());
 													log.log(Level.FINE, "object list updated and directories created for object keys : " + objectCandidates.toString()); //$NON-NLS-1$
 												}

@@ -1552,7 +1552,7 @@ public class HoTTbinReader {
 	 * @param _buf1
 	 * @param _buf2
 	 */
-	protected static int parse4Vario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) { // todo
+	protected static int parse4Vario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) {
 																									// re-activate
 																									// LogVersion
 																									// for

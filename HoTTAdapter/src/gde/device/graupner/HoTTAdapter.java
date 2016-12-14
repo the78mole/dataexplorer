@@ -924,17 +924,31 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/* (non-Javadoc)
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
-	public List<HistoRecordSet> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
 		log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
 		if (this.getClass().equals(HoTTAdapter.class)) {
-			List<HistoRecordSet> histoRecordSets = new ArrayList<HistoRecordSet>();
+			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
 			for (HistoVault truss : trusses) {
-				if (truss.getLogFilePath().equals(filePath.toString()))
-					histoRecordSets.add(HoTTbinHistoReader.read(truss));
+				if (truss.getLogFilePath().equals(filePath.toString())) {
+					long nanoTime = System.nanoTime();
+					HistoRecordSet histoRecordSet = HoTTbinHistoReader.read(truss);
+					if (histoRecordSet.getRecordDataSize(true) > 0) {
+						histoRecordSet.setElapsedHistoRecordSet_ns(System.nanoTime() - nanoTime);
+						histoRecordSet.addSettlements();
+						// put all aggregated data and scores into the history vault
+						HistoVault histoVault = histoRecordSet.getHistoVault();
+						histoVaults.add(histoVault);
+					}
+					else {
+						histoVaults.add(truss);
+					}
+					// reduce memory consumption in advance to the garbage collection
+					histoRecordSet.cleanup();
+				}
 				else
 					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
 			}
-			return histoRecordSets;
+			return histoVaults;
 		}
 		else
 			// todo implement HoTTbinHistoReader for subclasses

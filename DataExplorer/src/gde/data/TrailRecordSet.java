@@ -20,6 +20,10 @@
 package gde.data;
 
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -30,6 +34,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.TableColumn;
 
 import gde.GDE;
 import gde.config.HistoGraphicsTemplate;
@@ -57,7 +62,8 @@ public class TrailRecordSet extends RecordSet {
 	private final static long						serialVersionUID				= -1580283867987273535L;
 	private final static Logger					log											= Logger.getLogger($CLASS_NAME);
 
-	final static int										initialRecordCapacity		= 111;																					// vector capacity values are crucial for the overall performance
+	private final static int						initialRecordCapacity		= 111;																					// vector capacity values are crucial for the overall performance
+	private final String								isoDateTimeDelimiter		= "T";																					//$NON-NLS-1$
 
 	private final HistoGraphicsTemplate	template;																																// graphics template holds view configuration
 	private final int[]									linkedOrdinals;																													// allows getting a trail record by ordinal without iterating the linked hashmap  
@@ -590,8 +596,7 @@ public class TrailRecordSet extends RecordSet {
 	 * support trail suites.
 	 * @return Record[] containing records
 	 */
-	@Override // reason is: 1. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
-	// 2. 
+	@Override // reason is:The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
 	public Record[] getRecordsSortedForDisplay() {
 		Vector<Record> displayRecords = new Vector<Record>();
 		// add the record with horizontal grid
@@ -636,6 +641,30 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
+	 * update the collection of visible and displayable records in this record set for table view.
+	 * the sort order conforms to the record insertion order.
+	 */
+	@Override // reason is display sequence independent from record names sequence (record ordinal)
+	public void updateVisibleAndDisplayableRecordsForTable() {
+		this.visibleAndDisplayableRecords.removeAllElements();
+		this.allRecords.removeAllElements();
+		// get by insertion order
+		for (Map.Entry<String, Record> entry : this.entrySet()) {
+			final TrailRecord record = (TrailRecord) entry.getValue();
+			if (record.isVisible && record.isDisplayable) this.visibleAndDisplayableRecords.add(record);
+			this.allRecords.add(record);
+		}
+	}
+
+	/**
+	 * @return visible and displayable records (p.e. to build the partial data table) in record insertion order.
+	 */
+	@Override // reason is display sequence independent from record names sequence (record ordinal)
+	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
+		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords;
+	}
+
+	/**
 	 * get all tags for all recordsets / vaults.
 	 * @param logTagOrdinal
 	 * @return empty record name and tag description as a trail text replacement followed by the tag values
@@ -661,8 +690,13 @@ public class TrailRecordSet extends RecordSet {
 			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
 
 		List<String> logTag = this.logTags.get(logTagOrdinal);
-		for (int i = 0; i < this.get(0).size(); i++) {
-			dataTableRow[i + 2] = logTag.get(i);
+		if (this.settings.isXAxisReversed()) {
+			for (int i = 0; i < this.timeStep_ms.size(); i++)
+				dataTableRow[i + 2] = logTag.get(i);
+		}
+		else {
+			for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+				dataTableRow[i + 2] = logTag.get(j);
 		}
 		return dataTableRow;
 	}
@@ -674,4 +708,27 @@ public class TrailRecordSet extends RecordSet {
 		return this.logTags;
 	}
 
+	/**
+	 * @return the column headers starting with the first data column 
+	 */
+	public String[] getTableHeaderRow() {
+		String[] headerRow = new String[this.timeStep_ms.size()];
+		if (this.settings.isXAxisReversed()) {
+			for (int i = 0; i < this.timeStep_ms.size(); i++) {
+				StringBuilder sb = new StringBuilder();
+				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) this.timeStep_ms.getTime_ms(i)), ZoneId.systemDefault());
+				sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
+				headerRow[i] = sb.toString();
+			}
+		}
+		else {
+			for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--) {
+				StringBuilder sb = new StringBuilder();
+				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) this.timeStep_ms.getTime_ms(i)), ZoneId.systemDefault());
+				sb.append(zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace(this.isoDateTimeDelimiter, GDE.STRING_BLANK));
+				headerRow[j] = sb.toString();
+			}
+		}
+		return headerRow;
+	}
 }

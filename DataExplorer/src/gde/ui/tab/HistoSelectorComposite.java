@@ -211,8 +211,9 @@ public class HistoSelectorComposite extends Composite {
 		Combo[] selectorCombos = new Combo[recordSet.size()];
 		this.editors = new TableEditor[recordSet.size()];
 		Iterator<Entry<String, Record>> iterator = recordSet.entrySet().iterator();
+		 // get by insertion order
 		for (int i = 0; iterator.hasNext(); ++i) {
-			TrailRecord record = (TrailRecord) iterator.next().getValue(); // get by insertion order
+			TrailRecord record = (TrailRecord) iterator.next().getValue(); 
 			if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, record.getName());
 			textSize = record.getName().length() * 8;
 			if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;

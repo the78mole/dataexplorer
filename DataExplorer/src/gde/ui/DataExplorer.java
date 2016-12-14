@@ -677,7 +677,7 @@ public class DataExplorer extends Composite {
 						}
 						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
 							log.log(Level.FINER, "HistoTableWindow in displayTab.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DataExplorer.this.updateHistoTabs(DataExplorer.this.rebuildStepInvisibleTab, true); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
+							DataExplorer.this.updateHistoTabs(HistoSet.RebuildStep.E_USER_INTERFACE, true); // ensures rebuild after trails change or record selector change
 						}
 					}
 				}
@@ -936,26 +936,27 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * updates the histo table from the histoset.
+	 * updates the histo table.
 	 */
 	private synchronized void updateHistoTable(boolean forceClean) {
 		//		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 		//				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
 		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()) {
-			if (forceClean) {
+			// check headers and itemsTexts in order to decide if table rebuild is required
+			if (forceClean || !this.histoTableTabItem.isRowTextAndTrailValid() || !this.histoTableTabItem.isHeaderTextValid()) {
+					GDE.display.asyncExec(new Runnable() {
+						public void run() {
+							DataExplorer.this.histoTableTabItem.setHeader();
+						}
+					});
 				GDE.display.asyncExec(new Runnable() {
+
 					public void run() {
-						DataExplorer.this.histoTableTabItem.setHeader();
+						TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
+						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
 					}
 				});
 			}
-			GDE.display.asyncExec(new Runnable() {
-
-				public void run() {
-					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-					DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
-				}
-			});
 		}
 		else {
 			//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
@@ -1987,7 +1988,8 @@ public class DataExplorer extends Composite {
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
-					|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible())) {
+					|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed()
+							&& this.histoTableTabItem.isVisible())) {
 				boolean isRebuilt = false;
 				try {
 					isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
@@ -2001,7 +2003,7 @@ public class DataExplorer extends Composite {
 
 				if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 					this.updateHistoGraphicsWindow(true);
-					this.updateHistoTable(true);
+					this.updateHistoTable(false);
 				}
 				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 				this.setProgress(100, sThreadId);
@@ -2009,8 +2011,7 @@ public class DataExplorer extends Composite {
 					if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
 						String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? DataExplorer.this.getActiveDevice().getName() : DataExplorer.this.getObjectKey();
 						String importDir = DataExplorer.this.histoSet.getValidatedImportDir() != null ? "\n" + DataExplorer.this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY;
-						this.openMessageDialog(
-								Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, DataExplorer.this.histoSet.getValidatedDataDir(),  importDir }));
+						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, DataExplorer.this.histoSet.getValidatedDataDir(), importDir }));
 					}
 					else if (DataExplorer.this.histoSet.size() >= this.settings.getMaxLogCount()) {
 						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0067));

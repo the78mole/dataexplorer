@@ -800,6 +800,7 @@ public class Settings extends Properties {
 	/**
 	 * @return standard data directory path with trailing device and / or object stripped off
 	 */
+	@Deprecated 
 	public Path getDataBaseDir() {
 		Path path = null;
 		String tmpDataDirPath = getDataFilePath();
@@ -823,23 +824,22 @@ public class Settings extends Properties {
 	public Set<String> getObjectKeyCandidates() {
 		Set<String> result = new HashSet<String>();
 		TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-		String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation()
+		Path tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir()
 				: null;
-		ArrayList<String> dirPaths = new ArrayList<String>();
-		dirPaths.add(getDataFilePath());
+		ArrayList<Path> dirPaths = new ArrayList<Path>();
+		dirPaths.add(Paths.get(getDataFilePath()));
 		if (getSearchImportPath() && tmpImportDirPath != null) dirPaths.add(tmpImportDirPath);
-		for (String tmpDataDirPath : dirPaths) {
-			if (!(tmpDataDirPath == null || tmpDataDirPath.trim().isEmpty() || tmpDataDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
-				Path path = Paths.get(tmpDataDirPath);
+		for (Path dirPath : dirPaths) {
+			if (!(dirPath == null || dirPath.toString().isEmpty())) {
 				// ignore object if path ends with a valid object
-				String directoryName = path.getFileName().toString();
-				path = getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
+				String directoryName = dirPath.getFileName().toString();
+				dirPath = getValidatedObjectKey(directoryName).isPresent() ? dirPath.getParent() : dirPath;
 				// ignore device if path ends with a valid device
-				String directoryName2 = path.getFileName().toString();
-				path = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
+				String directoryName2 = dirPath.getFileName().toString();
+				dirPath = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? dirPath.getParent() : dirPath;
 				List<File> directories = new ArrayList<File>();
 				try {
-					directories = FileUtils.getDirectories(path.toFile());
+					directories = FileUtils.getDirectories(dirPath.toFile());
 				}
 				catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -856,11 +856,11 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param objectKey is supposed to be a valid object key
+	 * @param objectKeyCandidate is supposed to be a valid object key
 	 * @return empty or the validated object key in the correct case sensitive format
 	 */
-	public Optional<String> getValidatedObjectKey(String objectKey) {
-		String key = objectKey.trim();
+	public Optional<String> getValidatedObjectKey(String objectKeyCandidate) {
+		String key = objectKeyCandidate.trim();
 		return Arrays.asList(getObjectList()).stream().filter(s -> s.equalsIgnoreCase(key)).findFirst();
 	}
 
