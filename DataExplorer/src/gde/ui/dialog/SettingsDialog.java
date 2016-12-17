@@ -140,8 +140,6 @@ public class SettingsDialog extends Dialog {
 	CCombo															histoBoxplotScale;
 	CLabel															histoBoxplotSizeAdaptationLabel;
 	CCombo															histoBoxplotSizeAdaptation;
-	CLabel															histoMaxLogLabel;
-	Text																histoMaxLogCount;
 	CLabel															histoRetrospectLabel;
 	Text																histoRetrospectMonths;
 	Button															histoSearchImportPath;
@@ -801,7 +799,7 @@ public class SettingsDialog extends Dialog {
 								public void widgetSelected(SelectionEvent evt) {
 									SettingsDialog.log.log(Level.FINEST, "histoActiveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActiveButton.getSelection());
-									application.setupHistoWindows();
+									SettingsDialog.this.application.setupHistoWindows();
 								}
 							});
 						}
@@ -830,7 +828,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoReversedButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setXAxisReversed(SettingsDialog.this.histoReversedButton.getSelection());
-										application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -860,7 +858,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSpreadGrade.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setXAxisSpreadGrade(SettingsDialog.this.histoSpreadGrade.getText().trim());
-										application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -879,7 +877,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoLogarithmicDistanceButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setXAxisLogarithmicDistance(SettingsDialog.this.histoLogarithmicDistanceButton.getSelection());
-										application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -909,7 +907,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoQuantilesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setQuantilesActive(SettingsDialog.this.histoQuantilesButton.getSelection());
-										application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -939,7 +937,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoBoxplotScale.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setBoxplotScale(SettingsDialog.this.histoBoxplotScale.getText().trim());
-										application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -969,7 +967,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoBoxplotSizeAdaptation.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setBoxplotSizeAdaptation(SettingsDialog.this.histoBoxplotSizeAdaptation.getText().trim());
-										application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -985,64 +983,8 @@ public class SettingsDialog extends Dialog {
 							this.histoFileContentsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.histoFileContentsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0804));
 							{
-								this.histoMaxDurationLabel = new CLabel(this.histoFileContentsGroup, SWT.NONE);
-								FormData formData = new FormData();
-								this.histoMaxDurationLabel.setLayoutData(formData);
-								this.histoMaxDurationLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoMaxDurationLabel.setBounds(15, GDE.IS_MAC_COCOA ? 8 : 20, 90, 20);
-								this.histoMaxDurationLabel.setText(Messages.getString(MessageIds.GDE_MSGT0805));
-								this.histoMaxDurationLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0806));
-							}
-							{
-								this.histoMaxLogDuration = new Text(this.histoFileContentsGroup, SWT.RIGHT | SWT.BORDER);
-								FormData formData = new FormData();
-								formData.right = new FormAttachment(100, -5);
-								this.histoMaxLogDuration.setLayoutData(formData);
-								this.histoMaxLogDuration.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoMaxLogDuration.setBounds(260, GDE.IS_MAC_COCOA ? 8 : 18, 181, GDE.IS_LINUX ? 22 : 20);
-								//									this.defaultDataPath.setBounds(107, GDE.IS_MAC_COCOA ? 6 : 18, 295, GDE.IS_LINUX ? 22 : 20);
-								this.histoMaxLogDuration.setText(String.format("  %9d", 99999));
-								this.histoMaxLogDuration.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0806));
-								this.histoMaxLogDuration.addVerifyListener(new VerifyListener() {
-									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
-										e.doit = StringHelper.verifyPortInput(e.text.trim());
-									}
-								});
-								this.histoMaxLogDuration.addKeyListener(new KeyAdapter() {
-									@Override
-									public void keyReleased(KeyEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "histoMaxLogDuration.keyReleased, event=" + evt); //$NON-NLS-1$
-										//SettingsDialog.this.settings.setMaxLogDuration_mm(SettingsDialog.this.histoMaxLogDuration.getText());
-									}
-								});
-								this.histoMaxLogDuration.addVerifyListener(new VerifyListener() {
-									@Override
-									public void verifyText(VerifyEvent e) {
-										if (!(Character.isDigit(e.character) || e.keyCode == 8 || e.keyCode == 127)) e.doit = false;
-									}
-								});
-								this.histoMaxLogDuration.addFocusListener(new FocusListener() {
-									private String trimmedInitialText;
-
-									@Override
-									public void focusLost(FocusEvent e) {
-										if (!trimmedInitialText.equals(histoMaxLogDuration.getText().trim())) {
-											application.setupHistoWindows();
-										}
-									}
-
-									@Override
-									public void focusGained(FocusEvent e) {
-										trimmedInitialText = histoMaxLogDuration.getText().trim();
-
-									}
-								});
-							}
-							{
 								this.histoSamplingLabel = new CLabel(this.histoFileContentsGroup, SWT.NONE);
 								FormData formData = new FormData();
-								formData.top = new FormAttachment(this.histoMaxDurationLabel, 5);
 								this.histoSamplingLabel.setLayoutData(formData);
 								this.histoSamplingLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSamplingLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
@@ -1065,7 +1007,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSamplingTimespan_ms.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSamplingTimespan_ms(SettingsDialog.this.histoSamplingTimespan_ms.getText().trim());
-										application.setupHistoWindows();
+										SettingsDialog.this.application.setupHistoWindows();
 									}
 								});
 							}
@@ -1084,7 +1026,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoChannelMix.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setChannelMix(SettingsDialog.this.histoChannelMix.getSelection());
-										application.setupHistoWindows();
+										SettingsDialog.this.application.setupHistoWindows();
 									}
 								});
 							}
@@ -1137,69 +1079,14 @@ public class SettingsDialog extends Dialog {
 
 									@Override
 									public void focusLost(FocusEvent e) {
-										if (!trimmedInitialText.equals(histoRetrospectMonths.getText().trim())) {
-											application.updateHistoTabs(true);
+										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
+											SettingsDialog.this.application.updateHistoTabs(true);
 										}
 									}
 
 									@Override
 									public void focusGained(FocusEvent e) {
-										trimmedInitialText = histoRetrospectMonths.getText().trim();
-
-									}
-								});
-							}
-							{
-								this.histoMaxLogLabel = new CLabel(this.histoScreeningGroup, SWT.NONE);
-								FormData formData = new FormData();
-								formData.top = new FormAttachment(this.histoRetrospectMonths, 5);
-								this.histoMaxLogLabel.setLayoutData(formData);
-								this.histoMaxLogLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoMaxLogLabel.setText(Messages.getString(MessageIds.GDE_MSGT0810));
-								this.histoMaxLogLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0811));
-							}
-							{
-								this.histoMaxLogCount = new Text(this.histoScreeningGroup, SWT.RIGHT | SWT.BORDER);
-								FormData formData = new FormData();
-								formData.right = new FormAttachment(100, -5);
-								formData.top = new FormAttachment(this.histoRetrospectMonths, 5);
-								this.histoMaxLogCount.setLayoutData(formData);
-								this.histoMaxLogCount.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								//								this.defaultDataPath.setBounds(107, GDE.IS_MAC_COCOA ? 6 : 18, 295, GDE.IS_LINUX ? 22 : 20);
-								this.histoMaxLogCount.setText(String.format("  %8d", SettingsDialog.this.settings.getMaxLogCount()));
-								this.histoMaxLogCount.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0811));
-								this.histoMaxLogCount.addVerifyListener(new VerifyListener() {
-									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
-										e.doit = StringHelper.verifyPortInput(e.text.trim());
-									}
-								});
-								this.histoMaxLogCount.addKeyListener(new KeyAdapter() {
-									@Override
-									public void keyReleased(KeyEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "histoMaxLogCount.keyReleased, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.setMaxLogCount(SettingsDialog.this.histoMaxLogCount.getText());
-									}
-								});
-								this.histoMaxLogCount.addVerifyListener(new VerifyListener() {
-									@Override
-									public void verifyText(VerifyEvent e) {
-										if (!(Character.isDigit(e.character) || e.keyCode == 8 || e.keyCode == 127)) e.doit = false;
-									}
-								});
-								this.histoMaxLogCount.addFocusListener(new FocusListener() {
-									private String trimmedInitialText;
-
-									@Override
-									public void focusLost(FocusEvent e) {
-										if (!trimmedInitialText.equals(histoMaxLogCount.getText().trim())) {
-											application.updateHistoTabs(true);
-										}
-									}
-
-									@Override
-									public void focusGained(FocusEvent e) {
-										trimmedInitialText = histoMaxLogCount.getText().trim();
+										this.trimmedInitialText = SettingsDialog.this.histoRetrospectMonths.getText().trim();
 
 									}
 								});
@@ -1208,7 +1095,7 @@ public class SettingsDialog extends Dialog {
 								this.histoSearchDataPathImports = new Button(this.histoScreeningGroup, SWT.CHECK);
 								FormData formData = new FormData();
 								formData.left = new FormAttachment(0, 5);
-								formData.top = new FormAttachment(this.histoMaxLogCount, 7);
+								formData.top = new FormAttachment(this.histoRetrospectMonths, 7);
 								this.histoSearchDataPathImports.setLayoutData(formData);
 								this.histoSearchDataPathImports.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSearchDataPathImports.setText(Messages.getString(MessageIds.GDE_MSGT0834));
@@ -1219,7 +1106,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
-										application.updateHistoTabs(true);
+										SettingsDialog.this.application.updateHistoTabs(true);
 									}
 								});
 							}
@@ -1238,7 +1125,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										application.updateHistoTabs(true);
+										SettingsDialog.this.application.updateHistoTabs(true);
 									}
 								});
 							}
@@ -1265,7 +1152,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoSkipFilesWithoutObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setFilesWithoutObject(SettingsDialog.this.histoSkipFilesWithoutObject.getSelection());
-											application.setupHistoWindows();
+											SettingsDialog.this.application.setupHistoWindows();
 										}
 									});
 								}
@@ -1280,7 +1167,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoSkipFilesWithOtherObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setFilesWithOtherObject(SettingsDialog.this.histoSkipFilesWithOtherObject.getSelection());
-											application.setupHistoWindows();
+											SettingsDialog.this.application.setupHistoWindows();
 										}
 									});
 								}
@@ -1329,7 +1216,7 @@ public class SettingsDialog extends Dialog {
 								this.fontSizeGroup.addListener(SWT.Selection, new Listener() {
 									@Override
 									public void handleEvent(Event evt) {
-										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(fontCorrection[0] / 10.0);
+										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(SettingsDialog.this.fontCorrection[0] / 10.0);
 									}
 								});
 							}
@@ -1798,7 +1685,7 @@ public class SettingsDialog extends Dialog {
 								this.clearHistoCacheButton = new Button(this.histoToolsGroup, SWT.PUSH | SWT.CENTER);
 								this.clearHistoCacheButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.clearHistoCacheButton.setText(Messages.getString(MessageIds.GDE_MSGT0829));
-								this.clearHistoCacheButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0830));
+								this.clearHistoCacheButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0830, new Object[] { this.settings.getHistoCacheDirectory().toString() }));
 								RowData clearHistoCacheButtonLData = new RowData();
 								clearHistoCacheButtonLData.width = 180;
 								clearHistoCacheButtonLData.height = 30;

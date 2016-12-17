@@ -453,7 +453,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public String[] getHistoTableRow() {
 		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
 		String[] dataTableRow = new String[masterRecord.size() + 2];
-		dataTableRow[0] = getHistoTableRowText();
+		dataTableRow[0] = getHistoTableRowText().intern();
 		dataTableRow[1] = this.getTrailText().intern();
 		double factor = getFactor();
 		double offset = getOffset();

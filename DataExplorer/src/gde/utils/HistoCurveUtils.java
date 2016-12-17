@@ -151,7 +151,7 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 			points = record.getDisplayPoints(timeLine, x0, y0);
 		}
 		Point newPoint, oldPoint = null;
-		for (int j = 0; j < points.length && j <= displayableSize && displayableSize > 1; j++) {
+		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
 				drawHistoMarker(gc, newPoint, record.getColor(), timeLine.getDensity());
 				if (oldPoint != null) {
@@ -205,7 +205,7 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 		if (record.getParent().isCompareSet()) {// todo not supported // compare set might contain records with different size
 			throw new UnsupportedOperationException();
 		}
-		else if (record.getDevice().isGPSCoordinates(record)) { // todo not supported
+		else if (record.getDevice().isGPSCoordinates(record)) { // todo GPS not supported
 			// points = record.getGpsDisplayPoints(timeLine, x0, y0);
 			throw new UnsupportedOperationException();
 		}
@@ -230,7 +230,7 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 		List<Integer> durations_mm = ((TrailRecordSet) record.getParent()).getDurations_mm();
 		Point[] newSuitePoints = new Point[record.getTrailRecordSuite().length]; // all points for the current x-axis position
 		Point[] oldSuitePoints = new Point[record.getTrailRecordSuite().length]; // all points for the previous x-axis position
-		for (int j = 0; j < suitePoints.get(0).length && j <= displayableSize && displayableSize > 1; j++) {
+		for (int j = 0; j < suitePoints.get(0).length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((suitePoints.get(0)[j]) != null) { // in case of a suite the master triggers the display of all trails
 				for (int i = 0; i < record.getTrailRecordSuite().length; i++) {
 					oldSuitePoints[i] = newSuitePoints[i];

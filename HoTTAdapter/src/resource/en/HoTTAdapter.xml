@@ -105,6 +105,97 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Time steps</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="averageTimeStep_ms" value="Average" type="String" description="Average"/>
+                <score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
+                <score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
+                <score label="sigmaTimeStep_ms" value="Standard deviation" type="String" description="Standard deviation"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Package lost duration</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="lostPackagesAvg_ms" value="Average" type="String" description="Average"/>
+                <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
+                <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
+                <score label="lostPackagesSigma_ms" value="Standard deviation" type="String" description="Standard deviation"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Packages lost</name>
+                <symbol></symbol>
+                <unit>‰</unit>
+                <active>true</active>
+                <score label="lostPackagesPerMille" value="Package lost ratio" type="String" description="lost packages / total packages"/>
+                <property name="factor" value="0.1" type="Double"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Sensors</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="sensors" value="Count" type="String"/>
+                <score label="sensorVario" value="Vario" type="String"/>
+                <score label="sensorGps" value="GPS" type="String"/>
+                <score label="sensorGam" value="GAM" type="String"/>
+                <score label="sensorEam" value="EAM" type="String"/>
+                <score label="sensorEsc" value="ESC" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="6">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="7">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="8">
+                <name>Recordsets</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logFileRecordSets" value="Count" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="9">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
             </Channel>
         <Channel type="TYPE_CONFIG" name="Vario">
             <Measurement>
@@ -167,6 +258,50 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_CONFIG" name="GPS">
             <Measurement>
@@ -264,6 +399,50 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Universal">
             <Measurement>
@@ -442,6 +621,50 @@
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Elektro">
             <Measurement>
@@ -685,6 +908,50 @@
                 <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Channels">
             <Measurement>
@@ -864,6 +1131,50 @@
                 <active>false</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorDriver">
             <Measurement>
@@ -968,6 +1279,50 @@
                 <active>true</active>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="4">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+            </Scoregroup>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
         <property name="enable_channel" value="false" type="Boolean"/>

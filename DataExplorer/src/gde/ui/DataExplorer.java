@@ -185,8 +185,8 @@ public class DataExplorer extends Composite {
 	CellVoltageWindow							cellVoltageTabItem;
 	FileCommentWindow							fileCommentTabItem;
 	ObjectDescriptionWindow				objectDescriptionTabItem;
-	HistoGraphicsWindow						histoGraphicsTabItem;																																					// todo same as DataTableWindow
-	HistoTableWindow							histoTableTabItem;																																						// todo same as DataTableWindow
+	HistoGraphicsWindow						histoGraphicsTabItem;
+	HistoTableWindow							histoTableTabItem;
 	final Vector<CTabItem>				customTabItems										= new Vector<CTabItem>();
 	GraphicsWindow								utilGraphicsTabItem;
 	Composite											tabComposite;
@@ -944,11 +944,11 @@ public class DataExplorer extends Composite {
 		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()) {
 			// check headers and itemsTexts in order to decide if table rebuild is required
 			if (forceClean || !this.histoTableTabItem.isRowTextAndTrailValid() || !this.histoTableTabItem.isHeaderTextValid()) {
-					GDE.display.asyncExec(new Runnable() {
-						public void run() {
-							DataExplorer.this.histoTableTabItem.setHeader();
-						}
-					});
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						DataExplorer.this.histoTableTabItem.setHeader();
+					}
+				});
 				GDE.display.asyncExec(new Runnable() {
 
 					public void run() {
@@ -960,7 +960,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
-			if (false) { //todo cleaning the table is not supported currently
+			if (false) { //todo is there any requirement to clean the table ???
 				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 					if (this.histoTableTabItem != null) {
 						this.histoTableTabItem.cleanTable();
@@ -975,7 +975,6 @@ public class DataExplorer extends Composite {
 						}
 					});
 				}
-
 			}
 		}
 	}
@@ -1999,6 +1998,7 @@ public class DataExplorer extends Composite {
 					if (isWithUi) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 					// TODO where to go on in case of error? NullPointerException lead to next error
 					e.printStackTrace();
+					return;
 				}
 
 				if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
@@ -2012,9 +2012,6 @@ public class DataExplorer extends Composite {
 						String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? DataExplorer.this.getActiveDevice().getName() : DataExplorer.this.getObjectKey();
 						String importDir = DataExplorer.this.histoSet.getValidatedImportDir() != null ? "\n" + DataExplorer.this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY;
 						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, DataExplorer.this.histoSet.getValidatedDataDir(), importDir }));
-					}
-					else if (DataExplorer.this.histoSet.size() >= this.settings.getMaxLogCount()) {
-						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0067));
 					}
 				}
 				// determine the rebuild action for the invisible histo tabs or those which are not selected
@@ -2044,6 +2041,7 @@ public class DataExplorer extends Composite {
 							if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 							// TODO Auto-generated catch block
 							e.printStackTrace();
+							return;
 						}
 
 						if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
@@ -2055,9 +2053,6 @@ public class DataExplorer extends Composite {
 						if (isWithUi && rebuildStep == RebuildStep.B_HISTORECORDSETS) {
 							if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
 								DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
-							}
-							else if (DataExplorer.this.histoSet.size() >= DataExplorer.this.settings.getMaxLogCount()) {
-								DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0067));
 							}
 						}
 						// determine the rebuild action for the invisible histo tabs or those which are not selected
@@ -2408,19 +2403,6 @@ public class DataExplorer extends Composite {
 					recordSet.clearMeasurementModes();
 					this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
-			}
-		}
-	}
-
-	/**
-	 * clear measurement pointer
-	 */
-	public void clearHistoMeasurementModes() {
-		boolean isWindowTypeHisto = isRecordSetVisible(GraphicsWindow.TYPE_HISTO);
-		if (DataExplorer.this.histoSet.size() == 0) {
-			if (isWindowTypeHisto) {
-				this.histoSet.clearMeasurementModes();
-				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			}
 		}
 	}
@@ -3024,7 +3006,6 @@ public class DataExplorer extends Composite {
 				int position = (this.displayTab.getItems().length < DataExplorer.TAB_INDEX_HISTO_GRAPHIC ? this.displayTab.getItems().length : DataExplorer.TAB_INDEX_HISTO_GRAPHIC);
 				this.histoGraphicsTabItem = new HistoGraphicsWindow(this.displayTab, SWT.NONE, position);
 				this.histoGraphicsTabItem.create();
-				// todo create selection listener
 			}
 		}
 		else {

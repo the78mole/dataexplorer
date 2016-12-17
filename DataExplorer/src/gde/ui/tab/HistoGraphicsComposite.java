@@ -630,7 +630,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			}
 			break;
 		}
-		if (recordSet != null && recordSet.realSize() > 0 && this.histoSet.size() > 0) {
+		if (recordSet != null && recordSet.realSize() > 0 ) {
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
@@ -735,10 +735,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		gc.fillRectangle(this.curveAreaBounds);
 		gc.setBackground(this.surroundingBackground);
 
-		long minimumTimeStamp = this.histoSet.lastKey(); // todo WRONG : for zoom must be leftPixelPosition etc
-		long maximumTimeStamp = this.histoSet.firstKey();
-		this.timeLine.initialize(recordSet, width, maximumTimeStamp, minimumTimeStamp);
-
+		this.timeLine.initialize(recordSet, width, ((TrailRecordSet) recordSet).getMaxTimeStamp(), ((TrailRecordSet) recordSet).getMinTimeStamp());
 		this.timeLine.drawTimeLine(gc, x0, y0);
 
 		// draw draw area bounding

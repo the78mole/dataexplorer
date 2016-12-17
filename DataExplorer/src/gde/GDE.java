@@ -83,6 +83,7 @@ public class GDE {
 
 	// ****** begin global constants section *******
 	public static final String							VERSION														= "Version 3.2.8";																																																					//$NON-NLS-1$
+	public static final int									VERSION_NUMBER										= Integer.parseInt(GDE.VERSION.substring(8).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 	public static final String							NAME_SHORT												= "GDE";																																																										//$NON-NLS-1$
 	public static final String							NAME_LONG													= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String							DEVICE_PROPERTIES_XSD_VERSION			= "_V30";																																																										//$NON-NLS-1$
@@ -125,6 +126,7 @@ public class GDE {
 	public static final String							STRING_COLON											= ":";																																																											//$NON-NLS-1$
 	public static final String							STRING_BLANK_COLON_BLANK					= " : ";																																																										//$NON-NLS-1$
 	public static final String							STRING_COMMA											= ",";																																																											//$NON-NLS-1$
+	public static final String							STRING_COMMA_BLANK								= ", ";																																																											//$NON-NLS-1$
 	public static final String							STRING_SEMICOLON									= ";";																																																											//$NON-NLS-1$
 	public static final String							STRING_DOT												= ".";																																																											//$NON-NLS-1$
 	public static final String							STRING_EQUAL											= "=";																																																											//$NON-NLS-1$

@@ -31,7 +31,7 @@
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>/Users/brueg/Documents/DataExplorer/HoTTAdapter_Problem/Ralf Helbing</preferredDataLocation>
+        <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.bin</preferredFileExtention>
     </DataBlock>
     <State>

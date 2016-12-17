@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -925,8 +924,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
 	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-		log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
 		if (this.getClass().equals(HoTTAdapter.class)) {
+			log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
 			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
 			for (HistoVault truss : trusses) {
 				if (truss.getLogFilePath().equals(filePath.toString())) {

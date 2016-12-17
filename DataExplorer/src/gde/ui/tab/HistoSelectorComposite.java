@@ -19,7 +19,6 @@
 package gde.ui.tab;
 
 import gde.GDE;
-import gde.data.Channels;
 import gde.data.HistoSet;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -32,9 +31,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
 
-import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +67,6 @@ public class HistoSelectorComposite extends Composite {
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
 	private final DataExplorer			application							= DataExplorer.getInstance();
-	private final Channels					channels								= Channels.getInstance();
 	private final HistoSet					histoSet								= HistoSet.getInstance();
 	final SashForm									parent;
 	final String										headerText;
@@ -309,7 +305,6 @@ public class HistoSelectorComposite extends Composite {
 				}
 				activeRecord.getParent().syncScaleOfSyncableRecords();
 				activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
-				if (activeRecord.getParent().getVisibleAndDisplayableRecordsForMeasurement().size() == 0) HistoSelectorComposite.this.application.clearHistoMeasurementModes();
 			}
 		}
 	}

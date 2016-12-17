@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -404,25 +403,32 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		List<HistoVault> histoVaults = null;
 		if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) && this.application.getActiveDevice() instanceof IHistoDevice) {
 			histoVaults = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
+			if (histoVaults == null) {
+				histoVaults = new ArrayList<HistoVault>();
+				log.log(Level.INFO, String.format("file format not supported: device = %s  channelConfigNumber = %d  histoFilePath = %s", //$NON-NLS-1$
+						this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
+			}
 		}
 		else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
 			histoVaults = HistoOsdReaderWriter.readHisto(filePath, trusses.values());
 		}
-		else {
+		
+		if (histoVaults == null) {
 			log.log(Level.INFO, String.format("file format not supported: device = %s  channelConfigNumber = %d  histoFilePath = %s", //$NON-NLS-1$
 					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
 			throw new RuntimeException(String.format("file format not supported: device = %s  channelConfigNumber = %d  histoFilePath = %s", //$NON-NLS-1$
 					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
 		}
-
-		// put vaults into the histoSet
-		for (HistoVault histoVault : histoVaults) {
-			if (!histoVault.isTruss()) {
-				List<HistoVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
-				if (timeStampHistoVaults == null) {
-					this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<HistoVault>());
+		else {
+			// put vaults into the histoSet
+			for (HistoVault histoVault : histoVaults) {
+				if (!histoVault.isTruss()) {
+					List<HistoVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
+					if (timeStampHistoVaults == null) {
+						this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<HistoVault>());
+					}
+					timeStampHistoVaults.add(histoVault);
 				}
-				timeStampHistoVaults.add(histoVault);
 			}
 		}
 		return histoVaults;
@@ -563,7 +569,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		//		this.validatedChannel = this.application.getActiveChannel();
 
 		if (filePath == null)
-			this.validatedDataDir = this.settings.getDataBaseDir();
+			this.validatedDataDir = Paths.get(this.settings.getDataFilePath());
 		else
 			this.validatedDataDir = filePath;
 		this.validatedImportDir = null;
@@ -596,10 +602,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 	/**
 	 * determine file paths from an input directory and an import directory which fit to the objectKey, the device, the channel and the file extensions.
-	 * resets the histoset singleton if the trail is invalid.
-	 * decide if the file list valid via comparison against the last call of this method.
-	 * @param rebuildStep define which steps during histo data collection are skipped
-	 * @return true if the list of file paths has already been valid (no modification by this method)
+	 * @param rebuildStep defines which steps during histo data collection are skipped
+	 * @return true if the list of file paths has already been valid
 	 * @throws NotSupportedFileFormatException 
 	 * @throws IOException 
 	 */
@@ -630,8 +634,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		isFullChange = isFullChange || (lastImportExtention != null ? !lastImportExtention.equals(this.validatedImportExtention) : this.validatedImportExtention != null);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
 
-		if (isFullChange) {
-			if (this.validatedDataDir != null) {
+		if (this.validatedDataDir != null) {
+			if (isFullChange) {
 				this.histoFilePaths.clear();
 				{
 					FileUtils.checkDirectoryAndCreate(this.validatedDataDir.toString());
@@ -850,7 +854,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 	@Deprecated
 	public void clearMeasurementModes() {
-		// todo Auto-generated method stub -> copy from RecordSet
 		throw new UnsupportedOperationException();
 	}
 
@@ -889,27 +892,23 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		if (fileName.contains(GDE.STRING_UNDER_BAR)) {
 			try {
 				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET
-						+ fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
-			} catch (Exception e) {
-				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET
-							+ fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR))
-							+ GDE.STRING_RIGHT_BRACKET;
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
-		} else {
+			catch (Exception e) {
+				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+			}
+		}
+		else {
 			try {
 				Integer.parseInt(fileName.substring(0, 4));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4)
-						+ GDE.STRING_RIGHT_BRACKET;
-			} catch (Exception e) {
-				if (fileName.substring(0, fileName.length()).length() <= 8 + 4)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4)
-							+ GDE.STRING_RIGHT_BRACKET;
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
+			}
+			catch (Exception e) {
+				if (fileName.substring(0, fileName.length()).length() <= 8 + 4) recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}
 		return recordSetNameExtend;
 	}
-
 
 }

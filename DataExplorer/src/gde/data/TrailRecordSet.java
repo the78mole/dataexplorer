@@ -323,7 +323,7 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * set time steps for the trail recordset and the data points for all trail records.
+	 * set time steps for the trail recordset and the data points for all displayable trail records.
 	 * every record takes the selected trail type / score data from the history vault and populates its data. 
 	 */
 	public void setPoints() {
@@ -334,7 +334,7 @@ public class TrailRecordSet extends RecordSet {
 				this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getLogStartTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
 				this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10);
-				for (String recordName : this.getRecordNames()) {
+				for (String recordName : this.getDisplayableRecordNames()) {
 					((TrailRecord) this.get(recordName)).add(histoVault);
 				}
 			}
@@ -349,13 +349,19 @@ public class TrailRecordSet extends RecordSet {
 	 */
 	public void setPoints(int recordOrdinal) {
 		TrailRecord trailRecord = (TrailRecord) super.get(recordOrdinal);
-		trailRecord.clear();
-		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
-			for (HistoVault histoVault : entry.getValue()) {
-				trailRecord.add(histoVault);
+		// the vault does hot hold data for non displayable records (= inactive records)
+		if (trailRecord.isDisplayable) {
+			trailRecord.clear();
+			for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
+				for (HistoVault histoVault : entry.getValue()) {
+					trailRecord.add(histoVault);
+				}
 			}
+			syncScaleOfSyncableRecords();
 		}
-		syncScaleOfSyncableRecords();
+		else {
+			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, "access vault for non displayable record " + trailRecord.getName()); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -376,13 +382,13 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * inform trail records about the trail types which are allowed, set trail selection list and current trailType / score. 
+	 * inform displayable trail records about the trail types which are allowed, set trail selection list and current trailType / score. 
 	 * @param isLiveActive 
 	 */
 	public void defineTrailTypes() {
-		String[] trailRecordNames = super.getRecordNames();
+		String[] trailRecordNames = this.getDisplayableRecordNames();
 		for (int j = 0; j < trailRecordNames.length; j++) {
-			TrailRecord trailRecord = ((TrailRecord) super.get(trailRecordNames[j]));
+			TrailRecord trailRecord = ((TrailRecord) this.get(trailRecordNames[j]));
 			trailRecord.setApplicableTrailTypes();
 			applyTemplateTrailData(trailRecord.getOrdinal());
 		}
@@ -525,12 +531,13 @@ public class TrailRecordSet extends RecordSet {
 	 * at least an update of the graphics window should be included at the end of this method.
 	 */
 	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
+		// todo check if setting records to displayable is required for trailRecordSets: the current isActive settings should be valid for display --> remove this method
 		int displayableCounter = 0;
 		for (int i = 0; i < this.size(); ++i) {
 			Record record = this.get(i);
 			if (includeReasonableDataCheck) {
-				record.setDisplayable(record.isActive() || record.hasReasonableData()); // todo was initially: (record.hasReasonableData());
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
+				// todo record.setDisplayable(record.isActive() || record.hasReasonableData()); // was initially: (record.hasReasonableData());
+				//	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -730,5 +737,13 @@ public class TrailRecordSet extends RecordSet {
 			}
 		}
 		return headerRow;
+	}
+	
+	public long getMaxTimeStamp() {
+		return this.timeStep_ms.get(0) / 10;
+	}
+
+	public long getMinTimeStamp() {
+		return this.timeStep_ms.get(this.timeStep_ms.size() - 1) / 10;
 	}
 }

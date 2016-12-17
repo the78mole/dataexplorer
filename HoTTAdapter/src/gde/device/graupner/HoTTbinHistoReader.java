@@ -120,7 +120,6 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		File file = HoTTbinHistoReader.filePath.toFile();
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
-		Channel activeChannel = device.channels.getActiveChannel(); //  // HoTTbinHistoReader.application.getActiveChannel();
 		tmpRecordSet = HistoRecordSet.createRecordSet(truss);
 		tmpRecordSet.setStartTimeStamp(file.lastModified());
 		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + ((HistoRecordSet) tmpRecordSet).getStartTimeStampFormatted());
@@ -528,8 +527,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 				scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.GAM.name()) ? 1000 : 0;
 				scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
 				scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
-				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) (HoTTbinHistoReader.filePath.getFileName().toString().startsWith(GDE.TEMP_FILE_STEM.substring(0, 1)) ? 4.2 * 1000 : 4.0 * 1000); // V4 with and without container
 				scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 				scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
 				scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
 				scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000;
@@ -911,8 +911,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 				scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.GAM.name()) ? 1000 : 0;
 				scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
 				scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
-				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) (HoTTbinHistoReader.filePath.getFileName().toString().startsWith(GDE.TEMP_FILE_STEM.substring(0, 1)) ? 4.2 * 1000 : 4.0 * 1000); // V4 with and without container
 				scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
+				scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 				scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
 				scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
 				scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.values.length;

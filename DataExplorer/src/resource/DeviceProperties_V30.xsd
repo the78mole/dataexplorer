@@ -938,6 +938,7 @@
 			<xs:enumeration value="sensorEsc" />
 			<xs:enumeration value="logDataVersion" />
 			<xs:enumeration value="logDataExplorerVersion" />
+			<xs:enumeration value="logFileVersion" />
 			<xs:enumeration value="logRecordSetBytes" />
 			<xs:enumeration value="logFileBytes" />
 			<xs:enumeration value="logFileRecordSets" />

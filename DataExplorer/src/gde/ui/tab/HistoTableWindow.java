@@ -18,12 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.NavigableMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +53,6 @@ import gde.data.Channels;
 import gde.data.HistoSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
-import gde.histocache.HistoVault;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -391,11 +384,9 @@ public class HistoTableWindow extends CTabItem {
 		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
 			boolean isValid = true;
 			for (int i = 0; i < tableHeaderRow.length; i++) {
-				String string = tableHeaderRow[i];
-				if (!tableHeaderRow[i].equals(this.dataTable.getColumn(i + 2).getText())) {
-					isValid = false;
+				isValid = tableHeaderRow[i].equals(this.dataTable.getColumn(i + 2).getText());
+				if (!isValid) 
 					break;
-				}
 			}
 			return isValid;
 		}
@@ -411,17 +402,13 @@ public class HistoTableWindow extends CTabItem {
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
 			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
 				TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
-				if (!tableItem.getText().equals(trailRecord.getHistoTableRowText()) || !tableItem.getText(1).equals(trailRecord.getTrailText())) {
-					isValid = false;
-					break;
-				} else isValid = true;
+				isValid = tableItem.getText().equals(trailRecord.getHistoTableRowText()) && tableItem.getText(1).equals(trailRecord.getTrailText());
 			}
 			else {
-				if (!tableItem.getText().isEmpty()) {
-					isValid = false;
-					break;
-				}else isValid = true;
+				isValid = tableItem.getText().isEmpty();
 			}
+			if (!isValid) 
+				break;
 		}
 		return isValid;
 	}

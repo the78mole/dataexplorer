@@ -153,7 +153,6 @@ public class Settings extends Properties {
 	final static String							X_SPREAD_GRADE_ORDINAL					= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
 	final static String							IS_X_LOGARITHMIC_DISTANCE				= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
 	final static String							IS_X_REVERSED										= "is_x_reversed";																																								//$NON-NLS-1$
-	final static String							MAX_LOG_COUNT										= "max_log_count";																																								//$NON-NLS-1$
 	final static String							SEARCH_IMPORT_PATH							= "search_import_path";																																						//$NON-NLS-1$
 	final static String							SEARCH_DATAPATH_IMPORTS					= "search_datapath_imports";																																			//$NON-NLS-1$
 	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
@@ -423,15 +422,18 @@ public class Settings extends Properties {
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
 	}
 
+	public Path getHistoCacheDirectory() {
+		return Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+	}
+
 	public String resetHistoCache() {
 		final String $METHOD_NAME = "resetHistoCache"; //$NON-NLS-1$
-		Path histoCacheDirectory = Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
-		int initialSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
-		FileUtils.deleteDirectory(histoCacheDirectory.toString());
-		FileUtils.checkDirectoryAndCreate(histoCacheDirectory.toString());
-		int deletedSize_KiB = (int) FileUtils.size(histoCacheDirectory) / 1024;
-		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory.toString(), Settings.PERMISSION_555);
-		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, histoCacheDirectory });
+		int initialSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
+		FileUtils.deleteDirectory(getHistoCacheDirectory().toString());
+		FileUtils.checkDirectoryAndCreate(getHistoCacheDirectory().toString());
+		int deletedSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
+		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, getHistoCacheDirectory().toString(), Settings.PERMISSION_555);
+		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, getHistoCacheDirectory() });
 		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
 		return message;
 	}
@@ -712,7 +714,6 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, isXAxisLogarithmicDistance())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, isXAxisReversed())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MAX_LOG_COUNT, getMaxLogCount())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, getRetrospectMonths())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_IMPORT_PATH, getSearchImportPath())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
@@ -2494,28 +2495,7 @@ public class Settings extends Properties {
 		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true"));
 	}
 
-	/**
-	 * set the maximum number of logs (recordsets) which are read for the history 
-	 * @param uintValue
-	 */
-	public void setMaxLogCount(String uintValue) {
-		try {
-			int value = Integer.parseUnsignedInt(uintValue.trim());
-			if (value < 1 || value > 1000) value = 300;
-			this.setProperty(Settings.MAX_LOG_COUNT, String.valueOf(value));
-		}
-		catch (Exception e) {
-		}
-	}
-
-	/**
-	 * @return the maximum number of logs (recordsets) which are read for the history (default is 300)
-	 */
-	public int getMaxLogCount() {
-		return Integer.valueOf(this.getProperty(Settings.MAX_LOG_COUNT, String.valueOf(300)));
-	}
-
-	/**
+		/**
 	 * @param isActive true if files from the device import directory are read for the history 
 	 */
 	public void setSearchImportPath(boolean isActive) {

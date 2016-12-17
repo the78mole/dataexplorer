@@ -1525,9 +1525,8 @@ public class FileUtils {
 				if (inputLine.contains("The latest stable version of DataExplorer is")) { //$NON-NLS-1$
 					String versionString = inputLine.substring(inputLine.lastIndexOf("<B>") + 3, inputLine.lastIndexOf("</B>")); //$NON-NLS-1$ //$NON-NLS-2$
 					int availableVersion = Integer.parseInt(versionString.replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-					int actualVersion = Integer.parseInt(GDE.VERSION.substring(8).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-					FileUtils.log.log(Level.OFF, "actualVersion = " + actualVersion + " - availableVersion = " + availableVersion); //$NON-NLS-1$ //$NON-NLS-2$
-					versionCheck = new String[] { new Boolean(actualVersion < availableVersion).toString(), versionString };
+					FileUtils.log.log(Level.OFF, "actualVersion = " + GDE.VERSION_NUMBER + " - availableVersion = " + availableVersion); //$NON-NLS-1$ //$NON-NLS-2$
+					versionCheck = new String[] { new Boolean(GDE.VERSION_NUMBER < availableVersion).toString(), versionString };
 				}
 
 			in.close();
