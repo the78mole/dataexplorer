@@ -145,8 +145,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Thread																listPortsThread;
 	Vector<String>												availablePorts			= new Vector<String>();
 	boolean																isUpdateSerialPorts	= true;
-	HashMap<String,String>								legacyDeviceNames = new HashMap<String,String>(2);
-
+	HashMap<String, String>								legacyDeviceNames		= new HashMap<String, String>(2);
 
 	public DeviceSelectionDialog(Shell parent, int style, final DataExplorer currentApplication) {
 		super(parent, style);
@@ -154,7 +153,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
 		this.availablePorts = DeviceSerialPortImpl.getAvailableports();
-		
+
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
@@ -233,16 +232,16 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setSize(566, 644);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0189));
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
-	        switch (event.detail) {
-	        case SWT.TRAVERSE_ESCAPE:
-	        	DeviceSelectionDialog.this.dialogShell.close();
-	          event.detail = SWT.TRAVERSE_NONE;
-	          event.doit = false;
-	          break;
-	        }
-	      }
-	    });
+				public void handleEvent(Event event) {
+					switch (event.detail) {
+					case SWT.TRAVERSE_ESCAPE:
+						DeviceSelectionDialog.this.dialogShell.close();
+						event.detail = SWT.TRAVERSE_NONE;
+						event.doit = false;
+						break;
+					}
+				}
+			});
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -289,8 +288,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						DeviceSelectionDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0015,
-								new Object[] { e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() }));
+						DeviceSelectionDialog.this.application
+								.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() }));
 					}
 				}
 			});
@@ -336,14 +335,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											// allow device switch only if port not connected
 											if (DeviceSelectionDialog.this.application.getActiveDevice() == null
 													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() == null)
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null && !DeviceSelectionDialog.this.application
-															.getActiveDevice().getCommunicationPort().isConnected())) {
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null
+															&& !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												DeviceSelectionDialog.this.activeDeviceName = DeviceSelectionDialog.this.deviceSelectCombo.getText();
 												log.log(Level.FINE, "activeName = " + DeviceSelectionDialog.this.activeDeviceName); //$NON-NLS-1$
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName);
 												// if a device tool box is open, dispose it
-												if (DeviceSelectionDialog.this.application.getActiveDevice() != null 
-														&& DeviceSelectionDialog.this.application.getDeviceDialog() != null && !DeviceSelectionDialog.this.application.getDeviceDialog().isDisposed()) {
+												if (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getDeviceDialog() != null
+														&& !DeviceSelectionDialog.this.application.getDeviceDialog().isDisposed()) {
 													DeviceSelectionDialog.this.application.getDeviceDialog().dispose();
 												}
 												updateDialogEntries();
@@ -367,8 +366,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											// allow device switch only if port not connected
 											if (DeviceSelectionDialog.this.application.getActiveDevice() == null
 													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() == null)
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null && !DeviceSelectionDialog.this.application
-															.getActiveDevice().getCommunicationPort().isConnected())) {
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null
+															&& !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												int position = DeviceSelectionDialog.this.deviceSlider.getSelection();
 												log.log(Level.FINE, " Position: " + position); //$NON-NLS-1$
 												if (DeviceSelectionDialog.this.activeDevices.size() > 0 && !DeviceSelectionDialog.this.activeDevices.get(position).equals(DeviceSelectionDialog.this.activeDeviceName)) {
@@ -752,14 +751,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												if (deviceName.equals("MC3000")) {
 													if (GDE.IS_LINUX)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
-													else if (GDE.IS_MAC)
-														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
+													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
 												}
 												else if (deviceName.contains("DUO") && deviceName.contains("iCharger")) {
 													if (GDE.IS_LINUX)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
-													else if (GDE.IS_MAC)
-														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
+													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
 												}
 											}
 										}
@@ -1067,19 +1064,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @return actual device Nmae
 	 */
 	private String exchangeLegacyDeviceNames(String checkoutDeviceName) {
-		if(this.legacyDeviceNames.get(checkoutDeviceName) != null) 
-			return this.legacyDeviceNames.get(checkoutDeviceName); 
+		if (this.legacyDeviceNames.get(checkoutDeviceName) != null) return this.legacyDeviceNames.get(checkoutDeviceName);
 
 		return checkoutDeviceName;
 	}
-	
+
 	/**
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
 		IDevice previousActiveDevice = this.application.getActiveDevice();
 		// check if any thing to clean up
-		if (previousActiveDevice != null) { 
+		if (previousActiveDevice != null) {
 			checkAndStoreDeviceConfiguration(previousActiveDevice);
 			if (previousActiveDevice.getDialog() != null && !previousActiveDevice.getDialog().isDisposed()) {
 				previousActiveDevice.getDialog().dispose();
@@ -1098,11 +1094,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.setCellVoltageTabItemVisible(activeDevice.isVoltagePerCellTabRequested());
 			this.application.setUtilGraphicsWindowVisible(activeDevice.isUtilityGraphicsTabRequested(), GDE.STRING_EMPTY);
 			this.application.registerCustomTabItem(activeDevice.isUtilityDeviceTabRequested() ? activeDevice.getUtilityDeviceTabItem() : null);
-			setupDataChannels(activeDevice);
-			// compare names because the device is re-instantiated when the deviceSelectionDialog is opened
-//			if (previousActiveDevice == null) { // this would result in calling setupHistoWindows twice :  || ! activeDevice.getName().equals(previousActiveDevice.getName())) {
-//				this.application.setupHistoWindows(); // always full setup as this is passed during application startup
-//			}
+			// do not call setupDataChannels because it rebuilds again the histo tabs which also done by updateDialogEntries
+			if (activeDevice != null && (previousActiveDevice == null || !activeDevice.getName().equals(previousActiveDevice.getName()))) { 
+				setupDataChannels(activeDevice);
+			}
 			this.application.setupDataTableHeader();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
@@ -1146,7 +1141,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
 		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full qualified
-				: "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+				: "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." //$NON-NLS-1$
+						+ selectedDeviceName;
 		try {
 			//String className = "gde.device.DefaultDeviceDialog";
 			log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
@@ -1230,8 +1226,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		boolean result = true;
 		String unsaved = Channels.getInstance().checkRecordSetsSaved();
 		if (unsaved.length() != 0) {
-			if (unsaved.length() > 500)
-				unsaved = unsaved.substring(0, 500) + "........";
+			if (unsaved.length() > 500) unsaved = unsaved.substring(0, 500) + "........";
 			String msg = Messages.getString(MessageIds.GDE_MSGW0020) + unsaved.toString();
 			if (this.application.openOkCancelMessageDialog(msg) == SWT.CANCEL) {
 				result = false;

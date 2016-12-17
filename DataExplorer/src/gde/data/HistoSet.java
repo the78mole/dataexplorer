@@ -55,6 +55,7 @@ import org.eclipse.swt.SWT;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.device.DeviceConfiguration;
 import gde.device.DeviceTypes;
 import gde.device.IDevice;
 import gde.device.IHistoDevice;
@@ -213,12 +214,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
-	public void rebuild4Test() throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+	public void rebuild4Test(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		// this.clear();
 		{
 			if (this.getHistoFilePaths().size() > 0) {
 				// step: build the workload map consisting of the cache key and the file path
-				Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(false);
+				Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(false, deviceConfigurations);
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
 
 				// step: put cached vaults into the histoSet map and reduce workload map
@@ -290,7 +291,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				if (this.getHistoFilePaths().size() > 0) {
 					long nanoTimeCheckFilesSum = -System.nanoTime();
 					// step: build the workload map consisting of the cache key and the file path
-					Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(isWithUi);
+					Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(isWithUi, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 					nanoTimeCheckFilesSum += System.nanoTime();
 					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
 						log.log(Level.TIME, String.format("%,5d files          job check          time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
@@ -414,9 +415,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		}
 		
 		if (histoVaults == null) {
-			log.log(Level.INFO, String.format("file format not supported: device = %s  channelConfigNumber = %d  histoFilePath = %s", //$NON-NLS-1$
-					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
-			throw new RuntimeException(String.format("file format not supported: device = %s  channelConfigNumber = %d  histoFilePath = %s", //$NON-NLS-1$
+			histoVaults = new ArrayList<HistoVault>();
+			log.log(Level.INFO, String.format("file format not supported: device=%s  channelNumber=%d  %s", //$NON-NLS-1$
 					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
 		}
 		else {
@@ -680,11 +680,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * selects osd file candidates for the active device and the active channel; select as well for objectKey and start timestamp.
 	 * selects bin file candidates for object key based on the parent directory name and last modified.
 	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
+	 * @param deviceConfigurations 
 	 * @return trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
 	 * @throws IOException 
 	 * @throws NotSupportedFileFormatException 
 	*/
-	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(boolean isWithUi) throws IOException, NotSupportedFileFormatException {
+	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(boolean isWithUi, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
 		final Map<Long, Map<String, HistoVault>> trusses4Start = new LinkedHashMap<Long, Map<String, HistoVault>>();
 		final List<Integer> channelMixConfigNumbers;
@@ -714,7 +715,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					}
 					else {
 						String objectDirectory = GDE.STRING_EMPTY;
-						if (!DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
+						if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
 							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())) {
@@ -791,7 +792,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				else if (actualFile.getName().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
 					boolean isValidObject = false;
 					String objectDirectory = GDE.STRING_EMPTY;
-					if (!DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
+					if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
 					int fileRecordSetSize = Channels.getInstance().size();
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(actualFile.getName());
 					HistoVault truss = HistoVault.createTruss(objectDirectory, actualFile, 0, fileRecordSetSize, recordSetBaseName);

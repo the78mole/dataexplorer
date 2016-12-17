@@ -156,9 +156,9 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 				setupDeviceChannelObject(deviceEntry.getKey(), 1, "");
 				for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 					this.channels.setActiveChannelNumber(channelEntry.getKey());
-					histoSet.rebuild4Test();
+					histoSet.rebuild4Test( this.deviceConfigurations);
 					System.out
-							.println(String.format("Device=%3.33s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
+							.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
 				}
 			}
 		}
