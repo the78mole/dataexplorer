@@ -630,7 +630,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			}
 			break;
 		}
-		if (recordSet != null && recordSet.realSize() > 0 ) {
+		if (recordSet != null && recordSet.realSize() > 0) {
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
@@ -726,30 +726,32 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		this.offSetX = x0;
 		this.offSetY = y0 - height;
 
-		// draw curves for each active record
-		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
-		recordSet.setDrawAreaBounds(this.curveAreaBounds);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
+		if (((TrailRecordSet) recordSet).getRecordDataSize(true) != 0) {
+			// draw curves for each active record
+			this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
+			recordSet.setDrawAreaBounds(this.curveAreaBounds);
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 
-		gc.setBackground(this.curveAreaBackground);
-		gc.fillRectangle(this.curveAreaBounds);
-		gc.setBackground(this.surroundingBackground);
+			gc.setBackground(this.curveAreaBackground);
+			gc.fillRectangle(this.curveAreaBounds);
+			gc.setBackground(this.surroundingBackground);
 
-		this.timeLine.initialize(recordSet, width, ((TrailRecordSet) recordSet).getMaxTimeStamp(), ((TrailRecordSet) recordSet).getMinTimeStamp());
-		this.timeLine.drawTimeLine(gc, x0, y0);
+			this.timeLine.initialize(recordSet, width, ((TrailRecordSet) recordSet).getFirstTimeStamp_ms(), ((TrailRecordSet) recordSet).getLastTimeStamp_ms());
+			this.timeLine.drawTimeLine(gc, x0, y0);
 
-		// draw draw area bounding
-		gc.setForeground(this.curveAreaBorderColor);
+			// draw draw area bounding
+			gc.setForeground(this.curveAreaBorderColor);
 
-		gc.drawLine(x0 - 1, yMax - 1, xMax + 1, yMax - 1);
-		gc.drawLine(x0 - 1, yMax - 1, x0 - 1, y0);
-		gc.drawLine(xMax + 1, yMax - 1, xMax + 1, y0);
+			gc.drawLine(x0 - 1, yMax - 1, xMax + 1, yMax - 1);
+			gc.drawLine(x0 - 1, yMax - 1, x0 - 1, y0);
+			gc.drawLine(xMax + 1, yMax - 1, xMax + 1, y0);
 
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedTime("ss.SSS", (new Date().getTime() - startInitTime)));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedTime("ss.SSS", (new Date().getTime() - startInitTime)));
 
-		long startTime = new Date().getTime();
-		drawTrailRecordSet((TrailRecordSet) recordSet, gc, dataScaleWidth, x0, y0, width, height);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedTime("ss.SSS", (new Date().getTime() - startTime)));
+			long startTime = new Date().getTime();
+			drawTrailRecordSet((TrailRecordSet) recordSet, gc, dataScaleWidth, x0, y0, width, height);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedTime("ss.SSS", (new Date().getTime() - startTime)));
+		}
 	}
 
 	/**

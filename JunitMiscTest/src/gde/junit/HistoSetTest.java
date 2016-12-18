@@ -208,10 +208,10 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 								String objectDirectory = GDE.STRING_EMPTY;
 								if (!super.activeDevices.contains(file.toPath().getParent().getFileName().toString())) objectDirectory = file.toPath().getParent().getFileName().toString();
 								HistoVault truss = HistoVault.createTruss(objectDirectory, file, 0, 0, "test");
-								HistoRecordSet recordSet = HoTTbinHistoReader.read(truss);
-								maxTime_sec = recordSet.getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSet.getMaxTime_ms() / 1000 : maxTime_sec;
-								System.out.println(String.format("binFile processed      channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", this.channels.getActiveChannelNumber(), (int) recordSet.getMaxTime_ms() / 1000,
-										file.length(), file.toPath().toAbsolutePath().toString()));
+								HoTTbinHistoReader.read(truss);
+//								maxTime_sec = recordSet.getMaxTime_ms() / 1000 > maxTime_sec ? (int) recordSet.getMaxTime_ms() / 1000 : maxTime_sec;
+//								System.out.println(String.format("binFile processed      channel=%d  MaxTime_sec=%,9d  Bytes=%,11d %s", this.channels.getActiveChannelNumber(), (int) recordSet.getMaxTime_ms() / 1000,
+//										file.length(), file.toPath().toAbsolutePath().toString()));
 							}
 							catch (Exception e) {
 								e.printStackTrace();

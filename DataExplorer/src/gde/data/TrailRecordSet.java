@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -334,7 +335,7 @@ public class TrailRecordSet extends RecordSet {
 				this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getLogStartTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
 				this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10);
-				for (String recordName : this.getDisplayableRecordNames()) {
+				for (String recordName : this.getRecordNames()) {
 					((TrailRecord) this.get(recordName)).add(histoVault);
 				}
 			}
@@ -386,7 +387,7 @@ public class TrailRecordSet extends RecordSet {
 	 * @param isLiveActive 
 	 */
 	public void defineTrailTypes() {
-		String[] trailRecordNames = this.getDisplayableRecordNames();
+		String[] trailRecordNames = this.getRecordNames();
 		for (int j = 0; j < trailRecordNames.length; j++) {
 			TrailRecord trailRecord = ((TrailRecord) this.get(trailRecordNames[j]));
 			trailRecord.setApplicableTrailTypes();
@@ -738,12 +739,12 @@ public class TrailRecordSet extends RecordSet {
 		}
 		return headerRow;
 	}
-	
-	public long getMaxTimeStamp() {
-		return this.timeStep_ms.get(0) / 10;
+
+	public long getFirstTimeStamp_ms() {
+		return this.timeStep_ms.firstElement() / 10;
 	}
 
-	public long getMinTimeStamp() {
-		return this.timeStep_ms.get(this.timeStep_ms.size() - 1) / 10;
+	public long getLastTimeStamp_ms() {
+		return this.timeStep_ms.lastElement() / 10;
 	}
 }

@@ -293,55 +293,7 @@ public class OsdReaderWriter {
 				channelConfig = channelConfig.contains(GDE.STRING_BLANK) ? channelConfig.split(GDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
 	
-				if (device.isVariableMeasurementSize()) {
-					int activeChannelConfigNumber = channels.getActiveChannelNumber();
-					
-					//cleanup measurement, if count doesn't match
-					int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
-					if (recordsProperties.length != existingNumberMeasurements) {
-						for (int i = recordsProperties.length; i < existingNumberMeasurements; i++) {
-							device.removeMeasurementFromChannel(activeChannelConfigNumber, device.getMeasurement(activeChannelConfigNumber, recordsProperties.length));
-						}
-					}
-					//build up the record set with variable number of records just fit the sensor data
-					String[] recordNames = new String[recordsProperties.length];
-					String[] recordSymbols = new String[recordsProperties.length];
-					String[] recordUnits = new String[recordsProperties.length];
-					for (int i = 0; i < recordsProperties.length; i++) {
-						HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-						MeasurementType gdeMeasurement = device.getMeasurement(activeChannelConfigNumber, i);
-						gdeMeasurement.setName(recordNames[i] = recordProperties.get(Record.NAME));
-						gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
-						gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
-						gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
-					}
-					recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
-				}
-				else {
-					recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
-				}
-				recordSet.setRecordSetDescription(recordSetComment);
-
-				//apply record sets records properties
-				if (log.isLoggable(Level.FINE)) {
-					StringBuilder sb = new StringBuilder().append(recordSet.getName()).append(GDE.STRING_MESSAGE_CONCAT);
-					for (String recordProps : recordsProperties) {
-						sb.append(StringHelper.splitString(recordProps, Record.DELIMITER, Record.propertyKeys).get(Record.propertyKeys[0])).append(GDE.STRING_COMMA);
-					}
-					log.log(Level.FINE, sb.toString());
-				}
-
-				String [] recordKeys = device.crossCheckMeasurements(recordsProperties, recordSet);
-				// check if the file content fits measurements form device properties XML which was used to create the record set
-				for (int i = 0; i < recordKeys.length; ++i) {
-					Record record = recordSet.get(recordKeys[i]);
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]);
-					record.setSerializedProperties(recordsProperties[i]);
-					record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
-				}
-				recordSet.setDeserializedProperties(recordSetProperties);
-				recordSet.setSaved(true);
-
+				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true);
 				channel.put(recordSetName, recordSet);
 			}
 			MenuToolBar menuToolBar = OsdReaderWriter.application.getMenuToolBar();
@@ -400,6 +352,73 @@ public class OsdReaderWriter {
 			file_input = null;
 			zip_input = null;
 		}
+	}
+
+	/**
+	 * side effects in case the active device supports a variable measurement size:
+	 *  - measurements are removed from the channel
+	 *  - measurementType objects are modified
+	 * @param recordSetName
+	 * @param channelNumber
+	 * @param recordSetInfo
+	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
+	 * @return the recordSet filled with basic data delivered by the params but without any values (points)
+	 */
+	protected static RecordSet buildRecordSet(String recordSetName, int channelNumber, HashMap<String, String> recordSetInfo, boolean adjustObjectKey) {
+		RecordSet recordSet;
+		IDevice device = OsdReaderWriter.application.getActiveDevice();
+		String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
+		String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
+		String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
+		if (device.isVariableMeasurementSize()) {
+			int activeChannelConfigNumber = channelNumber; // todo get rid of activeChannelConfigNumber after checking during merge
+			
+			//cleanup measurement, if count doesn't match
+			int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
+			if (recordsProperties.length != existingNumberMeasurements) {
+				for (int i = recordsProperties.length; i < existingNumberMeasurements; i++) {
+					device.removeMeasurementFromChannel(activeChannelConfigNumber, device.getMeasurement(activeChannelConfigNumber, recordsProperties.length));
+				}
+			}
+			//build up the record set with variable number of records just fit the sensor data
+			String[] recordNames = new String[recordsProperties.length];
+			String[] recordSymbols = new String[recordsProperties.length];
+			String[] recordUnits = new String[recordsProperties.length];
+			for (int i = 0; i < recordsProperties.length; i++) {
+				HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+				MeasurementType gdeMeasurement = device.getMeasurement(activeChannelConfigNumber, i);
+				gdeMeasurement.setName(recordNames[i] = recordProperties.get(Record.NAME));
+				gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
+				gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
+				gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
+			}
+			recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
+		}
+		else {
+			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true);
+		}
+		recordSet.setRecordSetDescription(recordSetComment);
+
+		//apply record sets records properties
+		if (log.isLoggable(Level.FINE)) {
+			StringBuilder sb = new StringBuilder().append(recordSet.getName()).append(GDE.STRING_MESSAGE_CONCAT);
+			for (String recordProps : recordsProperties) {
+				sb.append(StringHelper.splitString(recordProps, Record.DELIMITER, Record.propertyKeys).get(Record.propertyKeys[0])).append(GDE.STRING_COMMA);
+			}
+			log.log(Level.FINE, sb.toString());
+		}
+
+		String [] recordKeys = device.crossCheckMeasurements(recordsProperties, recordSet);
+		// check if the file content fits measurements form device properties XML which was used to create the record set
+		for (int i = 0; i < recordKeys.length; ++i) {
+			Record record = recordSet.get(recordKeys[i]);
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]);
+			record.setSerializedProperties(recordsProperties[i]);
+			record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
+		}
+		recordSet.setDeserializedProperties(recordSetProperties);
+		recordSet.setSaved(true);
+		return recordSet;
 	}
 
 	/**

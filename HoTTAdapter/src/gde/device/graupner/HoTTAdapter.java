@@ -929,20 +929,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
 			for (HistoVault truss : trusses) {
 				if (truss.getLogFilePath().equals(filePath.toString())) {
-					long nanoTime = System.nanoTime();
-					HistoRecordSet histoRecordSet = HoTTbinHistoReader.read(truss);
-					if (histoRecordSet.getRecordDataSize(true) > 0) {
-						histoRecordSet.setElapsedHistoRecordSet_ns(System.nanoTime() - nanoTime);
-						histoRecordSet.addSettlements();
-						// put all aggregated data and scores into the history vault
-						HistoVault histoVault = histoRecordSet.getHistoVault();
-						histoVaults.add(histoVault);
-					}
-					else {
-						histoVaults.add(truss);
-					}
-					// reduce memory consumption in advance to the garbage collection
-					histoRecordSet.cleanup();
+					// add aggregated measurement and settlement points and score points to the truss
+					HoTTbinHistoReader.read(truss);
+					histoVaults.add(truss);
 				}
 				else
 					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");

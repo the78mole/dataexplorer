@@ -363,12 +363,17 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		{
 			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTORECORDSETS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
 				isRebuilt = true;
+				log.log(Level.TIME, "start createRecordSet");
 				long nanoTimeTrailRecordSet = -System.nanoTime();
 				this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
+				log.log(Level.TIME, "start defineTrailTypes");
 				this.trailRecordSet.defineTrailTypes();
 				// this.trailRecordSet.checkAllDisplayable();
+				log.log(Level.TIME, "start setPoints");
 				this.trailRecordSet.setPoints();
+				log.log(Level.TIME, "start setTags");
 				this.trailRecordSet.setTags();
+				log.log(Level.TIME, "start applyTemplate");
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data
 				nanoTimeTrailRecordSet += System.nanoTime();
 				if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))

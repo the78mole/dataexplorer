@@ -110,7 +110,7 @@ public class HistoRecordSet extends RecordSet {
 	/**
 	 * clears the data points in all records and in timeStep.
 	 * reduce initial capacity to zero.
-	 * does not clear any fields in the recordSet, the records or in timeStep. 
+	 * does not clear any fields in the recordSet, in the records or in timeStep. 
 	 */
 	public void cleanup() {
 		//		this.histoSettlements.clear();
@@ -279,14 +279,6 @@ public class HistoRecordSet extends RecordSet {
 	public void setElapsedHistoRecordSet_ns(long nanoTimeSpan) {
 		this.elapsedHistoRecordSet_ns = nanoTimeSpan;
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timeSpan=%,7d ms", TimeUnit.NANOSECONDS.toMillis(nanoTimeSpan))); //$NON-NLS-1$
-	}
-
-	/**
-	 * @return the populated history vault
-	 */
-	public HistoVault getHistoVault() {
-		if (this.getRecordDataSize(true) > 0) this.truss.complementTruss(this.getStartTimeStamp(), getMeasurementsPoints(), getSettlementsPoints(), getScorePoints());
-		return this.truss;
 	}
 
 	/**

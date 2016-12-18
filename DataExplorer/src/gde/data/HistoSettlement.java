@@ -73,7 +73,7 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 	int												ordinal;																											// ordinal is referencing the source position of the record relative to the initial
 	// device measurement configuration and used to find specific properties
 
-	HistoRecordSet						parent;
+	RecordSet						parent;
 	String										name;																													// measurement name Höhe
 	String										unit;																													// unit [m]
 	String										symbol;																												// symbol h
@@ -191,7 +191,7 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 	 * @param newSettlement
 	 * @param initialCapacity
 	 */
-	public HistoSettlement(IDevice newDevice, SettlementType newSettlement, HistoRecordSet parent, int initialCapacity) {
+	public HistoSettlement(IDevice newDevice, SettlementType newSettlement, RecordSet parent, int initialCapacity) {
 		super(initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newSettlement.getName() + " Settlement(IDevice , SettlementType , int )"); //$NON-NLS-1$
 		this.device = newDevice;
@@ -1334,9 +1334,10 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 	 * @return the decimal format used by this record
 	 */
 	public DecimalFormat getDecimalFormat() {
-		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
-		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
+		throw new UnsupportedOperationException();
+//		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
+//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
+//		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
 	}
 
 	/**
@@ -1613,53 +1614,56 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
-		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		if (this.parent.isOneOfSyncableRecord(this) && this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor();
-			this.displayScaleFactorValue = this.displayScaleFactorValue * syncMasterFactor;
-		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
-				String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, //$NON-NLS-1$
-						(this.maxDisplayValue - this.minDisplayValue)));
-
+		throw new UnsupportedOperationException();
+//		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
+//		if (this.parent.isOneOfSyncableRecord(this) && this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
+//			this.syncMasterFactor = this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor();
+//			this.displayScaleFactorValue = this.displayScaleFactorValue * syncMasterFactor;
+//		}
+//		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
+//				String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, //$NON-NLS-1$
+//						(this.maxDisplayValue - this.minDisplayValue)));
+//
 	}
 
 	/**
 	 * @param newMinDisplayValue the minDisplayValue to set
 	 */
 	public void setMinDisplayValue(double newMinDisplayValue) {
-		if (false) { // todo (this.device.isGPSCoordinates(this)) {
-			this.minDisplayValue = translateValue(newMinDisplayValue) * 1000;
-		}
-		else
-			this.minDisplayValue = newMinDisplayValue;
-
-		if (this.parent.isOneOfSyncableRecord(this)) {
-			// todo find better solution for syncing records and histo settlements
-			throw new IllegalStateException();
-			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
-			// tmpRecord.minDisplayValue = this.minDisplayValue;
-			// }
-		}
+		throw new UnsupportedOperationException();
+//		if (false) { // todo (this.device.isGPSCoordinates(this)) {
+//			this.minDisplayValue = translateValue(newMinDisplayValue) * 1000;
+//		}
+//		else
+//			this.minDisplayValue = newMinDisplayValue;
+//
+//		if (this.parent.isOneOfSyncableRecord(this)) {
+//			// todo find better solution for syncing records and histo settlements
+//			throw new IllegalStateException();
+//			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+//			// tmpRecord.minDisplayValue = this.minDisplayValue;
+//			// }
+//		}
 	}
 
 	/**
 	 * @param newMaxDisplayValue the maxDisplayValue to set
 	 */
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		if (false) { // todo (this.device.isGPSCoordinates(this)) {
-			this.maxDisplayValue = translateValue(newMaxDisplayValue) * 1000;
-		}
-		else
-			this.maxDisplayValue = newMaxDisplayValue;
-
-		if (this.parent.isOneOfSyncableRecord(this)) {
-			// todo find better solution for syncing records and histo settlements
-			throw new IllegalStateException();
-			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
-			// tmpRecord.maxDisplayValue = this.maxDisplayValue;
-			// }
-		}
+		throw new UnsupportedOperationException();
+//		if (false) { // todo (this.device.isGPSCoordinates(this)) {
+//			this.maxDisplayValue = translateValue(newMaxDisplayValue) * 1000;
+//		}
+//		else
+//			this.maxDisplayValue = newMaxDisplayValue;
+//
+//		if (this.parent.isOneOfSyncableRecord(this)) {
+//			// todo find better solution for syncing records and histo settlements
+//			throw new IllegalStateException();
+//			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+//			// tmpRecord.maxDisplayValue = this.maxDisplayValue;
+//			// }
+//		}
 	}
 
 	/**
@@ -1889,7 +1893,8 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 	 * @return the isScaleSynced
 	 */
 	public boolean isScaleSynced() {
-		return this.parent.isOneOfSyncableRecord(this);
+		throw new UnsupportedOperationException();
+//		return this.parent.isOneOfSyncableRecord(this);
 	}
 
 	/**
@@ -1903,8 +1908,9 @@ public class HistoSettlement extends Vector<Integer> { // todo maybe a better op
 	 * @return true if the record is the scale sync master
 	 */
 	public boolean isScaleVisible() {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.parent.isOneOfSyncableRecord(this));
-		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
+		throw new UnsupportedOperationException();
+//		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.parent.isOneOfSyncableRecord(this));
+//		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
 	}
 
 	/**

@@ -106,7 +106,7 @@ public class Quantile {
 	 */
 	public double getQuantile(double probabilityCutPoint) {
 		if (this.fixings.contains(Fixings.IS_SAMPLE)) {
-			if (probabilityCutPoint >= 1. / (this.realSize + 1) || probabilityCutPoint < (double) this.realSize / (this.realSize + 1)) {
+			if (probabilityCutPoint >= 1. / (this.realSize + 1) && probabilityCutPoint < (double) this.realSize / (this.realSize + 1)) {
 				double position = (this.realSize + 1) * probabilityCutPoint;
 				return this.population.get((int) position - 1) + (position - (int) position) * (this.population.get((int) position) - this.population.get((int) position - 1));
 			}
