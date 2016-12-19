@@ -478,8 +478,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						if (masterRecord.realRealGet(i) != null) {
 							StringBuilder sb = new StringBuilder();
 							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((medianRecord.get(i) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
+							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 					}
@@ -489,8 +490,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						if (masterRecord.realRealGet(j) != null) {
 							StringBuilder sb = new StringBuilder();
 							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((medianRecord.get(j) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
+							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 				}
@@ -504,8 +506,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						if (masterRecord.realRealGet(i) != null) {
 							StringBuilder sb = new StringBuilder();
 							sb.append(this.getDecimalFormat().format((lowerRecord.get(i) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((middleRecord.get(i) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperRecord.get(i) / 1000. - reduction) * factor + offset));
+							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.get(i) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 					}
@@ -515,8 +518,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						if (masterRecord.realRealGet(j) != null) {
 							StringBuilder sb = new StringBuilder();
 							sb.append(this.getDecimalFormat().format((lowerRecord.get(j) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((middleRecord.get(j) / 1000. - reduction) * factor + offset));
-							sb.append(GDE.STRING_BLANK_COLON_BLANK).append(this.getDecimalFormat().format((upperRecord.get(j) / 1000. - reduction) * factor + offset));
+							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.get(j) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 				}

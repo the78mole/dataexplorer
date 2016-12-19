@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.io;
 
-import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -26,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,11 +44,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.naming.OperationNotSupportedException;
-
 import gde.GDE;
 import gde.data.Channel;
-import gde.data.HistoRecordSet;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IHistoDevice;
@@ -65,7 +60,7 @@ import gde.utils.StringHelper;
  * reads the DataExplorer file format into histo recordsets.
  * @author Thomas Eickert 
  */
-public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this class with the base class reduced the number of classes
+public class HistoOsdReaderWriter extends OsdReaderWriter {
 	final private static String	$CLASS_NAME	= HistoOsdReaderWriter.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -134,7 +129,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			inputStream = (InputStream) new FileInputStream(file);
 		}
 
-		try (DataInputStream data_in = new DataInputStream((InputStream) inputStream)) {
+		try (DataInputStream data_in = new DataInputStream((InputStream) inputStream)) { // closes the inputStream also
 			final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(filePath.toString());
 			final double logDataExplorerVersion = header.containsKey(GDE.DATA_EXPLORER_FILE_VERSION) ? Double.parseDouble(header.get(GDE.DATA_EXPLORER_FILE_VERSION)) : 1.; // OpenSerialData version : 1
 			final int numberRecordSets = Integer.parseInt(header.get(GDE.RECORD_SET_SIZE));
@@ -144,36 +139,43 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			final List<HashMap<String, String>> recordSetsInfo = OsdReaderWriter.readRecordSetsInfo4AllVersions(data_in, header);
 
 			long startTimeNs = System.nanoTime();
+			long unreadDataPointer = -1;
 			for (int i = 0; i < recordSetsInfo.size(); i++) {
 				HashMap<String, String> recordSetInfo = recordSetsInfo.get(i);
 				final Channel recordSetInfoChannel = OsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
-				String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
+				//				String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 				String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 				int recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				long recordSetDataPointer = Long.parseLong(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER));
-				HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetProperties, Record.DELIMITER, RecordSet.propertyKeys);
-				String[] cleanedMeasurementNames = HistoOsdReaderWriter.getMeasurementNames(recordsProperties, recordSetInfoChannel.getNumber());
-				String[] recordKeys = HistoOsdReaderWriter.getRecordKeys(recordsProperties);
-				String[] noneCalculationMeasurementNames = HistoOsdReaderWriter.application.getActiveDevice().getNoneCalculationMeasurementNames(recordSetInfoChannel.getNumber(), recordKeys);
-				int numberRecordAndTimeStamp = recordSetProps.containsKey(RecordSet.TIME_STEP_MS) && recordSetProps.get(RecordSet.TIME_STEP_MS).length() > 0
-						&& Double.parseDouble(recordSetProps.get(RecordSet.TIME_STEP_MS).trim()) < 0 ? noneCalculationMeasurementNames.length + 1 : noneCalculationMeasurementNames.length;
+				//				HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetProperties, Record.DELIMITER, RecordSet.propertyKeys);
+				//				String[] cleanedMeasurementNames = HistoOsdReaderWriter.getMeasurementNames(recordsProperties, recordSetInfoChannel.getNumber());
+				//				String[] recordKeys = HistoOsdReaderWriter.getRecordKeys(recordsProperties);
+				//				String[] noneCalculationMeasurementNames = HistoOsdReaderWriter.application.getActiveDevice().getNoneCalculationMeasurementNames(recordSetInfoChannel.getNumber(), recordKeys);
 
 				if (!recordSetTrusses.containsKey(i)) {
-					int toSkip = GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize;
-					while (toSkip > 0) { // The skip method may, for a variety of reasons, end up skipping over some smaller number of bytes, possibly 0. The actual number of bytes skipped is returned.
-						toSkip -= data_in.skip(toSkip);
-						if (toSkip > 0) {
-							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "toSkip=" + toSkip); //$NON-NLS-1$
-							if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size"); //$NON-NLS-1$
-						}
-					}
+					// defer reading any unused recordsets until a recordset is actually required
+					if (unreadDataPointer < 0) unreadDataPointer = recordSetDataPointer;
 				}
 				else {
 					long nanoTime = System.nanoTime();
+					if (unreadDataPointer > -1) {
+						// make up all deferred readings in one single step
+						long toSkip = recordSetDataPointer - unreadDataPointer;
+						while (toSkip > 0) { // The skip method may, for a variety of reasons, end up skipping over some smaller number of bytes, possibly 0. The actual number of bytes skipped is returned.
+							toSkip -= data_in.skip(toSkip);
+							if (toSkip > 0) {
+								if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "toSkip=" + toSkip); //$NON-NLS-1$
+								if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size"); //$NON-NLS-1$
+							}
+						}
+						unreadDataPointer = -1;
+					}
+					RecordSet histoRecordSet = buildRecordSet(recordSetTrusses.get(i).getLogRecordsetBaseName(), recordSetTrusses.get(i).getLogChannelNumber(), recordSetInfo, false);
+					String[] noneCalculationMeasurementNames = histoRecordSet.getNoneCalculationRecordNames();
+					int numberRecordAndTimeStamp = noneCalculationMeasurementNames.length + (histoRecordSet.isTimeStepConstant() ? 0 : 1);
+
 					byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
 					data_in.readFully(buffer);
-					// HistoRecordSet histoRecordSet = HistoOsdReaderWriter.buildRecordSetOBS(recordSetInfo, recordSetTrusses.get(i));
-					RecordSet histoRecordSet = buildRecordSet(recordSetTrusses.get(i).getLogRecordsetBaseName(), recordSetTrusses.get(i).getLogChannelNumber(), recordSetInfo, false);
 
 					// setDeserializedProperties does not take all possibilities to set the timestamp
 					if (log.isLoggable(Level.INFO) && histoRecordSet.getStartTimeStamp() != HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo))
@@ -186,9 +188,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 					if (histoRecordSet.getDevice() instanceof IHistoDevice) {
 						int[] maxPoints = new int[noneCalculationMeasurementNames.length];
 						int[] minPoints = new int[noneCalculationMeasurementNames.length];
+						String[] recordKeys = recordKeys = HistoOsdReaderWriter.getRecordKeys(recordsProperties);
 						List<String> noneCalculationMeasurementNameList = Arrays.asList(noneCalculationMeasurementNames);
-						for (int j = 0; j < recordsProperties.length; j++) {
-							int index = noneCalculationMeasurementNameList.indexOf(cleanedMeasurementNames[j]);
+						for (int j = 0; j < recordKeys.length; j++) {
+							int index = noneCalculationMeasurementNameList.indexOf(recordKeys[j]);
 							if (index > -1) {
 								HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[j], Record.DELIMITER, Record.propertyKeys);
 								maxPoints[index] = Integer.parseInt(recordProperties.get(Record.MAX_VALUE).trim());
@@ -237,10 +240,11 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 
 					// reduce memory consumption in advance to the garbage collection
 					histoRecordSet.cleanup();
+
 					//reset, previous manipulated channel types measurements (p.e. set active = null as calculation)
 					// todo does resetMeasurements also revert the manipulations done in OsdReaderWriter.buildRecordSet(...) ?
 					histoRecordSet.getDevice().resetMeasurements(); // todo not sure if channel manipulations affect logs which are currently displayed in the standard tabs and also rely on channel manipulations 
-					
+
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
 							recordSetTrusses.get(i).getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); //$NON-NLS-1$
 				}
@@ -259,7 +263,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		String[] recordKeys = new String[fileRecordsProperties.length];
 		for (int i = 0; i < fileRecordsProperties.length; i++) {
 			HashMap<String, String> recordProperties = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-			recordKeys [i] = recordProperties.get(Record.NAME);
+			recordKeys[i] = recordProperties.get(Record.NAME);
 		}
 		return recordKeys;
 	}
@@ -276,45 +280,6 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 			cleanedRecordNames.add(measurementNames[i]);
 		}
 		return cleanedRecordNames.toArray(new String[cleanedRecordNames.size()]);
-	}
-
-	/**
-	 * parse recordSetInfo from osd file. channel is determined without user interaction.
-	 * @param path 
-	 * @return null if this recordSet is not valid for histo (channel not allowed for histo).
-	 */
-	private static HistoRecordSet buildRecordSetOBS(HashMap<String, String> recordSetInfo, HistoVault truss) {
-		final String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
-		final String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
-		HistoRecordSet recordSet;
-		if (HistoOsdReaderWriter.application.getActiveDevice().isVariableMeasurementSize()) {
-			// build up the record set with the same number of records which may not fit to the current device XML
-			final String[] recordNames = new String[recordsProperties.length];
-			final String[] recordSymbols = new String[recordsProperties.length];
-			final String[] recordUnits = new String[recordsProperties.length];
-			for (int i = 0; i < recordsProperties.length; i++) {
-				HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-				recordNames[i] = recordProperties.get(Record.NAME);
-				recordSymbols[i] = recordProperties.get(Record.SYMBOL) == null ? GDE.STRING_EMPTY : recordProperties.get(Record.SYMBOL);
-				recordUnits[i] = recordProperties.get(Record.UNIT) == null ? GDE.STRING_EMPTY : recordProperties.get(Record.UNIT);
-			}
-			recordSet = HistoRecordSet.createRecordSet(truss, recordNames, recordSymbols, recordUnits);
-		}
-		else {
-			recordSet = HistoRecordSet.createRecordSet(truss);
-		}
-
-		String[] recordKeys = application.getActiveDevice().crossCheckMeasurements(recordsProperties, recordSet);
-		// check if the file content fits measurements from device properties XML which was used to create the record set
-		for (int i = 0; i < recordKeys.length; ++i) {
-			Record record = recordSet.get(recordKeys[i]);
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]); //$NON-NLS-1$
-			record.setSerializedProperties(recordsProperties[i]);
-			record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
-		}
-		recordSet.setDeserializedProperties(recordSetProperties);
-		recordSet.setSaved(true);
-		return recordSet;
 	}
 
 	/**
@@ -352,26 +317,6 @@ public class HistoOsdReaderWriter extends OsdReaderWriter { // todo merging this
 		else {
 			return null;
 		}
-	}
-
-	/**
-	 * @param header
-	 * @return null if parsing was not successful.
-	 */
-	private static Double parseDataExplorerVersion(HashMap<String, String> header) {
-		Double retVal;
-		if (header.containsKey(GDE.DATA_EXPLORER_FILE_VERSION)) {
-			try {
-				retVal = Double.parseDouble(header.get(GDE.DATA_EXPLORER_FILE_VERSION));
-			}
-			catch (Exception e) {
-				retVal = null;
-			}
-		}
-		else {
-			retVal = 1.; // OpenSerialData version : 1
-		}
-		return retVal;
 	}
 
 	/**

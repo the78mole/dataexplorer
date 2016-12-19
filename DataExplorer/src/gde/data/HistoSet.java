@@ -230,7 +230,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				// step: transform log files for the truss jobs into vaults and put them into the histoSet map
 				ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
 				for (Map.Entry<Path, Map<String, HistoVault>> pathEntry : trussJobs.entrySet()) {
-					newVaults.addAll(loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue()));
+					try {
+						newVaults.addAll(loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue()));
+					}
+					catch (Exception e) {
+						throw new UnsupportedOperationException(pathEntry.getKey().toString(), e);
+					}
 				}
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs loaded from file  = %d", newVaults.size())); //$NON-NLS-1$
 
@@ -411,17 +416,17 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			histoVaults = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
 			if (histoVaults == null) {
 				histoVaults = new ArrayList<HistoVault>();
-				log.log(Level.INFO, String.format("file format not supported: device = %s  channelConfigNumber = %d  histoFilePath = %s", //$NON-NLS-1$
+				log.log(Level.INFO, String.format("file format not supported: %s  channelNumber=%d  %s", //$NON-NLS-1$
 						this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
 			}
 		}
 		else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
 			histoVaults = HistoOsdReaderWriter.readHisto(filePath, trusses.values());
 		}
-		
+
 		if (histoVaults == null) {
 			histoVaults = new ArrayList<HistoVault>();
-			log.log(Level.INFO, String.format("file format not supported: device=%s  channelNumber=%d  %s", //$NON-NLS-1$
+			log.log(Level.INFO, String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
 					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
 		}
 		else {

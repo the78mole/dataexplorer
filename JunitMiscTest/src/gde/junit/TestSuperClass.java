@@ -74,7 +74,7 @@ public class TestSuperClass extends TestCase {
 			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 
 	protected enum DataSource {
-		SETTINGS, TESTDATA
+		SETTINGS, TESTDATA, INDIVIDUAL
 	};
 
 	final TimeLine												timeLine					= new TimeLine();
@@ -511,7 +511,7 @@ public class TestSuperClass extends TestCase {
 		if (dataSource == DataSource.SETTINGS && settingsPropertiesExist && isDataPathConfigured) {
 			this.dataPath = Paths.get(this.settings.getDataFilePath()).resolve(subPath).toFile();
 		}
-		else {
+		else if (dataSource == DataSource.TESTDATA) {
 			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
 				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
@@ -524,6 +524,9 @@ public class TestSuperClass extends TestCase {
 			}
 			// this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile(); Error because of leading slash: /C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer // this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile();
 			this.dataPath = (new File(srcDataPath)).toPath().resolve(subPath).toFile();
+		}
+		else if (dataSource == DataSource.INDIVIDUAL) {
+			this.dataPath = subPath.toFile();
 		}
 
 		this.settings.setDataFilePath(this.dataPath.getPath());

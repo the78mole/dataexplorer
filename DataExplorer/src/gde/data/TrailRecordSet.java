@@ -344,6 +344,35 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
+	 * query the size of record set child record 
+	 * - normal record set will return the size of the data vector of first active in recordNames
+	 * - zoomed set will return size of zoomOffset + zoomWith
+	 * @param isReal false return the size of zoomOffset + zoomWith
+	 * @return the size of data point to calculate the time unit
+	 */
+	@Override // trail suite support
+	public int getRecordDataSize(boolean isReal) {
+		int size = 0;
+		if (isReal) {
+			for (String recordKey : this.recordNames) {
+				if (get(recordKey).isActive()) {
+					size = ((TrailRecord) get(recordKey)).getTrailRecordSuite()[0].realSize();
+					break;
+				}
+			}
+		}
+		else {
+			for (String recordKey : this.recordNames) {
+				if (get(recordKey).isActive()) {
+					size = ((TrailRecord) get(recordKey)).getTrailRecordSuite()[0].realSize();
+					break;
+				}
+			}
+		}
+		return size;
+	}
+
+	/**
 	 * set the data points for one single trail record.
 	 * the record takes the selected trail type / score data from the trail record vault and populates its data. 
 	 * @param recordOrdinal
