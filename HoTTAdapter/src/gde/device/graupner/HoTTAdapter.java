@@ -605,16 +605,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				if (dataBuffer.length == 57) {
 					// 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
-					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
-					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
-					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
+					tmpVoltage = DataParser.parse2Short(dataBuffer, 16);
+					tmpCurrent = DataParser.parse2Short(dataBuffer, 24);
+					tmpRevolution = DataParser.parse2Short(dataBuffer, 28);
 					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
-						points[3] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+						points[3] = DataParser.parse2Short(dataBuffer, 20) * 1000;
 						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 						points[5] = tmpRevolution * 1000;
-						points[6] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+						points[6] = ((dataBuffer[35] & 0xFF) - 20) * 1000;
 					}
 				}
 				break;
