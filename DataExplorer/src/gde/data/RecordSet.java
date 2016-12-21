@@ -20,13 +20,13 @@ package gde.data;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.TriggerType;
 import gde.exception.DataInconsitsentException;
+import gde.histocache.HistoVault;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -62,6 +63,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final static String								$CLASS_NAME											= RecordSet.class.getName();
 	final static long									serialVersionUID								= 26031957;
 	final static Logger								log															= Logger.getLogger(RecordSet.class.getName());
+
+	private final static int					initialRecordCapacity						= 555;																			
 
 	TimeSteps													timeStep_ms;
 
@@ -155,7 +158,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 
 	public static final String[]			propertyKeys										= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
-			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };				//ET propertyKeys of class Record are public static as well
+			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };	
 
 	int																configuredDisplayable						= 0;																																																										// number of record which must be displayable before table calculation begins
 
@@ -532,6 +535,27 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
+	 * @return the minimum time step (timespan) in msec
+	 */
+	public double getMinimumTimeStep_ms() {
+		return this.timeStep_ms != null ? this.timeStep_ms.getMinimumTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getMinimumTimeStep_ms() : -1.0;
+	}
+
+	/**
+	 * @return the maximum time step (timespan) in msec
+	 */
+	public double getMaximumTimeStep_ms() {
+		return this.timeStep_ms != null ? this.timeStep_ms.getMaximumTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getMaximumTimeStep_ms() : -1.0;
+	}
+
+	/**
+	 * @return the standard deviation of the time steps (timespans) in msec
+	 */
+	public double getSigmaTimeStep_ms() {
+		return this.timeStep_ms != null ? this.timeStep_ms.getSigmaTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getSigmaTimeStep_ms() : -1.0;
+	}
+
+	/**
 	 * @return the isConstant true if time step is a constant value between measurement points
 	 */
 	public boolean isTimeStepConstant() {
@@ -764,7 +788,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names 
 	 */
-	public String[] getNoneCalculationRecordNames() { // TODO make this private
+	public String[] getNoneCalculationRecordNames() { 
 		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
@@ -782,6 +806,29 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		this.maxValue = -20000;
 		this.minValue = 20000;
 		this.resetZoomAndMeasurement();
+	}
+
+	/**
+	 * clears the data points in all records and in timeStep.
+	 * reduce initial capacity to zero.
+	 * does not clear any fields in the recordSet, in the records or in timeStep. 
+	 */
+	public void cleanup() {
+		//		this.histoSettlements.clear();
+		//		this.histoScoregroups.clear();
+		//		this.visibleAndDisplayableRecords.clear();
+		//		this.visibleAndDisplayableRecords.trimToSize();
+		//		this.allRecords.clear();
+		//		this.allRecords.trimToSize();
+		//		this.scaleSyncedRecords.clear();
+
+		this.timeStep_ms.clear();
+		this.timeStep_ms.trimToSize();
+		for (Map.Entry<String, Record> entry : this.entrySet()) {
+			entry.getValue().clear();
+			entry.getValue().trimToSize();
+		}
+		//		clear();  because cleanup is intended to reduce the heap size this clear is not required
 	}
 
 	public String getName() {
@@ -802,6 +849,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
+	@Deprecated // WBrueg get rid of this method and use the new method below
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 
@@ -833,6 +881,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
+	@Deprecated // WBrueg get rid of this method and use the new method below
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
 			boolean isRaw, boolean isFromFile) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
@@ -855,6 +904,81 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
 			if (activeChannel != null && !activeChannel.getObjectKey().equals(Settings.getInstance().getActiveObject())) {
 				activeChannel.setObjectKey(Settings.getInstance().getActiveObject());
+			}
+		}
+		newRecordSet.syncScaleOfSyncableRecords();
+		return newRecordSet;
+	}
+
+	/**
+	 * this method with param adjustObjectKey=true is 100% identical to the deprecated createRecordSet method
+	 * method to create a record set with given name "1) Laden" containing records according the device channle/configuration
+	 * which are loaded from device properties file
+	 * @param recordSetName the name of the record set
+	 * @param device the instance of the device 
+	 * @param channelConfigNumber (number of the outlet or configuration)
+	 * @param isRaw defines if the data needs translation using device specific properties
+	 * @param isFromFile defines if a configuration change must be recorded to signal changes
+	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
+	 * @return a record set containing all records (empty) as specified
+	 */
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
+		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+
+		String[] recordNames = device.getMeasurementNames(channelConfigNumber);
+		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
+			recordNames = device.getMeasurementNames(channelConfigNumber = 1);
+		}
+		String[] recordSymbols = new String[recordNames.length];
+		String[] recordUnits = new String[recordNames.length];
+		for (int i = 0; i < recordNames.length; i++) {
+			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
+			recordSymbols[i] = measurement.getSymbol();
+			recordUnits[i] = measurement.getUnit();
+		}
+		return createRecordSet(recordSetName, device, channelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile, adjustObjectKey);
+	}
+
+	/**
+	 * this method with param adjustObjectKey=true is 100% identical to the deprecated createRecordSet method
+	 * method to create a record set with given name "1) Laden" containing records according the given record names, symbols and units.
+	 * active status as well as statistics and properties are used from device properties.
+	 * @param recordSetName the name of the record set
+	 * @param device the instance of the device 
+	 * @param channelConfigNumber (name of the outlet or configuration)
+	 * @param recordNames array of names to be used for created records
+	 * @param recordSymbols array of symbols to be used for created records
+	 * @param recordUnits array of units to be used for created records
+	 * @param timeStep_ms 
+	 * @param isRaw defines if the data needs translation using device specific properties
+	 * @param isFromFile defines if a configuration change must be recorded to signal changes
+	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
+	 * @return a record set containing all records (empty) as specified
+	 */
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
+			boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
+		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
+		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
+
+		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms(), initialRecordCapacity);
+
+		for (int i = 0; i < recordNames.length; i++) {
+			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
+			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), initialRecordCapacity);
+			tmpRecord.setColorDefaultsAndPosition(i);
+			newRecordSet.put(recordNames[i], tmpRecord);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added record for " + recordNames[i] + " - " + newRecordSet.size()); //$NON-NLS-1$
+		}
+
+		if (adjustObjectKey) {
+			// check and update object key
+			DataExplorer application = DataExplorer.getInstance();
+			if (application != null && application.isObjectoriented()) {
+				Channel activeChannel = Channels.getInstance().getActiveChannel();
+				if (activeChannel != null && !activeChannel.getObjectKey().equals(Settings.getInstance().getActiveObject())) {
+					activeChannel.setObjectKey(Settings.getInstance().getActiveObject());
+				}
 			}
 		}
 		newRecordSet.syncScaleOfSyncableRecords();
@@ -2220,6 +2344,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public long getStartTimeStamp() {
 		return this.timeStep_ms != null ? this.timeStep_ms.getStartTimeStamp() : new Date().getTime();
+	}
+
+	/**
+	 * @return the record set start time stamp yyyy-MM-dd HH:mm:ss.SSS
+	 */
+	public String getStartTimeStampFormatted() {
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()); //$NON-NLS-1$
 	}
 
 	/**

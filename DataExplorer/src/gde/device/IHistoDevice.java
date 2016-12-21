@@ -14,32 +14,47 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    Copyright (c) 2016 Thomas Eickert
 ****************************************************************************************/
 package gde.device;
 
-import gde.data.RecordSet;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-
-import java.io.IOException;
+import gde.histocache.HistoVault;
 
 /**
  * devices with history support implementations.
  * @author Thomas Eickert
  */
-public interface IHistoDevice { //TODO merging with IDevice later
+public interface IHistoDevice { //todo merging with IDevice later
 
 	/**
-	 * add record data size points from binary file to each measurement.
+	 * create history recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
 	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
 	 * @param filePath 
+	 * @param trusses referencing a subset of the recordsets in the file
+	 * @throws DataInconsitsentException 
+	 * @throws DataTypeException 
+	 * @throws IOException 
+	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
+	 */
+	public List<HistoVault>  getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException;
+
+	/**
+	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param maxPoints maximum values from the data buffer which are verified during sampling
+	 * @param minPoints minimum values from the data buffer which are verified during sampling
 	 * @throws DataInconsitsentException 
 	 */
-	public void addBinFileAsRawDataPoints(RecordSet recordSet, String filePath) throws IOException, DataTypeException, DataInconsitsentException;
+	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
 
 }

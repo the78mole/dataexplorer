@@ -20,17 +20,13 @@
 package gde.utils;
 
 import gde.GDE;
-import gde.data.HistoSet;
+import gde.config.Settings;
 import gde.data.Record;
 import gde.data.TrailRecord;
-import gde.data.TrailRecord.TrailType;
-import gde.device.IDevice;
+import gde.data.TrailRecordSet;
 import gde.log.Level;
-import gde.ui.DataExplorer;
 import gde.utils.HistoTimeLine.Density;
 
-import java.awt.BasicStroke;
-import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -46,9 +42,11 @@ import org.eclipse.swt.graphics.Point;
  * vertical scales for histo graphics are supported by the base class.
  * @author Thomas Eickert
  */
-public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtils reduces number of classes
-	private final static String	$CLASS_NAME	= HistoTimeLine.class.getName();
-	private final static Logger	log			= Logger.getLogger($CLASS_NAME);
+public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtils reduces number of classes
+	private final static String		$CLASS_NAME	= HistoTimeLine.class.getName();
+	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
+
+	private final static Settings	settings		= Settings.getInstance();
 
 	/**
 	 * method draw the curve using the given graphics context (GC)
@@ -77,10 +75,8 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 	 * @param timeLine 
 	 */
 	public static void drawHistoCurve(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -91,11 +87,9 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 		int displayableSize = record.size();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
 		double displayableTime_ms = record.getDrawTimeWidth_ms();
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
 		int xScaleFactor; // x-axis scaling not supported
 		if (false) {
@@ -108,11 +102,11 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 			// xScaleFactor+=2;
 			// calculate scale factor to fit time into draw bounds display pixel based
 			double xTimeFactor = width / displayableTime_ms; // * (xScaleFactor - 0.44);
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
 			record.setDisplayScaleFactorTime(xTimeFactor);
 			record.setDisplayScaleFactorValue(height);
-		} else {
+		}
+		else {
 			xScaleFactor = 1;
 			record.setDisplayScaleFactorTime(1);
 			record.setDisplayScaleFactorValue(height);
@@ -128,45 +122,46 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 				// oldPoint = record.getParent().isScopeMode() ? record.getDisplayPoint(0, x0, y0) : record.getDisplayEndPoint(0, x0);
 				int xPosNewestPoint = timeLine.getScalePositions().firstEntry().getValue(); // is the leftmost point only if the scale is not reversed (reversed is standard)
 				oldPoint1 = record.getDisplayEndPoint(xPosNewestPoint);
-				if (log.isLoggable(Level.FINEST))
-					sb.append(GDE.LINE_SEPARATOR).append(oldPoint1.toString());
-			} catch (RuntimeException e) {
+				if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(oldPoint1.toString());
+			}
+			catch (RuntimeException e) {
 				log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
 			}
 		}
 
 		Point[] points = null;
-		List<Point[]> suitePoints = new ArrayList<Point[]>();
+		List<Point[]> suitePoints = new ArrayList<>();
 		Point[] oldSuitePoints = new Point[3];
 		int boxWidth = 0; // boxplot only
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		if (record.getParent().isCompareSet()) {// TODO not supported // compare set might contain records with different size
+		if (record.getParent().isCompareSet()) {// todo not supported // compare set might contain records with different size
 			throw new UnsupportedOperationException();
-		} else if (record.getDevice().isGPSCoordinates(record)) {
+		}
+		else if (record.getDevice().isGPSCoordinates(record)) {
 			points = record.getGpsDisplayPoints(timeLine, x0, y0);
-		} else if (record.getTrailRecordSuite().length > 1) {
+		}
+		else if (record.getTrailRecordSuite().length > 1) {
 			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
 				points = trailRecord.getDisplayPoints(timeLine, x0, y0);
 				suitePoints.add(points);
 			}
-			boxWidth = timeLine.getDensity().getBoxWidth();
-		} else {
+			boxWidth = timeLine.getDensity().getScaledBoxWidth();
+		}
+		else {
 			points = record.getDisplayPoints(timeLine, x0, y0);
 		}
 		Point newPoint, oldPoint = null;
-		for (int j = 0; j < points.length && j <= displayableSize && displayableSize > 1; j++) {
+		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
 				drawHistoMarker(gc, newPoint, record.getColor(), timeLine.getDensity());
 				if (oldPoint != null) {
-					if (log.isLoggable(Level.FINEST))
-						sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
+					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
 				oldPoint = newPoint; // remember the last draw point for next drawLine operation
 			}
 		}
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, sb.toString());
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, sb.toString());
 	}
 
 	/**
@@ -181,10 +176,8 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 	 * @param timeLine 
 	 */
 	public static void drawHistoSuite(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -197,26 +190,26 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 		double displayableTime_ms = masterRecord.getDrawTimeWidth_ms();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, "average record time step msec = " + masterRecord.getAverageTimeStep_ms()); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + masterRecord.getAverageTimeStep_ms()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 		{
-			int xScaleFactor  = 1; // x-axis scaling not supported
+			int xScaleFactor = 1; // x-axis scaling not supported
 			record.setDisplayScaleFactorTime(xScaleFactor);
 			record.setDisplayScaleFactorValue(height);
 		}
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
 
-		List<Point[]> suitePoints = new ArrayList<Point[]>(); // display point cache: one row for each record of the suite
+		List<Point[]> suitePoints = new ArrayList<>(); // display point cache: one row for each record of the suite
 		int boxWidth = 0; // boxplot only
-		if (record.getParent().isCompareSet()) {// TODO not supported // compare set might contain records with different size
+		if (record.getParent().isCompareSet()) {// todo not supported // compare set might contain records with different size
 			throw new UnsupportedOperationException();
-		} else if (record.getDevice().isGPSCoordinates(record)) { // TODO not supported
+		}
+		else if (record.getDevice().isGPSCoordinates(record)) { // todo GPS not supported
 			// points = record.getGpsDisplayPoints(timeLine, x0, y0);
 			throw new UnsupportedOperationException();
-		} else if (record.getTrailRecordSuite().length > 1) {
+		}
+		else if (record.getTrailRecordSuite().length > 1) {
 			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
 				// this was done in drawScale for the record
 				trailRecord.setMinScaleValue(record.getMinScaleValue());
@@ -228,72 +221,90 @@ public class HistoCurveUtils extends CurveUtils { // TODO merging with CurveUtil
 				trailRecord.setDisplayScaleFactorValue(height); // for getDisplayPoints
 				suitePoints.add(trailRecord.getDisplayPoints(timeLine, x0, y0));
 			}
-			boxWidth = timeLine.getDensity().getBoxWidth();
-		} else {
+			boxWidth = timeLine.getDensity().getScaledBoxWidth();
+		}
+		else {
 			throw new UnsupportedOperationException();
 		}
+		double averageDuration = ((TrailRecordSet) record.getParent()).getAverageDuration_mm();
+		List<Integer> durations_mm = ((TrailRecordSet) record.getParent()).getDurations_mm();
 		Point[] newSuitePoints = new Point[record.getTrailRecordSuite().length]; // all points for the current x-axis position
 		Point[] oldSuitePoints = new Point[record.getTrailRecordSuite().length]; // all points for the previous x-axis position
-		for (int j = 0; j < suitePoints.get(0).length && j <= displayableSize && displayableSize > 1; j++) {
+		for (int j = 0; j < suitePoints.get(0).length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((suitePoints.get(0)[j]) != null) { // in case of a suite the master triggers the display of all trails
 				for (int i = 0; i < record.getTrailRecordSuite().length; i++) {
 					oldSuitePoints[i] = newSuitePoints[i];
 					newSuitePoints[i] = suitePoints.get(i)[j];
 				}
-				if (record.getTrailType().equals(TrailType.SUITE_BOX_PLOT)) { // 0=AVG, 1=Q0,2=Q1,3=Q2,4=Q3,5=Q4, 6=O1,7=O7
-					if (log.isLoggable(Level.FINEST))
-						sb.append(GDE.LINE_SEPARATOR).append(newSuitePoints[0].toString());
-					// main box
-					int elementHeight = newSuitePoints[2].y - newSuitePoints[3].y;
-					gc.drawRectangle(newSuitePoints[0].x - boxWidth / 2, newSuitePoints[0].y - elementHeight / 2, boxWidth, elementHeight);
-					elementHeight = newSuitePoints[4].y - newSuitePoints[3].y;
-					gc.drawRectangle(-1 + newSuitePoints[0].x - boxWidth / 2, newSuitePoints[0].y - elementHeight / 2, 2 + boxWidth, elementHeight);
-					// antennas
-					elementHeight = newSuitePoints[6].y - newSuitePoints[2].y;
-					gc.drawLine(newSuitePoints[0].x, newSuitePoints[6].y, newSuitePoints[0].x, newSuitePoints[2].y);
-					gc.drawLine(newSuitePoints[0].x, newSuitePoints[7].y, newSuitePoints[0].x, newSuitePoints[4].y);
-					int elementHalfWidth = boxWidth * 3 / 8;
-					gc.drawLine(newSuitePoints[0].x - elementHalfWidth, newSuitePoints[6].y, newSuitePoints[0].x + elementHalfWidth, newSuitePoints[6].y);
-					gc.drawLine(newSuitePoints[0].x - elementHalfWidth, newSuitePoints[7].y, newSuitePoints[0].x + elementHalfWidth, newSuitePoints[7].y);
-					// avg, min, max markers
-					drawHistoMarker(gc, newSuitePoints[0], record.getColor(), timeLine.getDensity());
-					drawHistoMarker(gc, newSuitePoints[1], record.getColor(), timeLine.getDensity());
-					drawHistoMarker(gc, newSuitePoints[5], record.getColor(), timeLine.getDensity());
-				} else if (record.getTrailType().isSuite()) { // other suite members do not require special treatment
-					drawHistoMarker(gc, newSuitePoints[0], record.getColor(), timeLine.getDensity());
-					if (oldSuitePoints[0] != null) {
-						if (log.isLoggable(Level.FINEST))
-							sb.append(GDE.LINE_SEPARATOR).append(suitePoints.get(0)[j].toString());
-						// main curve
-						gc.drawLine(oldSuitePoints[0].x, oldSuitePoints[0].y, newSuitePoints[0].x, newSuitePoints[0].y);
-						// two extremum curves
-						gc.setLineStyle(SWT.LINE_DASH); 
-						gc.drawLine(oldSuitePoints[1].x, oldSuitePoints[1].y, newSuitePoints[1].x, newSuitePoints[1].y);
-						gc.drawLine(oldSuitePoints[2].x, oldSuitePoints[2].y, newSuitePoints[2].x, newSuitePoints[2].y);
-						// vertical connection lines sparsely dotted
-						gc.setLineStyle(SWT.LINE_CUSTOM); 
-						gc.setLineDash(new int[] {1, 9});
-						gc.drawLine(newSuitePoints[1].x, newSuitePoints[1].y, newSuitePoints[2].x, newSuitePoints[2].y);
-						gc.setLineStyle(SWT.LINE_SOLID);
+				if (record.isBoxPlotSuite()) {
+					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newSuitePoints[0].toString());
+					// helper variables
+					final int posX = newSuitePoints[0].x;
+					final int q0PosY = newSuitePoints[0].y, q1PosY = newSuitePoints[1].y, q2PosY = newSuitePoints[2].y, q3PosY = newSuitePoints[3].y, q4PosY = newSuitePoints[4].y,
+							qLowerWhiskerY = newSuitePoints[5].y, qUpperWhiskerY = newSuitePoints[6].y;
+					final int interQuartileRange = q1PosY - q3PosY;
+					int halfBoxWidth = (int) (boxWidth
+							* (1. + (Math.sqrt(durations_mm.get(j) / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0) / 2.); // divison by 3 is the best fit divisor; 2 results in bigger modulation rates
+					halfBoxWidth = halfBoxWidth < 1 ? 1 : halfBoxWidth;
+					// draw main box
+					gc.drawRectangle(posX - halfBoxWidth, q3PosY, halfBoxWidth * 2, interQuartileRange);
+					gc.drawLine(posX - halfBoxWidth, q2PosY, posX + halfBoxWidth, q2PosY);
+					// draw min and lower whisker
+					if (q0PosY > qLowerWhiskerY) {
+						drawHistoMarker(gc, newSuitePoints[0], record.getColor(), timeLine.getDensity());
 					}
-				} else {
+					gc.drawLine(posX, qLowerWhiskerY, posX, q1PosY);
+					gc.drawLine(posX - halfBoxWidth / 2, qLowerWhiskerY, posX + halfBoxWidth / 2, qLowerWhiskerY);
+					// draw max and upper whisker
+					if (q4PosY < qUpperWhiskerY) {
+						drawHistoMarker(gc, newSuitePoints[4], record.getColor(), timeLine.getDensity());
+					}
+					gc.drawLine(posX, qUpperWhiskerY, posX, q3PosY);
+					gc.drawLine(posX - halfBoxWidth / 2, qUpperWhiskerY, posX + halfBoxWidth / 2, qUpperWhiskerY);
+				}
+				else if (record.isRangePlotSuite()) { // other suite members do not require a special treatment
+					drawHistoMarker(gc, newSuitePoints[0], record.getColor(), timeLine.getDensity());
+					// helper variables
+					final int posX = newSuitePoints[0].x;
+					if (oldSuitePoints[0] != null) {
+						final int oldPosX = oldSuitePoints[0].x;
+						if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(suitePoints.get(0)[j].toString());
+						// draw main curve
+						gc.drawLine(oldPosX, oldSuitePoints[0].y, posX, newSuitePoints[0].y);
+						// draw two extremum curves
+						gc.setLineStyle(SWT.LINE_DASH);
+						gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
+						gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
+					}
+					// draw vertical connection lines sparsely dotted
+					gc.setLineStyle(SWT.LINE_CUSTOM);
+					gc.setLineDash(new int[] { 2, 9 });
+					gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
+					gc.setLineStyle(SWT.LINE_SOLID);
+				}
+				else {
 					throw new UnsupportedOperationException();
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, sb.toString());
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, sb.toString());
 	}
 
 	private static void drawHistoMarker(GC gc, Point newPoint, Color color, Density density) {
 		if (density == HistoTimeLine.Density.LOW) {
-			Color last = gc.getBackground();
-			gc.setBackground(color);
-			gc.fillOval(newPoint.x - 4, newPoint.y - 4, 8, 8);
-			gc.setBackground(last);
-		} else if (density == HistoTimeLine.Density.MEDIUM) {
+			//Color last = gc.getBackground();
+			//gc.setBackground(color);
+			//gc.fillOval(newPoint.x - 4, newPoint.y - 4, 8, 8);
+			//gc.setBackground(last);
+			gc.drawOval(newPoint.x - 3, newPoint.y - 3, 6, 6);
+		}
+		else if (density == HistoTimeLine.Density.MEDIUM) {
 			gc.drawOval(newPoint.x - 2, newPoint.y - 2, 4, 4);
-		} else if (density == HistoTimeLine.Density.HIGH) {
+		}
+		else if (density == HistoTimeLine.Density.HIGH) {
+			gc.drawOval(newPoint.x - 1, newPoint.y - 1, 2, 2);
+		}
+		else if (density == HistoTimeLine.Density.EXTREME) {
 			gc.drawOval(newPoint.x - 1, newPoint.y - 1, 2, 2);
 		}
 	}

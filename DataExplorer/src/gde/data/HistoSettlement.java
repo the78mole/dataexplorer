@@ -14,17 +14,18 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    Copyright (c) 2016 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.CalculationType;
-import gde.device.CalculationType.CalcType;
+import gde.device.CalculationTypes;
 import gde.device.DataTypes;
 import gde.device.EvaluationType;
 import gde.device.IDevice;
+import gde.device.LevelingTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.SettlementType;
@@ -54,8 +55,8 @@ import org.eclipse.swt.graphics.Rectangle;
  * similar to record class except: clone, serialization, triggers, syncWithRecords, setName, GPS-longitude, GPS-latitude.
  * @author Thomas Eickert
  */
-public class HistoSettlement extends Vector<Integer> { // TODO maybe a better option is to create a common base class for Record, HistoSettlement and TrailRecord.
-	// TODO get rid of all the rubbish copied from the data class.
+public class HistoSettlement extends Vector<Integer> { // todo maybe a better option is to create a common base class for Record, HistoSettlement and TrailRecord.
+	// todo get rid of all the rubbish copied from the data class.
 	final static String				$CLASS_NAME								= HistoSettlement.class.getName();
 	final static long					serialVersionUID					= 6130190003229390899L;
 	final static Logger				log												= Logger.getLogger($CLASS_NAME);
@@ -72,7 +73,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	int												ordinal;																											// ordinal is referencing the source position of the record relative to the initial
 	// device measurement configuration and used to find specific properties
 
-	HistoRecordSet						parent;
+	RecordSet						parent;
 	String										name;																													// measurement name Höhe
 	String										unit;																													// unit [m]
 	String										symbol;																												// symbol h
@@ -178,7 +179,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		public static List<String> getValuesAsList() {
 			List<String> dataTypeValues = new ArrayList<String>();
 			for (DataType type : DataType.values()) {
-				dataTypeValues.add(type.value);
+				dataTypeValues.add(type.value());
 			}
 			return dataTypeValues;
 		}
@@ -190,7 +191,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @param newSettlement
 	 * @param initialCapacity
 	 */
-	public HistoSettlement(IDevice newDevice, SettlementType newSettlement, HistoRecordSet parent, int initialCapacity) {
+	public HistoSettlement(IDevice newDevice, SettlementType newSettlement, RecordSet parent, int initialCapacity) {
 		super(initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newSettlement.getName() + " Settlement(IDevice , SettlementType , int )"); //$NON-NLS-1$
 		this.device = newDevice;
@@ -308,13 +309,13 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
 		Record calculationRecord = this.parent.get(this.parent.recordNames[calculation.getRefOrdinal()]);
 		double calculationValue;
-		if (calculation.getCalcType().equals(CalcType.COUNT.value)) {
+		if (calculation.getCalcType().equals(CalculationTypes.COUNT.value())) {
 			calculationValue = transition.thresholdSize * 1000.; // all internal values are multiplied by 1000
 		}
-		else if (calculation.getCalcType().equals(CalcType.TIMESUM_MS.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.TIME_SUM_MS.value())) {
 			calculationValue = (calculationRecord.getTime_ms(transition.recoveryStartIndex) - calculationRecord.getTime_ms(transition.thresholdStartIndex)) * 10.;
 		}
-		else if (calculation.getCalcType().equals(CalcType.MIN.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MIN.value())) {
 			calculationValue = Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
 				if (calculationRecord.get(j) != null) {
@@ -322,7 +323,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					calculationValue = Math.min(calculationValue, calculation.isUnsigned() ? Math.abs(calculationTranslateValue) : calculationTranslateValue);
 				}
 		}
-		else if (calculation.getCalcType().equals(CalcType.MAX.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MAX.value())) {
 			calculationValue = calculation.isUnsigned() ? Double.MAX_VALUE : -Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
 				if (calculationRecord.get(j) != null) {
@@ -330,7 +331,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					calculationValue = Math.max(calculationValue, calculation.isUnsigned() ? Math.abs(calculationTranslateValue) : calculationTranslateValue);
 				}
 		}
-		else if (calculation.getCalcType().equals(CalcType.AVG.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.AVG.value())) {
 			double sum = 0;
 			int skipCount = 0;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
@@ -343,7 +344,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 				}
 			calculationValue = sum / (double) (transition.thresholdSize - skipCount);
 		}
-		else if (calculation.getCalcType().equals(CalcType.SIGMA.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SIGMA.value())) {
 			double avg = 0, q = 0, value = 0;
 			int skipCount = 0;
 			calculationValue = 0;
@@ -358,9 +359,9 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 				else {
 					skipCount++;
 				}
-			calculationValue = Math.sqrt(q / (transition.thresholdSize - skipCount));
+			calculationValue = Math.sqrt(q / (transition.thresholdSize - skipCount - 1));
 		}
-		else if (calculation.getCalcType().equals(CalcType.SUM.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SUM.value())) {
 			calculationValue = 0;
 			for (int j = transition.thresholdStartIndex; j > transition.recoveryStartIndex; j++)
 				if (calculationRecord.get(j) != null) {
@@ -371,9 +372,9 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		else
 			calculationValue = 0;
 		// add to settlement record
-		addNullableRaw((int) reverseTranslateValue(calculationValue), (long) calculationRecord.getTime_ms(transition.thresholdEndIndex) * 10); // TODO assign better to the time step of the extremum value in the threshold and recovery time
-		// if (log.isLoggable(Level.FINE))
-		log.log(Level.SEVERE, String.format("%s: timeStamp_ms=%f  calculationValue=%d  reverseTranslateValue=%f", calculation.getCalcType(), calculationRecord.getTime_ms(transition.recoveryStartIndex //$NON-NLS-1$
+		addNullableRaw((int) reverseTranslateValue(calculationValue), (long) calculationRecord.getTime_ms(transition.thresholdEndIndex) * 10); // todo assign better to the time step of the extremum value in the threshold and recovery time
+		 if (log.isLoggable(Level.FINE))
+		log.log(Level.FINE, String.format("%s: timeStamp_ms=%f  calculationValue=%d  reverseTranslateValue=%f", calculation.getCalcType(), calculationRecord.getTime_ms(transition.recoveryStartIndex //$NON-NLS-1$
 				- 1), calculationValue, reverseTranslateValue(calculationValue)));
 	}
 
@@ -385,7 +386,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @param transition
 	 * @return peak spread value as translatedValue
 	 */
-	private double calculateDelta4Peak(Record record, String leveling, Transition transition) {
+	private double calculateDelta4Peak(Record record, LevelingTypes leveling, Transition transition) {
 		double deltaValue = 0;
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
 		double referenceExtremum = 0;
@@ -507,8 +508,8 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					}
 				}
 				isPositivePeak = (negativeWeightSum / (double) negativeDeltaSum - positiveWeightSum / (double) positiveDeltaSum) > 0;
-				// if (log.isLoggable(Level.FINE))
-				log.log(Level.SEVERE,
+				 if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE,
 						String.format("%s isPositivePeak=%b  based on PositionIndicator=%f", record.getName(), isPositivePeak,
 								((double) negativeWeightSum / negativeDeltaSum - (double) positiveWeightSum / positiveDeltaSum)
 										/ ((double) negativeWeightSum / negativeDeltaSum + (double) positiveWeightSum / positiveDeltaSum)));
@@ -574,8 +575,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 			deltaValue = calculation.isBasedOnRecovery() == null ? thresholdExtremum - (referenceExtremum + recoveryExtremum) / 2
 					: calculation.isBasedOnRecovery() ? thresholdExtremum - recoveryExtremum : thresholdExtremum - referenceExtremum;
 		}
-		// if (log.isLoggable(Level.FINE))
-		log.log(Level.SEVERE, String.format("referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
 				, referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, calculation.isBasedOnRecovery()));
 		return deltaValue;
 	}
@@ -588,44 +588,43 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	private void calculateAndAdd4Peak(Transition transition) {
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
 		final Record record = this.parent.get(this.parent.recordNames[calculation.getRefOrdinal()]);
-		// if (log.isLoggable(Level.FINE))
-		// log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d thresholdDequeSize=%d recoveryDequeSize=%d", record.getName(), transition.getReferenceSize(), transition.thresholdSize, transition.getRecoverySize())); //$NON-NLS-1$
-		log.log(Level.SEVERE, record.getName() + " values   " //$NON-NLS-1$
+		//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+		//				String.format("%s: referenceDequeSize=%d thresholdDequeSize=%d recoveryDequeSize=%d", record.getName(), transition.getReferenceSize(), transition.thresholdSize, transition.getRecoverySize())); //$NON-NLS-1$
+		log.log(Level.FINE, record.getName() + " values   " //$NON-NLS-1$
 				+ record.subList(transition.startIndex, transition.endIndex + 1));
 		final double calculationValue;
-		if (calculation.getCalcType().equals(CalcType.RATIO.value) || calculation.getCalcType().equals(CalcType.RATIOINVERSE.value)) {
+		if (calculation.getCalcType().equals(CalculationTypes.RATIO.value()) || calculation.getCalcType().equals(CalculationTypes.RATIO_INVERSE.value())) {
 			final double denominator = calculateDelta4Peak(record, calculation.getLeveling(), transition);
 			final Record divisorRecord = calculation.getRefOrdinalDivisor() != null ? this.parent.get(this.parent.recordNames[calculation.getRefOrdinalDivisor()]) : null;
-			// if (log.isLoggable(Level.FINE))
-			log.log(Level.SEVERE, divisorRecord.getName() + " divisors " //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, divisorRecord.getName() + " divisors " //$NON-NLS-1$
 					+ divisorRecord.subList(transition.startIndex, transition.endIndex + 1));
 			final double divisor = calculateDelta4Peak(divisorRecord, calculation.getDivisorLeveling(), transition);
-			if (calculation.getCalcType().equals(CalcType.RATIO.value)) {
+			if (calculation.getCalcType().equals(CalculationTypes.RATIO.value())) {
 				calculationValue = calculation.isUnsigned() ? Math.abs(1000. * denominator / divisor) : 1000. * denominator / divisor; // all internal values are multiplied by 1000
 			}
 			else {
 				calculationValue = calculation.isUnsigned() ? Math.abs(1000. * divisor / denominator) : 1000. * divisor / denominator; // all internal values are multiplied by 1000
 			}
 		}
-		else if (calculation.getCalcType().equals(CalcType.COUNT.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.COUNT.value())) {
 			calculationValue = 1000. * transition.thresholdSize; // all internal values are multiplied by 1000
 		}
-		else if (calculation.getCalcType().equals(CalcType.TIMESUM_MS.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.TIME_SUM_MS.value())) {
 			calculationValue = (record.getTime_ms(transition.recoveryStartIndex) - record.getTime_ms(transition.thresholdStartIndex));
 		}
-		else if (calculation.getCalcType().equals(CalcType.MIN.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MIN.value())) {
 			double value = Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
 				if (record.get(j) != null) value = Math.min(value, calculation.isUnsigned() ? Math.abs(this.device.translateValue(record, record.get(j))) : this.device.translateValue(record, record.get(j)));
 			calculationValue = value;
 		}
-		else if (calculation.getCalcType().equals(CalcType.MAX.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.MAX.value())) {
 			double value = calculation.isUnsigned() ? 0. : -Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
 				if (record.get(j) != null) value = Math.max(value, calculation.isUnsigned() ? Math.abs(this.device.translateValue(record, record.get(j))) : this.device.translateValue(record, record.get(j)));
 			calculationValue = value;
 		}
-		else if (calculation.getCalcType().equals(CalcType.AVG.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.AVG.value())) {
 			double sum = 0;
 			int skipCount = 0;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
@@ -636,7 +635,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					skipCount++;
 			calculationValue = sum / (double) (transition.thresholdSize - skipCount);
 		}
-		else if (calculation.getCalcType().equals(CalcType.SIGMA.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SIGMA.value())) {
 			// https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
 			double avg = 0, q = 0, value = 0;
 			int skipCount = 0;
@@ -646,14 +645,13 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.thresholdStartIndex - skipCount + 1);
 					q += deltaAvg * (value - avg);
-					log.log(Level.SEVERE, String.format("value=%f  deltaAvg=%f  q=%f", value //$NON-NLS-1$
-							, deltaAvg, q));
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value=%f  deltaAvg=%f  q=%f", value, deltaAvg, q));
 				}
 				else
 					skipCount++;
-			calculationValue = Math.sqrt(q / (transition.thresholdSize - skipCount));
+			calculationValue = Math.sqrt(q / (transition.thresholdSize - skipCount - 1));
 		}
-		else if (calculation.getCalcType().equals(CalcType.SUM.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.SUM.value())) {
 			double sum = 0;
 			for (int j = transition.thresholdStartIndex; j < transition.recoveryStartIndex; j++)
 				sum += calculation.isUnsigned() ? Math.abs(this.device.translateValue(record, record.get(j))) : this.device.translateValue(record, record.get(j));
@@ -662,9 +660,8 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		else
 			calculationValue = 0;
 		// add to settlement record
-		addNullableRaw((int) reverseTranslateValue(calculationValue), (long) record.getTime_ms(transition.thresholdEndIndex) * 10); // TODO assign better to the time step of the extremum value in the threshold and recovery time
-		// if (log.isLoggable(Level.FINE))
-		log.log(Level.SEVERE, String.format("addRaw: timeStamp_ms=%f  calculationValue=%f  reverseTranslateValue=%f", record.getTime_ms(transition.recoveryStartIndex) //$NON-NLS-1$
+		addNullableRaw((int) reverseTranslateValue(calculationValue), (long) record.getTime_ms(transition.thresholdEndIndex) * 10); // todo assign better to the time step of the extremum value in the threshold and recovery time
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("addRaw: timeStamp_ms=%f  calculationValue=%f  reverseTranslateValue=%f", record.getTime_ms(transition.recoveryStartIndex) //$NON-NLS-1$
 				, calculationValue, reverseTranslateValue(calculationValue)));
 	}
 
@@ -694,10 +691,8 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 					this.maxValue = point;
 				else if (point < this.minValue) this.minValue = point;
 			}
-			// if (log.isLoggable(Level.FINER))
-			log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
-			// if (log.isLoggable(Level.FINEST))
-			log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return super.add(point);
 	}
@@ -713,10 +708,8 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 				this.maxValue = point;
 			else if (point < this.minValue) this.minValue = point;
 		}
-		// if (log.isLoggable(Level.FINER))
-		log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
-		// if (log.isLoggable(Level.FINEST))
-		log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		return super.set(index, point);
 	}
 
@@ -1226,7 +1219,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @param timeStep_ms the timeStep_ms to set
 	 */
 	void setTimeStep_ms(double newTimeStep_ms) {
-		this.timeStep_ms = new TimeSteps(newTimeStep_ms);
+		this.timeStep_ms = new TimeSteps(newTimeStep_ms, HistoRecordSet.initialRecordCapacity);
 	}
 
 	/**
@@ -1341,9 +1334,10 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @return the decimal format used by this record
 	 */
 	public DecimalFormat getDecimalFormat() {
-		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
-		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
+		throw new UnsupportedOperationException();
+//		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
+//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
+//		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
 	}
 
 	/**
@@ -1510,7 +1504,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		String displayPointValue;
 		// scales are all synchronized in viewpoint of end values (min/max)
 		// PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-		// if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+		// if (syncProperty != null && !syncProperty.getValue().isEmpty()) {
 		// Record syncRecord = this.parent.get(this.ordinal);
 		// displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue + ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		// }
@@ -1620,53 +1614,56 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
-		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		if (this.parent.isOneOfSyncableRecord(this) && this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor();
-			this.displayScaleFactorValue = this.displayScaleFactorValue * syncMasterFactor;
-		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
-				String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, //$NON-NLS-1$
-						(this.maxDisplayValue - this.minDisplayValue)));
-
+		throw new UnsupportedOperationException();
+//		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
+//		if (this.parent.isOneOfSyncableRecord(this) && this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
+//			this.syncMasterFactor = this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor();
+//			this.displayScaleFactorValue = this.displayScaleFactorValue * syncMasterFactor;
+//		}
+//		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
+//				String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, //$NON-NLS-1$
+//						(this.maxDisplayValue - this.minDisplayValue)));
+//
 	}
 
 	/**
 	 * @param newMinDisplayValue the minDisplayValue to set
 	 */
 	public void setMinDisplayValue(double newMinDisplayValue) {
-		if (false) { // TODO (this.device.isGPSCoordinates(this)) {
-			this.minDisplayValue = translateValue(newMinDisplayValue) * 1000;
-		}
-		else
-			this.minDisplayValue = newMinDisplayValue;
-
-		if (this.parent.isOneOfSyncableRecord(this)) {
-			// TODO find better solution for syncing records and histo settlements
-			throw new IllegalStateException();
-			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
-			// tmpRecord.minDisplayValue = this.minDisplayValue;
-			// }
-		}
+		throw new UnsupportedOperationException();
+//		if (false) { // todo (this.device.isGPSCoordinates(this)) {
+//			this.minDisplayValue = translateValue(newMinDisplayValue) * 1000;
+//		}
+//		else
+//			this.minDisplayValue = newMinDisplayValue;
+//
+//		if (this.parent.isOneOfSyncableRecord(this)) {
+//			// todo find better solution for syncing records and histo settlements
+//			throw new IllegalStateException();
+//			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+//			// tmpRecord.minDisplayValue = this.minDisplayValue;
+//			// }
+//		}
 	}
 
 	/**
 	 * @param newMaxDisplayValue the maxDisplayValue to set
 	 */
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		if (false) { // TODO (this.device.isGPSCoordinates(this)) {
-			this.maxDisplayValue = translateValue(newMaxDisplayValue) * 1000;
-		}
-		else
-			this.maxDisplayValue = newMaxDisplayValue;
-
-		if (this.parent.isOneOfSyncableRecord(this)) {
-			// TODO find better solution for syncing records and histo settlements
-			throw new IllegalStateException();
-			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
-			// tmpRecord.maxDisplayValue = this.maxDisplayValue;
-			// }
-		}
+		throw new UnsupportedOperationException();
+//		if (false) { // todo (this.device.isGPSCoordinates(this)) {
+//			this.maxDisplayValue = translateValue(newMaxDisplayValue) * 1000;
+//		}
+//		else
+//			this.maxDisplayValue = newMaxDisplayValue;
+//
+//		if (this.parent.isOneOfSyncableRecord(this)) {
+//			// todo find better solution for syncing records and histo settlements
+//			throw new IllegalStateException();
+//			// for (HistoSettlement tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+//			// tmpRecord.maxDisplayValue = this.maxDisplayValue;
+//			// }
+//		}
 	}
 
 	/**
@@ -1896,7 +1893,8 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @return the isScaleSynced
 	 */
 	public boolean isScaleSynced() {
-		return this.parent.isOneOfSyncableRecord(this);
+		throw new UnsupportedOperationException();
+//		return this.parent.isOneOfSyncableRecord(this);
 	}
 
 	/**
@@ -1910,8 +1908,9 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 	 * @return true if the record is the scale sync master
 	 */
 	public boolean isScaleVisible() {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.parent.isOneOfSyncableRecord(this));
-		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
+		throw new UnsupportedOperationException();
+//		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.parent.isOneOfSyncableRecord(this));
+//		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
 	}
 
 	/**
@@ -2028,12 +2027,12 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		double offset;
 		double reduction;
 		CalculationType calculation = this.settlement.getEvaluation().getCalculation();
-		if (calculation.getCalcType().equals(CalcType.RATIO.value) || calculation.getCalcType().equals(CalcType.RATIOINVERSE.value)) {
+		if (calculation.getCalcType().equals(CalculationTypes.RATIO.value()) || calculation.getCalcType().equals(CalculationTypes.RATIO_INVERSE.value())) {
 			factor = .001; // internal representation in per mille
 			offset = 0; // != 0 if a unit translation is required
 			reduction = 0; // != 0 if a unit translation is required
 		}
-		else if (calculation.getCalcType().equals(CalcType.COUNT.value)) {
+		else if (calculation.getCalcType().equals(CalculationTypes.COUNT.value())) {
 			factor = 1; // internal representation in ea
 			offset = 0; // != 0 if a unit translation is required
 			reduction = 0; // != 0 if a unit translation is required
@@ -2053,8 +2052,7 @@ public class HistoSettlement extends Vector<Integer> { // TODO maybe a better op
 		// } else {
 		newValue = (value - offset) / factor + reduction;
 		// }
-		// if (log.isLoggable(Level.FINE))
-		log.log(Level.SEVERE, "for " + this.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + this.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 

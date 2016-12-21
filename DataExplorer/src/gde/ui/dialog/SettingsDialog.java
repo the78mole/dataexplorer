@@ -15,29 +15,18 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.dialog;
 
-import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
-import gde.config.Settings;
-import gde.device.CommaSeparatorTypes;
-import gde.device.DecimalSeparatorTypes;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.ParameterConfigControl;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.LogLevelSelectionContextMenu;
-import gde.utils.ObjectKeyScanner;
-import gde.utils.OperatingSystemHelper;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
-
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -49,6 +38,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -78,9 +69,27 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.config.Settings;
+import gde.device.CommaSeparatorTypes;
+import gde.device.DecimalSeparatorTypes;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.ParameterConfigControl;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.LogLevelSelectionContextMenu;
+import gde.utils.FileUtils;
+import gde.utils.ObjectKeyScanner;
+import gde.utils.OperatingSystemHelper;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
+
 /**
  * Dialog class to adjust application wide properties
- * @author Winfried Bruegmann
+ * @author Winfried Brügmann
  */
 public class SettingsDialog extends Dialog {
 	final static Logger									log											= Logger.getLogger(SettingsDialog.class.getName());
@@ -121,8 +130,34 @@ public class SettingsDialog extends Dialog {
 	Composite														generalTabComposite;
 	Composite														analysisComposite;
 	CTabItem														generalTabItem;
+	CTabItem														testTabItem;
 	CTabItem														histoTabItem;
 	Button															histoActiveButton;
+	Group																histoScreeningGroup;
+	Group																histoBoxplotGroup;
+	Button															histoQuantilesButton;
+	CLabel															histoBoxplotScaleLabel;
+	CCombo															histoBoxplotScale;
+	CLabel															histoBoxplotSizeAdaptationLabel;
+	CCombo															histoBoxplotSizeAdaptation;
+	CLabel															histoRetrospectLabel;
+	Text																histoRetrospectMonths;
+	Button															histoSearchImportPath;
+	Button															histoSearchDataPathImports;
+	Button															histoChannelMix;
+	Group																histoXAxisGroup;
+	CLabel															histoSpreadLabel;
+	CCombo															histoSpreadGrade;
+	Button															histoReversedButton;
+	Button															histoLogarithmicDistanceButton;
+	Group																histoFileContentsGroup;
+	CLabel															histoMaxDurationLabel;
+	Text																histoMaxLogDuration;
+	CLabel															histoSamplingLabel;
+	CCombo															histoSamplingTimespan_ms;
+	Group																histoForceObjectGroup;
+	Button															histoSkipFilesWithoutObject;
+	Button															histoSkipFilesWithOtherObject;
 	CTabItem														analysisTabItem;
 	CTabFolder													settingsTabFolder;
 	Slider															alphaSlider;
@@ -132,6 +167,8 @@ public class SettingsDialog extends Dialog {
 	Button															scanObjectKeysButton;
 	Button															cleanObjectReferecesButton;
 	Button															removeMimeAssocButton;
+	Group																histoToolsGroup;
+	Button															createObjectsFromDirectoriesButton, importLogsButton, clearHistoCacheButton;
 	Group																miscDiagGroup;
 	Button															resourceConsumptionButton, cleanSettingsButton;
 	Button															assocMimeTypeButton;
@@ -145,7 +182,7 @@ public class SettingsDialog extends Dialog {
 	Composite														miscComposite;
 	Group																shellMimeType;
 	Group																desktopLauncher;
-	Group																histoGeneralGroup, fontSizeGroup, dataTableGroup, chargerSpecials, graphicsView;
+	Group																fontSizeGroup, dataTableGroup, chargerSpecials, graphicsView;
 	CTabItem														osMiscTabItem;
 	CTabItem														miscTabItem;
 	CLabel															fileIOLevelLabel;
@@ -289,7 +326,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.timeFormatCombo = new CCombo(this.groupTimeFormat, SWT.BORDER);
 								this.timeFormatCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.timeFormatCombo.setItems(new String[]{Messages.getString(MessageIds.GDE_MSGT0684), Messages.getString(MessageIds.GDE_MSGT0359)});
+								this.timeFormatCombo.setItems(new String[] { Messages.getString(MessageIds.GDE_MSGT0684), Messages.getString(MessageIds.GDE_MSGT0359) });
 								this.timeFormatCombo.select(getTimeFormatIndex());
 								this.timeFormatCombo.setBounds(115, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 20, 125, GDE.IS_LINUX ? 22 : 20);
 								this.timeFormatCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0683));
@@ -340,6 +377,7 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
 											SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
+											SettingsDialog.this.application.setupHistoWindows();
 										}
 									}
 								});
@@ -386,7 +424,7 @@ public class SettingsDialog extends Dialog {
 								this.writeTmpFiles = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.writeTmpFiles.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.writeTmpFiles.setText(Messages.getString(MessageIds.GDE_MSGT0674));
-								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[]{this.settings.getApplHomePath()}));
+								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[] { this.settings.getApplHomePath() }));
 								this.writeTmpFiles.setBounds(370, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 20, 95, 16);
 								this.writeTmpFiles.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -592,7 +630,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 18, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text.trim()));
+										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
 										e.doit = StringHelper.verifyPortInput(e.text.trim());
 									}
 								});
@@ -744,13 +782,14 @@ public class SettingsDialog extends Dialog {
 					{
 						this.miscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
 						this.histoTabItem.setControl(this.miscComposite);
-						RowLayout compositeHistoLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
-						compositeHistoLayout.marginLeft = 11;
-						compositeHistoLayout.spacing = 11;
-						compositeHistoLayout.marginTop = 22;
+						RowLayout compositeHistoLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+						compositeHistoLayout.marginLeft = 7;
+						compositeHistoLayout.spacing = 10;
+						compositeHistoLayout.marginTop = 20;
 						this.miscComposite.setLayout(compositeHistoLayout);
 						{
 							this.histoActiveButton = new Button(this.miscComposite, SWT.CHECK);
+							this.histoActiveButton.setLayoutData(new RowData(333, 22));
 							this.histoActiveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.histoActiveButton.setText(Messages.getString(MessageIds.GDE_MSGT0739));
 							this.histoActiveButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0740));
@@ -760,28 +799,380 @@ public class SettingsDialog extends Dialog {
 								public void widgetSelected(SelectionEvent evt) {
 									SettingsDialog.log.log(Level.FINEST, "histoActiveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActiveButton.getSelection());
-									application.setupHistoWindows();
+									SettingsDialog.this.application.setupHistoWindows();
 								}
 							});
 						}
 						{
-							this.histoGeneralGroup = new Group(this.miscComposite, SWT.NONE);
-							RowLayout histoGeneralGroupLayout = new RowLayout(SWT.HORIZONTAL);
-							this.histoGeneralGroup.setLayout(histoGeneralGroupLayout);
-							RowData histoGeneralGroupLData = new RowData();
-							histoGeneralGroupLData.width = 466;
-							histoGeneralGroupLData.height = 70;
-							this.histoGeneralGroup.setLayoutData(histoGeneralGroupLData);
-							this.histoGeneralGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.histoGeneralGroup.setText(Messages.getString(MessageIds.GDE_MSGT0738));
+							this.histoXAxisGroup = new Group(this.miscComposite, SWT.NONE);
+							RowData histoXAxisGroupLData = new RowData();
+							histoXAxisGroupLData.width = 230;
+							this.histoXAxisGroup.setLayoutData(histoXAxisGroupLData);
+							FormLayout formLayout = new FormLayout();
+							formLayout.marginTop = 7;
+							formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 0;
+							this.histoXAxisGroup.setLayout(formLayout);
+							this.histoXAxisGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoXAxisGroup.setText(Messages.getString(MessageIds.GDE_MSGT0816));
 							{
-								this.localLabel = new CLabel(this.histoGeneralGroup, SWT.NONE);
-								this.localLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.localLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
-								this.localLabel.setText(Messages.getString(MessageIds.GDE_MSGT0739));
-								this.localLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0740));
+								this.histoReversedButton = new Button(this.histoXAxisGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								this.histoReversedButton.setLayoutData(formData);
+								this.histoReversedButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoReversedButton.setText(Messages.getString(MessageIds.GDE_MSGT0821));
+								this.histoReversedButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0822));
+								this.histoReversedButton.setSelection(this.settings.isXAxisReversed());
+								this.histoReversedButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoReversedButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setXAxisReversed(SettingsDialog.this.histoReversedButton.getSelection());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
 							}
-						} // end histoGeneral group
+							{
+								this.histoSpreadLabel = new CLabel(this.histoXAxisGroup, SWT.NONE);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoReversedButton, 5);
+								this.histoSpreadLabel.setLayoutData(formData);
+								this.histoSpreadLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSpreadLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
+								this.histoSpreadLabel.setText(Messages.getString(MessageIds.GDE_MSGT0817));
+								this.histoSpreadLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0818));
+							}
+							{
+								this.histoSpreadGrade = new CCombo(this.histoXAxisGroup, SWT.BORDER | SWT.CENTER);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoReversedButton, 5);
+								formData.right = new FormAttachment(100, -5);
+								this.histoSpreadGrade.setLayoutData(formData);
+								this.histoSpreadGrade.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSpreadGrade.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								this.histoSpreadGrade.setItems(SettingsDialog.this.settings.getXAxisSpreadGradeNomenclatures());
+								this.histoSpreadGrade.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getXAxisSpreadGrade());
+								this.histoSpreadGrade.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0818));
+								this.histoSpreadGrade.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoSpreadGrade.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setXAxisSpreadGrade(SettingsDialog.this.histoSpreadGrade.getText().trim());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
+							}
+							{
+								this.histoLogarithmicDistanceButton = new Button(this.histoXAxisGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								formData.top = new FormAttachment(this.histoSpreadLabel, 10);
+								this.histoLogarithmicDistanceButton.setLayoutData(formData);
+								this.histoLogarithmicDistanceButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoLogarithmicDistanceButton.setText(Messages.getString(MessageIds.GDE_MSGT0819));
+								this.histoLogarithmicDistanceButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0820));
+								this.histoLogarithmicDistanceButton.setSelection(this.settings.isXAxisLogarithmicDistance());
+								this.histoLogarithmicDistanceButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoLogarithmicDistanceButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setXAxisLogarithmicDistance(SettingsDialog.this.histoLogarithmicDistanceButton.getSelection());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
+							}
+						} // end histoXAxis group
+						{
+							this.histoBoxplotGroup = new Group(this.miscComposite, SWT.NONE);
+							RowData histoXAxisGroupLData = new RowData();
+							histoXAxisGroupLData.width = 230;
+							this.histoBoxplotGroup.setLayoutData(histoXAxisGroupLData);
+							FormLayout formLayout = new FormLayout();
+							formLayout.marginTop = 7;
+							formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 0;
+							this.histoBoxplotGroup.setLayout(formLayout);
+							this.histoBoxplotGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoBoxplotGroup.setText(Messages.getString(MessageIds.GDE_MSGT0795));
+							{
+								this.histoQuantilesButton = new Button(this.histoBoxplotGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								this.histoQuantilesButton.setLayoutData(formData);
+								this.histoQuantilesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoQuantilesButton.setText(Messages.getString(MessageIds.GDE_MSGT0800));
+								this.histoQuantilesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
+								this.histoQuantilesButton.setSelection(this.settings.isQuantilesActive());
+								this.histoQuantilesButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoQuantilesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setQuantilesActive(SettingsDialog.this.histoQuantilesButton.getSelection());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
+							}
+							{
+								this.histoBoxplotScaleLabel = new CLabel(this.histoBoxplotGroup, SWT.NONE);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoQuantilesButton, 5);
+								this.histoBoxplotScaleLabel.setLayoutData(formData);
+								this.histoBoxplotScaleLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoBoxplotScaleLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
+								this.histoBoxplotScaleLabel.setText(Messages.getString(MessageIds.GDE_MSGT0812));
+								this.histoBoxplotScaleLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0813));
+							}
+							{
+								this.histoBoxplotScale = new CCombo(this.histoBoxplotGroup, SWT.BORDER | SWT.CENTER);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoQuantilesButton, 5);
+								formData.right = new FormAttachment(100, -5);
+								this.histoBoxplotScale.setLayoutData(formData);
+								this.histoBoxplotScale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoBoxplotScale.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								this.histoBoxplotScale.setItems(SettingsDialog.this.settings.getBoxplotScaleNomenclatures());
+								this.histoBoxplotScale.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotScale());
+								this.histoBoxplotScale.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0813));
+								this.histoBoxplotScale.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoBoxplotScale.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setBoxplotScale(SettingsDialog.this.histoBoxplotScale.getText().trim());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
+							}
+							{
+								this.histoBoxplotSizeAdaptationLabel = new CLabel(this.histoBoxplotGroup, SWT.NONE);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
+								this.histoBoxplotSizeAdaptationLabel.setLayoutData(formData);
+								this.histoBoxplotSizeAdaptationLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoBoxplotSizeAdaptationLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
+								this.histoBoxplotSizeAdaptationLabel.setText(Messages.getString(MessageIds.GDE_MSGT0814));
+								this.histoBoxplotSizeAdaptationLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
+							}
+							{
+								this.histoBoxplotSizeAdaptation = new CCombo(this.histoBoxplotGroup, SWT.BORDER | SWT.CENTER);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
+								formData.right = new FormAttachment(100, -5);
+								this.histoBoxplotSizeAdaptation.setLayoutData(formData);
+								this.histoBoxplotSizeAdaptation.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoBoxplotSizeAdaptation.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								this.histoBoxplotSizeAdaptation.setItems(SettingsDialog.this.settings.getBoxplotSizeAdaptationNomenclatures());
+								this.histoBoxplotSizeAdaptation.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotSizeAdaptation());
+								this.histoBoxplotSizeAdaptation.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
+								this.histoBoxplotSizeAdaptation.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoBoxplotSizeAdaptation.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setBoxplotSizeAdaptation(SettingsDialog.this.histoBoxplotSizeAdaptation.getText().trim());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
+							}
+						} // end histoBoxplot group
+						{
+							this.histoFileContentsGroup = new Group(this.miscComposite, SWT.NONE);
+							RowData histoFileContentsGroupLData = new RowData();
+							histoFileContentsGroupLData.width = 288;
+							this.histoFileContentsGroup.setLayoutData(histoFileContentsGroupLData);
+							FormLayout formLayout1 = new FormLayout();
+							formLayout1.marginTop = formLayout1.marginLeft = formLayout1.marginRight = formLayout1.marginHeight = 2;
+							this.histoFileContentsGroup.setLayout(formLayout1);
+							this.histoFileContentsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoFileContentsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0804));
+							{
+								this.histoSamplingLabel = new CLabel(this.histoFileContentsGroup, SWT.NONE);
+								FormData formData = new FormData();
+								this.histoSamplingLabel.setLayoutData(formData);
+								this.histoSamplingLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSamplingLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
+								this.histoSamplingLabel.setText(Messages.getString(MessageIds.GDE_MSGT0807));
+								this.histoSamplingLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
+							}
+							{
+								this.histoSamplingTimespan_ms = new CCombo(this.histoFileContentsGroup, SWT.BORDER | SWT.CENTER);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoMaxDurationLabel, 5);
+								formData.right = new FormAttachment(100, -5);
+								this.histoSamplingTimespan_ms.setLayoutData(formData);
+								this.histoSamplingTimespan_ms.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								this.histoSamplingTimespan_ms.setItems(SettingsDialog.this.settings.getSamplingTimespanValues());
+								this.histoSamplingTimespan_ms.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getSamplingTimespan_ms() / 1000.);
+								this.histoSamplingTimespan_ms.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
+								this.histoSamplingTimespan_ms.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoSamplingTimespan_ms.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSamplingTimespan_ms(SettingsDialog.this.histoSamplingTimespan_ms.getText().trim());
+										SettingsDialog.this.application.setupHistoWindows();
+									}
+								});
+							}
+							{
+								this.histoChannelMix = new Button(this.histoFileContentsGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								formData.top = new FormAttachment(this.histoSamplingLabel, 7);
+								this.histoChannelMix.setLayoutData(formData);
+								this.histoChannelMix.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoChannelMix.setText(Messages.getString(MessageIds.GDE_MSGT0826));
+								this.histoChannelMix.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0827));
+								this.histoChannelMix.setSelection(this.settings.isChannelMix());
+								this.histoChannelMix.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoChannelMix.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setChannelMix(SettingsDialog.this.histoChannelMix.getSelection());
+										SettingsDialog.this.application.setupHistoWindows();
+									}
+								});
+							}
+						} // end histoFileContentsGroup
+						{
+							this.histoScreeningGroup = new Group(this.miscComposite, SWT.NONE);
+							RowData histoScreeningGroupLData = new RowData();
+							histoScreeningGroupLData.width = 288;
+							this.histoScreeningGroup.setLayoutData(histoScreeningGroupLData);
+							FormLayout formLayout = new FormLayout();
+							formLayout.marginTop = formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
+							this.histoScreeningGroup.setLayout(formLayout);
+							this.histoScreeningGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoScreeningGroup.setText(Messages.getString(MessageIds.GDE_MSGT0809));
+							{
+								this.histoRetrospectLabel = new CLabel(this.histoScreeningGroup, SWT.NONE);
+								this.histoRetrospectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoRetrospectLabel.setText(Messages.getString(MessageIds.GDE_MSGT0832));
+								this.histoRetrospectLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0833));
+							}
+							{
+								this.histoRetrospectMonths = new Text(this.histoScreeningGroup, SWT.RIGHT | SWT.BORDER);
+								FormData formData = new FormData();
+								formData.right = new FormAttachment(100, -5);
+								this.histoRetrospectMonths.setLayoutData(formData);
+								this.histoRetrospectMonths.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoRetrospectMonths.setText(String.format("  %9d", SettingsDialog.this.settings.getRetrospectMonths()));
+								this.histoRetrospectMonths.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0833));
+								this.histoRetrospectMonths.addVerifyListener(new VerifyListener() {
+									public void verifyText(VerifyEvent e) {
+										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
+										e.doit = StringHelper.verifyPortInput(e.text.trim());
+									}
+								});
+								this.histoRetrospectMonths.addKeyListener(new KeyAdapter() {
+									@Override
+									public void keyReleased(KeyEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoRetrospectMonths.keyReleased, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setRetrospectMonths(SettingsDialog.this.histoRetrospectMonths.getText());
+									}
+								});
+								this.histoRetrospectMonths.addVerifyListener(new VerifyListener() {
+									@Override
+									public void verifyText(VerifyEvent e) {
+										if (!(Character.isDigit(e.character) || e.keyCode == 8 || e.keyCode == 127)) e.doit = false;
+									}
+								});
+								this.histoRetrospectMonths.addFocusListener(new FocusListener() {
+									private String trimmedInitialText;
+
+									@Override
+									public void focusLost(FocusEvent e) {
+										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
+											SettingsDialog.this.application.updateHistoTabs(true);
+										}
+									}
+
+									@Override
+									public void focusGained(FocusEvent e) {
+										this.trimmedInitialText = SettingsDialog.this.histoRetrospectMonths.getText().trim();
+
+									}
+								});
+							}
+							{
+								this.histoSearchDataPathImports = new Button(this.histoScreeningGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								formData.top = new FormAttachment(this.histoRetrospectMonths, 7);
+								this.histoSearchDataPathImports.setLayoutData(formData);
+								this.histoSearchDataPathImports.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSearchDataPathImports.setText(Messages.getString(MessageIds.GDE_MSGT0834));
+								this.histoSearchDataPathImports.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0835));
+								this.histoSearchDataPathImports.setSelection(this.settings.getSearchDataPathImports());
+								this.histoSearchDataPathImports.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
+										SettingsDialog.this.application.updateHistoTabs(true);
+									}
+								});
+							}
+							{
+								this.histoSearchImportPath = new Button(this.histoScreeningGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								formData.top = new FormAttachment(this.histoSearchDataPathImports, 7);
+								this.histoSearchImportPath.setLayoutData(formData);
+								this.histoSearchImportPath.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSearchImportPath.setText(Messages.getString(MessageIds.GDE_MSGT0824));
+								this.histoSearchImportPath.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0825));
+								this.histoSearchImportPath.setSelection(this.settings.getSearchImportPath());
+								this.histoSearchImportPath.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
+										SettingsDialog.this.application.updateHistoTabs(true);
+									}
+								});
+							}
+							{
+								this.histoForceObjectGroup = new Group(this.histoScreeningGroup, SWT.NONE);
+								RowLayout histoForceObjectGroupLLayout = new RowLayout(SWT.HORIZONTAL);
+								histoForceObjectGroupLLayout.marginTop = 5;
+								histoForceObjectGroupLLayout.marginLeft = 5;
+								this.histoForceObjectGroup.setLayout(histoForceObjectGroupLLayout);
+								FormData histoForceObjectGroupLData = new FormData();
+								histoForceObjectGroupLData.top = new FormAttachment(this.histoSearchImportPath, 7);
+								histoForceObjectGroupLData.width = 277;
+								this.histoForceObjectGroup.setLayoutData(histoForceObjectGroupLData);
+								this.histoForceObjectGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoForceObjectGroup.setText(Messages.getString(MessageIds.GDE_MSGT0794));
+								{
+									this.histoSkipFilesWithoutObject = new Button(this.histoForceObjectGroup, SWT.CHECK | SWT.LEFT);
+									this.histoSkipFilesWithoutObject.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoSkipFilesWithoutObject.setText(Messages.getString(MessageIds.GDE_MSGT0796));
+									this.histoSkipFilesWithoutObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0798));
+									this.histoSkipFilesWithoutObject.setSelection(this.settings.skipFilesWithoutObject());
+									this.histoSkipFilesWithoutObject.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											SettingsDialog.log.log(Level.FINEST, "histoSkipFilesWithoutObject.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setFilesWithoutObject(SettingsDialog.this.histoSkipFilesWithoutObject.getSelection());
+											SettingsDialog.this.application.setupHistoWindows();
+										}
+									});
+								}
+								{
+									this.histoSkipFilesWithOtherObject = new Button(this.histoForceObjectGroup, SWT.CHECK);
+									this.histoSkipFilesWithOtherObject.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoSkipFilesWithOtherObject.setText(Messages.getString(MessageIds.GDE_MSGT0797));
+									this.histoSkipFilesWithOtherObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0799));
+									this.histoSkipFilesWithOtherObject.setSelection(this.settings.skipFilesWithOtherObject());
+									this.histoSkipFilesWithOtherObject.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											SettingsDialog.log.log(Level.FINEST, "histoSkipFilesWithOtherObject.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setFilesWithOtherObject(SettingsDialog.this.histoSkipFilesWithOtherObject.getSelection());
+											SettingsDialog.this.application.setupHistoWindows();
+										}
+									});
+								}
+							} // end histoForceObjectGroup
+						} // end histoScreening group
 					} // end miscComposite
 				} // end histo tab item
 				{
@@ -815,15 +1206,17 @@ public class SettingsDialog extends Dialog {
 								label.setLayoutData(labelLData);
 								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 								label.setText("Font Size Correction Factor");
-								label.setToolTipText("This factor enable adjustment of the overall font size. Initial correction factor is 1.0. A factor of 2.0 will result in double font sizes which may result that some text can not be read anymore due to lack of nessecary space.");
+								label.setToolTipText(
+										"This factor enable adjustment of the overall font size. Initial correction factor is 1.0. A factor of 2.0 will result in double font sizes which may result that some text can not be read anymore due to lack of nessecary space.");
 							}
 							{
-								this.fontSizeCorrectionSlider = new ParameterConfigControl(this.fontSizeGroup, this.fontCorrection, 0, GDE.STRING_EMPTY, "Correction value / 10", 140, GDE.STRING_EMPTY, 0, true, 30, 250, 10, 20);
+								this.fontSizeCorrectionSlider = new ParameterConfigControl(this.fontSizeGroup, this.fontCorrection, 0, GDE.STRING_EMPTY, "Correction value / 10", 140, GDE.STRING_EMPTY, 0, true, 30,
+										250, 10, 20);
 								this.fontSizeCorrectionSlider.setSliderSelection((int) (this.settings.getFontDisplayDensityAdaptionFactor() * 10));
 								this.fontSizeGroup.addListener(SWT.Selection, new Listener() {
 									@Override
 									public void handleEvent(Event evt) {
-										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(fontCorrection[0] / 10.0);
+										SettingsDialog.this.settings.setFontDisplayDensityAdaptionFactor(SettingsDialog.this.fontCorrection[0] / 10.0);
 									}
 								});
 							}
@@ -979,6 +1372,7 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "partialDataTableButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPartialDataTable(SettingsDialog.this.partialDataTableButton.getSelection());
 										SettingsDialog.this.application.updateAllTabs(true, false);
+										SettingsDialog.this.application.updateHistoTabs(false);
 									}
 								});
 							}
@@ -1021,7 +1415,8 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "blankChargeDischargeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setReduceChargeDischarge(SettingsDialog.this.blankChargeDischargeButton.getSelection());
-										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge() && SettingsDialog.this.application.getActiveDevice().getName().equals("MC3000")) {
+										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge()
+												&& SettingsDialog.this.application.getActiveDevice().getName().equals("MC3000")) {
 											// continuous recording without breaks like pauses or termination phase may lead in combination record sets to
 											// time gaps which can not be realized, so charger specific implementation take place here
 											SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0059));
@@ -1044,7 +1439,8 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "continiousRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setContinuousRecordSet(SettingsDialog.this.continiousRecordSetButton.getSelection());
-										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge() && SettingsDialog.this.application.getActiveDevice().getName().equals("MC3000")) {
+										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge()
+												&& SettingsDialog.this.application.getActiveDevice().getName().equals("MC3000")) {
 											// continuous recording without breaks like pauses or termination phase may lead in combination record sets to
 											// time gaps which can not be realized, so charger specific implementation take place here
 											SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0059));
@@ -1068,9 +1464,9 @@ public class SettingsDialog extends Dialog {
 							this.desktopLauncher = new Group(this.osMiscComposite, SWT.NONE);
 							RowLayout desktopLauncherLayout = new RowLayout(SWT.HORIZONTAL);
 							desktopLauncherLayout.center = true;
-							desktopLauncherLayout.marginTop = 30;
-							desktopLauncherLayout.marginWidth = 40;
-							desktopLauncherLayout.spacing = 40;
+							desktopLauncherLayout.marginTop = 20;
+							desktopLauncherLayout.marginLeft = 55;
+							desktopLauncherLayout.spacing = 10;
 							this.desktopLauncher.setLayout(desktopLauncherLayout);
 							this.desktopLauncher.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.desktopLauncher.setText(Messages.getString(MessageIds.GDE_MSGT0362));
@@ -1115,9 +1511,9 @@ public class SettingsDialog extends Dialog {
 							this.shellMimeType = new Group(this.osMiscComposite, SWT.NONE);
 							RowLayout shellMimeTypeLayout = new RowLayout(SWT.HORIZONTAL);
 							shellMimeTypeLayout.center = true;
-							shellMimeTypeLayout.marginTop = 30;
-							shellMimeTypeLayout.marginWidth = 40;
-							shellMimeTypeLayout.spacing = 40;
+							shellMimeTypeLayout.marginTop = 20;
+							shellMimeTypeLayout.marginLeft = 55;
+							shellMimeTypeLayout.spacing = 10;
 							this.shellMimeType.setLayout(shellMimeTypeLayout);
 							this.shellMimeType.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.shellMimeType.setText(Messages.getString(MessageIds.GDE_MSGT0365));
@@ -1162,9 +1558,9 @@ public class SettingsDialog extends Dialog {
 							this.objectKeyGroup = new Group(this.osMiscComposite, SWT.NONE);
 							RowLayout objectKeyGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							objectKeyGroupLayout.center = true;
-							objectKeyGroupLayout.marginTop = 30;
-							objectKeyGroupLayout.marginWidth = 40;
-							objectKeyGroupLayout.spacing = 40;
+							objectKeyGroupLayout.marginTop = 5;
+							objectKeyGroupLayout.marginLeft = 55;
+							objectKeyGroupLayout.spacing = 10;
 							this.objectKeyGroup.setLayout(objectKeyGroupLayout);
 							this.objectKeyGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.objectKeyGroup.setText(Messages.getString(MessageIds.GDE_MSGT0206));
@@ -1230,14 +1626,86 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+							{
+								this.createObjectsFromDirectoriesButton = new Button(this.objectKeyGroup, SWT.PUSH | SWT.CENTER);
+								this.createObjectsFromDirectoriesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.createObjectsFromDirectoriesButton.setText(Messages.getString(MessageIds.GDE_MSGT0836));
+								String toolTipExtension = String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0523), this.settings.getDataFilePath());
+								if (this.application.getActiveDevice() != null && this.settings.getSearchImportPath()) {
+									Path importPath = this.application.getActiveDevice().getDeviceConfiguration().getImportBaseDir();
+									if (importPath != null && !importPath.toString().isEmpty()) {
+										toolTipExtension += String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0846), importPath);
+									}
+								}
+								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837, new Object[] { toolTipExtension }));
+								this.cleanObjectReferecesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0221, new Object[] { this.settings.getDataFilePath() }));
+								RowData createObjectsFromDirectoriesButtonLData = new RowData();
+								createObjectsFromDirectoriesButtonLData.width = 180;
+								createObjectsFromDirectoriesButtonLData.height = 30;
+								this.createObjectsFromDirectoriesButton.setLayoutData(createObjectsFromDirectoriesButtonLData);
+								this.createObjectsFromDirectoriesButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "createObjectsFromDirectoriesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										Set<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
+										if (objectCandidates.size() > 0) {
+											String message = Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() });
+											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(message)) {
+												List<String> objectListClone = new ArrayList<String>(Arrays.asList(SettingsDialog.this.settings.getObjectList()));
+												objectListClone.remove(0); // device oriented / gerätebezogen
+												if (objectListClone.addAll(objectCandidates)) {
+													for (String tmpObjectKey : objectCandidates) {
+														Path objectKeyDirPath = Paths.get(SettingsDialog.this.settings.getDataFilePath()).resolve(tmpObjectKey);
+														FileUtils.checkDirectoryAndCreate(objectKeyDirPath.toString());
+													}
+													SettingsDialog.this.settings.setObjectList(objectListClone.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
+													SettingsDialog.this.application.setObjectList(SettingsDialog.this.settings.getObjectList(), SettingsDialog.this.settings.getActiveObject());
+													log.log(Level.FINE, "object list updated and directories created for object keys : " + objectCandidates.toString()); //$NON-NLS-1$
+												}
+											}
+										}
+										else {
+											SettingsDialog.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0070));
+										}
+									}
+								});
+							}
+						}
+						{
+							this.histoToolsGroup = new Group(this.osMiscComposite, SWT.NONE);
+							RowLayout histoToolsGroupLayout = new RowLayout(SWT.HORIZONTAL);
+							histoToolsGroupLayout.center = true;
+							histoToolsGroupLayout.marginTop = 20;
+							histoToolsGroupLayout.marginLeft = 55;
+							histoToolsGroupLayout.spacing = 10;
+							this.histoToolsGroup.setLayout(histoToolsGroupLayout);
+							this.histoToolsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoToolsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0738));
+							{
+								this.clearHistoCacheButton = new Button(this.histoToolsGroup, SWT.PUSH | SWT.CENTER);
+								this.clearHistoCacheButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.clearHistoCacheButton.setText(Messages.getString(MessageIds.GDE_MSGT0829));
+								this.clearHistoCacheButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0830, new Object[] { this.settings.getHistoCacheDirectory().toString() }));
+								RowData clearHistoCacheButtonLData = new RowData();
+								clearHistoCacheButtonLData.width = 180;
+								clearHistoCacheButtonLData.height = 30;
+								this.clearHistoCacheButton.setLayoutData(clearHistoCacheButtonLData);
+								this.clearHistoCacheButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "clearHistoCacheButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.settings.resetHistoCache());
+									}
+								});
+							}
 						}
 						{
 							this.miscDiagGroup = new Group(this.osMiscComposite, SWT.NONE);
 							RowLayout miscDiagGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							miscDiagGroupLayout.center = true;
-							miscDiagGroupLayout.marginTop = 30;
-							miscDiagGroupLayout.marginWidth = 40;
-							miscDiagGroupLayout.spacing = 40;
+							miscDiagGroupLayout.marginTop = 20;
+							miscDiagGroupLayout.marginLeft = 55;
+							miscDiagGroupLayout.spacing = 10;
 							this.miscDiagGroup.setLayout(miscDiagGroupLayout);
 							this.miscDiagGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.miscDiagGroup.setText(Messages.getString(MessageIds.GDE_MSGT0209));
@@ -1255,6 +1723,8 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SWTResourceManager.listResourceStatus(this.getClass().getSimpleName());
+										SettingsDialog.log.log(Level.WARNING, String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(),
+												Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
 									}
 								});
 							}
@@ -1589,7 +2059,9 @@ public class SettingsDialog extends Dialog {
 				if (!display.readAndDispatch()) display.sleep();
 			}
 		}
-		catch (Exception e) {
+		catch (
+
+		Exception e) {
 			e.printStackTrace();
 		}
 	}

@@ -125,85 +125,56 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
-            <Settlement>
+             <Scoregroup scoregroupId="0">
                 <name>Dauer</name>
                 <symbol></symbol>
                 <unit>h</unit>
                 <active>true</active>
-                <score name="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
                 <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
                 <property name="histo_top_placement" value="true" type="Boolean"/>
-            </Settlement>
-            <Settlement>
-                <name>Zeitschritte</name>
-                <symbol></symbol>
-                <unit>ms</unit>
-                <active>true</active>
-                <score name="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
-                <score name="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
-                <score name="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
-                <score name="sigmaTimeStep_ms"   value="Standardabweichung" type="String" description="Standardabweichung"/>
-            </Settlement>
-            <Settlement>
-                <name>Zähler</name>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Zählerwerte</name>
                 <symbol></symbol>
                 <unit>Tsd</unit>
                 <active>true</active>
-                <score name="realSize" value="Anzahl Werte" type="String" description="Anzahl Werte"/>
-                <score name="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
-                <score name="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
-                <score name="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
-                <score name="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
-                <property name="factor" value="0.001" type="Double"/>
-            </Settlement>
-            <Settlement>
-                <name>Paketverlustzeit</name>
-                <symbol></symbol>
-                <unit>ms</unit>
-                <active>true</active>
-                <score name="lostPackagesAvg_ms"   value="Mittel" type="String" description="Mittelwert"/>
-                <score name="lostPackagesMin_ms"   value="Minimum" type="String" description="Minimum"/>
-                <score name="lostPackagesMax_ms"   value="Maximum" type="String" description="Maximum"/>
-                <score name="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-            </Settlement>
-            <Settlement>
-                <name>Paketverluste</name>
-                <symbol></symbol>
-                <unit>%</unit>
-                <active>true</active>
-                <score name="lostPackagesPerMille"   value="Prozent" type="String" description="lostPackages / totalPackages"/>
-                <property name="factor" value="0.1" type="Double"/>
-            </Settlement>
-            <Settlement>
-                <name>Sensoren</name>
+                <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
+                <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versionen</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <score name="sensors" value="Anzahl" type="String"/>
-            </Settlement>
-            <Settlement>
-                <name>Internal Resistance</name>
-                <symbol>Ri</symbol>
-                <unit>mOhm</unit>
+                <score label="logDataVersion" value="Gerät" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log-Datei" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Datenmenge</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
                 <active>true</active>
-                <evaluation sum="false" first="true" last="true" min="true" max="true" avg="true" sigma="true" comment="definierbar in jedem channel">
-                    <calculation transitionId="0" calcType="ratioInverse" unsigned="true" refOrdinal="1" leveling="min" refOrdinalDivisor="0" divisorLeveling="max" comment="min(Strom@Reference - Strom@Threshold) / max(Spannung@Recovery - Spannung@Threshold) und das Ganze reziprok"/>
-                </evaluation>
-                <property name="factor" value="1" type="Double" description="interne Darstellung in microOhm"/>
-                <property name="histo_top_placement" value="true" type="Boolean"/>
-            </Settlement>
-            <Settlement>
-                <name>Ri Zelle 2</name>
-                <symbol>Ri</symbol>
-                <unit>mOhm</unit>
+                <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
+                <score label="logFileBytes" value="Dateigröße" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Laufzeiten</name>
+                <symbol></symbol>
+                <unit>ms</unit>
                 <active>true</active>
-                <evaluation sum="false" first="true" last="true" min="true" max="true" avg="true" sigma="true" comment="definierbar in jedem channel">
-                    <calculation transitionId="0" calcType="ratioInverse" unsigned="true" refOrdinal="1" leveling="min" refOrdinalDivisor="8" divisorLeveling="max" comment="min(Strom@Reference - Strom@Threshold) / max(Spannung@Recovery - Spannung@Threshold) und das Ganze reziprok"/>
-                </evaluation>
-                <property name="factor" value="1" type="Double" description="interne Darstellung in milliOhm"/>
-                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
-            </Settlement>
-            <Transition transitionId="0" refOrdinal="1" isPeak="true" isGreater="false" isPercent="true" triggerLevel="90" recoveryLevel="10" referenceTimeMsec="5000" thresholdTimeMsec="7000" recoveryTimeMsec="5000" comment="Stromeinbruch auf min 10% mit Wiederanstieg auf min 90% über &lt; 7 Sekunden"/>
+                <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_OUTLET" name="Ausgang 2">
             <Measurement>
@@ -277,6 +248,56 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Dauer</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Zählerwerte</name>
+                <symbol></symbol>
+                <unit>Tsd</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
+                <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versionen</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Gerät" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log-Datei" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Datenmenge</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
+                <score label="logFileBytes" value="Dateigröße" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Laufzeiten</name>
+                <symbol></symbol>
+                <unit>ms</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_OUTLET" name="Ausgang 3">
             <Measurement>
@@ -350,6 +371,56 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Dauer</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Zählerwerte</name>
+                <symbol></symbol>
+                <unit>Tsd</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
+                <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versionen</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Gerät" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log-Datei" type="String"/>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Datenmenge</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
+                <score label="logFileBytes" value="Dateigröße" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+            </Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Laufzeiten</name>
+                <symbol></symbol>
+                <unit>ms</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
+            </Scoregroup>
         </Channel>
     </Channels>
     <Desktop>
@@ -359,7 +430,5 @@
         <property name="voltage_per_cell_tab" value="true" target_reference_ordinal="7"/>
         <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
         <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
-        <property name="histo_graphics_tab" value="true" description="HISTO_GRAPHICS_TAB"/>
-        <property name="histo_table_tab" value="true" description="HISTO_TABLE_TAB"/>
     </Desktop>
 </DeviceProperties>
