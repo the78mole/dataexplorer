@@ -1421,6 +1421,27 @@ public class FileUtils {
 	}
 
 	/**
+	 * query device and object related import directory
+	 * @param device
+	 * @return device and object related import directory path
+	 */
+	public static String getDeviceImportDirectory(IDevice device) {
+		String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String objectKey = DataExplorer.application.getObjectKey();
+
+		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			FileUtils.checkDirectoryAndCreate(objectkeyPath);
+			searchDirectory = objectkeyPath;
+		}
+		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
+			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+		}
+		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		return searchDirectory;
+	}
+	/**
 	 * query the import data directory in dependency of search directory, object, etc
 	 * @param searchDirectory
 	 * @param ouiObjectKey
