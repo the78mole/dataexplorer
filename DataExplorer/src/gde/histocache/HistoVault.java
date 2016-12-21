@@ -127,8 +127,8 @@ import gde.utils.Quantile.Fixings;
  * suitable for history persistence and xml serialization.
  * may exist in two stages: 
  *  - truss: does not hold measurement, settlement or score points
- *  - partial vault: points conform to the device xml for settlements and scores, but only a subset of measurements is included
- *  - full vault: conforms to the current device xml channel entries 
+ *  - vault: the number of points conform to the device xml for settlements and scores, but only a subset of measurements is required
+ * supports creating a truss or accessing a vault without having read the original log file.
  * find the constructors and non-xsd code a good way down for simplified merging with JAXB generated class.  
  * @author Thomas Eickert
  */
@@ -355,7 +355,7 @@ public class HistoVault {
 	}
 
 	/**
-	 * Gets the value of the logRecordSetOrdinal property.
+	 * Gets the value of the logRecordSetOrdinal property (0-based).
 	 * 
 	 */
 	public int getLogRecordSetOrdinal() {
@@ -497,7 +497,7 @@ public class HistoVault {
 	 * @param fileLength in bytes
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
-	 * @param logRecordSetOrdinal identifies multiple recordsets within on single file
+	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
 	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logDeviceName 
@@ -539,7 +539,7 @@ public class HistoVault {
 	 * @param file is the log origin file (not a link file)
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
-	 * @param logRecordSetOrdinal identifies multiple recordsets within on single file
+	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
 	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logDeviceName 
@@ -702,8 +702,8 @@ public class HistoVault {
 		if (this.vaultName.equals(HistoVault.getVaultName(Paths.get(this.logFilePath), file.lastModified(), file.length(), this.logRecordSetOrdinal))) {
 			List<HistoVault> trusses = new ArrayList<HistoVault>();
 			trusses.add(this);
-			List<HistoVault> histoRecordSets = HistoOsdReaderWriter.readHisto(file.toPath(), trusses);
-			return this.getVaultName().equals(histoRecordSets.get(0).getVaultName());
+			List<HistoVault> histoVaults = HistoOsdReaderWriter.readHisto(file.toPath(), trusses);
+			return this.getVaultName().equals(histoVaults.get(0).getVaultName());
 		}
 		else {
 			return false;
@@ -719,6 +719,8 @@ public class HistoVault {
 	}
 
 	/**
+	 * the vaults directory is determined without any log file contents.
+	 * this supports vault directory scanning functions in the future.
 	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus channel number and some settings values
 	 */
 	public static String getVaultsDirectory() {
@@ -728,14 +730,24 @@ public class HistoVault {
 
 	}
 
+	/**
+	 * the vaults file name is determined without any log file contents and without file location properties (path).
+	 * this supports creating a truss or accessing a vault without having read the original log file.
+	 * @param newLogFileName file name + lastModified + newFileLength are a simple solution for getting a SHA-1 hash from the file contents
+	 * @param newFileLastModified_ms 
+	 * @param newFileLength in bytes
+	 * @param newLogRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
+	 * @return the file name as a unique identifier (sha1)
+	 */
 	private static String getVaultName(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal) {
 		return sha1(HistoVault.getVaultsDirectory() + String.format("%s,%d,%d,%d", newLogFileName.getFileName(), newFileLastModified_ms, newFileLength, newLogRecordSetOrdinal));
 	}
 
 	/**
-	 * @param newLogFileName file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param newFileLastModified_ms file name + lastModified are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param newLogRecordSetOrdinal identifies multiple recordsets in one single file
+	 * @param newLogFileName file name + lastModified + newFileLength are a simple solution for getting a SHA-1 hash from the file contents
+	 * @param newFileLastModified_ms 
+	 * @param newFileLength in bytes
+	 * @param newLogRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
 	 * @return the path with filename as a unique identifier (sha1)
 	 */
 	public static Path getVaultRelativePath(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal) {
@@ -903,10 +915,10 @@ public class HistoVault {
 						else {
 							// these trail types might act as default trails
 							for (TrailType trailType : TrailType.getSubstitutes()) {
-								if (trailType == TrailType.REAL_FIRST)
-									entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.size() != 0 ? record.realRealGet(0) : 0);
-								else if (trailType == TrailType.REAL_LAST)
-									entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.size() != 0 ? record.realRealGet(record.size() - 1) : 0);
+								if (trailType == TrailType.REAL_LAST)
+									entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.realRealGet(record.size() - 1));
+								else if (trailType == TrailType.REAL_FIRST)
+									entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.realRealGet(0));
 								else
 									throw new UnsupportedOperationException(record.getName());
 							}

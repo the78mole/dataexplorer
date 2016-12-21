@@ -65,7 +65,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
-		 * identify enhanced value for the start timestamp.
+		 * identify an enhanced value for the start timestamp.
 		 * @param file
 		 * @param objectDirectory holds the validated object key from the parent directory or is empty 
 		 * @return the vaults skeletons created from the recordsets (for valid channels in the current device only)
@@ -99,7 +99,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * read histo record sets from one single file. 
 	 * @param filePath 
 	 * @param trusses referencing a subset of the recordsets in the file
-	 * @return histo vault list (may contain vaults without measurements, settlements and scores)
+	 * @return histo vault list (may contain trusses without measurements, settlements and scores)
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	 * @throws DataInconsitsentException
@@ -143,10 +143,10 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 			for (int i = 0; i < recordSetsInfo.size(); i++) {
 				HashMap<String, String> recordSetInfo = recordSetsInfo.get(i);
 				final Channel recordSetInfoChannel = OsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
-				//				String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 				String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 				int recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				long recordSetDataPointer = Long.parseLong(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER));
+				//				String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 				//				HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetProperties, Record.DELIMITER, RecordSet.propertyKeys);
 				//				String[] cleanedMeasurementNames = HistoOsdReaderWriter.getMeasurementNames(recordsProperties, recordSetInfoChannel.getNumber());
 				//				String[] recordKeys = HistoOsdReaderWriter.getRecordKeys(recordsProperties);
@@ -170,14 +170,14 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 						}
 						unreadDataPointer = -1;
 					}
-					RecordSet histoRecordSet = buildRecordSet(recordSetTrusses.get(i).getLogRecordsetBaseName(), recordSetTrusses.get(i).getLogChannelNumber(), recordSetInfo, false);
+					RecordSet histoRecordSet = OsdReaderWriter.buildRecordSet(recordSetTrusses.get(i).getLogRecordsetBaseName(), recordSetTrusses.get(i).getLogChannelNumber(), recordSetInfo, false);
 					String[] noneCalculationMeasurementNames = histoRecordSet.getNoneCalculationRecordNames();
 					int numberRecordAndTimeStamp = noneCalculationMeasurementNames.length + (histoRecordSet.isTimeStepConstant() ? 0 : 1);
 
 					byte[] buffer = new byte[GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize];
 					data_in.readFully(buffer);
 
-					// setDeserializedProperties does not take all possibilities to set the timestamp
+					// setDeserializedProperties does not take all possible solutions to set the timestamp
 					if (log.isLoggable(Level.INFO) && histoRecordSet.getStartTimeStamp() != HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo))
 						log.log(Level.INFO, "startTimeStamp rectified " + HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo) + "  " + histoRecordSet.getStartTimeStamp()); //$NON-NLS-1$
 					histoRecordSet.setStartTimeStamp(HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo));
@@ -202,13 +202,13 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					}
 					histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
 
-					// todo not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(histoRecordSet);
+					// WBrueg not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(histoRecordSet);
 
 					// extract additional data
 					final String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
-					final Double[] packagesLost = parsePackageLoss(recordSetComment);
-					final String[] sensors = parseSensors(recordSetComment);
-					final Double logDataVersion = parseFirmware(recordSetComment);
+					final Double[] packagesLost = HistoOsdReaderWriter.parsePackageLoss(recordSetComment);
+					final String[] sensors = HistoOsdReaderWriter.parseSensors(recordSetComment);
+					final Double logDataVersion = HistoOsdReaderWriter.parseFirmware(recordSetComment);
 					final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
 					// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 					// scores for duration and timestep values are filled in by the HistoRecordSet
@@ -227,7 +227,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : 0; //$NON-NLS-1$
 					scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : 0; //$NON-NLS-1$
 					scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : 0; //$NON-NLS-1$
-					scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0;
+					scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0; // Firmware
 					scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = (int) (logDataExplorerVersion * 1000.);
 					scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION).trim()).intValue() * 1000;
 					scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize;
@@ -242,8 +242,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					histoRecordSet.cleanup();
 
 					//reset, previous manipulated channel types measurements (p.e. set active = null as calculation)
-					// todo does resetMeasurements also revert the manipulations done in OsdReaderWriter.buildRecordSet(...) ?
-					histoRecordSet.getDevice().resetMeasurements(); // todo not sure if channel manipulations affect logs which are currently displayed in the standard tabs and also rely on channel manipulations 
+					// WBrueg does resetMeasurements also revert the manipulations done in OsdReaderWriter.buildRecordSet(...) ?
+					histoRecordSet.getDevice().resetMeasurements(); // WBrueg not sure if channel manipulations affect logs which are currently displayed in the standard tabs and also rely on channel manipulations 
 
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
 							recordSetTrusses.get(i).getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); //$NON-NLS-1$

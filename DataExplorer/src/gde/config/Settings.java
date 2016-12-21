@@ -2466,7 +2466,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set true if the history x axis distances between the timesteps are based on a logarithmic values
+	 * set true if the history x axis distances between the timesteps are based on logarithmic values
 	 * @param isActive
 	 */
 	public void setXAxisLogarithmicDistance(boolean isActive) {
@@ -2474,10 +2474,10 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if the history x axis distances between the timesteps are based on a logarithmic values
+	 * @return true if the history x axis distances between the timesteps are based on logarithmic values
 	 */
 	public boolean isXAxisLogarithmicDistance() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, "true"));
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, "false"));
 	}
 
 	/**

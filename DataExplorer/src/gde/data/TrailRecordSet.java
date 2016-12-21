@@ -30,12 +30,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.TableColumn;
 
 import gde.GDE;
 import gde.config.HistoGraphicsTemplate;
@@ -63,7 +61,7 @@ public class TrailRecordSet extends RecordSet {
 	private final static long						serialVersionUID				= -1580283867987273535L;
 	private final static Logger					log											= Logger.getLogger($CLASS_NAME);
 
-	private final static int						initialRecordCapacity		= 111;																					// vector capacity values are crucial for the overall performance
+	private final static int						initialRecordCapacity		= 111;							
 	private final String								isoDateTimeDelimiter		= "T";																					//$NON-NLS-1$
 
 	private final HistoGraphicsTemplate	template;																																// graphics template holds view configuration
@@ -550,7 +548,7 @@ public class TrailRecordSet extends RecordSet {
 				updateVisibilityStatus(true);
 			}
 			// if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-			this.application.updateGraphicsWindow(); // todo histoGraphicsWindow
+			this.application.updateGraphicsWindow(); // WBrueg histoGraphicsWindow
 			// }
 		}
 
@@ -561,7 +559,7 @@ public class TrailRecordSet extends RecordSet {
 	 * at least an update of the graphics window should be included at the end of this method.
 	 */
 	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
-		// todo check if setting records to displayable is required for trailRecordSets: the current isActive settings should be valid for display --> remove this method
+		// WBrueg check if setting records to displayable is required for trailRecordSets: the current isActive settings should be valid for display --> remove this method
 		int displayableCounter = 0;
 		for (int i = 0; i < this.size(); ++i) {
 			Record record = this.get(i);

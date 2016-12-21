@@ -343,9 +343,7 @@ public class HistoTimeLine {
 			double scaleConstant = normalizedDistancesSum / logBaseDivisor + (1 - normalizedDistancesMin / logBaseDivisor) * normalizedDistances.size();
 			double relativeTimeScaleSum = 0.;
 			for (Entry<Long, Double> entry2 : normalizedDistances.entrySet()) {
-				// =(1+(logDistance-logMin)/logBase)/(logSum/logBase+(1-logMin/logBase)*listSize())
 				double relativeDistance = (1. + (entry2.getValue() - normalizedDistancesMin) / logBaseDivisor) / scaleConstant;
-				// relativeDistances.add(relativeDistance);
 				relativeTimeScaleSum += relativeDistance;
 				if (this.settings.isXAxisReversed())
 					relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
@@ -357,23 +355,6 @@ public class HistoTimeLine {
 			}
 			HistoTimeLine.log.log(Level.FINER, "relativeTimeScaleSum=" + relativeTimeScaleSum); //$NON-NLS-1$
 		}
-		// // pass 3: determine how full the chart is
-		// Collections.sort(relativeDistances);
-		// // a high distanceQuantile value indicates that there is plenty of space between the x-axis points
-		// double distanceQuantile = relativeDistances.get(relativeDistances.size() * (2 + 2 * preferredBoxSize) / 10); // use relative distance and calculate lower or higher quantile according to user's priorities
-		// int absoluteDistance = (int) (this.width * distanceQuantile);
-		// // use the box size as a standard of comparison
-		// if (absoluteDistance >= this.boxWidths[TimeLine.DENSITY_LOW] + this.boxWidthAmplitude)
-		// this.density = TimeLine.DENSITY_LOW;
-		// else if (absoluteDistance >= this.boxWidths[TimeLine.DENSITY_MEDIUM] + this.boxWidthAmplitude)
-		// this.density = TimeLine.DENSITY_MEDIUM;
-		// else if (absoluteDistance >= this.boxWidths[TimeLine.DENSITY_HIGH] + this.boxWidthAmplitude)
-		// this.density = TimeLine.DENSITY_HIGH;
-		// else
-		// this.density = TimeLine.DENSITY_EXTREME;
-		// if (TimeLine.log.isLoggable(Level.SEVERE))
-		// TimeLine.log.log(Level.SEVERE, String.format("pixel distance requested = %d boxType selected = %d Distance min = %f max = %f", absoluteDistance, this.density, relativeDistances.get(0), relativeDistances.get(relativeDistances.size()
-		// - 1)));
 		return relativeTimeScale;
 	}
 

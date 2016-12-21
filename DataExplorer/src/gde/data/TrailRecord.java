@@ -47,7 +47,7 @@ import gde.utils.HistoTimeLine;
  * supports multiple curves (trail suites).
  * @author Thomas Eickert
  */
-public class TrailRecord extends Record { // todo maybe a better option is to create a common base class for Record, HistoSettlement and TrailRecord.
+public class TrailRecord extends Record { // WBrueg maybe a better option is to create a common base class for Record and TrailRecord.
 	private final static String		$CLASS_NAME					= TrailRecord.class.getName();
 	private final static long			serialVersionUID		= 110124007964748556L;
 	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
@@ -62,15 +62,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		//		REAL_COUNT_OBS(11, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0751)), // counter
 		REAL_MAX(1, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0754), false), //
 		REAL_MIN(2, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0755), false), //
-		REAL_SD(5, true, 1, false, Messages.getString(MessageIds.GDE_MSGT0756), false), //
+		REAL_SD(3, true, 1, false, Messages.getString(MessageIds.GDE_MSGT0756), false), //
+		REAL_FIRST(4, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0752), false), //
+		REAL_LAST(5, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0753), true), //
 		REAL_SUM_TRIGGERED(6, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0758), false), //
 		REAL_AVG_RATIO_TRIGGERED(8, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0760), false), //
 		REAL_MAX_RATIO_TRIGGERED(9, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0761), false), //
 		REAL_TIME_SUM_TRIGGERED(7, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0759), false), //
 		REAL_COUNT_TRIGGERED(10, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0757), false), //
 		REAL_SUM(12, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0762), false), //
-		REAL_FIRST(3, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0752), true), //
-		REAL_LAST(4, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0753), false), //
 		//		SCORE(13, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0763)),
 		//		AVG(14, false, false, false, Messages.getString(MessageIds.GDE_MSGT0764)), //
 		//		SUM(15, false, false, false, Messages.getString(MessageIds.GDE_MSGT0765)), //
@@ -430,8 +430,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		for (Integer xPos : timeLine.getScalePositions().values()) {
 			if ((value = super.realRealGet(i)) != null) {
 				int grad = value / 1000000;
-				points[i++] = new Point(xDisplayOffset + xPos,
+				points[i] = new Point(xDisplayOffset + xPos,
 						yDisplayOffset - Double.valueOf((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue).intValue());
+				i++;
 			}
 		}
 		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
@@ -445,7 +446,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public String getHistoTableRowText() {
 		return this.getUnit().length() > 0 ? (this.getName() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET).intern() : this.getName().intern();
 	}
-	
+
 	/**
 	 * get all calculated and formated data table points.
 	 * @return record name and trail text followed by formatted values as string array
@@ -570,21 +571,23 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						&& measurementStatistics.getSumTriggerTimeText().length() > 1);
 				applicablePrimitiveTrails[TrailType.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
 			}
-			else {
-				// these trail types might act as default trails
-				for (TrailType trailType : TrailType.getSubstitutes()) {
-					if (trailType == TrailType.REAL_FIRST)
-						applicablePrimitiveTrails[TrailType.REAL_FIRST.ordinal()] = true;
-					else if (trailType == TrailType.REAL_LAST)
-						applicablePrimitiveTrails[TrailType.REAL_LAST.ordinal()] = true;
-					else
-						throw new UnsupportedOperationException(this.getName());
+			applicablePrimitiveTrails[TrailType.REAL_SUM.ordinal()] = false; // in settlements only
+			// set at least one trail if no trail is applicable
+			boolean containsTrue = false;
+			for (boolean value : applicablePrimitiveTrails) {
+				if (value) {
+					containsTrue = true;
+					break;
 				}
 			}
-			applicablePrimitiveTrails[TrailType.REAL_SUM.ordinal()] = false; // in settlements only
+			if (!containsTrue) {
+				for (TrailType trailType : TrailType.getSubstitutes()) {
+					applicablePrimitiveTrails[trailType.ordinal()] = true;
+				}
+			}
 
-			if (settings.isQuantilesActive()) {
-				//				applicablePrimitiveTrails[TrailType.AVG.ordinal()] = true;
+			if (this.settings.isQuantilesActive() && !(this.measurementType.isSuppressQuantiles() != null && this.measurementType.isSuppressQuantiles()) // 
+					&& !this.getDevice().isGPSCoordinates(this)) {
 				applicablePrimitiveTrails[TrailType.Q0.ordinal()] = true;
 				applicablePrimitiveTrails[TrailType.Q1.ordinal()] = true;
 				applicablePrimitiveTrails[TrailType.Q2.ordinal()] = true;
@@ -817,7 +820,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getFactor() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
+	public double getFactor() { // WBrueg maybe this is a better solution for the record class also (so we get rid of this override)
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null) {
@@ -844,7 +847,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getOffset() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
+	public double getOffset() { // WBrueg maybe this is a better solution for the record class also (so we get rid of this override)
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null) {
@@ -871,7 +874,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getReduction() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
+	public double getReduction() { // WBrueg maybe this is a better solution for the record class also (so we get rid of this override)
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null) {
@@ -905,6 +908,13 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.trailRecordSuite;
 	}
 
-	// todo a bunch of base class methods is not applicable for this class (e.g. trigger): Use common base class for TrailRecord and Record
+	/**
+	 * @return the value of the label property from the device channel entry.
+	 */
+	public String getLabel() {
+		return this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoregroupType.getLabel();
+	}
+
+	// WBrueg a bunch of base class methods is not applicable for this class (e.g. trigger): Common base class for TrailRecord and Record???
 
 }

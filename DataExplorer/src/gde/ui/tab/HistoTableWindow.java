@@ -446,7 +446,7 @@ public class HistoTableWindow extends CTabItem {
 				}
 			}
 			else {
-				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //todo required??? add additional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //WBrueg required??? add additional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(100);
 				}

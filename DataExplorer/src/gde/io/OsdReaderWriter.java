@@ -371,7 +371,7 @@ public class OsdReaderWriter {
 		String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 		if (device.isVariableMeasurementSize()) {
-			int activeChannelConfigNumber = channelNumber; // todo get rid of activeChannelConfigNumber after checking during merge
+			int activeChannelConfigNumber = channelNumber; // WBrueg get rid of activeChannelConfigNumber after checking during merge
 			
 			//cleanup measurement, if count doesn't match
 			int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;

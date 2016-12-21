@@ -57,8 +57,8 @@ public class HistoRecordSet extends RecordSet {
 	final static long																serialVersionUID					= -1580283867987273535L;
 	final static Logger															log												= Logger.getLogger($CLASS_NAME);
 
-	final static int																initialRecordCapacity			= 5555;																					// vector capacity values are crucial for performance
-	final static int																initialSettlementCapacity	= 22;																						// vector capacity values are crucial for performance
+	final static int																initialRecordCapacity			= 5555;																				
+	final static int																initialSettlementCapacity	= 22;			
 
 	private LinkedHashMap<String, HistoSettlement>	histoSettlements					= new LinkedHashMap<String, HistoSettlement>();
 
@@ -372,10 +372,10 @@ public class HistoRecordSet extends RecordSet {
 				else {
 					// these trail types might act as default trails
 					for (TrailType trailType : TrailType.getSubstitutes()) {
-						if (trailType == TrailType.REAL_FIRST)
-							entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.size() != 0 ? record.realRealGet(0) : 0);
-						else if (trailType == TrailType.REAL_LAST)
-							entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.size() != 0 ? record.realRealGet(record.size() - 1) : 0);
+						if (trailType == TrailType.REAL_LAST)
+							entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.realRealGet(record.size() - 1));
+						else if (trailType == TrailType.REAL_FIRST)
+							entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.realRealGet(0));
 						else
 							throw new UnsupportedOperationException(record.getName());
 					}
@@ -425,10 +425,10 @@ public class HistoRecordSet extends RecordSet {
 				else {
 					// these trail types might act as default trails
 					for (TrailType trailType : TrailType.getSubstitutes()) {
-						if (trailType == TrailType.REAL_FIRST)
-							entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.realRealGet(0));
-						else if (trailType == TrailType.REAL_LAST)
+						if (trailType == TrailType.REAL_LAST)
 							entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.realRealGet(record.size() - 1));
+						else if (trailType == TrailType.REAL_FIRST)
+							entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.realRealGet(0));
 						else
 							throw new UnsupportedOperationException(record.getName());
 					}
@@ -475,7 +475,5 @@ public class HistoRecordSet extends RecordSet {
 	public String getStartTimeStampFormatted() {
 		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()); //$NON-NLS-1$
 	}
-
-	// todo a bunch of base class methods is not applicable for this class: Use common base class for HistoRecordSet and RecordSet
 
 }

@@ -73,7 +73,7 @@ import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
 /**
- * holds current selection of histo vaults for the selected channel, device and object.
+ * supports the selection of histo vaults and provides a trail recordset based on the vaults. 
  * sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
  * @author Thomas Eickert
  */
@@ -111,15 +111,15 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		*/
 		A_HISTOSET(5),
 		/**
-		* true starts building the histo recordsets
+		* true starts building the histo vaults
 		*/
-		B_HISTORECORDSETS(4),
+		B_HISTOVAULTS(4),
 		/**
-		* true starts building the trail recordset from the histo recordsets 
+		* true starts building the trail recordset from the histo vaults 
 		*/
 		C_TRAILRECORDSET(3),
 		/**
-		* true starts refreshing the trail data from the histo recordsets
+		* true starts refreshing the trail data from the histo vaults
 		*/
 		D_TRAIL_DATA(2),
 		/**
@@ -271,7 +271,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		{
 			if (!isHistoFilePathsValid) {
 				this.clear();
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("histoSet             clear")); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             clear")); //$NON-NLS-1$
 				if ((new Date().getTime() - startTimeFileValid) > 0) log.log(Level.TIME, String.format("%,5d files          select folders     time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
 						new Date().getTime() - startTimeFileValid, this.histoFilePaths.size() * 1000 / (new Date().getTime() - startTimeFileValid)));
 			}
@@ -285,12 +285,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			if (RebuildStep.A_HISTOSET == rebuildStep) {
 				isRebuilt = true;
 				this.initialize();
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("histoSet             initialize")); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             initialize")); //$NON-NLS-1$
 				if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 2, sThreadId);
 			}
 		}
 		{
-			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTORECORDSETS).contains(rebuildStep)) {
+			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
 				isRebuilt = true;
 				this.fileSizeSum_B = 0;
 				if (this.getHistoFilePaths().size() > 0) {
@@ -366,19 +366,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		}
 
 		{
-			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTORECORDSETS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
+			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
 				isRebuilt = true;
-				log.log(Level.TIME, "start createRecordSet");
 				long nanoTimeTrailRecordSet = -System.nanoTime();
 				this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
-				log.log(Level.TIME, "start defineTrailTypes");
 				this.trailRecordSet.defineTrailTypes();
 				// this.trailRecordSet.checkAllDisplayable();
-				log.log(Level.TIME, "start setPoints");
 				this.trailRecordSet.setPoints();
-				log.log(Level.TIME, "start setTags");
 				this.trailRecordSet.setTags();
-				log.log(Level.TIME, "start applyTemplate");
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data
 				nanoTimeTrailRecordSet += System.nanoTime();
 				if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
@@ -634,7 +629,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		this.validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
 		this.validatedImportDir = this.settings.getSearchImportPath() && this.validatedImportDir != null ? this.validatedImportDir.resolve(subPathImport) : null;
 		this.validatedImportExtention = this.validatedDevice.getDeviceConfiguration().getDataBlockType().getPreferredFileExtention();
-		this.validatedImportExtention = this.settings.getSearchImportPath() && !this.validatedImportExtention.isEmpty() ? this.validatedImportExtention.substring(1) : GDE.STRING_EMPTY;
+		this.validatedImportExtention = !this.validatedImportExtention.isEmpty() ? this.validatedImportExtention.substring(1) : GDE.STRING_EMPTY;
 
 		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.histoFilePaths.size() == 0;
 		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
@@ -699,7 +694,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
 		final Map<Long, Map<String, HistoVault>> trusses4Start = new LinkedHashMap<Long, Map<String, HistoVault>>();
 		final List<Integer> channelMixConfigNumbers;
-		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER)
+		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER) // WBrueg is channel type a better criterion?
 			channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelBundle(this.application.getActiveChannelNumber());
 		else
 			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });
@@ -728,7 +723,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
-							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())) {
+							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
+									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // hard wired for HoTTViewerAdapter
 								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
 								break; // ignore all log file trusses 
 							}
@@ -749,11 +745,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 										isValidObject = true;
 									}
 								}
-								//								if (!this.settings.skipFilesWithoutObject()
-								//										|| (isWithUi && SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0065, new String[] { actualFile.toString() })))) {
-								//									isValidObject = true;
-								//									this.settings.setFilesWithoutObject(false);
-								//								}
 							}
 							else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
 								log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
@@ -769,11 +760,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 										isValidObject = true;
 									}
 								}
-								//								if (!this.settings.skipFilesWithOtherObject()
-								//										|| (isWithUi && SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { truss.getLogObjectKey(), actualFile.toString() })))) {
-								//									isValidObject = true;
-								//									this.settings.setFilesWithOtherObject(false);
-								//								}
 							}
 							else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
 								log.log(Level.FINER, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
@@ -823,11 +809,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								isValidObject = true;
 							}
 						}
-						//						if (!this.settings.skipFilesWithOtherObject()
-						//								|| (isWithUi && SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { objectDirectory, path.toString() })))) {
-						//							isValidObject = true;
-						//							this.settings.setFilesWithOtherObject(true);
-						//						}
 					}
 					else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
 						isValidObject = true;

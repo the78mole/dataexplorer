@@ -206,10 +206,10 @@ public class HistoSelectorComposite extends Composite {
 		TrailRecordSet recordSet = this.histoSet.getTrailRecordSet();
 		Combo[] selectorCombos = new Combo[recordSet.size()];
 		this.editors = new TableEditor[recordSet.size()];
+		// get records by insertion order
 		Iterator<Entry<String, Record>> iterator = recordSet.entrySet().iterator();
-		 // get by insertion order
 		for (int i = 0; iterator.hasNext(); ++i) {
-			TrailRecord record = (TrailRecord) iterator.next().getValue(); 
+			TrailRecord record = (TrailRecord) iterator.next().getValue();
 			if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, record.getName());
 			textSize = record.getName().length() * 8;
 			if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
@@ -223,8 +223,9 @@ public class HistoSelectorComposite extends Composite {
 				selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
 				this.editors[i].grabHorizontal = true;
 				this.editors[i].setEditor(selectorCombos[i], item, 1);
-				selectorCombos[i].setItems(record.getApplicableTrailsTexts().toArray(new String[record.getApplicableTrailsTexts().size()]));
+				selectorCombos[i].setItems(record.getApplicableTrailsTexts().toArray(new String[0]));
 				selectorCombos[i].setText(record.getTrailText());
+				selectorCombos[i].setToolTipText(record.getLabel() != null ? record.getLabel() : Messages.getString(MessageIds.GDE_MSGT0748));
 				selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent event) {
 						Combo combo = (Combo) event.getSource();
@@ -248,7 +249,7 @@ public class HistoSelectorComposite extends Composite {
 		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 		recordSet.updateVisibleAndDisplayableRecordsForTable();
 
-		this.tableCurveTypeColumn.setWidth(111); // todo column width
+		this.tableCurveTypeColumn.setWidth(122); // todo column width
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth - 1, this.curveSelectorHeader.getSize().y);
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);

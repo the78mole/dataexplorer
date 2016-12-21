@@ -27,6 +27,7 @@ import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.TriggerType;
 import gde.exception.DataInconsitsentException;
+import gde.histocache.HistoVault;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
@@ -64,7 +65,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final static long									serialVersionUID								= 26031957;
 	final static Logger								log															= Logger.getLogger(RecordSet.class.getName());
 
-	private final static int					initialRecordCapacity						= 555;																																																									// vector capacity values are crucial for the overall performance
+	private final static int					initialRecordCapacity						= 555;																			
 
 	TimeSteps													timeStep_ms;
 
@@ -788,7 +789,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names 
 	 */
-	public String[] getNoneCalculationRecordNames() { // TODO make this private
+	public String[] getNoneCalculationRecordNames() { 
 		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
@@ -849,9 +850,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	@Deprecated
+	@Deprecated // WBrueg get rid of this method and use the new method below
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile) {
-		// todo get rid of this method and use the new method below
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 		String[] recordNames = device.getMeasurementNames(channelConfigNumber);
@@ -882,10 +882,9 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	@Deprecated
+	@Deprecated // WBrueg get rid of this method and use the new method below
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
 			boolean isRaw, boolean isFromFile) {
-		// todo get rid of this method and use the new method below
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2346,6 +2345,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public long getStartTimeStamp() {
 		return this.timeStep_ms != null ? this.timeStep_ms.getStartTimeStamp() : new Date().getTime();
+	}
+
+	/**
+	 * @return the record set start time stamp yyyy-MM-dd HH:mm:ss.SSS
+	 */
+	public String getStartTimeStampFormatted() {
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()); //$NON-NLS-1$
 	}
 
 	/**

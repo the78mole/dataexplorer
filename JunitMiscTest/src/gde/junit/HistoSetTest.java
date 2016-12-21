@@ -61,8 +61,9 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 	/**
 	 * fills histoSet by reading all logs into all devices and all channels.
 	 * uses cache data.
-	 * ET Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files: 
-	 * 1st run w/o vault cache 72 sec  /  2nd run with vault cache 23 sec   using a zipped Cache
+	 * ET Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files resulting in 223 vaults (using a zipped cache): 
+	 *  - 1st run w/o vault cache 72 sec 
+	 *  - 2nd run with vault cache 23 sec  
 	 */
 	public void testBuildHistoSet4TestSamples() {
 		System.out
@@ -73,7 +74,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		HistoSet histoSet = HistoSet.getInstance();
 
 		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
-		// >>> take one of these optional data sources for the test <<<
+		// >>> take one of these optional data sources for a smaller test portion <<<
 //		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Thomas", "DataExplorer"));
 //		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Winfried", "DataExplorer"));
 

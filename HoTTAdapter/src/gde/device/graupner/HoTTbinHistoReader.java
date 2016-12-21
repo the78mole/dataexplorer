@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import gde.GDE;
-import gde.data.HistoRecordSet;
 import gde.data.RecordSet;
 import gde.device.HistoRandomSample;
 import gde.device.ScoreLabelTypes;
@@ -120,9 +119,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		File file = HoTTbinHistoReader.filePath.toFile();
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
-		tmpRecordSet = HistoRecordSet.createRecordSet(truss);
+		tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader.application.getActiveChannelNumber(), true, true, false);
 		tmpRecordSet.setStartTimeStamp(file.lastModified());
-		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + ((HistoRecordSet) tmpRecordSet).getStartTimeStampFormatted());
+		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + tmpRecordSet.getStartTimeStampFormatted());
 		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader.filePath.getFileName().toString());
 		if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getLogRecordsetBaseName());
 
@@ -158,7 +157,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 	/**
 	* read log data according to version 0.
-	* allocates only one single recordset for the active channel, so HoTTAdapter.isChannelsChannelEnabled does not take effect.
+	* allocates only one single recordset for the active channel, so HoTTAdapter.isChannelsChannelEnabled does not take any effect.
 	* no progress bar support and no channel data modifications.
 	* @param data_in
 	* @param initializeBlocks if this number is greater than zero, the min/max values are initialized
@@ -508,10 +507,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			}
 		}
 		if (doFullRead) {
-			HistoRecordSet recordSet = (HistoRecordSet) tmpRecordSet;
 			final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
-			// scores for duration and timestep values are filled in by the HistoRecordSet
+			// scores for duration and timestep values are filled in by the HistoVault
 			scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
 			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) fileLength / HoTTbinHistoReader.dataBlockSize;
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = countPackageLoss;
@@ -893,10 +891,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		// application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2405, new Object[] { HoTTbinHistoReader.oldProtocolCount }));
 		// }
 		if (doFullRead) {
-			HistoRecordSet recordSet = (HistoRecordSet) tmpRecordSet;
 			final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
-			// scores for duration and timestep values are filled in by the HistoRecordSet
+			// scores for duration and timestep values are filled in by the HistoVault
 			scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
 			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) fileLength / HoTTbinHistoReader.dataBlockSize;
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = countPackageLoss;

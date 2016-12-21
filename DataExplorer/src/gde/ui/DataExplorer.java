@@ -1977,7 +1977,7 @@ public class DataExplorer extends Composite {
 	 * @param readFromFiles if true then reload from files; if false then use histo vault data 
 	 */
 	public void updateHistoTabs(boolean readFromFiles) {
-		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTORECORDSETS : RebuildStep.E_USER_INTERFACE, true);
+		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	/**
@@ -2007,7 +2007,7 @@ public class DataExplorer extends Composite {
 				}
 				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 				this.setProgress(100, sThreadId);
-				if (isWithUi && (isRebuilt || rebuildStep == RebuildStep.B_HISTORECORDSETS)) {
+				if (isWithUi && (isRebuilt || rebuildStep == RebuildStep.B_HISTOVAULTS)) {
 					if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
 						String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? DataExplorer.this.getActiveDevice().getName() : DataExplorer.this.getObjectKey();
 						String importDir = DataExplorer.this.histoSet.getValidatedImportDir() != null ? "\n" + DataExplorer.this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY;
@@ -2015,7 +2015,7 @@ public class DataExplorer extends Composite {
 					}
 				}
 				// determine the rebuild action for the invisible histo tabs or those which are not selected
-				RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTORECORDSETS : rebuildStep;
+				RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
 				// determine the maximum rebuild priority from the past updates
 				RebuildStep maximumRebuildStep = this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? this.rebuildStepInvisibleTab : performedRebuildStep;
 				// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
@@ -2050,13 +2050,13 @@ public class DataExplorer extends Composite {
 						}
 						String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 						DataExplorer.this.setProgress(100, sThreadId);
-						if (isWithUi && rebuildStep == RebuildStep.B_HISTORECORDSETS) {
+						if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
 							if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
 								DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
 							}
 						}
 						// determine the rebuild action for the invisible histo tabs or those which are not selected
-						RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTORECORDSETS : rebuildStep;
+						RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
 						// determine the maximum rebuild priority from the past updates
 						RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab
 								: performedRebuildStep;

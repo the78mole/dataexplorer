@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ************************************************************************************* 
-	This file is part of GNU DataExplorer. GNU DataExplorer is free software: 
-	you can redistribute it and/or modify it under the terms of the GNU General 
-	Public License as published by the Free Software Foundation, either version 
-	3 of the License, or (at your option) any later version. GNU DataExplorer 
-	is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-	PURPOSE. See the GNU General Public License for more details. You should 
-	have received a copy of the GNU General Public License along with GNU DataExplorer. 
-	If not, see <http://www.gnu.org/licenses/>. Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 
+<!-- ************************************************************************************* This file 
+	is part of GNU DataExplorer. GNU DataExplorer is free software: you can redistribute it and/or modify 
+	it under the terms of the GNU General Public License as published by the Free Software Foundation, either 
+	version 3 of the License, or (at your option) any later version. GNU DataExplorer is distributed in the 
+	hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should 
+	have received a copy of the GNU General Public License along with GNU DataExplorer. If not, see <http://www.gnu.org/licenses/>. 
+	Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 
 	Winfried Bruegmann 2016 Thomas Eickert ************************************************************************************** -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified" attributeFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+	attributeFormDefault="qualified">
 	<xs:element name="DeviceProperties" type="DevicePropertiesType">
 		<xs:annotation>
 			<xs:documentation>DataExplorer Properties</xs:documentation>
@@ -23,11 +21,9 @@
 				<xs:complexType>
 					<xs:simpleContent>
 						<xs:extension base="xs:string">
-							<xs:attribute name="implementation" type="xs:string"
-								use="optional">
+							<xs:attribute name="implementation" type="xs:string" use="optional">
 								<xs:annotation>
-									<xs:documentation>specify implementation class if different
-										from name
+									<xs:documentation>specify implementation class if different from name
 									</xs:documentation>
 								</xs:annotation>
 							</xs:attribute>
@@ -80,8 +76,7 @@
 		<xs:sequence>
 			<xs:element name="vendorId" type="xs:string" />
 			<xs:element name="productId" type="xs:string" />
-			<xs:element name="usbInterface" type="UsbInterfaceType"
-				minOccurs="1" />
+			<xs:element name="usbInterface" type="UsbInterfaceType" minOccurs="1" />
 			<xs:element name="TimeOut" type="TimeOutType" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
@@ -93,8 +88,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="SerialPort" type="SerialPortType"
-				minOccurs="0">
+			<xs:element name="SerialPort" type="SerialPortType" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Defines the serial port configuration
 					</xs:documentation>
@@ -109,16 +103,17 @@
 			<xs:element name="TimeBase" type="TimeBaseType">
 				<xs:annotation>
 					<xs:documentation>Defines the time base used to display the data. A
-						timeStep of -1 means time comes with data block and is not
+						timeStep of -1 means time
+						comes with data block and is not
 						constant over an record set
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="DataBlock" type="DataBlockType"
-				minOccurs="0">
+			<xs:element name="DataBlock" type="DataBlockType" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>This describes the data as to be interpreted as
-						input. Nomally this is handled by individual device plug-in
+						input. Nomally this is handled
+						by individual device plug-in
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -131,38 +126,35 @@
 			<xs:element name="Channels">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="Channel" type="ChannelType"
-							maxOccurs="unbounded">
+						<xs:element name="Channel" type="ChannelType" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>Defines output channels or configurations
 								</xs:documentation>
 							</xs:annotation>
-							  <xs:key         name="settlementKey">
+							<xs:key name="settlementKey">
 								<xs:annotation>
 									<xs:documentation>Makes persistent history vaults independent from language settings
 									</xs:documentation>
 								</xs:annotation>
-								 <xs:selector xpath="Settlement" />
-								 <xs:field    xpath="@settlementId" />
-							  </xs:key>
-							  <xs:key         name="scoregroupKey">
-								 <xs:selector xpath="Scoregroup" />
-								 <xs:field    xpath="@scoregroupId" />
-							  </xs:key>
-							  <xs:key         name="transitionKey">
-								 <xs:selector xpath="Transition" />
-								 <xs:field    xpath="@transitionId" />
-							  </xs:key>
-							  <xs:keyref      name="transitionKeyref" refer="transitionKey">
-								 <xs:selector xpath="calculation" />
-								 <xs:field    xpath="@transitionId" />
-							  </xs:keyref>
+								<xs:selector xpath="Settlement" />
+								<xs:field xpath="@settlementId" />
+							</xs:key>
+							<xs:key name="scoregroupKey">
+								<xs:selector xpath="Scoregroup" />
+								<xs:field xpath="@scoregroupId" />
+							</xs:key>
+							<xs:key name="transitionKey">
+								<xs:selector xpath="Transition" />
+								<xs:field xpath="@transitionId" />
+							</xs:key>
+							<xs:keyref name="transitionKeyref" refer="transitionKey">
+								<xs:selector xpath="calculation" />
+								<xs:field xpath="@transitionId" />
+							</xs:keyref>
 						</xs:element>
-						<xs:element name="property" type="ChannelPropertyType"
-							minOccurs="0" maxOccurs="unbounded" />
+						<xs:element name="property" type="ChannelPropertyType" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
-					<xs:attribute name="lastUseOrdinal" type="xs:integer"
-						use="optional" />
+					<xs:attribute name="lastUseOrdinal" type="xs:integer" use="optional" />
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="Desktop" type="DesktopType">
@@ -185,7 +177,8 @@
 			<xs:element name="ReadStableIndex" type="xs:integer">
 				<xs:annotation>
 					<xs:documentation>specify number of 1 msec cycles where the receive
-						buffer do not change to detect buffer complete
+						buffer do not change to
+						detect buffer complete
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -211,29 +204,22 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:attribute name="inputType" type="input_types" use="required" />
-					<xs:attribute name="formatType" type="format_types"
-						use="required" />
+					<xs:attribute name="formatType" type="format_types" use="required" />
 					<xs:attribute name="size" type="xs:integer" use="required" />
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="checkSum" minOccurs="0">
 				<xs:complexType>
-					<xs:attribute name="format" type="format_types"
-						default="BINARY" />
-					<xs:attribute name="type" type="checkSum_types"
-						default="XOR" />
+					<xs:attribute name="format" type="format_types" default="BINARY" />
+					<xs:attribute name="type" type="checkSum_types" default="XOR" />
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="timeUnit" type="time_unit_types"
-				default="msec" minOccurs="0" />
-			<xs:element name="separator" type="comma_separator_types"
-				default="semicolon" minOccurs="0" />
-			<xs:element name="leader" type="xs:string" default="$"
+			<xs:element name="timeUnit" type="time_unit_types" default="msec" minOccurs="0" />
+			<xs:element name="separator" type="comma_separator_types" default="semicolon"
 				minOccurs="0" />
-			<xs:element name="trailer" type="xs:hexBinary" default="0D0A"
-				minOccurs="0" />
-			<xs:element name="preferredDataLocation" type="xs:string"
-				minOccurs="0">
+			<xs:element name="leader" type="xs:string" default="$" minOccurs="0" />
+			<xs:element name="trailer" type="xs:hexBinary" default="0D0A" minOccurs="0" />
+			<xs:element name="preferredDataLocation" type="xs:string" minOccurs="0">
 				<xs:annotation>
 					<xs:appinfo />
 					<xs:appinfo>preferred file location if raw data loaded from file
@@ -242,16 +228,15 @@
 					<xs:documentation />
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="preferredFileExtention" type="xs:string"
-				default="*.csv" minOccurs="0">
+			<xs:element name="preferredFileExtention" type="xs:string" default="*.csv" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>specify a file extention (*.abc) if the data file
-						extension is diferent to *.csv
+						extension is diferent to
+						*.csv
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="histoSamplingTime_ms" type="xs:integer"
-				default="1000" minOccurs="0" />
+			<xs:element name="histoSamplingTime_ms" type="xs:integer" default="1000" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="TimeBaseType">
@@ -262,12 +247,12 @@
 			<xs:element name="timeStep" type="xs:double">
 				<xs:annotation>
 					<xs:documentation>a negative value means variable time step, some
-						devices allow editing, other edit by its configuration
+						devices allow editing, other
+						edit by its configuration
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="avarage_timeStep" type="xs:double"
-				minOccurs="0">
+			<xs:element name="avarage_timeStep" type="xs:double" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>for backwards compatibility</xs:documentation>
 				</xs:annotation>
@@ -286,16 +271,15 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="score" type="ScoreType"
-				minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="score" type="ScoreType" minOccurs="1" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>for single values.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="property" type="PropertyType" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="label" type="xs:string" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute  name="scoregroupId"   type="xs:int" use="required" />
+		<xs:attribute name="scoregroupId" type="xs:int" use="required" />
 	</xs:complexType>
 	<xs:complexType name="SettlementType">
 		<xs:sequence>
@@ -308,67 +292,62 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="evaluation" type="EvaluationType"
-				minOccurs="0">
+			<xs:element name="evaluation" type="EvaluationType" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>procedures for using measurement data.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="property" type="PropertyType" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="suppressQuantiles" type="xs:boolean" nillable="false" minOccurs="0" />
+			<xs:element name="label" type="xs:string" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute  name="settlementId"   type="xs:int" use="required" />
+		<xs:attribute name="settlementId" type="xs:int" use="required" />
 	</xs:complexType>
 	<xs:complexType name="MeasurementType">
 		<xs:sequence>
 			<xs:element name="name" type="xs:string" />
 			<xs:element name="symbol" type="xs:string" />
 			<xs:element name="unit" type="xs:string" />
-			<xs:element name="active" type="xs:boolean" nillable="false"
-				minOccurs="0">
+			<xs:element name="active" type="xs:boolean" nillable="false" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>true can read data, false inactive, null ->
-						calculation = true
+					<xs:documentation>true can read data, false inactive, null -> calculation = true
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="statistics" type="StatisticsType"
-				minOccurs="0" />
-			<xs:element name="property" type="PropertyType" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element name="statistics" type="StatisticsType" minOccurs="0" />
+			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="suppressQuantiles" type="xs:boolean" nillable="false" minOccurs="0" />
+			<xs:element name="label" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="ChannelType">
 		<xs:sequence>
-			<xs:element name="Measurement" type="MeasurementType"
-				maxOccurs="unbounded">
+			<xs:element name="Measurement" type="MeasurementType" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>Defines measurement capabilities, it might be
-						calculations depending on measurements
+						calculations depending on
+						measurements
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Settlement" type="SettlementType"
-				minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="Settlement" type="SettlementType" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>Defines calculation capabilities depending on
 						measurements
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Transition" type="TransitionType"
-				minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="Transition" type="TransitionType" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>Defines trigger mechanisms</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Scoregroup" type="ScoregroupType"
-				minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="Scoregroup" type="ScoregroupType" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>Defines collections of score values calculated,
-						it might be
-						calculations depending on measurements
+						it might be calculations
+						depending on measurements
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -383,36 +362,31 @@
 		<xs:attribute name="description" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="ScoreType">
-		<xs:attribute name="label" type="score_label_types"
-			use="required" />
+		<xs:attribute name="label" type="score_label_types" use="required" />
 		<xs:attribute name="value" use="required" />
 		<xs:attribute name="type" type="data_types" use="required" />
 		<xs:attribute name="description" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="ChannelPropertyType">
-		<xs:attribute name="name" type="channel_property_types"
-			use="required" />
+		<xs:attribute name="name" type="channel_property_types" use="required" />
 		<xs:attribute name="value" use="optional" />
 		<xs:attribute name="type" type="data_types" use="required" />
 		<xs:attribute name="description" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="DesktopPropertyType">
-		<xs:attribute name="name" type="desktop_property_types"
-			use="required" />
+		<xs:attribute name="name" type="desktop_property_types" use="required" />
 		<xs:attribute name="value" type="xs:boolean" use="required" />
 		<xs:attribute name="description" type="xs:string" />
 		<xs:attribute name="target_reference_ordinal" type="xs:integer" />
 	</xs:complexType>
 	<xs:complexType name="DesktopType">
 		<xs:sequence>
-			<xs:element name="property" type="DesktopPropertyType"
-				minOccurs="4" maxOccurs="8" />
+			<xs:element name="property" type="DesktopPropertyType" minOccurs="4" maxOccurs="8" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EvaluationType">
 		<xs:sequence>
-			<xs:element name="calculation" type="CalculationType"
-				minOccurs="0" maxOccurs="1">
+			<xs:element name="calculation" type="CalculationType" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>calculations based on trigger</xs:documentation>
 				</xs:annotation>
@@ -443,7 +417,8 @@
 		<xs:attribute name="triggerRefOrdinal" type="xs:integer">
 			<xs:annotation>
 				<xs:documentation>references the measurement ordinal where trigger
-					level is set in case of trigger is defined
+					level is set in case of
+					trigger is defined
 					(0=VoltageReceiver;1=Voltage,2=Current, ...)
 				</xs:documentation>
 			</xs:annotation>
@@ -451,7 +426,8 @@
 		<xs:attribute name="sumByTriggerRefOrdinal" type="xs:integer">
 			<xs:annotation>
 				<xs:documentation>calculates sum of values where trigger level
-					becomes active at referenced triggered measurement ordinal
+					becomes active at referenced
+					triggered measurement ordinal
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -465,7 +441,8 @@
 		<xs:attribute name="countByTrigger" type="xs:boolean">
 			<xs:annotation>
 				<xs:documentation>counts the number of events trigger level becomes
-					active at specified trigger type
+					active at specified trigger
+					type
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -486,14 +463,16 @@
 		<xs:attribute name="sumTriggerTimeText" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>text displayed in front of the time sum value in
-					case of trigger is defined displayed at time row
+					case of trigger is defined
+					displayed at time row
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="ratioRefOrdinal" type="xs:integer">
 			<xs:annotation>
 				<xs:documentation>measurement ordinal to calculate the ratio of
-					referenced avg or max value to sumByTriggerRefOrdinal
+					referenced avg or max value to
+					sumByTriggerRefOrdinal
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -523,15 +502,14 @@
 		<xs:attribute name="peak" type="xs:boolean" use="required">
 			<xs:annotation>
 				<xs:documentation>
-					true means the trigger fires if the threshold
-					level is exceeded within
-					the threshold time AND the recovery level
-					is reached within the
-					recovery time which starts after the threshold
-					time.
-					false means the trigger fires if the threshold level is
-					exceeded within
-					the threshold time
+					true means the trigger fires if the threshold level is exceeded within
+					the
+					threshold time AND the recovery level is reached within the
+					recovery time which starts after the
+					threshold time.
+					false means the trigger fires if the threshold level is exceeded within
+					the
+					threshold time
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -551,7 +529,8 @@
 		<xs:attribute name="triggerLevel" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>value which fires the trigger (absolute in units
-					of the refOrdinal measurement or relative in percent based on the
+					of the refOrdinal measurement
+					or relative in percent based on the
 					values in the reference time.)
 				</xs:documentation>
 			</xs:annotation>
@@ -559,59 +538,55 @@
 		<xs:attribute name="recoveryLevel" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>hysteresis value for trigger off (10% means:
-					trigger is switched off if the value recovers to a delta of 10%
-					compared to the maximum / minimum value which fired the trigger)
+					trigger is switched off if the
+					value recovers to a delta of 10%
+					compared to the maximum / minimum value which fired the
+					trigger)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="referenceTimeMsec" type="xs:int"
-			use="required">
+		<xs:attribute name="referenceTimeMsec" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>time length in seconds for finding the maximum /
-					minimum reference value. The end of the reference time is the last
+					minimum reference value. The
+					end of the reference time is the last
 					time step before the trigger fired.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="thresholdTimeMsec" type="xs:int"
-			use="required">
+		<xs:attribute name="thresholdTimeMsec" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>time length in seconds of trigger range for
-					finding the maximum / minimum threshold value.
-					Level: if the
-					threshold does not conform perfectly to the threshold level
-					and time
-					minimum, the trigger is cancelled.
-					once the threshold is triggered,
-					the recovery time starts if the
-					recovery level is constantly
-					exceeded and does NOT depend on the
+					finding the maximum / minimum
+					threshold value.
+					Level: if the threshold does not conform perfectly to the threshold level
+					and
+					time minimum, the trigger is cancelled.
+					once the threshold is triggered, the recovery time
+					starts if the
+					recovery level is constantly exceeded and does NOT depend on the
 					threshold time.
-					Peak: if the
-					threshold does not conform perfectly to the threshold level
-					and time
-					minimum, the trigger continues.
-					once the threshold is triggered, the
-					recovery time starts after the end
-					of the threshold time or if the
-					recovery level is constantly
-					exceeded during the rest of the
-					threshold time.
+					Peak: if the threshold does not conform perfectly to the threshold level
+					and time minimum, the
+					trigger continues.
+					once the threshold is triggered, the recovery time starts after the end
+					of the
+					threshold time or if the recovery level is constantly
+					exceeded during the rest of the threshold
+					time.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="recoveryTimeMsec" type="xs:int"
-			use="required">
+		<xs:attribute name="recoveryTimeMsec" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>time length in seconds for finding the maximum /
 					minimum hysteresis value.
-					Level: if recovery does not conform
-					perfectly to the recovery level and
-					time minimum, the trigger
-					continues.
-					Peak: if recovery does not conform perfectly to the
-					recovery level and
-					time minimum, the trigger is cancelled.
+					Level: if recovery does not conform perfectly to the recovery level and
+					time minimum, the
+					trigger continues.
+					Peak: if recovery does not conform perfectly to the recovery level and
+					time
+					minimum, the trigger is cancelled.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -629,8 +604,7 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="calcType" type="calculation_types"
-			use="required">
+		<xs:attribute name="calcType" type="calculation_types" use="required">
 		</xs:attribute>
 		<xs:attribute name="unsigned" type="xs:boolean" use="required">
 			<xs:annotation>
@@ -647,7 +621,8 @@
 		<xs:attribute name="leveling" type="leveling_types">
 			<xs:annotation>
 				<xs:documentation>procedure how to determine the first operand
-					(measurement) during the threshold period (peak triggers only)
+					(measurement) during the threshold
+					period (peak triggers only)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -661,14 +636,16 @@
 		<xs:attribute name="divisorLeveling" type="leveling_types">
 			<xs:annotation>
 				<xs:documentation>procedure how to determine the second operand
-					(measurement) during the recovery period (peak triggers only)
+					(measurement) during the recovery
+					period (peak triggers only)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="basedOnRecovery" type="xs:boolean">
 			<xs:annotation>
 				<xs:documentation>delta values are calculated based on recovery
-					period values (peak triggers only). if false the base is the
+					period values (peak triggers
+					only). if false the base is the
 					reference period. if missing the base are reference period and
 					recovery period.
 				</xs:documentation>
@@ -710,8 +687,7 @@
 	</xs:complexType>
 	<xs:complexType name="StateType">
 		<xs:sequence>
-			<xs:element name="property" type="PropertyType" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:simpleType name="data_types">

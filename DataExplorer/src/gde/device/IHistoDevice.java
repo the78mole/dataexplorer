@@ -18,18 +18,14 @@
 ****************************************************************************************/
 package gde.device;
 
-import gde.data.HistoRecordSet;
-import gde.data.RecordSet;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.histocache.HistoVault;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
+import gde.histocache.HistoVault;
 
 /**
  * devices with history support implementations.

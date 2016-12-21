@@ -160,7 +160,15 @@
                 <score label="logFileBytes" value="Dateigröße" type="String"/>
                 <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
             </Scoregroup>
-            <Scoregroup scoregroupId="4">
+			<Scoregroup scoregroupId="4">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
                 <name>Laufzeiten</name>
                 <symbol></symbol>
                 <unit>ms</unit>
@@ -275,7 +283,15 @@
                 <score label="logFileBytes" value="Dateigröße" type="String"/>
                 <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
             </Scoregroup>
-            <Scoregroup scoregroupId="4">
+			<Scoregroup scoregroupId="4">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
                 <name>Laufzeiten</name>
                 <symbol></symbol>
                 <unit>ms</unit>
@@ -390,7 +406,15 @@
                 <score label="logFileBytes" value="Dateigröße" type="String"/>
                 <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
             </Scoregroup>
-            <Scoregroup scoregroupId="4">
+			<Scoregroup scoregroupId="4">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
                 <name>Laufzeiten</name>
                 <symbol></symbol>
                 <unit>ms</unit>
