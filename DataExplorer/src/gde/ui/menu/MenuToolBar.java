@@ -15,6 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.menu;
 
@@ -451,7 +452,8 @@ public class MenuToolBar {
 								if (MenuToolBar.this.application.getActiveDevice() != null)
 									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 								if (!previousObjectKey.equals(MenuToolBar.this.activeObjectKey))
-									MenuToolBar.this.application.setupHistoWindows();
+									MenuToolBar.this.application.setupHistoWindows(); 
+
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
@@ -1076,32 +1078,32 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "helpToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {
-								MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().notifyListeners(SWT.Help, new Event());
-							}
-							else {
-								for (CTabItem tabItem : MenuToolBar.this.application.getTabFolder().getItems()) {
-									if (!tabItem.isDisposed() && tabItem.getControl() != null && tabItem.getControl().isVisible()) {
-										if (tabItem.getControl() != null && tabItem.getControl().isListening(SWT.Help)) {
-											tabItem.getControl().notifyListeners(SWT.Help, new Event());
-											break;
-										}
-										else if (tabItem instanceof GraphicsWindow) {
-											((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
-										}
-										else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
-											if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
-												try {
-													MenuToolBar.this.application.openHelpDialog(FileUtils.getJarFileNameOfDevice(MenuToolBar.this.application.getActiveDevice().getDeviceConfiguration()), "HelpInfo.html");//$NON-NLS-1$
+								if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {
+									MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().notifyListeners(SWT.Help, new Event());
+								}
+								else {
+									for (CTabItem tabItem : MenuToolBar.this.application.getTabFolder().getItems()) {
+										if (!tabItem.isDisposed()&& tabItem.getControl().isVisible()) {
+											if (tabItem.getControl().isListening(SWT.Help)) {
+												tabItem.getControl().notifyListeners(SWT.Help, new Event());
+												break;
+											}
+											else if (tabItem instanceof GraphicsWindow) {
+												((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
+											}
+											else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
+												if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
+													try {
+														MenuToolBar.this.application.openHelpDialog(FileUtils.getJarFileNameOfDevice(MenuToolBar.this.application.getActiveDevice().getDeviceConfiguration()), "HelpInfo.html");//$NON-NLS-1$
+													}
+													catch (Throwable e) {
+														//ignore
+													} 	
 												}
-												catch (Throwable e) {
-													//ignore
-												} 	
 											}
 										}
 									}
 								}
-							}
 						}
 					});
 				}

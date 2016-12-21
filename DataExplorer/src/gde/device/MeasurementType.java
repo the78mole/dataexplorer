@@ -32,6 +32,8 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="active" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *         &lt;element name="statistics" type="{}StatisticsType" minOccurs="0"/>
  *         &lt;element name="property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="suppressQuantiles" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
+ *         &lt;element name="label" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -41,15 +43,17 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MeasurementType", propOrder = { //$NON-NLS-1$
-		"name", //$NON-NLS-1$
-		"symbol", //$NON-NLS-1$
-		"unit", //$NON-NLS-1$
-		"active", //$NON-NLS-1$
-		"statistics", //$NON-NLS-1$
-		"property" //$NON-NLS-1$
+@XmlType(name = "MeasurementType", propOrder = {
+    "name",
+    "symbol",
+    "unit",
+    "active",
+    "statistics",
+    "property",
+    "suppressQuantiles",
+    "label"
 })
-public class MeasurementType implements Cloneable {
+public class MeasurementType {
 
 	@XmlElement(required = true)
 	protected String							name;
@@ -60,6 +64,8 @@ public class MeasurementType implements Cloneable {
 	protected Boolean							active;
 	protected StatisticsType			statistics;
 	protected List<PropertyType>	property;
+	protected Boolean							suppressQuantiles;
+	protected String							label;
 
 	/**
 	 * default constructor
@@ -78,8 +84,7 @@ public class MeasurementType implements Cloneable {
 		this.unit = measurement.unit;
 		this.active = measurement.active;
 		this.statistics = measurement.statistics != null ? measurement.statistics.clone() : null;
-		if(measurement.getProperty().size() != 0)
-			this.property = new ArrayList<PropertyType>();
+		if (measurement.getProperty().size() != 0) this.property = new ArrayList<PropertyType>();
 		for (PropertyType tmpProperty : measurement.getProperty()) {
 			this.property.add(tmpProperty.clone());
 		}
@@ -201,29 +206,29 @@ public class MeasurementType implements Cloneable {
 		return this.active == null ? true : false;
 	}
 
-    /**
-     * Gets the value of the statistics property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link StatisticsType }
-     *     
-     */
-    public StatisticsType getStatistics() {
-        return statistics;
-    }
+	/**
+	 * Gets the value of the statistics property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link StatisticsType }
+	 *     
+	 */
+	public StatisticsType getStatistics() {
+		return statistics;
+	}
 
-    /**
-     * Sets the value of the statistics property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link StatisticsType }
-     *     
-     */
-    public void setStatistics(StatisticsType value) {
-        this.statistics = value;
-    }
+	/**
+	 * Sets the value of the statistics property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link StatisticsType }
+	 *     
+	 */
+	public void setStatistics(StatisticsType value) {
+		this.statistics = value;
+	}
 
 	/**
 	 * Gets the value of the property property.
@@ -255,6 +260,54 @@ public class MeasurementType implements Cloneable {
 	}
 
 	/**
+	 * Gets the value of the suppressQuantiles property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link Boolean }
+	 *     
+	 */
+	public Boolean isSuppressQuantiles() {
+		return suppressQuantiles;
+	}
+
+	/**
+	 * Sets the value of the suppressQuantiles property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link Boolean }
+	 *     
+	 */
+	public void setSuppressQuantiles(Boolean value) {
+		this.suppressQuantiles = value;
+	}
+
+	/**
+	 * Gets the value of the label property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getLabel() {
+		return label;
+	}
+
+	/**
+	 * Sets the value of the label property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setLabel(String value) {
+		this.label = value;
+	}
+
+	/**
 	 * @param propertyKey
 	 * @param type
 	 * @param value
@@ -275,7 +328,7 @@ public class MeasurementType implements Cloneable {
 	 */
 	public void removeProperties() {
 		Iterator<PropertyType> iterator = this.getProperty().iterator();
-		
+
 		while (iterator.hasNext()) {
 			iterator.next();
 			iterator.remove();
@@ -289,11 +342,10 @@ public class MeasurementType implements Cloneable {
 	 */
 	public void removeProperty(String propertyKey) {
 		Iterator<PropertyType> iterator = this.getProperty().iterator();
-		
+
 		while (iterator.hasNext()) {
 			PropertyType tmpProp = iterator.next();
-			if (tmpProp.name.equals(propertyKey))
-				iterator.remove();
+			if (tmpProp.name.equals(propertyKey)) iterator.remove();
 		}
 	}
 

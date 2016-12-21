@@ -16,7 +16,7 @@
     </TimeBase>
     <DataBlock>
         <format inputType="FILE_IO" formatType="VALUE" size="-1536"/>
-        <preferredDataLocation>/Users/brueg/Documents/DataExplorer/Weatronic-Telemetry</preferredDataLocation>
+        <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.log</preferredFileExtention>
     </DataBlock>
     <State>

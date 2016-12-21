@@ -37,6 +37,8 @@ import gde.utils.TimeLine;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -44,6 +46,8 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.naming.OperationNotSupportedException;
 
 import junit.framework.TestCase;
 
@@ -56,37 +60,41 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class TestSuperClass extends TestCase {
-	Logger																rootLogger;
+	Logger rootLogger;
 	static {
-	Settings.getInstance();
-	GDE.display														= Display.getDefault();
-	GDE.shell															= new Shell(GDE.display);
+		Settings.getInstance();
+		GDE.display = Display.getDefault();
+		GDE.shell = new Shell(GDE.display);
 	}
 
-	final DataExplorer										application	= DataExplorer.getInstance();
-	final Channels												channels		= Channels.getInstance();
-	final Settings												settings		= Settings.getInstance();
-	final String 													tmpDir 			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) 
-																												? System.getProperty("java.io.tmpdir") 
-																												: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR ;
+	final DataExplorer	application	= DataExplorer.getInstance();
+	final Channels			channels		= Channels.getInstance();
+	final Settings			settings		= Settings.getInstance();
+	final String				tmpDir			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) ? System.getProperty("java.io.tmpdir")
+			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 
+	protected enum DataSource {
+		SETTINGS, TESTDATA, INDIVIDUAL
+	};
 
-	final TimeLine												timeLine		= new TimeLine();
+	final TimeLine												timeLine					= new TimeLine();
 	Rectangle															curveAreaBounds;
 	int																		offSetX, offSetY;
 
 	TreeMap<String, DeviceConfiguration>	deviceConfigurations;
 	Vector<String>												activeDevices;
 	File																	dataPath;
-	HashMap<String,String>								legacyDeviceNames = new HashMap<String,String>(2);
+	HashMap<String, String>								legacyDeviceNames	= new HashMap<String, String>(2);
 
-	Handler																ch					= new ConsoleHandler();
-	LogFormatter													lf					= new LogFormatter();
+	Handler																ch								= new ConsoleHandler();
+	LogFormatter													lf								= new LogFormatter();
 
-	Logger																logger1			= Logger.getLogger("gde.data.Record");
-	Logger																logger2			= Logger.getLogger("gde.data.RecordSet");
+	Logger																logger1						= Logger.getLogger("gde.data.Record");
+	Logger																logger2						= Logger.getLogger("gde.data.RecordSet");
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
@@ -105,24 +113,26 @@ public class TestSuperClass extends TestCase {
 		this.ch.setFormatter(this.lf);
 		this.ch.setLevel(Level.FINER);
 
-		//this.logger1.setLevel(Level.FINE);
-		//this.logger1.setUseParentHandlers(true);
-		//this.logger2.setLevel(Level.FINE);
-		//this.logger2.setUseParentHandlers(true);
+		// this.logger1.setLevel(Level.FINE);
+		// this.logger1.setUseParentHandlers(true);
+		// this.logger2.setLevel(Level.FINE);
+		// this.logger2.setUseParentHandlers(true);
 
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 
 		this.initialize();
-		
-		//add this two renamed device plug-ins to the list of legacy devices
+
+		// add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
 		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
 	}
 
 	/**
-	 * goes through the existing device properties files and set active flagged devices into active devices list
-	 * @throws FileNotFoundException 
+	 * goes through the existing device properties files and set active flagged
+	 * devices into active devices list
+	 * 
+	 * @throws FileNotFoundException
 	 */
 	public void initialize() throws FileNotFoundException {
 
@@ -133,15 +143,14 @@ public class TestSuperClass extends TestCase {
 		String[] files = file.list();
 		DeviceConfiguration devConfig;
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
-		
-		
-		//wait until schema is setup
+
+		// wait until schema is setup
 		while (this.settings.isXsdThreadAlive()) {
 			try {
 				Thread.sleep(5);
 			}
 			catch (InterruptedException e) {
-				//ignore
+				// ignore
 			}
 		}
 
@@ -152,7 +161,7 @@ public class TestSuperClass extends TestCase {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
 					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR + files[i]);
 
-					// store all device configurations in a map					
+					// store all device configurations in a map
 					String keyString;
 					if (devConfig.getName() != null)
 						keyString = devConfig.getName();
@@ -177,17 +186,22 @@ public class TestSuperClass extends TestCase {
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
 		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
-		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName  // full qualified
-				: "gde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+		// selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase()
+		// + selectedDeviceName.substring(1);
+		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full
+				// qualified
+				: "gde.device." //$NON-NLS-1$
+						+ selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName;
 		try {
-			//String className = "gde.device.DefaultDeviceDialog";
-			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+			// String className = "gde.device.DefaultDeviceDialog";
+			// log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
-			//Class c = Class.forName(className);
+			// Class c = Class.forName(className);
 			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { String.class });
-			//log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			// log.log(Level.FINE, "constructor != null -> " + (constructor !=
+			// null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$
+			// //$NON-NLS-3$
 			if (constructor != null) {
 				newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig.getPropertiesFileName() });
 			}
@@ -207,7 +221,9 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * this will setup empty channels according the device properties file
 	 * copied and modified from DeviceSelectionDialog.setupDataChannels();
-	 * @param activeDevice (IDevice is the abstract type)
+	 * 
+	 * @param activeDevice
+	 *            (IDevice is the abstract type)
 	 */
 	protected void setupDataChannels(IDevice activeDevice) {
 		// cleanup existing channels and record sets
@@ -215,7 +231,7 @@ public class TestSuperClass extends TestCase {
 
 		if (activeDevice != null) {
 			String[] channelNames = new String[activeDevice.getChannelCount()];
-			// buildup new structure  - set up the channels
+			// buildup new structure - set up the channels
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 				Channel newChannel = new Channel(activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
 				newChannel.setObjectKey(this.application.getObjectKey());
@@ -227,73 +243,114 @@ public class TestSuperClass extends TestCase {
 	}
 
 	/**
+	 * reflect user GUI settings required for history tabs.
+	 * copied from 'setDevice', 'setupDataChannels'
+	 * @param activeDevice
+	 * @param activeChannelNumber
+	 * @param activeObjectKey
+	 */
+	protected void setupDeviceChannelObject(String fileDeviceName, int activeChannelNumber, String activeObjectKey) {
+		// device : from setDevice
+		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
+		if (fileDeviceName.toLowerCase().contains("charger308duo") || fileDeviceName.toLowerCase().contains("charger308duo")) {
+			System.out.println("skip fileDeviceName=" + fileDeviceName);
+		}
+		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
+		IDevice device = this.getInstanceOfDevice(deviceConfig);
+		this.application.setActiveDeviceWoutUI(device);
+		
+		setupDataChannels(device);
+		
+		this.application.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
+	}
+
+	/**
 	 * method to draw the curves with it scales and defines the curve area
 	 * copied and modified from GraphicsComposite.drawCurves()
+	 * 
 	 * @param recordSet
 	 * @param maxX
 	 * @param maxY
 	 */
 	protected void drawCurves(RecordSet recordSet, int maxX, int maxY) {
 		// get the image and prepare GC
-		Image	 curveArea =  new Image(Display.getDefault(), maxX, maxY);
+		Image curveArea = new Image(Display.getDefault(), maxX, maxY);
 		GC gc = new GC(curveArea);
 		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
-			
-		//prepare time scale
+
+		// prepare time scale
 		double totalDisplayDeltaTime_ms = recordSet.get(0).getDrawTimeWidth_ms();
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(totalDisplayDeltaTime_ms);
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
 
-		//calculate number of curve scales, left and right side
+		// calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
 		for (Record tmpRecord : recordSet.getRecordsSortedForDisplay()) {
 			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-				//System.out.println("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				// System.out.println("==>> " + recordKey + " isVisible = " +
+				// tmpRecord.isVisible() + " isDisplayable = " +
+				// tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$
+				// //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
 					numberCurvesRight++;
 			}
 		}
-		//correct scales and scale position according compare set requirements
+		// correct scales and scale position according compare set requirements
 		if (recordSet.isCompareSet()) {
-			numberCurvesLeft = 1; //numberCurvesLeft > 0 ? 1 : 0;
-			numberCurvesRight = 0; //numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
+			numberCurvesLeft = 1; // numberCurvesLeft > 0 ? 1 : 0;
+			numberCurvesRight = 0; // numberCurvesRight > 0 && numberCurvesLeft
+			// == 0 ? 1 : 0;
 		}
-		//System.out.println("nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
+		// System.out.println("nCurveLeft=" + numberCurvesLeft + ",
+		// nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
-		//calculate the bounds left for the curves
-		int dataScaleWidth; // horizontal space used for text and scales, numbers and caption
+		// calculate the bounds left for the curves
+		int dataScaleWidth; // horizontal space used for text and scales,
+		// numbers and caption
 		int x0, y0; // the lower left corner of the curve area
 		int xMax, yMax; // the upper right corner of the curve area
-		int width; // x coordinate width	- time scale
+		int width; // x coordinate width - time scale
 		int height; // y coordinate - make modulo 10 ??
 		int startTimeFormated, endTimeFormated;
-		
+
 		// calculate the horizontal space width to be used for the scales
 		Point pt = gc.textExtent("-000,00"); //$NON-NLS-1$
-		int horizontalGap = pt.x/5;
+		int horizontalGap = pt.x / 5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;	
+		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
-		
+
 		// calculate the horizontal area available for plotting graphs
 		int gapSide = 10; // free gap left or right side of the curves
-		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide/2 : gapSide);// enable a small gap if no axis is shown
-		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide/2 : gapSide);
+		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide / 2 : gapSide);// enable
+		// a
+		// small
+		// gap
+		// if no
+		// axis
+		// is
+		// shown
+		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide / 2 : gapSide);
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
-		
+
 		// calculate the vertical area available for plotting graphs
 		yMax = 10; // free gap on top of the curves
-		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
+		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales
+		// with description or legend;
 		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
-		//System.out.println("draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		// System.out.println("draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" +
+		// xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height);
+		// //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		// //$NON-NLS-6$
 		// set offset values used for mouse measurement pointers
 		this.offSetX = x0;
 		this.offSetY = y0 - height;
@@ -301,29 +358,32 @@ public class TestSuperClass extends TestCase {
 		// draw curves for each active record
 		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
 		recordSet.setDrawAreaBounds(this.curveAreaBounds);
-		//System.out.println("curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
-		
-		//gc.setBackground(this.curveAreaBackground);
-		gc.fillRectangle(this.curveAreaBounds);
-		//gc.setBackground(this.surroundingBackground);
+		// System.out.println("curve bounds = " + this.curveAreaBounds);
+		// //$NON-NLS-1$
 
-		//draw the time scale
-		//System.out.println("average time step record 0 = " + recordSet.getAverageTimeStep_ms());
+		// gc.setBackground(this.curveAreaBackground);
+		gc.fillRectangle(this.curveAreaBounds);
+		// gc.setBackground(this.surroundingBackground);
+
+		// draw the time scale
+		// System.out.println("average time step record 0 = " +
+		// recordSet.getAverageTimeStep_ms());
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		//System.out.println("startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (long)totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
+		// System.out.println("startTime = " + startTimeFormated + " detaTime_ms
+		// = " + (int)totalDisplayDeltaTime_ms + " endTime = " +
+		// endTimeFormated);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0 + 1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (long) totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
 
-		// draw draw area bounding 
-		//gc.setForeground(this.curveAreaBorderColor);
-		
-		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
-		gc.drawLine(x0-1, yMax-1, x0-1, y0); 
-		gc.drawLine(xMax+1, yMax-1, xMax+1, y0);
+		// draw draw area bounding
+		// gc.setForeground(this.curveAreaBorderColor);
+
+		gc.drawLine(x0 - 1, yMax - 1, xMax + 1, yMax - 1);
+		gc.drawLine(x0 - 1, yMax - 1, x0 - 1, y0);
+		gc.drawLine(xMax + 1, yMax - 1, xMax + 1, y0);
 
 		// check for activated time grid
-		if (recordSet.getTimeGridType() > 0) 
-			drawTimeGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
+		if (recordSet.getTimeGridType() > 0) drawTimeGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
@@ -334,12 +394,16 @@ public class TestSuperClass extends TestCase {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (actualRecord.isScaleVisible()) CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, true, true, true);
 
-			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check
+				// for
+				// activated
+				// horizontal
+				// grid
 				drawCurveGrid(recordSet, gc, this.offSetY, width, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
-				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
-				//gc.drawRectangle(x0, y0-height, width, height);
+				// gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+				// gc.drawRectangle(x0, y0-height, width, height);
 				gc.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
 				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
 				gc.setClipping(bounds);
@@ -347,7 +411,7 @@ public class TestSuperClass extends TestCase {
 		}
 
 		// draw start time for zoom mode or scope mode
-		if (startTimeFormated != 0) { 
+		if (startTimeFormated != 0) {
 			String strStartTime = Messages.getString(MessageIds.GDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
@@ -359,11 +423,15 @@ public class TestSuperClass extends TestCase {
 	}
 
 	/**
-	 * draw vertical (time) grid lines according the vector defined during drawing of time scale
+	 * draw vertical (time) grid lines according the vector defined during
+	 * drawing of time scale
+	 * 
 	 * @param recordSet
-	 * @param gc the graphics context to be used
+	 * @param gc
+	 *            the graphics context to be used
 	 * @param height
-	 * @param dash to be used for the custom line style
+	 * @param dash
+	 *            to be used for the custom line style
 	 */
 	public void drawTimeGrid(RecordSet recordSet, GC gc, Rectangle bounds, int[] dash) {
 		gc.setLineWidth(1);
@@ -376,54 +444,94 @@ public class TestSuperClass extends TestCase {
 	}
 
 	/**
-	 * draw horizontal (curve) grid lines according the vector prepared during daring specified curve scale 
+	 * draw horizontal (curve) grid lines according the vector prepared during
+	 * daring specified curve scale
+	 * 
 	 * @param recordSet
-	 * @param gc the graphics context to be used
-	 * @param useOffsetY the offset in vertical direction
+	 * @param gc
+	 *            the graphics context to be used
+	 * @param useOffsetY
+	 *            the offset in vertical direction
 	 * @param width
-	 * @param dash to be used for the custom line style
+	 * @param dash
+	 *            to be used for the custom line style
 	 */
 	private void drawCurveGrid(RecordSet recordSet, GC gc, int useOffSetY, int width, int[] dash) {
 		gc.setLineWidth(1);
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getHorizontalGridColor());
-		//curveAreaGC.setLineStyle(recordSet.getHorizontalGridLineStyle());
+		// curveAreaGC.setLineStyle(recordSet.getHorizontalGridLineStyle());
 		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
 		for (int i = 0; i < horizontalGridVector.size() - 1; i += recordSet.getHorizontalGridType()) {
 			int y = horizontalGridVector.get(i);
 			gc.drawLine(0, y - useOffSetY, width - 1, y - useOffSetY);
 		}
 	}
-	
+
 	/**
 	 * ger the path where the class GDE gets loaded
+	 * 
 	 * @return
 	 */
 	protected String getLoaderPath() {
 		return GDE.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	}
-	
+
 	protected File setDataPath() {
 		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
 		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
-		
+
 		if (settingsPropertiesExist && isDataPathConfigured) {
 			this.dataPath = new File(this.settings.getDataFilePath());
 		}
 		else {
 			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG  ;
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			else if (srcDataPath.indexOf("classes") > -1) { // ET running inside eclipse in Debug mode
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
 			}
 			else {
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG  ;
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG;
 			}
-			this.dataPath = new File(srcDataPath); ///usr/src/dataexplorer-2.23-src/build/target/<os_arch>/DataExplorer/DataExplorer.jar
+			this.dataPath = new File(srcDataPath); /// usr/src/dataexplorer-2.23-src/build/target/<os_arch>/DataExplorer/DataExplorer.jar
 		}
-		
+
 		this.settings.setDataFilePath(this.dataPath.getPath());
-		System.out.println("this.devicePath = " + this.dataPath.getPath());
+		System.out.println("this.dataPath = " + this.dataPath.getPath());
 		return this.dataPath;
 	}
+
+	protected File setDataPath(DataSource dataSource, Path subPath) {
+		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
+		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
+
+		if (dataSource == DataSource.SETTINGS && settingsPropertiesExist && isDataPathConfigured) {
+			this.dataPath = Paths.get(this.settings.getDataFilePath()).resolve(subPath).toFile();
+		}
+		else if (dataSource == DataSource.TESTDATA) {
+			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			else if (srcDataPath.indexOf("classes") > -1) { // ET running inside eclipse in Debug mode
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			else {
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+			}
+			// this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile(); Error because of leading slash: /C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer // this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile();
+			this.dataPath = (new File(srcDataPath)).toPath().resolve(subPath).toFile();
+		}
+		else if (dataSource == DataSource.INDIVIDUAL) {
+			this.dataPath = subPath.toFile();
+		}
+
+		this.settings.setDataFilePath(this.dataPath.getPath());
+		System.out.println("this.dataPath = " + this.dataPath.getPath());
+		return this.dataPath;
+	}
+
 }

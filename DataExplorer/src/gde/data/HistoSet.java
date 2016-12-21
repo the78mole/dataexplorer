@@ -18,456 +18,889 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+import java.util.zip.ZipFile;
+
+import org.eclipse.swt.SWT;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
+import gde.device.DeviceTypes;
+import gde.device.IDevice;
 import gde.device.IHistoDevice;
-import gde.device.MeasurementType;
-import gde.device.SettlementType;
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
+import gde.histocache.HistoVault;
 import gde.io.HistoOsdReaderWriter;
-import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
+import gde.utils.StringHelper;
 
 /**
- * holds current selection of histo recordSets for the selected channel.
- * sorted by timestamp in reverse order; each timestamp may hold multiple recordSets.
+ * supports the selection of histo vaults and provides a trail recordset based on the vaults. 
+ * sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
  * @author Thomas Eickert
  */
-public class HistoSet extends TreeMap<Long, List<HistoRecordSet>> {
-	final static String												$CLASS_NAME					= HistoSet.class.getName();
-	private static final long									serialVersionUID		= 1111377035274863787L;
-	final static Logger												log									= Logger.getLogger($CLASS_NAME);
+public class HistoSet extends TreeMap<Long, List<HistoVault>> {
+	private final static String		$CLASS_NAME								= HistoSet.class.getName();
+	private static final long			serialVersionUID					= 1111377035274863787L;
+	private final static Logger		log												= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer								application					= DataExplorer.getInstance();
-	private final Settings										settings						= Settings.getInstance();
+	private final DataExplorer		application								= DataExplorer.getInstance();
+	private final Settings				settings									= Settings.getInstance();
 
-	private HashMap<Integer, MeasurementType>	measurements				= new HashMap<Integer, MeasurementType>();
-	private String														deviceName					= null;
-	private String														objectKey						= null;
-	private int																channelNumber				= -Integer.MAX_VALUE;
-	private String														histoDataDirPath		= null;
-	//TODO private String														histoImportDirPath	= null;																		// TODO for bin files histo
+	private static HistoSet				histoSet									= null;
 
-	private TreeMap<Date, String>							histoFilePaths;																								// current paths to the histo files as evaluated during the last check
-	private TreeMap<Date, String>							lastCheckFilesPaths;																					// to be able to detect changes: paths to the histo files as evaluated during the last check
+	private IDevice								validatedDevice						= null;
+	private Channel								validatedChannel					= null;
+	private Path									validatedDataDir					= null;
+	private Path									validatedImportDir				= null;
+	private String								validatedImportExtention	= GDE.STRING_EMPTY;
 
-	private TrailRecordSet										trailRecordSet			= null;																		// histo data transformed in a recordset format
-	private static HistoSet										histoSet						= null;
+	/**
+	 * histo files coming from the last directory validation.
+	 * key is lastModified [ms] of the file, the list holds link file paths or file paths for all types of log files.
+	 */
+	private Map<Long, Set<Path>>	histoFilePaths						= new TreeMap<Long, Set<Path>>(Collections.reverseOrder());	// todo HashMap is sufficient (no sort required)
+	private long									fileSizeSum_B							= 0;																												// size of all the histo files which have been read to build the histo recordsets 
+	private TrailRecordSet				trailRecordSet						= null;																											// histo data transformed in a recordset format
+
+	/**
+	 * defines the first step during rebuilding the histoset data.
+	 * a minimum of steps may be selected for performance reasons.
+	 */
+	public enum RebuildStep {
+		/**
+		* true starts from scratch on
+		*/
+		A_HISTOSET(5),
+		/**
+		* true starts building the histo vaults
+		*/
+		B_HISTOVAULTS(4),
+		/**
+		* true starts building the trail recordset from the histo vaults 
+		*/
+		C_TRAILRECORDSET(3),
+		/**
+		* true starts refreshing the trail data from the histo vaults
+		*/
+		D_TRAIL_DATA(2),
+		/**
+		* starts updating the graphics and table
+		*/
+		E_USER_INTERFACE(1),
+		/**
+		* starts with a file check only which decides which update activity is required
+		*/
+		F_FILE_CHECK(0);
+
+		/**
+		 * zero is the lowest scopeOfWork.
+		 */
+		public final int					scopeOfWork;
+		/**
+		 * use this to avoid repeatedly cloning actions instead of values()
+		 */
+		public static RebuildStep	values[]	= values();
+
+		private RebuildStep(int scopeOfWork) {
+			this.scopeOfWork = scopeOfWork;
+		}
+
+		/**
+		 * @param scopeOfWork zero is the lowest scopeOfWork
+		 * @return
+		 */
+		public static RebuildStep area(int scopeOfWork) {
+			for (RebuildStep rebuildStep : values()) {
+				if (rebuildStep.scopeOfWork == scopeOfWork) {
+					return rebuildStep;
+				}
+			}
+			throw new IllegalArgumentException(String.valueOf(scopeOfWork));
+		}
+
+	};
 
 	public static HistoSet getInstance() {
-		if (HistoSet.histoSet == null) 
-			 HistoSet.histoSet = new HistoSet();
+		if (HistoSet.histoSet == null) HistoSet.histoSet = new HistoSet();
 		return HistoSet.histoSet;
 	}
-	
+
 	private HistoSet() {
 		super(Collections.reverseOrder());
 	}
 
-//	/**
-//	 * instantiates the singleton and initializes it.
-//	 */
-//	public static void resetFully() {
-//		histoSet = new HistoSet();
-//		histoSet.initialize();
-//	}
+	//	/**
+	//	 * instantiates the singleton and initializes it.
+	//	 */
+	//	public void resetFully() {
+	//		HistoSet.histoSet = new HistoSet();
+	//		initialize();
+	//	}
 
 	/**
 	 * re- initializes the singleton. 
 	 */
 	public void initialize() {
 		this.clear();
+
+		this.validatedDevice = null;
+		this.validatedChannel = null;
+		this.validatedDataDir = null;
+		this.validatedImportDir = null;
+		this.validatedImportExtention = GDE.STRING_EMPTY;
+
+		// this.histoFilePaths.clear(); is accomplished by files validation
+		this.fileSizeSum_B = 0;
 		this.trailRecordSet = null;
-		//this.buildTrail(); // initialize to make sure != null, replace 
-		if (this.channelNumber == -Integer.MAX_VALUE) { // this is only the case during first initialization or after resetFully
-			this.deviceName = this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName();
-			this.objectKey = this.application.getActiveObject() == null ? null : this.application.getActiveObject().getKey();
-			this.channelNumber = this.application.getActiveChannelNumber();
-		}
-		this.measurements = new HashMap<Integer, MeasurementType>();
-		if (this.application.getActiveDevice() != null) {
-			for (int i = 0; i < this.application.getActiveDevice().getNumberOfMeasurements(this.channelNumber); i++) {
-				this.measurements.put(i, this.application.getActiveDevice().getMeasurement(this.channelNumber, i).clone());
-			}
-		}
-		log.log(Level.OFF, String.format("device = %s  channel = %d  objectKey = %s", this.deviceName, this.channelNumber, this.objectKey)); //$NON-NLS-1$
+		log.log(Level.SEVERE, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
-	/**
-	 * add new measurement to the list. 
-	 * the measurement list corresponds to the selector in the histoGraphics window.
-	 * @param position The index at which the specified element is to be inserted.
-	 * @param measurementName
-	 * @param measurementSymbol
-	 * @param measurementUnit
+	/* 
+	 * clears trails for refill but keeps the trail recordset.
+	 * @see java.util.TreeMap#clear()
 	 */
-	public void addMeasurement(String measurementName, String measurementSymbol, String measurementUnit) {
-		log.log(Level.FINE, "addMeasurement " + measurementName); //$NON-NLS-1$
-		MeasurementType measurement = new MeasurementType();
-		measurement.setName(measurementName);
-		measurement.setSymbol(measurementSymbol);
-		measurement.setUnit(measurementUnit);
-		measurement.setActive(true);
-		// TODO setStatistics
-		// TODO setProperties
-		this.measurements.put(this.measurements.size(), measurement);
+	@Override
+	public void clear() {
+		// deep clear in order to reduce memory consumption prior to garbage collection
+		for (List<HistoVault> timestampHistoVaults : this.values()) {
+			timestampHistoVaults.clear();
+		}
+		super.clear();
+
+		// this.histoFilePaths.clear(); is accomplished by files validation
+		this.fileSizeSum_B = 0;
+		// this.trailRecordSet = null;
+		log.log(Level.SEVERE, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
-	/**
-	 * browse all record sets for measurement data.
-	 * @param recordOrdinal
-	 * @return the first array element is the measurement name which is followed by the measurement values from all histo record sets.
-	 */
-	public String[] getTableRow(int recordOrdinal) {
-		StringBuilder sb = new StringBuilder();
-		List<String> result = new ArrayList<String>();
-		MeasurementType measurementType = this.getMeasurements().get(recordOrdinal);
-		sb.append(measurementType.getName()).append(GDE.STRING_BLANK);
-		sb.append(GDE.STRING_BLANK_LEFT_BRACKET).append(measurementType.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
-		result.add(sb.toString());
-		for (List<HistoRecordSet> histoRecordSets : this.values()) {
-			for (HistoRecordSet histoRecordSet : histoRecordSets) {
-				if (histoRecordSet.realSize()-1 > recordOrdinal) {
-					Record record = histoRecordSet.get(recordOrdinal);
-					double value = this.application.getActiveDevice().translateValue(record, record.getAvgValue()) / 1000.;
-					result.add(record.getDecimalFormat().format(value));
+	public void rebuild4Test(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		// this.clear();
+		{
+			if (this.getHistoFilePaths().size() > 0) {
+				// step: build the workload map consisting of the cache key and the file path
+				Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(false, deviceConfigurations);
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
+
+				// step: put cached vaults into the histoSet map and reduce workload map
+				int trussJobsSize = trussJobs.size();
+				this.fileSizeSum_B = loadVaultsFromCache(trussJobs);
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs loaded from cache = %d", trussJobsSize - trussJobs.size())); //$NON-NLS-1$
+
+				// step: transform log files for the truss jobs into vaults and put them into the histoSet map
+				ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
+				for (Map.Entry<Path, Map<String, HistoVault>> pathEntry : trussJobs.entrySet()) {
+					try {
+						newVaults.addAll(loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue()));
+					}
+					catch (Exception e) {
+						throw new UnsupportedOperationException(pathEntry.getKey().toString(), e);
+					}
+				}
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs loaded from file  = %d", newVaults.size())); //$NON-NLS-1$
+
+				// step: save vaults in the file system
+				if (newVaults.size() > 0) {
+					storeVaultsInCache(newVaults);
 				}
 			}
 		}
-		return result.toArray(new String[result.size()]);
 	}
 
 	/**
-	 * build a new trail structure.
-	 * the trails data structure fits more closely to the graphics algorithms. 
+	 * determine histo files, build a recordset based job list and read from the log file or the cache for each job.
+	 * populate the trail recordset.
+	 * disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user or the device, channel or object was modified. 
+	 * @param rebuildStep
+	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
+	 * @return true if the HistoSet was rebuilt
+	 * @throws DataTypeException 
+	 * @throws DataInconsitsentException 
+	 * @throws NotSupportedFileFormatException 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public void buildTrail() {
-		this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.channelNumber);
-		this.trailRecordSet.defineTrailTypes();
-		// me.trailRecordSet.checkAllDisplayable();
-	}
+	public boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		boolean isRebuilt = false;
+		log.log(Level.INFO, rebuildStep.toString());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(2, sThreadId);
 
-	/**
-	 * copy the applicable aggregate values from the list of histo recordsets into the trail structure.
-	 */
-	public void populateTrail() {
-		this.trailRecordSet.addHisto(this);
-		this.trailRecordSet.applyTemplate(true); // needs reasonable data
-	}
+		long startTimeFileValid = new Date().getTime();
+		boolean isHistoFilePathsValid = this.validateHistoFilePaths(rebuildStep);
+		{
+			if (!isHistoFilePathsValid) {
+				this.clear();
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             clear")); //$NON-NLS-1$
+				if ((new Date().getTime() - startTimeFileValid) > 0) log.log(Level.TIME, String.format("%,5d files          select folders     time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
+						new Date().getTime() - startTimeFileValid, this.histoFilePaths.size() * 1000 / (new Date().getTime() - startTimeFileValid)));
+			}
+			else { // histo record sets are ready to use
+				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d files    file paths verified     time=%s [ss.SSS]", this.getHistoFilePaths().size(), //$NON-NLS-1$
+						StringHelper.getFormatedTime("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
+			}
+			if (isWithUi) this.application.setProgress(5, sThreadId);
+		}
+		{
+			if (RebuildStep.A_HISTOSET == rebuildStep) {
+				isRebuilt = true;
+				this.initialize();
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             initialize")); //$NON-NLS-1$
+				if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 2, sThreadId);
+			}
+		}
+		{
+			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
+				isRebuilt = true;
+				this.fileSizeSum_B = 0;
+				if (this.getHistoFilePaths().size() > 0) {
+					long nanoTimeCheckFilesSum = -System.nanoTime();
+					// step: build the workload map consisting of the cache key and the file path
+					Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(isWithUi, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+					nanoTimeCheckFilesSum += System.nanoTime();
+					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
+						log.log(Level.TIME, String.format("%,5d files          job check          time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
+								TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), this.histoFilePaths.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
 
-	/**
-	 * builds recordsets from the file and adds settlements to them.
-	 * skips those which exist in the histo set already.
-	 * @param histoFilePath
-	 * @return record sets found in the file which fit to the device, the channel and the object key 
-	 */
-	public List<HistoRecordSet> readRecordSets(String histoFilePath) {
-		List<HistoRecordSet> recordSets = null;
-		try {
-			recordSets = HistoOsdReaderWriter.readHisto(histoFilePath);
-			for (HistoRecordSet recordSet : recordSets) {
-				// some devices create multiple recordsets which may have identical timestamp values
-				if (this.containsKey(recordSet.getStartTimeStamp())) {
-					boolean alreadyExists = false;
-					for (HistoRecordSet myHistoRecordSet : this.get(recordSet.getStartTimeStamp())) {
-						if (myHistoRecordSet.getChannelConfigNumber() == recordSet.getChannelConfigNumber() &&
-								myHistoRecordSet.getDevice().getName() == recordSet.getDevice().getName()) {
-							if (log.isLoggable(Level.FINE))
-								log.log(Level.FINE, String.format("duplicate histo recordSet was discarded: device = %s  channelConfigNumber = %d  timestamp = %,d  histoFilePath = %s", recordSet.getDevice().getName(), recordSet.getChannelConfigNumber(), recordSet.getStartTimeStamp(), histoFilePath)); //$NON-NLS-1$
-							alreadyExists = true;
-							break;
+					if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 10, sThreadId);
+
+					// step: put cached vaults into the histoSet map and reduce workload map
+					long nanoTimeReadVaultSum = -System.nanoTime();
+					int timeStepsSize = -this.size();
+					long fileSizeSumCached_B = this.fileSizeSum_B = loadVaultsFromCache(trussJobs);
+					timeStepsSize += this.size();
+					nanoTimeReadVaultSum += System.nanoTime();
+					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum) > 0) log.log(Level.TIME,
+							String.format("%,5d trailTimeSteps load from cache    time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", timeStepsSize, //$NON-NLS-1$
+									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum), timeStepsSize * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum),
+									this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
+
+					// step: calculate progress bar parameters
+					double progressCycle = 0.;
+					int progressStart = 0;
+					if (isWithUi) {
+						progressStart = DataExplorer.application.getProgressPercentage()
+								+ (int) ((95 - DataExplorer.application.getProgressPercentage()) * this.size() / (double) (this.size() + 10 * trussJobs.size())); // 10 is the estimated processing time ratio between reading from files and reading from cache
+						this.application.setProgress(progressStart, sThreadId);
+						progressCycle = trussJobs.size() > 0 ? (95 - progressStart) / (double) trussJobs.size() : 1;
+					}
+
+					// step: transform log files from workload map into vaults and put them into the histoSet map
+					long nanoTimeReadRecordSetSum = -System.nanoTime();
+					ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
+					int i = 0;
+					for (Map.Entry<Path, Map<String, HistoVault>> trussJobsEntry : trussJobs.entrySet()) {
+						newVaults.addAll(loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue()));
+						this.fileSizeSum_B += new File(trussJobsEntry.getKey().toString()).length();
+						if (isWithUi) this.application.setProgress((int) (++i * progressCycle + progressStart), sThreadId);
+					}
+					nanoTimeReadRecordSetSum += System.nanoTime();
+					if (newVaults.size() > 0) log.log(Level.TIME,
+							String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
+									(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
+
+					// step: save vaults in the file system
+					long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
+					if (newVaults.size() > 0) {
+						cacheSize_B = storeVaultsInCache(newVaults);
+					}
+					if (isWithUi) this.application.setProgress(95, sThreadId);
+					nanoTimeWriteVaultSum += System.nanoTime();
+					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
+							String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+									TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
+									(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
+					log.log(Level.TIME, String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.size(), //$NON-NLS-1$
+							new Date().getTime() - startTimeFileValid, this.size() * 1000 / (new Date().getTime() - startTimeFileValid), this.fileSizeSum_B / 1000 / (new Date().getTime() - startTimeFileValid)));
+					for (List<HistoVault> vaultList : this.values()) {
+						if (vaultList.size() > 1) {
+							for (HistoVault histoVault : vaultList) {
+								log.log(Level.WARNING, "same timeStamp: " + histoVault.toString());
+							}
 						}
 					}
-					if (!alreadyExists) {
-						if (log.isLoggable(Level.INFO))
-							log.log(Level.INFO, String.format("different histo recordSet with identical timestamp: device = %s  channelConfigNumber = %d  timestamp = %,d  histoFilePath = %s", recordSet.getDevice().getName(), recordSet.getChannelConfigNumber(), recordSet.getStartTimeStamp(), histoFilePath)); //$NON-NLS-1$
-						this.get(recordSet.getStartTimeStamp()).add(recordSet);
-					}
-				} else {
-					ArrayList<HistoRecordSet> arrayList = new ArrayList<HistoRecordSet>();
-					arrayList.add(recordSet);
-					this.put(recordSet.getStartTimeStamp(), arrayList);
 				}
-				recordSet.addEvaluationSettlements();
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return recordSets;
-	}
-
-	/**
-	 * builds recordsets from the file and adds settlements to them.
-	 * skips those which exist in the histo set already.
-	 * new version with access to bin files. 
-	 * @param histoFilePath
-	 * @return record sets found in the file which fit to the device, the channel and the object key 
-	 */
-	public List<HistoRecordSet> readRecordSets4Bin(String histoFilePath) {
-		List<HistoRecordSet> recordSets = null;
-		// see a bunch of device construction code lines at gde.ui.dialog.DeviceSelectionDialog.getInstanceOfDevice()
-		IHistoDevice histoDevice = (IHistoDevice) this.application.getActiveDevice();
-			RecordSet recordSet = HistoRecordSet.createRecordSet("test", application.getActiveDevice(), application.getActiveChannelNumber(), true, true);
-			try {
-				histoDevice.addBinFileAsRawDataPoints(recordSet, "C:\\_Thomas\\Eigene Dokumente\\2016\\2016_Fliegen\\LogData\\FS14\\0213_2016-5-28.bin");
-				recordSet = HistoRecordSet.createRecordSet("test", application.getActiveDevice(), application.getActiveChannelNumber(), true, true);
-				histoDevice.addBinFileAsRawDataPoints(recordSet, "C:\\_Thomas\\Eigene Dokumente\\2016\\2016_Fliegen\\LogData\\FS14\\0210_2016-5-25.bin");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			}
-		return recordSets;
-	}
-
-	/**
-	 * decide about validity via comparison against the last call of this method.
-	 * determine files from an input directory which fit to the objectKey, the device, the channel and the file extensions.
-	 * resets the histoset singleton if the trail is invalid.
-	 * @param doUpdateProgressBar
-	 * @return true: trail data are valid 
-	 */
-	public boolean validateHistoFilePaths(boolean doUpdateProgressBar) {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		if (doUpdateProgressBar)
-			this.application.setProgress(2, sThreadId);
-
-		boolean isChannelChanged = detectChannelChange();
-		boolean isFolderChanged = detectFolderChange(false);
-		boolean isInvalid = isChannelChanged | isFolderChanged;
-		if (doUpdateProgressBar)
-			this.application.setProgress(5, sThreadId);
-		boolean isFilesChanged = detectFilesChange(isFolderChanged);
-		if (isFilesChanged && !isInvalid) {
-			isInvalid = SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0064)); // ask user if he wants new files added into the history
-		}
-		if (isInvalid)
-			this.initialize();
-
-		if (doUpdateProgressBar)
-			this.application.setProgress(7, sThreadId);
-		if (log.isLoggable(Level.OFF))
-			log.log(Level.OFF, String.format("isChannelChanged %s  isFolderChanged %s  isFilesChanged %s  isInvalid %s", isChannelChanged, isFolderChanged, isFilesChanged, isInvalid)); //$NON-NLS-1$
-		return !isInvalid;
-	}
-
-	/**
-	 * comparison against the last call of this method.
-	 * determine input directory which fits to the objectKey, the device and the file extensions.
-	 * @param reBuild true perform full check even if neither the device nor the object key was changed 
-	 * @return true if the histoDataDirPath was reinitialized. False if no activity is required.
-	 */
-	private boolean detectChannelChange() {
-		int tmpChannelNumber = this.application.getActiveChannelNumber();
-		boolean hasChanged = tmpChannelNumber != this.channelNumber;
-		this.channelNumber = tmpChannelNumber;
-		return hasChanged;
-	}
-
-	/**
-	 * comparison against the last call of this method.
-	 * initialize histoDataDirPath. 
-	 * determine input directory which fits to the objectKey, the device and the file extensions.
-	 * @param reBuild true perform full check even if neither the device nor the object key was changed 
-	 * @return true if the histoDataDirPath was reinitialized. False if no activity is required.
-	 */
-	private boolean detectFolderChange(boolean reBuild) {
-		log.log(Level.FINER, "reInitialize " + reBuild); //$NON-NLS-1$
-		boolean hasChanged = false;
-		String tmpDeviceName = this.application.getActiveDevice().getName();
-		hasChanged = hasChanged || !(tmpDeviceName.equals(this.deviceName));
-
-		// String tmpObjectData = me.application.getActiveObject().getKey();
-		// String tmpObjectKey = null;
-		// hasChanged = hasChanged || !(tmpObjectData.equals(me.objectData));
-		// if (hasChanged) {
-		// if (tmpObjectData != null && tmpObjectData.length() > 1) { // use exact defined object key
-		// tmpObjectKey = tmpObjectData;
-		// }
-		// }
-		String tmpObjectKey = null;
-		if (this.application.getActiveObject() == null) {
-			hasChanged = hasChanged || this.objectKey != null;
-		} else {
-			tmpObjectKey = this.application.getActiveObject().getKey();
-			hasChanged = hasChanged || !(tmpObjectKey.equals(this.objectKey));
+			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(95, sThreadId);
 		}
 
-		if (reBuild || hasChanged || this.histoDataDirPath == null) {
-			String tmpHistoDataDirPath;
-			if (tmpObjectKey != null) {
-				tmpHistoDataDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + tmpObjectKey;
-			} else if (tmpDeviceName != null) {
-				tmpHistoDataDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + tmpDeviceName;
-			} else {
-				tmpHistoDataDirPath = this.settings.getDataFilePath();
+		{
+			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
+				isRebuilt = true;
+				long nanoTimeTrailRecordSet = -System.nanoTime();
+				this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
+				this.trailRecordSet.defineTrailTypes();
+				// this.trailRecordSet.checkAllDisplayable();
+				this.trailRecordSet.setPoints();
+				this.trailRecordSet.setTags();
+				this.trailRecordSet.applyTemplate(true); // needs reasonable data
+				nanoTimeTrailRecordSet += System.nanoTime();
+				if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
+					log.log(Level.TIME, String.format("%,5d trailTimeSteps build and populate time=%,6d [ms]  ::  per second:%5d", this.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
+							this.size() > 0 ? this.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
 			}
-			hasChanged = hasChanged || !tmpHistoDataDirPath.equals(this.histoDataDirPath);
-
-			/*
-			 * activate when bin files will be processed
-			 * String tmpHistoImportDirPath; String tmpPreferredFileExtention; if (me.device != null) { tmpHistoImportDirPath = me.device.getDeviceConfiguration().getDataBlockType().getPreferredDataLocation(); if (tmpHistoImportDirPath != null) {
-			 * tmpHistoImportDirPath = tmpHistoImportDirPath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); // adapt import path to current objectKey for (String objectKeyTmp : me.settings.getObjectList()) { if (tmpHistoImportDirPath.endsWith(objectKeyTmp)) { tmpHistoImportDirPath =
-			 * tmpHistoImportDirPath.substring(0, tmpHistoImportDirPath.length() - objectKeyTmp.length()) + me.objectKey; break; } } } tmpPreferredFileExtention = me.device.getDeviceConfiguration().getDataBlockType().getPreferredFileExtention(); hasChanged = hasChanged ||
-			 * !tmpHistoImportDirPath.equals(me.histoImportDirPath); hasChanged = hasChanged || !tmpPreferredFileExtention.equals(me.preferredFileExtention); } else { tmpHistoImportDirPath = null; tmpPreferredFileExtention = null; hasChanged = hasChanged || me.histoImportDirPath != null; hasChanged =
-			 * hasChanged || me.preferredFileExtention != null; }
-			 */
-			if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, String.format("device=%s, object=\"%s\"", (tmpDeviceName != null ? tmpDeviceName : GDE.STRING_EMPTY), (tmpObjectKey != null ? tmpObjectKey : GDE.STRING_EMPTY))); //$NON-NLS-1$
-			this.deviceName = tmpDeviceName;
-			this.objectKey = tmpObjectKey;
-			this.histoDataDirPath = tmpHistoDataDirPath;
-			if (hasChanged) {
-				if (log.isLoggable(Level.INFO))
-				log.log(Level.INFO, "new histoDataDirPath " + tmpHistoDataDirPath); //$NON-NLS-1$
-				/*
-				 * activate when bin files will be processed me.histoImportDirPath = tmpHistoImportDirPath; me.preferredFileExtention = tmpPreferredFileExtention; log.log(Level.FINER, "new histoImportDirPath " + tmpHistoImportDirPath); //$NON-NLS-1$ log.log(Level.FINER, "new preferredFileExtention " +
-				 * tmpPreferredFileExtention); //$NON-NLS-1$
-				 */
-			}
+			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(97, sThreadId);
 		}
-		return hasChanged;
+		{
+			if (EnumSet.of(RebuildStep.D_TRAIL_DATA).contains(rebuildStep)) { // saves some time compared to the logic above
+				isRebuilt = true;
+				this.trailRecordSet.cleanup();
+				this.trailRecordSet.setPoints();
+				this.trailRecordSet.setTags();
+			}
+			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(98, sThreadId);
+		}
+		return isRebuilt;
 	}
 
 	/**
-	 * reads files and selects histo file candidates for the active device and objectKey and updates the histo files list.
-	 * comparison against the last call of this method.
-	 * @param reBuild false: omits the files search for performance reasons, takes the file list from the last call.
-	 * @return true if list of files has changed.
+	 * read file and populate vault from the histo recordset.
+	 * put the vault into the histoset map.
+	 * @param filePath is the actual file path, not the path to the link file 
+	 * @param trusses
+	 * @throws DataTypeException for the bin file reader only
+	 * @throws DataInconsitsentException 
+	 * @throws NotSupportedFileFormatException 
+	 * @throws IOException 	
+	 * @return the vaults extracted from the file based on the input trusses
 	 */
-	private boolean detectFilesChange(boolean reBuild) {
-		boolean hasChanged = false;
-		if (reBuild || this.histoFilePaths == null) {
-			this.lastCheckFilesPaths = new TreeMap<Date, String>(Collections.reverseOrder());
-			FileUtils.checkDirectoryAndCreate(this.histoDataDirPath);
-			try {
-				List<File> files = FileUtils.getFileListing(new File(this.histoDataDirPath), 0);
-				log.log(Level.INFO, String.format("%04d files found in histoDataDirPath %s", files.size(), this.histoDataDirPath)); //$NON-NLS-1$
-				int countFiles = 0;
+	private List<HistoVault> loadVaultsFromFile(Path filePath, Map<String, HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		List<HistoVault> histoVaults = null;
+		if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) && this.application.getActiveDevice() instanceof IHistoDevice) {
+			histoVaults = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
+			if (histoVaults == null) {
+				histoVaults = new ArrayList<HistoVault>();
+				log.log(Level.INFO, String.format("file format not supported: %s  channelNumber=%d  %s", //$NON-NLS-1$
+						this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
+			}
+		}
+		else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
+			histoVaults = HistoOsdReaderWriter.readHisto(filePath, trusses.values());
+		}
+
+		if (histoVaults == null) {
+			histoVaults = new ArrayList<HistoVault>();
+			log.log(Level.INFO, String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
+					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
+		}
+		else {
+			// put vaults into the histoSet
+			for (HistoVault histoVault : histoVaults) {
+				if (!histoVault.isTruss()) {
+					List<HistoVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
+					if (timeStampHistoVaults == null) {
+						this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<HistoVault>());
+					}
+					timeStampHistoVaults.add(histoVault);
+				}
+			}
+		}
+		return histoVaults;
+	}
+
+	/**
+	 * put cached vaults into the histoSet map and reduce the trussJobs map.
+	 * @param trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
+	 * @return total length (bytes) of the original log files of those vaults which were put into the histoset 
+	 * @throws IOException during opening or traversing the zip file
+	 */
+	private long loadVaultsFromCache(Map<Path, Map<String, HistoVault>> trussJobs) throws IOException {
+		long localSizeSum_B = 0;
+		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("cacheFilePath=%s", cacheFilePath.toString())); //$NON-NLS-1$
+		if (this.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
+			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
+				Iterator<Map.Entry<Path, Map<String, HistoVault>>> timeStampsIterator = trussJobs.entrySet().iterator();
+				while (timeStampsIterator.hasNext()) {
+					final Map<String, HistoVault> map = timeStampsIterator.next().getValue();
+					final Iterator<Map.Entry<String, HistoVault>> trussesIterator = map.entrySet().iterator();
+					while (trussesIterator.hasNext()) {
+						HistoVault truss = trussesIterator.next().getValue();
+						if (zf.getEntry(truss.getVaultName()) != null) {
+							HistoVault histoVault = HistoVault.load(new BufferedInputStream(zf.getInputStream(zf.getEntry(truss.getVaultName()))));
+							// put the vault into the histoSet map and sum up the file length
+							if (!histoVault.isTruss()) {
+								List<HistoVault> vaultsList = this.get(truss.getLogStartTimestamp_ms());
+								if (vaultsList == null) this.put(truss.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
+								vaultsList.add(histoVault);
+								if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
+										histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
+								localSizeSum_B += Paths.get(truss.getLogFilePath()).toFile().length();
+							}
+							trussesIterator.remove();
+						}
+					}
+					if (map.size() == 0) timeStampsIterator.remove();
+				}
+			}
+		}
+		else if (!this.settings.isZippedCache() && FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
+			Iterator<Map.Entry<Path, Map<String, HistoVault>>> timeStampsIterator = trussJobs.entrySet().iterator();
+			while (timeStampsIterator.hasNext()) {
+				final Map<String, HistoVault> map = timeStampsIterator.next().getValue();
+				final Iterator<Map.Entry<String, HistoVault>> trussesIterator = map.entrySet().iterator();
+				while (trussesIterator.hasNext()) {
+					HistoVault truss = trussesIterator.next().getValue();
+					if (FileUtils.checkFileExist(cacheFilePath.resolve(truss.getVaultName()).toString())) {
+						HistoVault histoVault = null;
+						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(cacheFilePath.resolve(truss.getVaultName()).toFile()))) {
+							histoVault = HistoVault.load(inputStream);
+						}
+						// put the vault into the histoSet map and sum up the file length
+						if (histoVault != null && !histoVault.isTruss()) {
+							List<HistoVault> vaultsList = this.get(truss.getLogStartTimestamp_ms());
+							if (vaultsList == null) this.put(truss.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
+							vaultsList.add(histoVault);
+							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
+									histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
+							localSizeSum_B += Paths.get(truss.getLogFilePath()).toFile().length();
+						}
+						trussesIterator.remove();
+					}
+				}
+				if (map.size() == 0) timeStampsIterator.remove();
+			}
+		}
+		return localSizeSum_B;
+	}
+
+	/**
+	 * some devices create multiple recordsets which might have identical timestamp values.
+	 * @param timeStampTrusses is a map with vault skeletons for the startTimeStamp 
+	 * @param histoVault is the item to identify as duplicate
+	 * @return true if a histoVault with identical device and channel number is already in timeStampTrusses  
+	 */
+	private boolean isDuplicateVault(Map<String, HistoVault> timeStampTrusses, HistoVault histoVault) {
+		boolean isDuplicate = false;
+		// some devices create multiple recordsets which might have identical timestamp values
+		for (HistoVault tmpHistoVault : timeStampTrusses.values()) {
+			if (histoVault.getVaultChannelNumber() == tmpHistoVault.getVaultChannelNumber() && histoVault.getLogChannelNumber() == tmpHistoVault.getLogChannelNumber() // 
+					&& histoVault.getVaultDeviceName().equals(tmpHistoVault.getVaultDeviceName())) {
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("duplicate vault was discarded: device=%s  logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s",
+						histoVault.getVaultDeviceName(), histoVault.getLogChannelNumber(), histoVault.getLogRecordSetOrdinal(), histoVault.getStartTimeStampFormatted(), histoVault.getLogFilePath()));
+				isDuplicate = true;
+				break;
+			}
+		}
+		if (!isDuplicate) {
+			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("WARN same startTimeStamp=%s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(),
+					histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
+		}
+		return isDuplicate;
+	}
+
+	/**
+	 * get the zip file name from the history vault class and add all histoset vaults to this file.
+	 * source http://stackoverflow.com/a/17504151
+	 * @return cache file bytes length
+	 * @throws IOException 
+	 */
+	private long storeVaultsInCache(List<HistoVault> newVaults) throws IOException {
+		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
+		if (this.settings.isZippedCache()) {
+			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
+			Map<String, String> env = new HashMap<String, String>();
+			env.put("create", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) { //$NON-NLS-1$
+				for (HistoVault histoVault : newVaults) {
+					// name the file inside the zip file 
+					Path filePath = zipFileSystem.getPath(histoVault.getVaultFileName().toString());
+					if (!FileUtils.checkFileExist(filePath.toString())) {
+						//					if (!filePath.toFile().exists()) {
+						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
+							histoVault.store(zipOutputStream);
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
+						}
+					}
+				}
+			}
+		}
+		else {
+			FileUtils.checkDirectoryAndCreate(cacheFilePath.toString());
+			for (HistoVault histoVault : newVaults) {
+				Path filePath = cacheFilePath.resolve(histoVault.getVaultFileName());
+				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
+					histoVault.store(outputStream);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
+				}
+			}
+		}
+		return cacheFilePath.toFile().length();
+	}
+
+	public void setHistoFilePaths4Test(Path filePath, int subDirLevelMax) throws IOException {
+		//		this.validatedDevice = this.application.getActiveDevice();
+		//		this.validatedChannel = this.application.getActiveChannel();
+
+		if (filePath == null)
+			this.validatedDataDir = Paths.get(this.settings.getDataFilePath());
+		else
+			this.validatedDataDir = filePath;
+		this.validatedImportDir = null;
+		this.validatedImportExtention = GDE.FILE_ENDING_DOT_BIN;
+
+		this.histoFilePaths.clear();
+		{
+			FileUtils.checkDirectoryAndCreate(this.validatedDataDir.toString());
+			List<File> files = FileUtils.getFileListing(this.validatedDataDir.toFile(), subDirLevelMax);
+			log.log(Level.INFO, String.format("%04d files found in dataDir %s", files.size(), this.validatedDataDir)); //$NON-NLS-1$
+			if (this.settings.getSearchDataPathImports() && !this.validatedImportExtention.isEmpty()) {
 				for (File file : files) {
-					try {
-						String linkOrFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-						// TODO examine lov files similar to osd files.
-						if (linkOrFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
-							long startMillis = System.currentTimeMillis();
-							String actualFilePath = OperatingSystemHelper.getLinkContainedFilePath(linkOrFilePath).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-							// getLinkContainedFilePath may have long response times in case of an unavailable network resources
-							// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-							if (!linkOrFilePath.equals(actualFilePath) && (System.currentTimeMillis() - startMillis > 555)) {
-								log.log(Level.FINER, "Dead OSD link " + linkOrFilePath + " pointing to " + actualFilePath); //$NON-NLS-1$ //$NON-NLS-2$
-								if (!file.delete()) {
-									log.log(Level.FINE, "could not delete " + file.getName()); //$NON-NLS-1$
-								}
-							} else {
-								boolean histoFilesWithoutObject = false; // TODO new setting
-								boolean histoFilesWrongObject = false; // TODO new setting
-								HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(actualFilePath);
-								String creationDate = fileHeader.get(GDE.CREATION_TIME_STAMP);
-								SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd" + ' ' + " HH:mm:ss");
-								Date parsedCreationDate = formatter.parse(creationDate);
-								if (this.application.getActiveDevice() == null || fileHeader.get(GDE.DEVICE_NAME).equals(this.application.getActiveDevice().getName())) {
-									if (this.application.getActiveObject() == null || fileHeader.get(GDE.OBJECT_KEY).equals(this.application.getActiveObject().getKey())
-											|| histoFilesWithoutObject && fileHeader.get(GDE.OBJECT_KEY).equals(GDE.STRING_EMPTY)
-											|| histoFilesWrongObject && !fileHeader.get(GDE.OBJECT_KEY).equals(this.application.getActiveObject().getKey())) {
-										log.log(Level.FINER, String.format("OSD candidate found for object       \"%s\" in %s %s%s  %s%s", (this.application.getActiveObject() != null ? this.application.getActiveObject().getKey() : GDE.STRING_EMPTY), actualFilePath, //$NON-NLS-1$
-												GDE.CREATION_TIME_STAMP, fileHeader.get(GDE.CREATION_TIME_STAMP), GDE.DATA_EXPLORER_FILE_VERSION, fileHeader.get(GDE.DATA_EXPLORER_FILE_VERSION)));
-										// me.lastCheckFilesPaths1.put(new Date(file.lastModified()), actualFilePath);
-										this.lastCheckFilesPaths.put(parsedCreationDate, actualFilePath);
-									} else {
-										log.log(Level.WARNING, String.format("OSD candidate found for wrong object \"%s\" in %s %s%s  %s%s", fileHeader.get(GDE.OBJECT_KEY), //$NON-NLS-1$
-												actualFilePath, GDE.CREATION_TIME_STAMP, fileHeader.get(GDE.CREATION_TIME_STAMP), GDE.DATA_EXPLORER_FILE_VERSION, fileHeader.get(GDE.DATA_EXPLORER_FILE_VERSION)));
-										if (fileHeader.get(GDE.OBJECT_KEY).equals(GDE.STRING_EMPTY)) {
-											if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0065, new String[] { actualFilePath }))) {
-												this.lastCheckFilesPaths.put(parsedCreationDate, actualFilePath);
-												// TODO Settings.HISTO_FILES_WITHOUT_OBJECT = true;
-											}
-										} else {
-											if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { fileHeader.get(GDE.OBJECT_KEY),
-													actualFilePath }))) {
-												this.lastCheckFilesPaths.put(parsedCreationDate, actualFilePath);
-												// TODO Settings.HISTO_FILES_WRONG_OBJECT = true;
-											}
+					if (file.getName().endsWith(GDE.FILE_ENDING_OSD) || file.getName().endsWith(this.validatedImportExtention)) {
+						if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+						this.histoFilePaths.get(file.lastModified()).add(file.toPath());
+					}
+				}
+			}
+			else {
+				for (File file : files) {
+					if (file.getName().endsWith(GDE.FILE_ENDING_OSD)) {
+						if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+						this.histoFilePaths.get(file.lastModified()).add(file.toPath());
+					}
+				}
+			}
+		}
+		log.log(Level.INFO, String.format("%04d files selected", this.histoFilePaths.size())); //$NON-NLS-1$
+	}
+
+	/**
+	 * determine file paths from an input directory and an import directory which fit to the objectKey, the device, the channel and the file extensions.
+	 * @param rebuildStep defines which steps during histo data collection are skipped
+	 * @return true if the list of file paths has already been valid
+	 * @throws NotSupportedFileFormatException 
+	 * @throws IOException 
+	 */
+	private boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
+		final int subDirLevelMax = 1;
+
+		IDevice lastDevice = this.validatedDevice;
+		Channel lastChannel = this.validatedChannel;
+		Path lastHistoDataDir = this.validatedDataDir;
+		Path lastHistoImportDir = this.validatedImportDir;
+		String lastImportExtention = this.validatedImportExtention;
+
+		this.validatedDevice = this.application.getActiveDevice();
+		this.validatedChannel = this.application.getActiveChannel();
+		String subPathData = this.application.getActiveObject() == null ? this.validatedDevice.getName() : this.application.getObjectKey();
+		this.validatedDataDir = Paths.get(this.settings.getDataFilePath()).resolve(subPathData);
+		String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
+		this.validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
+		this.validatedImportDir = this.settings.getSearchImportPath() && this.validatedImportDir != null ? this.validatedImportDir.resolve(subPathImport) : null;
+		this.validatedImportExtention = this.validatedDevice.getDeviceConfiguration().getDataBlockType().getPreferredFileExtention();
+		this.validatedImportExtention = !this.validatedImportExtention.isEmpty() ? this.validatedImportExtention.substring(1) : GDE.STRING_EMPTY;
+
+		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.histoFilePaths.size() == 0;
+		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
+		isFullChange = isFullChange || (lastChannel != null ? !lastChannel.channelConfigName.equals(this.validatedChannel.channelConfigName) : this.validatedChannel != null);
+		isFullChange = isFullChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDataDir) : this.validatedDataDir != null);
+		isFullChange = isFullChange || (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedImportDir) : this.validatedImportDir != null);
+		isFullChange = isFullChange || (lastImportExtention != null ? !lastImportExtention.equals(this.validatedImportExtention) : this.validatedImportExtention != null);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
+
+		if (this.validatedDataDir != null) {
+			if (isFullChange) {
+				this.histoFilePaths.clear();
+				{
+					FileUtils.checkDirectoryAndCreate(this.validatedDataDir.toString());
+					List<File> files = FileUtils.getFileListing(this.validatedDataDir.toFile(), subDirLevelMax);
+					log.log(Level.INFO, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDataDir)); //$NON-NLS-1$
+					if (this.settings.getSearchDataPathImports() && !this.validatedImportExtention.isEmpty()) {
+						for (File file : files) {
+							if (file.getName().endsWith(GDE.FILE_ENDING_OSD) || file.getName().endsWith(this.validatedImportExtention)) {
+								if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+								this.histoFilePaths.get(file.lastModified()).add(file.toPath());
+							}
+						}
+					}
+					else {
+						for (File file : files) {
+							if (file.getName().endsWith(GDE.FILE_ENDING_OSD)) {
+								if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+								this.histoFilePaths.get(file.lastModified()).add(file.toPath());
+							}
+						}
+					}
+				}
+				if (this.validatedImportDir != null && this.settings.getSearchImportPath() && !this.validatedImportExtention.isEmpty()) {
+					FileUtils.checkDirectoryAndCreate(this.validatedImportDir.toString());
+					List<File> files = FileUtils.getFileListing(this.validatedImportDir.toFile(), subDirLevelMax);
+					log.log(Level.INFO, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedImportDir)); //$NON-NLS-1$
+					for (File file : files) {
+						if (file.getName().endsWith(this.validatedImportExtention)) {
+							if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+							this.histoFilePaths.get(file.lastModified()).add(file.toPath());
+						}
+					}
+				}
+				log.log(Level.INFO, String.format("%04d files selected", this.histoFilePaths.size())); //$NON-NLS-1$
+			}
+		}
+		return !isFullChange;
+	}
+
+	/**
+	 * determine the vaults which are required for the data access.
+	 * selects osd file candidates for the active device and the active channel; select as well for objectKey and start timestamp.
+	 * selects bin file candidates for object key based on the parent directory name and last modified.
+	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
+	 * @param deviceConfigurations 
+	 * @return trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
+	 * @throws IOException 
+	 * @throws NotSupportedFileFormatException 
+	*/
+	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(boolean isWithUi, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
+		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
+		final Map<Long, Map<String, HistoVault>> trusses4Start = new LinkedHashMap<Long, Map<String, HistoVault>>();
+		final List<Integer> channelMixConfigNumbers;
+		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER) // WBrueg is channel type a better criterion?
+			channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelBundle(this.application.getActiveChannelNumber());
+		else
+			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });
+		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		boolean ask4FilesWithoutObject = isWithUi;
+		boolean ask4FilesWithOtherObject = isWithUi;
+		int invalidRecordSetsCount = 0;
+		for (Map.Entry<Long, Set<Path>> pathListEntry : this.histoFilePaths.entrySet()) {
+			for (Path path : pathListEntry.getValue()) {
+				Map<String, HistoVault> pathMap = new HashMap<String, HistoVault>();
+				File actualFile = path.toFile();
+				if (actualFile.getName().endsWith(GDE.FILE_ENDING_OSD)) {
+					long startMillis = System.currentTimeMillis();
+					actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(path.toString()));
+					// getLinkContainedFilePath may have long response times in case of an unavailable network resources
+					// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+					if (path.equals(actualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
+						log.log(Level.FINER, "Dead OSD link " + path + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
+						if (!path.toFile().delete()) {
+							log.log(Level.FINE, "could not delete link file " + path.toString()); //$NON-NLS-1$
+						}
+					}
+					else {
+						String objectDirectory = GDE.STRING_EMPTY;
+						if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
+						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
+							boolean isValidObject = false;
+							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
+									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // hard wired for HoTTViewerAdapter
+								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
+								break; // ignore all log file trusses 
+							}
+							else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber()) || truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
+								// discard truss
+							}
+							else if (this.application.getActiveObject() != null && truss.getValidatedObjectKey().isEmpty()) {
+								log.log(Level.INFO, String.format("OSD candidate found for empty object \"%s\" in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
+								if (!this.settings.skipFilesWithoutObject()) {
+									if (ask4FilesWithoutObject) {
+										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0065, new String[] { path.toString() }))) {
+											isValidObject = true;
+											this.settings.setFilesWithoutObject(false);
 										}
+										ask4FilesWithoutObject = false;
+									}
+									else {
+										isValidObject = true;
 									}
 								}
 							}
+							else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+								log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
+								if (!this.settings.skipFilesWithOtherObject()) {
+									if (ask4FilesWithOtherObject) {
+										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { truss.getLogObjectKey(), path.toString() }))) {
+											isValidObject = true;
+											this.settings.setFilesWithOtherObject(false);
+										}
+										ask4FilesWithoutObject = false;
+									}
+									else {
+										isValidObject = true;
+									}
+								}
+							}
+							else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+								log.log(Level.FINER, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
+								isValidObject = true;
+							}
+
+							Map<String, HistoVault> timeStampTrusses = trusses4Start.get(truss.getLogStartTimestamp_ms());
+							if (isValidObject && timeStampTrusses == null) {
+								pathMap.put(truss.getVaultFileName().toString(), truss);
+								timeStampTrusses = new HashMap<String, HistoVault>();
+								trusses4Start.put(truss.getLogStartTimestamp_ms(), timeStampTrusses);
+								timeStampTrusses.put(truss.getVaultFileName().toString(), truss);
+							}
+							else if (isValidObject && timeStampTrusses != null && !isDuplicateVault(timeStampTrusses, truss)) {
+								pathMap.put(truss.getVaultFileName().toString(), truss);
+								timeStampTrusses.put(truss.getVaultFileName().toString(), truss);
+							}
+							else {
+								invalidRecordSetsCount++;
+								if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("skip   %s %3.7s    %s %2d %s", truss.getStartTimeStampFormatted(), truss.getVaultDeviceName(), //$NON-NLS-1$
+										truss.getLogChannelNumber(), truss.getLogRecordSetOrdinal(), actualFile.toString()));
+							}
 						}
-					} catch (IOException e) {
-						log.log(Level.WARNING, file.getAbsolutePath(), e);
-					} catch (NotSupportedFileFormatException e) {
-						log.log(Level.WARNING, e.getLocalizedMessage(), e);
-					} catch (Throwable t) {
-						log.log(Level.WARNING, t.getLocalizedMessage(), t);
 					}
 				}
-				log.log(Level.INFO, String.format("%04d files taken in histoDataDirPath %s", this.lastCheckFilesPaths.size() - countFiles, this.histoDataDirPath)); // TODO SEVERE -> FINE //$NON-NLS-1$
-			} catch (FileNotFoundException e) {
-				log.log(Level.WARNING, e.getLocalizedMessage(), e);
-			}
-			// if (hasChanged = !(tmpHistoFilePaths.containsAll(me.histoFilePaths) && me.histoFilePaths.containsAll(tmpHistoFilePaths))) {
-			// compares key and value in Java if both have 'equals' implemented
-			hasChanged = this.histoFilePaths == null || !this.histoFilePaths.equals(this.lastCheckFilesPaths);
-			if (hasChanged) {
-				this.histoFilePaths = this.lastCheckFilesPaths;
+				else if (actualFile.getName().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+					boolean isValidObject = false;
+					String objectDirectory = GDE.STRING_EMPTY;
+					if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
+					int fileRecordSetSize = Channels.getInstance().size();
+					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(actualFile.getName());
+					HistoVault truss = HistoVault.createTruss(objectDirectory, actualFile, 0, fileRecordSetSize, recordSetBaseName);
+					if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
+						// discard truss
+					}
+					else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+						log.log(Level.INFO, String.format("BIN candidate found for wrong object \"%s\" in %s lastModified=%d", objectDirectory, actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
+						if (!this.settings.skipFilesWithOtherObject()) {
+							if (ask4FilesWithOtherObject) {
+								if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { objectDirectory, path.toString() }))) {
+									isValidObject = true;
+									this.settings.setFilesWithOtherObject(false);
+								}
+								ask4FilesWithoutObject = false;
+							}
+							else {
+								isValidObject = true;
+							}
+						}
+					}
+					else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+						isValidObject = true;
+					}
+
+					Map<String, HistoVault> timeStampTrusses = trusses4Start.get(truss.getLogStartTimestamp_ms());
+					if (isValidObject && timeStampTrusses == null) {
+						pathMap.put(truss.getVaultFileName().toString(), truss);
+						timeStampTrusses = new HashMap<String, HistoVault>();
+						trusses4Start.put(truss.getLogStartTimestamp_ms(), timeStampTrusses);
+						timeStampTrusses.put(truss.getVaultFileName().toString(), truss);
+					}
+					else if (isValidObject && timeStampTrusses != null && !isDuplicateVault(timeStampTrusses, truss)) {
+						pathMap.put(truss.getVaultFileName().toString(), truss);
+						timeStampTrusses.put(truss.getVaultFileName().toString(), truss);
+					}
+					else {
+						invalidRecordSetsCount++;
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("isValidRecordSet=false  lastModified=%,d  %s", actualFile.lastModified(), actualFile.getAbsolutePath())); //$NON-NLS-1$
+					}
+				}
+				if (pathMap.size() > 0) trusses4Paths.put(actualFile.toPath(), pathMap);
 			}
 		}
-		return hasChanged;
+		log.log(Level.INFO, String.format("%04d files taken --- %04d checked files --- %04d invalid recordsets", trusses4Paths.size(), this.histoFilePaths.size(), invalidRecordSetsCount)); //$NON-NLS-1$
+		return trusses4Paths;
 	}
 
 	/**
-	 * corresponds to the selector in the histoGraphics window. 
-	 * may have more or less measurements than the device channel.
-	 * @return
+	 * @return all the paths which have been identified in the last validation sorted by lastModified in reverse order
 	 */
-	@Deprecated
-	public HashMap<Integer, MeasurementType> getMeasurements() {
-		return this.measurements;
-	}
-
-	public List<SettlementType> getSettlements() {
-		return ((DeviceConfiguration) this.application.getActiveDevice()).getChannel(this.channelNumber).getSettlement();
-	}
-
-	@Deprecated
-	public List<String> getMeasurementNames_OBS() {
-		List<String> result = new ArrayList<String>();
-		for (int i = 0; i < this.measurements.size(); i++) {
-			result.add(this.measurements.get(i).getName());
-		}
-		return result;
-	}
-
-	public TreeMap<Date, String> getHistoFilePaths() {
+	public Map<Long, Set<Path>> getHistoFilePaths() {
 		return this.histoFilePaths;
 	}
 
+	@Deprecated
 	public void clearMeasurementModes() {
-		// TODO Auto-generated method stub -> copy from RecordSet
 		throw new UnsupportedOperationException();
 	}
 
 	public TrailRecordSet getTrailRecordSet() {
 		return this.trailRecordSet;
+	}
+
+	/**
+	 * @return the validatedDataDir
+	 */
+	public Path getValidatedDataDir() {
+		return this.validatedDataDir;
+	}
+
+	/**
+	 * @return the validatedImportDir
+	 */
+	public Path getValidatedImportDir() {
+		return this.validatedImportDir;
+	}
+
+	/**
+	 * @return the validatedImportExtention
+	 */
+	public String getValidatedImportExtention() {
+		return this.validatedImportExtention;
+	}
+
+	/**
+	 * compose the record set extend to give capability to identify source of this record set
+	 * @param fileName
+	 * @return
+	 */
+	private String getRecordSetExtend(String fileName) {
+		String recordSetNameExtend = GDE.STRING_EMPTY;
+		if (fileName.contains(GDE.STRING_UNDER_BAR)) {
+			try {
+				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+			}
+			catch (Exception e) {
+				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+			}
+		}
+		else {
+			try {
+				Integer.parseInt(fileName.substring(0, 4));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
+			}
+			catch (Exception e) {
+				if (fileName.substring(0, fileName.length()).length() <= 8 + 4) recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4) + GDE.STRING_RIGHT_BRACKET;
+			}
+		}
+		return recordSetNameExtend;
 	}
 
 }

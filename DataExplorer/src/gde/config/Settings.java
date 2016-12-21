@@ -15,22 +15,9 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    							2016 Thomas Eickert
 ****************************************************************************************/
 package gde.config;
-
-import gde.GDE;
-import gde.device.DeviceConfiguration;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.FileUtils;
-import gde.utils.RecordSetNameComparator;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -42,14 +29,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.jar.JarEntry;
@@ -71,6 +63,20 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
+
+import gde.GDE;
+import gde.device.DeviceConfiguration;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.FileUtils;
+import gde.utils.RecordSetNameComparator;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * Settings class will read and write/update application settings, like window size and default path ....
@@ -141,6 +147,20 @@ public class Settings extends Properties {
 	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";																															//$NON-NLS-1$
 
 	final static String							IS_HISTO_ACTIVE									= "is_histo_active";																																							//$NON-NLS-1$
+	final static String							IS_QUANTILE_ACTIVE							= "is_quantile_active";																																						//$NON-NLS-1$
+	final static String							BOXPLOT_SCALE_ORDINAL						= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
+	final static String							BOXPLOT_SIZE_ADAPTATION_ORDINAL	= "boxplot_size_adaptation_ordinal";																															//$NON-NLS-1$
+	final static String							X_SPREAD_GRADE_ORDINAL					= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
+	final static String							IS_X_LOGARITHMIC_DISTANCE				= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
+	final static String							IS_X_REVERSED										= "is_x_reversed";																																								//$NON-NLS-1$
+	final static String							SEARCH_IMPORT_PATH							= "search_import_path";																																						//$NON-NLS-1$
+	final static String							SEARCH_DATAPATH_IMPORTS					= "search_datapath_imports";																																			//$NON-NLS-1$
+	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
+	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
+	final static String							SKIP_FILES_WITHOUT_OBJECT				= "skip_files_without_object";																																		//$NON-NLS-1$
+	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
+	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
+	final static String							IS_ZIPPED_CACHE									= "zipped_cache";																																									//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -214,12 +234,16 @@ public class Settings extends Properties {
 	public final static String			GRAPHICS_TEMPLATES_XSD_NAME			= "GraphicsTemplates" + GDE.GRAPHICS_TEMPLATES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;							//$NON-NLS-1$
 	public final static String			GRAPHICS_TEMPLATES_EXTENSION		= GDE.FILE_ENDING_STAR_XML;
 
+	public final static String			HISTO_CACHE_ENTRIES_DIR_NAME		= "Cache";																																												//$NON-NLS-1$
+	public final static String			HISTO_CACHE_ENTRIES_XSD_NAME		= "HistoVault" + GDE.HISTO_CACHE_ENTRIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;										//$NON-NLS-1$
+
 	BufferedReader									reader;																																																														// to read the application settings
 	BufferedWriter									writer;																																																														// to write the application settings
 
 	boolean													isDevicePropertiesUpdated				= false;
 	boolean													isDevicePropertiesReplaced			= false;
 	boolean													isGraphicsTemplateUpdated				= false;
+	boolean													isHistocacheTemplateUpdated			= false;
 
 	Rectangle												window;
 	boolean													isWindowMaximized								= false;
@@ -375,6 +399,12 @@ public class Settings extends Properties {
 		}
 		checkDeviceTemplates(templateDirectory + GDE.FILE_SEPARATOR_UNIX);
 
+		String histoCacheDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
+		if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
+			resetHistoCache();
+			this.isHistocacheTemplateUpdated = true;
+		}
+
 		FileUtils.checkDirectoryAndCreate(this.applHomePath + GDE.FILE_SEPARATOR_UNIX + "Logs"); //$NON-NLS-1$
 
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, String.format("settingsFilePath = %s", this.settingsFilePath)); //$NON-NLS-1$
@@ -390,6 +420,22 @@ public class Settings extends Properties {
 			this.window = new Rectangle(50, 50, 950, 600);
 
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
+	}
+
+	public Path getHistoCacheDirectory() {
+		return Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+	}
+
+	public String resetHistoCache() {
+		final String $METHOD_NAME = "resetHistoCache"; //$NON-NLS-1$
+		int initialSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
+		FileUtils.deleteDirectory(getHistoCacheDirectory().toString());
+		FileUtils.checkDirectoryAndCreate(getHistoCacheDirectory().toString());
+		int deletedSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
+		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, getHistoCacheDirectory().toString(), Settings.PERMISSION_555);
+		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, getHistoCacheDirectory() });
+		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
+		return message;
 	}
 
 	/**
@@ -500,7 +546,7 @@ public class Settings extends Properties {
 			}
 			//BufferedInputStream stream = new BufferedReader(new InputStreamReader(new FileInputStream(propertyFilePath), "UTF-8")); //$NON-NLS-1$
 			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(propertyFilePath)));
-			measurementProperties.loadFromXML(stream);
+			this.measurementProperties.loadFromXML(stream);
 			stream.close();
 		}
 		catch (Exception e) {
@@ -660,8 +706,22 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_IO_LOG_LEVEL, getLogLevel(Settings.FILE_IO_LOG_LEVEL))); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SERIAL_IO_LOG_LEVEL, getLogLevel(Settings.SERIAL_IO_LOG_LEVEL))); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Einstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, this.isHistoActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_QUANTILE_ACTIVE, isQuantilesActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, getBoxplotScaleOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, isXAxisLogarithmicDistance())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, isXAxisReversed())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, getRetrospectMonths())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_IMPORT_PATH, getSearchImportPath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, isChannelMix())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, skipFilesWithoutObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, skipFilesWithOtherObject())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -736,6 +796,73 @@ public class Settings extends Properties {
 
 	public void setActiveDevice(String activeDeviceString) {
 		this.setProperty(Settings.ACTIVE_DEVICE, activeDeviceString.trim());
+	}
+
+	/**
+	 * @return standard data directory path with trailing device and / or object stripped off
+	 */
+	@Deprecated 
+	public Path getDataBaseDir() {
+		Path path = null;
+		String tmpDataDirPath = getDataFilePath();
+		if (!(tmpDataDirPath == null || tmpDataDirPath.trim().isEmpty() || tmpDataDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
+			path = Paths.get(tmpDataDirPath);
+			// ignore object if path ends with a valid object
+			String directoryName = path.getFileName().toString();
+			path = getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
+			// ignore device if path ends with a valid device
+			String directoryName2 = path.getFileName().toString();
+			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
+		}
+		log.log(Level.INFO, "DataBaseDir " + path); //$NON-NLS-1$
+		return path;
+	}
+
+	/**
+	 * scan the sub-directories in the data and import file paths.
+	 * @return all sub-directories which neither represent devices nor objects
+	 */
+	public Set<String> getObjectKeyCandidates() {
+		Set<String> result = new HashSet<String>();
+		TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
+		Path tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir()
+				: null;
+		ArrayList<Path> dirPaths = new ArrayList<Path>();
+		dirPaths.add(Paths.get(getDataFilePath()));
+		if (getSearchImportPath() && tmpImportDirPath != null) dirPaths.add(tmpImportDirPath);
+		for (Path dirPath : dirPaths) {
+			if (!(dirPath == null || dirPath.toString().isEmpty())) {
+				// ignore object if path ends with a valid object
+				String directoryName = dirPath.getFileName().toString();
+				dirPath = getValidatedObjectKey(directoryName).isPresent() ? dirPath.getParent() : dirPath;
+				// ignore device if path ends with a valid device
+				String directoryName2 = dirPath.getFileName().toString();
+				dirPath = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? dirPath.getParent() : dirPath;
+				List<File> directories = new ArrayList<File>();
+				try {
+					directories = FileUtils.getDirectories(dirPath.toFile());
+				}
+				catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				List<String> actualObjects = Arrays.asList(getObjectList());
+				for (File file : directories) {
+					if (!actualConfigurations.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
+						result.add(file.getName());
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * @param objectKeyCandidate is supposed to be a valid object key
+	 * @return empty or the validated object key in the correct case sensitive format
+	 */
+	public Optional<String> getValidatedObjectKey(String objectKeyCandidate) {
+		String key = objectKeyCandidate.trim();
+		return Arrays.asList(getObjectList()).stream().filter(s -> s.equalsIgnoreCase(key)).findFirst();
 	}
 
 	public String getObjectListAsString() {
@@ -858,7 +985,7 @@ public class Settings extends Properties {
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "dataFilePath = " + dataPath); //$NON-NLS-1$
 		return dataPath.trim();
 	}
-	
+
 	/**
 	 * set the default dataFilePath
 	 */
@@ -1329,6 +1456,7 @@ public class Settings extends Properties {
 			java.util.logging.Level globalLogLevel = java.util.logging.Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim()); //$NON-NLS-1$
 			setIndividualLogLevel("gde.ui", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.data", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.histocache", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.config", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.device", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.utils", globalLogLevel); //$NON-NLS-1$
@@ -1346,6 +1474,7 @@ public class Settings extends Properties {
 			setGlobalLogLevel(java.util.logging.Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim())); //$NON-NLS-1$
 			setIndividualLogLevel("gde.ui", getLogLevel(Settings.UI_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.data", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.histocache", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.config", getLogLevel(Settings.CONFIG_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.device", getLogLevel(Settings.DEVICE_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.utils", getLogLevel(Settings.UTILS_LOG_LEVEL)); //$NON-NLS-1$
@@ -1565,6 +1694,13 @@ public class Settings extends Properties {
 	 */
 	public boolean isGraphicsTemplateUpdated() {
 		return this.isGraphicsTemplateUpdated;
+	}
+
+	/**
+	 * @return 
+	 */
+	public boolean isHistoCacheTemplateUpdated() {
+		return this.isHistocacheTemplateUpdated;
 	}
 
 	/**
@@ -2213,17 +2349,297 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set boolean value if the histo analysis tabs should be visible
-	 * @param isUseChannelConfigName
+	 * set boolean value if the history analysis tabs should be visible
+	 * @param isActive
 	 */
 	public void setHistoActive(boolean isActive) {
-		this.setProperty(Settings.IS_HISTO_ACTIVE, GDE.STRING_EMPTY + isActive);
+		this.setProperty(Settings.IS_HISTO_ACTIVE, String.valueOf(isActive));
 	}
 
 	/**
-	 * @return boolean value of true if the channel/configuration name should be used as leader of record name in curve compare
+	 * @return boolean true if the history labels should be visible if the current device supports the history 
 	 */
-	public boolean isHistoActive() { // TODO change default value
+	public boolean isHistoActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_HISTO_ACTIVE, "false")); //$NON-NLS-1$
 	}
+
+	/**
+	 * set boolean value if the history analysis contains quantile values
+	 * @param isActive
+	 */
+	public void setQuantilesActive(boolean isActive) {
+		this.setProperty(Settings.IS_QUANTILE_ACTIVE, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return boolean true if the history analysis contains quantile values
+	 */
+	public boolean isQuantilesActive() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_QUANTILE_ACTIVE, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return three boxplot graphics sizes as localized texts 
+	 */
+	public String[] getBoxplotScaleNomenclatures() {
+		return Messages.getString(MessageIds.GDE_MSGT0802).split(GDE.STRING_COMMA);
+	}
+
+	/**
+	 * set the boxplot size for the history 
+	 * @param scaleNomenclature
+	 */
+	public void setBoxplotScale(String scaleNomenclature) {
+		this.setProperty(Settings.BOXPLOT_SCALE_ORDINAL, String.valueOf(Arrays.asList(getBoxplotScaleNomenclatures()).indexOf(scaleNomenclature)));
+	}
+
+	/**
+	 * @return the boxplot size for the history (default is medium size)
+	 */
+	public String getBoxplotScale() {
+		return getBoxplotScaleNomenclatures()[getBoxplotScaleOrdinal()];
+	}
+
+	/**
+	 * @return the boxplot size ordinal for the history (default is medium size)
+	 */
+	public int getBoxplotScaleOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.BOXPLOT_SCALE_ORDINAL, String.valueOf(1)));
+	}
+
+	/**
+	 * @return four boxplot size adaptation levels as localized texts ranging from none to large. the adaptation is based on the log duration. 
+	 */
+	public String[] getBoxplotSizeAdaptationNomenclatures() {
+		return Messages.getString(MessageIds.GDE_MSGT0803).split(GDE.STRING_COMMA);
+	}
+
+	/**
+	 * set the boxplot size adaptation level for the history 
+	 * @param scaleNomenclature
+	 */
+	public void setBoxplotSizeAdaptation(String scaleNomenclature) {
+		this.setProperty(Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, String.valueOf(Arrays.asList(getBoxplotSizeAdaptationNomenclatures()).indexOf(scaleNomenclature)));
+	}
+
+	/**
+	 * @return the boxplot size adaptation level for the history (default is medium adaptation)
+	 */
+	public String getBoxplotSizeAdaptation() {
+		return getBoxplotSizeAdaptationNomenclatures()[getBoxplotSizeAdaptationOrdinal()];
+	}
+
+	/**
+	 * @return the ordinal of the boxplot size adaptation level for the history (default is medium adaptation)
+	 */
+	public int getBoxplotSizeAdaptationOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, String.valueOf(2)));
+	}
+
+	/**
+	 * @return six spreading labels starting with 0 to 5 for the history x axis
+	 */
+	public String[] getXAxisSpreadGradeNomenclatures() {
+		return Messages.getString(MessageIds.GDE_MSGT0823).split(GDE.STRING_COMMA);
+	}
+
+	/**
+	 * set the extent of logarithmic spreading of the x axis distances between trails 
+	 * @param gradeText
+	 */
+	public void setXAxisSpreadGrade(String gradeText) {
+		this.setProperty(Settings.X_SPREAD_GRADE_ORDINAL, String.valueOf(Arrays.asList(getXAxisSpreadGradeNomenclatures()).indexOf(gradeText)));
+	}
+
+	/**
+	 * @return the extent of logarithmic spreading of the x axis distances between timesteps (default is grade 2 which is just before the middle of six grades)
+	 */
+	public String getXAxisSpreadGrade() {
+		return getXAxisSpreadGradeNomenclatures()[getXAxisSpreadOrdinal()];
+	}
+
+	/**
+	 * @return the ordinal of the extent of logarithmic spreading of the x axis distances between trails (default is grade 2 which is just before the middle of six grades)
+	 */
+	public int getXAxisSpreadOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.X_SPREAD_GRADE_ORDINAL, String.valueOf(2)));
+	}
+
+	/**
+	 * set true if the history x axis distances between the timesteps are based on logarithmic values
+	 * @param isActive
+	 */
+	public void setXAxisLogarithmicDistance(boolean isActive) {
+		this.setProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if the history x axis distances between the timesteps are based on logarithmic values
+	 */
+	public boolean isXAxisLogarithmicDistance() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, "false"));
+	}
+
+	/**
+	 * set true if the history x axis starts with the most recent timesteps
+	 * @param isActive
+	 */
+	public void setXAxisReversed(boolean isActive) {
+		this.setProperty(Settings.IS_X_REVERSED, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if the history x axis starts with the most recent timesteps
+	 */
+	public boolean isXAxisReversed() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true"));
+	}
+
+		/**
+	 * @param isActive true if files from the device import directory are read for the history 
+	 */
+	public void setSearchImportPath(boolean isActive) {
+		this.setProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if import files from the data directory are read for the history
+	 */
+	public boolean getSearchImportPath() {
+		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(true)));
+	}
+
+	/**
+	 * @param isActive true if import files from the data directory are read for the history 
+	 */
+	public void setSearchDataPathImports(boolean isActive) {
+		this.setProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true if files from the device import directory are read for the history
+	 */
+	public boolean getSearchDataPathImports() {
+		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(true)));
+	}
+
+	/**
+	 * @param isActive true if channels with identical measurements are selected for the history 
+	 */
+	public void setChannelMix(boolean isActive) {
+		this.setProperty(Settings.IS_CHANNEL_MIX, String.valueOf(isActive));
+	}
+
+	/**
+	 * @return true true if channels with identical measurements are selected for the history 
+	 */
+	public boolean isChannelMix() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_CHANNEL_MIX, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return sampling timespan values in seconds with seven values ranging from 0.001 to 10.0 based on the current locale 
+	 */
+	public String[] getSamplingTimespanValues() {
+		double[] values_ss = { 10., 5., 1., .5, .1, .05, .001 };
+		String[] textValues = new String[7];
+		for (int i = 0; i < values_ss.length; i++) {
+			textValues[i] = String.valueOf(values_ss[i]);
+		}
+		return textValues;
+	}
+
+	/**
+	 * set the sampling time which defines the timespan for one single sample value for the history 
+	 * @param valueText
+	 */
+	public void setSamplingTimespan_ms(String valueText) {
+		this.setProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(Arrays.asList(getSamplingTimespanValues()).indexOf(valueText)));
+	}
+
+	/**
+	 * repairs the properties file setting if it holds an invalid index value. 
+	 * @return the sampling time which defines the timespan for one single sample value for the history (default is 1 sec)
+	 */
+	public int getSamplingTimespan_ms() {
+		String textValue;
+		try {
+			textValue = getSamplingTimespanValues()[getSamplingTimespanOrdinal()];
+		}
+		catch (Exception e) {
+			setSamplingTimespan_ms(Double.toString(1.)); // one second
+			textValue = getSamplingTimespanValues()[getSamplingTimespanOrdinal()];
+		}
+		return (int) (Double.valueOf(textValue) * 1000.);
+	}
+
+	/**
+	 * @return the ordinal of the sampling time which defines the timespan for one single sample value for the history (default is 1 ms which is the value at index 4)
+	 */
+	public int getSamplingTimespanOrdinal() {
+		return Integer.parseInt(this.getProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(2)));
+	}
+
+	/**
+	 * @param doSkip true if the history should skip files in the object directory which do not hold the object key internally 
+	 */
+	public void setFilesWithoutObject(boolean doSkip) {
+		this.setProperty(Settings.SKIP_FILES_WITHOUT_OBJECT, String.valueOf(doSkip));
+	}
+
+	/**
+	 * @return true if the history should skip files in the object directory which do not hold the object key internally
+	 */
+	public boolean skipFilesWithoutObject() {
+		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITHOUT_OBJECT, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param doSkip true if the history should skip files in the object directory which hold a different object key internally 
+	 */
+	public void setFilesWithOtherObject(boolean doSkip) {
+		this.setProperty(Settings.SKIP_FILES_WITH_OTHER_OBJECT, String.valueOf(doSkip));
+	}
+
+	/**
+	 * @return true if the history should skip files in the object directory which hold a different object key internally
+	 */
+	public boolean skipFilesWithOtherObject() {
+		return Boolean.valueOf(this.getProperty(Settings.SKIP_FILES_WITH_OTHER_OBJECT, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the maximum number of full calendar months which is used for history log selection (default is 12) 
+	 */
+	public int getRetrospectMonths() {
+		return Integer.valueOf(this.getProperty(Settings.RETROSPECT_MONTHS, String.valueOf(12)));
+	}
+
+	/**
+	 * @param uintValue the maximum number of full calendar months which is used for history log selection
+	 */
+	public void setRetrospectMonths(String uintValue) {
+		try {
+			int value = Integer.parseUnsignedInt(uintValue.trim());
+			if (value < 1 || value > 120) value = 12;
+			this.setProperty(Settings.RETROSPECT_MONTHS, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @return true if the history cache directories are zip files (performs better for more than about 100 directory entries)
+	 */
+	public boolean isZippedCache() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_ZIPPED_CACHE, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param value true if the history cache directories are zip files (performs better for more than about 100 directory entries)
+	 */
+	public void setZippedCache(boolean value) {
+		this.setProperty(Settings.IS_ZIPPED_CACHE, String.valueOf(value));
+	}
+
 }

@@ -125,6 +125,63 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+				<label>Log recording period</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+				<label>Number of log measurement data blocks</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+				<label>Program versions of recording and analytic software</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+				<label>Recorded byte size</label>
+            </Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Recordsets</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Count" type="String" />
+				<label>Number of log record sets</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+				<label>Computer runtime for log recordset analysis</label>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_OUTLET" name="Outlet 2">
             <Measurement>
@@ -198,6 +255,63 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+				<label>Log recording period</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+				<label>Number of log measurement data blocks</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+				<label>Program versions of recording and analytic software</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+				<label>Recorded byte size</label>
+            </Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Recordsets</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Count" type="String" />
+				<label>Number of log record sets</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+				<label>Computer runtime for log recordset analysis</label>
+            </Scoregroup>
         </Channel>
         <Channel type="TYPE_OUTLET" name="Outlet 3">
             <Measurement>
@@ -271,6 +385,63 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Scoregroup scoregroupId="0">
+                <name>Duration</name>
+                <symbol></symbol>
+                <unit>h</unit>
+                <active>true</active>
+                <score label="duration_mm" value="Gesamt" type="String" description="Duration"/>
+                <property name="factor" value="0.01666667" type="Double" description="internal representation in minutes"/>
+                <property name="histo_top_placement" value="true" type="Boolean"/>
+				<label>Log recording period</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="1">
+                <name>Counters</name>
+                <symbol></symbol>
+                <unit>k</unit>
+                <active>true</active>
+                <score label="totalReadings" value="Total readings" type="String" description="Total number of readings"/>
+                <score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings"/>
+                <score label="totalPackages" value="Total packages" type="String" description="Total number of packages"/>
+                <score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages"/>
+				<label>Number of log measurement data blocks</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="2">
+                <name>Versions</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <score label="logDataVersion" value="Device" type="String"/>
+                <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
+                <score label="logFileVersion" value="Log file" type="String"/>
+				<label>Program versions of recording and analytic software</label>
+            </Scoregroup>
+            <Scoregroup scoregroupId="3">
+                <name>Data volume</name>
+                <symbol></symbol>
+                <unit>kiB</unit>
+                <active>true</active>
+                <score label="logRecordSetBytes" value="Log recordset" type="String"/>
+                <score label="logFileBytes" value="Log file" type="String"/>
+                <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+				<label>Recorded byte size</label>
+            </Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Recordsets</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Count" type="String" />
+				<label>Number of log record sets</label>
+			</Scoregroup>
+            <Scoregroup scoregroupId="5">
+                <name>Elapsed</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <score label="elapsedHistoRecordSet_ms" value="Read recordset" type="String"/>
+				<label>Computer runtime for log recordset analysis</label>
+            </Scoregroup>
         </Channel>
     </Channels>
     <Desktop>
@@ -278,7 +449,7 @@
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
         <property target_reference_ordinal="7" value="true" name="voltage_per_cell_tab"/>
-        <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
-        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
+        <property name="utility_garphics_tab" value="false" description="UTILITY_GARPHICS_TAB"/>
+        <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
     </Desktop>
 </DeviceProperties>
