@@ -45,7 +45,7 @@ public class TimeSteps extends Vector<Long> {
 	 * @param newTimeStep_ms
 	 */
 	public TimeSteps(double newTimeStep_ms) {
-		super(newTimeStep_ms < 0 ? 5555 : 5); 
+		super(newTimeStep_ms < 0 ? 555 : 5); 
 		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
@@ -59,7 +59,7 @@ public class TimeSteps extends Vector<Long> {
 	 * @param initialCapacity
 	 */
 	public TimeSteps(double newTimeStep_ms, int initialCapacity) {
-		super(initialCapacity);
+		super(newTimeStep_ms < 0 ? initialCapacity : 5);
 		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());

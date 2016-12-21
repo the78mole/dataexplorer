@@ -14,8 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
  
- Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
-    					2016 Thomas Eickert
+ Copyright (c) 2016 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
 
@@ -50,10 +49,7 @@ public class HistoTransitions extends Vector<Transition> {
 	private final RecordSet			parent;
 
 	private enum TriggerState {
-		UNDEFINED,
-		WAITING,
-		TRIGGERED,
-		RECOVERING;
+		UNDEFINED, WAITING, TRIGGERED, RECOVERING;
 	}
 
 	class DequePair {
@@ -77,10 +73,10 @@ public class HistoTransitions extends Vector<Transition> {
 	private class SettlementDeque extends ArrayDeque<DequePair> {
 
 		private static final long	serialVersionUID	= 915484098600135376L;
-		private boolean				isGreater;
-		private long					timePeriod_100ns;
-		private double					extremeValue;
-		private boolean				isExhausted;
+		private boolean						isGreater;
+		private long							timePeriod_100ns;
+		private double						extremeValue;
+		private boolean						isExhausted;
 
 		SettlementDeque(int numElements, boolean isMinimumExtremum, long timePeriod_100ns) {
 			super(numElements);
@@ -99,8 +95,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean add(DequePair newDequePair) {
 			boolean bb = super.add(newDequePair);
 			this.extremeValue = this.isGreater ? Math.min(this.extremeValue, newDequePair.translatedValue) : Math.max(this.extremeValue, newDequePair.translatedValue);
-			if (bb)
-				ensureTimePeriod();
+			if (bb) ensureTimePeriod();
 			return bb;
 		}
 
@@ -162,8 +157,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean offer(DequePair newDequePair) {
 			boolean bb = super.offer(newDequePair);
 			this.extremeValue = this.isGreater ? Math.min(this.extremeValue, newDequePair.translatedValue) : Math.max(this.extremeValue, newDequePair.translatedValue);
-			if (bb)
-				ensureTimePeriod();
+			if (bb) ensureTimePeriod();
 			return bb;
 		}
 
@@ -188,8 +182,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean offerLast(DequePair newDequePair) {
 			boolean bb = super.offerLast(newDequePair);
 			this.extremeValue = this.isGreater ? Math.min(this.extremeValue, newDequePair.translatedValue) : Math.max(this.extremeValue, newDequePair.translatedValue);
-			if (bb)
-				ensureTimePeriod();
+			if (bb) ensureTimePeriod();
 			return bb;
 		}
 
@@ -201,8 +194,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair poll() {
 			DequePair polled = super.poll();
 			this.extremeValue = getExtremeValue(polled);
-			if (polled != null)
-				this.isExhausted = false;
+			if (polled != null) this.isExhausted = false;
 			return polled;
 		}
 
@@ -214,8 +206,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair pollFirst() {
 			DequePair polled = super.pollFirst();
 			this.extremeValue = getExtremeValue(polled);
-			if (polled != null)
-				this.isExhausted = false;
+			if (polled != null) this.isExhausted = false;
 			return polled;
 		}
 
@@ -227,8 +218,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair pollLast() {
 			DequePair polled = super.pollLast();
 			this.extremeValue = getExtremeValue(polled);
-			if (polled != null)
-				this.isExhausted = false;
+			if (polled != null) this.isExhausted = false;
 			return polled;
 		}
 
@@ -252,8 +242,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair pop() {
 			DequePair popped = super.pop();
 			this.extremeValue = getExtremeValue(popped);
-			if (popped != null)
-				this.isExhausted = false;
+			if (popped != null) this.isExhausted = false;
 			return popped;
 		}
 
@@ -265,8 +254,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair remove() {
 			DequePair removed = super.remove();
 			this.extremeValue = getExtremeValue(removed);
-			if (removed != null)
-				this.isExhausted = false;
+			if (removed != null) this.isExhausted = false;
 			return removed;
 		}
 
@@ -278,8 +266,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean remove(DequePair dequePair) {
 			boolean bb = super.remove(dequePair);
 			this.extremeValue = getExtremeValue(dequePair);
-			if (bb)
-				this.isExhausted = false;
+			if (bb) this.isExhausted = false;
 			return bb;
 		}
 
@@ -291,8 +278,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair removeFirst() {
 			DequePair removed = super.removeFirst();
 			this.extremeValue = getExtremeValue(removed);
-			if (removed != null)
-				this.isExhausted = false;
+			if (removed != null) this.isExhausted = false;
 			return removed;
 		}
 
@@ -304,8 +290,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean removeFirstOccurrence(DequePair dequePair) {
 			boolean bb = super.removeFirstOccurrence(dequePair);
 			this.extremeValue = getExtremeValue(dequePair);
-			if (bb)
-				this.isExhausted = false;
+			if (bb) this.isExhausted = false;
 			return bb;
 		}
 
@@ -317,8 +302,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public DequePair removeLast() {
 			DequePair removed = super.removeLast();
 			this.extremeValue = getExtremeValue(removed);
-			if (removed != null)
-				this.isExhausted = false;
+			if (removed != null) this.isExhausted = false;
 			return removed;
 		}
 
@@ -330,8 +314,7 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean removeLastOccurrence(DequePair dequePair) {
 			boolean bb = super.removeLastOccurrence(dequePair);
 			this.extremeValue = getExtremeValue(dequePair);
-			if (bb)
-				this.isExhausted = false;
+			if (bb) this.isExhausted = false;
 			return bb;
 		}
 
@@ -341,15 +324,14 @@ public class HistoTransitions extends Vector<Transition> {
 		 * @return elements which were removed successfully.
 		 */
 		public ArrayList<DequePair> removeList(ArrayList<DequePair> dequePairs) {
-			ArrayList<DequePair> removedPairs = new ArrayList<DequePair>();
+			ArrayList<DequePair> removedPairs = new ArrayList<>();
 			for (DequePair dequePair : dequePairs) {
 				if (super.remove(dequePair)) {
 					removedPairs.add(dequePair);
 				}
 			}
 			this.extremeValue = getExtremeValue(removedPairs);
-			if (removedPairs.size() > 0)
-				this.isExhausted = false;
+			if (removedPairs.size() > 0) this.isExhausted = false;
 			return removedPairs;
 		}
 
@@ -361,7 +343,8 @@ public class HistoTransitions extends Vector<Transition> {
 		public boolean tryAdd(DequePair dequePair) {
 			if (this.peekFirst().timeStamp_100ns + this.timePeriod_100ns > dequePair.timeStamp_100ns) {
 				return this.add(dequePair);
-			} else {
+			}
+			else {
 				this.isExhausted = true;
 				return false;
 			}
@@ -385,7 +368,7 @@ public class HistoTransitions extends Vector<Transition> {
 
 		private boolean ensureTimePeriod() {
 			this.isExhausted = false;
-			ArrayList<DequePair> removedList = new ArrayList<DequePair>();
+			ArrayList<DequePair> removedList = new ArrayList<>();
 			for (; this.peekFirst().timeStamp_100ns + this.timePeriod_100ns < this.peekLast().timeStamp_100ns;) {
 				removedList.add(this.removeFirst());
 				this.isExhausted = true;
@@ -396,16 +379,15 @@ public class HistoTransitions extends Vector<Transition> {
 		private double getExtremeValue(DequePair removedPair) {
 			boolean isExtremeValueRemoved = removedPair.translatedValue == this.extremeValue;
 			if (this.size() == 0 || isExtremeValueRemoved) {
-				if (log.isLoggable(Level.FINEST))
-					log.log(Level.FINEST, String.format("translatedValue=%f extremeValue=%f", removedPair.translatedValue, this.extremeValue));
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("translatedValue=%f extremeValue=%f", removedPair.translatedValue, this.extremeValue));
 				double extremeValue = this.isGreater ? Double.MAX_VALUE : -Double.MAX_VALUE;
 				for (DequePair pair : this) {
 					extremeValue = this.isGreater ? Math.min(extremeValue, pair.translatedValue) : Math.max(extremeValue, pair.translatedValue);
 				}
-				if (log.isLoggable(Level.FINEST))
-					log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
 				return extremeValue;
-			} else
+			}
+			else
 				return this.extremeValue;
 		}
 
@@ -418,21 +400,20 @@ public class HistoTransitions extends Vector<Transition> {
 				}
 			}
 			if (this.size() == 0 || isExtremeValueRemoved) { // at least one element holding the extremum value was removed: check all entries if the extremum is still present
-				if (log.isLoggable(Level.FINEST))
-					log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
 				double extremeValue = this.isGreater ? Double.MAX_VALUE : -Double.MAX_VALUE;
 				for (DequePair pair : this) {
 					extremeValue = this.isGreater ? Math.min(extremeValue, pair.translatedValue) : Math.max(extremeValue, pair.translatedValue);
 				}
-				if (log.isLoggable(Level.FINEST))
-					log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
 				return extremeValue;
-			} else
+			}
+			else
 				return this.extremeValue;
 		}
 
 		public ArrayList<Double> getTranslatedValues() {
-			ArrayList<Double> values = new ArrayList<Double>();
+			ArrayList<Double> values = new ArrayList<>();
 			for (DequePair dequePair : this) {
 				values.add(dequePair.translatedValue);
 			}
@@ -440,7 +421,7 @@ public class HistoTransitions extends Vector<Transition> {
 		}
 
 		public ArrayList<Long> getTimestamps_ms() {
-			ArrayList<Long> values = new ArrayList<Long>();
+			ArrayList<Long> values = new ArrayList<>();
 			for (DequePair dequePair : this) {
 				values.add(dequePair.timeStamp_100ns * 10);
 			}
@@ -481,28 +462,32 @@ public class HistoTransitions extends Vector<Transition> {
 		int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
 		int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
 		int recoveryDequeSize = (int) (transitionType.getRecoveryTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
-		// if (log.isLoggable(Level.FINE))
-		log.log(Level.SEVERE, transitionRecord.parent.name + " " + transitionRecord.parent.description
-				+ String.format("%s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
+		// if (log.isLoggable(Level.FINE)) {
+		int descriptionCutPoint = transitionRecord.parent.description.indexOf("\r");
+		if (descriptionCutPoint < 0) descriptionCutPoint = transitionRecord.parent.description.length();
+		log.log(Level.FINE, transitionRecord.parent.name + " " + transitionRecord.parent.description.substring(0, descriptionCutPoint)
+				+ String.format(" %s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
+	 // }
 		if (transitionType.isPercent()) {
 			TriggerState triggerState = TriggerState.UNDEFINED;
 			for (int i = 0; i < transitionRecord.size(); i++) {
-				if (transitionRecord.get(i) == null)
-					break;
+				if (transitionRecord.get(i) == null) break;
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
 				Double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.get(i));
 				switch (triggerState) {
 				case UNDEFINED:
 					if (recoveryDeque == null) {
 						referenceDeque = new SettlementDeque(referenceDequeSize, transitionType.isGreater(), transitionType.getReferenceTimeMsec() * 10);
-					} else { // take from previous trigger
-						referenceDeque = recoveryDeque.clone(); // TODO take only the number of elements which are required
+					}
+					else { // take from previous trigger
+						referenceDeque = recoveryDeque.clone(); // todo take only the number of elements which are required
 					}
 					thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
 					recoveryDeque = new SettlementDeque(recoveryDequeSize, transitionType.isGreater(), transitionType.getRecoveryTimeMsec() * 10);
 					if (translatedValue == null) {
-						
-					} else {
+
+					}
+					else {
 						triggerState = TriggerState.WAITING;
 						referenceDeque.add(new DequePair(translatedValue, timeStamp_100ns));
 					}
@@ -512,9 +497,10 @@ public class HistoTransitions extends Vector<Transition> {
 					if (isInitiated) { // trigger has fired right now
 						triggerState = TriggerState.TRIGGERED;
 						thresholdDeque.add(new DequePair(translatedValue, timeStamp_100ns));
-						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-					} else { // continue waiting for trigger fire
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+					}
+					else { // continue waiting for trigger fire
 						referenceDeque.add(new DequePair(translatedValue, timeStamp_100ns));
 					}
 					break;
@@ -523,11 +509,15 @@ public class HistoTransitions extends Vector<Transition> {
 					if (isRecovering) { // force recovery if threshold time has expired
 						triggerState = TriggerState.RECOVERING;
 						recoveryDeque.add(new DequePair(translatedValue, timeStamp_100ns));
-					} else if (!thresholdDeque.tryAdd(new DequePair(translatedValue, timeStamp_100ns))) { // threshold time has expired
-						log.log(Level.SEVERE, String.format("%s > WAITING: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-						log.log(Level.SEVERE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
-						log.log(Level.SEVERE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
-						log.log(Level.SEVERE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+					}
+					else if (!thresholdDeque.tryAdd(new DequePair(translatedValue, timeStamp_100ns))) { // threshold time has expired
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE,
+									String.format("%s > WAITING: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+							log.log(Level.FINE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+						}
 						triggerState = TriggerState.WAITING;
 						for (DequePair dequePair : thresholdDeque) {
 							referenceDeque.add(dequePair);
@@ -542,13 +532,17 @@ public class HistoTransitions extends Vector<Transition> {
 					boolean isThresholdTimeExceeded = timeStamp_100ns - thresholdDeque.getFirst().timeStamp_100ns >= transitionType.getThresholdTimeMsec() * 10;
 					if (isPersistentRecovery) {
 						isRecoveryFinalized = !recoveryDeque.tryAdd(new DequePair(translatedValue, timeStamp_100ns));
-					} else if (isThresholdTimeExceeded) {
+					}
+					else if (isThresholdTimeExceeded) {
 						isRecoveryFinalized = !recoveryDeque.tryAdd(new DequePair(translatedValue, timeStamp_100ns));
 						if (!isRecoveryFinalized) { // recovery must conform perfectly to the recovery requirements which are level and time
-							log.log(Level.SEVERE, String.format("%s > WAITING: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-							log.log(Level.SEVERE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
-							log.log(Level.SEVERE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
-							log.log(Level.SEVERE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) {
+								log.log(Level.FINE, String.format("%s > WAITING: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), //$NON-NLS-1$
+										recoveryDeque.size()));
+								log.log(Level.FINE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
+								log.log(Level.FINE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
+								log.log(Level.FINE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+							}
 							triggerState = TriggerState.WAITING;
 							for (DequePair dequePair : thresholdDeque) {
 								referenceDeque.add(dequePair);
@@ -560,17 +554,23 @@ public class HistoTransitions extends Vector<Transition> {
 							recoveryDeque.clear();
 						}
 						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-					} else { // try to extend the threshold time, interpret entries as jitter
-						log.log(Level.SEVERE, String.format("%s > TRIGGERED: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d  translatedValue=%f", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size(), translatedValue)); //$NON-NLS-1$
-						log.log(Level.SEVERE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
-						log.log(Level.SEVERE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
-						log.log(Level.SEVERE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
-						ArrayList<DequePair> movedPairs = new ArrayList<DequePair>();
+						log.log(Level.SEVERE,
+								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+					}
+					else { // try to extend the threshold time, interpret entries as jitter
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, String.format("%s > TRIGGERED: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d  translatedValue=%f", triggerState, referenceDeque.size(), //$NON-NLS-1$
+									thresholdDeque.size(), recoveryDeque.size(), translatedValue));
+							log.log(Level.FINE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+						}
+						ArrayList<DequePair> movedPairs = new ArrayList<>();
 						for (DequePair dequePair : recoveryDeque) {
 							if (thresholdDeque.tryAdd(dequePair)) {
 								movedPairs.add(dequePair);
-							} else {
+							}
+							else {
 								break;
 							}
 						}
@@ -579,29 +579,34 @@ public class HistoTransitions extends Vector<Transition> {
 							triggerState = TriggerState.TRIGGERED;
 							isRecoveryFinalized = false;
 							// if (log.isLoggable(Level.FINE))
-							log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-						} else { // threshold time is exceeded: jitters have been accepted
+							log.log(Level.FINE,
+									String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+						}
+						else { // threshold time is exceeded: jitters have been accepted
 							isRecoveryFinalized = !recoveryDeque.tryAdd(new DequePair(translatedValue, timeStamp_100ns));
 						}
 					}
 					if (isRecoveryFinalized) {
-						log.log(Level.SEVERE, String.format("%s finalized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-						log.log(Level.SEVERE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
-						log.log(Level.SEVERE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
-						log.log(Level.SEVERE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE,
+									String.format("%s finalized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+							log.log(Level.FINE, "referenceDeque " + referenceDeque.getTranslatedValues() + " @ " + referenceDeque.getTimestamps_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, "thresholdDeque " + thresholdDeque.getTranslatedValues() + " @ " + thresholdDeque.getTimestamps_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, "recoveryDeque " + recoveryDeque.getTranslatedValues() + " @ " + recoveryDeque.getTimestamps_ms()); //$NON-NLS-1$
+						}
 						triggerState = TriggerState.UNDEFINED;
-						Transition transition = new Transition(i - referenceDeque.size() - thresholdDeque.size()
-								- recoveryDeque.size(), referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size(), transitionRecord, transitionType);
+						Transition transition = new Transition(i - referenceDeque.size() - thresholdDeque.size() - recoveryDeque.size(), referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size(),
+								transitionRecord, transitionType);
 						this.add(transition);
 					}
 					break;
 				} // end switch
 			} // end for
-		} else {
+		}
+		else {
 			TriggerState triggerState = TriggerState.UNDEFINED;
 			for (int i = 0; i < transitionRecord.size(); i++) {
-				if (transitionRecord.get(i) == null)
-					break;
+				if (transitionRecord.get(i) == null) break;
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
 				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.get(i));
 				switch (triggerState) {
@@ -612,32 +617,34 @@ public class HistoTransitions extends Vector<Transition> {
 						recoveryDeque = new SettlementDeque(recoveryDequeSize, transitionType.isGreater(), transitionType.getRecoveryTimeMsec() * 10);
 						triggerState = TriggerState.WAITING;
 						referenceDeque.add(new DequePair(translatedValue, timeStamp_100ns));
-					} else { // take from previous trigger
-						referenceDeque = recoveryDeque.clone(); // TODO take only the number of elements which are required
+					}
+					else { // take from previous trigger
+						referenceDeque = recoveryDeque.clone(); // todo take only the number of elements which are required
 						thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), Long.MAX_VALUE); // allow unlimited trigger length
 						recoveryDeque = new SettlementDeque(recoveryDequeSize, transitionType.isGreater(), transitionType.getRecoveryTimeMsec() * 10);
 						// initialize for next trigger
-						boolean isInitiatedFromRecovery = referenceDeque.isFilledToCapacity()
-								&& isLevelCrossed(transitionType, transitionType.getTriggerLevel(), translatedValue, true);
+						boolean isInitiatedFromRecovery = referenceDeque.isFilledToCapacity() && isLevelCrossed(transitionType, transitionType.getTriggerLevel(), translatedValue, true);
 						if (isInitiatedFromRecovery) { // trigger has fired right now
 							triggerState = TriggerState.TRIGGERED;
 							thresholdDeque.add(new DequePair(translatedValue, timeStamp_100ns));
-						} else {
+						}
+						else {
 							triggerState = TriggerState.WAITING;
 							referenceDeque.add(new DequePair(translatedValue, timeStamp_100ns));
 						}
 					}
-					// if (log.isLoggable(Level.FINE))
-					log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+							String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
 					break;
 				case WAITING:
 					boolean isTriggered = isLevelCrossed(transitionType, transitionType.getTriggerLevel(), translatedValue, true);
 					if (isTriggered) {
 						triggerState = TriggerState.TRIGGERED;
 						thresholdDeque.add(new DequePair(translatedValue, timeStamp_100ns));
-						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-					} else {
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+					}
+					else {
 						referenceDeque.add(new DequePair(translatedValue, timeStamp_100ns));
 					}
 					break;
@@ -648,17 +655,18 @@ public class HistoTransitions extends Vector<Transition> {
 					if (!isPersistentTrigger && !isInThresholdTime) {
 						triggerState = TriggerState.RECOVERING;
 						recoveryDeque.add(new DequePair(translatedValue, timeStamp_100ns));
-						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-					} else if (!isPersistentTrigger && isInThresholdTime) { // threshold must conform perfectly to the threshold requirements which are level and time
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+					}
+					else if (!isPersistentTrigger && isInThresholdTime) { // threshold must conform perfectly to the threshold requirements which are level and time
 						triggerState = TriggerState.WAITING;
 						for (DequePair dequePair : thresholdDeque) {
 							referenceDeque.add(dequePair);
 						}
 						thresholdDeque.clear();
 						recoveryDeque.clear();
-						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
 					}
 					break;
 				case RECOVERING:
@@ -671,12 +679,13 @@ public class HistoTransitions extends Vector<Transition> {
 							thresholdDeque.add(dequePair);
 						}
 						recoveryDeque.clear();
-						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE, String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
-					} else if (!isInRecoveryTime) { // recovery was successful: record trigger data and test for new trigger just as in waiting state
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
+					}
+					else if (!isInRecoveryTime) { // recovery was successful: record trigger data and test for new trigger just as in waiting state
 						triggerState = TriggerState.UNDEFINED;
-						Transition transition = new Transition(i - referenceDeque.size() - thresholdDeque.size()
-								- recoveryDeque.size(), referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size(), transitionRecord, transitionType);
+						Transition transition = new Transition(i - referenceDeque.size() - thresholdDeque.size() - recoveryDeque.size(), referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size(),
+								transitionRecord, transitionType);
 						this.add(transition);
 					}
 				}
@@ -712,7 +721,7 @@ public class HistoTransitions extends Vector<Transition> {
 	}
 
 	public List<Transition> getTransitions(Integer transitionId) {
-		List<Transition> result = new ArrayList<Transition>();
+		List<Transition> result = new ArrayList<>();
 		for (Transition transition : this) {
 			if (transition.transitionType.getTransitionId() == transitionId) {
 				result.add(transition);

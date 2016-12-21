@@ -507,7 +507,7 @@ public class LogViewReader {
 
 	/**
 	 * method to read the data using a given input stream
-	 * @param filePath
+	 * @param flogFilePath
 	 * @param data_in
 	 * @return
 	 * @throws IOException

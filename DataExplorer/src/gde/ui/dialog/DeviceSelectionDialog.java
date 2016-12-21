@@ -120,9 +120,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Button																analogTabButton;
 	Button																digitalTabButton;
 	Button																tableTabButton;
-	CCombo																HistoSourceCombo;
-	Button																histoTableButton;
-	Button																histoGraphicsButton;
 	Group																	desktopTabsGroup;
 	Group																	deviceSelectionGroup;
 	Button																openToolBoxCheck;
@@ -148,8 +145,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Thread																listPortsThread;
 	Vector<String>												availablePorts			= new Vector<String>();
 	boolean																isUpdateSerialPorts	= true;
-	HashMap<String,String>								legacyDeviceNames = new HashMap<String,String>(2);
-
+	HashMap<String, String>								legacyDeviceNames		= new HashMap<String, String>(2);
 
 	public DeviceSelectionDialog(Shell parent, int style, final DataExplorer currentApplication) {
 		super(parent, style);
@@ -157,7 +153,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
 		this.availablePorts = DeviceSerialPortImpl.getAvailableports();
-		
+
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
@@ -236,16 +232,16 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setSize(566, 644);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0189));
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
-	        switch (event.detail) {
-	        case SWT.TRAVERSE_ESCAPE:
-	        	DeviceSelectionDialog.this.dialogShell.close();
-	          event.detail = SWT.TRAVERSE_NONE;
-	          event.doit = false;
-	          break;
-	        }
-	      }
-	    });
+				public void handleEvent(Event event) {
+					switch (event.detail) {
+					case SWT.TRAVERSE_ESCAPE:
+						DeviceSelectionDialog.this.dialogShell.close();
+						event.detail = SWT.TRAVERSE_NONE;
+						event.doit = false;
+						break;
+					}
+				}
+			});
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -292,8 +288,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						DeviceSelectionDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0015,
-								new Object[] { e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() }));
+						DeviceSelectionDialog.this.application
+								.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() }));
 					}
 				}
 			});
@@ -324,7 +320,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.deviceSelectionGroup = new Group(this.composite2, SWT.NONE);
 								this.deviceSelectionGroup.setLayout(null);
 								this.deviceSelectionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0155));
-								this.deviceSelectionGroup.setBounds(12, 9, 524, 224);
+								this.deviceSelectionGroup.setBounds(12, 9, 524, 250);
 								{
 									this.deviceSelectCombo = new CCombo(this.deviceSelectionGroup, SWT.BORDER);
 									this.deviceSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -339,14 +335,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											// allow device switch only if port not connected
 											if (DeviceSelectionDialog.this.application.getActiveDevice() == null
 													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() == null)
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null && !DeviceSelectionDialog.this.application
-															.getActiveDevice().getCommunicationPort().isConnected())) {
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null
+															&& !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												DeviceSelectionDialog.this.activeDeviceName = DeviceSelectionDialog.this.deviceSelectCombo.getText();
 												log.log(Level.FINE, "activeName = " + DeviceSelectionDialog.this.activeDeviceName); //$NON-NLS-1$
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName);
 												// if a device tool box is open, dispose it
-												if (DeviceSelectionDialog.this.application.getActiveDevice() != null 
-														&& DeviceSelectionDialog.this.application.getDeviceDialog() != null && !DeviceSelectionDialog.this.application.getDeviceDialog().isDisposed()) {
+												if (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getDeviceDialog() != null
+														&& !DeviceSelectionDialog.this.application.getDeviceDialog().isDisposed()) {
 													DeviceSelectionDialog.this.application.getDeviceDialog().dispose();
 												}
 												updateDialogEntries();
@@ -370,8 +366,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											// allow device switch only if port not connected
 											if (DeviceSelectionDialog.this.application.getActiveDevice() == null
 													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() == null)
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null && !DeviceSelectionDialog.this.application
-															.getActiveDevice().getCommunicationPort().isConnected())) {
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null
+															&& !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												int position = DeviceSelectionDialog.this.deviceSlider.getSelection();
 												log.log(Level.FINE, " Position: " + position); //$NON-NLS-1$
 												if (DeviceSelectionDialog.this.activeDevices.size() > 0 && !DeviceSelectionDialog.this.activeDevices.get(position).equals(DeviceSelectionDialog.this.activeDeviceName)) {
@@ -393,57 +389,57 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.deviceGroupText = new Label(this.deviceSelectionGroup, SWT.WRAP);
-									this.deviceGroupText.setBounds(251, 48, 270, 32);
+									this.deviceGroupText.setBounds(12, 48, 430, 16);
 									this.deviceGroupText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.deviceGroupText.setText(Messages.getString(MessageIds.GDE_MSGI0026));
 								}
 								{
 									this.deviceCanvas = new Canvas(this.deviceSelectionGroup, SWT.BORDER);
-									this.deviceCanvas.setBounds(12, 48, 227, 165);
+									this.deviceCanvas.setBounds(12, 70, 227, 165);
 								}
 								{
 									this.manufacturerDescription = new Label(this.deviceSelectionGroup, SWT.WRAP);
-									this.manufacturerDescription.setBounds(251, 92, 101, 16);
+									this.manufacturerDescription.setBounds(251, 70, 101, 16);
 									this.manufacturerDescription.setText(Messages.getString(MessageIds.GDE_MSGT0157));
 									this.manufacturerDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								}
 								{
 									this.deviceNameDescription = new Label(this.deviceSelectionGroup, SWT.WRAP);
-									this.deviceNameDescription.setBounds(251, 114, 101, 16);
+									this.deviceNameDescription.setBounds(251, 92, 101, 16);
 									this.deviceNameDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.deviceNameDescription.setText(Messages.getString(MessageIds.GDE_MSGT0158));
 								}
 								{
 									this.deviceTypeDescription = new Label(this.deviceSelectionGroup, SWT.WRAP);
-									this.deviceTypeDescription.setBounds(251, 136, 101, 16);
+									this.deviceTypeDescription.setBounds(251, 114, 101, 16);
 									this.deviceTypeDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.deviceTypeDescription.setText(Messages.getString(MessageIds.GDE_MSGT0159));
 								}
 								{
 									this.internetLinkDescription = new Label(this.deviceSelectionGroup, SWT.WRAP);
-									this.internetLinkDescription.setBounds(251, 158, 101, 16);
+									this.internetLinkDescription.setBounds(251, 136, 101, 16);
 									this.internetLinkDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.internetLinkDescription.setText(Messages.getString(MessageIds.GDE_MSGT0160));
 								}
 								{
 									this.manufacturerName = new Label(this.deviceSelectionGroup, SWT.NONE);
 									this.manufacturerName.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.manufacturerName.setBounds(358, 92, 154, 16);
+									this.manufacturerName.setBounds(358, 70, 154, 16);
 								}
 								{
 									this.deviceText = new Label(this.deviceSelectionGroup, SWT.NONE);
 									this.deviceText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.deviceText.setBounds(358, 114, 154, 16);
+									this.deviceText.setBounds(358, 92, 154, 16);
 								}
 								{
 									this.deviceTypeText = new Label(this.deviceSelectionGroup, SWT.NONE);
 									this.deviceTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.deviceTypeText.setBounds(358, 136, 154, 16);
+									this.deviceTypeText.setBounds(358, 114, 154, 16);
 								}
 								{
 									this.internetLinkText = new Label(this.deviceSelectionGroup, SWT.NONE);
 									this.internetLinkText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.internetLinkText.setBounds(358, 158, 154, 16);
+									this.internetLinkText.setBounds(358, 136, 154, 16);
 								}
 								{
 									this.openToolBoxCheck = new Button(this.deviceSelectionGroup, SWT.CHECK | SWT.LEFT);
@@ -470,18 +466,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.serialPortSelectionGroup.setLayout(null);
 								this.serialPortSelectionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortSelectionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0163));
-								this.serialPortSelectionGroup.setBounds(12, 239, 524, 52);
+								this.serialPortSelectionGroup.setBounds(12, 265, 524, 58);
 								{
 									this.portDescription = new Label(this.serialPortSelectionGroup, SWT.NONE);
 									this.portDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.portDescription.setText(Messages.getString(MessageIds.GDE_MSGT0164));
-									this.portDescription.setBounds(10, GDE.IS_MAC_COCOA ? 12 : 24, 70, 18);
+									this.portDescription.setBounds(10, GDE.IS_MAC_COCOA ? 12 : 29, 70, 18);
 									this.portDescription.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
 								}
 								{
 									this.portSelectCombo = new CCombo(this.serialPortSelectionGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.portSelectCombo.setBounds(80, GDE.IS_MAC_COCOA ? 10 : 22, 435, GDE.IS_LINUX ? 22 : 20);
+									this.portSelectCombo.setBounds(80, GDE.IS_MAC_COCOA ? 10 : 27, 435, GDE.IS_LINUX ? 22 : 20);
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
@@ -625,7 +621,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							}
 							{
 								this.desktopTabsGroup = new Group(this.composite2, SWT.NONE);
-								this.desktopTabsGroup.setBounds(12, 297, 524, 106);
+								this.desktopTabsGroup.setBounds(12, 329, 524, 74);
 								this.desktopTabsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.desktopTabsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0176));
 								this.desktopTabsGroup.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0177));
@@ -713,22 +709,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.utilityGraphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0227));
 									this.utilityGraphicsButton.setEnabled(false);
 								}
-								{
-									this.histoTableButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.histoTableButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
-									this.histoTableButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoTableButton.setText(Messages.getString(MessageIds.GDE_MSGT0790));
-									this.histoTableButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0791));
-									this.histoTableButton.setEnabled(false);
-								}
-								{
-									this.histoGraphicsButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.histoGraphicsButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
-									this.histoGraphicsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoGraphicsButton.setText(Messages.getString(MessageIds.GDE_MSGT0788));
-									this.histoGraphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0789));
-									this.histoGraphicsButton.setEnabled(false);
-								}
 								this.desktopTabsGroup.layout();
 							}
 						}
@@ -771,14 +751,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												if (deviceName.equals("MC3000")) {
 													if (GDE.IS_LINUX)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
-													else if (GDE.IS_MAC)
-														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
+													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
 												}
 												else if (deviceName.contains("DUO") && deviceName.contains("iCharger")) {
 													if (GDE.IS_LINUX)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
-													else if (GDE.IS_MAC)
-														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
+													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
 												}
 											}
 										}
@@ -1009,8 +987,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					DeviceSelectionDialog.this.voltagePerCellButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isVoltagePerCellTabRequested());
 					DeviceSelectionDialog.this.utilityGraphicsButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isUtilityGraphicsTabRequested());
 					DeviceSelectionDialog.this.utilityDeviceButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isUtilityDeviceTabRequested());
-					DeviceSelectionDialog.this.histoTableButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isHistoTableTabRequested());
-					DeviceSelectionDialog.this.histoGraphicsButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isHistoGraphicsTabRequested());
 
 					this.application.updateTitleBar(this.application.getObjectKey(), this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
 
@@ -1088,19 +1064,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @return actual device Nmae
 	 */
 	private String exchangeLegacyDeviceNames(String checkoutDeviceName) {
-		if(this.legacyDeviceNames.get(checkoutDeviceName) != null) 
-			return this.legacyDeviceNames.get(checkoutDeviceName); 
+		if (this.legacyDeviceNames.get(checkoutDeviceName) != null) return this.legacyDeviceNames.get(checkoutDeviceName);
 
 		return checkoutDeviceName;
 	}
-	
+
 	/**
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
 		IDevice previousActiveDevice = this.application.getActiveDevice();
 		// check if any thing to clean up
-		if (previousActiveDevice != null) { 
+		if (previousActiveDevice != null) {
 			checkAndStoreDeviceConfiguration(previousActiveDevice);
 			if (previousActiveDevice.getDialog() != null && !previousActiveDevice.getDialog().isDisposed()) {
 				previousActiveDevice.getDialog().dispose();
@@ -1108,7 +1083,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		// cleanup menuBar for device specific entries
 		this.application.getMenuBar().cleanup();
-		
+
 		// prepare every thing for the new device
 		IDevice activeDevice = this.application.getActiveDevice();
 		if ((activeDevice = getInstanceOfDevice()) != null) {
@@ -1119,10 +1094,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.setCellVoltageTabItemVisible(activeDevice.isVoltagePerCellTabRequested());
 			this.application.setUtilGraphicsWindowVisible(activeDevice.isUtilityGraphicsTabRequested(), GDE.STRING_EMPTY);
 			this.application.registerCustomTabItem(activeDevice.isUtilityDeviceTabRequested() ? activeDevice.getUtilityDeviceTabItem() : null);
-			setupDataChannels(activeDevice);
-			// compare names because the device is re-instantiated when the deviceSelectionDialog is opened
-			if (previousActiveDevice == null || ! activeDevice.getName().equals(previousActiveDevice.getName())) {
-				this.application.setupHistoWindows();
+			// do not call setupDataChannels because it rebuilds again the histo tabs which also done by updateDialogEntries
+			if (activeDevice != null && (previousActiveDevice == null || !activeDevice.getName().equals(previousActiveDevice.getName()))) { 
+				setupDataChannels(activeDevice);
 			}
 			this.application.setupDataTableHeader();
 			this.application.updateDigitalWindow();
@@ -1131,9 +1105,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.updateCellVoltageWindow();
 			//this.application.updateCompareWindow();
 			this.application.updateFileCommentWindow();
-		} else {
-//			this.application.setHistoGraphicsTabItemVisible(false);
-//			this.application.setHistoTableTabItemVisible(false);
 		}
 	}
 
@@ -1170,7 +1141,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
 		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full qualified
-				: "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+				: "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." //$NON-NLS-1$
+						+ selectedDeviceName;
 		try {
 			//String className = "gde.device.DefaultDeviceDialog";
 			log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
@@ -1254,8 +1226,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		boolean result = true;
 		String unsaved = Channels.getInstance().checkRecordSetsSaved();
 		if (unsaved.length() != 0) {
-			if (unsaved.length() > 500)
-				unsaved = unsaved.substring(0, 500) + "........";
+			if (unsaved.length() > 500) unsaved = unsaved.substring(0, 500) + "........";
 			String msg = Messages.getString(MessageIds.GDE_MSGW0020) + unsaved.toString();
 			if (this.application.openOkCancelMessageDialog(msg) == SWT.CANCEL) {
 				result = false;

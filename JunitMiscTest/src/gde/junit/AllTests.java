@@ -33,6 +33,9 @@ public class AllTests {
 		suite.addTestSuite(LogViewReaderTester.class);
 		suite.addTestSuite(TestObjectKeyScanner.class);
 		suite.addTestSuite(CleanupTestTemp.class);
+		suite.addTestSuite(QuantileTest.class);
+		suite.addTestSuite(HistoSetTest.class);
+		
 		//$JUnit-END$
 		return suite;
 	}

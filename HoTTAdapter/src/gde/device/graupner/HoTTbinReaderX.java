@@ -81,7 +81,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		FileInputStream file_input = new FileInputStream(inputFile);
 		DataInputStream data_in = new DataInputStream(file_input);
 		try {
-			if (inputFile.exists() && inputFile.length() > HoTTbinReaderX.headerSize+HoTTbinReaderX.footerSize+23*16) {
+			if (inputFile.exists()) {
 				byte[] buffer = new byte[HoTTbinReaderX.headerSize];
 				data_in.read(buffer);
 				if (new String(buffer).startsWith("GRAUPNER SD LOG8")) {

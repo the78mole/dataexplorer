@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import gde.config.Settings;
 import gde.log.Level;
 
 /**
@@ -31,7 +32,7 @@ import gde.log.Level;
  * this may result in a small number of additional samples in areas with new min/max values.
  * b) the min/max points are identified on the basis of full sets of points.
  * so it is not sure that all individual min/max points to appear in the samples.
- * c) the algorithm may be tought with a selection of sample points to avoid areas with new min/max values which results in oversampling. 
+ * c) the algorithm may be taught with a selection of sample points to avoid areas with new min/max values which results in oversampling. 
  * a sufficient number of representative points from the same population will build an internal min/max estimation.
  * d) the samples are selected randomly. 
  * so multiple runs will neither select the same samples nor the same number of samples.
@@ -39,53 +40,91 @@ import gde.log.Level;
  * @author Thomas Eickert
  */
 public class HistoRandomSample {
-	private final static String	$CLASS_NAME						= HistoRandomSample.class.getName();
+	private final static String	$CLASS_NAME				= HistoRandomSample.class.getName();
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	private final int					recordTimespan_ms				= 10;											// TODO smallest time interval to the next sample: one record every 10 ms
-	private final int					histoSamplingTimespan_ms	= 1000;										// TODO from settings
-	private final int					timespan_ms;																	// actual used timespan; one sample in this time span + potential oversampling samples
-	private final Random				rand								= new Random();
+	private final Settings			settings					= Settings.getInstance();
 
-	private static int[]				minPoints;
-	private static int[]				maxPoints;
+	private final int						recordTimespan_ms;																		// smallest time interval to the next sample: one record every 10 ms
+	private final int						samplingTimespan_ms;																	// actual used timespan; one sample in this time span + potential oversampling samples
+	private final Random				rand							= new Random();
+
+	private int[]								minPoints;
+	private int[]								maxPoints;
 
 	private TimeStepValues			timeStep;
 	private TimeStepValues			lastTimeStep;
-	private int							readingCount					= 0;
-	private int							samplingCount					= 0;
-	private int							oversamplingCount				= 0;
+	private int									readingCount			= 0;
+	private int									samplingCount			= 0;
+	private int									oversamplingCount	= 0;
+	private DeviceConfiguration	device;
+	private int									pointsLength;
 
 	private class TimeStepValues {
-		int		nextSamplingTimeStamp_ms;
-		int		nextStartTimeStamp_ms;
+		int			nextSamplingTimeStamp_ms;
+		int			nextStartTimeStamp_ms;
 		boolean	isSamplingDone;
 		boolean	isSampleTimePassed;
-		int		timeSpanSamplingCount;
+		int			timeSpanSamplingCount;
 		int[]		points;
 		long		timeStep_ms	= -1;
 		boolean	isMinMax;
 		boolean	isTime4Sample;
 	}
 
-	public HistoRandomSample(int pointsLength, boolean keepMinMax) { // reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
-		if (!keepMinMax) {
-			minPoints = new int[pointsLength];
-			maxPoints = new int[pointsLength];
-			Arrays.fill(minPoints, Integer.MAX_VALUE);
-			Arrays.fill(maxPoints, Integer.MIN_VALUE);
-		}
+	/**
+	 * @param device
+	 * @param pointsLength number of log measurement points
+	 * @param recordTimespan_ms log measurement rate
+	 */
+	public HistoRandomSample(DeviceConfiguration device, int pointsLength, int recordTimespan_ms) { // reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
+		this.device = device;
+		this.pointsLength = pointsLength;
+		this.maxPoints = new int[pointsLength];
+		this.minPoints = new int[pointsLength];
+		Arrays.fill(this.maxPoints, Integer.MIN_VALUE);
+		Arrays.fill(this.minPoints, Integer.MAX_VALUE);
 		this.lastTimeStep = new TimeStepValues();
-		this.timespan_ms = this.histoSamplingTimespan_ms < this.recordTimespan_ms ? this.recordTimespan_ms : this.histoSamplingTimespan_ms; // biggest time interval to the next sample
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, String.format("HistoRandomSample  keepMinMax=%b", keepMinMax)); //$NON-NLS-1$
+		device.getDataBlockPreferredDataLocation();
+		this.recordTimespan_ms = recordTimespan_ms;
+		this.samplingTimespan_ms = Math.max(this.settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", pointsLength)); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param device
+	 * @param pointsLength number of log measurement points
+	 * @param recordTimespan_ms log measurement rate
+	 */
+	public HistoRandomSample(DeviceConfiguration device, int[] maxPoints, int[] minPoints, int recordTimespan_ms) {
+		this.device = device;
+		this.pointsLength = maxPoints.length;
+		this.maxPoints = maxPoints;
+		this.minPoints = minPoints;
+		this.lastTimeStep = new TimeStepValues();
+		device.getDataBlockPreferredDataLocation();
+		this.recordTimespan_ms = recordTimespan_ms;
+		this.samplingTimespan_ms = Math.max(this.settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", this.pointsLength)); //$NON-NLS-1$
 	}
 
 	private enum Action {
-		DISCARD, // predecessor points are not used as a sample
-		FORCE_RELEASE, // predecessor points are a mandatory sample
-		DEFER_RELEASE, // points are a candidate for release but may be discarded if better points come up; current points must be minmax points
-		COMPENSATE_RELEASE, // points are a candidate for release but may be discarded to compensate an oversampling action; predecessor points must NOT be minmax points
+		/**
+		 *  predecessor points are not used as a sample
+		 */
+		DISCARD,
+		/**
+		 * predecessor points are a mandatory sample
+		 */
+		FORCE_RELEASE,
+		/**
+		 * points are a candidate for release but may be discarded if better points come up; current points must be minmax points
+		 */
+		DEFER_RELEASE,
+		/**
+		 * points are a candidate for release but may be discarded to compensate an oversampling action; predecessor points must NOT be minmax points
+		 */
+		COMPENSATE_RELEASE
 	}
 
 	/**
@@ -95,27 +134,29 @@ public class HistoRandomSample {
 	 * in all cases the sample is made ready for use one cycle later which results in loosing the last sample of the population.
 	 * @param points
 	 * @param timeStep_ms
-	 * @return indicates a valid sample which must be fetched by calling the properties getSamplePoints and getSampleTimeStep_ms
+	 * @return true if a valid sample is available which must be fetched by calling the properties getSamplePoints and getSampleTimeStep_ms
 	 */
 	public boolean isValidSample(int[] points, long timeStep_ms) { //
 		boolean isValidSample = false;
-		if (this.timespan_ms <= this.recordTimespan_ms) { // each timeStep must be a "sample"
+		if (this.samplingTimespan_ms <= this.recordTimespan_ms) { // every timeStep must be a "sample"
 			this.lastTimeStep.points = points;
 			this.lastTimeStep.timeStep_ms = timeStep_ms;
 			this.samplingCount = ++this.readingCount;
 			isValidSample = true;
-		} else { // take real samples
+		}
+		else { // take real samples
 			this.timeStep = new TimeStepValues();
 			Action predecessorAction;
 			if (timeStep_ms >= this.lastTimeStep.nextStartTimeStamp_ms) { // lastTimeStep was the last in the current sampling timespan
-				this.timeStep.nextSamplingTimeStamp_ms = this.lastTimeStep.nextStartTimeStamp_ms + this.rand.nextInt(this.timespan_ms);
-				this.timeStep.nextStartTimeStamp_ms = this.lastTimeStep.nextStartTimeStamp_ms + this.timespan_ms;
+				this.timeStep.nextSamplingTimeStamp_ms = this.lastTimeStep.nextStartTimeStamp_ms + this.rand.nextInt(this.samplingTimespan_ms);
+				this.timeStep.nextStartTimeStamp_ms = this.lastTimeStep.nextStartTimeStamp_ms + this.samplingTimespan_ms;
 				this.timeStep.isSamplingDone = false;
 				this.timeStep.isSampleTimePassed = false;
 				this.timeStep.timeSpanSamplingCount = 0;
 				if (log.isLoggable(Level.FINEST))
 					log.log(Level.SEVERE, "******************** " + String.format("timeStep_ms=%d nextSamplingTimeStamp_ms=%d", timeStep_ms, this.timeStep.nextSamplingTimeStamp_ms));
-			} else {
+			}
+			else {
 				this.timeStep.nextSamplingTimeStamp_ms = this.lastTimeStep.nextSamplingTimeStamp_ms;
 				this.timeStep.nextStartTimeStamp_ms = this.lastTimeStep.nextStartTimeStamp_ms;
 				this.timeStep.isSamplingDone = this.lastTimeStep.isSamplingDone;
@@ -129,7 +170,8 @@ public class HistoRandomSample {
 			;
 			if (log.isLoggable(Level.FINEST))
 				// if (timeStep_ms > 1107500 && timeStep_ms < 1115000)
-				log.log(Level.SEVERE, String.format("timeStep_ms=%,d isSampleTimePassed=%b isSamplingDone=%b isTime4Sample=%b", timeStep_ms, this.timeStep.isSampleTimePassed, this.timeStep.isSamplingDone, this.timeStep.isTime4Sample));
+				log.log(Level.SEVERE, String.format("timeStep_ms=%,d isSampleTimePassed=%b isSamplingDone=%b isTime4Sample=%b", timeStep_ms, this.timeStep.isSampleTimePassed, this.timeStep.isSamplingDone,
+						this.timeStep.isTime4Sample));
 			{
 				if (this.lastTimeStep.isMinMax && this.lastTimeStep.isTime4Sample) {
 					if (this.timeStep.isMinMax)
@@ -139,7 +181,8 @@ public class HistoRandomSample {
 							predecessorAction = Action.DEFER_RELEASE; // <> take the next points as they are new minmax values
 					else
 						predecessorAction = Action.FORCE_RELEASE; // {}
-				} else if (this.lastTimeStep.isMinMax && !this.lastTimeStep.isTime4Sample) {
+				}
+				else if (this.lastTimeStep.isMinMax && !this.lastTimeStep.isTime4Sample) {
 					if (this.timeStep.isMinMax)
 						if (this.timeStep.isTime4Sample)
 							predecessorAction = Action.DISCARD;
@@ -147,7 +190,8 @@ public class HistoRandomSample {
 							predecessorAction = Action.DEFER_RELEASE; // <> take the next points as they are new minmax values
 					else
 						predecessorAction = Action.FORCE_RELEASE; // OVERSAMPLING;
-				} else if (!this.lastTimeStep.isMinMax && this.lastTimeStep.isTime4Sample) {
+				}
+				else if (!this.lastTimeStep.isMinMax && this.lastTimeStep.isTime4Sample) {
 					if (this.timeStep.isMinMax)
 						if (this.timeStep.isTime4Sample)
 							predecessorAction = Action.COMPENSATE_RELEASE; // ()
@@ -155,14 +199,17 @@ public class HistoRandomSample {
 							predecessorAction = Action.DEFER_RELEASE; // <>
 					else
 						predecessorAction = Action.COMPENSATE_RELEASE; // ()
-				} else if (!this.lastTimeStep.isMinMax && !this.lastTimeStep.isTime4Sample) {
+				}
+				else if (!this.lastTimeStep.isMinMax && !this.lastTimeStep.isTime4Sample) {
 					predecessorAction = Action.DISCARD;
-				} else {
+				}
+				else {
 					predecessorAction = null; // is never reached
 				}
 				if (log.isLoggable(Level.FINEST))
 					// if (timeStep_ms > 1107500 && timeStep_ms < 1115000)
-					log.log(Level.SEVERE, String.format("action=%s isLastMinMax=%b isLastTime4Sample=%b isMinMax=%b isTime4Sample=%b", predecessorAction.toString(), this.lastTimeStep.isMinMax, this.lastTimeStep.isTime4Sample, this.timeStep.isMinMax, this.timeStep.isTime4Sample));
+					log.log(Level.SEVERE, String.format("action=%s isLastMinMax=%b isLastTime4Sample=%b isMinMax=%b isTime4Sample=%b", predecessorAction.toString(), this.lastTimeStep.isMinMax,
+							this.lastTimeStep.isTime4Sample, this.timeStep.isMinMax, this.timeStep.isTime4Sample));
 			}
 			switch (predecessorAction) {
 			case DISCARD:
@@ -179,7 +226,8 @@ public class HistoRandomSample {
 			case COMPENSATE_RELEASE:
 				if (this.lastTimeStep.timeSpanSamplingCount <= 0) {
 					this.timeStep.isSamplingDone = isValidSample = true;
-				} else {
+				}
+				else {
 					this.timeStep.isSamplingDone = true; // compensates an oversampling event
 				}
 				break;
@@ -195,13 +243,13 @@ public class HistoRandomSample {
 				else
 					++this.timeStep.timeSpanSamplingCount;
 			}
-			if (log.isLoggable(Level.FINEST))
-				log.log(Level.SEVERE, String.format("%5s  %s isValidSample=%b isSamplingDone=%b readingCount=%d samplingCount=%d", isValidSample, predecessorAction.toString(), isValidSample, this.timeStep.isSamplingDone, this.readingCount, this.samplingCount));
+			if (log.isLoggable(Level.FINEST)) log.log(Level.SEVERE, String.format("%5s  %s isValidSample=%b isSamplingDone=%b readingCount=%d samplingCount=%d", isValidSample, predecessorAction.toString(),
+					isValidSample, this.timeStep.isSamplingDone, this.readingCount, this.samplingCount));
 			if (this.lastTimeStep.nextStartTimeStamp_ms < this.timeStep.nextStartTimeStamp_ms) {
 				this.oversamplingCount += this.lastTimeStep.timeSpanSamplingCount > 1 ? this.lastTimeStep.timeSpanSamplingCount - 1 : 0; // one sample per timespan is the standard case
 				if (log.isLoggable(Level.FINEST) && this.oversamplingCount > 0)
-					log.log(Level.SEVERE, "******************** "
-							+ String.format("timeSpanSamplingCount =%,9d samplingCount=%,9d oversamplingCount=%,9d oversamplingCountMax=%,9d   ", this.timeStep.timeSpanSamplingCount, this.samplingCount, this.oversamplingCount, this.oversamplingCount));
+					log.log(Level.SEVERE, "******************** " + String.format("timeSpanSamplingCount =%,9d samplingCount=%,9d oversamplingCount=%,9d oversamplingCountMax=%,9d   ",
+							this.timeStep.timeSpanSamplingCount, this.samplingCount, this.oversamplingCount, this.oversamplingCount));
 			}
 			if (log.isLoggable(Level.FINEST) && this.oversamplingCount > 0)
 				// if (timeStep_ms > 1107500 && timeStep_ms < 1115000)
@@ -216,12 +264,12 @@ public class HistoRandomSample {
 		boolean isChanged = false;
 		for (int i = 0; i < points.length; i++) {
 			int point = points[i];
-			if (point < minPoints[i]) {
-				minPoints[i] = point;
+			if (point < this.minPoints[i]) {
+				this.minPoints[i] = point;
 				isChanged = true;
 			}
-			if (point > maxPoints[i]) {
-				maxPoints[i] = point;
+			if (point > this.maxPoints[i]) {
+				this.maxPoints[i] = point;
 				isChanged = true;
 			}
 		}
@@ -246,6 +294,40 @@ public class HistoRandomSample {
 
 	public int getOverSamplingCount() {
 		return this.oversamplingCount;
+	}
+
+	public int[] getMinPoints() {
+		return this.minPoints;
+	}
+
+	/**
+	 * @param minPoints utilizes the minMax values from a previous run and thus reduces oversampling
+	 */
+	public void setMinPoints(int[] minPoints) {
+		if (minPoints.length == 0) {
+			this.minPoints = new int[this.pointsLength];
+			Arrays.fill(this.minPoints, Integer.MAX_VALUE);
+		}
+		else {
+			this.minPoints = minPoints;
+		}
+	}
+
+	public int[] getMaxPoints() {
+		return this.maxPoints;
+	}
+
+	/**
+	 * @param maxPoints utilizes the minMax values from a previous run and thus reduces oversampling
+	 */
+	public void setMaxPoints(int[] maxPoints) {
+		if (maxPoints.length == 0) {
+			this.maxPoints = new int[this.pointsLength];
+			Arrays.fill(this.maxPoints, Integer.MIN_VALUE);
+		}
+		else {
+			this.maxPoints = maxPoints;
+		}
 	}
 
 }
