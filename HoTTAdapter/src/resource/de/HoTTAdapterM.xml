@@ -935,7 +935,7 @@
                 <symbol>U_min</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
                 <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
             </Measurement>
             <Measurement>

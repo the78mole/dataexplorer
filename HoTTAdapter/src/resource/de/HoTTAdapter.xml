@@ -1312,7 +1312,7 @@
 				<symbol>U_min</symbol>
 				<unit>V</unit>
 				<active>true</active>
-				<property name="scale_sync_ref_ordinal" value="7" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<suppressQuantiles>true</suppressQuantiles>
 			</Measurement>
@@ -1408,6 +1408,6 @@
 		<property name="analog_tab" value="true" />
 		<property name="voltage_per_cell_tab" value="false" />
 		<property name="utility_garphics_tab" value="false" description="UTILITY_GARPHICS_TAB" />
-		<property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB" />
+		<property name="utility_device_tab" value="true" description="UTILITY_DEVICE_TAB" />
 	</Desktop>
 </DeviceProperties>

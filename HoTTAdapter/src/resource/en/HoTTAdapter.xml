@@ -1313,7 +1313,7 @@
 				<symbol>U_min</symbol>
 				<unit>V</unit>
 				<active>true</active>
-				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal" />
+				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="1" name="scale_sync_ref_ordinal" />
 				<property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor" />
 				<suppressQuantiles>true</suppressQuantiles>
 			</Measurement>
