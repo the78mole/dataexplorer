@@ -265,6 +265,11 @@ public class Q200GathererThread extends Thread {
 							Q200GathererThread.log.logp(Level.FINE, Q200GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
 					}
 					else if (e instanceof UsbNotClaimedException) { //USB error detected, p.e. disconnect
+						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+						stopDataGatheringThread(false, e);
+					}
+					else if (e instanceof UsbDisconnectedException) { //USB error detected, p.e. disconnect
+						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 						stopDataGatheringThread(false, e);
 					}
 					else if (e instanceof UsbException) { //USB error detected, p.e. disconnect
@@ -367,7 +372,7 @@ public class Q200GathererThread extends Thread {
 				}
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-				channel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+				channel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false, true));
 
 				if (channel.getType() == ChannelTypes.TYPE_CONFIG) 
 					channel.applyTemplate(processRecordSetKey, false);

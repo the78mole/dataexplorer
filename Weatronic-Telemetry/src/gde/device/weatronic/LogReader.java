@@ -434,8 +434,7 @@ public class LogReader {
 			}
 			String recordSetNameExtend = LogReader.device.getStateType().getProperty().get(0).getName(); // state name
 			String recordSetName = (LogReader.channels.getActiveChannel().size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
-			LogReader.recordSet = RecordSet.createRecordSet(recordSetName, LogReader.device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, LogReader.device.getTimeStep_ms(), true,
-					true);
+			LogReader.recordSet = RecordSet.createRecordSet(recordSetName, LogReader.device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, LogReader.device.getTimeStep_ms(), true, true, true);
 			LogReader.recordSet.getName(); // cut/correct length of recordSetName
 			for (gde.data.Record record : LogReader.recordSet.values()) {
 				MeasurementType measurementType = LogReader.device.getMeasurement(activeChannelConfigNumber, record.getOrdinal());

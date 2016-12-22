@@ -37,9 +37,6 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 	private final static String	$CLASS_NAME	= HistoSetTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private static final double	DELTA				= 1e-13;
-	private static int					count				= 0;
-
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */

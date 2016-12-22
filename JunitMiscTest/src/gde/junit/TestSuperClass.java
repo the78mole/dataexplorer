@@ -18,6 +18,27 @@
 ****************************************************************************************/
 package gde.junit;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.Vector;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -33,31 +54,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.CurveUtils;
 import gde.utils.TimeLine;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.reflect.Constructor;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.Vector;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.naming.OperationNotSupportedException;
-
 import junit.framework.TestCase;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 public class TestSuperClass extends TestCase {
 	Logger rootLogger;

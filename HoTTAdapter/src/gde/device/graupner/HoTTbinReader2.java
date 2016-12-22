@@ -129,7 +129,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			channel = HoTTbinReader.channels.get(channelNumber);
 			channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
 			recordSetName = recordSetNumber + device.getRecordSetStemName() + recordSetNameExtend;
-			HoTTbinReader2.recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true);
+			HoTTbinReader2.recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 			channel.put(recordSetName, HoTTbinReader2.recordSet);
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
@@ -461,7 +461,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			channel = HoTTbinReader.channels.get(channelNumber);
 			channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
 			recordSetName = recordSetNumber + device.getRecordSetStemName() + recordSetNameExtend;
-			HoTTbinReader2.recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true);
+			HoTTbinReader2.recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 			channel.put(recordSetName, HoTTbinReader2.recordSet);
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);

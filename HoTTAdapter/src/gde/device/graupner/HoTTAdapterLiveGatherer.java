@@ -186,7 +186,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		//receiver is always - might be empty in slave modus
 		this.channel = this.channels.get(1);
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value() + recordSetNameExtend;
-		recordSetReceiver = RecordSet.createRecordSet(recordSetKey, this.device, 1, true, true);
+		recordSetReceiver = RecordSet.createRecordSet(recordSetKey, this.device, 1, true, true, true);
 		this.channel.put(recordSetKey, recordSetReceiver);
 		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), recordSetReceiver);
 		this.channel.applyTemplate(recordSetKey, true);
@@ -194,7 +194,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		//vario
 		this.channel = this.channels.get(2);
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
-		recordSetVario = RecordSet.createRecordSet(recordSetKey, this.device, 2, true, true);
+		recordSetVario = RecordSet.createRecordSet(recordSetKey, this.device, 2, true, true, true);
 		this.channel.put(recordSetKey, recordSetVario);
 		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.VARIO.value(), recordSetVario);
 		this.channel.applyTemplate(recordSetKey, true);
@@ -202,7 +202,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		//GPS
 		this.channel = this.channels.get(3);
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
-		recordSetGPS = RecordSet.createRecordSet(recordSetKey, this.device, 3, true, true);
+		recordSetGPS = RecordSet.createRecordSet(recordSetKey, this.device, 3, true, true, true);
 		this.channel.put(recordSetKey, recordSetGPS);
 		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GPS.value(), recordSetGPS);
 		this.channel.applyTemplate(recordSetKey, true);
@@ -210,7 +210,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		//General
 		this.channel = this.channels.get(4);
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
-		recordSetGeneral = RecordSet.createRecordSet(recordSetKey, this.device, 4, true, true);
+		recordSetGeneral = RecordSet.createRecordSet(recordSetKey, this.device, 4, true, true, true);
 		this.channel.put(recordSetKey, recordSetGeneral);
 		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(), recordSetGeneral);
 		this.channel.applyTemplate(recordSetKey, true);
@@ -218,7 +218,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		//Electric
 		this.channel = this.channels.get(5);
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
-		recordSetElectric = RecordSet.createRecordSet(recordSetKey, this.device, 5, true, true);
+		recordSetElectric = RecordSet.createRecordSet(recordSetKey, this.device, 5, true, true, true);
 		this.channel.put(recordSetKey, recordSetElectric);
 		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(), recordSetElectric);
 		this.channel.applyTemplate(recordSetKey, true);
@@ -226,7 +226,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		//SpeedControl
 		this.channel = this.channels.get(7);
 		recordSetKey = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
-		recordSetMotorDriver = RecordSet.createRecordSet(recordSetKey, this.device, 7, true, true);
+		recordSetMotorDriver = RecordSet.createRecordSet(recordSetKey, this.device, 7, true, true, true);
 		this.channel.put(recordSetKey, recordSetMotorDriver);
 		HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), recordSetMotorDriver);
 		this.channel.applyTemplate(recordSetKey, true);

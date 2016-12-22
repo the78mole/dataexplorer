@@ -392,10 +392,10 @@ public class OsdReaderWriter {
 				gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
 				gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
 			}
-			recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
+			recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true, true);
 		}
 		else {
-			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true);
+			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 		}
 		recordSet.setRecordSetDescription(recordSetComment);
 

@@ -191,7 +191,6 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.buf2 = null;
 		HoTTbinHistoReader.buf3 = null;
 		HoTTbinHistoReader.buf4 = null;
-		int version = -1;
 		HoTTAdapter.reverseChannelPackageLossCounter.clear();
 		HoTTbinHistoReader.lostPackages.clear();
 		HoTTbinHistoReader.countLostPackages = 0;
@@ -307,7 +306,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							if (HoTTbinHistoReader.buf1 != null && HoTTbinHistoReader.buf2 != null) {
 								if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 									final int versionOBS = -99;
-									version = HoTTbinHistoReader.parse4Vario(versionOBS, HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2);
+									 HoTTbinHistoReader.parse4Vario(versionOBS, HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2);
 									setTimeMarks(TimeMark.READ);
 									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsVario, HoTTbinHistoReader.timeStep_ms);
 									setTimeMarks(TimeMark.REVIEWED);

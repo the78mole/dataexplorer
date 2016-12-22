@@ -25,7 +25,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import gde.utils.MathUtils;
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
 

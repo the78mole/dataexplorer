@@ -135,7 +135,7 @@ public class Picolario2LogReader {
 				log.log(Level.FINE, String.format("start pressure = %d; start voltage = %d", startValues[1]/1000, startValues[2]/1000));
 				fileSize -= 4;
 				
-				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfigNumber, true, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfigNumber, true, true, true);
 				activeChannel.put(recordSetName, recordSet);
 				recordSet = activeChannel.get(recordSetName);
 				recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format("\nFirmware : %s", firmware));

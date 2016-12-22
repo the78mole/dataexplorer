@@ -104,7 +104,7 @@ public class LiPoWatchDataGatherer extends Thread {
 				// check analog modus and update channel/configuration
 				//this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
 				
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false, true));
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added

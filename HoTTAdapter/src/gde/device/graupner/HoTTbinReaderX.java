@@ -186,7 +186,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			channel = HoTTbinReaderX.channels.get(2);
 			channel.setFileDescription(HoTTbinReaderX.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReaderX.application.getObjectKey() : date);
 			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
-			HoTTbinReaderX.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 2, true, true);
+			HoTTbinReaderX.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 2, true, true, true);
 			channel.put(recordSetName, HoTTbinReaderX.recordSetChannel);
 			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReaderX.recordSetChannel);
 			tmpRecordSet = channel.get(recordSetName);
@@ -201,7 +201,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			channel = HoTTbinReaderX.channels.get(1);
 			channel.setFileDescription(HoTTbinReaderX.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReaderX.application.getObjectKey() : date);
 			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value() + recordSetNameExtend;
-			HoTTbinReaderX.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true);
+			HoTTbinReaderX.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true, true);
 			channel.put(recordSetName, HoTTbinReaderX.recordSetReceiver);
 			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), HoTTbinReaderX.recordSetReceiver);
 			tmpRecordSet = channel.get(recordSetName);

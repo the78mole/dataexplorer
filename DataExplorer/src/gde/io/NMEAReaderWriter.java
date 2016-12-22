@@ -229,7 +229,7 @@ public class NMEAReaderWriter {
 						//prepare new record set now
 						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 
-						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), true, true);
+						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), true, true, true);
 						recordSetName = recordSet.getName(); // cut/correct length
 						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(data.getDate() == null ? new Date() : data.getDate()); //$NON-NLS-1$
 						boolean isOutdated = false;

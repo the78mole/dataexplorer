@@ -244,7 +244,7 @@ public class CSVReaderWriter {
 				for (int i = 0; i < tmpRecordNames.length; i++) {
 					tmpRecordSymbols[i] = GDE.STRING_EMPTY;
 				}
-				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), tmpRecordNames, tmpRecordSymbols, tmpRecordUnits, device.getTimeStep_ms(), true, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), tmpRecordNames, tmpRecordSymbols, tmpRecordUnits, device.getTimeStep_ms(), true, true, true);
 				recordSetName = recordSet.getName(); // cut length
 
 				//find GPS related records and try to assign data type

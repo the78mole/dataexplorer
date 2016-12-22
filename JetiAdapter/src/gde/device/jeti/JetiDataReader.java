@@ -243,7 +243,7 @@ public class JetiDataReader {
 						recordSymbols[i] = measurement.getSymbol();
 						recordUnits[i] = measurement.getUnit();
 					}
-					recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true);
+					recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true, true);
 					//set record data type which are not default
 					for (Entry<Integer, Record.DataType> entry : mapRecordType.entrySet()) {
 						recordSet.get(entry.getKey().intValue()).setDataType(entry.getValue());

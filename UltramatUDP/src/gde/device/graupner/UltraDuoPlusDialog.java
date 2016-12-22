@@ -1518,7 +1518,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													String recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
 													recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-													channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, UltraDuoPlusDialog.this.device, UltraDuoPlusDialog.this.channelSelectionIndex, true, false));
+													channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, UltraDuoPlusDialog.this.device, UltraDuoPlusDialog.this.channelSelectionIndex, true, false, true));
 													channel.applyTemplateBasics(recordSetKey);
 													UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 													recordSet = channel.get(recordSetKey);

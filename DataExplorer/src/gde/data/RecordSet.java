@@ -26,7 +26,6 @@ import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.TriggerType;
 import gde.exception.DataInconsitsentException;
-import gde.histocache.HistoVault;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
@@ -912,7 +911,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * this method with param adjustObjectKey=true is 100% identical to the deprecated createRecordSet method
-	 * method to create a record set with given name "1) Laden" containing records according the device channle/configuration
+	 * method to create a record set with given name "1) Laden" containing records according the device channel/configuration
 	 * which are loaded from device properties file
 	 * @param recordSetName the name of the record set
 	 * @param device the instance of the device 

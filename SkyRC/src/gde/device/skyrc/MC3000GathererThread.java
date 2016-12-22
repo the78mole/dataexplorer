@@ -242,7 +242,7 @@ public class MC3000GathererThread extends Thread {
 										recordSetKey5 = slotChannel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
 										recordSetKey5 = recordSetKey5.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey5 : recordSetKey5.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-										slotChannel.put(recordSetKey5, RecordSet.createRecordSet(recordSetKey5, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
+										slotChannel.put(recordSetKey5, RecordSet.createRecordSet(recordSetKey5, this.application.getActiveDevice(), slotChannel.getNumber(), true, false, true));
 										if (slotChannel.getType() == ChannelTypes.TYPE_CONFIG) 
 											slotChannel.applyTemplate(recordSetKey5, false);
 										else
@@ -395,7 +395,7 @@ public class MC3000GathererThread extends Thread {
 				}
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false));
+				slotChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), slotChannel.getNumber(), true, false, true));
 
 				if (slotChannel.getType() == ChannelTypes.TYPE_CONFIG) 
 					slotChannel.applyTemplate(processRecordSetKey, false);

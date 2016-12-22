@@ -197,7 +197,7 @@ public class CSVSerialDataReaderWriter {
 								activeChannel.remove(recordSetName);
 								createdRecordSets.remove(channelRecordSet);
 								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points, last line number = " + (lineNumber - 1)); //$NON-NLS-1$
-								activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false));
+								activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false, true));
 								createdRecordSets.add(activeChannel.get(recordSetName));
 								recordSetName = channelRecordSet.getName(); // cut/correct length
 								
@@ -218,7 +218,7 @@ public class CSVSerialDataReaderWriter {
 						else {
 							int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(activeChannelConfigNumber) : activeChannel.getNextRecordSetNumber();
 							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
-							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false));
+							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false, true));
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
 							
 							if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)

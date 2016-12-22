@@ -157,7 +157,7 @@ public class GathererThread extends Thread {
 						// record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
 						this.recordSetKey = (device.recordSetNumberFollowChannel() && this.channel.getType() == ChannelTypes.TYPE_CONFIG ? this.channel.getNextRecordSetNumber(this.channelNumber) : this.channel.getNextRecordSetNumber())	
 								+ GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false, true));
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) 
 							this.channel.setActiveRecordSet(this.recordSetKey);

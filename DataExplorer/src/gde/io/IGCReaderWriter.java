@@ -241,7 +241,7 @@ public class IGCReaderWriter {
 							//prepare new record set now
 							recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 
-							recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), true, true);
+							recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), true, true, true);
 							recordSetName = recordSet.getName(); // cut/correct length
 							String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(actualTimeStamp); //$NON-NLS-1$
 							String description = device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime + GDE.LINE_SEPARATOR + header.toString();

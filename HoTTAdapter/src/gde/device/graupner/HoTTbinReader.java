@@ -18,6 +18,18 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Vector;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -31,19 +43,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Vector;
-import java.util.logging.Logger;
 
 /**
  * Class to read Graupner HoTT binary data as saved on SD-Cards
@@ -421,7 +420,7 @@ public class HoTTbinReader {
 					? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
 			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value()
 					+ recordSetNameExtend;
-			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true);
+			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true, true);
 			channel.put(recordSetName, HoTTbinReader.recordSetReceiver);
 			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), HoTTbinReader.recordSetReceiver);
 			tmpRecordSet = channel.get(recordSetName);
@@ -443,7 +442,7 @@ public class HoTTbinReader {
 						? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
 				recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 						+ HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
-				HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true);
+				HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true, true);
 				channel.put(recordSetName, HoTTbinReader.recordSetChannel);
 				HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReader.recordSetChannel);
 				tmpRecordSet = channel.get(recordSetName);
@@ -526,8 +525,7 @@ public class HoTTbinReader {
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 											+ HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, 2,
-											true, true);
+									HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, 2, true, true, true);
 									channel.put(recordSetName, HoTTbinReader.recordSetVario);
 									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.VARIO.value(),
 											HoTTbinReader.recordSetVario);
@@ -573,8 +571,7 @@ public class HoTTbinReader {
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 											+ HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, 3,
-											true, true);
+									HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, 3, true, true, true);
 									channel.put(recordSetName, HoTTbinReader.recordSetGPS);
 									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GPS.value(),
 											HoTTbinReader.recordSetGPS);
@@ -626,8 +623,7 @@ public class HoTTbinReader {
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 											+ HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, 4,
-											true, true);
+									HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, 4, true, true, true);
 									channel.put(recordSetName, HoTTbinReader.recordSetGeneral);
 									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(),
 											HoTTbinReader.recordSetGeneral);
@@ -684,8 +680,7 @@ public class HoTTbinReader {
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 											+ HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device,
-											5, true, true);
+									HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device, 5, true, true, true);
 									channel.put(recordSetName, HoTTbinReader.recordSetElectric);
 									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(),
 											HoTTbinReader.recordSetElectric);
@@ -742,8 +737,7 @@ public class HoTTbinReader {
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 											+ HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetSpeedControl = RecordSet.createRecordSet(recordSetName,
-											device, 7, true, true);
+									HoTTbinReader.recordSetSpeedControl = RecordSet.createRecordSet(recordSetName, device, 7, true, true, true);
 									channel.put(recordSetName, HoTTbinReader.recordSetSpeedControl);
 									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(),
 											HoTTbinReader.recordSetSpeedControl);
@@ -1016,7 +1010,7 @@ public class HoTTbinReader {
 					? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
 			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value()
 					+ recordSetNameExtend;
-			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true);
+			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true, true);
 			channel.put(recordSetName, HoTTbinReader.recordSetReceiver);
 			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), HoTTbinReader.recordSetReceiver);
 			tmpRecordSet = channel.get(recordSetName);
@@ -1038,7 +1032,7 @@ public class HoTTbinReader {
 						? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
 				recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 						+ HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
-				HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true);
+				HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true, true);
 				channel.put(recordSetName, HoTTbinReader.recordSetChannel);
 				HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReader.recordSetChannel);
 				tmpRecordSet = channel.get(recordSetName);
@@ -1119,8 +1113,7 @@ public class HoTTbinReader {
 													: date);
 											recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 													+ HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
-											HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName,
-													device, 2, true, true);
+											HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, 2, true, true, true);
 											channel.put(recordSetName, HoTTbinReader.recordSetVario);
 											HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.VARIO.value(),
 													HoTTbinReader.recordSetVario);
@@ -1153,8 +1146,7 @@ public class HoTTbinReader {
 													: date);
 											recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 													+ HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
-											HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName,
-													device, 3, true, true);
+											HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, 3, true, true, true);
 											channel.put(recordSetName, HoTTbinReader.recordSetGPS);
 											HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GPS.value(),
 													HoTTbinReader.recordSetGPS);
@@ -1188,8 +1180,7 @@ public class HoTTbinReader {
 													: date);
 											recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 													+ HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
-											HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName,
-													device, 4, true, true);
+											HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, 4, true, true, true);
 											channel.put(recordSetName, HoTTbinReader.recordSetGeneral);
 											HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(),
 													HoTTbinReader.recordSetGeneral);
@@ -1223,8 +1214,7 @@ public class HoTTbinReader {
 													: date);
 											recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 													+ HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
-											HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName,
-													device, 5, true, true);
+											HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device, 5, true, true, true);
 											channel.put(recordSetName, HoTTbinReader.recordSetElectric);
 											HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(),
 													HoTTbinReader.recordSetElectric);
@@ -1258,15 +1248,13 @@ public class HoTTbinReader {
 													: date);
 											recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 													+ HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
-											HoTTbinReader.recordSetSpeedControl = RecordSet
-													.createRecordSet(recordSetName, device, 7, true, true);
+											HoTTbinReader.recordSetSpeedControl = RecordSet.createRecordSet(recordSetName, device, 7, true, true, true);
 											channel.put(recordSetName, HoTTbinReader.recordSetSpeedControl);
 											HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(),
 													HoTTbinReader.recordSetSpeedControl);
 											tmpRecordSet = channel.get(recordSetName);
 											tmpRecordSet.setRecordSetDescription(
-													device.getName() + GDE.STRING_MESSAGE_CONCAT
-															+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+													device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 											tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 											if (HoTTbinReader.application.getMenuToolBar() != null) {
 												channel.applyTemplate(recordSetName, false);

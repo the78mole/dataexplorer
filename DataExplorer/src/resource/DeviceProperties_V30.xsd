@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ************************************************************************************* This file 
-	is part of GNU DataExplorer. GNU DataExplorer is free software: you can redistribute it and/or modify 
-	it under the terms of the GNU General Public License as published by the Free Software Foundation, either 
-	version 3 of the License, or (at your option) any later version. GNU DataExplorer is distributed in the 
-	hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should 
-	have received a copy of the GNU General Public License along with GNU DataExplorer. If not, see <http://www.gnu.org/licenses/>. 
-	Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 
-	Winfried Bruegmann 2016 Thomas Eickert ************************************************************************************** -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-	attributeFormDefault="qualified">
+<!-- 
+*************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
+    					2016 Thomas Eickert
+************************************************************************************** 
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified">
 	<xs:element name="DeviceProperties" type="DevicePropertiesType">
 		<xs:annotation>
 			<xs:documentation>DataExplorer Properties</xs:documentation>
@@ -23,8 +34,7 @@
 						<xs:extension base="xs:string">
 							<xs:attribute name="implementation" type="xs:string" use="optional">
 								<xs:annotation>
-									<xs:documentation>specify implementation class if different from name
-									</xs:documentation>
+                                    <xs:documentation>specify implementation class if different from name</xs:documentation>
 								</xs:annotation>
 							</xs:attribute>
 						</xs:extension>
@@ -84,43 +94,32 @@
 		<xs:sequence>
 			<xs:element name="Device" type="DeviceType">
 				<xs:annotation>
-					<xs:documentation>Defines device specific global properties
-					</xs:documentation>
+                    <xs:documentation>Defines device specific global properties</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="SerialPort" type="SerialPortType" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>Defines the serial port configuration
-					</xs:documentation>
+                    <xs:documentation>Defines the serial port configuration</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="UsbPort" type="UsbPortType" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>Defines the USB port configuration
-					</xs:documentation>
+                    <xs:documentation>Defines the USB port configuration</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="TimeBase" type="TimeBaseType">
 				<xs:annotation>
-					<xs:documentation>Defines the time base used to display the data. A
-						timeStep of -1 means time
-						comes with data block and is not
-						constant over an record set
-					</xs:documentation>
+                    <xs:documentation>Defines the time base used to display the data. A timeStep of -1 means time comes with data block and is not constant over an record set</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="DataBlock" type="DataBlockType" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>This describes the data as to be interpreted as
-						input. Nomally this is handled
-						by individual device plug-in
-					</xs:documentation>
+                    <xs:documentation>This describes the data as to be interpreted as input. Nomally this is handled by individual device plug-in</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="State" type="StateType" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>Defines device processing states
-					</xs:documentation>
+                    <xs:documentation>Defines device processing states</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="Channels">
@@ -128,8 +127,7 @@
 					<xs:sequence>
 						<xs:element name="Channel" type="ChannelType" maxOccurs="unbounded">
 							<xs:annotation>
-								<xs:documentation>Defines output channels or configurations
-								</xs:documentation>
+                                <xs:documentation>Defines output channels or configurations</xs:documentation>
 							</xs:annotation>
 							<xs:key name="settlementKey">
 								<xs:annotation>
@@ -159,9 +157,7 @@
 			</xs:element>
 			<xs:element name="Desktop" type="DesktopType">
 				<xs:annotation>
-					<xs:documentation>Defines miscellaneous visualization properties of
-						the application desktop
-					</xs:documentation>
+                    <xs:documentation>Defines miscellaneous visualization properties of the application desktop</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -170,28 +166,22 @@
 		<xs:sequence>
 			<xs:element name="ReadTimeOut" type="xs:integer">
 				<xs:annotation>
-					<xs:documentation>Read timeout value per data chunk in msec
-					</xs:documentation>
+                    <xs:documentation>Read timeout value per data chunk in msec</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="ReadStableIndex" type="xs:integer">
 				<xs:annotation>
-					<xs:documentation>specify number of 1 msec cycles where the receive
-						buffer do not change to
-						detect buffer complete
-					</xs:documentation>
+                    <xs:documentation>specify number of 1 msec cycles where the receive buffer do not change to detect buffer complete</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="WriteCharDelayTime" type="xs:integer">
 				<xs:annotation>
-					<xs:documentation>write delay time in msec per char
-					</xs:documentation>
+                    <xs:documentation>write delay time in msec per char</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="WriteDelayTime" type="xs:integer">
 				<xs:annotation>
-					<xs:documentation>delay time after write completed in msec
-					</xs:documentation>
+                    <xs:documentation>delay time after write completed in msec</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -215,25 +205,20 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="timeUnit" type="time_unit_types" default="msec" minOccurs="0" />
-			<xs:element name="separator" type="comma_separator_types" default="semicolon"
-				minOccurs="0" />
+            <xs:element name="separator" type="comma_separator_types" default="semicolon" minOccurs="0"/>
 			<xs:element name="leader" type="xs:string" default="$" minOccurs="0" />
 			<xs:element name="trailer" type="xs:hexBinary" default="0D0A" minOccurs="0" />
 			<xs:element name="preferredDataLocation" type="xs:string" minOccurs="0">
 				<xs:annotation>
 					<xs:appinfo />
-					<xs:appinfo>preferred file location if raw data loaded from file
-					</xs:appinfo>
+                    <xs:appinfo>preferred file location if raw data loaded from file</xs:appinfo>
 					<xs:appinfo />
 					<xs:documentation />
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="preferredFileExtention" type="xs:string" default="*.csv" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation>specify a file extention (*.abc) if the data file
-						extension is diferent to
-						*.csv
-					</xs:documentation>
+                    <xs:documentation>specify a file extention (*.abc) if the data file extension is diferent to *.csv</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="histoSamplingTime_ms" type="xs:integer" default="1000" minOccurs="0" />
@@ -246,10 +231,7 @@
 			<xs:element name="unit" type="xs:string" />
 			<xs:element name="timeStep" type="xs:double">
 				<xs:annotation>
-					<xs:documentation>a negative value means variable time step, some
-						devices allow editing, other
-						edit by its configuration
-					</xs:documentation>
+                    <xs:documentation>a negative value means variable time step, some devices allow editing, other edit by its configuration</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="avarage_timeStep" type="xs:double" minOccurs="0">
@@ -325,17 +307,12 @@
 		<xs:sequence>
 			<xs:element name="Measurement" type="MeasurementType" maxOccurs="unbounded">
 				<xs:annotation>
-					<xs:documentation>Defines measurement capabilities, it might be
-						calculations depending on
-						measurements
-					</xs:documentation>
+                    <xs:documentation>Defines measurement capabilities, it might be calculations depending on measurements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="Settlement" type="SettlementType" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
-					<xs:documentation>Defines calculation capabilities depending on
-						measurements
-					</xs:documentation>
+                    <xs:documentation>Defines calculation capabilities depending on measurements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="Transition" type="TransitionType" minOccurs="0" maxOccurs="unbounded">
@@ -401,8 +378,7 @@
 		<xs:attribute name="last" type="xs:boolean" use="required" />
 		<xs:attribute name="comment" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>comment for documentation purposes
-				</xs:documentation>
+                <xs:documentation>comment for documentation purposes</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -416,71 +392,47 @@
 		<xs:attribute name="sigma" type="xs:boolean" use="required" />
 		<xs:attribute name="triggerRefOrdinal" type="xs:integer">
 			<xs:annotation>
-				<xs:documentation>references the measurement ordinal where trigger
-					level is set in case of
-					trigger is defined
-					(0=VoltageReceiver;1=Voltage,2=Current, ...)
-				</xs:documentation>
+                <xs:documentation>references the measurement ordinal where trigger level is set in case of trigger is defined (0=VoltageReceiver;1=Voltage,2=Current, ...)</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="sumByTriggerRefOrdinal" type="xs:integer">
 			<xs:annotation>
-				<xs:documentation>calculates sum of values where trigger level
-					becomes active at referenced
-					triggered measurement ordinal
-				</xs:documentation>
+                <xs:documentation>calculates sum of values where trigger level becomes active at referenced triggered measurement ordinal</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="sumTriggerText" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>this is the text displayed in front of sum value
-					in case of trigger is defined
-				</xs:documentation>
+                <xs:documentation>this is the text displayed in front of sum value in case of trigger is defined</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="countByTrigger" type="xs:boolean">
 			<xs:annotation>
-				<xs:documentation>counts the number of events trigger level becomes
-					active at specified trigger
-					type
-				</xs:documentation>
+                <xs:documentation>counts the number of events trigger level becomes active  at specified trigger type </xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="countTriggerText" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>text displayed in front of count value in case of
-					trigger is defined
-				</xs:documentation>
+                <xs:documentation>text displayed in front of count value in case of trigger is defined</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="comment" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>trigger related comment in case of trigger is
-					defined
-				</xs:documentation>
+                <xs:documentation>trigger related comment in case of trigger is defined</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="sumTriggerTimeText" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>text displayed in front of the time sum value in
-					case of trigger is defined
-					displayed at time row
-				</xs:documentation>
+                <xs:documentation>text displayed in front of the time sum value in case of trigger is defined displayed at time row</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="ratioRefOrdinal" type="xs:integer">
 			<xs:annotation>
-				<xs:documentation>measurement ordinal to calculate the ratio of
-					referenced avg or max value to
-					sumByTriggerRefOrdinal
-				</xs:documentation>
+                <xs:documentation>measurement ordinal to calculate the ratio of referenced avg or max value to sumByTriggerRefOrdinal</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="ratioText" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>text displayed in front of the calculated ratio
-					case of resolvable dependencyes
-				</xs:documentation>
+                <xs:documentation>text displayed in front of the calculated ratio case of resolvable dependencyes</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="sum" type="xs:boolean" />

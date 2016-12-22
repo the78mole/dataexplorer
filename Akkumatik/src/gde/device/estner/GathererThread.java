@@ -139,7 +139,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_RIGHT_BRACKET;
 							if (processType.length() > 0) this.recordSetKey1 = this.recordSetKey1 + GDE.STRING_MESSAGE_CONCAT + processType;
 							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "Create record set with name = " + this.recordSetKey1);
-							this.channel.put(this.recordSetKey1, RecordSet.createRecordSet(this.recordSetKey1, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
+							this.channel.put(this.recordSetKey1, RecordSet.createRecordSet(this.recordSetKey1, this.application.getActiveDevice(), this.channel.getNumber(), true, false, true));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey1 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 							if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey1);
 							recordSet1 = this.channel.get(this.recordSetKey1);
@@ -196,7 +196,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_RIGHT_BRACKET;
 							if (processType.length() > 0) this.recordSetKey2 = this.recordSetKey2 + GDE.STRING_MESSAGE_CONCAT + processType;
 							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "Create record set with name = " + this.recordSetKey2);
-							this.channel.put(this.recordSetKey2, RecordSet.createRecordSet(this.recordSetKey2, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
+							this.channel.put(this.recordSetKey2, RecordSet.createRecordSet(this.recordSetKey2, this.application.getActiveDevice(), this.channel.getNumber(), true, false, true));
 							GathererThread.log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey2 + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 							if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey2);
 							recordSet2 = this.channel.get(this.recordSetKey2);

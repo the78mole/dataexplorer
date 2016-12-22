@@ -87,7 +87,7 @@ public class DataGathererThread extends Thread {
 				this.dialog.setAlreadyRedDataSets(this.datagramNumbers[j]);
 				Vector<byte[]> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device);
 				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false, true));
 				DataGathererThread.log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);

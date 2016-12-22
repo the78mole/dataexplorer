@@ -275,7 +275,7 @@ public class UsbGathererThread extends Thread {
 				processRecordSetKey = String.format("%d) %s - %s %s", outputChannel.getNextRecordSetNumber(), batterieType, processTypeName, extend.toString()).trim();
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-				outputChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), outputChannel.getNumber(), true, false));
+				outputChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), outputChannel.getNumber(), true, false, true));
 				outputChannel.applyTemplateBasics(processRecordSetKey);
 				UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + outputChannel.getName()); //$NON-NLS-1$
 				recordSet = outputChannel.get(processRecordSetKey);

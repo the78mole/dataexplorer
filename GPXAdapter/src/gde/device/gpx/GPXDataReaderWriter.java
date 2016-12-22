@@ -354,7 +354,7 @@ public class GPXDataReaderWriter {
 											+ (recordNames[i].split(GDE.STRING_BLANK).length > 1 ? recordNames[i].substring(recordNames[i].indexOf(GDE.STRING_BLANK)) : GDE.STRING_BLANK));
 								}
 							}
-							activeRecordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true);
+							activeRecordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true, true);
 							String correctedRecordSetName = activeRecordSet.getName(); // cut/correct length of recordSetName
 							activeChannel.put(correctedRecordSetName, activeRecordSet);
 

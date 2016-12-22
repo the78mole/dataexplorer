@@ -158,7 +158,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 
 		this.dialog.selectTab(this.device.getLastChannelNumber());
 		this.channel = this.channels.get(this.device.getLastChannelNumber());
-		recordSet = RecordSet.createRecordSet(recordSetKey, this.device, this.device.getLastChannelNumber(), true, true);
+		recordSet = RecordSet.createRecordSet(recordSetKey, this.device, this.device.getLastChannelNumber(), true, true, true);
 		this.channel.put(recordSetKey, recordSet);
 		HoTTAdapter.recordSets.put(HoTTAdapter2.Sensor.RECEIVER.value(), recordSet);
 		this.channel.applyTemplate(recordSetKey, true);

@@ -288,7 +288,7 @@ public class CSVReaderWriter {
 							recordUnits[i] = tmpRecordUnits[i];
 					}
 				}
-				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true, true);
 				recordSetName = recordSet.getName(); // cut length
 				
 				// make all records displayable while absolute data

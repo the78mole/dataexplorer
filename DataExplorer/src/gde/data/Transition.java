@@ -18,18 +18,9 @@
 ****************************************************************************************/
 package gde.data;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.device.MeasurementType;
-import gde.device.PropertyType;
-import gde.device.SettlementType;
-import gde.device.StatisticsType;
-import gde.device.TransitionType;
-
-import java.util.ArrayDeque;
 import java.util.logging.Logger;
+
+import gde.device.TransitionType;
 
 /**
  * holds the data record and the indices for the identified trigger sections.
