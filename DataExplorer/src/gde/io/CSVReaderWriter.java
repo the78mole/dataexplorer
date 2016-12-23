@@ -235,7 +235,7 @@ public class CSVReaderWriter {
 
 			if (activeChannel != null) {
 				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
-				int time_ms = 0;
+				long time_ms = 0;
 
 				// check for device name and channel or configuration in first line
 				if (!application.getActiveDevice().getName().equals(fileHeader.get(GDE.DEVICE_NAME))) {
@@ -307,7 +307,7 @@ public class CSVReaderWriter {
 				while ((line = reader.readLine()) != null) {
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
 					String data = dataStr[0].trim().replace(',', '.');
-					if (data.contains(GDE.STRING_BLANK)) {
+					if (data.contains(GDE.STRING_BLANK)) { //absolute time YYYY-MM-DD HH:mm:ss:SSS
 						if (date == null) {
 							year = Integer.parseInt(data.substring(0,4));
 							month = Integer.parseInt(data.substring(5, 7));
@@ -321,7 +321,7 @@ public class CSVReaderWriter {
 						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
 
 						if (lastTimeStamp < timeStamp) {
-							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
+							time_ms = lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp);
 							lastTimeStamp = timeStamp;
 							date = calendar.getTime();
 							if (startTimeStamp == 0) startTimeStamp = timeStamp;
@@ -329,9 +329,20 @@ public class CSVReaderWriter {
 						else 
 							continue;
 					}
-					else // decimal time value
-						time_ms = (int) (new Double(data).doubleValue() * 1000);
-					
+					else { // relative time HH:mm:ss:SSS
+						if (startTimeStamp == 0) startTimeStamp = new Date().getTime();
+						if (data.length() == 9) { //00:00.000
+							int minute = Integer.parseInt(data.substring(0, 2));
+							int second = Integer.parseInt(data.substring(3, 5));
+							time_ms = minute*60*1000 + second*1000 + Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1));
+						}
+						else if (data.length() == 12) { //00:00:00.000)
+							int hour = Integer.parseInt(data.substring(0, 2));
+							int minute = Integer.parseInt(data.substring(3, 5));
+							int second = Integer.parseInt(data.substring(6, 8));
+							time_ms = hour*60*60*1000 + minute*60*1000 + second*1000 + Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1));
+						}
+					}
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
 						data = dataStr[i + 1].trim().replace(',', '.').replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
 						points[i] = (int) (new Double(data).doubleValue() * 1000);
@@ -344,9 +355,13 @@ public class CSVReaderWriter {
 
 				activeChannel.put(recordSetName, recordSet);
 				activeChannel.setActiveRecordSet(recordSetName);
+				if (isRaw) 	
+					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				activeChannel.applyTemplate(recordSetName, true);
-				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
-				//				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+				if (application.getStatusBar() != null) {
+					activeChannel.switchRecordSet(recordSetName);
+					application.updateAllTabs(true, true);
+				}
 
 				reader.close();
 				reader = null;
