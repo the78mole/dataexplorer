@@ -22,6 +22,14 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;simpleType name="channel_property_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="enable_filter"/>
+ *     &lt;enumeration value="text_mode"/>
+ *     &lt;enumeration value="enable_channel"/>
+ *     &lt;enumeration value="number_poles"/>
+ *     &lt;enumeration value="pinion_gear"/>
+ *     &lt;enumeration value="main_gear"/>
+ *     &lt;enumeration value="status_fields"/>
+ *     &lt;enumeration value="time_info"/>
+ *     &lt;enumeration value="minimum_transition_steps"/>
  *     &lt;enumeration value="none_specified"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -48,6 +56,8 @@ public enum ChannelPropertyTypes {
     STATUS_FIELDS("status_fields"),
     @XmlEnumValue("time_info")
     TIME_INFO("time_info"),
+    @XmlEnumValue("minimum_transition_steps")
+    MINIMUM_TRANSITION_STEPS("minimum_transition_steps"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;

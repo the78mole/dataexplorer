@@ -376,6 +376,7 @@
 		<xs:attribute name="sum" type="xs:boolean" use="required" />
 		<xs:attribute name="first" type="xs:boolean" use="required" />
 		<xs:attribute name="last" type="xs:boolean" use="required" />
+		<xs:attribute name="count" type="xs:boolean" use="required" />
 		<xs:attribute name="comment" type="xs:string">
 			<xs:annotation>
                 <xs:documentation>comment for documentation purposes</xs:documentation>
@@ -451,93 +452,70 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="peak" type="xs:boolean" use="required">
+		<xs:attribute name="classType" type="transition_class_types" use="required">
 			<xs:annotation>
 				<xs:documentation>
-					true means the trigger fires if the threshold level is exceeded within
-					the
+					peak means the trigger fires if the threshold level is exceeded within the
 					threshold time AND the recovery level is reached within the
-					recovery time which starts after the
-					threshold time.
-					false means the trigger fires if the threshold level is exceeded within
-					the
-					threshold time
+					recovery time which starts after the threshold time.
+					pulse means the trigger is ON if the threshold level is exceeded for all measurement values in the 
+					threshold time and if there is a recovery period where the measurement values comply to the recovery level and time.
+					level means that the trigger fires whenever the threshold level is exceeded for all measurement values in the threshold time.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="greater" type="xs:boolean" use="required">
+		<xs:attribute name="valueType" type="transition_value_types" use="required">
 			<xs:annotation>
-				<xs:documentation>true means the trigger fires at increasing values
+				<xs:documentation>related to the threshold and recovery level values.
+				'absoluteLevel' means that the levels are taken from the thresholdValue and the recoveryValue.
+				'deltaValue' and 'deltaFactor' mean that the levels are calculated based on the reference level
+				(e.g. thresholdLevel = referenceLevel + thresholdValue 
+				or thresholdLevel = referenceLevel + thresholdValue * referenceLevel ).
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="percent" type="xs:boolean" use="required">
+		<xs:attribute name="thresholdValue" type="xs:double" use="required">
 			<xs:annotation>
-				<xs:documentation>true means the trigger levels are relative levels
-					based on the reference level.
+				<xs:documentation>value for the threshold level which must be exceeded for all measurements in the threshold time.
+				basis for the comparison are the measurement values in the reference time.
+				(absolute in measurement units or relative in percent)
+				a level trigger fires if all the threshold values comply with this delta.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="triggerLevel" type="xs:int" use="required">
+		<xs:attribute name="recoveryValue" type="xs:double">
 			<xs:annotation>
-				<xs:documentation>value which fires the trigger (absolute in units
-					of the refOrdinal measurement
-					or relative in percent based on the
-					values in the reference time.)
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="recoveryLevel" type="xs:int" use="required">
-			<xs:annotation>
-				<xs:documentation>hysteresis value for trigger off (10% means:
-					trigger is switched off if the
-					value recovers to a delta of 10%
-					compared to the maximum / minimum value which fired the
-					trigger)
+				<xs:documentation>value for the peak recovery level which must be exceeded for all measurements in the recovery time.
+				basis for the comparison are the measurement values in the reference time.
+				a peak trigger fires if the threshold is correct and if the recovery values comply with this delta.
+				(10% means: all recovery measurement values have to exceed the reference values by at least 10%)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="referenceTimeMsec" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>time length in seconds for finding the maximum /
-					minimum reference value. The
-					end of the reference time is the last
+					minimum reference value. The end of the reference time is the last
 					time step before the trigger fired.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="thresholdTimeMsec" type="xs:int" use="required">
 			<xs:annotation>
-				<xs:documentation>time length in seconds of trigger range for
-					finding the maximum / minimum
+				<xs:documentation>time length in seconds of trigger range for finding the maximum / minimum
 					threshold value.
-					Level: if the threshold does not conform perfectly to the threshold level
-					and
+					Level: if the threshold does not conform perfectly to the threshold level and
 					time minimum, the trigger is cancelled.
-					once the threshold is triggered, the recovery time
-					starts if the
-					recovery level is constantly exceeded and does NOT depend on the
+					Peak: once the threshold value is exceeded, the recovery time starts after the end of
+					the threshold time or if the recovery level is constantly exceeded during the rest of the
 					threshold time.
-					Peak: if the threshold does not conform perfectly to the threshold level
-					and time minimum, the
-					trigger continues.
-					once the threshold is triggered, the recovery time starts after the end
-					of the
-					threshold time or if the recovery level is constantly
-					exceeded during the rest of the threshold
-					time.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="recoveryTimeMsec" type="xs:int" use="required">
+		<xs:attribute name="recoveryTimeMsec" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>time length in seconds for finding the maximum /
-					minimum hysteresis value.
-					Level: if recovery does not conform perfectly to the recovery level and
-					time minimum, the
-					trigger continues.
-					Peak: if recovery does not conform perfectly to the recovery level and
-					time
+				<xs:documentation>time length in seconds for finding the maximum / minimum hysteresis value.
+					applicable for peaks only: if the recovery does not conform perfectly to the recovery level and time
 					minimum, the trigger is cancelled.
 				</xs:documentation>
 			</xs:annotation>
@@ -551,55 +529,45 @@
 	<xs:complexType name="CalculationType">
 		<xs:attribute name="transitionId" type="xs:int" use="required">
 			<xs:annotation>
-				<xs:documentation>Specifies which transition triggers this
-					calculation
+				<xs:documentation>Specifies which transition triggers this calculation
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="calcType" type="calculation_types" use="required">
 		</xs:attribute>
-		<xs:attribute name="unsigned" type="xs:boolean" use="required">
+		<xs:attribute name="unsigned" type="xs:boolean">
 			<xs:annotation>
 				<xs:documentation>take absolute values</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="refOrdinal" type="xs:int" use="required">
+		<xs:attribute name="refOrdinal" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>first operand (measurement) for the calculation
-					based on threshold values
+				<xs:documentation>first operand (measurement) for the calculation based on threshold values
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="leveling" type="leveling_types">
 			<xs:annotation>
-				<xs:documentation>procedure how to determine the first operand
-					(measurement) during the threshold
-					period (peak triggers only)
+				<xs:documentation>procedure how to determine the first operand (refOrdinal measurement) value
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="refOrdinalDivisor" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>second operand (measurement) for the calculation
-					based on recovery values
+				<xs:documentation>second operand (measurement) for the calculation based on recovery values
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="divisorLeveling" type="leveling_types">
 			<xs:annotation>
-				<xs:documentation>procedure how to determine the second operand
-					(measurement) during the recovery
-					period (peak triggers only)
+				<xs:documentation>procedure how to determine the second operand (refOrdinal measurement) value
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="basedOnRecovery" type="xs:boolean">
+		<xs:attribute name="deltaBasis" type="delta_basis_types">
 			<xs:annotation>
-				<xs:documentation>delta values are calculated based on recovery
-					period values (peak triggers
-					only). if false the base is the
-					reference period. if missing the base are reference period and
-					recovery period.
+				<xs:documentation>delta values are calculated based on the recovery period and / or recovery period values.
+				default is 'reference'.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -661,6 +629,15 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="dot" />
 			<xs:enumeration value="comma" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="delta_basis_types">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="reference" />
+			<xs:enumeration value="recovery" />
+			<xs:enumeration value="bothAvg" />
+			<xs:enumeration value="inner" />
+			<xs:enumeration value="outer" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="device_types">
@@ -800,6 +777,7 @@
 			<xs:enumeration value="main_gear" />
 			<xs:enumeration value="status_fields" />
 			<xs:enumeration value="time_info" />
+			<xs:enumeration value="minimum_transition_steps" />
 			<xs:enumeration value="none_specified" />
 		</xs:restriction>
 	</xs:simpleType>
@@ -826,7 +804,7 @@
 			<xs:enumeration value="avg" />
 			<xs:enumeration value="sigma" />
 			<xs:enumeration value="sum" />
-			<xs:enumeration value="timeSum_ms" />
+			<xs:enumeration value="timeSum_sec" />
 			<xs:enumeration value="count" />
 			<xs:enumeration value="ratio" />
 			<xs:enumeration value="ratioInverse" />
@@ -840,6 +818,8 @@
 			<xs:enumeration value="min" />
 			<xs:enumeration value="max" />
 			<xs:enumeration value="avg" />
+			<xs:enumeration value="qbottom" />
+			<xs:enumeration value="qtop" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="score_label_types">
@@ -871,6 +851,21 @@
 			<xs:enumeration value="logFileBytes" />
 			<xs:enumeration value="logFileRecordSets" />
 			<xs:enumeration value="elapsedHistoRecordSet_ms" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transition_class_types">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="slope" />
+			<xs:enumeration value="pulse" />
+			<xs:enumeration value="peak" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transition_value_types">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="lowerThreshold" />
+			<xs:enumeration value="upperThreshold" />
+			<xs:enumeration value="deltaValue" />
+			<xs:enumeration value="deltaFactor" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

@@ -13,6 +13,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import gde.GDE;
+
 
 /**
  * <p>Java class for EvaluationType complex type.
@@ -33,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="sum" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="first" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="last" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="count" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -62,6 +65,8 @@ public class EvaluationType {
     protected boolean first;
     @XmlAttribute(required = true)
     protected boolean last;
+    @XmlAttribute(required = true)
+    protected boolean count;
     @XmlAttribute
     protected String comment;
 
@@ -202,6 +207,22 @@ public class EvaluationType {
     }
 
     /**
+     * Gets the value of the count property.
+     * 
+     */
+    public boolean isCount() {
+        return count;
+    }
+
+    /**
+     * Sets the value of the count property.
+     * 
+     */
+    public void setCount(boolean value) {
+        this.count = value;
+    }
+
+    /**
      * Gets the value of the comment property.
      * 
      * @return
@@ -224,5 +245,15 @@ public class EvaluationType {
     public void setComment(String value) {
         this.comment = value;
     }
+
+  	@Override
+  	public String toString() {
+  		StringBuilder sb = new StringBuilder();
+  		sb.append("max=").append(this.isMax()).append(GDE.STRING_COMMA_BLANK).append("min=").append(this.isMin()).append(GDE.STRING_COMMA_BLANK);
+  		sb.append("avg=").append(this.isAvg()).append(GDE.STRING_COMMA_BLANK).append("sigma=").append(this.isSigma()).append(GDE.STRING_COMMA_BLANK);
+  		sb.append("sum=").append(this.isSum()).append(GDE.STRING_COMMA_BLANK).append("count=").append(this.isCount()).append(GDE.STRING_COMMA_BLANK);
+  		sb.append("first=").append(this.isFirst()).append(GDE.STRING_COMMA_BLANK).append("last=").append(this.isLast()).append(GDE.STRING_COMMA_BLANK);
+  		return sb.toString();
+  	}
 
 }

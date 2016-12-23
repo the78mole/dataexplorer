@@ -161,6 +161,10 @@ public class Settings extends Properties {
 	final static String							SKIP_FILES_WITH_OTHER_OBJECT		= "skip_files_with_other_object";																																	//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
 	final static String							IS_ZIPPED_CACHE									= "zipped_cache";																																									//$NON-NLS-1$
+	final static String							REFERENCE_QUANTILE_DISTANCE			= "reference_quantile_distance";																																	//$NON-NLS-1$
+	final static String							ABSOLUTE_TRANSITION_LEVEL				= "absolute_transition_level";																																		//$NON-NLS-1$
+	final static String							TRANSITION_QUANTILE_RANGE				= "transition_quantile_range";																																		//$NON-NLS-1$
+	final static String							IS_DATETIME_UTC									= "is_datetime_utc";																																							//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -722,6 +726,10 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITHOUT_OBJECT, skipFilesWithoutObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_FILES_WITH_OTHER_OBJECT, skipFilesWithOtherObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REFERENCE_QUANTILE_DISTANCE, getReferenceQuantileDistance())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ABSOLUTE_TRANSITION_LEVEL, getAbsoluteTransitionLevel())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.TRANSITION_QUANTILE_RANGE, getTransitionQuantileRange())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATETIME_UTC, isDateTimeUtc())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -801,7 +809,7 @@ public class Settings extends Properties {
 	/**
 	 * @return standard data directory path with trailing device and / or object stripped off
 	 */
-	@Deprecated 
+	@Deprecated
 	public Path getDataBaseDir() {
 		Path path = null;
 		String tmpDataDirPath = getDataFilePath();
@@ -825,8 +833,7 @@ public class Settings extends Properties {
 	public Set<String> getObjectKeyCandidates() {
 		Set<String> result = new HashSet<String>();
 		TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-		Path tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir()
-				: null;
+		Path tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir() : null;
 		ArrayList<Path> dirPaths = new ArrayList<Path>();
 		dirPaths.add(Paths.get(getDataFilePath()));
 		if (getSearchImportPath() && tmpImportDirPath != null) dirPaths.add(tmpImportDirPath);
@@ -2495,9 +2502,9 @@ public class Settings extends Properties {
 		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true"));
 	}
 
-		/**
-	 * @param isActive true if files from the device import directory are read for the history 
-	 */
+	/**
+	* @param isActive true if files from the device import directory are read for the history 
+	*/
 	public void setSearchImportPath(boolean isActive) {
 		this.setProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(isActive));
 	}
@@ -2640,6 +2647,92 @@ public class Settings extends Properties {
 	 */
 	public void setZippedCache(boolean value) {
 		this.setProperty(Settings.IS_ZIPPED_CACHE, String.valueOf(value));
+	}
+
+	/**
+	 * @return the distance value used in quantile calculations for settlements based on transitions
+	 */
+	public double getReferenceQuantileDistance() {
+		return Double.valueOf(this.getProperty(Settings.REFERENCE_QUANTILE_DISTANCE, ".1")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param doubleValue is the distance value used in quantile calculations for settlements based on transitions
+	 */
+	public void setReferenceQuantileDistance(String doubleValue) {
+		try {
+			double value = Double.parseDouble(doubleValue.trim());
+			if (value > 1 || value < 0) value = .1;
+			this.setProperty(Settings.REFERENCE_QUANTILE_DISTANCE, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+	
+	/**
+	 * small values select transitions with a smaller amplitude. values close to 1 only select peaks with an amplitude close to the min-max distance.
+	 * @return the factor for the calculation of the minimum absolute transition level required for firing the trigger
+	 */
+	public double getAbsoluteTransitionLevel() {
+		return Double.valueOf(this.getProperty(Settings.ABSOLUTE_TRANSITION_LEVEL, ".5")); //$NON-NLS-1$
+	}
+
+	/**
+	 * small values select peaks with a smaller amplitude. values close to 1 only select peaks with an amplitude close to the min-max distance.
+	 * @param doubleValue is the factor for the calculation of the minimum absolute transition level required for firing the trigger 
+	 */
+	public void setAbsoluteTransitionLevel(String doubleValue) {
+		try {
+			double value = Double.parseDouble(doubleValue.trim());
+			if (value >= 1 || value <= 0) value = .5;
+			this.setProperty(Settings.ABSOLUTE_TRANSITION_LEVEL, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * defines a minimum absolute transition delta value for deltaFactor transitions.
+	 * small values select peaks with a smaller amplitude. values close to 1 only select peaks with an amplitude close to the min-max distance.
+	 * Example based on a transition quantile range (qr) of 0.6:
+	 * record = [20, 10, 30, 40, 50, 60, 60, 50, 40, 30, 20, 10]
+	 * From the tqr we calculate the quantile cut off values: q_20% and q_80% enclose an iqr of 0.6
+	 * From the sorted record we get the quantile values: q_20%=20, q_80%=50
+	 * The absolute delta limit (adl) is the distance between the quantile values: adl = q_80% - q_20% = 50 - 20 = 30
+	 * Consequently we will only accept transitions with a delta value of at least 30 which for example is the transition from record[1]=20 to record[5]=60
+	 * This example also denotes the influence of the reference time, threshold time and the reference quantile distance (rqd).
+	 * @return the quantile range for the calculation of the minimum absolute transition level required for firing the trigger
+	 */
+	public double getTransitionQuantileRange() {
+		return Double.valueOf(this.getProperty(Settings.TRANSITION_QUANTILE_RANGE, ".5")); //$NON-NLS-1$
+	}
+
+	/**
+	 * small values select peaks with a smaller amplitude. values close to 1 only select peaks with an amplitude close to the min-max distance.
+	 * @param doubleValue is the quantile range for the calculation of the minimum absolute transition level required for firing the trigger 
+	 */
+	public void setTransitionQuantileRange(String doubleValue) {
+		try {
+			double value = Double.parseDouble(doubleValue.trim());
+			if (value >= 1 || value <= 0) value = .5;
+			this.setProperty(Settings.TRANSITION_QUANTILE_RANGE, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @param isUtc true if the date and time values output are formatted in UTC
+	 */
+	public void setDateTimeUtc(boolean isUtc) {
+		this.setProperty(Settings.IS_DATETIME_UTC, String.valueOf(isUtc));
+	}
+
+	/**
+	 * @return true if the date and time values output are formatted in UTC
+	 */
+	public boolean isDateTimeUtc() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DATETIME_UTC, "false")); //$NON-NLS-1$
 	}
 
 }

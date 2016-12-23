@@ -66,7 +66,7 @@ public class Entries {
 	 * <p>
 	 * For example, to add a new item, do as follows:
 	 * <pre>
-	 *    getEntryPoints().add(newItem);
+	 *    getEntries().add(newItem);
 	 * </pre>
 	 * 
 	 * 
@@ -76,7 +76,7 @@ public class Entries {
 	 * 
 	 * 
 	 */
-	public List<EntryPoints> getEntryPoints() {
+	public List<EntryPoints> getEntries() {
 		if (entryPoints == null) {
 			entryPoints = new ArrayList<EntryPoints>();
 		}

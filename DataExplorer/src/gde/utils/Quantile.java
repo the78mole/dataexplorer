@@ -22,6 +22,7 @@ import gde.log.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -58,7 +59,7 @@ public class Quantile {
 	 * @param currentRecord
 	 * @param fixings defines how to proceed with the data
 	 */
-	public Quantile(Vector<Integer> population, EnumSet<Fixings> fixings) {
+	public Quantile(Collection<Integer> population, EnumSet<Fixings> fixings) {
 		this.population = new ArrayList<>(population);
 		this.fixings = fixings;
 		if (fixings.contains(Fixings.REMOVE_NULLS) && fixings.contains(Fixings.REMOVE_ZEROS)) {

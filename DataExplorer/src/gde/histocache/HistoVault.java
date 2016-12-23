@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
@@ -138,27 +139,29 @@ import gde.utils.Quantile.Fixings;
 		"vaultSamplingTimespanMs", "logFilePath", "logFileLastModified", "logFileLength", "logObjectDirectory", "logFileVersion", "logRecordSetSize", "logRecordSetOrdinal", "logRecordsetBaseName",
 		"logDeviceName", "logChannelNumber", "logObjectKey", "logStartTimestampMs", "measurements", "settlements", "scores" })
 public class HistoVault {
-	final private static String	$CLASS_NAME					= HistoVault.class.getName();
-	final private static Logger	log									= Logger.getLogger($CLASS_NAME);
+	final private static String	$CLASS_NAME									= HistoVault.class.getName();
+	final private static Logger	log													= Logger.getLogger($CLASS_NAME);
 
-	private static Path					activeDevicePath;																					// criterion for the active device version key cache
-	private static String				activeDeviceKey;																					// caches the version key for the active device which is calculated only if the device is changed by the user
-	private static long					activeDeviceLastModified_ms;															// caches the version key for the active device which is calculated only if the device is changed by the user
+	private final static int		INITIAL_SETTLEMENT_CAPACITY	= 5;
+
+	private static Path					activeDevicePath;																									// criterion for the active device version key cache
+	private static String				activeDeviceKey;																									// caches the version key for the active device which is calculated only if the device is changed by the user
+	private static long					activeDeviceLastModified_ms;																			// caches the version key for the active device which is calculated only if the device is changed by the user
 	private static JAXBContext	jaxbContext;
 	private static Unmarshaller	jaxbUnmarshaller;
 	private static Marshaller		jaxbMarshaller;
 
 	@XmlTransient
-	private final DataExplorer	application					= DataExplorer.getInstance();
+	private final DataExplorer	application									= DataExplorer.getInstance();
 	@XmlTransient
-	private final Settings			settings						= Settings.getInstance();
+	private final Settings			settings										= Settings.getInstance();
 	@XmlTransient
-	private final IDevice				device							= this.application.getActiveDevice();
+	private final IDevice				device											= this.application.getActiveDevice();
 
 	@XmlTransient
-	private int									warnedMeasurementID	= Integer.MAX_VALUE;
+	private int									warnedMeasurementID					= Integer.MAX_VALUE;
 	@XmlTransient
-	private int									warnedSettlementID	= Integer.MAX_VALUE;
+	private int									warnedSettlementID					= Integer.MAX_VALUE;
 
 	@XmlElement(required = true)
 	protected String						vaultName;
@@ -414,78 +417,6 @@ public class HistoVault {
 		return logStartTimestampMs;
 	}
 
-	/**
-	* Gets the value of the measurements property.
-	* 
-	* @return
-	*     possible object is
-	*     {@link Entries }
-	*     
-	*/
-	public Entries getMeasurements() {
-		return measurements;
-	}
-
-	/**
-	 * Sets the value of the measurements property.
-	 * 
-	 * @param value
-	 *     allowed object is
-	 *     {@link Entries }
-	 *     
-	 */
-	public void setMeasurements(Entries value) {
-		this.measurements = value;
-	}
-
-	/**
-	 * Gets the value of the settlements property.
-	 * 
-	 * @return
-	 *     possible object is
-	 *     {@link Entries }
-	 *     
-	 */
-	public Entries getSettlements() {
-		return settlements;
-	}
-
-	/**
-	 * Sets the value of the settlements property.
-	 * 
-	 * @param value
-	 *     allowed object is
-	 *     {@link Entries }
-	 *     
-	 */
-	public void setSettlements(Entries value) {
-		this.settlements = value;
-	}
-
-	/**
-	   * Gets the value of the scores property.
-	 * 
-	 * @return
-	 *     possible object is
-	 *     {@link EntryPoints }
-	 *     
-	 */
-	public EntryPoints getScores() {
-		return scores;
-	}
-
-	/**
-	   * Sets the value of the scores property.
-	 * 
-	 * @param value
-	 *     allowed object is
-	 *     {@link EntryPoints }
-	 *     
-	 */
-	public void setScores(EntryPoints value) {
-		this.scores = value;
-	}
-
 	@Deprecated // for marshalling purposes only
 	public HistoVault() {
 	}
@@ -551,9 +482,9 @@ public class HistoVault {
 			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
 		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName,
 				logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey);
-		newHistoVault.setMeasurements(new Entries());
-		newHistoVault.setSettlements(new Entries());
-		newHistoVault.setScores(new EntryPoints(0, "truss"));
+		newHistoVault.measurements = new Entries();
+		newHistoVault.settlements = new Entries();
+		newHistoVault.scores = new EntryPoints(0, "truss");
 		return newHistoVault;
 	}
 
@@ -566,12 +497,8 @@ public class HistoVault {
 	 * @return new instance with a basic set of data
 	 */
 	public static HistoVault createTruss(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName) {
-		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(),
-				DataExplorer.getInstance().getActiveChannelNumber(), objectDirectory);
-		newHistoVault.setMeasurements(new Entries());
-		newHistoVault.setSettlements(new Entries());
-		newHistoVault.setScores(new EntryPoints(0, "truss"));
-		return newHistoVault;
+		return createTruss(objectDirectory, file, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(), DataExplorer.getInstance().getActiveChannelNumber(),
+				objectDirectory);
 	}
 
 	/**
@@ -830,12 +757,10 @@ public class HistoVault {
 			this.logStartTimestampMs = recordSet.getStartTimeStamp();
 			{
 				List<MeasurementType> channelMeasurements = this.device.getChannelMeasuremts(this.getLogChannelNumber());
-				this.measurements = new Entries();
-
 				for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 					MeasurementType measurementType = channelMeasurements.get(i);
 					EntryPoints entryPoints = new EntryPoints(i, measurementType.getName());
-					this.measurements.getEntryPoints().add(entryPoints);
+					this.measurements.getEntries().add(entryPoints);
 
 					Record record = recordSet.get(recordSet.getRecordNames()[i]);
 					if (record == null) {
@@ -942,57 +867,59 @@ public class HistoVault {
 				{ // todo not tested
 					LinkedHashMap<String, HistoSettlement> histoSettlements = new LinkedHashMap<String, HistoSettlement>();
 					ChannelType channelType = this.device.getDeviceConfiguration().getChannel(this.logChannelNumber);
-					HistoTransitions transitions = new HistoTransitions(this.device, recordSet);
+					HistoTransitions transitions = new HistoTransitions(this.device, recordSet, channelType.getTransition().size());
 					for (TransitionType transitionType : channelType.getTransition()) {
 						transitions.addFromRecord(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
 					}
 					if (transitions.size() == 0) { // todo implement evaluations w/o transitions
 					}
 					else {
-						int initialSettlementCapacity = 22;
 						for (SettlementType settlementType : channelType.getSettlement()) {
 							if (settlementType.getEvaluation() != null) {
-								HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, recordSet, initialSettlementCapacity);
+								HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, recordSet, INITIAL_SETTLEMENT_CAPACITY);
 								histoSettlements.put(settlementType.getName(), histoSettlement);
-								Integer transitionId = settlementType.getEvaluation().getCalculation().getTransitionId(); // todo decide if evaluations without calculation are useful
-								histoSettlement.clear();
-								histoSettlement.addFromTransitions(transitions, channelType.getTransitionById(transitionId));
+								if (settlementType.getEvaluation().getCalculation() != null) { // todo decide if evaluations without calculation are useful
+									Integer transitionId = settlementType.getEvaluation().getCalculation().getTransitionId(); 
+									histoSettlement.addFromTransitions(transitions, channelType.getTransitionById(transitionId));
+								}
 							}
 						}
 					}
-					this.settlements = new Entries();
-					List<SettlementType> channelSettlements = this.device.getDeviceConfiguration().getChannelSettlements(this.logChannelNumber);
+					//					List<SettlementType> channelSettlements = this.device.getDeviceConfiguration().getChannelSettlements(this.logChannelNumber);
 					//		HashMap<Integer, Integer[]> settlementsPoints = new HashMap<Integer, Integer[]>(channelSettlements.size());
-					for (int i = 0; i < channelSettlements.size(); i++) {
-						SettlementType settlementType = channelSettlements.get(i);
+					for (Entry<String, HistoSettlement> entry : histoSettlements.entrySet()) {
+						HistoSettlement histoSettlement = entry.getValue();
+						SettlementType settlementType = histoSettlement.getSettlement();
 						//			Integer[] trailTypePoints = new Integer[TrailType.getPrimitives().size()];
 						//			settlementsPoints.put(settlementType.getSettlementId(), trailTypePoints);
-						EntryPoints entryPoints = new EntryPoints(i, settlementType.getName());
-						this.settlements.getEntryPoints().add(entryPoints);
+						EntryPoints entryPoints = new EntryPoints(settlementType.getSettlementId(), settlementType.getName());
+						this.settlements.getEntries().add(entryPoints);
 
-						HistoSettlement record = histoSettlements.get(settlementType.getName());
-						if (record.size() > 0 && settlementType.getEvaluation() != null) {
+						if (histoSettlement.size() > 0 && settlementType.getEvaluation() != null) {
 							EvaluationType settlementEvaluations = settlementType.getEvaluation();
-							if (record.hasReasonableData()) {
-								if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), record.getAvgValue());
-								if (settlementEvaluations.isMax()) entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), record.getMaxValue());
-								if (settlementEvaluations.isMin()) entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), record.getMinValue());
-								if (settlementEvaluations.isSigma()) entryPoints.addPoint(TrailType.REAL_SD.ordinal(), TrailType.REAL_SD.name(), record.getSigmaValue());
-								if (settlementEvaluations.isSum()) entryPoints.addPoint(TrailType.REAL_SUM.ordinal(), TrailType.REAL_SUM.name(), record.getSumValue());
+							if (histoSettlement.hasReasonableData()) {
+								if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), histoSettlement.getAvgValue());
+								if (settlementEvaluations.isMax()) entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), histoSettlement.getRealMaxValue());
+								if (settlementEvaluations.isMin()) entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), histoSettlement.getRealMinValue());
+								if (settlementEvaluations.isSigma()) entryPoints.addPoint(TrailType.REAL_SD.ordinal(), TrailType.REAL_SD.name(), histoSettlement.getSigmaValue());
+								if (settlementEvaluations.isSum()) entryPoints.addPoint(TrailType.REAL_SUM.ordinal(), TrailType.REAL_SUM.name(), histoSettlement.getSumValue());
+								if (settlementEvaluations.isFirst()) entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), histoSettlement.getFirst());
+								if (settlementEvaluations.isLast()) entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), histoSettlement.getLast());
+								if (settlementEvaluations.isCount()) entryPoints.addPoint(TrailType.REAL_COUNT.ordinal(), TrailType.REAL_COUNT.name(), histoSettlement.getCountValue() * 1000);
 							}
 							else {
 								// these trail types might act as default trails
 								for (TrailType trailType : TrailType.getSubstitutes()) {
 									if (trailType == TrailType.REAL_FIRST)
-										entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.realRealGet(0));
+										entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), histoSettlement.getFirst());
 									else if (trailType == TrailType.REAL_LAST)
-										entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.realRealGet(record.size() - 1));
+										entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), histoSettlement.getLast());
 									else
-										throw new UnsupportedOperationException(record.getName());
+										throw new UnsupportedOperationException(histoSettlement.getName());
 								}
 							}
 						}
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data " + this.settlements.toString()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, histoSettlement.getName() + " data " + this.settlements.toString()); //$NON-NLS-1$
 					}
 					{
 						// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
@@ -1020,8 +947,8 @@ public class HistoVault {
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
 	 * @return null in case of unavailable measurement
 	 */
-	public List<Point> getMeasurements(int measurementOrdinal) {
-		if (this.measurements.getEntryPoints().size() < measurementOrdinal) {
+	public List<Point> getMeasurementPoints(int measurementOrdinal) {
+		if (this.measurements.getEntries().size() < measurementOrdinal) {
 			if (this.warnedMeasurementID != measurementOrdinal) {
 				this.warnedMeasurementID = measurementOrdinal;
 				log.log(Level.WARNING, String.format("measurement does not exist for measurementOrdinal=%d %s", measurementOrdinal, this.logFilePath)); //$NON-NLS-1$ }
@@ -1029,10 +956,10 @@ public class HistoVault {
 			return null;
 		}
 		else {
-			if (this.measurements.getEntryPoints().get(measurementOrdinal).getId() != measurementOrdinal) {
+			if (this.measurements.getEntries().get(measurementOrdinal).getId() != measurementOrdinal) {
 				throw new RuntimeException("measurementOrdinal sequence or numbering mismatch"); //$NON-NLS-1$
 			}
-			return this.measurements.getEntryPoints().get(measurementOrdinal).getPoints();
+			return this.measurements.getEntries().get(measurementOrdinal).getPoints();
 		}
 	}
 
@@ -1042,68 +969,67 @@ public class HistoVault {
 	 * @param trailOrdinal
 	 * @return null in case of unavailable measurement
 	 */
-	public Integer getMeasurement(int measurementOrdinal, int trailTextSelectedIndex, int trailOrdinal) { // todo handle xml null values for points
+	public Integer getMeasurementPoint(int measurementOrdinal, int trailTextSelectedIndex, int trailOrdinal) { // todo handle xml null values for points
 		Integer point = null;
-		if (measurementOrdinal >= this.measurements.getEntryPoints().size()) {
-			if (this.warnedMeasurementID <= measurementOrdinal) {
-				this.warnedMeasurementID = measurementOrdinal;
-				log.log(Level.WARNING, String.format("measurement does not exist for measurementOrdinal=%d %s", measurementOrdinal, this.logFilePath)); //$NON-NLS-1$ }
-			}
-		}
-		else {
-			if (this.measurements.getEntryPoints().get(measurementOrdinal).getId() != measurementOrdinal) {
-				throw new RuntimeException("measurementOrdinal sequence or numbering mismatch"); //$NON-NLS-1$
-			}
-			if (this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().size() != 0) {
-				if (trailTextSelectedIndex > this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().size()) //
-					throw new UnsupportedOperationException();
-				if (this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().get(trailTextSelectedIndex).getId() != trailOrdinal) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", measurementOrdinal, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
-					for (Point tmpPoint : this.measurements.getEntryPoints().get(measurementOrdinal).getPoints()) {
-						if (tmpPoint.getId() == trailOrdinal) {
-							point = tmpPoint.getValue();
-						}
+		List<Point> measurementPoints = getMeasurementPoints(measurementOrdinal);
+		if (measurementPoints != null && !measurementPoints.isEmpty()) {
+			if (trailTextSelectedIndex > measurementPoints.size()) //
+				throw new UnsupportedOperationException();
+			if (measurementPoints.get(trailTextSelectedIndex).getId() != trailOrdinal) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", measurementOrdinal, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
+				for (Point tmpPoint : measurementPoints) {
+					if (tmpPoint.getId() == trailOrdinal) {
+						point = tmpPoint.getValue();
 					}
 				}
-				else
-					point = this.measurements.getEntryPoints().get(measurementOrdinal).getPoints().get(trailTextSelectedIndex).getValue();
 			}
+			else
+				point = measurementPoints.get(trailTextSelectedIndex).getValue();
 		}
 		return point;
 	}
 
-	public List<Point> getSettlements(int settlementId) {
-		if (this.settlements.getEntryPoints().get(settlementId).getId() != settlementId) {
-			throw new RuntimeException("settlementId sequence or numbering mismatch"); //$NON-NLS-1$
-		}
-		return this.settlements.getEntryPoints().get(settlementId).getPoints();
-	}
-
-	public Integer getSettlement(int settlementId, int trailTextSelectedIndex, int trailOrdinal) {
-		Integer point = null;
-		if (settlementId >= this.measurements.getEntryPoints().size()) {
+	/**
+	 * @param settlementId may specify an id which is not present in the vault (settlement did not provide values)
+	 * @return null in case of unavailable settlement
+	 */
+	public List<Point> getSettlementPoints(int settlementId) {
+		if (settlementId >= this.settlements.getEntries().size()) {
 			if (this.warnedSettlementID <= settlementId) {
 				this.warnedSettlementID = settlementId;
-				log.log(Level.WARNING, String.format("measurement does not exist for measurementOrdinal=%d %s", settlementId, this.logFilePath)); //$NON-NLS-1$ }
+				log.log(Level.WARNING, String.format("settlement does not exist for settlementId=%d %s", settlementId, this.logFilePath)); //$NON-NLS-1$ }
 			}
+			return null;
 		}
 		else {
-			if (this.settlements.getEntryPoints().get(settlementId).getId() != settlementId) {
+			if (this.settlements.getEntries().get(settlementId).getId() != settlementId) {
 				throw new RuntimeException("settlementId sequence or numbering mismatch"); //$NON-NLS-1$
 			}
-			if (this.settlements.getEntryPoints().get(settlementId).getPoints().size() != 0) {
-				if (trailTextSelectedIndex >= this.settlements.getEntryPoints().get(settlementId).getPoints().size()) //
-					throw new UnsupportedOperationException();
-				if (this.settlements.getEntryPoints().get(settlementId).getPoints().get(trailTextSelectedIndex).getId() != trailOrdinal) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", settlementId, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
-					for (Point tmpPoint : this.settlements.getEntryPoints().get(settlementId).getPoints()) {
-						if (tmpPoint.getId() == trailOrdinal) {
-							point = tmpPoint.getValue();
-						}
+			return this.settlements.getEntries().get(settlementId).getPoints();
+		}
+	}
+
+	/**
+	 * @param settlementId may specify an id which is not present in the vault (settlement did not provide values)
+	 * @param trailTextSelectedIndex
+	 * @param trailOrdinal
+	 * @return null in case of unavailable settlement
+	 */
+	public Integer getSettlementPoint(int settlementId, int trailTextSelectedIndex, int trailOrdinal) {
+		Integer point = null;
+		List<Point> settlementPoints = getSettlementPoints(settlementId);
+		if (settlementPoints != null && !settlementPoints.isEmpty()) {
+			if (trailTextSelectedIndex >= settlementPoints.size()) //
+				throw new UnsupportedOperationException();
+			if (settlementPoints.get(trailTextSelectedIndex).getId() != trailOrdinal) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", settlementId, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
+				for (Point tmpPoint : settlementPoints) {
+					if (tmpPoint.getId() == trailOrdinal) {
+						point = tmpPoint.getValue();
 					}
 				}
-				point = this.settlements.getEntryPoints().get(settlementId).getPoints().get(trailTextSelectedIndex).getValue();
 			}
+			point = settlementPoints.get(trailTextSelectedIndex).getValue();
 		}
 		return point;
 	}
@@ -1112,6 +1038,10 @@ public class HistoVault {
 		return this.scores.getPoints();
 	}
 
+	/**
+	 * @param scoreLabelOrdinal may specify an id which is not present in the vault (settlement did not provide values)
+	 * @return null in case of unavailable score
+	 */
 	public Integer getScorePoint(int scoreLabelOrdinal) {
 		Integer point = null;
 		if (this.scores.getPoints() != null) {

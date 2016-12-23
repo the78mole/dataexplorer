@@ -60,10 +60,11 @@ public interface IHistoDevice { //todo merging with IDevice later
 
 	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param channelNumber is the log channel number which may differ in case of channel mix
 	 * @param maxPoints maximum values from the data buffer which are verified during sampling
 	 * @param minPoints minimum values from the data buffer which are verified during sampling
 	 * @throws DataInconsitsentException 
 	 */
-	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
+	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
 
 }

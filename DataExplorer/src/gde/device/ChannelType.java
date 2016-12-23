@@ -121,6 +121,21 @@ public class ChannelType {
         return this.settlement;
     }
 
+  	/**
+  	 * @param settlementId
+  	 * @return the value of the settlement property
+  	 */
+  	public SettlementType getSettlementById(int settlementId) {
+  		SettlementType result = null;
+  		for (SettlementType settlementType : this.settlement) {
+  			if (settlementType.getSettlementId() == settlementId) {
+  				result = settlementType;
+  				break;
+  			}
+  		}
+  		return result;
+  	}
+
     /**
      * Gets the value of the transition property.
      * 
@@ -151,7 +166,8 @@ public class ChannelType {
     }
 
   	/**
-  	 * Get the value of the transition property.
+  	 * @param transitionId
+  	 * @return the value of the transition property
   	 */
   	public TransitionType getTransitionById(int transitionId) {
   		TransitionType result = null;

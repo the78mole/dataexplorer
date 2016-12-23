@@ -198,7 +198,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 								minPoints[index] = Integer.parseInt(recordProperties.get(Record.MIN_VALUE).trim());
 							}
 						}
-						((IHistoDevice) histoRecordSet.getDevice()).setSampling(maxPoints, minPoints);
+						((IHistoDevice) histoRecordSet.getDevice()).setSampling(recordSetTrusses.get(i).getLogChannelNumber(), maxPoints, minPoints);
 					}
 					histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
 

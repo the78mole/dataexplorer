@@ -60,6 +60,7 @@ import gde.device.IDevice;
 import gde.device.IHistoDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
+import gde.device.TransitionType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -835,7 +836,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				recordSet.addPoints(points,
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 			}
-			else if (histoRandomSample.isValidSample(points,
+			else if (this.histoRandomSample.isValidSample(points,
 					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
 			recordSet.addPoints(points,
 					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
@@ -846,7 +847,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		if (this.histoRandomSample != null) {
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize,
-					histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+					this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
 		}
 		recordSet.syncScaleOfSyncableRecords();
 	}
@@ -933,10 +934,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @param minPoints minimum values from the data buffer which are verified during sampling
 	 * @throws DataInconsitsentException 
 	 */
-	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
+	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points");
 		int recordTimespan_ms = 10;
-		this.histoRandomSample = new HistoRandomSample(this, maxPoints, minPoints, recordTimespan_ms);
+		List<TransitionType> transitionTypes = this.getChannelType(channelNumber).getTransition();
+		this.histoRandomSample = HistoRandomSample.createHistoRandomSample(channelNumber, maxPoints, minPoints, recordTimespan_ms);
 		}
 
 	/**

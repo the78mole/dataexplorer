@@ -209,31 +209,31 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetChannel = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetVario = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGPS = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGeneral = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGeneral.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsGeneral.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetElectric = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsElectric.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsElectric.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetSpeedControl = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsSpeedControl.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsSpeedControl.length, recordTimespan_ms);
 		}
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
@@ -621,31 +621,31 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		int activeChannelNumber = device.channels.getActiveChannelNumber(); // HoTTbinHistoReader.application.getActiveChannel().getNumber();
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetChannel = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetVario = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGPS = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGeneral = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsGeneral.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsGeneral.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetElectric = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsElectric.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsElectric.length, recordTimespan_ms);
 		}
 		else if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetSpeedControl = tmpRecordSet;
-			histoRandomSample = new HistoRandomSample(device, HoTTbinHistoReader.pointsSpeedControl.length, recordTimespan_ms);
+			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsSpeedControl.length, recordTimespan_ms);
 		}
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);

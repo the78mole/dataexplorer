@@ -150,6 +150,7 @@ public class GDE {
 	public static final String							STRING_SINGLE_QUOAT								= "'";																																																											//$NON-NLS-1$
 	public static final String							STRING_ENTRY											= "entry - ";																																																								//$NON-NLS-1$
 	public static final String							STRING_EXIT												= "exit - ";																																																								//$NON-NLS-1$
+	public static final String							STRING_BLANK_AT_BLANK							= " @ ";																																																										//$NON-NLS-1$
 
 	public static final String[]						STRING_ARRAY_TRUE_FALSE						= new String[] { "true", "false" };																																													//$NON-NLS-1$ //$NON-NLS-2$
 

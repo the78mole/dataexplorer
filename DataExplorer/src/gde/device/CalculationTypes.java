@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="avg"/>
  *     &lt;enumeration value="sigma"/>
  *     &lt;enumeration value="sum"/>
- *     &lt;enumeration value="timeSum_ms"/>
+ *     &lt;enumeration value="timeSum_sec"/>
  *     &lt;enumeration value="count"/>
  *     &lt;enumeration value="ratio"/>
  *     &lt;enumeration value="ratioInverse"/>
@@ -49,8 +49,8 @@ public enum CalculationTypes {
     SIGMA("sigma"),
     @XmlEnumValue("sum")
     SUM("sum"),
-    @XmlEnumValue("timeSum_ms")
-    TIME_SUM_MS("timeSum_ms"),
+    @XmlEnumValue("timeSum_sec")
+    TIME_SUM_SEC("timeSum_sec"),
     @XmlEnumValue("count")
     COUNT("count"),
     @XmlEnumValue("ratio")

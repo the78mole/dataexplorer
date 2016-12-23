@@ -59,7 +59,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 
 	public enum TrailType {
 		REAL_AVG(0, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0750), false), // average
-		//		REAL_COUNT_OBS(11, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0751)), // counter
+		REAL_COUNT(12, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0751), false), // counter
 		REAL_MAX(1, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0754), false), //
 		REAL_MIN(2, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0755), false), //
 		REAL_SD(3, true, 1, false, Messages.getString(MessageIds.GDE_MSGT0756), false), //
@@ -70,7 +70,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		REAL_MAX_RATIO_TRIGGERED(9, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0761), false), //
 		REAL_TIME_SUM_TRIGGERED(7, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0759), false), //
 		REAL_COUNT_TRIGGERED(10, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0757), false), //
-		REAL_SUM(12, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0762), false), //
+		REAL_SUM(11, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0762), false), //
 		//		SCORE(13, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0763)),
 		//		AVG(14, false, false, false, Messages.getString(MessageIds.GDE_MSGT0764)), //
 		//		SUM(15, false, false, false, Messages.getString(MessageIds.GDE_MSGT0765)), //
@@ -335,9 +335,9 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		else {
 			if (this.trailRecordSuite.length == 1) {
 				if (this.isMeasurement())
-					super.add(histoVault.getMeasurement(this.ordinal, this.trailTextSelectedIndex, this.getTrailOrdinal()));
+					super.add(histoVault.getMeasurementPoint(this.ordinal, this.trailTextSelectedIndex, this.getTrailOrdinal()));
 				else if (this.isSettlement())
-					super.add(histoVault.getSettlement(this.settlementType.getSettlementId(), this.trailTextSelectedIndex, this.getTrailOrdinal()));
+					super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.trailTextSelectedIndex, this.getTrailOrdinal()));
 				else if (this.isScoregroup()) {
 					if (log.isLoggable(Level.FINEST))
 						log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
@@ -354,9 +354,9 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					TrailRecord trailRecord = this.trailRecordSuite[i];
 					Integer point;
 					if (this.isMeasurement())
-						point = histoVault.getMeasurement(trailRecord.ordinal, trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
+						point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
 					else if (this.isSettlement())
-						point = histoVault.getSettlement(trailRecord.settlementType.getSettlementId(), trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
+						point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(), trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
 					else if (this.isScoregroup()) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
 						point = histoVault.getScorePoint(this.getTrailOrdinal());
@@ -462,11 +462,11 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		if (this.getTrailRecordSuite().length == 1) { // standard curve
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++)
-					if (masterRecord.realRealGet(i) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(i) / 1000. - reduction) * factor + offset).intern();
+					if (masterRecord.realRealGet(i) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.realRealGet(i) / 1000. - reduction) * factor + offset).intern();
 			}
 			else {
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-					if (masterRecord.realRealGet(j) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.get(j) / 1000. - reduction) * factor + offset).intern();
+					if (masterRecord.realRealGet(j) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.realRealGet(j) / 1000. - reduction) * factor + offset).intern();
 			}
 		}
 		else {
@@ -478,10 +478,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0; i < masterRecord.size(); i++) {
 						if (masterRecord.realRealGet(i) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.realGet(i) / 1000. - reduction) * factor + offset));
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.get(i) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 					}
@@ -490,10 +490,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 						if (masterRecord.realRealGet(j) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.get(j) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 				}
@@ -506,10 +506,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0; i < masterRecord.size(); i++) {
 						if (masterRecord.realRealGet(i) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(this.getDecimalFormat().format((lowerRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.get(i) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.get(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 					}
@@ -518,10 +518,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 						if (masterRecord.realRealGet(j) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(this.getDecimalFormat().format((lowerRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.get(j) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.get(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 				}
@@ -611,6 +611,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				applicablePrimitiveTrails[TrailType.REAL_SD.ordinal()] = settlementEvaluation.isSigma();
 
 				applicablePrimitiveTrails[TrailType.REAL_SUM.ordinal()] = settlementEvaluation.isSum();
+				applicablePrimitiveTrails[TrailType.REAL_COUNT.ordinal()] = settlementEvaluation.isCount();
 				applicablePrimitiveTrails[TrailType.REAL_FIRST.ordinal()] = settlementEvaluation.isFirst();
 				applicablePrimitiveTrails[TrailType.REAL_LAST.ordinal()] = settlementEvaluation.isLast();
 				// set at least one trail if no trail is applicable

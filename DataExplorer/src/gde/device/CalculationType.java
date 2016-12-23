@@ -5,7 +5,6 @@
 // Generated on: 2016.11.13 at 09:53:47 AM MEZ 
 //
 
-
 package gde.device;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,6 +12,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import gde.GDE;
 
 /**
  * <p>Java class for CalculationType complex type.
@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="leveling" type="{}leveling_types" />
  *       &lt;attribute name="refOrdinalDivisor" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="divisorLeveling" type="{}leveling_types" />
- *       &lt;attribute name="basedOnRecovery" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="deltaBasis" type="{}delta_basis_types" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -43,215 +43,225 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "CalculationType")
 public class CalculationType {
 
-    @XmlAttribute(required = true)
-    protected int transitionId;
-    @XmlAttribute(required = true)
-    protected CalculationTypes calcType;
-    @XmlAttribute(required = true)
-    protected boolean unsigned;
-    @XmlAttribute(required = true)
-    protected int refOrdinal;
-    @XmlAttribute
-    protected LevelingTypes leveling;
-    @XmlAttribute
-    protected Integer refOrdinalDivisor;
-    @XmlAttribute
-    protected LevelingTypes divisorLeveling;
-    @XmlAttribute
-    protected Boolean basedOnRecovery;
-    @XmlAttribute
-    protected String comment;
+	@XmlAttribute(required = true)
+	protected int								transitionId;
+	@XmlAttribute(required = true)
+	protected CalculationTypes	calcType;
+	@XmlAttribute(required = true)
+	protected boolean						unsigned;
+	@XmlAttribute(required = true)
+	protected int								refOrdinal;
+	@XmlAttribute
+	protected LevelingTypes			leveling;
+	@XmlAttribute
+	protected Integer						refOrdinalDivisor;
+	@XmlAttribute
+	protected LevelingTypes			divisorLeveling;
+	@XmlAttribute
+    protected DeltaBasisTypes deltaBasis;
+	@XmlAttribute
+	protected String						comment;
 
-    /**
-     * Gets the value of the transitionId property.
-     * 
-     */
-    public int getTransitionId() {
-        return transitionId;
-    }
+	/**
+	 * Gets the value of the transitionId property.
+	 * 
+	 */
+	public int getTransitionId() {
+		return transitionId;
+	}
 
-    /**
-     * Sets the value of the transitionId property.
-     * 
-     */
-    public void setTransitionId(int value) {
-        this.transitionId = value;
-    }
+	/**
+	 * Sets the value of the transitionId property.
+	 * 
+	 */
+	public void setTransitionId(int value) {
+		this.transitionId = value;
+	}
 
-    /**
-     * Gets the value of the calcType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CalculationTypes }
-     *     
-     */
-    public CalculationTypes getCalcType() {
-        return calcType;
-    }
+	/**
+	 * Gets the value of the calcType property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link CalculationTypes }
+	 *     
+	 */
+	public CalculationTypes getCalcType() {
+		return calcType;
+	}
 
-    /**
-     * Sets the value of the calcType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CalculationTypes }
-     *     
-     */
-    public void setCalcType(CalculationTypes value) {
-        this.calcType = value;
-    }
+	/**
+	 * Sets the value of the calcType property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link CalculationTypes }
+	 *     
+	 */
+	public void setCalcType(CalculationTypes value) {
+		this.calcType = value;
+	}
 
-    /**
-     * Gets the value of the unsigned property.
-     * 
-     */
-    public boolean isUnsigned() {
-        return unsigned;
-    }
+	/**
+	 * Gets the value of the unsigned property.
+	 * 
+	 */
+	public boolean isUnsigned() {
+		return unsigned;
+	}
 
-    /**
-     * Sets the value of the unsigned property.
-     * 
-     */
-    public void setUnsigned(boolean value) {
-        this.unsigned = value;
-    }
+	/**
+	 * Sets the value of the unsigned property.
+	 * 
+	 */
+	public void setUnsigned(boolean value) {
+		this.unsigned = value;
+	}
 
-    /**
-     * Gets the value of the refOrdinal property.
-     * 
-     */
-    public int getRefOrdinal() {
-        return refOrdinal;
-    }
+	/**
+	 * Gets the value of the refOrdinal property.
+	 * 
+	 */
+	public int getRefOrdinal() {
+		return refOrdinal;
+	}
 
-    /**
-     * Sets the value of the refOrdinal property.
-     * 
-     */
-    public void setRefOrdinal(int value) {
-        this.refOrdinal = value;
-    }
+	/**
+	 * Sets the value of the refOrdinal property.
+	 * 
+	 */
+	public void setRefOrdinal(int value) {
+		this.refOrdinal = value;
+	}
 
-    /**
-     * Gets the value of the leveling property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LevelingTypes }
-     *     
-     */
-    public LevelingTypes getLeveling() {
-        return leveling;
-    }
+	/**
+	 * Gets the value of the leveling property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link LevelingTypes }
+	 *     
+	 */
+	public LevelingTypes getLeveling() {
+		return leveling;
+	}
 
-    /**
-     * Sets the value of the leveling property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LevelingTypes }
-     *     
-     */
-    public void setLeveling(LevelingTypes value) {
-        this.leveling = value;
-    }
+	/**
+	 * Sets the value of the leveling property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link LevelingTypes }
+	 *     
+	 */
+	public void setLeveling(LevelingTypes value) {
+		this.leveling = value;
+	}
 
-    /**
-     * Gets the value of the refOrdinalDivisor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getRefOrdinalDivisor() {
-        return refOrdinalDivisor;
-    }
+	/**
+	 * Gets the value of the refOrdinalDivisor property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link Integer }
+	 *     
+	 */
+	public Integer getRefOrdinalDivisor() {
+		return refOrdinalDivisor;
+	}
 
-    /**
-     * Sets the value of the refOrdinalDivisor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setRefOrdinalDivisor(Integer value) {
-        this.refOrdinalDivisor = value;
-    }
+	/**
+	 * Sets the value of the refOrdinalDivisor property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link Integer }
+	 *     
+	 */
+	public void setRefOrdinalDivisor(Integer value) {
+		this.refOrdinalDivisor = value;
+	}
 
-    /**
-     * Gets the value of the divisorLeveling property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LevelingTypes }
-     *     
-     */
-    public LevelingTypes getDivisorLeveling() {
-        return divisorLeveling;
-    }
+	/**
+	 * Gets the value of the divisorLeveling property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link LevelingTypes }
+	 *     
+	 */
+	public LevelingTypes getDivisorLeveling() {
+		return divisorLeveling;
+	}
 
-    /**
-     * Sets the value of the divisorLeveling property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LevelingTypes }
-     *     
-     */
-    public void setDivisorLeveling(LevelingTypes value) {
-        this.divisorLeveling = value;
-    }
+	/**
+	 * Sets the value of the divisorLeveling property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link LevelingTypes }
+	 *     
+	 */
+	public void setDivisorLeveling(LevelingTypes value) {
+		this.divisorLeveling = value;
+	}
 
-    /**
-     * Gets the value of the basedOnRecovery property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public Boolean isBasedOnRecovery() {
-        return basedOnRecovery;
-    }
+	/**
+     * Gets the value of the deltaBasis property.
+	 * 
+	 * @return
+	 *     possible object is
+     *     {@link DeltaBasisTypes }
+	 *     
+	 */
+    public DeltaBasisTypes getDeltaBasis() {
+        return deltaBasis;
+	}
 
-    /**
-     * Sets the value of the basedOnRecovery property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setBasedOnRecovery(Boolean value) {
-        this.basedOnRecovery = value;
-    }
+	/**
+     * Sets the value of the deltaBasis property.
+	 * 
+	 * @param value
+	 *     allowed object is
+     *     {@link DeltaBasisTypes }
+	 *     
+	 */
+    public void setDeltaBasis(DeltaBasisTypes value) {
+        this.deltaBasis = value;
+	}
 
-    /**
-     * Gets the value of the comment property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getComment() {
-        return comment;
-    }
+	/**
+	 * Gets the value of the comment property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getComment() {
+		return comment;
+	}
 
-    /**
-     * Sets the value of the comment property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setComment(String value) {
-        this.comment = value;
-    }
+	/**
+	 * Sets the value of the comment property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setComment(String value) {
+		this.comment = value;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("transitionId=").append(this.getTransitionId()).append(GDE.STRING_COMMA_BLANK).append("calcType=").append(this.getCalcType().value()).append(GDE.STRING_COMMA_BLANK);
+		sb.append("unsigned=").append(this.isUnsigned()).append(GDE.STRING_COMMA_BLANK).append("deltaBasis=").append(this.getDeltaBasis()).append(GDE.STRING_COMMA_BLANK);
+		sb.append("refOrdinal=").append(this.getRefOrdinal()).append(GDE.STRING_OR).append(this.getLeveling() != null ? this.getLeveling().value() : GDE.STRING_EMPTY).append(GDE.STRING_COMMA_BLANK);
+		if (this.getRefOrdinalDivisor() != null) sb.append("refOrdinalDivisor=").append(this.getRefOrdinalDivisor()).append(GDE.STRING_OR).append(this.getDivisorLeveling().value());
+		return sb.toString();
+	}
 
 }

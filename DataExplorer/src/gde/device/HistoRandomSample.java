@@ -20,11 +20,13 @@
 package gde.device;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import gde.config.Settings;
 import gde.log.Level;
+import gde.ui.DataExplorer;
 
 /**
  * randomized measurements samples based on a sampling timespan which also supports a 100% sample.
@@ -45,6 +47,8 @@ public class HistoRandomSample {
 
 	private final Settings			settings					= Settings.getInstance();
 
+	private static final int		samplesInBaseTime	= 10;																// the reference and recovery time should have at last this number of samples 
+
 	private final int						recordTimespan_ms;																		// smallest time interval to the next sample: one record every 10 ms
 	private final int						samplingTimespan_ms;																	// actual used timespan; one sample in this time span + potential oversampling samples
 	private final Random				rand							= new Random();
@@ -57,7 +61,6 @@ public class HistoRandomSample {
 	private int									readingCount			= 0;
 	private int									samplingCount			= 0;
 	private int									oversamplingCount	= 0;
-	private DeviceConfiguration	device;
 	private int									pointsLength;
 
 	private class TimeStepValues {
@@ -70,42 +73,6 @@ public class HistoRandomSample {
 		long		timeStep_ms	= -1;
 		boolean	isMinMax;
 		boolean	isTime4Sample;
-	}
-
-	/**
-	 * @param device
-	 * @param pointsLength number of log measurement points
-	 * @param recordTimespan_ms log measurement rate
-	 */
-	public HistoRandomSample(DeviceConfiguration device, int pointsLength, int recordTimespan_ms) { // reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
-		this.device = device;
-		this.pointsLength = pointsLength;
-		this.maxPoints = new int[pointsLength];
-		this.minPoints = new int[pointsLength];
-		Arrays.fill(this.maxPoints, Integer.MIN_VALUE);
-		Arrays.fill(this.minPoints, Integer.MAX_VALUE);
-		this.lastTimeStep = new TimeStepValues();
-		device.getDataBlockPreferredDataLocation();
-		this.recordTimespan_ms = recordTimespan_ms;
-		this.samplingTimespan_ms = Math.max(this.settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", pointsLength)); //$NON-NLS-1$
-	}
-
-	/**
-	 * @param device
-	 * @param pointsLength number of log measurement points
-	 * @param recordTimespan_ms log measurement rate
-	 */
-	public HistoRandomSample(DeviceConfiguration device, int[] maxPoints, int[] minPoints, int recordTimespan_ms) {
-		this.device = device;
-		this.pointsLength = maxPoints.length;
-		this.maxPoints = maxPoints;
-		this.minPoints = minPoints;
-		this.lastTimeStep = new TimeStepValues();
-		device.getDataBlockPreferredDataLocation();
-		this.recordTimespan_ms = recordTimespan_ms;
-		this.samplingTimespan_ms = Math.max(this.settings.getSamplingTimespan_ms(), this.recordTimespan_ms); // biggest time interval to the next sample, sampling timespan must not be smaller than the recording timespan
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("HistoRandomSample  pointsLength=%d", this.pointsLength)); //$NON-NLS-1$
 	}
 
 	private enum Action {
@@ -125,6 +92,65 @@ public class HistoRandomSample {
 		 * points are a candidate for release but may be discarded to compensate an oversampling action; predecessor points must NOT be minmax points
 		 */
 		COMPENSATE_RELEASE
+	}
+
+	/**
+	 * sets the sampling timespan based on transition requirements.
+	 * @param channelNumber is the log channel number which may differ in case of channel mix
+	 * @param maxPoints log measurement points with a length equal to the number of log measurement points
+	 * @param minPointslog measurement points with a length equal to the number of log measurement points
+	 * @param recordTimespan_ms log measurement rate
+	 */
+	private HistoRandomSample(int channelNumber, int[] maxPoints, int[] minPoints, int recordTimespan_ms) {
+		this.pointsLength = maxPoints.length;
+		this.maxPoints = maxPoints;
+		this.minPoints = minPoints;
+		this.recordTimespan_ms = recordTimespan_ms;
+
+		this.lastTimeStep = new TimeStepValues();
+
+		// find the maximum sampling timespan
+		int proposedTimespan_ms = this.settings.getSamplingTimespan_ms();
+		List<TransitionType> transitionTypes = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransition();
+		if (!transitionTypes.isEmpty()) {
+			for (TransitionType transitionType : transitionTypes) {
+				if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
+					proposedTimespan_ms = this.recordTimespan_ms;
+					break; // peaks are always based on short term measurements and this requires all measurement points
+				}
+				else {
+					int detectableTimespan_ms = Math.min(Math.min(transitionType.referenceTimeMsec, transitionType.thresholdTimeMsec), transitionType.recoveryTimeMsec) / HistoRandomSample.samplesInBaseTime;
+					proposedTimespan_ms = Math.min(proposedTimespan_ms, detectableTimespan_ms);
+				}
+			}
+		}
+		this.samplingTimespan_ms = Math.max(proposedTimespan_ms, this.recordTimespan_ms); // sampling timespan must not be smaller than the recording timespan
+		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE,
+				String.format("HistoRandomSample  pointsLength=%d  samplingTimespan_ms effective=%d user=%d", this.pointsLength, this.samplingTimespan_ms, this.settings.getSamplingTimespan_ms())); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param channelNumber is the log channel number which may differ in case of channel mix
+	 * @param newPointsLength number of log measurement points
+	 * @param newRecordTimespan_ms log measurement rate
+	 */
+	public static HistoRandomSample createHistoRandomSample(int channelNumber, int newPointsLength, int newRecordTimespan_ms) { // reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
+		int[] tmpMaxPoints = new int[newPointsLength];
+		int[] tmpMinPoints = new int[newPointsLength];
+		Arrays.fill(tmpMaxPoints, Integer.MIN_VALUE);
+		Arrays.fill(tmpMinPoints, Integer.MAX_VALUE);
+		return new HistoRandomSample(channelNumber, tmpMaxPoints, tmpMinPoints, newRecordTimespan_ms);
+	}
+
+	/**
+	 * @param channelNumber is the log channel number which may differ in case of channel mix
+	 * @param maxPoints log measurement points with a length equal to the number of log measurement points
+	 * @param minPointslog measurement points with a length equal to the number of log measurement points
+	 * @param newRecordTimespan_ms log measurement rate
+	 * @return
+	 */
+	public static HistoRandomSample createHistoRandomSample(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms) {
+		return new HistoRandomSample(channelNumber, maxPoints, minPoints, newRecordTimespan_ms);
 	}
 
 	/**

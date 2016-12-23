@@ -250,7 +250,7 @@ public class HistoRecordSet extends RecordSet {
 	 */
 	public void addSettlements() {
 		ChannelType channelType = this.device.getDeviceConfiguration().getChannel(super.getChannelConfigNumber());
-		HistoTransitions transitions = new HistoTransitions(this.device, this);
+		HistoTransitions transitions = new HistoTransitions(this.device, this, 11);
 		for (TransitionType transitionType : channelType.getTransition()) {
 			transitions.addFromRecord(this.get(this.recordNames[transitionType.getRefOrdinal()]), transitionType);
 		}
@@ -292,7 +292,7 @@ public class HistoRecordSet extends RecordSet {
 		for (int i = 0; i < this.recordNames.length; i++) {
 			MeasurementType measurementType = channelMeasurements.get(i);
 			EntryPoints entryPoints = new EntryPoints(i, measurementType.getName());
-			entries.getEntryPoints().add(entryPoints);
+			entries.getEntries().add(entryPoints);
 
 			Record record = this.get(this.recordNames[i]);
 			if (record == null) {
@@ -410,17 +410,18 @@ public class HistoRecordSet extends RecordSet {
 			//			Integer[] trailTypePoints = new Integer[TrailType.getPrimitives().size()];
 			//			settlementsPoints.put(settlementType.getSettlementId(), trailTypePoints);
 			EntryPoints entryPoints = new EntryPoints(i, settlementType.getName());
-			entries.getEntryPoints().add(entryPoints);
+			entries.getEntries().add(entryPoints);
 
 			HistoSettlement record = this.histoSettlements.get(settlementType.getName());
 			if (record.size() > 0 && settlementType.getEvaluation() != null) {
 				EvaluationType settlementEvaluations = settlementType.getEvaluation();
 				if (record.hasReasonableData()) {
 					if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), record.getAvgValue());
-					if (settlementEvaluations.isMax()) entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), record.getMaxValue());
-					if (settlementEvaluations.isMin()) entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), record.getMinValue());
+					if (settlementEvaluations.isMax()) entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), record.getRealMaxValue());
+					if (settlementEvaluations.isMin()) entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), record.getRealMinValue());
 					if (settlementEvaluations.isSigma()) entryPoints.addPoint(TrailType.REAL_SD.ordinal(), TrailType.REAL_SD.name(), record.getSigmaValue());
 					if (settlementEvaluations.isSum()) entryPoints.addPoint(TrailType.REAL_SUM.ordinal(), TrailType.REAL_SUM.name(), record.getSumValue());
+					if (settlementEvaluations.isCount()) entryPoints.addPoint(TrailType.REAL_COUNT.ordinal(), TrailType.REAL_COUNT.name(), record.getCountValue());
 				}
 				else {
 					// these trail types might act as default trails
