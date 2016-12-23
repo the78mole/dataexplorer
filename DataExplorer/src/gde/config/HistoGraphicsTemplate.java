@@ -56,7 +56,8 @@ public class HistoGraphicsTemplate extends Properties {
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
 		this.setHistoFileName(deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
-		log.log(Level.SEVERE, "Histo graphics template file is " + this.templateFilePath); //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF))
+			log.log(Level.OFF, "Histo graphics template file is " + this.templateFilePath); //$NON-NLS-1$
 	}
 
 	/**

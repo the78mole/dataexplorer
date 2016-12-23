@@ -435,7 +435,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				i++;
 			}
 		}
-		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
 		return points;
 		// int grad = super.get(measurementPointIndex) / 1000000;
 		// return new Point(xDisplayOffset + Double.valueOf(super.getTime_ms(measurementPointIndex) * super.displayScaleFactorTime).intValue(), yDisplayOffset

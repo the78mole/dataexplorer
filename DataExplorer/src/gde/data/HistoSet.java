@@ -191,7 +191,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		// this.histoFilePaths.clear(); is accomplished by files validation
 		this.fileSizeSum_B = 0;
 		this.trailRecordSet = null;
-		log.log(Level.SEVERE, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF))
+			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
 				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
@@ -210,7 +211,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		// this.histoFilePaths.clear(); is accomplished by files validation
 		this.fileSizeSum_B = 0;
 		// this.trailRecordSet = null;
-		log.log(Level.SEVERE, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF))
+			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
 				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 

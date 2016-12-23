@@ -553,8 +553,8 @@ public class HistoTransitions extends Vector<Transition> {
 							}
 							recoveryDeque.clear();
 						}
-						// if (log.isLoggable(Level.FINE))
-						log.log(Level.SEVERE,
+						if (log.isLoggable(Level.OFF))
+							log.log(Level.OFF,
 								String.format("%s: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", triggerState, referenceDeque.size(), thresholdDeque.size(), recoveryDeque.size())); //$NON-NLS-1$
 					}
 					else { // try to extend the threshold time, interpret entries as jitter
