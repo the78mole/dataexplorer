@@ -56,14 +56,33 @@ public class PrepareTranslation {
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			log.log(Level.INFO, "basePath = " + basePath); //$NON-NLS-1$
-			List<File> files = FileUtils.getFileListing(new File(basePath), 5, "properties");
+			List<File> files = FileUtils.getFileListing(new File(basePath), 7, "properties");
 			String line;
-			BufferedReader reader;
+			BufferedReader reader = null;
+			//start to write all German messages
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(GDE.JAVA_IO_TMPDIR+"all_messages_de.po"), "UTF-8")); //$NON-NLS-1$
 			for (File path : files) {
 				if (path.getAbsolutePath().contains("src") && path.getName().contains("messages_de.")) {
 					log.log(Level.INFO, "working with : " + path.getAbsolutePath()); //$NON-NLS-1$
-					reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8")); //$NON-NLS-1$
+					reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "ISO-8859-1")); //$NON-NLS-1$
+					while ((line = reader.readLine()) != null) {
+						if (line.startsWith("GDE_MSG")) {
+							String[] tokens = line.split("=");
+							writer.write(String.format("\n#%s\nmsgid \"%s\"\nmsgstr \" \"\n", tokens[0], line.substring(13)));					
+						}
+					}
+					writer.flush();
+				}
+			}
+			writer.close();
+			if (reader != null) reader.close();
+			
+			//start all over to have message source in english
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(GDE.JAVA_IO_TMPDIR+"all_messages_en.po"), "UTF-8")); //$NON-NLS-1$
+			for (File path : files) {
+				if (path.getAbsolutePath().contains("src") && path.getName().contains("messages.")) {
+					log.log(Level.INFO, "working with : " + path.getAbsolutePath()); //$NON-NLS-1$
+					reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "ISO-8859-1")); //$NON-NLS-1$
 					while ((line = reader.readLine()) != null) {
 						if (line.startsWith("GDE_MSG")) {
 							String[] tokens = line.split("=");
@@ -74,6 +93,7 @@ public class PrepareTranslation {
 				}
 			}
 			writer.close();
+			if (reader != null) reader.close();
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
