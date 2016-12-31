@@ -127,7 +127,7 @@ public class CSVSerialDataReaderWriter {
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
-				if (dataBlockSize > 0 && measurementSize < Math.abs(dataBlockSize))  
+				if (dataBlockSize < 0 && measurementSize > Math.abs(dataBlockSize))  
 					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));

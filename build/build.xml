@@ -191,6 +191,7 @@
 		<ant antfile="build.xml" target="clean" dir="iCharger" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="FlightRecorder" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="JLog2" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="S32" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="GPXAdapter" inheritall="true" />
@@ -371,6 +372,7 @@
 		<ant antfile="build.xml" target="package" dir="iCharger" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="FlightRecorder" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="JLog2" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="S32" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="GPXAdapter" inheritall="true" />
@@ -406,6 +408,7 @@
 			<include name="iCharger/build/*.jar" />
 			<include name="FlightRecorder/build/*.jar" />
 			<include name="JLog2/build/*.jar" />
+			<include name="S32/build/*.jar" />
 			<include name="JetiAdapter/build/*.jar" />
 			<include name="IGCAdapter/build/*.jar" />
 			<include name="GPXAdapter/build/*.jar" />

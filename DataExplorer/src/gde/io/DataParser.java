@@ -92,9 +92,14 @@ public class DataParser extends NMEAParser {
 		try {
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			try {
-				Integer.parseInt(strValues[0].substring(1).trim());
-				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY ? strValues.length - 4 : this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE
-						&& this.dataBlockSize > 0 ? Math.abs(this.dataBlockSize) : strValues.length - 4;
+				this.channelConfigNumber = Integer.parseInt(strValues[0].substring(1).trim());
+				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY 
+						? strValues.length - 4 
+						: this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE	&& this.dataBlockSize != 0 
+							? Math.abs(this.dataBlockSize) > this.device.getNumberOfMeasurements(this.channelConfigNumber) 
+									? this.device.getNumberOfMeasurements(this.channelConfigNumber)
+									: Math.abs(this.dataBlockSize)
+							: strValues.length - 4;
 				this.values = new int[this.valueSize];
 				DataParser.log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 
