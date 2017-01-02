@@ -783,8 +783,8 @@ public class SettingsDialog extends Dialog {
 						this.miscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
 						this.histoTabItem.setControl(this.miscComposite);
 						RowLayout compositeHistoLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						compositeHistoLayout.marginLeft = 7;
-						compositeHistoLayout.spacing = 10;
+						compositeHistoLayout.marginLeft = GDE.IS_MAC ? 2 : 5;
+						compositeHistoLayout.spacing = GDE.IS_MAC ? 5 : 7;
 						compositeHistoLayout.marginTop = 20;
 						this.miscComposite.setLayout(compositeHistoLayout);
 						{
@@ -847,6 +847,7 @@ public class SettingsDialog extends Dialog {
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoReversedButton, 5);
 								formData.right = new FormAttachment(100, -5);
+								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 								this.histoSpreadGrade.setLayoutData(formData);
 								this.histoSpreadGrade.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSpreadGrade.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
@@ -926,6 +927,7 @@ public class SettingsDialog extends Dialog {
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoQuantilesButton, 5);
 								formData.right = new FormAttachment(100, -5);
+								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 								this.histoBoxplotScale.setLayoutData(formData);
 								this.histoBoxplotScale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoBoxplotScale.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
@@ -956,9 +958,10 @@ public class SettingsDialog extends Dialog {
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
 								formData.right = new FormAttachment(100, -5);
+								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 								this.histoBoxplotSizeAdaptation.setLayoutData(formData);
 								this.histoBoxplotSizeAdaptation.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoBoxplotSizeAdaptation.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								this.histoBoxplotSizeAdaptation.setBounds(370, GDE.IS_MAC_COCOA ? 20 : 24, 47, GDE.IS_LINUX ? 22 : 20);
 								this.histoBoxplotSizeAdaptation.setItems(SettingsDialog.this.settings.getBoxplotSizeAdaptationNomenclatures());
 								this.histoBoxplotSizeAdaptation.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotSizeAdaptation());
 								this.histoBoxplotSizeAdaptation.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
@@ -996,6 +999,7 @@ public class SettingsDialog extends Dialog {
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoMaxDurationLabel, 5);
 								formData.right = new FormAttachment(100, -5);
+								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 								this.histoSamplingTimespan_ms.setLayoutData(formData);
 								this.histoSamplingTimespan_ms.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
