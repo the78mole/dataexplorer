@@ -848,9 +848,10 @@ public class SettingsDialog extends Dialog {
 								formData.top = new FormAttachment(this.histoReversedButton, 5);
 								formData.right = new FormAttachment(100, -5);
 								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+								formData.width = GDE.IS_LINUX ? 80 : 70;
 								this.histoSpreadGrade.setLayoutData(formData);
 								this.histoSpreadGrade.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoSpreadGrade.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								//this.histoSpreadGrade.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
 								this.histoSpreadGrade.setItems(SettingsDialog.this.settings.getXAxisSpreadGradeNomenclatures());
 								this.histoSpreadGrade.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getXAxisSpreadGrade());
 								this.histoSpreadGrade.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0818));
@@ -928,9 +929,10 @@ public class SettingsDialog extends Dialog {
 								formData.top = new FormAttachment(this.histoQuantilesButton, 5);
 								formData.right = new FormAttachment(100, -5);
 								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+								formData.width = GDE.IS_LINUX ? 80 : 70;
 								this.histoBoxplotScale.setLayoutData(formData);
 								this.histoBoxplotScale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoBoxplotScale.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								//this.histoBoxplotScale.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
 								this.histoBoxplotScale.setItems(SettingsDialog.this.settings.getBoxplotScaleNomenclatures());
 								this.histoBoxplotScale.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotScale());
 								this.histoBoxplotScale.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0813));
@@ -959,9 +961,10 @@ public class SettingsDialog extends Dialog {
 								formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
 								formData.right = new FormAttachment(100, -5);
 								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+								formData.width = GDE.IS_LINUX ? 80 : 70;
 								this.histoBoxplotSizeAdaptation.setLayoutData(formData);
 								this.histoBoxplotSizeAdaptation.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoBoxplotSizeAdaptation.setBounds(370, GDE.IS_MAC_COCOA ? 20 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								//this.histoBoxplotSizeAdaptation.setBounds(370, GDE.IS_MAC_COCOA ? 20 : 24, 47, GDE.IS_LINUX ? 22 : 20);
 								this.histoBoxplotSizeAdaptation.setItems(SettingsDialog.this.settings.getBoxplotSizeAdaptationNomenclatures());
 								this.histoBoxplotSizeAdaptation.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotSizeAdaptation());
 								this.histoBoxplotSizeAdaptation.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
@@ -1000,9 +1003,10 @@ public class SettingsDialog extends Dialog {
 								formData.top = new FormAttachment(this.histoMaxDurationLabel, 5);
 								formData.right = new FormAttachment(100, -5);
 								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+								formData.width = GDE.IS_LINUX ? 80 : 70;
 								this.histoSamplingTimespan_ms.setLayoutData(formData);
 								this.histoSamplingTimespan_ms.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
+								//this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
 								this.histoSamplingTimespan_ms.setItems(SettingsDialog.this.settings.getSamplingTimespanValues());
 								this.histoSamplingTimespan_ms.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getSamplingTimespan_ms() / 1000.);
 								this.histoSamplingTimespan_ms.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
