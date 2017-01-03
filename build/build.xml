@@ -100,6 +100,11 @@
 		<property name="output.windows64.program.devices" location="${output.windows64}/DataExplorer/devices" />
 		<property name="output.windows64.java.ext" location="${output.windows64}/DataExplorer/java/ext" />
 
+		<property name="output.raspbian32" location="${output.dir}/Raspbian_32" />
+		<property name="output.raspbian32.program" location="${output.raspbian32}/DataExplorer" />
+		<property name="output.raspbian32.program.devices" location="${output.raspbian32}/DataExplorer/devices" />
+		<property name="output.raspbian32.java.ext" location="${output.raspbian32}/DataExplorer/java/ext" />
+
 		<property name="output.gnulinux32" location="${output.dir}/GNULinux_32" />
 		<property name="output.gnulinux32.program" location="${output.gnulinux32}/DataExplorer" />
 		<property name="output.gnulinux32.program.devices" location="${output.gnulinux32}/DataExplorer/devices" />
@@ -139,6 +144,11 @@
 		<mkdir dir="${output.windows64.program}" />
 		<mkdir dir="${output.windows64.program.devices}" />
 		<mkdir dir="${output.windows64.java.ext}" />
+
+		<mkdir dir="${output.raspbian32}" />
+		<mkdir dir="${output.raspbian32.program}" />
+		<mkdir dir="${output.raspbian32.program.devices}" />
+		<mkdir dir="${output.raspbian32.java.ext}" />
 
 		<mkdir dir="${output.gnulinux32}" />
 		<mkdir dir="${output.gnulinux32.program}" />
@@ -462,6 +472,24 @@
 			</fileset>
 		</copy>
 
+		<copy file="build/misc/DataExplorer32" tofile="${output.raspbian32.program}/DataExplorer" />
+		<copy todir="${output.raspbian32.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
+			<fileset file="build/misc/DataExplorer.xpm" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
+			<fileset file="build/misc/DataExplorer.desktop" />
+			<fileset file="build/misc/DevicePropertiesEditor" />
+			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
+			<fileset file="RXTXcomm/src/arm32/librxtxSerial.so" />
+		</copy>
+		<copy todir="${output.raspbian32.program.devices}" flatten="yes">
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
+			</fileset>
+		</copy>
+
 		<copy file="build/misc/DataExplorer32" tofile="${output.gnulinux32.program}/DataExplorer" />
 		<copy todir="${output.gnulinux32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
@@ -565,6 +593,18 @@
 			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
 			<fileset file="build/lib/Windows/64/libusb4java-1.2.0.jar" />
 		</copy>
+		<copy todir="${output.raspbian32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Raspbian/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/usb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb-api-1.0.2.jar" />
+			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
+			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
+			<fileset file="build/lib/Raspbian/32/libusb4java-1.2.0.jar" />
+		</copy>
 		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/GNULinux/32/swt.jar" />
@@ -620,6 +660,9 @@
 		<copy todir="${output.windows64}/DataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
+		<copy todir="${output.raspbian32}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
 		<copy todir="${output.gnulinux32}/DataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
@@ -654,6 +697,25 @@
 			<zipfileset dir="${output.windows64}" casesensitive="true" />
 		</zip>
 		-->
+		
+		<echo message="tar Raspbian Linux 32 bit files" />
+		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_RaspbianLinux_ARM_32.tar.gz" compression="gzip">
+			<tarfileset dir="${output.raspbian32}" casesensitive="true" mode="755">
+				<include name="*/DataExplorer" />
+				<include name="*/DevicePropertiesEditor" />
+			</tarfileset>
+			<tarfileset dir="${output.raspbian32}" casesensitive="true" mode="766">
+				<include name="*/DataExplorer.desktop" />
+				<include name="*/DevicePropertiesEditor.desktop" />
+			</tarfileset>
+			<tarfileset dir="${output.raspbian32}" casesensitive="true" mode="644">
+				<include name="**" />
+				<exclude name="*/DataExplorer" />
+				<exclude name="*/DevicePropertiesEditor" />
+				<exclude name="*/DataExplorer.desktop" />
+				<exclude name="*/DevicePropertiesEditor.desktop" />
+			</tarfileset>
+		</tar>
 		
 		<echo message="tar GNULinux 32 bit files" />
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_32.tar.gz" compression="gzip">
