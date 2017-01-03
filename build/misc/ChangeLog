@@ -5,6 +5,7 @@ Version 3.2.9 - yy xxx 2016
 +++++ important update Java 32 Bit -Xmx1024m, 64 Bit -Xmx3096m  +++++
 - fix early rounding while importing CSV data
 - fix CSV import capability using relative time stamp
+- add Raspbian 32 ARM build support 
 S32 (JLog3)
 	- add support
 SM GPS-Logger 1+2 
