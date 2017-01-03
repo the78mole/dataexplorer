@@ -748,7 +748,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											if (!DeviceSelectionDialog.this.activeDevices.contains(deviceName)) DeviceSelectionDialog.this.activeDevices.add(deviceName);
 											if (DeviceSelectionDialog.this.activeDevices.size() >= 1) {
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
-												if (deviceName.equals("MC3000")) {
+												if (deviceName.contains("MC3000") || deviceName.contains("Q200")) {
 													if (GDE.IS_LINUX)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
 													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
