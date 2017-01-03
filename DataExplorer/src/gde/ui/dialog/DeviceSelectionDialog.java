@@ -941,7 +941,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup().name());
 					String link = this.selectedActiveDeviceConfig.getManufacturerURL() != null ? this.selectedActiveDeviceConfig.getManufacturerURL() : Messages.getString(MessageIds.GDE_MSGT0191);
 					this.internetLinkText.setText(link);
-					if (this.deviceConfigurations.get(this.activeDeviceName).getSerialPortType() != null) {
+					if (this.deviceConfigurations.get(this.activeDeviceName).getSerialPortType() != null && !this.deviceConfigurations.get(this.activeDeviceName).getSerialPortType().getPort().equals("USB")) {
 						if (!this.serialPortSelectionGroup.getEnabled() || !this.portSettingsGroup.getEnabled()) {
 							enableSerialPortEntries(true);
 						}
