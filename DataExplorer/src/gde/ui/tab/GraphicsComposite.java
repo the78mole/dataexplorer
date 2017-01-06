@@ -32,8 +32,10 @@ import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
 import gde.utils.CurveUtils;
 import gde.utils.GraphicsUtils;
+import gde.utils.LocalizedDateTime;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
+import gde.utils.LocalizedDateTime.DateTimePattern;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -1829,7 +1831,7 @@ public class GraphicsComposite extends Composite {
 					this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 					this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
 					String graphicsHeaderExtend = this.graphicsHeaderText == null ? GDE.STRING_MESSAGE_CONCAT + recordSet.getName() : this.graphicsHeaderText.substring(11);
-					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", recordSet.getStartTimeStamp()), graphicsHeaderExtend));
+					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd, recordSet.getStartTimeStamp()), graphicsHeaderExtend));
 					this.graphicsHeader.redraw();
 				}
 				this.isRecordCommentChanged = false;

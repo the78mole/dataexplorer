@@ -36,6 +36,8 @@ import gde.ui.SWTResourceManager;
 import gde.ui.tab.GraphicsWindow;
 import gde.utils.CalculationThread;
 import gde.utils.CellVoltageValues;
+import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.LocalizedDateTime.DurationPattern;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
@@ -63,7 +65,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final static long									serialVersionUID								= 26031957;
 	final static Logger								log															= Logger.getLogger(RecordSet.class.getName());
 
-	private final static int					initialRecordCapacity						= 555;																			
+	private final static int					initialRecordCapacity						= 555;
 
 	TimeSteps													timeStep_ms;
 
@@ -157,7 +159,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 
 	public static final String[]			propertyKeys										= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
-			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };	
+			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
 
 	int																configuredDisplayable						= 0;																																																										// number of record which must be displayable before table calculation begins
 
@@ -569,24 +571,31 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @return the timeSteps_ms
+	 * @param index
+	 * @param isAbsolute true forces the formatting to "yyyy-mm-dd HH:mm:ss.SSS"
+	 * @return the timeSteps_ms formatted relative (e.g. "mm:ss.SSS") or absolute 
 	 */
 	public String getFormatedTime_sec(int index, boolean isAbsolute) {
 		if (isAbsolute) {
-			return this.timeStep_ms.getFormattedTime("yyyy-mm-dd HH:mm:ss.SSS", index, isAbsolute);
+			return this.timeStep_ms.getFormattedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, index);
 		}
-		String formatString = "HH:mm:ss.SSS";
-		if (this.getMaxTime_ms() <= 1000 * 60 * 60)
-			formatString = "mm:ss.SSS";
-		else if (this.getMaxTime_ms() <= 1000 * 60 * 60 * 60)
-			formatString = "HH:mm:ss.SSS";
-		else if (this.getMaxTime_ms() > 1000 * 60 * 60 * 60)
-			formatString = "dd HH:mm:ss.SSS";
-		else if (this.getMaxTime_ms() > 1000 * 60 * 60 * 60 * 24)
-			formatString = "MM:dd HH:mm:ss.SSS";
-		else
-			formatString = "yyyy-MM-dd HH:mm:ss.SSS";
-		return this.timeStep_ms.getFormattedTime(formatString, index, isAbsolute);
+		else if (this.getMaxTime_ms() > GDE.ONE_HOUR_MS * 24. * 365. * 11.) {
+			return this.timeStep_ms.getFormattedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, index);
+		}
+		else {
+			final DurationPattern formatString;
+			if (this.getMaxTime_ms() <= GDE.ONE_HOUR_MS)
+				formatString = DurationPattern.mm_ss_SSS;
+			else if (this.getMaxTime_ms() <= GDE.ONE_HOUR_MS * 24.)
+				formatString = DurationPattern.HH_mm_ss_SSS;
+			else if (this.getMaxTime_ms() <= GDE.ONE_HOUR_MS * 24. * 30.)
+				formatString = DurationPattern.dd_HH_mm_ss_SSS;
+			else if (this.getMaxTime_ms() <= GDE.ONE_HOUR_MS * 24. * 365.)
+				formatString = DurationPattern.MM_dd_HH_mm_ss_SSS;
+			else
+				formatString = DurationPattern.yy_MM_dd_HH_mm_ss_SSS;
+			return this.timeStep_ms.getFormattedDuration(formatString, index);
+		}
 	}
 
 	/**
@@ -662,14 +671,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
 	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
-		return this.settings.isPartialDataTable() ? visibleAndDisplayableRecords : this.allRecords;
+		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords;
 	}
 
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
 	public Vector<Record> getVisibleAndDisplayableRecordsForMeasurement() {
-		return visibleAndDisplayableRecords;
+		return this.visibleAndDisplayableRecords;
 	}
 
 	/**
@@ -787,7 +796,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names 
 	 */
-	public String[] getNoneCalculationRecordNames() { 
+	public String[] getNoneCalculationRecordNames() {
 		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
@@ -2343,13 +2352,6 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public long getStartTimeStamp() {
 		return this.timeStep_ms != null ? this.timeStep_ms.getStartTimeStamp() : new Date().getTime();
-	}
-
-	/**
-	 * @return the record set start time stamp yyyy-MM-dd HH:mm:ss.SSS
-	 */
-	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()); //$NON-NLS-1$
 	}
 
 	/**

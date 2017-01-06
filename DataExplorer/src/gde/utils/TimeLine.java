@@ -26,6 +26,8 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.LocalizedDateTime.DurationPattern;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -703,32 +705,32 @@ public class TimeLine {
 		// prepare to make every minute or hour to bold
 		switch (timeFormat) {
 		case TimeLine.TIME_LINE_MSEC: // 1000 sec/min
-			GraphicsUtils.drawTextCentered(StringHelper.getFormatedTime("ss.SSS", timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.ssSSS, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
 			break;
 
 		case TimeLine.TIME_LINE_SEC: // 60 sec/min
-			GraphicsUtils.drawTextCentered(StringHelper.getFormatedTime("mm:ss.SSS", timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.mmssSSS, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
 			break;
 
 		default:
 		case TimeLine.TIME_LINE_SEC_MIN:
 		case TimeLine.TIME_LINE_MIN:
 		case TimeLine.TIME_LINE_MIN_HRS:
-			GraphicsUtils.drawTextCentered(StringHelper.getFormatedTime("HH:mm:ss", timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.HHmmss, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
 			break;
 
 		case TimeLine.TIME_LINE_HRS:
-			GraphicsUtils.drawTextCentered(StringHelper.getFormatedTime("dd HH:mm", timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.dd_HHmm, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
 			break;
 
 		case TimeLine.TIME_LINE_DAYS: // 30 days/month
 		case TimeLine.TIME_LINE_DAYS_MONTH: // 30 days/month
-			GraphicsUtils.drawTextCentered(StringHelper.getFormatedTime("MM-dd HH", timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.MMdd_HH, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
 			break;
 
 		case TimeLine.TIME_LINE_MONTH: // 30 days/month
 		case TimeLine.TIME_LINE_MONTH_YEARS: // 12 month/year
-			GraphicsUtils.drawTextCentered(StringHelper.getFormatedTime("yy-MM-dd", timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.yyMMdd, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
 			break;
 		}
 	}
@@ -795,11 +797,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%s [ss:SSS]", TimeLine.timeFormatSeconds.format(Double.valueOf(milliSeconds).longValue())); //$NON-NLS-1$
+				time = String.format("%s [ss:SSS]", LocalizedDateTime.getFormatedTime(DateTimePattern.ssSSS, (long) milliSeconds)); //$NON-NLS-1$
 			else if (lHours == 0)
-				time = String.format("%s [mm:ss:SSS]", TimeLine.timeFormatMinutes.format(Double.valueOf(milliSeconds).longValue())); //$NON-NLS-1$
+				time = String.format("%s [mm:ss:SSS]", LocalizedDateTime.getFormatedTime(DateTimePattern.mmssSSS, (long) milliSeconds)); //$NON-NLS-1$
 			else
-				time = String.format("%s [HH:mm:ss:SSS]", TimeLine.timeFormatHours.format(Double.valueOf(milliSeconds).longValue())); //$NON-NLS-1$
+				time = String.format("%s [HH:mm:ss:SSS]", LocalizedDateTime.getFormatedTime(DateTimePattern.HHmmssSSS, (long) milliSeconds)); //$NON-NLS-1$
 		}
 		return time;
 	}
@@ -821,11 +823,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = TimeLine.timeFormatSeconds.format(Double.valueOf(milliSeconds).longValue());
+				time = LocalizedDateTime.getFormatedDuration(DurationPattern.ss_SSS, (long) milliSeconds);
 			else if (lHours == 0)
-				time = TimeLine.timeFormatMinutes.format(Double.valueOf(milliSeconds).longValue());
+				time = LocalizedDateTime.getFormatedDuration(DurationPattern.mm_ss_SSS, (long) milliSeconds);
 			else {
-				time = TimeLine.timeFormatHours.format(Double.valueOf(milliSeconds).longValue());
+				time = LocalizedDateTime.getFormatedDuration(DurationPattern.HH_mm_ss_SSS, (long) milliSeconds);
 				if (Integer.parseInt(time.substring(0, time.indexOf(GDE.STRING_COLON))) != lHours) time = String.format("%02d%s", lHours, time.substring(time.indexOf(GDE.STRING_COLON)));
 			}
 		}

@@ -158,6 +158,8 @@ public class SettingsDialog extends Dialog {
 	Group																histoForceObjectGroup;
 	Button															histoSkipFilesWithoutObject;
 	Button															histoSkipFilesWithOtherObject;
+	Group																timeZoneGroup;
+	Button															dateTimeUtc;
 	CTabItem														analysisTabItem;
 	CTabFolder													settingsTabFolder;
 	Slider															alphaSlider;
@@ -978,6 +980,37 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 						} // end histoBoxplot group
+						{
+							this.timeZoneGroup = new Group(this.miscComposite, SWT.NONE);
+							RowData groupLData = new RowData();
+							groupLData.width = 288;
+							this.timeZoneGroup.setLayoutData(groupLData);
+							FormLayout formLayout = new FormLayout();
+							formLayout.marginTop = 7;
+									formLayout.marginBottom = 3;
+							formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 0;
+							this.timeZoneGroup.setLayout(formLayout);
+							this.timeZoneGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.timeZoneGroup.setText(Messages.getString(MessageIds.GDE_MSGT0805));
+							{
+								this.dateTimeUtc = new Button(this.timeZoneGroup, SWT.CHECK);
+								FormData formData = new FormData();
+								formData.left = new FormAttachment(0, 5);
+								this.dateTimeUtc.setLayoutData(formData);
+								this.dateTimeUtc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.dateTimeUtc.setText(Messages.getString(MessageIds.GDE_MSGT0810));
+								this.dateTimeUtc.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0811));
+								this.dateTimeUtc.setSelection(this.settings.isDateTimeUtc());
+								this.dateTimeUtc.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "dateTimeUtc.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setDateTimeUtc(SettingsDialog.this.dateTimeUtc.getSelection());
+										SettingsDialog.this.application.updateHistoTabs(false);
+									}
+								});
+							}
+						} // end timeZoneGroup group
 						{
 							this.histoFileContentsGroup = new Group(this.miscComposite, SWT.NONE);
 							RowData histoFileContentsGroupLData = new RowData();

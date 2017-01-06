@@ -473,8 +473,4 @@ public class HistoRecordSet extends RecordSet {
 		super.setName(newName);
 	}
 
-	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.getStartTimeStamp()); //$NON-NLS-1$
-	}
-
 }

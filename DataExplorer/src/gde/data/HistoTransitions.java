@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.data;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +38,7 @@ import gde.device.TransitionValueTypes;
 import gde.log.Level;
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
+import gde.utils.StringHelper;
 
 /**
  * holds all transitions for the history recordSet.
@@ -87,7 +87,6 @@ public class HistoTransitions extends Vector<Transition> {
 	private class SettlementDeque extends ArrayDeque<Double> {
 
 		private static final long				serialVersionUID	= 915484098600135376L;
-		private final SimpleDateFormat	timeFormat				= new SimpleDateFormat("HH:mm:ss.SSS");
 
 		private boolean									isMinimumExtremum;
 		private long										timePeriod_100ns;
@@ -509,9 +508,8 @@ public class HistoTransitions extends Vector<Transition> {
 			return Arrays.asList(this.timeStampDeque.toArray(new Long[0]));
 		}
 
-		public String getFormattedTime(int index) {
-			return this.timeFormat.format(this.getTimestamps_100ns().get(index) / 10);
-
+		public String getFormatedDuration(int index) {
+			return StringHelper.getFormatedDuration("HH:mm:ss.SSS", this.getTimestamps_100ns().get(index) / 10);
 		}
 
 		/**
@@ -668,7 +666,7 @@ public class HistoTransitions extends Vector<Transition> {
 						}
 						else {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
-									this.thresholdDeque.getFormattedTime(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
+									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							this.triggerState = TriggerState.WAITING;
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 							this.referenceDeque.addLastByMoving(this.thresholdDeque);
@@ -684,7 +682,7 @@ public class HistoTransitions extends Vector<Transition> {
 						int removedCount = this.thresholdDeque.tryAddLastByMoving(this.recoveryDeque);
 						if (removedCount > 0 && this.recoveryDeque.isEmpty()) {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("recovery jitters provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
-									this.thresholdDeque.getFormattedTime(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
+									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							// all recovery entries including the current entry are now in the threshold phase
 							this.triggerState = TriggerState.TRIGGERED;
 							// thresholdStartIndex is not modified by jitters;
@@ -804,7 +802,7 @@ public class HistoTransitions extends Vector<Transition> {
 						}
 						else {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
-									this.thresholdDeque.getFormattedTime(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
+									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							this.triggerState = TriggerState.WAITING;
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
@@ -829,9 +827,9 @@ public class HistoTransitions extends Vector<Transition> {
 			// take the current transition even if the recovery time is not exhausted
 			if (this.triggerState == TriggerState.RECOVERING) {
 				// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
-				if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue()) //
-						&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue())//
-						&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
+					if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue()) //
+							&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue()) //
+							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
 					Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(), this.recoveryDeque.startIndex,
 							this.recoveryDeque.size(), transitionRecord, transitionType);
 					transition.setReferenceExtremumValue(this.referenceDeque.extremeValue);
@@ -840,6 +838,10 @@ public class HistoTransitions extends Vector<Transition> {
 					this.add(transition);
 					log.log(Level.OFF, transition.toString());
 				}
+			}
+			else if (this.triggerState == TriggerState.TRIGGERED) {
+				log.log(Level.OFF, String.format("ends %s %s  referenceExtreme=%f ", this.triggerState, this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), this.referenceDeque.extremeValue)
+						+ this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues());
 			}
 		} // end isPulse
 		else if (transitionType.getClassType() == TransitionClassTypes.SLOPE) {
@@ -884,7 +886,7 @@ public class HistoTransitions extends Vector<Transition> {
 						}
 						else {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
-									this.thresholdDeque.getFormattedTime(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
+									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							this.triggerState = TriggerState.WAITING;
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 							this.referenceDeque.initialize(i - this.thresholdDeque.size());
@@ -919,7 +921,7 @@ public class HistoTransitions extends Vector<Transition> {
 	@Override
 	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%s > %s %s:", this.previousTriggerState, this.triggerState, this.referenceDeque.getFormattedTime(this.referenceDeque.size() - 1)));
+		sb.append(String.format("%s > %s %s:", this.previousTriggerState, this.triggerState, this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1)));
 		sb.append(String.format(" referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", this.referenceDeque.size(), this.thresholdDeque.size(), this.recoveryDeque.size()))
 				.append(GDE.STRING_NEW_LINE);
 		sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues());

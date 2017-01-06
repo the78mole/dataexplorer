@@ -92,21 +92,21 @@ public class Transition {
 	/**
 	 * @return HH:mm:ss.SSS
 	 */
-	public String getFormattedTime(int index) {
-		return this.transitionRecord.parent.timeStep_ms.getFormattedTime("HH:mm:ss.SSS", index, false).substring(13);
+	public String getFormatedDuration(int index) {
+		return StringHelper.getFormatedDuration("HH:mm:ss.SSS", (long) this.transitionRecord.parent.timeStep_ms.getTime_ms(index)); //$NON-NLS-1$
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.transitionType.getTransitionId()).append(GDE.STRING_BLANK).append(GDE.STRING_BLANK);
-		sb.append("threshold=").append(getFormattedTime(this.thresholdStartIndex)).append(GDE.STRING_OR).append(this.thresholdExtremumValue).append(GDE.STRING_COMMA_BLANK);
+		sb.append("threshold=").append(getFormatedDuration(this.thresholdStartIndex)).append(GDE.STRING_OR).append(this.thresholdExtremumValue).append(GDE.STRING_COMMA_BLANK);
 		sb.append("isPeak=").append(isPeak()).append(GDE.STRING_COMMA_BLANK).append("isSlope=").append(isSlope()).append(GDE.STRING_COMMA_BLANK);
 		sb.append("referenceStartIndex=").append(this.startIndex).append(GDE.STRING_COMMA_BLANK);
-		sb.append("reference=").append(getFormattedTime(this.startIndex)).append(GDE.STRING_OR).append(this.referenceExtremumValue).append(GDE.STRING_COMMA_BLANK);
+		sb.append("reference=").append(getFormatedDuration(this.startIndex)).append(GDE.STRING_OR).append(this.referenceExtremumValue).append(GDE.STRING_COMMA_BLANK);
 		if (this.recoveryStartIndex > 0) {
 			sb.append(GDE.STRING_COMMA_BLANK);
-			sb.append("recovery=").append(getFormattedTime(this.recoveryStartIndex)).append(GDE.STRING_OR).append(this.recoveryExtremumValue).append(GDE.STRING_COMMA_BLANK);
+			sb.append("recovery=").append(getFormatedDuration(this.recoveryStartIndex)).append(GDE.STRING_OR).append(this.recoveryExtremumValue).append(GDE.STRING_COMMA_BLANK);
 		}
 		return sb.toString();
 	}

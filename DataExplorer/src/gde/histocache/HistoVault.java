@@ -460,8 +460,9 @@ public class HistoVault {
 		this.vaultName = HistoVault.getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal);
 		this.vaultCreatedMs = System.currentTimeMillis();
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
-				String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s",
-						objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, getOriginLastModifiedFormatted(), getStartTimeStampFormatted(), logChannelNumber, logObjectKey));
+				String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
+						objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
+						StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //$NON-NLS-1$
 	}
 
@@ -484,7 +485,7 @@ public class HistoVault {
 				logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey);
 		newHistoVault.measurements = new Entries();
 		newHistoVault.settlements = new Entries();
-		newHistoVault.scores = new EntryPoints(0, "truss");
+		newHistoVault.scores = new EntryPoints(0, "truss"); //$NON-NLS-1$
 		return newHistoVault;
 	}
 
@@ -497,7 +498,7 @@ public class HistoVault {
 	 * @return new instance with a basic set of data
 	 */
 	public static HistoVault createTruss(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName) {
-		return createTruss(objectDirectory, file, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(), DataExplorer.getInstance().getActiveChannelNumber(),
+		return createTruss(objectDirectory, file, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(), DataExplorer.getInstance().getActiveChannelNumber(), //$NON-NLS-1$
 				objectDirectory);
 	}
 
@@ -667,7 +668,7 @@ public class HistoVault {
 	 * @return the file name as a unique identifier (sha1)
 	 */
 	private static String getVaultName(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal) {
-		return sha1(HistoVault.getVaultsDirectory() + String.format("%s,%d,%d,%d", newLogFileName.getFileName(), newFileLastModified_ms, newFileLength, newLogRecordSetOrdinal));
+		return sha1(HistoVault.getVaultsDirectory() + String.format("%s,%d,%d,%d", newLogFileName.getFileName(), newFileLastModified_ms, newFileLength, newLogRecordSetOrdinal)); //$NON-NLS-1$
 	}
 
 	/**
@@ -879,7 +880,7 @@ public class HistoVault {
 								HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, recordSet, INITIAL_SETTLEMENT_CAPACITY);
 								histoSettlements.put(settlementType.getName(), histoSettlement);
 								if (settlementType.getEvaluation().getCalculation() != null) { // todo decide if evaluations without calculation are useful
-									Integer transitionId = settlementType.getEvaluation().getCalculation().getTransitionId(); 
+									Integer transitionId = settlementType.getEvaluation().getCalculation().getTransitionId();
 									histoSettlement.addFromTransitions(transitions, channelType.getTransitionById(transitionId));
 								}
 							}
@@ -1058,22 +1059,8 @@ public class HistoVault {
 	/**
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
-	public String getVaultCreatedFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.vaultCreatedMs);
-	}
-
-	/**
-	 * @return yyyy-MM-dd HH:mm:ss
-	 */
-	public String getOriginLastModifiedFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.logFileLastModified);
-	}
-
-	/**
-	 * @return yyyy-MM-dd HH:mm:ss
-	 */
 	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs);
+		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.logStartTimestampMs); //$NON-NLS-1$
 	}
 
 	/**
@@ -1110,14 +1097,14 @@ public class HistoVault {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.vaultName).append(GDE.STRING_COMMA_BLANK);
-		sb.append("isTruss=").append(isTruss()).append(GDE.STRING_COMMA_BLANK);
-		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(GDE.STRING_COMMA_BLANK);
-		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(GDE.STRING_COMMA_BLANK);
-		sb.append("logChannelNumber=").append(this.logChannelNumber).append(GDE.STRING_COMMA_BLANK);
-		sb.append("logObjectKey=").append(this.logObjectKey).append(GDE.STRING_COMMA_BLANK);
-		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(GDE.STRING_COMMA_BLANK);
+		sb.append("isTruss=").append(isTruss()).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("logChannelNumber=").append(this.logChannelNumber).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("logObjectKey=").append(this.logObjectKey).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
 		sb.append(this.logFilePath).append(GDE.STRING_COMMA_BLANK);
-		sb.append("vaultDirectory=").append(this.vaultDirectory);
+		sb.append("vaultDirectory=").append(this.vaultDirectory); //$NON-NLS-1$
 		return sb.toString();
 	}
 }

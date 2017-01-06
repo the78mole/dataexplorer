@@ -34,6 +34,8 @@ import gde.ui.SWTResourceManager;
 import gde.utils.HistoCurveUtils;
 import gde.utils.GraphicsUtils;
 import gde.utils.HistoTimeLine;
+import gde.utils.LocalizedDateTime;
+import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
@@ -95,12 +97,12 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		this.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event evt) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.controlResized() = " + evt);
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.controlResized() = " + evt); //$NON-NLS-1$
 				Rectangle clientRect = HistoGraphicsComposite.this.getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, HistoGraphicsComposite.this.oldSize + " - " + size);
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$
 				if (!HistoGraphicsComposite.this.oldSize.equals(size)) {
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "size changed, update " + HistoGraphicsComposite.this.oldSize + " - " + size);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "size changed, update " + HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
 					HistoGraphicsComposite.this.oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
@@ -157,17 +159,17 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 							RecordSet recordSet = activeChannel.getActiveRecordSet();
 							if (recordSet != null) {
 								String tmpDescription = activeChannel.getFileDescription();
-								if (tmpDescription.contains(":")) {
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":"));
+								if (tmpDescription.contains(":")) { //$NON-NLS-1$
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":")); //$NON-NLS-1$
 								}
-								if (tmpDescription.contains(";")) {
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(";"));
+								if (tmpDescription.contains(";")) { //$NON-NLS-1$
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(";")); //$NON-NLS-1$
 								}
-								if (tmpDescription.contains("\r")) {
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\r"));
+								if (tmpDescription.contains("\r")) { //$NON-NLS-1$
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\r")); //$NON-NLS-1$
 								}
-								if (tmpDescription.contains("\n")) {
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
+								if (tmpDescription.contains("\n")) { //$NON-NLS-1$
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n")); //$NON-NLS-1$
 								}
 								String tmpHeader = tmpDescription + GDE.STRING_MESSAGE_CONCAT + recordSet.getName();
 								if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
@@ -746,11 +748,11 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			gc.drawLine(x0 - 1, yMax - 1, x0 - 1, y0);
 			gc.drawLine(xMax + 1, yMax - 1, xMax + 1, y0);
 
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedTime("ss.SSS", (new Date().getTime() - startInitTime)));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			long startTime = new Date().getTime();
 			drawTrailRecordSet((TrailRecordSet) recordSet, gc, dataScaleWidth, x0, y0, width, height);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedTime("ss.SSS", (new Date().getTime() - startTime)));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -772,7 +774,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (log.isLoggable(Level.FINE) && isActualRecordEnabled)
 				log.log(Level.FINE, "record=" + actualRecord.getName() + "  isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						+ " isScaleSynced=" + actualRecord.isScaleSynced());
+						+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
 			if (actualRecord.isScaleVisible())
 				HistoCurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
@@ -856,7 +858,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		this.graphicsHeader.redraw();
 
 		if (!GDE.IS_LINUX) { // old code changed due to Mountain Lion refresh problems
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5, 5, 5, 5, true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
@@ -864,7 +866,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			this.graphicCanvas.redraw(size.x - 5, size.y - 5, 5, 5, true);
 		}
 		else {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required");
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required"); //$NON-NLS-1$
 			this.graphicCanvas.redraw(); // do full update where required
 		}
 		this.recordSetComment.redraw();
@@ -1519,7 +1521,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				if (this.isZoomMouse) {
 					if (this.isTransientZoom) {
 						this.isResetZoomPosition = false;
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.isZoomMouse + " - " + recordSet.isZoomMode() + " - " + this.isResetZoomPosition); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.isZoomMouse + " - " + recordSet.isZoomMode() + " - " + this.isResetZoomPosition); //$NON-NLS-1$ //$NON-NLS-2$
 
 						// sort the zoom values
 						int xStart, xEnd, yMin, yMax;
@@ -1677,17 +1679,17 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		int width = graphicsBounds.width;
 		int height = this.headerHeight;
 		this.graphicsHeader.setBounds(x, y, width, height);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.setBounds " + this.graphicsHeader.getBounds());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.setBounds " + this.graphicsHeader.getBounds()); //$NON-NLS-1$
 
 		y = this.headerGap + this.headerHeight;
 		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
 		this.graphicCanvas.setBounds(x, y, width, height);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.setBounds " + this.graphicCanvas.getBounds());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.setBounds " + this.graphicCanvas.getBounds()); //$NON-NLS-1$
 
 		y = this.headerGap + this.headerHeight + height + this.commentGap;
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width - 40, height - 5);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds()); //$NON-NLS-1$
 	}
 
 	/**
@@ -1710,7 +1712,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 					this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 					this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
 					String graphicsHeaderExtend = this.graphicsHeaderText == null ? GDE.STRING_MESSAGE_CONCAT + recordSet.getName() : this.graphicsHeaderText.substring(11);
-					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", StringHelper.getFormatedTime("yyyy-MM-dd", recordSet.getStartTimeStamp()), graphicsHeaderExtend));
+					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd, recordSet.getStartTimeStamp()), graphicsHeaderExtend)); //$NON-NLS-1$ 
 					this.graphicsHeader.redraw();
 				}
 				this.isRecordCommentChanged = false;
@@ -1823,25 +1825,25 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		Properties displayProps = this.settings.getMeasurementDisplayProperties();
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
-			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE + 1, SWT.BOLD));
+			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE + 1, SWT.BOLD)); //$NON-NLS-1$
 			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecordsForMeasurement();
 			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
-			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET))));
+			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET)))); //$NON-NLS-1$
 			for (Record record : records) {
 				if (displayProps.getProperty(record.getName()) != null)
-					sb.append(String.format("|%-10s", displayProps.getProperty(record.getName())));
+					sb.append(String.format("|%-10s", displayProps.getProperty(record.getName()))); //$NON-NLS-1$
 				else {
 					final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
 					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length() : record.getName().length());
-					final String format = "|%-" + (10 - unit.length()) + "s%" + unit.length() + "s";
+					final String format = "|%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sb.append(String.format(format, name, unit));
 				}
 			}
-			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET) - 1)));
+			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET) - 1))); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Record record : records) {
-				sb.append(String.format("|%7s   ", record.getVerticalDisplayPointAsFormattedScaleValue(record.getVerticalDisplayPointValue(this.xPosMeasure), this.curveAreaBounds)));
+				sb.append(String.format("|%7s   ", record.getVerticalDisplayPointAsFormattedScaleValue(record.getVerticalDisplayPointValue(this.xPosMeasure), this.curveAreaBounds))); //$NON-NLS-1$
 			}
-			return sb.append("|").toString();
+			return sb.append("|").toString(); //$NON-NLS-1$
 		}
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		return this.recordSetCommentText != null ? this.recordSetCommentText : GDE.STRING_EMPTY;

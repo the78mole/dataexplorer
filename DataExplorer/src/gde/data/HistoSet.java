@@ -69,6 +69,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.LocalizedDateTime;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
@@ -281,7 +282,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 				else { // histo record sets are ready to use
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d files    file paths verified     time=%s [ss.SSS]", this.getHistoFilePaths().size(), //$NON-NLS-1$
-							StringHelper.getFormatedTime("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
+						StringHelper.getFormatedDuration("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
 				}
 				if (isWithUi) this.application.setProgress(5, sThreadId);
 			}

@@ -18,26 +18,26 @@
 ****************************************************************************************/
 package gde.data;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import gde.log.Level;
+import gde.utils.LocalizedDateTime;
+import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.LocalizedDateTime.DurationPattern;
 
 /**
  * TimeSteps class handles all the time steps of a record set or a record of part of compare set
  * @author Winfried Brügmann
  */
 public class TimeSteps extends Vector<Long> {
-	final static String			$CLASS_NAME					= RecordSet.class.getName();
-	final static long				serialVersionUID		= 26031957;
-	final static Logger			log									= Logger.getLogger(RecordSet.class.getName());
+	final static String	$CLASS_NAME				= RecordSet.class.getName();
+	final static long		serialVersionUID	= 26031957;
+	final static Logger	log								= Logger.getLogger(RecordSet.class.getName());
 
-	final boolean						isConstant;																														// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
-	final SimpleDateFormat	timeFormat					= new SimpleDateFormat("HH:mm:ss.SSS");
-	final SimpleDateFormat	absoluteTimeFormat	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	long										startTimeStamp_ms		= 0;
+	final boolean				isConstant;																											// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
+	long								startTimeStamp_ms	= 0;
 
 	/**
 	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
@@ -45,8 +45,7 @@ public class TimeSteps extends Vector<Long> {
 	 * @param newTimeStep_ms
 	 */
 	public TimeSteps(double newTimeStep_ms) {
-		super(newTimeStep_ms < 0 ? 555 : 5); 
-		this.timeFormat.getTimeZone().setRawOffset(0);
+		super(newTimeStep_ms < 0 ? 555 : 5);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
 		this.startTimeStamp_ms = new Date().getTime();
@@ -60,7 +59,6 @@ public class TimeSteps extends Vector<Long> {
 	 */
 	public TimeSteps(double newTimeStep_ms, int initialCapacity) {
 		super(newTimeStep_ms < 0 ? initialCapacity : 5);
-		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) super.add(Double.valueOf(newTimeStep_ms * 10).longValue());
 		this.startTimeStamp_ms = new Date().getTime();
@@ -128,11 +126,11 @@ public class TimeSteps extends Vector<Long> {
 	 */
 	public double getDeltaTime(int indexStart, int indexEnd) {
 		if (indexStart < 0) {
-			log.log(Level.WARNING, "indexStart < 0 " + indexStart);
+			log.log(Level.WARNING, "indexStart < 0 " + indexStart); //$NON-NLS-1$
 			indexStart = 0;
 		}
 		if (indexEnd > this.elementCount - 1) {
-			log.log(Level.WARNING, "indexEnd > this.elementCount - 1 " + indexEnd);
+			log.log(Level.WARNING, "indexEnd > this.elementCount - 1 " + indexEnd); //$NON-NLS-1$
 			indexEnd = this.elementCount - 1;
 		}
 		indexEnd = indexEnd > this.elementCount - 1 ? this.elementCount - 1 : indexEnd;
@@ -151,14 +149,22 @@ public class TimeSteps extends Vector<Long> {
 	}
 
 	/**
-	 * query time at an index position and return as HH:mm:ss:SSS formated string
-	 * @param formatPattern yy:mm:dd HH:mm:ss:SSS
+	 * @param formatPattern
 	 * @param index
-	 * @return time fit to index
+	 * @param isAbsolute true adds the start timestamp to the timestep value
+	 * @return the absolute time at the index position as 25 char formated string
 	 */
-	public String getFormattedTime(String formatPattern, int index, boolean isAbsolute) {
-		this.timeFormat.applyPattern(formatPattern);
-		return String.format("%25s", isAbsolute ? this.getIndexDateTime(index) : this.timeFormat.format(this.getTime_ms(index)));
+	public String getFormattedTime(DateTimePattern formatPattern, int index) {
+		return String.format("%25s", LocalizedDateTime.getFormatedTime(formatPattern,  this.startTimeStamp_ms + (long) getTime_ms(index))); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param formatPattern
+	 * @param index
+	 * @return the time duration value at the index position as 25 char formated string
+	 */
+	public String getFormattedDuration(DurationPattern formatPattern, int index) {
+		return String.format("%25s", LocalizedDateTime.getFormatedDuration(formatPattern, (long) this.getTime_ms(index))); //$NON-NLS-1$
 	}
 
 	/**
@@ -188,7 +194,7 @@ public class TimeSteps extends Vector<Long> {
 	 */
 	public double getAverageTimeStep_ms() {
 		try {
-			return this.isConstant ? this.getTime_ms(1) : (double) this.lastElement() / elementCount / 10.0 ; 
+			return this.isConstant ? this.getTime_ms(1) : (double) this.lastElement() / elementCount / 10.0;
 		}
 		catch (Exception e) {
 			// a redraw event where the record set has no records 
@@ -360,12 +366,4 @@ public class TimeSteps extends Vector<Long> {
 		return this.startTimeStamp_ms;
 	}
 
-	/**
-	 * query the formated absolute date time at index
-	 * @param index
-	 * @return
-	 */
-	public String getIndexDateTime(int index) {
-		return absoluteTimeFormat.format(this.startTimeStamp_ms + getTime_ms(index));
-	}
 }

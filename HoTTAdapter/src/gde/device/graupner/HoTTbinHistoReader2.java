@@ -122,7 +122,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		long numberDatablocks = file.length() / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
 		tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader2.application.getActiveChannelNumber(), true, true, false);
 		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
-		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + tmpRecordSet.getStartTimeStampFormatted());
+		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
 		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader2.filePath.getFileName().toString());
 		if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinHistoReader2.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getLogRecordsetBaseName());
 
@@ -200,7 +200,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.countLostPackages = 0;
 		HoTTbinHistoReader2.isJustParsed = false;
 		int countPackageLoss = 0;
-		HistoRandomSample histoRandomSample = new HistoRandomSample(device, device.getNumberOfMeasurements(activeChannelNumber), recordTimespan_ms);
+		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, maxPoints, minPoints,  recordTimespan_ms);
 
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
@@ -554,7 +554,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.isJustParsed = false;
 		HoTTbinHistoReader2.isTextModusSignaled = false;
 		int countPackageLoss = 0;
-		HistoRandomSample histoRandomSample = new HistoRandomSample(device, device.getNumberOfMeasurements(activeChannelNumber), recordTimespan_ms);
+		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, maxPoints, minPoints,  recordTimespan_ms);
 
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);

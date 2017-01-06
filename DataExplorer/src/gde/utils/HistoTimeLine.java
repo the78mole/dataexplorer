@@ -28,8 +28,8 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.LocalizedDateTime.DateTimePattern;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -60,29 +60,6 @@ public class HistoTimeLine {
 	private final Settings			settings		= Settings.getInstance();
 	private final HistoSet			histoSet		= HistoSet.getInstance();
 
-	private enum TimeLine {
-		MONTH_TO_DAY, MONTH_TO_HOUR, YEAR_TO_MONTH, DATE, DATE_TIME
-	}
-
-	private enum TimeFormat {
-		MonthDay(new SimpleDateFormat("MM-dd")), MonthHour(new SimpleDateFormat("MM-dd HH")), YearMonth(new SimpleDateFormat("yyyy-MM")), Date(new SimpleDateFormat("yyyy-MM-dd")), DateTime(
-				new SimpleDateFormat("yyyy-MM-dd HH:mm"));
-
-		private final SimpleDateFormat	simpleDateFormat;
-		/**
-		 * use this to avoid repeatedly cloning actions instead of values()
-		 */
-		public final static TimeFormat	values[]	= values();	
-
-		private TimeFormat(SimpleDateFormat simpleDateFormat) {
-			this.simpleDateFormat = simpleDateFormat;
-		}
-
-		public String toPattern() {
-			return this.simpleDateFormat.toPattern();
-		}
-	}
-
 	enum Density {
 		EXTREME(4), HIGH(8), MEDIUM(10), LOW(16);
 
@@ -93,7 +70,7 @@ public class HistoTimeLine {
 		/**
 		 * use this to avoid repeatedly cloning actions instead of  values()
 		 */
-		public final static Density	values[]					= values();					
+		public final static Density	values[]					= values();
 
 		private Density(int boxWidth) {
 			this.boxWidth = boxWidth;
@@ -151,31 +128,54 @@ public class HistoTimeLine {
 		gc.drawLine(x0 - 1, y0, x0 + this.width + 1, y0);
 		if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
-		long totalDisplayTime_ms = (long) (this.trailRecordSet.getStartTimeStamp() - (long) this.trailRecordSet.getMaxTime_ms());
-		TimeLine timeFormat = this.getScaleFormat(totalDisplayTime_ms);
+		// calculate the maximum time to be displayed and define the corresponding label format
+		final DateTimePattern timeFormat;
+		long totalTime_month = TimeUnit.DAYS.convert(this.trailRecordSet.getStartTimeStamp() - (long) this.trailRecordSet.getMaxTime_ms(), TimeUnit.MILLISECONDS) / 30;
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(this.leftmostTimeStamp); // start year
+		if (totalTime_month < 12 && Calendar.getInstance().get(Calendar.YEAR) == cal.get(Calendar.YEAR)) { // starts in the current year
+			if (this.density == Density.EXTREME)
+				timeFormat = DateTimePattern.MMdd;
+			else if (this.density == Density.HIGH)
+				timeFormat = DateTimePattern.MMdd_HH;
+			else if (this.density == Density.MEDIUM)
+				timeFormat = DateTimePattern.yyyyMMdd;
+			else
+				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
+		}
+		else {
+			if (this.density == Density.EXTREME)
+				timeFormat = DateTimePattern.yyyyMM;
+			else if (this.density == Density.HIGH)
+				timeFormat = DateTimePattern.yyyyMM;
+			else if (this.density == Density.MEDIUM)
+				timeFormat = DateTimePattern.yyyyMMdd;
+			else
+				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
+		}
+		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		String timeLineDescription;
 		Point pt; // to calculate the space required to draw the time values
-		if (timeFormat == TimeLine.MONTH_TO_DAY) {
+		if (timeFormat == DateTimePattern.MMdd) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0745);
-			pt = gc.textExtent(StringHelper.getFormatedTime(TimeFormat.MonthDay.toPattern(), this.histoSet.firstKey())); // $NON-NLS-1$
 		}
-		else if (timeFormat == TimeLine.MONTH_TO_HOUR) {
+		else if (timeFormat == DateTimePattern.MMdd_HH) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0744);
-			pt = gc.textExtent(StringHelper.getFormatedTime(TimeFormat.MonthHour.toPattern(), this.histoSet.firstKey())); // $NON-NLS-1$
 		}
-		else if (timeFormat == TimeLine.YEAR_TO_MONTH) {
+		else if (timeFormat == DateTimePattern.yyyyMM) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0743);
-			pt = gc.textExtent(StringHelper.getFormatedTime(TimeFormat.YearMonth.toPattern(), this.histoSet.firstKey())); // $NON-NLS-1$
 		}
-		else if (timeFormat == TimeLine.DATE) {
+		else if (timeFormat == DateTimePattern.yyyyMMdd) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0742);
-			pt = gc.textExtent(StringHelper.getFormatedTime(TimeFormat.Date.toPattern(), this.histoSet.firstKey())); // $NON-NLS-1$
+		}
+		else if (timeFormat == DateTimePattern.yyyyMMdd_HHmm) {
+			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0741);
 		}
 		else {
-			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0741);
-			pt = gc.textExtent(StringHelper.getFormatedTime(TimeFormat.DateTime.toPattern(), this.histoSet.firstKey())); // $NON-NLS-1$
+			throw new UnsupportedOperationException();
 		}
+		pt = gc.textExtent(LocalizedDateTime.getFormatedTime(timeFormat, this.histoSet.firstKey())); // $NON-NLS-1$
 		GraphicsUtils.drawTimeLineText(timeLineDescription, (x0 + this.width / 2), y0 + pt.y * 5 / 2 + 2, gc, SWT.HORIZONTAL);
 		drawTickMarks(gc, x0, y0, pt, timeFormat);
 	}
@@ -185,40 +185,35 @@ public class HistoTimeLine {
 	 * @param totalDisplayTime_ms timespan
 	 * @return format (e.g. TimeLine.TIME_LINE_DATE_TIME)
 	 */
-	public TimeLine getScaleFormat(long totalDisplayTime_ms) {
-		TimeLine format = TimeLine.DATE; // the time format type
+	public DateTimePattern getScaleFormat(long totalDisplayTime_ms) {
+		final DateTimePattern timeFormat;
 		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "totalDisplayTime_ms = " + totalDisplayTime_ms); //$NON-NLS-1$
 
-		long totalTime_sec = totalDisplayTime_ms / 1000;
-		long totalTime_days = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS);
-		long totalTime_month = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS) / 30;
-		long totalTime_year = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS) / 365;
-		if (HistoTimeLine.log.isLoggable(Level.FINER))
-			HistoTimeLine.log.log(Level.FINER, "totalTime_year = " + totalTime_year + "; totalTime_month = " + totalTime_month + "; totalTime_days = " + totalTime_days); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		long totalTime_month = TimeUnit.DAYS.convert(totalDisplayTime_ms / 1000, TimeUnit.SECONDS) / 30;
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(this.leftmostTimeStamp); // start year
 		if (totalTime_month < 12 && Calendar.getInstance().get(Calendar.YEAR) == cal.get(Calendar.YEAR)) { // starts in the current year
 			if (this.density == Density.EXTREME)
-				format = TimeLine.MONTH_TO_DAY;
+				timeFormat = DateTimePattern.MMdd;
 			else if (this.density == Density.HIGH)
-				format = TimeLine.MONTH_TO_HOUR;
+				timeFormat = DateTimePattern.MMdd_HH;
 			else if (this.density == Density.MEDIUM)
-				format = TimeLine.DATE;
+				timeFormat = DateTimePattern.yyyyMMdd;
 			else
-				format = TimeLine.DATE_TIME;
+				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
 		}
 		else {
 			if (this.density == Density.EXTREME)
-				format = TimeLine.YEAR_TO_MONTH;
+				timeFormat = DateTimePattern.yyyyMM;
 			else if (this.density == Density.HIGH)
-				format = TimeLine.YEAR_TO_MONTH;
+				timeFormat = DateTimePattern.yyyyMM;
 			else if (this.density == Density.MEDIUM)
-				format = TimeLine.DATE;
+				timeFormat = DateTimePattern.yyyyMMdd;
 			else
-				format = TimeLine.DATE_TIME;
+				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
 		}
 		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return format;
+		return timeFormat;
 	}
 
 	/**
@@ -400,26 +395,15 @@ public class HistoTimeLine {
 		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, String.format("density = %s  ", this.density.toString()));
 	}
 
-	private void drawTickMarks(GC gc, int x0, int y0, Point pt, TimeLine timeFormat) {
+	private void drawTickMarks(GC gc, int x0, int y0, Point pt, DateTimePattern timeFormat) {
 		int tickLength = pt.y / 2 + 1;
 		int gap = pt.y / 3;
 		int labelGap = 4;
 		int lastXPosLabel = -Integer.MAX_VALUE;
-		String timePattern;
-		if (timeFormat == TimeLine.MONTH_TO_DAY)
-			timePattern = TimeFormat.MonthDay.toPattern();
-		else if (timeFormat == TimeLine.MONTH_TO_HOUR)
-			timePattern = TimeFormat.MonthHour.toPattern();
-		else if (timeFormat == TimeLine.YEAR_TO_MONTH)
-			timePattern = TimeFormat.YearMonth.toPattern();
-		else if (timeFormat == TimeLine.DATE)
-			timePattern = TimeFormat.Date.toPattern();
-		else
-			timePattern = TimeFormat.DateTime.toPattern();
 		String lastText = GDE.STRING_BLANK;
 		for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed -> important for next if
 			int xPos = x0 + entry.getValue();
-			String text = StringHelper.getFormatedTime(timePattern, entry.getKey());
+			String text = LocalizedDateTime.getFormatedTime(timeFormat, entry.getKey());
 			if ((this.settings.isXAxisReversed() && lastXPosLabel + pt.x + labelGap < xPos && !lastText.equals(text))
 					|| (!this.settings.isXAxisReversed() && lastXPosLabel - pt.x - labelGap > xPos && !lastText.equals(text))) {
 				gc.drawLine(xPos, y0 + 1, xPos, y0 + tickLength);

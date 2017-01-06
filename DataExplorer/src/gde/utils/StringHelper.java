@@ -42,7 +42,7 @@ import org.eclipse.swt.graphics.Point;
  * class with collection of string helper finctions
  */
 public class StringHelper {
-	final static Logger	log	= Logger.getLogger(StringHelper.class.getName());
+	final static Logger log = Logger.getLogger(StringHelper.class.getName());
 
 	/**
 	 * split the given string at delimiter to hash map where the keys are used for hashes
@@ -50,8 +50,8 @@ public class StringHelper {
 	 * @param delimiter
 	 * @param hashKeys
 	 */
-	public static HashMap<String,String> splitString(String line, String delimiter, String[] hashKeys) {
-		HashMap<String,String> resultMap = new HashMap<String, String>();
+	public static HashMap<String, String> splitString(String line, String delimiter, String[] hashKeys) {
+		HashMap<String, String> resultMap = new HashMap<String, String>();
 		if (line != null && line.length() > 5) {
 			String tmpStr = line;
 			int endindex = 0;
@@ -119,21 +119,21 @@ public class StringHelper {
 		}
 		return result.toArray(new String[0]);
 	}
-	
+
 	/**
-	 * method to receive formated data and time
+	 * method to receive formated data and time in format string like "yyyy-MM-dd, HH:mm:ss"
 	 */
 	public static String getDateAndTime() {
-		return  new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date().getTime()); //$NON-NLS-1$
+		return new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date().getTime()); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * method to receive formated data and time with given format string like "yyyy-MM-dd, HH:mm:ss"
 	 */
 	public static String getDateAndTime(String format) {
-		return  new SimpleDateFormat(format).format(new Date().getTime()); //$NON-NLS-1$
+		return new SimpleDateFormat(format).format(new Date().getTime()); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * method to get current date
 	 */
@@ -149,6 +149,17 @@ public class StringHelper {
 	}
 
 	/**
+	 * method to get formated duration by given format string and time in millis seconds
+	 */
+	public static String getFormatedDuration(String format, long millisec) {
+		if (millisec > GDE.ONE_HOUR_MS * 24 * 365 * 11) throw new UnsupportedOperationException("use getFormatedTime instead");
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		// avoid wrong number of hours due to a locale setting other than UTC/GMT
+		sdf.getTimeZone().setRawOffset(0);
+		return sdf.format(millisec);
+	}
+
+	/**
 	 * remove blanks within a string
 	 * @param inputString
 	 * @return cleaned string
@@ -161,7 +172,7 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String intArrayToString(Integer[] values) {
 		StringBuffer sb = new StringBuffer();
 
@@ -171,7 +182,7 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String intArrayToString(int[] values) {
 		StringBuffer sb = new StringBuffer();
 
@@ -210,84 +221,200 @@ public class StringHelper {
 		}
 		return points;
 	}
-	
+
 	/**
 	 * print the SWT key code by log info
 	 * @param evt
 	 */
 	public static void printSWTKeyCode(KeyEvent evt) {
-		String keyCode = ""+evt.character;
+		String keyCode = "" + evt.character;
 		switch (evt.keyCode) {
 		/* Keyboard and Mouse Masks */
-		case SWT.ALT: 		keyCode = "ALT"; break;
-		case SWT.SHIFT: 	keyCode = "SHIFT"; break;
-		case SWT.CONTROL:	keyCode = "CONTROL"; break;
-		case SWT.COMMAND:	keyCode = "COMMAND"; break;
-			
+		case SWT.ALT:
+			keyCode = "ALT";
+			break;
+		case SWT.SHIFT:
+			keyCode = "SHIFT";
+			break;
+		case SWT.CONTROL:
+			keyCode = "CONTROL";
+			break;
+		case SWT.COMMAND:
+			keyCode = "COMMAND";
+			break;
+
 		/* Non-Numeric Keypad Keys */
-		case SWT.ARROW_UP:		keyCode = "ARROW_UP"; break;
-		case SWT.ARROW_DOWN:	keyCode = "ARROW_DOWN"; break;
-		case SWT.ARROW_LEFT:	keyCode = "ARROW_LEFT"; break;
-		case SWT.ARROW_RIGHT:	keyCode = "ARROW_RIGHT"; break;
-		case SWT.PAGE_UP:			keyCode = "PAGE_UP"; break;
-		case SWT.PAGE_DOWN:		keyCode = "PAGE_DOWN"; break;
-		case SWT.HOME:				keyCode = "HOME"; break;
-		case SWT.END:					keyCode = "END"; break;
-		case SWT.INSERT:			keyCode = "INSERT"; break;
+		case SWT.ARROW_UP:
+			keyCode = "ARROW_UP";
+			break;
+		case SWT.ARROW_DOWN:
+			keyCode = "ARROW_DOWN";
+			break;
+		case SWT.ARROW_LEFT:
+			keyCode = "ARROW_LEFT";
+			break;
+		case SWT.ARROW_RIGHT:
+			keyCode = "ARROW_RIGHT";
+			break;
+		case SWT.PAGE_UP:
+			keyCode = "PAGE_UP";
+			break;
+		case SWT.PAGE_DOWN:
+			keyCode = "PAGE_DOWN";
+			break;
+		case SWT.HOME:
+			keyCode = "HOME";
+			break;
+		case SWT.END:
+			keyCode = "END";
+			break;
+		case SWT.INSERT:
+			keyCode = "INSERT";
+			break;
 
 		/* Virtual and Ascii Keys */
-		case SWT.BS:	keyCode = "BS"; break;
-		case SWT.CR:	keyCode = "CR"; break;		
-		case SWT.DEL:	keyCode = "DEL"; break;
-		case SWT.ESC:	keyCode = "ESC"; break;
-		case SWT.LF:	keyCode = "LF"; break;
-		case SWT.TAB:	keyCode = "TAB"; break;
+		case SWT.BS:
+			keyCode = "BS";
+			break;
+		case SWT.CR:
+			keyCode = "CR";
+			break;
+		case SWT.DEL:
+			keyCode = "DEL";
+			break;
+		case SWT.ESC:
+			keyCode = "ESC";
+			break;
+		case SWT.LF:
+			keyCode = "LF";
+			break;
+		case SWT.TAB:
+			keyCode = "TAB";
+			break;
 
 		/* Functions Keys */
-		case SWT.F1:	keyCode = "F1"; break;
-		case SWT.F2:	keyCode = "F2"; break;
-		case SWT.F3:	keyCode = "F3"; break;
-		case SWT.F4:	keyCode = "F4"; break;
-		case SWT.F5:	keyCode = "F5"; break;
-		case SWT.F6:	keyCode = "F6"; break;
-		case SWT.F7:	keyCode = "F7"; break;
-		case SWT.F8:	keyCode = "F8"; break;
-		case SWT.F9:	keyCode = "F9"; break;
-		case SWT.F10:	keyCode = "F10"; break;
-		case SWT.F11:	keyCode = "F11"; break;
-		case SWT.F12:	keyCode = "F12"; break;
-		case SWT.F13:	keyCode = "F13"; break;
-		case SWT.F14:	keyCode = "F14"; break;
-		case SWT.F15:	keyCode = "F15"; break;
-		
+		case SWT.F1:
+			keyCode = "F1";
+			break;
+		case SWT.F2:
+			keyCode = "F2";
+			break;
+		case SWT.F3:
+			keyCode = "F3";
+			break;
+		case SWT.F4:
+			keyCode = "F4";
+			break;
+		case SWT.F5:
+			keyCode = "F5";
+			break;
+		case SWT.F6:
+			keyCode = "F6";
+			break;
+		case SWT.F7:
+			keyCode = "F7";
+			break;
+		case SWT.F8:
+			keyCode = "F8";
+			break;
+		case SWT.F9:
+			keyCode = "F9";
+			break;
+		case SWT.F10:
+			keyCode = "F10";
+			break;
+		case SWT.F11:
+			keyCode = "F11";
+			break;
+		case SWT.F12:
+			keyCode = "F12";
+			break;
+		case SWT.F13:
+			keyCode = "F13";
+			break;
+		case SWT.F14:
+			keyCode = "F14";
+			break;
+		case SWT.F15:
+			keyCode = "F15";
+			break;
+
 		/* Numeric Keypad Keys */
-		case SWT.KEYPAD_ADD:			keyCode = "KEYPAD_ADD"; break;
-		case SWT.KEYPAD_SUBTRACT:	keyCode = "KEYPAD_SUBTRACT"; break;
-		case SWT.KEYPAD_MULTIPLY:	keyCode = "KEYPAD_MULTIPLY"; break;
-		case SWT.KEYPAD_DIVIDE:		keyCode = "KEYPAD_DIVIDE"; break;
-		case SWT.KEYPAD_DECIMAL:	keyCode = "KEYPAD_DECIMAL"; break;
-		case SWT.KEYPAD_CR:				keyCode = "KEYPAD_CR"; break;
-		case SWT.KEYPAD_0:				keyCode = "KEYPAD_0"; break;
-		case SWT.KEYPAD_1:				keyCode = "KEYPAD_1"; break;
-		case SWT.KEYPAD_2:				keyCode = "KEYPAD_2"; break;
-		case SWT.KEYPAD_3:				keyCode = "KEYPAD_3"; break;
-		case SWT.KEYPAD_4:				keyCode = "KEYPAD_4"; break;
-		case SWT.KEYPAD_5:				keyCode = "KEYPAD_5"; break;
-		case SWT.KEYPAD_6:				keyCode = "KEYPAD_6"; break;
-		case SWT.KEYPAD_7:				keyCode = "KEYPAD_7"; break;
-		case SWT.KEYPAD_8:				keyCode = "KEYPAD_8"; break;
-		case SWT.KEYPAD_9:				keyCode = "KEYPAD_9"; break;
-		case SWT.KEYPAD_EQUAL:		keyCode = "KEYPAD_EQUAL"; break;
+		case SWT.KEYPAD_ADD:
+			keyCode = "KEYPAD_ADD";
+			break;
+		case SWT.KEYPAD_SUBTRACT:
+			keyCode = "KEYPAD_SUBTRACT";
+			break;
+		case SWT.KEYPAD_MULTIPLY:
+			keyCode = "KEYPAD_MULTIPLY";
+			break;
+		case SWT.KEYPAD_DIVIDE:
+			keyCode = "KEYPAD_DIVIDE";
+			break;
+		case SWT.KEYPAD_DECIMAL:
+			keyCode = "KEYPAD_DECIMAL";
+			break;
+		case SWT.KEYPAD_CR:
+			keyCode = "KEYPAD_CR";
+			break;
+		case SWT.KEYPAD_0:
+			keyCode = "KEYPAD_0";
+			break;
+		case SWT.KEYPAD_1:
+			keyCode = "KEYPAD_1";
+			break;
+		case SWT.KEYPAD_2:
+			keyCode = "KEYPAD_2";
+			break;
+		case SWT.KEYPAD_3:
+			keyCode = "KEYPAD_3";
+			break;
+		case SWT.KEYPAD_4:
+			keyCode = "KEYPAD_4";
+			break;
+		case SWT.KEYPAD_5:
+			keyCode = "KEYPAD_5";
+			break;
+		case SWT.KEYPAD_6:
+			keyCode = "KEYPAD_6";
+			break;
+		case SWT.KEYPAD_7:
+			keyCode = "KEYPAD_7";
+			break;
+		case SWT.KEYPAD_8:
+			keyCode = "KEYPAD_8";
+			break;
+		case SWT.KEYPAD_9:
+			keyCode = "KEYPAD_9";
+			break;
+		case SWT.KEYPAD_EQUAL:
+			keyCode = "KEYPAD_EQUAL";
+			break;
 
 		/* Other keys */
-		case SWT.CAPS_LOCK:			keyCode = "CAPS_LOCK"; break;
-		case SWT.NUM_LOCK:			keyCode = "NUM_LOCK"; break;
-		case SWT.SCROLL_LOCK:		keyCode = "SCROLL_LOCK"; break;
-		case SWT.PAUSE:					keyCode = "PAUSE"; break;
-		case SWT.BREAK:					keyCode = "BREAK"; break;
-		case SWT.PRINT_SCREEN:	keyCode = "PRINT_SCREEN"; break;
-		case SWT.HELP:					keyCode = "HELP"; break;
-		default :								
+		case SWT.CAPS_LOCK:
+			keyCode = "CAPS_LOCK";
+			break;
+		case SWT.NUM_LOCK:
+			keyCode = "NUM_LOCK";
+			break;
+		case SWT.SCROLL_LOCK:
+			keyCode = "SCROLL_LOCK";
+			break;
+		case SWT.PAUSE:
+			keyCode = "PAUSE";
+			break;
+		case SWT.BREAK:
+			keyCode = "BREAK";
+			break;
+		case SWT.PRINT_SCREEN:
+			keyCode = "PRINT_SCREEN";
+			break;
+		case SWT.HELP:
+			keyCode = "HELP";
+			break;
+		default:
 		}
 		log.log(Level.OFF, "keyCode = SWT." + keyCode);
 	}
@@ -302,7 +429,7 @@ public class StringHelper {
 			if (GDE.IS_WINDOWS) {
 				try {
 					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
-					String portDescription = DeviceSerialPortImpl.getWindowsPorts().get(portNumber)==null ? "" : DeviceSerialPortImpl.getWindowsPorts().get(portNumber);
+					String portDescription = DeviceSerialPortImpl.getWindowsPorts().get(portNumber) == null ? "" : DeviceSerialPortImpl.getWindowsPorts().get(portNumber);
 					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portDescription;
 				}
 				catch (Exception e) {
@@ -310,13 +437,13 @@ public class StringHelper {
 				}
 			}
 			else if (GDE.IS_LINUX) {
-				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id" , tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
-				if (portName.length() > 8)  // ./ttyUSB0
-					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portName.substring(portName.indexOf("usb-")+4, portName.length()-11);
-				else 
+				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id", tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				if (portName.length() > 8) // ./ttyUSB0
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portName.substring(portName.indexOf("usb-") + 4, portName.length() - 11);
+				else
 					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 			}
-			else 
+			else
 				serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 		}
 		return serialPortList;
@@ -337,15 +464,15 @@ public class StringHelper {
 				}
 			}
 			else if (GDE.IS_LINUX) {
-				if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 't' == chars[i] || 'y' == chars[i] || ' ' == chars[i]
-						|| 'U' == chars[i] || 'S' == chars[i] || 'B' == chars[i])) {
+				if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 't' == chars[i] || 'y' == chars[i] || ' ' == chars[i] || 'U' == chars[i]
+						|| 'S' == chars[i] || 'B' == chars[i])) {
 					return false;
 				}
 			}
-			else if (GDE.IS_MAC) { 
-//				if (!(('0' <= chars[i] && chars[i] <= '9') || '/' == chars[i] || '.' == chars[i] || ('a' <= chars[i] && 'z' <= chars[i]) || ('A' <= chars[i] && 'Z' <= chars[i]))) {
-//					return false;
-//				}
+			else if (GDE.IS_MAC) {
+				//				if (!(('0' <= chars[i] && chars[i] <= '9') || '/' == chars[i] || '.' == chars[i] || ('a' <= chars[i] && 'z' <= chars[i]) || ('A' <= chars[i] && 'Z' <= chars[i]))) {
+				//					return false;
+				//				}
 			}
 		}
 		return true;
@@ -360,10 +487,9 @@ public class StringHelper {
 		switch (useType) {
 		case INTEGER:
 			try {
-				if (eventText.equals("-")) 
+				if (eventText.equals("-"))
 					return doIt;
-				else if (eventText.equals(GDE.STRING_EMPTY)) 
-					eventText = "0";
+				else if (eventText.equals(GDE.STRING_EMPTY)) eventText = "0";
 				Integer.parseInt(eventText.trim());
 			}
 			catch (Exception e) {
@@ -372,7 +498,7 @@ public class StringHelper {
 			break;
 		case DOUBLE:
 			try {
-				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".") || eventText.equals(GDE.STRING_EMPTY)) 
+				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".") || eventText.equals(GDE.STRING_EMPTY))
 					doIt = true;
 				else
 					Double.parseDouble(eventText.replace(",", ".").trim());
@@ -453,7 +579,7 @@ public class StringHelper {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 8; i++) {
 			sb.append(((0x80 & inByte) >> 7));
-			inByte = (byte)(inByte << 1); 
+			inByte = (byte) (inByte << 1);
 		}
 		if (newLine) {
 			sb.append(GDE.LINE_SEPARATOR);
@@ -470,10 +596,10 @@ public class StringHelper {
 		eventText.getChars(0, chars.length, chars, 0);
 		for (int i = 0; i < chars.length; i++) {
 			log.log(Level.FINER, "\"" + chars[i] + "\"");
-			if (!('0' <= chars[i] && chars[i] <= '9' || 'a' == chars[i] || 'A' == chars[i] || 'b' == chars[i] || 'B' == chars[i] || 'c' == chars[i] || 'C' == chars[i] 
-			     || 'd' == chars[i] || 'D' == chars[i] || 'e' == chars[i] || 'E' == chars[i] || 'f' == chars[i] || 'F' == chars[i])) {
-					return false;
-				}
+			if (!('0' <= chars[i] && chars[i] <= '9' || 'a' == chars[i] || 'A' == chars[i] || 'b' == chars[i] || 'B' == chars[i] || 'c' == chars[i] || 'C' == chars[i] || 'd' == chars[i] || 'D' == chars[i]
+					|| 'e' == chars[i] || 'E' == chars[i] || 'f' == chars[i] || 'F' == chars[i])) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -487,7 +613,7 @@ public class StringHelper {
 	public static String byte2CharString(final byte[] bytes, final int size) {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(size).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < size; i++) {
-			sb.append(String.format("%c", (char)bytes[i])); //$NON-NLS-1$
+			sb.append(String.format("%c", (char) bytes[i])); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -502,7 +628,7 @@ public class StringHelper {
 	public static String byte2CharString(final byte[] bytes, final int start, final int size) {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(start).append(GDE.STRING_SEMICOLON).append(size).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = start >= 0 ? start : 0; i < size; i++) {
-			sb.append(String.format("%c", (char)bytes[i])); //$NON-NLS-1$
+			sb.append(String.format("%c", (char) bytes[i])); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -510,7 +636,7 @@ public class StringHelper {
 	public static int byte2hex2int(byte[] bytes, int start, int size) {
 		StringBuffer sb = new StringBuffer();
 		for (int i = start; i < size + start; i++) {
-			sb.append(String.format("%c", (char)bytes[i])); //$NON-NLS-1$
+			sb.append(String.format("%c", (char) bytes[i])); //$NON-NLS-1$
 		}
 		return Integer.parseInt(sb.toString(), 16);
 	}
@@ -559,7 +685,7 @@ public class StringHelper {
 	public static String byte2FourDigitsIntegerString(byte[] bytes) {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", bytes.length)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < bytes.length; i++) {
-			sb.append(String.format("%4d", (bytes[i]&0xFF))); //$NON-NLS-1$
+			sb.append(String.format("%4d", (bytes[i] & 0xFF))); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -572,7 +698,7 @@ public class StringHelper {
 	public static String byte2FourDigitsIntegerString(byte[] bytes, byte subtract, int offset, int length) {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", bytes.length)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = offset; i < length; i++) {
-			sb.append(String.format("%4d", ((bytes[i]&0xFF) + subtract))); //$NON-NLS-1$
+			sb.append(String.format("%4d", ((bytes[i] & 0xFF) + subtract))); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -590,18 +716,18 @@ public class StringHelper {
 		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, sb.toString());
 		return sb.toString();
 	}
-	
+
 	/**
 	 * convert a string two char per byte input into byte array 
 	 * @param twoCharsPerByte
 	 * @return byte array with converted characters
 	 */
 	public static byte[] convert2ByteArray(String twoCharsPerByte) {
-		int length = twoCharsPerByte.length()/2;
+		int length = twoCharsPerByte.length() / 2;
 		byte[] buffer = new byte[length];
 		twoCharsPerByte = twoCharsPerByte + "0";
-		for (int i = 0,j = 0; i < length; i++,j+=2) {
-			buffer[i] = (byte)Integer.parseInt(twoCharsPerByte.substring(j, j+2), 16);
+		for (int i = 0, j = 0; i < length; i++, j += 2) {
+			buffer[i] = (byte) Integer.parseInt(twoCharsPerByte.substring(j, j + 2), 16);
 		}
 		return buffer;
 	}
@@ -633,7 +759,7 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * build a sting array from enumeration (combo.setItems(String[]))
 	 * @param enumValues
@@ -646,7 +772,7 @@ public class StringHelper {
 		}
 		return tmpVec.toArray(new String[0]);
 	}
-	
+
 	/**
 	 * convert string list to a string, list elements separated by separator character
 	 * @param list
@@ -668,7 +794,7 @@ public class StringHelper {
 	 * @return
 	 */
 	public static List<String> stringToList(String string, char separator) {
-		return Arrays.asList(string.split(""+separator));
+		return Arrays.asList(string.split("" + separator));
 	}
 
 	/**
@@ -683,18 +809,21 @@ public class StringHelper {
 		}
 		return itemNames;
 	}
+
 	/**
 	 * @return 16 bit binary representation
 	 */
 	public static String int2bin_16(int value) {
 		StringBuilder sb = new StringBuilder().append("binary : ");
-		for (int i = 0, j = 0x8000; i < 16; i++,j/=2) {
-			if ((value & j) > 0) sb.append("1");
-			else  sb.append("0");
+		for (int i = 0, j = 0x8000; i < 16; i++, j /= 2) {
+			if ((value & j) > 0)
+				sb.append("1");
+			else
+				sb.append("0");
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * print memory area as integer representation
 	 * @param name
@@ -725,7 +854,7 @@ public class StringHelper {
 		}
 		System.out.println();
 	}
-	
+
 	/**
 	 * print memory area in hex representation
 	 * @param name
@@ -747,7 +876,7 @@ public class StringHelper {
 				break;
 			case 2:
 				for (int j = 0; j < width; j++) {
-					System.out.print(String.format("%02x%02x", buffer[startIndex], buffer[startIndex+1]));
+					System.out.print(String.format("%02x%02x", buffer[startIndex], buffer[startIndex + 1]));
 					startIndex += 2;
 				}
 				break;
@@ -756,7 +885,7 @@ public class StringHelper {
 		}
 		System.out.println();
 	}
-	
+
 	/**
 	 * print memory area in character representation
 	 * @param name
@@ -778,7 +907,7 @@ public class StringHelper {
 				break;
 			case 2:
 				for (int j = 0; j < width; j++) {
-					System.out.print(String.format("%c%c", buffer[startIndex], buffer[startIndex+1]));
+					System.out.print(String.format("%c%c", buffer[startIndex], buffer[startIndex + 1]));
 					startIndex += 2;
 				}
 				break;
@@ -796,7 +925,7 @@ public class StringHelper {
 	public static String transfer(String array) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < array.length(); i++) {
-			sb.append(array.charAt(i));			
+			sb.append(array.charAt(i));
 		}
 		return sb.toString();
 	}
