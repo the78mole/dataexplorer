@@ -34,11 +34,20 @@ import gde.histocache.HistoVault;
 public interface IHistoDevice { //todo merging with IDevice later
 
 	/**
+	 * @return true if the device supports a native file import for histo purposes
+	 */
+	public boolean isHistoImportSupported();
+	
+	/**
+	 * @return an empty string or the device's import file extention if the device supports a native file import for histo purposes (e.g. '.bin')
+	 */
+	public String getSupportedImportExtention() ;
+
+	/**
 	 * create history recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
 	 * since this is a long term operation the progress bar should be updated to signal business to user. 
-	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param filePath 
 	 * @param trusses referencing a subset of the recordsets in the file

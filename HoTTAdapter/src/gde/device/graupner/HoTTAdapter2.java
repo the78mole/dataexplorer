@@ -26,10 +26,13 @@ import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.IHistoDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
+import gde.histocache.HistoVault;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -39,6 +42,10 @@ import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -56,7 +63,7 @@ import org.eclipse.swt.widgets.MenuItem;
  * Sample device class, used as template for new device implementations
  * @author Winfried Brügmann
  */
-public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
+public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	final static Logger									logger														= Logger.getLogger(HoTTAdapter2.class.getName());
 	
 	/**
@@ -1313,4 +1320,42 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 
 		return recordKeys;
 	}
+	
+	//IHistoDevice functions
+
+	/**
+	 * create history recordSet and add record data size points from binary file to each measurement.
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
+	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * collects life data if device setting |isLiveDataActive| is true.
+	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param filePath 
+	 * @param trusses referencing a subset of the record sets in the file
+	 * @throws DataInconsitsentException 
+	 * @throws DataTypeException 
+	 * @throws IOException 
+	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
+	 */
+	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+		if (this.getClass().equals(HoTTAdapter2.class)) {
+			log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
+			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
+			for (HistoVault truss : trusses) {
+				if (truss.getLogFilePath().equals(filePath.toString())) {
+					log.log(Level.OFF, filePath.toString());
+					// add aggregated measurement and settlement points and score points to the truss
+					HoTTbinHistoReader.read(truss);
+					histoVaults.add(truss);
+				}
+				else
+					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
+			}
+			return histoVaults;
+		}
+		else
+			// todo implement HoTTbinHistoReader for subclasses
+			return null;
+	}
+
 }

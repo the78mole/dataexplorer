@@ -908,6 +908,25 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
+	 * @return true if the device supports a native file import for histo purposes
+	 */
+	public boolean isHistoImportSupported() {
+		return this.getClass().equals(HoTTAdapter.class);
+	}
+
+	/**
+	 * @return an empty string or the device's import file extention if the device supports a native file import for histo purposes (e.g. '.bin')
+	 */
+	public String getSupportedImportExtention() {
+		String importExtention = GDE.STRING_EMPTY;
+		if (isHistoImportSupported()) {
+			String preferredFileExtention = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention();
+			if (preferredFileExtention != null && !preferredFileExtention.isEmpty()) importExtention = preferredFileExtention.substring(1);
+		}
+		return importExtention;
+	}
+
+	/**
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param maxPoints maximum values from the data buffer which are verified during sampling
 	 * @param minPoints minimum values from the data buffer which are verified during sampling
@@ -919,11 +938,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		this.histoRandomSample = new HistoRandomSample(this, maxPoints, minPoints, recordTimespan_ms);
 		}
 
-	/* (non-Javadoc)
-	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
+	/**
+	 * create history recordSet and add record data size points from binary file to each measurement.
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
+	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * collects life data if device setting |isLiveDataActive| is true.
+	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param filePath 
+	 * @param trusses referencing a subset of the record sets in the file
+	 * @throws DataInconsitsentException 
+	 * @throws DataTypeException 
+	 * @throws IOException 
+	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
 	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-		if (this.getClass().equals(HoTTAdapter.class)) {
 			log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
 			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
 			for (HistoVault truss : trusses) {
@@ -937,10 +966,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 			return histoVaults;
 		}
-		else
-			// todo implement HoTTbinHistoReader for subclasses
-			return null;
-	}
 
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
