@@ -836,8 +836,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 			else if (histoRandomSample.isValidSample(points,
 					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
-			recordSet.addPoints(points,
-					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+				recordSet.addPoints(points,
+						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 			}
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -907,39 +907,53 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				String.format("readTime: %,9d  addTime: %,9d  pickTime: %,9d", TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime))); //$NON-NLS-1$
 	}
 
-	/**
-	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param maxPoints maximum values from the data buffer which are verified during sampling
-	 * @param minPoints minimum values from the data buffer which are verified during sampling
-	 * @throws DataInconsitsentException 
+	/* (non-Javadoc)
+	 * @see gde.device.IHistoDevice#isHistoImportSupported()
 	 */
+	public boolean isHistoImportSupported() {
+		return this.getClass().equals(HoTTAdapter.class);
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.device.IHistoDevice#supportedImportExtention()
+	 */
+	public String getSupportedImportExtention() {
+		String importExtention = GDE.STRING_EMPTY;
+		if (isHistoImportSupported()) {
+			String preferredFileExtention = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention();
+			if (preferredFileExtention != null && !preferredFileExtention.isEmpty()) importExtention = preferredFileExtention.substring(1);
+		}
+		return importExtention;
+	}
+
+	/**
+		 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+		 * @param maxPoints maximum values from the data buffer which are verified during sampling
+		 * @param minPoints minimum values from the data buffer which are verified during sampling
+		 * @throws DataInconsitsentException 
+		 */
 	public void setSampling(int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points");
 		int recordTimespan_ms = 10;
 		this.histoRandomSample = new HistoRandomSample(this, maxPoints, minPoints, recordTimespan_ms);
-		}
+	}
 
 	/* (non-Javadoc)
 	 * @see gde.device.IHistoDevice#getRecordSetFromImportFile(int, java.nio.file.Path)
 	 */
 	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-		if (this.getClass().equals(HoTTAdapter.class)) {
-			log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
-			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
-			for (HistoVault truss : trusses) {
-				if (truss.getLogFilePath().equals(filePath.toString())) {
-					// add aggregated measurement and settlement points and score points to the truss
-					HoTTbinHistoReader.read(truss);
-					histoVaults.add(truss);
-				}
-				else
-					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
+		log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
+		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
+		for (HistoVault truss : trusses) {
+			if (truss.getLogFilePath().equals(filePath.toString())) {
+				// add aggregated measurement and settlement points and score points to the truss
+				HoTTbinHistoReader.read(truss);
+				histoVaults.add(truss);
 			}
-			return histoVaults;
+			else
+				throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
 		}
-		else
-			// todo implement HoTTbinHistoReader for subclasses
-			return null;
+		return histoVaults;
 	}
 
 	/**

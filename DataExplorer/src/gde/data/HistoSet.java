@@ -409,13 +409,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 */
 	private List<HistoVault> loadVaultsFromFile(Path filePath, Map<String, HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		List<HistoVault> histoVaults = null;
-		if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) && this.application.getActiveDevice() instanceof IHistoDevice) {
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
+		if (!supportedImportExtention.isEmpty() && filePath.toString().endsWith(supportedImportExtention) ) {
 			histoVaults = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
-			if (histoVaults == null) {
-				histoVaults = new ArrayList<HistoVault>();
-				log.log(Level.INFO, String.format("file format not supported: %s  channelNumber=%d  %s", //$NON-NLS-1$
-						this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
-			}
 		}
 		else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
 			histoVaults = HistoOsdReaderWriter.readHisto(filePath, trusses.values());
@@ -630,8 +626,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
 		this.validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
 		this.validatedImportDir = this.settings.getSearchImportPath() && this.validatedImportDir != null ? this.validatedImportDir.resolve(subPathImport) : null;
-		this.validatedImportExtention = this.validatedDevice.getDeviceConfiguration().getDataBlockType().getPreferredFileExtention();
-		this.validatedImportExtention = !this.validatedImportExtention.isEmpty() ? this.validatedImportExtention.substring(1) : GDE.STRING_EMPTY;
+		this.validatedImportExtention = this.validatedDevice instanceof  IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
 
 		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.histoFilePaths.size() == 0;
 		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
@@ -701,6 +696,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		else
 			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });
 		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
 
 		boolean ask4FilesWithoutObject = isWithUi;
 		boolean ask4FilesWithOtherObject = isWithUi;
@@ -726,7 +722,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
 							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
-									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // hard wired for HoTTViewerAdapter
+									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // WBrueg hard wired for HoTTViewerAdapter?
 								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
 								break; // ignore all log file trusses 
 							}
@@ -787,7 +783,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						}
 					}
 				}
-				else if (actualFile.getName().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+				else if (!supportedImportExtention.isEmpty() && actualFile.getName().endsWith(supportedImportExtention)) {
 					boolean isValidObject = false;
 					String objectDirectory = GDE.STRING_EMPTY;
 					if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
