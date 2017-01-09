@@ -396,6 +396,7 @@
 				<unit>km/h</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
+				<label>Geschwindigkeit berechnet aus den GPS-Koordinaten und Höhe</label>
 			</Measurement>
 			<Measurement>
 				<name>EntfernungStart</name>
@@ -403,6 +404,7 @@
 				<unit>m</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
+				<label>Entfernung des GPS-Sensors von Aufzeichnungsbegin zur aktuellen Position</label>
 			</Measurement>
 			<Measurement>
 				<name>Kurswinkel</name>
@@ -411,6 +413,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<suppressQuantiles>true</suppressQuantiles>
 			</Measurement>
 			<Measurement>
 				<name>Strecke</name>
@@ -427,6 +430,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannungslage des Empfängers</label>
 			</Measurement>
 			<Measurement>
 				<name>TemperaturRx</name>
@@ -435,7 +439,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="reduction" value="20.0" type="Double" description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Spannungslage des Empfängers</label>
+				<label>Temperatur des Empfängers</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Dauer</name>
@@ -501,6 +505,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannungslage des angeschlossen Akkus am GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Strom</name>
@@ -511,6 +516,7 @@
 					<trigger level="3000" isGreater="true" minTimeSec="5" comment="Strom &gt; 3 A über &gt; 5 Sekunden" />
 				</statistics>
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Strom aus dem angeschlossen Akkus am GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Kapazität</name>
@@ -519,6 +525,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Kapazizät entnommen aus dem angeschlossen Akkus am GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Leistung</name>
@@ -527,6 +534,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Eingangsleistung des angeschlossenem Motor am GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Balance</name>
@@ -535,6 +543,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Unterschied der Zellenspannung am GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 1</name>
@@ -543,6 +552,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 1 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 2</name>
@@ -552,6 +562,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 2 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 3</name>
@@ -561,6 +572,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 3 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 4</name>
@@ -570,6 +582,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 4 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 5</name>
@@ -579,6 +592,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 5 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 6</name>
@@ -588,6 +602,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 6 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Drehzahl</name>
@@ -596,6 +611,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Höhe (relativ)</name>
@@ -631,6 +647,7 @@
 				<unit>ml</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="false" sigma="false" />
+				<label>Menge des verbrauchten Kraftstoffs</label>
 			</Measurement>
 			<Measurement>
 				<name>Spannung S1</name>
@@ -639,6 +656,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannunglage Sensor 1 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Spannung S2</name>
@@ -648,6 +666,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="17" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Spannunglage Sensor 2 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 1</name>
@@ -656,6 +675,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="reduction" value="20.0" type="Double" description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Temperatur Sensor 1 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 2</name>
@@ -665,6 +685,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="reduction" value="20.0" type="Double" description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
 				<property name="scale_sync_ref_ordinal" value="19" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Temperatur Sensor 2 GAM</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Dauer</name>
@@ -730,6 +751,7 @@
 				<active>true</active>
 				<statistics min="false" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannung des angeschlossenen Akkus am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Strom</name>
@@ -740,6 +762,7 @@
 					<trigger level="3000" isGreater="true" minTimeSec="5" comment="Strom &gt; 3 A über &gt; 5 Sekunden" />
 				</statistics>
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Strom aus dem angeschlossenen Akkus am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Kapazität</name>
@@ -748,7 +771,8 @@
 				<active>true</active>
 				<statistics min="false" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
-			</Measurement>
+				<label>Kapazität entnommen aus dem angeschlossenen Akkus am EAM</label>
+ 			</Measurement>
 			<Measurement>
 				<name>Leistung</name>
 				<symbol>P</symbol>
@@ -756,7 +780,8 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
-			</Measurement>
+				<label>Eingangsleistung des angeschlossenen Motors am EAM</label>
+ 			</Measurement>
 			<Measurement>
 				<name>Balance</name>
 				<symbol></symbol>
@@ -764,6 +789,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" />
 				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Unterschied der Zellenspannung am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 1</name>
@@ -772,6 +798,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 1 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 2</name>
@@ -781,6 +808,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 2 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 3</name>
@@ -790,6 +818,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 3 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 4</name>
@@ -799,6 +828,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 4 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 5</name>
@@ -808,6 +838,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 5 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 6</name>
@@ -817,6 +848,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 6 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 7</name>
@@ -826,6 +858,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 7 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 8</name>
@@ -835,6 +868,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 8 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 9</name>
@@ -844,6 +878,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 9 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 10</name>
@@ -853,6 +888,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 10 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 11</name>
@@ -862,6 +898,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 11 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 12</name>
@@ -871,6 +908,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 12 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 13</name>
@@ -880,6 +918,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 13 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>ZellenSpannung 14</name>
@@ -889,6 +928,7 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
 				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 14 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Höhe (relativ)</name>
@@ -925,6 +965,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannung Sensor 1 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Spannung S2</name>
@@ -934,6 +975,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="23" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Spannung Sensor 2 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 1</name>
@@ -942,6 +984,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="reduction" value="20.0" type="Double" description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Temperatur Sensor 1 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 2</name>
@@ -951,6 +994,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="reduction" value="20.0" type="Double" description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
 				<property name="scale_sync_ref_ordinal" value="25" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Temperatur Sensor 2 am EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Drehzahl</name>
@@ -959,6 +1003,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am EAM</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Dauer</name>
@@ -1257,6 +1302,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannungslage des Akkus am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Strom</name>
@@ -1267,6 +1313,7 @@
 					<trigger level="3000" isGreater="true" minTimeSec="5" comment="Strom &gt; 3 A über &gt; 5 Sekunden" />
 				</statistics>
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Strom entnommen aus dem Akkus am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Kapazität</name>
@@ -1275,6 +1322,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Kapazität entnommen aus dem Akkus am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Leistung</name>
@@ -1283,6 +1331,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Eingangsleistung des Motors am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Drehzahl</name>
@@ -1291,6 +1340,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger" />
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 1</name>
@@ -1298,6 +1348,7 @@
 				<unit>°C</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
+				<label>Temperatur der Endstufe des ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 2</name>
@@ -1306,6 +1357,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Temperatur des Motors vom ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Spannung_min</name>
@@ -1315,6 +1367,7 @@
 				<property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Minimalspannung des Akkus am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Strom_max</name>
@@ -1324,6 +1377,7 @@
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="2" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Maximalstrom entnommen aus dem Akku am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Drehzahl_max</name>
@@ -1333,6 +1387,7 @@
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="5" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Maximaldrehzahl mit Berücksichtigung eines Getreibefaktors des Motors am ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 1_max</name>
@@ -1341,6 +1396,7 @@
 				<active>true</active>
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Maximaltemperatur der Endstufe des ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur 2_max</name>
@@ -1349,6 +1405,7 @@
 				<active>true</active>
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<suppressQuantiles>true</suppressQuantiles>
+ 				<label>Maximaltemperatur des Motors am ESC</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Dauer</name>
