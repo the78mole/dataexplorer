@@ -28,9 +28,13 @@ import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gde.GDE;
 import gde.data.RecordSet;
@@ -100,7 +104,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			// so any anther exception is propagated to the caller
 		}
 		finally {
-			if (HoTTbinHistoReader.filePath.getFileName().startsWith("~") && file.exists()) file.delete(); // 'GRAUPNER SD LOG8'
+			if (HoTTbinHistoReader.filePath.getFileName().startsWith("~") && file.exists()) file.delete(); // 'GRAUPNER SD LOG8' //$NON-NLS-1$
 		}
 	}
 
@@ -115,22 +119,18 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static synchronized void read(BufferedInputStream data_in) throws IOException, DataTypeException, DataInconsitsentException {
-		final String $METHOD_NAME = "read";
+		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		File file = HoTTbinHistoReader.filePath.toFile();
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
-		tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader.application.getActiveChannelNumber(), true, true, false);
-		tmpRecordSet.setStartTimeStamp(file.lastModified());
-		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + tmpRecordSet.getStartTimeStampFormatted());
-		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader.filePath.getFileName().toString());
-		if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getLogRecordsetBaseName());
+		if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getLogRecordsetBaseName()); //$NON-NLS-1$
 
 		if (file.length() > NUMBER_LOG_RECORDS_MIN * dataBlockSize) {
 			try {
 				header = HoTTbinReader.getFileInfo(HoTTbinHistoReader.filePath.toFile());
 			}
 			catch (DataTypeException e) {
-				HoTTbinHistoReader.log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), HoTTbinHistoReader.filePath)); // 'GRAUPNER SD LOG8'
+				HoTTbinHistoReader.log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), HoTTbinHistoReader.filePath)); // 'GRAUPNER SD LOG8' //$NON-NLS-1$
 			}
 			if (header != null && header.size() > 0) {
 				if (!header.get(HoTTAdapter.FILE_PATH).equals(HoTTbinHistoReader.filePath.toString())) {
@@ -143,12 +143,23 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 					data_in.mark(readLimitMark); // reduces # of overscan records from 57 to 23 (to 38 with 1500 blocks)
 					HistoRandomSample histoRandomSample = HoTTbinHistoReader.readSingle(data_in, LOG_RECORD_SCAN_START + NUMBER_LOG_RECORDS_TO_SCAN, new int[0], new int[0]);
 					data_in.reset();
+					boolean isChannelsChannel = device.channels.getActiveChannelNumber() == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
+					long numberDatablocks = file.length() / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
+					tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader.application.getActiveChannelNumber(), true, true, false);
+					tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
+					tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
+					tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader.filePath.getFileName().toString());
 					HoTTbinHistoReader.readSingle(data_in, -1, histoRandomSample.getMaxPoints(), histoRandomSample.getMinPoints());
 				}
 				else {
 					data_in.mark(readLimitMark);
 					HistoRandomSample histoRandomSample = HoTTbinHistoReader.readMultiple(data_in, LOG_RECORD_SCAN_START + NUMBER_LOG_RECORDS_TO_SCAN, new int[0], new int[0]);
 					data_in.reset();
+					long numberDatablocks = file.length() / HoTTbinReader.dataBlockSize;
+					tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader.application.getActiveChannelNumber(), true, true, false);
+					tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
+					tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
+					tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader.filePath.getFileName().toString());
 					HoTTbinHistoReader.readMultiple(data_in, -1, histoRandomSample.getMaxPoints(), histoRandomSample.getMinPoints());
 				}
 			}
@@ -168,7 +179,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	* @return
 	*/
 	private static HistoRandomSample readSingle(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
-		final String $METHOD_NAME = "readSingle";
+		final String $METHOD_NAME = "readSingle"; //$NON-NLS-1$
 		HoTTbinHistoReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinHistoReader.recordSetGeneral = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinHistoReader.recordSetElectric = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
@@ -247,7 +258,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 			if (!HoTTAdapter.isFilterTextModus || (HoTTbinHistoReader.buf[6] & 0x01) == 0) { // switch into text modus
 				if (HoTTbinHistoReader.buf[33] >= 0 && HoTTbinHistoReader.buf[33] <= 4 && HoTTbinHistoReader.buf[3] != 0 && HoTTbinHistoReader.buf[4] != 0) { // buf 3, 4, tx,rx
-					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinHistoReader.buf[7], HoTTbinHistoReader.buf[33]));
+					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinHistoReader.buf[7], HoTTbinHistoReader.buf[33])); //$NON-NLS-1$
 					if (HoTTbinHistoReader.log.isLoggable(Level.FINER)) HoTTbinHistoReader.log.logp(Level.FINER, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME,
 							StringHelper.byte2Hex2CharString(new byte[] { HoTTbinHistoReader.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinHistoReader.buf[7], false));
 					if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
@@ -306,7 +317,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							if (HoTTbinHistoReader.buf1 != null && HoTTbinHistoReader.buf2 != null) {
 								if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 									final int versionOBS = -99;
-									 HoTTbinHistoReader.parse4Vario(versionOBS, HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2);
+									HoTTbinHistoReader.parse4Vario(versionOBS, HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2);
 									setTimeMarks(TimeMark.READ);
 									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsVario, HoTTbinHistoReader.timeStep_ms);
 									setTimeMarks(TimeMark.REVIEWED);
@@ -474,7 +485,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 					}
 				}
 				else { // skip empty block, but add time step
-					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm"); //$NON-NLS-1$
 
 					if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
@@ -550,7 +561,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 									(int) HoTTbinReader.lostPackages.getAvgValue() * 10));
 				}
 				else {
-					log.log(Level.WARNING, String.format("RecordSet with unidentified data.  fileLength=%,11d   isTextModusSignaled=%b", fileLength, HoTTbinHistoReader.isTextModusSignaled));
+					log.log(Level.WARNING, String.format("RecordSet with unidentified data.  fileLength=%,11d   isTextModusSignaled=%b", fileLength, HoTTbinHistoReader.isTextModusSignaled)); //$NON-NLS-1$
 				}
 			}
 
@@ -559,7 +570,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			tmpRecordSet.cleanup();
 		}
 		else {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead)); //$NON-NLS-1$
 		}
 		return histoRandomSample;
 	}
@@ -576,7 +587,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	* @throws DataInconsitsentException 
 	*/
 	private static HistoRandomSample readMultiple(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
-		final String $METHOD_NAME = "readMultiple";
+		final String $METHOD_NAME = "readMultiple"; //$NON-NLS-1$
 		HoTTbinHistoReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinHistoReader.recordSetGeneral = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinHistoReader.recordSetElectric = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
@@ -645,9 +656,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		// read all the data blocks from the file, parse only for the active channel
 		setTimeMarks(TimeMark.INITIATED);
 		boolean doFullRead = initializeBlocks <= 0;
-		int initializeBlockLimit = initializeBlocks > 0 ? initializeBlocks : Integer.MAX_VALUE;
 		long fileLength = HoTTbinHistoReader.filePath.toFile().length();
-		for (int i = 0; i < initializeBlockLimit && i < fileLength / HoTTbinHistoReader.dataBlockSize; i++) {
+		int datablocksLimit = (doFullRead ? (int) fileLength / HoTTbinHistoReader.dataBlockSize : initializeBlocks);
+		for (int i = 0; i < datablocksLimit; i++) {
 			data_in.read(HoTTbinHistoReader.buf);
 			if (HoTTbinHistoReader.log.isLoggable(Level.FINEST) && i % 10 == 0) {
 				HoTTbinHistoReader.log.logp(Level.FINEST, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinHistoReader.buf.length));
@@ -656,7 +667,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 			if (!HoTTAdapter.isFilterTextModus || (HoTTbinHistoReader.buf[6] & 0x01) == 0) { // switch into text modus
 				if (HoTTbinHistoReader.buf[33] >= 0 && HoTTbinHistoReader.buf[33] <= 4 && HoTTbinHistoReader.buf[3] != 0 && HoTTbinHistoReader.buf[4] != 0) { // buf 3, 4, tx,rx
-					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinHistoReader.buf[7], HoTTbinHistoReader.buf[33]));
+					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinHistoReader.buf[7], HoTTbinHistoReader.buf[33])); //$NON-NLS-1$
 					if (HoTTbinHistoReader.log.isLoggable(Level.FINEST)) HoTTbinHistoReader.log.logp(Level.FINEST, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME,
 							StringHelper.byte2Hex2CharString(new byte[] { HoTTbinHistoReader.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinHistoReader.buf[7], false));
 
@@ -792,8 +803,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							}
 						}
 
-						if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario
-								+ " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric + " logCountMotorDriver = " + logCountSpeedControl);
+						if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario //$NON-NLS-1$
+								+ " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric + " logCountMotorDriver = " + logCountSpeedControl); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 						lastSensor = actualSensor;
 						logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
 					}
@@ -854,7 +865,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 				else
 
 				{ // tx,rx == 0
-					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+					if (HoTTbinHistoReader.log.isLoggable(Level.FINE)) HoTTbinHistoReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm"); //$NON-NLS-1$
 
 					if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
@@ -938,7 +949,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			tmpRecordSet.cleanup();
 		}
 		else {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead)); //$NON-NLS-1$
 		}
 		return histoRandomSample;
 	}
