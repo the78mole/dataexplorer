@@ -52,6 +52,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.data.TrailRecordSet;
 import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.HistoRandomSample;
@@ -207,7 +208,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	static double								latitudeToleranceFactor				= 90.0;
 	static double								longitudeToleranceFactor			= 25.0;
 
-	private HistoRandomSample		histoRandomSample;
+	protected HistoRandomSample		histoRandomSample;
 
 	/**
 	 * constructor using properties file
@@ -1078,21 +1079,34 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
-			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
-			if (record.isActive() != measurement.isActive()) {
-				record.setActive(measurement.isActive());
-				record.setVisible(measurement.isActive());
-				record.setDisplayable(measurement.isActive());
-				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (recordSet instanceof TrailRecordSet) {
+				if (includeReasonableDataCheck) {
+					record.setDisplayable(record.isActive() && record.hasReasonableData());
+					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				}
+	
+				if (record.isActive() && record.isDisplayable()) {
+					++displayableCounter;
+					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				}
 			}
-			if (includeReasonableDataCheck) {
-				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
-			}
-
-			if (record.isActive() && record.isDisplayable()) {
-				++displayableCounter;
-				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+			else {
+				MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
+				if (record.isActive() != measurement.isActive()) {
+					record.setActive(measurement.isActive());
+					record.setVisible(measurement.isActive());
+					record.setDisplayable(measurement.isActive());
+					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				if (includeReasonableDataCheck) {
+					record.setDisplayable(measurement.isActive() && record.hasReasonableData());
+					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				}
+	
+				if (record.isActive() && record.isDisplayable()) {
+					++displayableCounter;
+					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				}
 			}
 		}
 		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
