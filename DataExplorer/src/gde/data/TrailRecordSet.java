@@ -686,8 +686,11 @@ public class TrailRecordSet extends RecordSet {
 		// get by insertion order
 		for (Map.Entry<String, Record> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
-			if (record.isVisible && record.isDisplayable) this.visibleAndDisplayableRecords.add(record);
-			this.allRecords.add(record);
+			record.setDisplayable(record.isActive() && record.hasReasonableData());
+			if (record.isVisible && record.isDisplayable) //only selected records get displayed
+				this.visibleAndDisplayableRecords.add(record);
+			if (record.isDisplayable) // only records with reasonable data get displayed
+				this.allRecords.add(record);
 		}
 	}
 
