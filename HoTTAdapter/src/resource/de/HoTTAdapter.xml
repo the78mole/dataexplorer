@@ -414,6 +414,7 @@
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Bewegungsrichtung</label>
 			</Measurement>
 			<Measurement>
 				<name>Strecke</name>
@@ -422,6 +423,7 @@
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Zurück gelegte Weglänge während des Fluges</label>
 			</Measurement>
 			<Measurement>
 				<name>SpannungRx</name>
