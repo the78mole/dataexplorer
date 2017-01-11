@@ -191,6 +191,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
                 <name>Strecke</name>
@@ -199,6 +200,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Zurück gelegte Weglänge während des Fluges</label>
             </Measurement>
             <Measurement>
                 <name>Spannung G</name>
@@ -769,7 +771,7 @@
 				<score label="sensorGps" value="GPS" type="String" />
 				<score label="sensorGam" value="GAM" type="String" />
 				<score label="sensorEam" value="EAM" type="String" />
-				<score label="sensorEsc" value="Regler" type="String" />
+				<score label="sensorEsc" value="ESC" type="String" />
 				<label>Vorhandensein von Sensoren</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="6">
@@ -1541,7 +1543,7 @@
 				<score label="sensorGps" value="GPS" type="String" />
 				<score label="sensorGam" value="GAM" type="String" />
 				<score label="sensorEam" value="EAM" type="String" />
-				<score label="sensorEsc" value="Regler" type="String" />
+				<score label="sensorEsc" value="ESC" type="String" />
 				<label>Vorhandensein von Sensoren</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="6">
@@ -2313,7 +2315,7 @@
 				<score label="sensorGps" value="GPS" type="String" />
 				<score label="sensorGam" value="GAM" type="String" />
 				<score label="sensorEam" value="EAM" type="String" />
-				<score label="sensorEsc" value="Regler" type="String" />
+				<score label="sensorEsc" value="ESC" type="String" />
 				<label>Vorhandensein von Sensoren</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="6">
@@ -3839,7 +3841,7 @@
 				<score label="sensorGps" value="GPS" type="String" />
 				<score label="sensorGam" value="GAM" type="String" />
 				<score label="sensorEam" value="EAM" type="String" />
-				<score label="sensorEsc" value="Regler" type="String" />
+				<score label="sensorEsc" value="ESC" type="String" />
 				<label>Vorhandensein von Sensoren</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="6">
@@ -4519,6 +4521,107 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="74" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
+			<Scoregroup scoregroupId="0">
+				<name>Dauer</name>
+				<symbol></symbol>
+				<unit>h</unit>
+				<active>true</active>
+				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+				<property name="histo_top_placement" value="true" type="Boolean" />
+				<label>Zeitdauer der Log-Aufzeichnung</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="1">
+				<name>Zeitschritte</name>
+				<symbol></symbol>
+				<unit>ms</unit>
+				<active>true</active>
+				<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
+				<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
+				<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
+				<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
+				<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="2">
+				<name>Zählerwerte</name>
+				<symbol></symbol>
+				<unit>Tsd</unit>
+				<active>true</active>
+				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+				<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
+				<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
+				<label>Anzahl von Messwerten</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="3">
+				<name>Paketverlustdauer</name>
+				<symbol></symbol>
+				<unit>ms</unit>
+				<active>true</active>
+				<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
+				<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
+				<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
+				<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
+				<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="4">
+				<name>Paketverluste</name>
+				<symbol></symbol>
+				<unit>‰</unit>
+				<active>true</active>
+				<score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages" />
+				<property name="factor" value="0.1" type="Double" />
+				<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="5">
+				<name>Sensoren</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="sensors" value="Anzahl" type="String" />
+				<score label="sensorVario" value="Vario" type="String" />
+				<score label="sensorGps" value="GPS" type="String" />
+				<score label="sensorGam" value="GAM" type="String" />
+				<score label="sensorEam" value="EAM" type="String" />
+				<score label="sensorEsc" value="ESC" type="String" />
+				<label>Vorhandensein von Sensoren</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="6">
+				<name>Versionen</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logDataVersion" value="Gerät" type="String" />
+				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+				<score label="logFileVersion" value="Log-Datei" type="String" />
+				<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="7">
+				<name>Datenmenge</name>
+				<symbol></symbol>
+				<unit>kiB</unit>
+				<active>true</active>
+				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+				<score label="logFileBytes" value="Dateigröße" type="String" />
+				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+				<label>Größe der Log-Aufzeichnung</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="8">
+				<name>Datensätze</name>
+				<symbol></symbol>
+				<unit></unit>
+				<active>true</active>
+				<score label="logFileRecordSets" value="Anzahl" type="String" />
+				<label>Anzahl an Log-Aufzeichnungen</label>
+			</Scoregroup>
+			<Scoregroup scoregroupId="9">
+				<name>Laufzeiten</name>
+				<symbol></symbol>
+				<unit>ms</unit>
+				<active>true</active>
+				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+				<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+			</Scoregroup>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
         <property name="text_mode" value="true" type="Boolean"/>

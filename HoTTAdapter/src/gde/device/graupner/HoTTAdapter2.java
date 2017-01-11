@@ -638,12 +638,23 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
 
-			recordSet.addNoneCalculationRecordsPoints(points, 
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+
+			if (this.histoRandomSample == null) {
+				recordSet.addPoints(points,	(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+			}
+			else if (histoRandomSample.isValidSample(points, (((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
+			recordSet.addPoints(points, (((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+			}
+//			recordSet.addNoneCalculationRecordsPoints(points, 
+//						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		if (this.histoRandomSample != null) {
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize,
+					histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+		}
 		recordSet.syncScaleOfSyncableRecords();
 	}
 
@@ -1324,6 +1335,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	//IHistoDevice functions
 
 	/**
+	 * @return true if the device supports a native file import for histo purposes
+	 */
+	public boolean isHistoImportSupported() {
+		return this.getClass().equals(HoTTAdapter2.class);
+	}
+
+	/**
 	 * create history recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
@@ -1345,7 +1363,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				if (truss.getLogFilePath().equals(filePath.toString())) {
 					log.log(Level.OFF, filePath.toString());
 					// add aggregated measurement and settlement points and score points to the truss
-					HoTTbinHistoReader.read(truss);
+					HoTTbinHistoReader2.read(truss);
 					histoVaults.add(truss);
 				}
 				else
