@@ -25,10 +25,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -236,7 +240,8 @@ public class HoTTbinReader {
 					}
 				}
 				for (boolean element : HoTTAdapter.isSensorType) {
-					if (element == true) ++sensorCount;
+					if (element == true)
+					++sensorCount;
 				}
 			}
 			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
@@ -347,14 +352,15 @@ public class HoTTbinReader {
 		HoTTbinReader.isJustParsed = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? 10 : 1);
-		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
+		if (menuToolBar != null)
+			HoTTbinReader.application.setProgress(0, sThreadId);
 
 		try {
 			HoTTAdapter.recordSets.clear();
@@ -838,7 +844,7 @@ public class HoTTbinReader {
 		HoTTbinReader.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -1683,5 +1689,48 @@ public class HoTTbinReader {
 			sb.append("(").append(i).append(")").append(DataParser.parse2Short(buffer, i)).append(GDE.STRING_BLANK);
 		}
 		HoTTbinReader.log.log(Level.FINE, sb.toString());
+	}
+
+	/**
+	 * @param file
+	 * @param numberDatablocks
+	 * @return get a rectified start timestamp if the files's last modified timestamp does not correspond with the filename 
+	 */
+	protected static long getStartTimeStamp(File file, long numberDatablocks) {
+		final long startTimeStamp;
+		String name = file.getName();
+		log.log(Level.FINE, "name=", name); //$NON-NLS-1$
+		Pattern hoTTNamePattern = Pattern.compile("\\d{4}\\_\\d{4}-\\d{1,2}-\\d{1,2}"); //$NON-NLS-1$
+		Matcher hoTTMatcher = hoTTNamePattern.matcher(name);
+		if (hoTTMatcher.find()) {
+			String logName = hoTTMatcher.group();
+
+			String[] strValueLogName = logName.split(GDE.STRING_UNDER_BAR);
+			int logCounter = Integer.parseInt(strValueLogName[0]);
+
+			String[] strValueDate = strValueLogName[1].split(GDE.STRING_DASH);
+			int year = Integer.parseInt(strValueDate[0]);
+			int month = Integer.parseInt(strValueDate[1]);
+			int day = Integer.parseInt(strValueDate[2]);
+
+			// check if the zoned date is equal
+			GregorianCalendar lastModifiedDate = new GregorianCalendar();
+			lastModifiedDate.setTimeInMillis(file.lastModified() - numberDatablocks * 10);
+			if (year == lastModifiedDate.get(Calendar.YEAR) && month == lastModifiedDate.get(Calendar.MONTH) && day == lastModifiedDate.get(Calendar.DAY_OF_MONTH)) {
+				startTimeStamp = lastModifiedDate.getTimeInMillis();
+				log.log(Level.FINE,	"lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", file.lastModified()) + " " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", lastModifiedDate.getTimeInMillis()));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			else {
+				// spread the logCounter into steps of 10 minutes 
+				GregorianCalendar fileNameDate = new GregorianCalendar(year, month - 1, day, 0, 0, 0);
+				fileNameDate.add(GregorianCalendar.MINUTE, 10 * (logCounter % (24 * 6)));
+				startTimeStamp = fileNameDate.getTimeInMillis();
+				log.log(Level.FINE, "fileNameDate=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", fileNameDate.getTimeInMillis())); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		else {
+			startTimeStamp = file.lastModified();
+		}
+		return startTimeStamp;
 	}
 }

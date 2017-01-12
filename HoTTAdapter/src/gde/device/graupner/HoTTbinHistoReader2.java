@@ -118,8 +118,10 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		File file = HoTTbinHistoReader2.filePath.toFile();
 		HashMap<String, String> header = null;
 		HoTTAdapter2 device = (HoTTAdapter2) HoTTbinHistoReader2.application.getActiveDevice();
+		boolean isChannelsChannel = device.channels.getActiveChannelNumber() == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
+		long numberDatablocks = file.length() / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
 		tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader2.application.getActiveChannelNumber(), true, true, false);
-		tmpRecordSet.setStartTimeStamp(file.lastModified());
+		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
 		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + tmpRecordSet.getStartTimeStampFormatted());
 		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader2.filePath.getFileName().toString());
 		if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinHistoReader2.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getLogRecordsetBaseName());

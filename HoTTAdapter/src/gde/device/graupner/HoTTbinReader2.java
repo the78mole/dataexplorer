@@ -114,7 +114,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && channelNumber != 4 ? 10 : 1);
-		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -446,7 +446,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//		HoTTbinReader.blockSequenceCheck		= new Vector<Byte>();
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -942,7 +942,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsGeneral[19] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGeneral[20] = DataParser.parse2Short(_buf3, 5) * 1000;
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 5
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 20
 					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGeneral[21] / 1000 + HoTTbinReader.pointsGeneral[19] / 1000 * HoTTbinReader.pointsGeneral[20] / 1000 / 2500 + 2)) {
 				HoTTbinReader.pointsGeneral[21] = HoTTbinReader.tmpCapacity * 1000;
 			}
@@ -997,7 +997,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader.pointsElectric[36] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsElectric[37] = DataParser.parse2Short(_buf3, 5) * 1000;
-			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 5
+			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 20
 					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsElectric[38] / 1000 + HoTTbinReader.pointsElectric[36] / 1000 * HoTTbinReader.pointsElectric[37] / 1000 / 2500 + 2)) {
 				HoTTbinReader.pointsElectric[38] = HoTTbinReader.tmpCapacity * 1000;
 			}
@@ -1119,7 +1119,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				HoTTbinReader.pointsSpeedControl[80] = HoTTbinReader.tmpVoltage * 1000;
 				HoTTbinReader.pointsSpeedControl[81] = HoTTbinReader.tmpCurrent * 1000;
 				HoTTbinReader.pointsSpeedControl[83] = Double.valueOf(HoTTbinReader.pointsSpeedControl[80] / 1000.0 * HoTTbinReader.pointsSpeedControl[81]).intValue();
-				if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 5
+				if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 20
 						|| (HoTTbinReader.tmpCapacity != 0 && Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[82] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2))) {
 					HoTTbinReader.pointsSpeedControl[82] = HoTTbinReader.tmpCapacity * 1000;
 				}
@@ -1149,7 +1149,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				HoTTbinReader.pointsSpeedControl[60] = HoTTbinReader.tmpVoltage * 1000;
 				HoTTbinReader.pointsSpeedControl[61] = HoTTbinReader.tmpCurrent * 1000;
 				HoTTbinReader.pointsSpeedControl[63] = Double.valueOf(HoTTbinReader.pointsSpeedControl[60] / 1000.0 * HoTTbinReader.pointsSpeedControl[61]).intValue();
-				if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 5
+				if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 20
 						|| (HoTTbinReader.tmpCapacity != 0 && Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsSpeedControl[62] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2))) {
 					HoTTbinReader.pointsSpeedControl[62] = HoTTbinReader.tmpCapacity * 1000;
 				}
