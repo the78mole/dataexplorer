@@ -22,6 +22,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.ui.DataExplorer;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -52,34 +53,40 @@ public class CalculationThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		log.log(java.util.logging.Level.FINE, "start data calculation for record = " + this.recordKey); //$NON-NLS-1$
-		Record record = this.recordSet.get(this.recordKey);
-		// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
-		if (this.recordKey.equals(this.recordSet.get(3).getName())) { // 3=Leistung P[W]=U[V]*I[A]
-			Record recordVoltage = this.recordSet.get(0); // 0=Spannung
-			Record recordCurrent = this.recordSet.get(1); // 1=Strom
-			record.clear();
-			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(Double.valueOf((recordVoltage.realGet(i) / 1000.0) * (recordCurrent.realGet(i) / 1000.0) * 1000).intValue());
-				log.log(java.util.logging.Level.FINEST, "adding value = " + record.realGet(i)); //$NON-NLS-1$
+		Record record;
+		try {
+			log.log(java.util.logging.Level.FINE, "start data calculation for record = " + this.recordKey); //$NON-NLS-1$
+			record = this.recordSet.get(this.recordKey);
+			// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+			if (this.recordKey.equals(this.recordSet.get(3).getName())) { // 3=Leistung P[W]=U[V]*I[A]
+				Record recordVoltage = this.recordSet.get(0); // 0=Spannung
+				Record recordCurrent = this.recordSet.get(1); // 1=Strom
+				record.clear();
+				for (int i = 0; i < recordVoltage.size(); i++) {
+					record.add(Double.valueOf((recordVoltage.realGet(i) / 1000.0) * (recordCurrent.realGet(i) / 1000.0) * 1000).intValue());
+					log.log(java.util.logging.Level.FINEST, "adding value = " + record.realGet(i)); //$NON-NLS-1$
+				}
+				record.setDisplayable(true);
 			}
-			record.setDisplayable(true);
-		}
-		else if (this.recordKey.equals(this.recordSet.get(4).getName())) { // 4=Energie E[Wh]=U[V]*I[A]*t[h]=U[V]*C[Ah]
-			Record recordVoltage = this.recordSet.get(0); // 0=Spannung
-			Record recordCharge = this.recordSet.get(2); // 2=Ladung
-			record.clear();
-			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(Double.valueOf((recordVoltage.realGet(i) / 1000.0) * (recordCharge.realGet(i) / 1000.0)).intValue());
-				log.log(java.util.logging.Level.FINEST, "adding value = " + record.realGet(i)); //$NON-NLS-1$
+			else if (this.recordKey.equals(this.recordSet.get(4).getName())) { // 4=Energie E[Wh]=U[V]*I[A]*t[h]=U[V]*C[Ah]
+				Record recordVoltage = this.recordSet.get(0); // 0=Spannung
+				Record recordCharge = this.recordSet.get(2); // 2=Ladung
+				record.clear();
+				for (int i = 0; i < recordVoltage.size(); i++) {
+					record.add(Double.valueOf((recordVoltage.realGet(i) / 1000.0) * (recordCharge.realGet(i) / 1000.0)).intValue());
+					log.log(java.util.logging.Level.FINEST, "adding value = " + record.realGet(i)); //$NON-NLS-1$
+				}
+				record.setDisplayable(true);
 			}
-			record.setDisplayable(true);
-		}
-		else
-			log.log(java.util.logging.Level.WARNING, "only supported records are " + this.recordSet.get(3).getName() + ", " + this.recordSet.get(4).getName()); //$NON-NLS-1$ //$NON-NLS-2$
+			else
+				log.log(java.util.logging.Level.WARNING, "only supported records are " + this.recordSet.get(3).getName() + ", " + this.recordSet.get(4).getName()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		//recordSet.updateDataTable();
-		if (record.isVisible()) this.application.updateGraphicsWindow();
-		log.log(java.util.logging.Level.FINE, "finished data calculation for record = " + this.recordKey); //$NON-NLS-1$
+			//recordSet.updateDataTable();
+			if (record.isVisible()) this.application.updateGraphicsWindow();
+			log.log(java.util.logging.Level.FINE, "finished data calculation for record = " + this.recordKey); //$NON-NLS-1$
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 }
