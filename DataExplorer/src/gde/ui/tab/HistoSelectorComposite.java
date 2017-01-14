@@ -18,19 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.data.HistoSet;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.data.TrailRecord;
-import gde.data.TrailRecordSet;
-import gde.data.HistoSet.RebuildStep;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.CurveSelectorContextMenu;
-
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -55,6 +42,18 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+
+import gde.GDE;
+import gde.data.HistoSet;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.data.TrailRecord;
+import gde.data.TrailRecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.CurveSelectorContextMenu;
 
 /**
  * composite with a header (Curve Selector, ..) and table rows for the curves.
@@ -149,7 +148,8 @@ public class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true);
+					parent.redraw();
+					//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // WB: I do not see a need to go through the complete rebuild steps
 				}
 			});
 		}
@@ -172,7 +172,8 @@ public class HistoSelectorComposite extends Composite {
 					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
-						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true);
+						parent.redraw();
+						//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // WB: I do not see a need to go through the complete rebuild steps
 					}
 				}
 			});

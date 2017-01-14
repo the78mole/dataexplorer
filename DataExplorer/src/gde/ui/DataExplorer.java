@@ -1969,7 +1969,9 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
 		DataExplorer.this.histoSet.getTrailRecordSet().setPoints(recordOrdinal);
-		DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi);
+		this.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
+
+		//DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi); // WB: I do not see a need to go through the complete rebuild steps
 	}
 
 	/**
