@@ -426,7 +426,7 @@ public class HistoTableWindow extends CTabItem {
 
 		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0352);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.recordsColumn.setWidth(recordTitle.length() * this.textExtentFactor * 30 / 10);
+		this.recordsColumn.setWidth(recordTitle.length() * this.textExtentFactor * 35 / 10);
 		this.recordsColumn.setText(recordTitle);
 
 		String curveTypeHeader = Messages.getString(MessageIds.GDE_MSGT0828);

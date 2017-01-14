@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2016 Thomas Eickert
+    Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
 package gde.data;
@@ -580,12 +580,12 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					break;
 				}
 			}
+			if (!containsTrue) TrailType.getSubstitutes().stream().map(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 			if (!containsTrue) {
 				for (TrailType trailType : TrailType.getSubstitutes()) {
 					applicablePrimitiveTrails[trailType.ordinal()] = true;
 				}
 			}
-
 			if (this.settings.isQuantilesActive() && !(this.measurementType.isSuppressQuantiles() != null && this.measurementType.isSuppressQuantiles()) // 
 					&& !this.getDevice().isGPSCoordinates(this)) {
 				applicablePrimitiveTrails[TrailType.Q0.ordinal()] = true;
@@ -622,10 +622,23 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 						break;
 					}
 				}
+				if (!containsTrue) TrailType.getSubstitutes().stream().map(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 				if (!containsTrue) {
 					for (TrailType trailType : TrailType.getSubstitutes()) {
 						applicablePrimitiveTrails[trailType.ordinal()] = true;
 					}
+				}
+				if (this.settings.isQuantilesActive() && !(this.settlementType.isSuppressQuantiles() != null && this.settlementType.isSuppressQuantiles()) // 
+						&& !this.getDevice().isGPSCoordinates(this)) {
+					applicablePrimitiveTrails[TrailType.Q0.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q1.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q2.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q3.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q4.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q_25_PERMILLE.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q_975_PERMILLE.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q_LOWER_WHISKER.ordinal()] = true;
+					applicablePrimitiveTrails[TrailType.Q_UPPER_WHISKER.ordinal()] = true;
 				}
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " " + settlementEvaluation.toString()); // $NON-NLS-1$ //$NON-NLS-1$
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$

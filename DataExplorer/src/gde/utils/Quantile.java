@@ -46,7 +46,8 @@ public class Quantile {
 	private final static String			$CLASS_NAME	= Quantile.class.getName();
 	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
-	private final List<Integer>			population;
+	private final List<Integer>			iPopulation;
+	private final List<Double>			dPopulation;
 	private final EnumSet<Fixings>	fixings;
 	private int											realSize;																		// size of the population without zero values
 
@@ -59,44 +60,91 @@ public class Quantile {
 	 * @param currentRecord
 	 * @param fixings defines how to proceed with the data
 	 */
-	public Quantile(Collection<Integer> population, EnumSet<Fixings> fixings) {
-		this.population = new ArrayList<>(population);
+	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings) {
+		this.dPopulation = null;
+		this.iPopulation = new ArrayList<>(iPopulation);
 		this.fixings = fixings;
 		if (fixings.contains(Fixings.REMOVE_NULLS) && fixings.contains(Fixings.REMOVE_ZEROS)) {
-			for (int i = this.population.size() - 1; i >= 0; i--) {
-				if (this.population.get(i) == null || this.population.get(i) == 0) {
-					this.population.remove(i);
+			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {
+				if (this.iPopulation.get(i) == null || this.iPopulation.get(i) == 0) {
+					this.iPopulation.remove(i);
 				}
 			}
 		}
 		else if (fixings.contains(Fixings.REMOVE_NULLS)) {
-			for (int i = this.population.size() - 1; i >= 0; i--) {
-				if (this.population.get(i) == null) {
-					this.population.remove(i);
+			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {
+				if (this.iPopulation.get(i) == null) {
+					this.iPopulation.remove(i);
 				}
 			}
 		}
 		else if (fixings.contains(Fixings.REMOVE_ZEROS)) {
-			for (int i = this.population.size() - 1; i >= 0; i--) {
-				if (this.population.get(i) == 0) {
-					this.population.remove(i);
+			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {
+				if (this.iPopulation.get(i) == 0) {
+					this.iPopulation.remove(i);
 				}
 			}
 		}
 		if (fixings.contains(Fixings.ALLOW_NULLS)) {
-			Collections.sort(this.population, Comparator.nullsLast(Integer::compareTo)); // approx. 20% performance loss 
-			for (int i = this.population.size() - 1; i >= 0; i--) {
-				if (this.population.get(i) != null) {
+			Collections.sort(this.iPopulation, Comparator.nullsLast(Integer::compareTo)); // approx. 20% performance loss 
+			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {
+				if (this.iPopulation.get(i) != null) {
 					this.realSize = i + 1;
 					break;
 				}
 			}
 		}
 		else {
-			Collections.sort(this.population);
-			this.realSize = this.population.size();
+			Collections.sort(this.iPopulation);
+			this.realSize = this.iPopulation.size();
 		}
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.population.toArray()));
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.iPopulation.toArray()));
+	}
+
+	/**
+	 * constructor based on the record itself.
+	 * @param currentRecord
+	 * @param fixings defines how to proceed with the data
+	 */
+	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings) {
+		this.dPopulation = new ArrayList<>(dPopulation);
+		this.iPopulation = null;
+		this.fixings = fixings;
+		if (fixings.contains(Fixings.REMOVE_NULLS) && fixings.contains(Fixings.REMOVE_ZEROS)) {
+			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {
+				if (this.dPopulation.get(i) == null || this.dPopulation.get(i) == 0) {
+					this.dPopulation.remove(i);
+				}
+			}
+		}
+		else if (fixings.contains(Fixings.REMOVE_NULLS)) {
+			for (int i = this.dPopulation.size() - 1; i >= 0; i--) {
+				if (this.dPopulation.get(i) == null) {
+					this.dPopulation.remove(i);
+				}
+			}
+		}
+		else if (fixings.contains(Fixings.REMOVE_ZEROS)) {
+			for (int i = this.dPopulation.size() - 1; i >= 0; i--) {
+				if (this.dPopulation.get(i) == 0) {
+					this.dPopulation.remove(i);
+				}
+			}
+		}
+		if (fixings.contains(Fixings.ALLOW_NULLS)) {
+			Collections.sort(this.dPopulation, Comparator.nullsLast(Double::compareTo)); // approx. 20% performance loss 
+			for (int i = this.dPopulation.size() - 1; i >= 0; i--) {
+				if (this.dPopulation.get(i) != null) {
+					this.realSize = i + 1;
+					break;
+				}
+			}
+		}
+		else {
+			Collections.sort(this.dPopulation);
+			this.realSize = this.dPopulation.size();
+		}
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.dPopulation.toArray()));
 	}
 
 	/**
@@ -106,35 +154,64 @@ public class Quantile {
 	 * @return
 	 */
 	public double getQuantile(double probabilityCutPoint) {
-		if (this.fixings.contains(Fixings.IS_SAMPLE)) {
-			if (probabilityCutPoint >= 1. / (this.realSize + 1) && probabilityCutPoint < (double) this.realSize / (this.realSize + 1)) {
-				double position = (this.realSize + 1) * probabilityCutPoint;
-				return this.population.get((int) position - 1) + (position - (int) position) * (this.population.get((int) position) - this.population.get((int) position - 1));
+		if (this.dPopulation == null) {
+			if (this.fixings.contains(Fixings.IS_SAMPLE)) {
+				if (probabilityCutPoint >= 1. / (this.realSize + 1) && probabilityCutPoint < (double) this.realSize / (this.realSize + 1)) {
+					double position = (this.realSize + 1) * probabilityCutPoint;
+					return this.iPopulation.get((int) position - 1) + (position - (int) position) * (this.iPopulation.get((int) position) - this.iPopulation.get((int) position - 1));
+				}
+				else if (probabilityCutPoint < 1. / (this.realSize + 1))
+					return this.iPopulation.get(0);
+				else
+					return this.iPopulation.get(this.realSize - 1);
 			}
-			else if (probabilityCutPoint < 1. / (this.realSize + 1))
-				return this.population.get(0);
-			else
-				return this.population.get(this.realSize - 1);
+			else {
+				if (probabilityCutPoint > 0. || probabilityCutPoint < 1.) {
+					double position = this.realSize * probabilityCutPoint;
+					if (position % 2 == 0)
+						// take elements p-1 and p due to zerobased index
+						return (this.iPopulation.get((int) position - 1) + this.iPopulation.get((int) (position))) / 2.;
+					else
+						// take element p due to zerobased index in combination with upper bound operation in the calculation rule
+						return this.iPopulation.get((int) (position));
+				}
+				else if (probabilityCutPoint == 0.)
+					return this.iPopulation.get(0);
+				else
+					return this.iPopulation.get(this.realSize - 1);
+			}
 		}
 		else {
-			if (probabilityCutPoint > 0. || probabilityCutPoint < 1.) {
-				double position = this.realSize * probabilityCutPoint;
-				if (position % 2 == 0)
-					// take elements p-1 and p due to zerobased index
-					return (this.population.get((int) position - 1) + this.population.get((int) (position))) / 2.;
+			if (this.fixings.contains(Fixings.IS_SAMPLE)) {
+				if (probabilityCutPoint >= 1. / (this.realSize + 1) && probabilityCutPoint < (double) this.realSize / (this.realSize + 1)) {
+					double position = (this.realSize + 1) * probabilityCutPoint;
+					return this.dPopulation.get((int) position - 1) + (position - (int) position) * (this.dPopulation.get((int) position) - this.dPopulation.get((int) position - 1));
+				}
+				else if (probabilityCutPoint < 1. / (this.realSize + 1))
+					return this.dPopulation.get(0);
 				else
-					// take element p due to zerobased index in combination with upper bound operation in the calculation rule
-					return this.population.get((int) (position));
+					return this.dPopulation.get(this.realSize - 1);
 			}
-			else if (probabilityCutPoint == 0.)
-				return this.population.get(0);
-			else
-				return this.population.get(this.realSize - 1);
+			else {
+				if (probabilityCutPoint > 0. || probabilityCutPoint < 1.) {
+					double position = this.realSize * probabilityCutPoint;
+					if (position % 2 == 0)
+						// take elements p-1 and p due to zerobased index
+						return (this.dPopulation.get((int) position - 1) + this.dPopulation.get((int) (position))) / 2.;
+					else
+						// take element p due to zerobased index in combination with upper bound operation in the calculation rule
+						return this.dPopulation.get((int) (position));
+				}
+				else if (probabilityCutPoint == 0.)
+					return this.dPopulation.get(0);
+				else
+					return this.dPopulation.get(this.realSize - 1);
+			}
 		}
 	}
 
 	public double getQuartile0() {
-		return this.population.get(0);
+		return this.dPopulation == null ? this.iPopulation.get(0) : this.dPopulation.get(0);
 	}
 
 	public double getQuartile1() {
@@ -150,25 +227,38 @@ public class Quantile {
 	}
 
 	public double getQuartile4() {
-		return this.population.get(this.realSize - 1);
+		return this.dPopulation == null ? this.iPopulation.get(this.realSize - 1) : this.dPopulation.get(this.realSize - 1);
 	}
-	
+
 	public double getInterQuartileRange() {
 		return getQuantile(.75) - getQuantile(.25);
 	}
-	
+
 	public double getQuantileLowerWhisker() {
 		final double probabilityCutPoint = .25;
 		final double whiskerStartValue = getQuantile(probabilityCutPoint);
 		final double whiskerLimitValue = whiskerStartValue - getInterQuartileRange() * 1.5;
 		double value = whiskerStartValue;
-		for (int i = 0; i < this.realSize * probabilityCutPoint; i++) {
-			if (this.population.get(i) >= whiskerLimitValue) {
-				// get the corrected value which is crucial for samples
-				value = getQuantile( (.5 + i) / this.realSize); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
-				// take the whisker limit value if the interpolation / estimation value is beyond the limit
-				value = value < whiskerLimitValue ? whiskerLimitValue : value;
-				break;
+		if (this.dPopulation == null) {
+			for (int i = 0; i < this.realSize * probabilityCutPoint; i++) {
+				if (this.iPopulation.get(i) >= whiskerLimitValue) {
+					// get the corrected value which is crucial for samples
+					value = getQuantile((.5 + i) / this.realSize); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// take the whisker limit value if the interpolation / estimation value is beyond the limit
+					value = value < whiskerLimitValue ? whiskerLimitValue : value;
+					break;
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < this.realSize * probabilityCutPoint; i++) {
+				if (this.dPopulation.get(i) >= whiskerLimitValue) {
+					// get the corrected value which is crucial for samples
+					value = getQuantile((.5 + i) / this.realSize); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// take the whisker limit value if the interpolation / estimation value is beyond the limit
+					value = value < whiskerLimitValue ? whiskerLimitValue : value;
+					break;
+				}
 			}
 		}
 		return value;
@@ -179,13 +269,26 @@ public class Quantile {
 		final double whiskerStartValue = getQuantile(probabilityCutPoint);
 		final double whiskerLimitValue = whiskerStartValue + getInterQuartileRange() * 1.5;
 		double value = whiskerStartValue;
-		for (int i = this.realSize - 1; i > this.realSize * probabilityCutPoint; i--) {
-			if (this.population.get(i) <= whiskerLimitValue) {
-				// get the corrected value which is crucial for samples
-				value = getQuantile((.5 + i) / this.realSize); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
-				// take the whisker limit value if the interpolation / estimation value is beyond the limit
-				value = value > whiskerLimitValue ? whiskerLimitValue : value;
-				break;
+		if (this.dPopulation == null) {
+			for (int i = this.realSize - 1; i > this.realSize * probabilityCutPoint; i--) {
+				if (this.iPopulation.get(i) <= whiskerLimitValue) {
+					// get the corrected value which is crucial for samples
+					value = getQuantile((.5 + i) / this.realSize); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// take the whisker limit value if the interpolation / estimation value is beyond the limit
+					value = value > whiskerLimitValue ? whiskerLimitValue : value;
+					break;
+				}
+			}
+		}
+		else {
+			for (int i = this.realSize - 1; i > this.realSize * probabilityCutPoint; i--) {
+				if (this.dPopulation.get(i) <= whiskerLimitValue) {
+					// get the corrected value which is crucial for samples
+					value = getQuantile((.5 + i) / this.realSize); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// take the whisker limit value if the interpolation / estimation value is beyond the limit
+					value = value > whiskerLimitValue ? whiskerLimitValue : value;
+					break;
+				}
 			}
 		}
 		return value;
@@ -199,7 +302,7 @@ public class Quantile {
 		values[quartile2Idx] = getQuartile2();
 		values[quartile3Idx] = getQuartile3();
 		values[quartile4Idx] = getQuartile4();
-		
+
 		return values;
 	}
 
@@ -207,7 +310,7 @@ public class Quantile {
 	 * @return size after removing nulls or zeros as defined in the constructor
 	 */
 	public int getRealSize() {
-		return realSize;
+		return this.realSize;
 	}
 
 }

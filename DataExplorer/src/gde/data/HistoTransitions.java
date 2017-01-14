@@ -14,7 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
  
- Copyright (c) 2016 Thomas Eickert
+ Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
 
@@ -22,43 +22,58 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.ChannelPropertyTypes;
+import gde.device.ChannelType;
 import gde.device.IDevice;
 import gde.device.TransitionClassTypes;
+import gde.device.TransitionGroupType;
 import gde.device.TransitionType;
 import gde.device.TransitionValueTypes;
 import gde.log.Level;
-import gde.utils.Quantile;
-import gde.utils.Quantile.Fixings;
+import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
 /**
  * holds all transitions for the history recordSet.
- * the transitions are identified by applying the transition type to the histo recordSet.
- * sorted by timestamp.
+ * the transitions are sorted by timestamp.
  * @author Thomas Eickert
  */
-public class HistoTransitions extends Vector<Transition> {
-	final static String				$CLASS_NAME				= HistoTransitions.class.getName();
-	private static final long	serialVersionUID	= -3373317163399403911L;
-	final static Logger				log								= Logger.getLogger($CLASS_NAME);
+public class HistoTransitions {
+	final static String															$CLASS_NAME	= HistoTransitions.class.getName();
+	final static Logger															log					= Logger.getLogger($CLASS_NAME);
 
-	private final IDevice			device;
+	private final DataExplorer											application	= DataExplorer.getInstance();
+	private final Settings													settings		= Settings.getInstance();
+	private final IDevice														device			= this.application.getActiveDevice();
 
-	private final RecordSet		parent;
-	private SettlementDeque		referenceDeque;
-	private SettlementDeque		thresholdDeque;
-	private SettlementDeque		recoveryDeque;
-	private TriggerState			previousTriggerState;
-	private TriggerState			triggerState;
+	private final RecordSet													recordSet;
+
+	/**
+	 * hierarchical container for all transitions.
+	 * holds only groups which actually have transitions.
+	 * keys: transitionGroupId, thresholdStartTimestamp
+	 */
+	private Map<Integer, TreeMap<Long, Transition>>	transitionContainer;
+
+	private SettlementDeque													referenceDeque;
+	private SettlementDeque													thresholdDeque;
+	private SettlementDeque													recoveryDeque;
+	private TriggerState														previousTriggerState;
+	private TriggerState														triggerState;
+	private int																			transitionCount;
 
 	private enum TriggerState {
 		/**
@@ -86,16 +101,16 @@ public class HistoTransitions extends Vector<Transition> {
 	 */
 	private class SettlementDeque extends ArrayDeque<Double> {
 
-		private static final long				serialVersionUID	= 915484098600135376L;
+		private static final long	serialVersionUID	= 915484098600135376L;
 
-		private boolean									isMinimumExtremum;
-		private long										timePeriod_100ns;
-		private double									extremeValue;
-		private boolean									isExhausted;
-		private int											startIndex;
+		private boolean						isMinimumExtremum;
+		private long							timePeriod_100ns;
+		private double						extremeValue;
+		private boolean						isExhausted;
+		private int								startIndex;
 
-		private ArrayDeque<Long>				timeStampDeque;
-		private List<Double>						sortedValues;
+		private ArrayDeque<Long>	timeStampDeque;
+		private List<Double>			sortedValues;
 
 		/**
 		 * be sure to call initialize before using the deque.
@@ -190,15 +205,10 @@ public class HistoTransitions extends Vector<Transition> {
 		 * 
 		 * @see java.util.ArrayDeque#clone()
 		 */
+		@Override
+		@Deprecated
 		public SettlementDeque clone() {
-			SettlementDeque cloned = (SettlementDeque) super.clone();
-			cloned.timeStampDeque = this.timeStampDeque.clone();
-			cloned.isMinimumExtremum = this.isMinimumExtremum;
-			cloned.timePeriod_100ns = this.timePeriod_100ns;
-			cloned.extremeValue = this.extremeValue;
-			cloned.isExhausted = this.isExhausted;
-			cloned.sortedValues = null;
-			return cloned;
+			throw new UnsupportedOperationException();
 		}
 
 		/*
@@ -338,7 +348,7 @@ public class HistoTransitions extends Vector<Transition> {
 		 * @return false if the timestamp is beyond the deque time period or if the element already exists in the deque. 
 		 */
 		public boolean tryAddLast(double translatedValue, long timeStamp_100ns) {
-			if (this.timeStampDeque.peekFirst() + this.timePeriod_100ns > timeStamp_100ns) {
+			if (this.timeStampDeque.peekFirst() + this.timePeriod_100ns >= timeStamp_100ns) {
 				this.addLast(translatedValue, timeStamp_100ns);
 				return true;
 			}
@@ -349,7 +359,7 @@ public class HistoTransitions extends Vector<Transition> {
 		}
 
 		/**
-		 * moves all deque entries and leaves an empty deque.
+		 * moves all deque entries and leaves an cleared deque.
 		 * @param settlementDeque
 		 */
 		public void addLastByMoving(SettlementDeque settlementDeque) {
@@ -402,7 +412,7 @@ public class HistoTransitions extends Vector<Transition> {
 			if (!this.timeStampDeque.isEmpty()) {
 				for (int i = 0; i < this.timeStampDeque.size(); i++) {
 					if (this.timeStampDeque.peekFirst() + this.timePeriod_100ns < this.timeStampDeque.peekLast()) {
-						this.pollFirst();
+						this.pollFirst(); // polls timestampDeque also
 						this.isExhausted = true;
 					}
 					else {
@@ -447,13 +457,12 @@ public class HistoTransitions extends Vector<Transition> {
 				return Double.NaN;
 			}
 			else {
-				if (Settings.getInstance().getReferenceQuantileDistance() == 0.) {
+				if (Settings.getInstance().getMinmaxQuantileDistance() == 0.) {
 					// bypass deque sort
 					return this.extremeValue;
 				}
 				else {
-					return this.isMinimumExtremum ? this.getQuantileValue(Settings.getInstance().getReferenceQuantileDistance())
-							: this.getQuantileValue(1. - Settings.getInstance().getReferenceQuantileDistance());
+					return this.isMinimumExtremum ? this.getQuantileValue(Settings.getInstance().getMinmaxQuantileDistance()) : this.getQuantileValue(1. - Settings.getInstance().getMinmaxQuantileDistance());
 				}
 			}
 		}
@@ -467,8 +476,7 @@ public class HistoTransitions extends Vector<Transition> {
 				return Double.NaN;
 			}
 			else {
-				return this.isMinimumExtremum ? this.getQuantileValue(1. - Settings.getInstance().getReferenceQuantileDistance())
-						: this.getQuantileValue(Settings.getInstance().getReferenceQuantileDistance());
+				return this.isMinimumExtremum ? this.getQuantileValue(1. - Settings.getInstance().getMinmaxQuantileDistance()) : this.getQuantileValue(Settings.getInstance().getMinmaxQuantileDistance());
 			}
 		}
 
@@ -482,7 +490,7 @@ public class HistoTransitions extends Vector<Transition> {
 			for (double translatedValue : this) {
 				averageValue += (translatedValue - averageValue) / ++i;
 			}
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("averageValue=%f", averageValue));
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("averageValue=%f", averageValue)); //$NON-NLS-1$
 			return averageValue;
 		}
 
@@ -493,9 +501,9 @@ public class HistoTransitions extends Vector<Transition> {
 			else if (removedValue == this.extremeValue) {
 				// avoid the calculation of a new extreme value if the neighbor value is identical
 				if (removedValue != this.peekFirst()) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("removedValue=%f extremeValue=%f", removedValue, this.extremeValue));
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("removedValue=%f extremeValue=%f", removedValue, this.extremeValue)); //$NON-NLS-1$
 					this.extremeValue = this.isMinimumExtremum ? getQuantileValue(0.) : getQuantileValue(1.);
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue));
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -509,7 +517,7 @@ public class HistoTransitions extends Vector<Transition> {
 		}
 
 		public String getFormatedDuration(int index) {
-			return StringHelper.getFormatedDuration("HH:mm:ss.SSS", this.getTimestamps_100ns().get(index) / 10);
+			return StringHelper.getFormatedDuration("HH:mm:ss.SSS", this.getTimestamps_100ns().get(index) / 10); //$NON-NLS-1$
 		}
 
 		/**
@@ -549,20 +557,138 @@ public class HistoTransitions extends Vector<Transition> {
 
 	}
 
-	public HistoTransitions(IDevice newDevice, RecordSet parent, int transitionTypeSize) {
-		super(transitionTypeSize * 3); // let us assume we will identify 3 transitions per transitionType
-		this.device = newDevice;
-		this.parent = parent;
+	public HistoTransitions(RecordSet recordSet) {
+		this.recordSet = recordSet;
 	}
 
 	/**
-	 * add a transition.
-	 * @param point
+	 * identify all transitions for the recordset and channel.
+	 * remove transition duplicates or overlapping transitions in all transition groups.
+	 * @param logChannelNumber
+	 * @return false if no valid transition was identified
 	 */
-	@Override
-	public synchronized boolean add(Transition transition) {
-		return super.add(transition);
+	public void add4Channel(int logChannelNumber) {
+		this.transitionCount = 0;
+		this.transitionContainer = new HashMap<Integer, TreeMap<Long, Transition>>();
 
+		// step: determine all transitions for all transition types defined for the channel
+		final ChannelType channelType = this.device.getDeviceConfiguration().getChannel(logChannelNumber);
+		for (TransitionType transitionType : channelType.getTransition()) {
+			final TreeMap<Long, Transition> transitionsFromRecord = addFromRecord(this.recordSet.get(this.recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
+
+			if (!transitionsFromRecord.isEmpty()) {
+				this.transitionCount += transitionsFromRecord.size();
+				log.log(Level.OFF, String.valueOf(transitionType.getTransitionId()) + "  transitionCount =", this.transitionCount); //$NON-NLS-1$
+
+				// assign the transitions to all transition groups which have a mapping to this transition type 
+				Iterable<TransitionGroupType> iterable = channelType.getTransitionGroup().stream()
+						.filter(group -> group.getTransitionMapping().stream().anyMatch(mapping -> mapping.getTransitionId() == transitionType.getTransitionId()))::iterator;
+				for (TransitionGroupType transitionGroupType : iterable) {
+					if (!this.transitionContainer.containsKey(transitionGroupType.getTransitionGroupId())) {
+						// build the container 
+						TreeMap<Long, Transition> groupTransitions = new TreeMap<Long, Transition>();
+						this.transitionContainer.put(transitionGroupType.getTransitionGroupId(), groupTransitions);
+					}
+
+					// add or merge the transitions
+					final TreeMap<Long, Transition> selectedTransitions = this.transitionContainer.get(transitionGroupType.getTransitionGroupId());
+					if (!selectedTransitions.isEmpty()) {
+						// identify transitions with the same threshold startTimeStamp
+						Set<Long> intersection = new HashSet<Long>(transitionsFromRecord.keySet()); // use the copy constructor because the keyset is only a view on the map
+						intersection.retainAll(selectedTransitions.keySet());
+						// discard transitions with the same timestamp
+						for (long thresholdStartTimeStamp_ms : intersection) {
+							// check which one of the conflicting transitions is inferior and remove it from its parent map
+							final Entry<Long, Transition> transitionFromRecord = transitionsFromRecord.ceilingEntry(thresholdStartTimeStamp_ms);
+							getInferiorTransition(selectedTransitions.ceilingEntry(thresholdStartTimeStamp_ms), transitionsFromRecord.ceilingEntry(thresholdStartTimeStamp_ms)).ifPresent(x -> {
+								if (transitionFromRecord.equals(x))
+									transitionsFromRecord.remove(thresholdStartTimeStamp_ms);
+								else
+									selectedTransitions.remove(thresholdStartTimeStamp_ms);
+							});
+						}
+						if (!intersection.isEmpty()) {
+							log.log(Level.OFF, "removals due to same timestamp:  ", intersection.size()); //$NON-NLS-1$
+						}
+					}
+					// merge the new transitions with existing transitions for the current group and class
+					selectedTransitions.putAll(transitionsFromRecord);
+
+					// eliminate transitions which overlap in the reference and threshold phases; prioritize shorter transitions because this will increase the probability for additional transitions
+					List<Long> duplicates = new ArrayList<Long>();
+					Entry<Long, Transition> previousTransitionEntry = null;
+					for (Entry<Long, Transition> transitionEntry : selectedTransitions.entrySet()) {
+						if (previousTransitionEntry != null) {
+							Entry<Long, Transition> inferiorTransitionEntry = getInferiorTransition(previousTransitionEntry, transitionEntry).orElse(null);
+							if (inferiorTransitionEntry == null)
+								previousTransitionEntry = transitionEntry;
+							else if (previousTransitionEntry.equals(inferiorTransitionEntry)) {
+								duplicates.add(previousTransitionEntry.getKey());
+								previousTransitionEntry = transitionEntry;
+							}
+							else {
+								duplicates.add(transitionEntry.getKey());
+								// keep previousTransitionEntry for the next overlap check
+							}
+						}
+						else {
+							previousTransitionEntry = transitionEntry;
+						}
+					}
+					for (long timeStamp_ms : duplicates) {
+						selectedTransitions.remove(timeStamp_ms);
+					}
+					if (!duplicates.isEmpty()) {
+						log.log(Level.OFF, "removals due to general overlap:  transitionCount =",  duplicates.size()); //$NON-NLS-1$
+					}
+				} // for transitionGroupTypes
+			} // transitionsFromRecord.isEmpty()
+		} // for transitionTypes
+
+	}
+
+	/**
+	 * prioritize transitions (peak is top priority, slope is last priority).
+	 * the  second-order criterion is the reference + threshold duration (shorter is higher priority).
+	 * @param entry1
+	 * @param entry2
+	 * @return the inferior transition in case of overlapping transitions
+	 */
+	private Optional<Entry<Long, Transition>> getInferiorTransition(Entry<Long, Transition> entry1, Entry<Long, Transition> entry2) {
+		Optional<Entry<Long, Transition>> inferiorTransition = Optional.empty();
+
+		final Transition transition2 = entry2.getValue();
+		final Transition transition1 = entry1.getValue();
+		final boolean isOverlap = transition2.getReferenceStartTimeStamp_ms() < transition1.getThresholdEndTimeStamp_ms()
+				&& transition1.getReferenceStartTimeStamp_ms() < transition2.getThresholdEndTimeStamp_ms(); // !start2.after(end1) && !start1.after(end2)
+		final boolean isTransition1Prioritized = (transition1.isPeak() && !transition2.isPeak()) || (transition1.isPulse() && !transition2.isPeak() && !transition2.isPulse());
+		final boolean isTransition2Prioritized = (transition2.isPeak() && !transition1.isPeak()) || (transition2.isPulse() && !transition1.isPeak() && !transition1.isPulse());
+
+		if (isOverlap) {
+			if (isTransition1Prioritized) {
+				inferiorTransition = Optional.of(entry2);
+			}
+			else if (isTransition2Prioritized) {
+				inferiorTransition = Optional.of(entry1);
+			}
+			else {
+				final long transition1Duration = transition1.getThresholdEndTimeStamp_ms() - transition1.getReferenceStartTimeStamp_ms();
+				final long transition2Duration = transition2.getThresholdEndTimeStamp_ms() - transition2.getReferenceStartTimeStamp_ms();
+				if (transition1Duration < transition2Duration) {
+					inferiorTransition = Optional.of(entry2);
+				}
+				else if (transition2Duration < transition1Duration) {
+					inferiorTransition = Optional.of(entry1);
+				}
+				else {
+					// no criterion found
+					inferiorTransition = Optional.of(entry1);
+				}
+			}
+		}
+
+		inferiorTransition.ifPresent(x -> log.log(Level.OFF, "discarded due to " + (isTransition1Prioritized || isTransition2Prioritized ? "class:  " : "duration:  "), x.getValue())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return inferiorTransition;
 	}
 
 	/**
@@ -571,30 +697,27 @@ public class HistoTransitions extends Vector<Transition> {
 	 * measurements with null values are ignored.
 	 * @param transitionRecord
 	 * @param transitionType
-	 * @return false if no valid transition was identified
+	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	public synchronized boolean addFromRecord(Record transitionRecord, TransitionType transitionType) {
-		int mySize = this.size();
-		final double lowerCutPoint = (1. - Settings.getInstance().getTransitionQuantileRange()) / 2.;
-		final Quantile recordQuantile = new Quantile(transitionRecord, EnumSet.of(Fixings.IS_SAMPLE));
-		final double absoluteDeltaOBS = (this.device.translateValue(transitionRecord, recordQuantile.getQuantile(1. - lowerCutPoint)) - this.device.translateValue(transitionRecord, recordQuantile.getQuantile(lowerCutPoint)));
+	private TreeMap<Long, Transition> addFromRecord(Record transitionRecord, TransitionType transitionType) {
+		TreeMap<Long, Transition> transitionFromRecord = new TreeMap<Long, Transition>();
+
 		final double absoluteDelta = (this.device.translateValue(transitionRecord, transitionRecord.getMaxValue()) - this.device.translateValue(transitionRecord, transitionRecord.getMinValue()))
 				* Settings.getInstance().getAbsoluteTransitionLevel();
-//		log.log(Level.OFF, String.format("new/old=%f/%f  upper=%f/%d  lower=%f/%d", absoluteDelta, absoluteDeltaOBS, recordQuantile.getQuantile(1. - lowerCutPoint), transitionRecord.getMaxValue(), recordQuantile.getQuantile(lowerCutPoint),transitionRecord.getMinValue() ));
 
 		final int minimumTransitionSteps = Integer.parseInt(this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.MINIMUM_TRANSITION_STEPS).getValue());
-		final int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
-		final int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
-		final int recoveryDequeSize = (int) (transitionType.getRecoveryTimeMsec() != null ? transitionType.getRecoveryTimeMsec() / this.parent.timeStep_ms.getAverageTimeStep_ms() + 11 : 1); // plus 11 elements ensures sufficient elements for most cases
+		final int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
+		final int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms()) + 11; // plus 11 elements ensures sufficient elements for most cases
+		final int recoveryDequeSize = (int) (transitionType.getRecoveryTimeMsec() != null ? transitionType.getRecoveryTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms() + 11 : 1); // plus 11 elements ensures sufficient elements for most cases
 		this.referenceDeque = new SettlementDeque(referenceDequeSize, transitionType.isGreater(), transitionType.getReferenceTimeMsec() * 10);
 		this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-		this.recoveryDeque = new SettlementDeque(recoveryDequeSize, true,  transitionType.getRecoveryTimeMsec() != null ?  transitionType.getRecoveryTimeMsec() * 10 : 1); // initialize an empty deque just for avoiding a null reference
+		this.recoveryDeque = new SettlementDeque(recoveryDequeSize, true, transitionType.getRecoveryTimeMsec() != null ? transitionType.getRecoveryTimeMsec() * 10 : 1); // initialize an empty deque just for avoiding a null reference
 		this.triggerState = TriggerState.WAITING;
 		this.referenceDeque.initialize(0);
 
-		int descriptionCutPoint = transitionRecord.parent.description.indexOf("\r");
+		int descriptionCutPoint = transitionRecord.parent.description.indexOf("\r"); //$NON-NLS-1$
 		if (descriptionCutPoint < 0) descriptionCutPoint = 11;
-		log.log(Level.OFF, transitionType.getTransitionId() + "  " + transitionRecord.parent.name + " " + " " + transitionRecord.parent.description.substring(0, descriptionCutPoint)
+		log.log(Level.FINEST, transitionType.getTransitionId() + "  " + transitionRecord.parent.name + " " + " " + transitionRecord.parent.description.substring(0, descriptionCutPoint) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ String.format(" %s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
 		if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
@@ -610,7 +733,7 @@ public class HistoTransitions extends Vector<Transition> {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
 					else { // continue waiting for trigger fire
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -625,13 +748,13 @@ public class HistoTransitions extends Vector<Transition> {
 						this.triggerState = TriggerState.RECOVERING;
 						this.recoveryDeque.initialize(i);
 						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
 					else { // hysteresis
 						boolean isThresholdTimeExceeded = !this.thresholdDeque.tryAddLast(translatedValue, timeStamp_100ns);
-						if (isThresholdTimeExceeded) { // never reached the recovery level
+						if (isThresholdTimeExceeded) {
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+							log.log(Level.FINER, " isThresholdTimeExceeded ", this); //$NON-NLS-1$
 							this.referenceDeque.addLastByMoving(this.thresholdDeque);
 							// referenceStartIndex is not modified by jitters
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -650,25 +773,21 @@ public class HistoTransitions extends Vector<Transition> {
 								&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue()) //
 								&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+							log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 							Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(),
 									this.recoveryDeque.startIndex, this.recoveryDeque.size(), transitionRecord, transitionType);
-							transition.setReferenceExtremumValue(this.referenceDeque.getExtremeValue());
-							transition.setThresholdExtremumValue(this.thresholdDeque.getExtremeValue());
-							transition.setRecoveryExtremumValue(this.recoveryDeque.getExtremeValue());
-							this.add(transition);
-							log.log(Level.OFF, transition.toString());
-							this.referenceDeque = this.recoveryDeque.clone();
+							transitionFromRecord.put(transition.getThresholdStartTimeStamp_ms(), transition);
+							log.log(Level.OFF, GDE.STRING_GREATER, transition);
+							this.thresholdDeque.clear();
 							this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
+							this.referenceDeque.addLastByMoving(this.recoveryDeque);
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-							this.recoveryDeque = new SettlementDeque(recoveryDequeSize, transitionType.isGreater(), transitionType.getRecoveryTimeMsec() * 10);
 						}
 						else {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+							log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 							this.referenceDeque.addLastByMoving(this.thresholdDeque);
 							this.referenceDeque.addLastByMoving(this.recoveryDeque);
 							// referenceStartIndex is not modified by jitters
@@ -676,12 +795,12 @@ public class HistoTransitions extends Vector<Transition> {
 					}
 					else if (!isRecoveryFinalized && isPersistentRecovery) { // go on with the recovery
 					}
-					else if (!isRecoveryFinalized && !isPersistentRecovery) { // recovery level not stable
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+					else if (!isRecoveryFinalized && !isPersistentRecovery) {
+						log.log(Level.FINER, " recovery level not stable ", this); //$NON-NLS-1$
 						// try to extend the threshold time
 						int removedCount = this.thresholdDeque.tryAddLastByMoving(this.recoveryDeque);
 						if (removedCount > 0 && this.recoveryDeque.isEmpty()) {
-							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("recovery jitters provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("recovery jitters provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							// all recovery entries including the current entry are now in the threshold phase
 							this.triggerState = TriggerState.TRIGGERED;
@@ -706,15 +825,13 @@ public class HistoTransitions extends Vector<Transition> {
 						&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
 					Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(), this.recoveryDeque.startIndex,
 							this.recoveryDeque.size(), transitionRecord, transitionType);
-					transition.setReferenceExtremumValue(this.referenceDeque.extremeValue);
-					transition.setThresholdExtremumValue(this.thresholdDeque.extremeValue);
-					transition.setRecoveryExtremumValue(this.recoveryDeque.extremeValue);
-					this.add(transition);
-					log.log(Level.OFF, transition.toString());
+					transitionFromRecord.put(transition.getThresholdStartTimeStamp_ms(), transition);
+					log.log(Level.OFF, GDE.STRING_GREATER, transition);
 				}
 			}
 		} // end if isPeak
-		else if (transitionType.getClassType() == TransitionClassTypes.PULSE) { // todo not tested
+
+		else if (transitionType.getClassType() == TransitionClassTypes.PULSE) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
 				if (transitionRecord.realRealGet(i) == null) break;
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
@@ -728,7 +845,7 @@ public class HistoTransitions extends Vector<Transition> {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
 					else {
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -744,13 +861,14 @@ public class HistoTransitions extends Vector<Transition> {
 						if (!isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue())) {
 							// threshold must conform perfectly to the threshold requirements which are level and MINIMUM time
 							this.triggerState = TriggerState.RECOVERING;
+							this.recoveryDeque.initialize(i);
 							this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+							log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 						}
 						else {
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
-							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
+							log.log(Level.FINER, " threshold SecurityValue ", this); //$NON-NLS-1$
+							this.thresholdDeque.clear();
 							this.referenceDeque.initialize(i);
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 						}
@@ -760,15 +878,15 @@ public class HistoTransitions extends Vector<Transition> {
 					}
 					else if (!isInThresholdTime && !isPersistentTrigger) { // no hysteresis 
 						this.triggerState = TriggerState.WAITING;
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
-						this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
+						log.log(Level.FINER, " !isInThresholdTime && !isPersistentTrigger ", this); //$NON-NLS-1$
+						this.thresholdDeque.clear();
 						this.referenceDeque.initialize(i);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 					else if (isInThresholdTime && !isPersistentTrigger) { // no hysteresis 
 						this.triggerState = TriggerState.WAITING;
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
-						this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
+						log.log(Level.FINER, " !isPersistentTrigger ", this); //$NON-NLS-1$
+						this.thresholdDeque.clear();
 						this.referenceDeque.initialize(i);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
@@ -786,36 +904,33 @@ public class HistoTransitions extends Vector<Transition> {
 								&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue()) //
 								&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+							log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 							Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(),
 									this.recoveryDeque.startIndex, this.recoveryDeque.size(), transitionRecord, transitionType);
-							transition.setReferenceExtremumValue(this.referenceDeque.getExtremeValue());
-							transition.setThresholdExtremumValue(this.thresholdDeque.getExtremeValue());
-							transition.setRecoveryExtremumValue(this.recoveryDeque.getExtremeValue());
-							this.add(transition);
-							log.log(Level.OFF, transition.toString());
-							this.referenceDeque = this.recoveryDeque.clone();
+							transitionFromRecord.put(transition.getThresholdStartTimeStamp_ms(), transition);
+							log.log(Level.OFF, GDE.STRING_GREATER, transition);
+							this.thresholdDeque.clear();
 							this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
+							this.referenceDeque.addLastByMoving(this.recoveryDeque);
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-							this.recoveryDeque = new SettlementDeque(recoveryDequeSize, transitionType.isGreater(), transitionType.getRecoveryTimeMsec() * 10);
 						}
 						else {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
-							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-							this.referenceDeque.initialize(i);
+							log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
+							this.thresholdDeque.clear();
+							this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
+							this.referenceDeque.addLastByMoving(this.recoveryDeque);
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 					}
 					else if (!isRecoveryFinalized && !isPersistentRecovery) {
-						// currently within recovery time
 						this.triggerState = TriggerState.WAITING;
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
-						this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-						this.referenceDeque.initialize(i);
+						log.log(Level.FINER, " !isPersistentRecovery " + transitionType.getTransitionId(), this); //$NON-NLS-1$
+						this.thresholdDeque.clear();
+						this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
+						this.referenceDeque.addLastByMoving(this.recoveryDeque);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 					else {
@@ -827,23 +942,22 @@ public class HistoTransitions extends Vector<Transition> {
 			// take the current transition even if the recovery time is not exhausted
 			if (this.triggerState == TriggerState.RECOVERING) {
 				// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
-					if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue()) //
-							&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue()) //
-							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
+				if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue()) //
+						&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue()) //
+						&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.recoveryDeque.getSecurityValue())) {
 					Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(), this.recoveryDeque.startIndex,
 							this.recoveryDeque.size(), transitionRecord, transitionType);
-					transition.setReferenceExtremumValue(this.referenceDeque.extremeValue);
-					transition.setThresholdExtremumValue(this.thresholdDeque.extremeValue);
-					transition.setRecoveryExtremumValue(this.recoveryDeque.extremeValue);
-					this.add(transition);
-					log.log(Level.OFF, transition.toString());
+					transitionFromRecord.put(transition.getThresholdStartTimeStamp_ms(), transition);
+					log.log(Level.OFF, GDE.STRING_GREATER, transition);
 				}
 			}
 			else if (this.triggerState == TriggerState.TRIGGERED) {
-				log.log(Level.OFF, String.format("ends %s %s  referenceExtreme=%f ", this.triggerState, this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), this.referenceDeque.extremeValue)
-						+ this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues());
+				log.log(Level.FINER,
+						String.format("ends %s %s  referenceExtreme=%f ", this.triggerState, this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), this.referenceDeque.extremeValue) //$NON-NLS-1$
+								+ this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues());
 			}
 		} // end isPulse
+
 		else if (transitionType.getClassType() == TransitionClassTypes.SLOPE) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
 				if (transitionRecord.realRealGet(i) == null) break;
@@ -858,7 +972,7 @@ public class HistoTransitions extends Vector<Transition> {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
 					else {
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -872,34 +986,31 @@ public class HistoTransitions extends Vector<Transition> {
 						// final check if the majority of the reference values did not pass the threshold and if the majority of the threshold values passed the threshold 
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue())) {
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+							log.log(Level.FINE, Integer.toString(transitionType.getTransitionId()), this);
 							Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(),
 									this.recoveryDeque.startIndex, this.recoveryDeque.size(), transitionRecord, transitionType);
-							transition.setReferenceExtremumValue(this.referenceDeque.getExtremeValue());
-							transition.setThresholdExtremumValue(this.thresholdDeque.getExtremeValue());
-							this.add(transition);
-							log.log(Level.OFF, transition.toString());
+							transitionFromRecord.put(transition.getThresholdStartTimeStamp_ms(), transition);
+							log.log(Level.OFF, GDE.STRING_GREATER, transition);
+							this.thresholdDeque.clear();
 							this.referenceDeque.initialize(i);
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+							log.log(Level.FINE, Integer.toString(transitionType.getTransitionId()), this);
 						}
 						else {
 							if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 									this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 							this.triggerState = TriggerState.WAITING;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
+							log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 							this.referenceDeque.initialize(i - this.thresholdDeque.size());
-							this.referenceDeque.addLastByMoving(this.thresholdDeque);
-							this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
+							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
+							this.thresholdDeque.clear();
 						}
 					}
 					else if (isInThresholdTime && !isPersistentTrigger) { // threshold must conform perfectly to the threshold requirements which are level and time
 						this.triggerState = TriggerState.WAITING;
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.toString());
+						log.log(Level.FINE, " !isPersistentTrigger " + transitionType.getTransitionId(), this); //$NON-NLS-1$
 						this.referenceDeque.initialize(i - this.thresholdDeque.size());
 						this.referenceDeque.addLastByMoving(this.thresholdDeque);
-						this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
 					}
 					else if (isInThresholdTime && isPersistentTrigger) {
 						// go on and try to confirm the trigger
@@ -915,20 +1026,23 @@ public class HistoTransitions extends Vector<Transition> {
 			throw new UnsupportedOperationException();
 		}
 
-		return mySize != this.size();
+		return transitionFromRecord;
 	}
 
 	@Override
 	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%s > %s %s:", this.previousTriggerState, this.triggerState, this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1)));
-		sb.append(String.format(" referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", this.referenceDeque.size(), this.thresholdDeque.size(), this.recoveryDeque.size()))
+		sb.append(String.format("%s > %s ", this.previousTriggerState, this.triggerState, this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1))); //$NON-NLS-1$
+		sb.append(this.previousTriggerState == TriggerState.WAITING ? this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1)
+				: this.previousTriggerState == TriggerState.TRIGGERED && !this.thresholdDeque.isEmpty() ? this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1)
+						: this.previousTriggerState == TriggerState.RECOVERING && !this.recoveryDeque.isEmpty() ? this.recoveryDeque.getFormatedDuration(this.recoveryDeque.size() - 1) : "null"); //$NON-NLS-1$
+		sb.append(String.format(": referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", this.referenceDeque.size(), this.thresholdDeque.size(), this.recoveryDeque.size())) //$NON-NLS-1$
 				.append(GDE.STRING_NEW_LINE);
-		sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues());
+		sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(GDE.STRING_BLANK_AT_BLANK + this.referenceDeque.getTimestamps_100ns()).append(GDE.STRING_NEW_LINE);
-		sb.append(String.format("%38s threshold bench=%.1f extreme=", "", this.thresholdDeque.getBenchmarkValue()) + this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues());
+		sb.append(String.format("%38s threshold bench=%.1f extreme=", "", this.thresholdDeque.getBenchmarkValue()) + this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(GDE.STRING_BLANK_AT_BLANK + this.thresholdDeque.getTimestamps_100ns()).append(GDE.STRING_NEW_LINE);
-		sb.append(String.format("%38s recovery  bench=%.1f extreme=", "", this.recoveryDeque.getBenchmarkValue()) + this.recoveryDeque.getExtremeValue() + this.recoveryDeque.getTranslatedValues());
+		sb.append(String.format("%38s recovery  bench=%.1f extreme=", "", this.recoveryDeque.getBenchmarkValue()) + this.recoveryDeque.getExtremeValue() + this.recoveryDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(GDE.STRING_BLANK_AT_BLANK + this.recoveryDeque.getTimestamps_100ns());
 		return sb.toString();
 	}
@@ -947,7 +1061,9 @@ public class HistoTransitions extends Vector<Transition> {
 		}
 		else if (transitionType.getValueType() == TransitionValueTypes.DELTA_FACTOR) {
 			final double baseValue = this.referenceDeque.getBenchmarkValue();
-			boolean minimumAbsoluteLevelExceeded = transitionType.isGreater() ? translatedValue > absoluteDelta + baseValue : translatedValue < baseValue - absoluteDelta;
+			boolean minimumAbsoluteLevelExceeded = transitionType.isGreater() ? translatedValue > baseValue + absoluteDelta : translatedValue < baseValue - absoluteDelta;
+			if (log.isLoggable(Level.FINEST) && minimumAbsoluteLevelExceeded) log.log(Level.FINEST,
+					String.format("minimumAbsoluteLevelExceeded=%b  baseValue=%f  absoluteDelta=%f  translatedValue=%f", minimumAbsoluteLevelExceeded, baseValue, absoluteDelta, translatedValue)); //$NON-NLS-1$
 			absoluteThresholdLevel = baseValue + transitionType.getThresholdValue() * baseValue;
 			isBeyond = minimumAbsoluteLevelExceeded && (transitionType.isGreater() ? translatedValue > absoluteThresholdLevel : translatedValue < absoluteThresholdLevel);
 		}
@@ -979,14 +1095,24 @@ public class HistoTransitions extends Vector<Transition> {
 		return transitionType.isGreater() ? translatedValue < absoluteRecoveryLevel : translatedValue > absoluteRecoveryLevel;
 	}
 
-	public List<Transition> getTransitions(Integer transitionId) {
-		List<Transition> result = new ArrayList<>();
-		for (Transition transition : this) {
-			if (transition.transitionType.getTransitionId() == transitionId) {
-				result.add(transition);
-			}
+	public TreeMap<Long, Transition> getTransitions(int transitionGroupId) {
+		if (this.transitionContainer.containsKey(transitionGroupId)) {
+			return this.transitionContainer.get(transitionGroupId);
 		}
-		return result;
+		else {
+			return new TreeMap<Long, Transition>();
+		}
+	}
+
+	public Map<Integer, TreeMap<Long, Transition>> getTransitionContainer() {
+		return this.transitionContainer;
+	}
+
+	/**
+	 * @return the transitionCount
+	 */
+	public int getTransitionCount() {
+		return this.transitionCount;
 	}
 
 }

@@ -14,7 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
  
- Copyright (c) 2016 Thomas Eickert
+ Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
 
@@ -47,14 +47,9 @@ public class Transition {
 	final int							thresholdEndIndex;
 	final int							recoveryStartIndex;
 	final int							recoveryEndIndex;
-	//	final int							endIndex;
-
-	private double				referenceExtremumValue;
-	private double				thresholdExtremumValue;
-	private double				recoveryExtremumValue;
 
 	/**
-	 * @param startIndex
+	 * @param startIndex is the position where the search started after the previous transition
 	 * @param referenceSize
 	 * @param recoveryStartIndex 
 	 * @param thresholdSize
@@ -70,23 +65,37 @@ public class Transition {
 		this.referenceEndIndex = thresholdStartIndex - 1;
 		this.thresholdStartIndex = thresholdStartIndex;
 		this.thresholdSize = thresholdSize;
-		this.recoveryStartIndex = recoveryStartIndex;
-		this.recoverySize = recoverySize;
 		this.transitionRecord = transitionRecord;
 		this.transitionType = transitionType;
 
-		if (this.recoveryStartIndex > 0) {
+		if (recoveryStartIndex > 0) {
 			this.thresholdEndIndex = recoveryStartIndex - 1;
+			this.recoveryStartIndex = recoveryStartIndex;
+			this.recoverySize = recoverySize;
 			this.recoveryEndIndex = recoveryStartIndex + recoverySize - 1;
 		}
 		else {
-			this.thresholdEndIndex = -1;
+			this.thresholdEndIndex = thresholdStartIndex + thresholdSize - 1;
+			this.recoveryStartIndex = -1;
+			this.recoverySize = 0;
 			this.recoveryEndIndex = -1;
 		}
 	}
 
-	public double getTimeStamp(int index) {
+	public double getTimeStamp_ms(int index) {
 		return this.transitionRecord.getTime_ms(index);
+	}
+
+	public long getReferenceStartTimeStamp_ms() {
+		return (long) this.transitionRecord.getTime_ms(this.referenceStartIndex);
+	}
+
+	public long getThresholdStartTimeStamp_ms() {
+		return (long) this.transitionRecord.getTime_ms(this.thresholdStartIndex);
+	}
+
+	public long getThresholdEndTimeStamp_ms() {
+		return (long) this.transitionRecord.getTime_ms(this.thresholdEndIndex);
 	}
 
 	/**
@@ -100,13 +109,15 @@ public class Transition {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.transitionType.getTransitionId()).append(GDE.STRING_BLANK).append(GDE.STRING_BLANK);
-		sb.append("threshold=").append(getFormatedDuration(this.thresholdStartIndex)).append(GDE.STRING_OR).append(this.thresholdExtremumValue).append(GDE.STRING_COMMA_BLANK);
-		sb.append("isPeak=").append(isPeak()).append(GDE.STRING_COMMA_BLANK).append("isSlope=").append(isSlope()).append(GDE.STRING_COMMA_BLANK);
-		sb.append("referenceStartIndex=").append(this.startIndex).append(GDE.STRING_COMMA_BLANK);
-		sb.append("reference=").append(getFormatedDuration(this.startIndex)).append(GDE.STRING_OR).append(this.referenceExtremumValue).append(GDE.STRING_COMMA_BLANK);
+		sb.append("threshold=").append(getFormatedDuration(this.thresholdStartIndex)).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("thresholdStartIndex/size=").append(this.thresholdStartIndex).append(GDE.STRING_OR).append(this.thresholdSize).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("isPeak=").append(isPeak()).append(GDE.STRING_COMMA_BLANK).append("isSlope=").append(isSlope()).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("referenceStartIndex/size=").append(this.startIndex).append(GDE.STRING_OR).append(this.referenceSize).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("reference=").append(getFormatedDuration(this.startIndex)); //$NON-NLS-1$
 		if (this.recoveryStartIndex > 0) {
 			sb.append(GDE.STRING_COMMA_BLANK);
-			sb.append("recovery=").append(getFormatedDuration(this.recoveryStartIndex)).append(GDE.STRING_OR).append(this.recoveryExtremumValue).append(GDE.STRING_COMMA_BLANK);
+			sb.append("recovery=").append(getFormatedDuration(this.recoveryStartIndex)).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+			sb.append("recoveryStartIndex/size=").append(this.recoveryStartIndex).append(GDE.STRING_OR).append(this.recoverySize).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -116,53 +127,11 @@ public class Transition {
 	}
 
 	public boolean isPeak() {
-	return this.transitionType.getClassType() == TransitionClassTypes.PEAK;
-}
+		return this.transitionType.getClassType() == TransitionClassTypes.PEAK;
+	}
 
 	public boolean isPulse() {
-	return this.transitionType.getClassType() == TransitionClassTypes.PULSE;
-}
-
-	/**
-	 * @return the referenceExtremumValue
-	 */
-	public double getReferenceExtremumValue() {
-		return referenceExtremumValue;
-	}
-
-	/**
-	 * @param referenceExtremumValue the referenceExtremumValue to set
-	 */
-	public void setReferenceExtremumValue(double referenceExtremumValue) {
-		this.referenceExtremumValue = referenceExtremumValue;
-	}
-
-	/**
-	 * @return the thresholdExtremumValue
-	 */
-	public double getThresholdExtremumValue() {
-		return thresholdExtremumValue;
-	}
-
-	/**
-	 * @param thresholdExtremumValue the thresholdExtremumValue to set
-	 */
-	public void setThresholdExtremumValue(double thresholdExtremumValue) {
-		this.thresholdExtremumValue = thresholdExtremumValue;
-	}
-
-	/**
-	 * @return the recoveryExtremumValue
-	 */
-	public double getRecoveryExtremumValue() {
-		return recoveryExtremumValue;
-	}
-
-	/**
-	 * @param recoveryExtremumValue the recoveryExtremumValue to set
-	 */
-	public void setRecoveryExtremumValue(double recoveryExtremumValue) {
-		this.recoveryExtremumValue = recoveryExtremumValue;
+		return this.transitionType.getClassType() == TransitionClassTypes.PULSE;
 	}
 
 }

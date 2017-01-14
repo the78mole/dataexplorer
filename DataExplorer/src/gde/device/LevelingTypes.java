@@ -24,11 +24,9 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="first"/>
  *     &lt;enumeration value="last"/>
  *     &lt;enumeration value="mid"/>
- *     &lt;enumeration value="min"/>
- *     &lt;enumeration value="max"/>
  *     &lt;enumeration value="avg"/>
- *     &lt;enumeration value="qbottom"/>
- *     &lt;enumeration value="qtop"/>
+ *     &lt;enumeration value="minmax"/>
+ *     &lt;enumeration value="smooth_minmax"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -44,16 +42,12 @@ public enum LevelingTypes {
     LAST("last"),
     @XmlEnumValue("mid")
     MID("mid"),
-    @XmlEnumValue("min")
-    MIN("min"),
-    @XmlEnumValue("max")
-    MAX("max"),
     @XmlEnumValue("avg")
     AVG("avg"),
-    @XmlEnumValue("qbottom")
-    QBOTTOM("qbottom"),
-    @XmlEnumValue("qtop")
-    QTOP("qtop");
+    @XmlEnumValue("minmax")
+    MINMAX("minmax"),
+    @XmlEnumValue("smooth_minmax")
+    SMOOTH_MINMAX("smooth_minmax");
     private final String value;
 
     LevelingTypes(String v) {

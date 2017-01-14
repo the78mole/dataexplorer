@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2016 Thomas Eickert
+    Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
 package gde.histocache;
@@ -61,14 +61,15 @@ import gde.data.HistoTransitions;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord.TrailType;
-import gde.device.ChannelType;
 import gde.device.EvaluationType;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
-import gde.device.TransitionType;
+import gde.device.TransitionAmountType;
+import gde.device.TransitionCalculusType;
+import gde.device.TransitionFigureType;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.HistoOsdReaderWriter;
@@ -141,8 +142,6 @@ import gde.utils.Quantile.Fixings;
 public class HistoVault {
 	final private static String	$CLASS_NAME									= HistoVault.class.getName();
 	final private static Logger	log													= Logger.getLogger($CLASS_NAME);
-
-	private final static int		INITIAL_SETTLEMENT_CAPACITY	= 5;
 
 	private static Path					activeDevicePath;																									// criterion for the active device version key cache
 	private static String				activeDeviceKey;																									// caches the version key for the active device which is calculated only if the device is changed by the user
@@ -652,8 +651,8 @@ public class HistoVault {
 	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus channel number and some settings values
 	 */
 	public static String getVaultsDirectory() {
-		String tmpSubDirectoryLongKey = String.format("%s,%s,%d,%d", GDE.VERSION, HistoVault.getActiveDeviceKey(), DataExplorer.getInstance().getActiveChannelNumber(), //$NON-NLS-1$
-				Settings.getInstance().getSamplingTimespan_ms());
+		String tmpSubDirectoryLongKey = String.format("%s,%s,%d,%d,%f,%f", GDE.VERSION, HistoVault.getActiveDeviceKey(), DataExplorer.getInstance().getActiveChannelNumber(), //$NON-NLS-1$
+				Settings.getInstance().getSamplingTimespan_ms(), Settings.getInstance().getMinmaxQuantileDistance(), Settings.getInstance().getAbsoluteTransitionLevel());
 		return HistoVault.sha1(tmpSubDirectoryLongKey);
 
 	}
@@ -849,7 +848,7 @@ public class HistoVault {
 									throw new UnsupportedOperationException(record.getName());
 							}
 						}
-						if (record.size() != 0) {
+						if (record.realSize() != 0) {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 							Quantile quantile = new Quantile(record, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
 							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
@@ -862,41 +861,52 @@ public class HistoVault {
 							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
 							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
 						}
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data " + entryPoints.toString()); //$NON-NLS-1$
+						log.log(Level.FINER, record.getName() + " data " , entryPoints); //$NON-NLS-1$
 					}
 				}
-				{ // todo not tested
+				{
+					// step: build transitions
+					HistoTransitions transitions = new HistoTransitions(recordSet);
+					transitions.add4Channel(this.logChannelNumber);
+
+					// step: calculate the histo settlements
 					LinkedHashMap<String, HistoSettlement> histoSettlements = new LinkedHashMap<String, HistoSettlement>();
-					ChannelType channelType = this.device.getDeviceConfiguration().getChannel(this.logChannelNumber);
-					HistoTransitions transitions = new HistoTransitions(this.device, recordSet, channelType.getTransition().size());
-					for (TransitionType transitionType : channelType.getTransition()) {
-						transitions.addFromRecord(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
-					}
-					if (transitions.size() == 0) { // todo implement evaluations w/o transitions
-					}
-					else {
-						for (SettlementType settlementType : channelType.getSettlement()) {
-							if (settlementType.getEvaluation() != null) {
-								HistoSettlement histoSettlement = new HistoSettlement(this.device, settlementType, recordSet, INITIAL_SETTLEMENT_CAPACITY);
-								histoSettlements.put(settlementType.getName(), histoSettlement);
-								if (settlementType.getEvaluation().getCalculation() != null) { // todo decide if evaluations without calculation are useful
-									Integer transitionId = settlementType.getEvaluation().getCalculation().getTransitionId();
-									histoSettlement.addFromTransitions(transitions, channelType.getTransitionById(transitionId));
+					if (transitions.getTransitionCount() > 0) { // todo implement evaluations w/o transitions
+						for (SettlementType settlementType : this.device.getDeviceConfiguration().getChannel(this.logChannelNumber).getSettlement()) {
+							if (settlementType.getEvaluation() != null) { // todo decide if evaluations without transition are useful
+								final TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
+								final TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
+								final TransitionCalculusType calculationType = settlementType.getEvaluation().getTransitionCalculus();
+								if (transitionFigureType != null) {
+									HistoSettlement histoSettlement = new HistoSettlement(settlementType, recordSet, this.logChannelNumber);
+									histoSettlement.addFromTransitions(transitions.getTransitions(transitionFigureType.getTransitionGroupId()).values());
+									histoSettlements.put(settlementType.getName(), histoSettlement);
+								}
+								else if (transitionAmountType != null) {
+									HistoSettlement histoSettlement = new HistoSettlement(settlementType, recordSet, this.logChannelNumber);
+									histoSettlement.addFromTransitions(transitions.getTransitions(transitionAmountType.getTransitionGroupId()).values());
+									histoSettlements.put(settlementType.getName(), histoSettlement);
+								}
+								else if (calculationType != null) {
+									HistoSettlement histoSettlement = new HistoSettlement(settlementType, recordSet, this.logChannelNumber);
+									histoSettlement.addFromTransitions(transitions.getTransitions(calculationType.getTransitionGroupId()).values());
+									histoSettlements.put(settlementType.getName(), histoSettlement);
+								}
+								else {
+									throw new UnsupportedOperationException();
 								}
 							}
 						}
 					}
-					//					List<SettlementType> channelSettlements = this.device.getDeviceConfiguration().getChannelSettlements(this.logChannelNumber);
-					//		HashMap<Integer, Integer[]> settlementsPoints = new HashMap<Integer, Integer[]>(channelSettlements.size());
+
+					// step: consume settlements
 					for (Entry<String, HistoSettlement> entry : histoSettlements.entrySet()) {
 						HistoSettlement histoSettlement = entry.getValue();
 						SettlementType settlementType = histoSettlement.getSettlement();
-						//			Integer[] trailTypePoints = new Integer[TrailType.getPrimitives().size()];
-						//			settlementsPoints.put(settlementType.getSettlementId(), trailTypePoints);
 						EntryPoints entryPoints = new EntryPoints(settlementType.getSettlementId(), settlementType.getName());
 						this.settlements.getEntries().add(entryPoints);
 
-						if (histoSettlement.size() > 0 && settlementType.getEvaluation() != null) {
+						if (histoSettlement.realSize() > 0 && settlementType.getEvaluation() != null) {
 							EvaluationType settlementEvaluations = settlementType.getEvaluation();
 							if (histoSettlement.hasReasonableData()) {
 								if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), histoSettlement.getAvgValue());
@@ -906,7 +916,7 @@ public class HistoVault {
 								if (settlementEvaluations.isSum()) entryPoints.addPoint(TrailType.REAL_SUM.ordinal(), TrailType.REAL_SUM.name(), histoSettlement.getSumValue());
 								if (settlementEvaluations.isFirst()) entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), histoSettlement.getFirst());
 								if (settlementEvaluations.isLast()) entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), histoSettlement.getLast());
-								if (settlementEvaluations.isCount()) entryPoints.addPoint(TrailType.REAL_COUNT.ordinal(), TrailType.REAL_COUNT.name(), histoSettlement.getCountValue() * 1000);
+								if (settlementEvaluations.isCount()) entryPoints.addPoint(TrailType.REAL_COUNT.ordinal(), TrailType.REAL_COUNT.name(), histoSettlement.realSize() * 1000);
 							}
 							else {
 								// these trail types might act as default trails
@@ -920,7 +930,20 @@ public class HistoVault {
 								}
 							}
 						}
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, histoSettlement.getName() + " data " + this.settlements.toString()); //$NON-NLS-1$
+						if (histoSettlement.realSize() != 0) {
+							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
+							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
+							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
+							entryPoints.addPoint(TrailType.Q1.ordinal(), TrailType.Q1.name(), (int) quantile.getQuartile1());
+							entryPoints.addPoint(TrailType.Q2.ordinal(), TrailType.Q2.name(), (int) quantile.getQuartile2());
+							entryPoints.addPoint(TrailType.Q3.ordinal(), TrailType.Q3.name(), (int) quantile.getQuartile3());
+							entryPoints.addPoint(TrailType.Q4.ordinal(), TrailType.Q4.name(), (int) quantile.getQuartile4());
+							entryPoints.addPoint(TrailType.Q_25_PERMILLE.ordinal(), TrailType.Q_25_PERMILLE.name(), (int) quantile.getQuantile(.025));
+							entryPoints.addPoint(TrailType.Q_975_PERMILLE.ordinal(), TrailType.Q_975_PERMILLE.name(), (int) quantile.getQuantile(.975));
+							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
+							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
+						}
+						log.log(Level.FINER, histoSettlement.getName() + " data " , this.settlements); //$NON-NLS-1$
 					}
 					{
 						// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
@@ -937,7 +960,7 @@ public class HistoVault {
 								this.scores.addPoint(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]);
 							}
 						}
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.scores.toString());
+						log.log(Level.FINE, "scores " , this.scores); //$NON-NLS-1$
 					}
 				}
 			}
@@ -981,6 +1004,7 @@ public class HistoVault {
 				for (Point tmpPoint : measurementPoints) {
 					if (tmpPoint.getId() == trailOrdinal) {
 						point = tmpPoint.getValue();
+						break;
 					}
 				}
 			}
@@ -1027,10 +1051,12 @@ public class HistoVault {
 				for (Point tmpPoint : settlementPoints) {
 					if (tmpPoint.getId() == trailOrdinal) {
 						point = tmpPoint.getValue();
+						break;
 					}
 				}
 			}
-			point = settlementPoints.get(trailTextSelectedIndex).getValue();
+			else
+				point = settlementPoints.get(trailTextSelectedIndex).getValue();
 		}
 		return point;
 	}

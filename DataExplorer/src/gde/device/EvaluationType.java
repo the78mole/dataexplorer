@@ -25,9 +25,17 @@ import gde.GDE;
  * &lt;complexType name="EvaluationType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="calculation" type="{}CalculationType" minOccurs="0"/>
- *       &lt;/sequence>
+ *       &lt;choice>
+ *         &lt;sequence>
+ *           &lt;element name="transitionFigure" type="{}TransitionFigureType"/>
+ *         &lt;/sequence>
+ *         &lt;sequence>
+ *           &lt;element name="transitionAmount" type="{}TransitionAmountType"/>
+ *         &lt;/sequence>
+ *         &lt;sequence>
+ *           &lt;element name="transitionCalculus" type="{}TransitionCalculusType"/>
+ *         &lt;/sequence>
+ *       &lt;/choice>
  *       &lt;attribute name="min" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="max" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="avg" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
@@ -46,11 +54,15 @@ import gde.GDE;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EvaluationType", propOrder = {
-    "calculation"
+    "transitionFigure",
+    "transitionAmount",
+    "transitionCalculus"
 })
 public class EvaluationType {
 
-    protected CalculationType calculation;
+    protected TransitionFigureType transitionFigure;
+    protected TransitionAmountType transitionAmount;
+    protected TransitionCalculusType transitionCalculus;
     @XmlAttribute(required = true)
     protected boolean min;
     @XmlAttribute(required = true)
@@ -71,27 +83,75 @@ public class EvaluationType {
     protected String comment;
 
     /**
-     * Gets the value of the calculation property.
+     * Gets the value of the transitionFigure property.
      * 
      * @return
      *     possible object is
-     *     {@link CalculationType }
+     *     {@link TransitionFigureType }
      *     
      */
-    public CalculationType getCalculation() {
-        return calculation;
+    public TransitionFigureType getTransitionFigure() {
+        return transitionFigure;
     }
 
     /**
-     * Sets the value of the calculation property.
+     * Sets the value of the transitionFigure property.
      * 
      * @param value
      *     allowed object is
-     *     {@link CalculationType }
+     *     {@link TransitionFigureType }
      *     
      */
-    public void setCalculation(CalculationType value) {
-        this.calculation = value;
+    public void setTransitionFigure(TransitionFigureType value) {
+        this.transitionFigure = value;
+    }
+
+    /**
+     * Gets the value of the transitionAmount property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TransitionAmountType }
+     *     
+     */
+    public TransitionAmountType getTransitionAmount() {
+        return transitionAmount;
+    }
+
+    /**
+     * Sets the value of the transitionAmount property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TransitionAmountType }
+     *     
+     */
+    public void setTransitionAmount(TransitionAmountType value) {
+        this.transitionAmount = value;
+    }
+
+    /**
+     * Gets the value of the transitionCalculus property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TransitionCalculusType }
+     *     
+     */
+    public TransitionCalculusType getTransitionCalculus() {
+        return transitionCalculus;
+    }
+
+    /**
+     * Sets the value of the transitionCalculus property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TransitionCalculusType }
+     *     
+     */
+    public void setTransitionCalculus(TransitionCalculusType value) {
+        this.transitionCalculus = value;
     }
 
     /**

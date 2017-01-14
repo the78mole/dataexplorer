@@ -43,25 +43,25 @@ import javax.xml.bind.annotation.XmlType;
 public class TransitionType {
 
 	@XmlAttribute(required = true)
-	protected int									transitionId;
+	protected int										transitionId;
 	@XmlAttribute(required = true)
-	protected int									refOrdinal;
+	protected int										refOrdinal;
 	@XmlAttribute(required = true)
-    protected TransitionClassTypes classType;
+	protected TransitionClassTypes	classType;
 	@XmlAttribute(required = true)
-    protected TransitionValueTypes valueType;
+	protected TransitionValueTypes	valueType;
 	@XmlAttribute(required = true)
-	protected double							thresholdValue;
+	protected double								thresholdValue;
 	@XmlAttribute
-	protected Double							recoveryValue;
+	protected Double								recoveryValue;
 	@XmlAttribute(required = true)
-	protected int									referenceTimeMsec;
+	protected int										referenceTimeMsec;
 	@XmlAttribute(required = true)
-	protected int									thresholdTimeMsec;
+	protected int										thresholdTimeMsec;
 	@XmlAttribute
-	protected Integer							recoveryTimeMsec;
+	protected Integer								recoveryTimeMsec;
 	@XmlAttribute
-	protected String							comment;
+	protected String								comment;
 
 	/**
 	 * Gets the value of the transitionId property.
@@ -100,10 +100,10 @@ public class TransitionType {
 	 * 
 	 * @return
 	 *     possible object is
-     *     {@link TransitionClassTypes }
-	 * 
+	 *     {@link TransitionClassTypes }
+	 *     
 	 */
-    public TransitionClassTypes getClassType() {
+	public TransitionClassTypes getClassType() {
 		return classType;
 	}
 
@@ -112,10 +112,10 @@ public class TransitionType {
 	 * 
 	 * @param value
 	 *     allowed object is
-     *     {@link TransitionClassTypes }
-	 * 
+	 *     {@link TransitionClassTypes }
+	 *     
 	 */
-    public void setClassType(TransitionClassTypes value) {
+	public void setClassType(TransitionClassTypes value) {
 		this.classType = value;
 	}
 
@@ -124,10 +124,10 @@ public class TransitionType {
 	 * 
 	 * @return
 	 *     possible object is
-     *     {@link TransitionValueTypes }
+	   *     {@link TransitionValueTypes }
 	 * 
 	 */
-    public TransitionValueTypes getValueType() {
+	public TransitionValueTypes getValueType() {
 		return valueType;
 	}
 
@@ -136,10 +136,10 @@ public class TransitionType {
 	 * 
 	 * @param value
 	 *     allowed object is
-     *     {@link TransitionValueTypes }
+	   *     {@link TransitionValueTypes }
 	 * 
 	 */
-    public void setValueType(TransitionValueTypes value) {
+	public void setValueType(TransitionValueTypes value) {
 		this.valueType = value;
 	}
 

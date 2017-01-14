@@ -47,7 +47,7 @@ public class HistoRandomSample {
 
 	private final Settings			settings					= Settings.getInstance();
 
-	private static final int		samplesInBaseTime	= 10;																// the reference and recovery time should have at last this number of samples 
+	private static final int		samplesInBaseTime	= 5;																// the reference and thresholdTimeMsec time should have at last this number of samples 
 
 	private final int						recordTimespan_ms;																		// smallest time interval to the next sample: one record every 10 ms
 	private final int						samplingTimespan_ms;																	// actual used timespan; one sample in this time span + potential oversampling samples
@@ -116,17 +116,22 @@ public class HistoRandomSample {
 			for (TransitionType transitionType : transitionTypes) {
 				if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 					proposedTimespan_ms = this.recordTimespan_ms;
+					if (log.isLoggable(Level.FINE))
+						log.log(Level.FINE, String.format("peak transitions inhibit sampling  samplingTimespan_ms effective=%d user=%d", this.recordTimespan_ms, this.settings.getSamplingTimespan_ms())); //$NON-NLS-1$
 					break; // peaks are always based on short term measurements and this requires all measurement points
 				}
 				else {
-					int detectableTimespan_ms = Math.min(Math.min(transitionType.referenceTimeMsec, transitionType.thresholdTimeMsec), transitionType.recoveryTimeMsec) / HistoRandomSample.samplesInBaseTime;
+					// do not care about the recovery time because it might be 0 in case of slopes
+					int detectableTimespan_ms = Math.min(transitionType.referenceTimeMsec, transitionType.thresholdTimeMsec) / HistoRandomSample.samplesInBaseTime;
 					proposedTimespan_ms = Math.min(proposedTimespan_ms, detectableTimespan_ms);
 				}
 			}
 		}
 		this.samplingTimespan_ms = Math.max(proposedTimespan_ms, this.recordTimespan_ms); // sampling timespan must not be smaller than the recording timespan
-		if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE,
-				String.format("HistoRandomSample  pointsLength=%d  samplingTimespan_ms effective=%d user=%d", this.pointsLength, this.samplingTimespan_ms, this.settings.getSamplingTimespan_ms())); //$NON-NLS-1$
+		if (proposedTimespan_ms != this.settings.getSamplingTimespan_ms()) {
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+					String.format("HistoRandomSample  pointsLength=%d  samplingTimespan_ms effective=%d user=%d", this.pointsLength, this.samplingTimespan_ms, this.settings.getSamplingTimespan_ms())); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -180,7 +185,7 @@ public class HistoRandomSample {
 				this.timeStep.isSampleTimePassed = false;
 				this.timeStep.timeSpanSamplingCount = 0;
 				if (log.isLoggable(Level.FINEST))
-					log.log(Level.SEVERE, "******************** " + String.format("timeStep_ms=%d nextSamplingTimeStamp_ms=%d", timeStep_ms, this.timeStep.nextSamplingTimeStamp_ms));
+					log.log(Level.FINEST, "******************** " + String.format("timeStep_ms=%d nextSamplingTimeStamp_ms=%d", timeStep_ms, this.timeStep.nextSamplingTimeStamp_ms));
 			}
 			else {
 				this.timeStep.nextSamplingTimeStamp_ms = this.lastTimeStep.nextSamplingTimeStamp_ms;
@@ -196,7 +201,7 @@ public class HistoRandomSample {
 			;
 			if (log.isLoggable(Level.FINEST))
 				// if (timeStep_ms > 1107500 && timeStep_ms < 1115000)
-				log.log(Level.SEVERE, String.format("timeStep_ms=%,d isSampleTimePassed=%b isSamplingDone=%b isTime4Sample=%b", timeStep_ms, this.timeStep.isSampleTimePassed, this.timeStep.isSamplingDone,
+				log.log(Level.FINEST, String.format("timeStep_ms=%,d isSampleTimePassed=%b isSamplingDone=%b isTime4Sample=%b", timeStep_ms, this.timeStep.isSampleTimePassed, this.timeStep.isSamplingDone,
 						this.timeStep.isTime4Sample));
 			{
 				if (this.lastTimeStep.isMinMax && this.lastTimeStep.isTime4Sample) {
@@ -234,7 +239,7 @@ public class HistoRandomSample {
 				}
 				if (log.isLoggable(Level.FINEST))
 					// if (timeStep_ms > 1107500 && timeStep_ms < 1115000)
-					log.log(Level.SEVERE, String.format("action=%s isLastMinMax=%b isLastTime4Sample=%b isMinMax=%b isTime4Sample=%b", predecessorAction.toString(), this.lastTimeStep.isMinMax,
+					log.log(Level.FINEST, String.format("action=%s isLastMinMax=%b isLastTime4Sample=%b isMinMax=%b isTime4Sample=%b", predecessorAction.toString(), this.lastTimeStep.isMinMax,
 							this.lastTimeStep.isTime4Sample, this.timeStep.isMinMax, this.timeStep.isTime4Sample));
 			}
 			switch (predecessorAction) {
@@ -269,17 +274,17 @@ public class HistoRandomSample {
 				else
 					++this.timeStep.timeSpanSamplingCount;
 			}
-			if (log.isLoggable(Level.FINEST)) log.log(Level.SEVERE, String.format("%5s  %s isValidSample=%b isSamplingDone=%b readingCount=%d samplingCount=%d", isValidSample, predecessorAction.toString(),
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("%5s  %s isValidSample=%b isSamplingDone=%b readingCount=%d samplingCount=%d", isValidSample, predecessorAction.toString(),
 					isValidSample, this.timeStep.isSamplingDone, this.readingCount, this.samplingCount));
 			if (this.lastTimeStep.nextStartTimeStamp_ms < this.timeStep.nextStartTimeStamp_ms) {
 				this.oversamplingCount += this.lastTimeStep.timeSpanSamplingCount > 1 ? this.lastTimeStep.timeSpanSamplingCount - 1 : 0; // one sample per timespan is the standard case
 				if (log.isLoggable(Level.FINEST) && this.oversamplingCount > 0)
-					log.log(Level.SEVERE, "******************** " + String.format("timeSpanSamplingCount =%,9d samplingCount=%,9d oversamplingCount=%,9d oversamplingCountMax=%,9d   ",
+					log.log(Level.FINEST, "******************** " + String.format("timeSpanSamplingCount =%,9d samplingCount=%,9d oversamplingCount=%,9d oversamplingCountMax=%,9d   ",
 							this.timeStep.timeSpanSamplingCount, this.samplingCount, this.oversamplingCount, this.oversamplingCount));
 			}
 			if (log.isLoggable(Level.FINEST) && this.oversamplingCount > 0)
 				// if (timeStep_ms > 1107500 && timeStep_ms < 1115000)
-				log.log(Level.SEVERE, String.format("%,9d  ", timeStep_ms) + String.format(String.format("%0" + this.oversamplingCount + "d", 0)));
+				log.log(Level.FINEST, String.format("%,9d  ", timeStep_ms) + String.format(String.format("%0" + this.oversamplingCount + "d", 0)));
 			// prepare the sample for fetching by the caller
 			this.lastTimeStep = this.timeStep;
 		}
