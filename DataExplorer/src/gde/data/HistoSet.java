@@ -624,7 +624,17 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 		this.validatedDevice = this.application.getActiveDevice();
 		this.validatedChannel = this.application.getActiveChannel();
-		String subPathData = this.application.getActiveObject() == null ? this.validatedDevice.getName() : this.application.getObjectKey();
+		
+		//special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder
+		String validatedDeviceName = validatedDevice.getName();
+		if (validatedDeviceName.startsWith("MC3000")) {
+			validatedDeviceName = "MC3000"; //store MC3000-Set record set as well in MC3000 directory
+		}
+		else if (validatedDeviceName.startsWith("Q200")) {
+			validatedDeviceName = "Q200";	//store Q00-Set record set as well in Q200 directory
+		}
+
+		String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();
 		this.validatedDataDir = Paths.get(this.settings.getDataFilePath()).resolve(subPathData);
 		String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
 		this.validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
@@ -632,7 +642,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		this.validatedImportExtention = this.validatedDevice instanceof  IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
 
 		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.histoFilePaths.size() == 0;
-		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
+		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(validatedDeviceName) : this.validatedDevice != null);
 		isFullChange = isFullChange || (lastChannel != null ? !lastChannel.channelConfigName.equals(this.validatedChannel.channelConfigName) : this.validatedChannel != null);
 		isFullChange = isFullChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDataDir) : this.validatedDataDir != null);
 		isFullChange = isFullChange || (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedImportDir) : this.validatedImportDir != null);
