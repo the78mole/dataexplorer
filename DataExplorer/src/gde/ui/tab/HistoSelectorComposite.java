@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 import gde.GDE;
 import gde.data.HistoSet;
+import gde.data.HistoSet.RebuildStep;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
@@ -148,8 +149,10 @@ public class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					parent.redraw();
-					//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // WB: I do not see a need to go through the complete rebuild steps
+					if ((evt.stateMask & SWT.SHIFT) == SWT.SHIFT)
+						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // go through the complete rebuild steps
+					else
+						HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
 				}
 			});
 		}
@@ -172,8 +175,10 @@ public class HistoSelectorComposite extends Composite {
 					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
-						parent.redraw();
-						//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // WB: I do not see a need to go through the complete rebuild steps
+						if ((evt.stateMask & SWT.SHIFT) == SWT.SHIFT)
+							HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // go through the complete rebuild steps
+						else
+							HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
 					}
 				}
 			});
@@ -232,6 +237,8 @@ public class HistoSelectorComposite extends Composite {
 						Combo combo = (Combo) event.getSource();
 						record.setTrailTextSelectedIndex(combo.getSelectionIndex());
 						HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);
+						if ((event.stateMask & SWT.SHIFT) == SWT.SHIFT)
+							HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // go through the complete rebuild steps
 					}
 				});
 				if (record.isVisible()) {

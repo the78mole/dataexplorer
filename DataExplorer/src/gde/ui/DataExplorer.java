@@ -1970,8 +1970,6 @@ public class DataExplorer extends Composite {
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
 		DataExplorer.this.histoSet.getTrailRecordSet().setPoints(recordOrdinal);
 		this.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
-
-		//DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi); // WB: I do not see a need to go through the complete rebuild steps
 	}
 
 	/**
@@ -2076,14 +2074,14 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * update the histoGraphicsWindow from the histo recordset.
-	 * @param rebuildSteps
+	 * @param redrawCurveSelector
 	 */
-	private void updateHistoGraphicsWindow(boolean redrawGraphics) {
+	public void updateHistoGraphicsWindow(boolean redrawCurveSelector) {
 		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 					if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
-						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawGraphics);
+						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
 					}
 				}
 			}
@@ -2092,7 +2090,7 @@ public class DataExplorer extends Composite {
 					public void run() {
 						if (!DataExplorer.this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 							if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
-								DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawGraphics);
+								DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
 							}
 						}
 					}
