@@ -143,14 +143,20 @@ public class MC3000GathererThread extends Thread {
 						System.out.println();
 					}
 					else { //if (this.dialog != null && this.dialog.isDisposed()) {
+						if (this.application != null) {
+							this.application.setSerialTxOn();
+							this.application.setSerialRxOn();
+						}
 						//get data from device for all4 slots
 						if (this.usbPort.isConnected()) dataBuffer1 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_0.value());
 						WaitTimer.delay(USB_QUERY_DELAY);
 						if (this.usbPort.isConnected()) dataBuffer2 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_1.value());
+						if (this.application != null) this.application.setSerialTxOff();
 						WaitTimer.delay(USB_QUERY_DELAY);
 						if (this.usbPort.isConnected()) dataBuffer3 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_2.value());
 						WaitTimer.delay(USB_QUERY_DELAY);
 						if (this.usbPort.isConnected()) dataBuffer4 = this.usbPort.getData(this.usbInterface, MC3000UsbPort.TakeMtuData.SLOT_3.value());
+						if (this.application != null) this.application.setSerialRxOff();
 
 						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer1);
 						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer2);

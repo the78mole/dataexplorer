@@ -341,7 +341,11 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 			usbInterface.release();		
 			log.log(Level.FINE, "interface released");
 		}
-		if (this.application != null) this.application.setPortConnected(false);
+		if (this.application != null) {
+			this.application.setSerialTxOff();
+			this.application.setSerialRxOff();
+			this.application.setPortConnected(false);
+		}
 	}
 
 	
@@ -357,7 +361,6 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public synchronized int write(final UsbInterface iface, final byte endpointAddress, final byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
-		if (this.application != null) this.application.setSerialTxOn();
 		UsbEndpoint endpoint = iface.getUsbEndpoint(endpointAddress);
 		int sent = 0;
 		UsbPipe pipe = endpoint.getUsbPipe();
@@ -369,7 +372,6 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		finally {
 			pipe.close();
 		}
-		if (this.application != null) this.application.setSerialTxOff();
 		return sent;
 	}
 
@@ -385,7 +387,6 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public synchronized int read(final UsbInterface iface, final byte endpointAddress, byte[] data) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
-		if (this.application != null) this.application.setSerialRxOn();
 		UsbEndpoint endpoint = iface.getUsbEndpoint(endpointAddress);
 		int received = 0;
 		UsbPipe pipe = endpoint.getUsbPipe();
@@ -399,7 +400,6 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		{
 		    pipe.close();
 		}
-		if (this.application != null) this.application.setSerialRxOff();
 		return received;
 	}
 
@@ -416,7 +416,6 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public synchronized int read(final UsbInterface iface, final byte endpointAddress, final byte[] data, final int timeout_msec) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException {
-		if (this.application != null) this.application.setSerialRxOn();
 		UsbEndpoint endpoint = iface.getUsbEndpoint(endpointAddress);
 		int waitTime_msec = timeout_msec;
 		int waitDelay_msec = timeout_msec/100;
@@ -453,7 +452,6 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 				pipe.close();
 			}
 		}
-		if (this.application != null) this.application.setSerialRxOff();
 		return asyncReceived;
 	}
 

@@ -140,7 +140,8 @@ public class Q200GathererThread extends Thread {
 			lastCycleTime = System.nanoTime()/1000000;
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
 				try {
-					// check if device is ready for data capturing or terminal open
+					if (this.application != null) this.application.setSerialTxOn();
+					if (this.application != null) this.application.setSerialRxOn();
 					//get data from device for all4 slots
 					if (this.usbPort.isConnected()) 
 						if (this.isProgrammExecuting1) 	{
@@ -164,6 +165,7 @@ public class Q200GathererThread extends Thread {
 							channelBuffer2 = this.usbPort.getData(this.usbInterface, Q200UsbPort.QueryChannelData.CHANNEL_B.value());
 							this.isProgrammExecuting2 = this.device.isProcessing(2, channelBuffer2, dataBuffer2);
 						}
+					if (this.application != null) this.application.setSerialTxOff();
 					WaitTimer.delay(USB_QUERY_DELAY);
 					
 					if (this.usbPort.isConnected()) 
@@ -188,6 +190,7 @@ public class Q200GathererThread extends Thread {
 							channelBuffer4 = this.usbPort.getData(this.usbInterface, Q200UsbPort.QueryChannelData.CHANNEL_D.value());
 							this.isProgrammExecuting4 = this.device.isProcessing(4, channelBuffer4, dataBuffer4);
 						}
+					if (this.application != null) this.application.setSerialRxOff();
 
 					// check if device is ready for data capturing, discharge or charge allowed only
 					if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4) {

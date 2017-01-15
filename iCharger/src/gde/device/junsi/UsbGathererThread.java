@@ -123,8 +123,14 @@ public class UsbGathererThread extends Thread {
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
 				try {
 					if (this.usbPort.isConnected()) {
+						if (this.application != null) {
+							this.application.setSerialTxOn();
+							this.application.setSerialRxOn();
+							this.application.setSerialTxOff();
+						}
 						dataBuffer = this.usbPort.getData(this.usbInterface);
-	
+						if (this.application != null) this.application.setSerialRxOff();
+
 						this.isProgrammExecuting1 = dataBuffer[2] == 0x01; //output channel 1
 						this.isProgrammExecuting2 = dataBuffer[2] == 0x02 ;//output channel 2
 						
