@@ -49,6 +49,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
+import gde.data.HistoSet.RebuildStep;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -148,8 +149,8 @@ public class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					parent.redraw();
-					//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // WB: I do not see a need to go through the complete rebuild steps
+					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
+					HistoSelectorComposite.this.parent.redraw(); // ET redraws once again in the rare case if new files have been found 
 				}
 			});
 		}
@@ -172,8 +173,8 @@ public class HistoSelectorComposite extends Composite {
 					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
-						parent.redraw();
-						//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // WB: I do not see a need to go through the complete rebuild steps
+						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
+						HistoSelectorComposite.this.parent.redraw(); // ET redraws once again in the rare case if new files have been found 
 					}
 				}
 			});
