@@ -150,6 +150,7 @@ public class HistoSelectorComposite extends Composite {
 					}
 					doUpdateCurveSelectorTable();
 					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
+					HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 				}
 			});
 		}
@@ -173,6 +174,7 @@ public class HistoSelectorComposite extends Composite {
 					if (evt != null && evt.item != null) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
 						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
+						HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 					}
 				}
 			});
