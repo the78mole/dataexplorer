@@ -284,7 +284,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Record(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties,
 			int initialCapacity) {
-		super(initialCapacity); 
+		super(initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newName + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)"); //$NON-NLS-1$
 		this.device = newDevice;
 		this.ordinal = newOrdinal;
@@ -2107,7 +2107,7 @@ public class Record extends Vector<Integer> {
 			if (this.size() > 0) {
 				long sum = 0;
 				int zeroCount = 0;
-				for (Integer xi : this) {
+				for (Integer xi : this) { // ET loops over all elements of the vector
 					if (xi != null && xi != 0) {
 						sum += xi;
 					}
@@ -2115,7 +2115,7 @@ public class Record extends Vector<Integer> {
 						zeroCount++;
 					}
 				}
-				this.avgValue = (this.size() - zeroCount) != 0 ? Long.valueOf(sum / (this.size() - zeroCount)).intValue() : 0;
+				this.avgValue = (this.realSize() - zeroCount) != 0 ? Long.valueOf(sum / (this.realSize() - zeroCount)).intValue() : 0; // ET realSize corresponds to the looped elements
 			}
 		}
 	}
@@ -2192,7 +2192,7 @@ public class Record extends Vector<Integer> {
 				double average = this.getAvgValue() / 1000.0;
 				double sumPoweredValues = 0;
 				int zeroCount = 0;
-				for (Integer xi : this) {
+				for (Integer xi : this) { // ET loops over all elements of the vector
 					if (xi != null && xi != 0) { // sigma is based on the same population as avg
 						sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
 					}
@@ -2200,7 +2200,7 @@ public class Record extends Vector<Integer> {
 						zeroCount++;
 					}
 				}
-				this.sigmaValue = (this.size() - zeroCount - 1) != 0 ? Double.valueOf(Math.sqrt(sumPoweredValues / (this.realSize() - zeroCount - 1)) * 1000).intValue() : 0; // sigma is based on the same population as avg
+				this.sigmaValue = (this.realSize() - zeroCount - 1) != 0 ? Double.valueOf(Math.sqrt(sumPoweredValues / (this.realSize() - zeroCount - 1)) * 1000).intValue() : 0; // ET realSize corresponds to the looped elements
 			}
 		}
 	}

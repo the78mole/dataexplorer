@@ -149,10 +149,7 @@ public class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					if ((evt.stateMask & SWT.SHIFT) == SWT.SHIFT)
-						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // go through the complete rebuild steps
-					else
-						HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
+					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
 				}
 			});
 		}
@@ -175,10 +172,7 @@ public class HistoSelectorComposite extends Composite {
 					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
-						if ((evt.stateMask & SWT.SHIFT) == SWT.SHIFT)
-							HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // go through the complete rebuild steps
-						else
-							HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
+						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
 					}
 				}
 			});
@@ -237,8 +231,6 @@ public class HistoSelectorComposite extends Composite {
 						Combo combo = (Combo) event.getSource();
 						record.setTrailTextSelectedIndex(combo.getSelectionIndex());
 						HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);
-						if ((event.stateMask & SWT.SHIFT) == SWT.SHIFT)
-							HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // go through the complete rebuild steps
 					}
 				});
 				if (record.isVisible()) {

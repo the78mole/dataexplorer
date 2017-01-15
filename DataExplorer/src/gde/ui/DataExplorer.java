@@ -1969,7 +1969,8 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
 		DataExplorer.this.histoSet.getTrailRecordSet().setPoints(recordOrdinal);
-		this.updateHistoGraphicsWindow(false); //just update the histo graphics window without updating the curve selection table
+		DataExplorer.this.updateHistoTabs(RebuildStep.F_FILE_CHECK, isWithUi); // ET rebuilds the graphics only if new files have been found
+		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found 
 	}
 
 	/**
