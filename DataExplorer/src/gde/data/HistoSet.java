@@ -374,7 +374,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				long nanoTimeTrailRecordSet = -System.nanoTime();
 				this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
 				this.trailRecordSet.defineTrailTypes();
-				this.trailRecordSet.checkAllDisplayable();
+				// this.trailRecordSet.checkAllDisplayable();
 				this.trailRecordSet.setPoints();
 				this.trailRecordSet.setTags();
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data

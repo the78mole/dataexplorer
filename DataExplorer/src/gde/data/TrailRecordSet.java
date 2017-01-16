@@ -61,7 +61,7 @@ public class TrailRecordSet extends RecordSet {
 	private final static long						serialVersionUID				= -1580283867987273535L;
 	private final static Logger					log											= Logger.getLogger($CLASS_NAME);
 
-	private final static int						initialRecordCapacity		= 111;							
+	private final static int						initialRecordCapacity		= 111;
 	private final String								isoDateTimeDelimiter		= "T";																					//$NON-NLS-1$
 
 	private final HistoGraphicsTemplate	template;																																// graphics template holds view configuration
@@ -541,8 +541,7 @@ public class TrailRecordSet extends RecordSet {
 				// histo properties
 			}
 			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-			if (log.isLoggable(Level.OFF))
-				log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
 				updateVisibilityStatus(true);
@@ -710,31 +709,33 @@ public class TrailRecordSet extends RecordSet {
 	public String[] getTagTableRow(int logTagOrdinal) {
 		String[] dataTableRow = new String[this.get(0).size() + 2];
 
-		if (logTagOrdinal == 0)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0838);
-		else if (logTagOrdinal == 1)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0839);
-		else if (logTagOrdinal == 2)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
-		else if (logTagOrdinal == 3)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0841);
-		else if (logTagOrdinal == 4)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
-		else if (logTagOrdinal == 5)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
-		else if (logTagOrdinal == 6)
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843); // for test only
-		else
-			dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
+		if (!this.timeStep_ms.isEmpty()) {
+			if (logTagOrdinal == 0)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0838);
+			else if (logTagOrdinal == 1)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0839);
+			else if (logTagOrdinal == 2)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
+			else if (logTagOrdinal == 3)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0841);
+			else if (logTagOrdinal == 4)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
+			else if (logTagOrdinal == 5)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
+			else if (logTagOrdinal == 6)
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843); // for test only
+			else
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
 
-		List<String> logTag = this.logTags.get(logTagOrdinal);
-		if (this.settings.isXAxisReversed()) {
-			for (int i = 0; i < this.timeStep_ms.size(); i++)
-				dataTableRow[i + 2] = logTag.get(i);
-		}
-		else {
-			for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-				dataTableRow[i + 2] = logTag.get(j);
+			List<String> logTag = this.logTags.get(logTagOrdinal);
+			if (this.settings.isXAxisReversed()) {
+				for (int i = 0; i < this.timeStep_ms.size(); i++)
+					dataTableRow[i + 2] = logTag.get(i);
+			}
+			else {
+				for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+					dataTableRow[i + 2] = logTag.get(j);
+			}
 		}
 		return dataTableRow;
 	}

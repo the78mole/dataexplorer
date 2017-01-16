@@ -295,6 +295,7 @@ public class HistoSelectorComposite extends Composite {
 				activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 				if (isTableSelection && item.getChecked() || forceVisible) {
 					activeRecord.setVisible(true);
+					activeRecord.setDisplayable(true);
 					HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(true);
 					item.setData(DataExplorer.OLD_STATE, true);
 					// ET item.setData(GraphicsWindow.WINDOW_TYPE, HistoSelectorComposite.this.windowType);
@@ -302,6 +303,7 @@ public class HistoSelectorComposite extends Composite {
 				}
 				else {
 					activeRecord.setVisible(false);
+					activeRecord.setDisplayable(false);
 					HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(false);
 					item.setData(DataExplorer.OLD_STATE, false);
 					// ET item.setData(GraphicsWindow.WINDOW_TYPE, HistoSelectorComposite.this.windowType);

@@ -346,7 +346,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				else
 					throw new UnsupportedOperationException("length == 1"); //$NON-NLS-1$
 			}
-			else {
+			if (this.trailRecordSuite.length > 1) {
 				int minVal = Integer.MAX_VALUE, maxVal = Integer.MIN_VALUE; // min/max depends on all values of the suite
 				int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
 				boolean summationSign = false; // false means subtract, true means add
@@ -913,6 +913,26 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	 */
 	public String getLabel() {
 		return this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoregroupType.getLabel();
+	}
+
+	/**
+	 * @return true if the record or the suite contains reasonable data
+	 */
+	@Override // reason is trail record suites with a master record without point values
+	public boolean hasReasonableData() {
+		boolean hasReasonableData = false;
+		if (this.trailRecordSuite == null || this.trailRecordSuite.length == 1) {
+			hasReasonableData = super.hasReasonableData();
+		}
+		else {
+			for (TrailRecord trailRecord : this.trailRecordSuite) {
+				if (trailRecord.hasReasonableData()) { // no recursion because suites do not contain suites
+					hasReasonableData = true;
+					break;
+				}
+			}
+		}
+		return hasReasonableData;
 	}
 
 	// WBrueg a bunch of base class methods is not applicable for this class (e.g. trigger): Common base class for TrailRecord and Record???
