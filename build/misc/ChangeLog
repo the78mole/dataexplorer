@@ -5,8 +5,8 @@ Version 3.2.9 - yy xxx 2016
 +++++ important update Java 32 Bit -Xmx1024m, 64 Bit -Xmx3096m  +++++
 - fix early rounding while importing CSV data
 - fix CSV import capability using relative time stamp
-- add Raspbian 32 ARM build support 
-
+- add Raspbian 32 ARM support 
+- add history analysis as beta support (need to be enabled in preferences)
 HoTTAdapter2
 	- fine tune capacity filter for cases value start != 0
 S32 (JLog3)
@@ -22,8 +22,8 @@ MC3000 SkyRC
 	- remove automatic program start/stop, form now gathering rely on manual start/stop of processing
 	- fix continuous record to gather pausing data
 Q200 SkyRC 4 channel charger 
-	- support for 4 individual batteries added by Q200
-	- support for 4 synchronized batteries added by Q200-Set
+	- support up to 4 individual batteries added by Q200
+	- support for a set up to 4 batteries added by Q200-Set
 
 Version 3.2.8 - 05 Oct 2016
 - remove the restriction re-naming compressed OSD-Files
