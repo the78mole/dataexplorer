@@ -501,7 +501,7 @@ public class TrailRecordSet extends RecordSet {
 		if (this.template != null && this.template.isAvailable()) {
 			for (int i = 0; i < this.size(); ++i) {
 				TrailRecord record = (TrailRecord) this.get(i);
-				record.setVisible(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
+				record.setVisible(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "false"))); //$NON-NLS-1$
 				record.setPositionLeft(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
 				int r, g, b;
 				String color = this.template.getProperty(i + Record.COLOR, record.getRGB());

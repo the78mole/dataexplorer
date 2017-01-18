@@ -23,6 +23,7 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.data.TrailRecordSet;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -85,6 +86,7 @@ public class CurveSelectorContextMenu {
 	String							recordNameMeasurement	= GDE.STRING_BLANK;
 	boolean							isWindowTypeCompare		= false;
 	boolean							isWindowTypeUtility		= false;
+	boolean							isWindowTypeHisto			= false;
 
 	public CurveSelectorContextMenu() {
 		super();
@@ -107,6 +109,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isWindowTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE);
 							CurveSelectorContextMenu.this.isWindowTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_UTIL);
+							CurveSelectorContextMenu.this.isWindowTypeHisto = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_HISTO);
 							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.application.getRecordSetOfVisibleTab();
 
 							if (CurveSelectorContextMenu.this.recordSet != null) {
@@ -119,8 +122,17 @@ public class CurveSelectorContextMenu {
 										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
-										CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
-										CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
+										if (!CurveSelectorContextMenu.this.isWindowTypeHisto) {
+											CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
+											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
+										}
+										else {
+											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
+											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(false);
+											CurveSelectorContextMenu.this.timeGrid.setEnabled(false);
+											CurveSelectorContextMenu.this.measurement.setEnabled(false);
+											CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
+										}
 										if (CurveSelectorContextMenu.this.recordSet.getDevice().getName().startsWith("Ultra")) {
 											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(true);
 											CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothVoltageCurve();

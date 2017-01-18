@@ -2124,6 +2124,9 @@ public class DataExplorer extends Composite {
 					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
 						this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 					}
+					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) {
+						this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+					}
 				}
 			}
 		}
@@ -2257,6 +2260,10 @@ public class DataExplorer extends Composite {
 			result = this.compareTabItem != null && !this.compareTabItem.isDisposed() && this.compareTabItem.isVisible();
 			break;
 
+		case GraphicsWindow.TYPE_HISTO:
+			result = this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible();
+			break;
+
 		case GraphicsWindow.TYPE_UTIL:
 			result = this.utilGraphicsTabItem != null && !this.utilGraphicsTabItem.isDisposed() && this.utilGraphicsTabItem.isVisible();
 			break;
@@ -2278,7 +2285,10 @@ public class DataExplorer extends Composite {
 			return this.getActiveRecordSet();
 		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE))
 			return this.compareSet;
-		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) return this.utilitySet;
+		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) 
+			return this.utilitySet;
+		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) 
+			return this.histoSet.getTrailRecordSet();
 
 		return this.getActiveRecordSet();
 	}

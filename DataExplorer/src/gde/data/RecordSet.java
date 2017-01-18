@@ -1131,7 +1131,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param unsavedReason
 	 */
 	public void setUnsaved(String unsavedReason) {
-		if (!this.isCompareSet) {
+		if (!this.isCompareSet && !(this instanceof TrailRecordSet)) {
 			this.changeCounter++;
 			this.isSaved = false;
 			if (!this.unsaveReasons.contains(unsavedReason)) {
