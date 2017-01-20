@@ -150,6 +150,8 @@ public class TrailRecordSet extends RecordSet {
 				TrailRecord tmpRecord = new TrailRecord(device, myIndex, scoregroup.getName(), scoregroup, newTrailRecordSet, scoregroup.getProperty().size());
 				newTrailRecordSet.put(scoregroup.getName(), tmpRecord);
 				tmpRecord.setColorDefaultsAndPosition(myIndex);
+				if (i == 0) //top score group entry, set color to black
+					tmpRecord.setColor(SWTResourceManager.getColor(0, 0, 0));
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added scoregroup record for " + scoregroup.getName() + " - " + myIndex); //$NON-NLS-1$
 			}
 			myIndex++;
@@ -499,6 +501,7 @@ public class TrailRecordSet extends RecordSet {
 	 */
 	public void applyTemplate(boolean doUpdateVisibilityStatus) {
 		if (this.template != null && this.template.isAvailable()) {
+			boolean isHorizontalGridOrdinalSet = false;
 			for (int i = 0; i < this.size(); ++i) {
 				TrailRecord record = (TrailRecord) this.get(i);
 				record.setVisible(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "false"))); //$NON-NLS-1$
@@ -517,10 +520,6 @@ public class TrailRecordSet extends RecordSet {
 						Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$
 						, Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0"))); //$NON-NLS-1$
 				record.setNumberFormat(Integer.parseInt(this.template.getProperty(i + Record.NUMBER_FORMAT, "-1"))); //$NON-NLS-1$
-				// smooth current drop
-				// recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
-				// smooth voltage curve
-				// recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
 				// time grid
 				// color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 				// r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
@@ -529,16 +528,17 @@ public class TrailRecordSet extends RecordSet {
 				// recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
 				// recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				// recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				// curve grid
-				// color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				// r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				// g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				// b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				// recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-				// recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				// recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				// recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
-				// histo properties
+				if (!isHorizontalGridOrdinalSet && record.isVisible) { // set curve grid to the first visible record
+					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					this.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
+					this.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					this.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					this.setHorizontalGridRecordOrdinal(record.ordinal); // initial use top score trail record
+					isHorizontalGridOrdinalSet = true;
+				}
 			}
 			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
