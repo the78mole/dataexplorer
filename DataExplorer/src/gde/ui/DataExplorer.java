@@ -938,43 +938,41 @@ public class DataExplorer extends Composite {
 	/**
 	 * updates the histo table.
 	 */
-	private synchronized void updateHistoTable(boolean forceClean) {
+	private synchronized void updateHistoTable(final boolean forceClean) {
 		//		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 		//				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
-		if (this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()) {
-			// check headers and itemsTexts in order to decide if table rebuild is required
-			if (forceClean || !this.histoTableTabItem.isRowTextAndTrailValid() || !this.histoTableTabItem.isHeaderTextValid()) {
-				GDE.display.asyncExec(new Runnable() {
-					public void run() {
+		// check headers and itemsTexts in order to decide if table rebuild is required
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()) 
+					if (forceClean || !(DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !(DataExplorer.this.histoTableTabItem.isHeaderTextValid())))
 						DataExplorer.this.histoTableTabItem.setHeader();
-					}
-				});
-				GDE.display.asyncExec(new Runnable() {
-
-					public void run() {
+			}
+		});
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()) 
+					if (forceClean || !(DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !(DataExplorer.this.histoTableTabItem.isHeaderTextValid()))) {
 						TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
 						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
 					}
-				});
 			}
-		}
-		else {
-			//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
-			if (false) { //todo is there any requirement to clean the table ???
-				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-					if (this.histoTableTabItem != null) {
-						this.histoTableTabItem.cleanTable();
-					}
+		});
+		//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
+		if (false) { //todo is there any requirement to clean the table ???
+			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+				if (this.histoTableTabItem != null) {
+					this.histoTableTabItem.cleanTable();
 				}
-				else {
-					GDE.display.asyncExec(new Runnable() {
-						public void run() {
-							if (DataExplorer.this.histoTableTabItem != null) {
-								DataExplorer.this.histoTableTabItem.cleanTable();
-							}
+			}
+			else {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						if (DataExplorer.this.histoTableTabItem != null) {
+							DataExplorer.this.histoTableTabItem.cleanTable();
 						}
-					});
-				}
+					}
+				});
 			}
 		}
 	}
@@ -1986,90 +1984,52 @@ public class DataExplorer extends Composite {
 	 * @param rebuildStep
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
-		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
-					|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed()
-							&& this.histoTableTabItem.isVisible())) {
+		if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
+				|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed()
+						&& this.histoTableTabItem.isVisible())) {
+			Thread rebuilThread = new Thread((Runnable) () -> {
 				boolean isRebuilt = false;
 				try {
+					DataExplorer.this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 					isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
+
+					if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
+						DataExplorer.this.updateHistoGraphicsWindow(true);
+						DataExplorer.this.updateHistoTable(true);
+					}
+					String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+					DataExplorer.this.setProgress(100, sThreadId);
+					if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
+						if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
+							DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+						}
+					}
+					// determine the rebuild action for the invisible histo tabs or those which are not selected
+					RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
+					// determine the maximum rebuild priority from the past updates
+					RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab
+							: performedRebuildStep;
+					// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
+					DataExplorer.this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE
+							: RebuildStep.F_FILE_CHECK;
+					if (log.isLoggable(Level.FINER))
+						log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
+								DataExplorer.this.rebuildStepInvisibleTab));
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					if (isWithUi) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
-					// TODO where to go on in case of error? NullPointerException lead to next error
-					e.printStackTrace();
-					return;
+					if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+				}		
+				finally {
+					DataExplorer.this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));								
 				}
-
-				if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
-					this.updateHistoGraphicsWindow(true);
-					this.updateHistoTable(false);
-				}
-				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-				this.setProgress(100, sThreadId);
-				if (isWithUi && (isRebuilt || rebuildStep == RebuildStep.B_HISTOVAULTS)) {
-					if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
-						String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? DataExplorer.this.getActiveDevice().getName() : DataExplorer.this.getObjectKey();
-						String importDir = DataExplorer.this.histoSet.getValidatedImportDir() != null ? "\n" + DataExplorer.this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY;
-						this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, DataExplorer.this.histoSet.getValidatedDataDir(), importDir }));
-					}
-				}
-				// determine the rebuild action for the invisible histo tabs or those which are not selected
-				RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
-				// determine the maximum rebuild priority from the past updates
-				RebuildStep maximumRebuildStep = this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? this.rebuildStepInvisibleTab : performedRebuildStep;
-				// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
-				this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE : RebuildStep.F_FILE_CHECK;
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
-							this.rebuildStepInvisibleTab));
+			}, "rebuild4Screening");
+			try {
+				rebuilThread.start();
 			}
-		}
-		else {
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					if ((DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow //
-							&& DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible())
-							|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow //
-									&& DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible())) {
-						boolean isRebuilt = false;
-						try {
-							isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
-						}
-						catch (Exception e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
-							if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							return;
-						}
-
-						if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
-							DataExplorer.this.updateHistoGraphicsWindow(true);
-							DataExplorer.this.updateHistoTable(true);
-						}
-						String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-						DataExplorer.this.setProgress(100, sThreadId);
-						if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
-							if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
-								DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
-							}
-						}
-						// determine the rebuild action for the invisible histo tabs or those which are not selected
-						RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
-						// determine the maximum rebuild priority from the past updates
-						RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab
-								: performedRebuildStep;
-						// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
-						DataExplorer.this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE
-								: RebuildStep.F_FILE_CHECK;
-						if (log.isLoggable(Level.FINER))
-							log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
-									DataExplorer.this.rebuildStepInvisibleTab));
-					}
-				}
-			});
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
 		}
 	}
 
@@ -2078,25 +2038,27 @@ public class DataExplorer extends Composite {
 	 * @param redrawCurveSelector
 	 */
 	public void updateHistoGraphicsWindow(boolean redrawCurveSelector) {
-		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) {
-			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-				if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
+				if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) {
 					if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
 						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
 					}
 				}
 			}
-			else {
-				GDE.display.asyncExec(new Runnable() {
-					public void run() {
-						if (!DataExplorer.this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
+		}
+		else {
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					if (!DataExplorer.this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
+						if (DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) {
 							if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
 								DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
 							}
 						}
 					}
-				});
-			}
+				}
+			});
 		}
 	}
 
