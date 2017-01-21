@@ -197,7 +197,8 @@ public class HistoSelectorComposite extends Composite {
 		this.curveSelectorTable.removeAll();
 		for (TableEditor editor : this.editors) {
 			if (editor != null) { // non displayable records
-				editor.getEditor().dispose();
+				if (editor.getEditor() != null)
+					editor.getEditor().dispose();
 				editor.dispose();
 			}
 		}
@@ -206,51 +207,52 @@ public class HistoSelectorComposite extends Composite {
 		int textSize = 10;
 		boolean isOneVisible = false;
 		TrailRecordSet recordSet = this.histoSet.getTrailRecordSet();
-		Combo[] selectorCombos = new Combo[recordSet.size()];
-		this.editors = new TableEditor[recordSet.size()];
-		// get records by insertion order
-		Iterator<Entry<String, Record>> iterator = recordSet.entrySet().iterator();
-		for (int i = 0; iterator.hasNext(); ++i) {
-			TrailRecord record = (TrailRecord) iterator.next().getValue();
-			if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, record.getName());
-			textSize = record.getName().length() * 8;
-			if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
-			// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
-			if (record.isDisplayable()) {
-				TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-				item.setForeground(record.getColor());
-				item.setText(record.getName().intern());
-
-				this.editors[i] = new TableEditor(this.curveSelectorTable);
-				selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
-				this.editors[i].grabHorizontal = true;
-				this.editors[i].setEditor(selectorCombos[i], item, 1);
-				selectorCombos[i].setItems(record.getApplicableTrailsTexts().toArray(new String[0]));
-				selectorCombos[i].setText(record.getTrailText());
-				selectorCombos[i].setToolTipText(record.getLabel() != null ? record.getLabel() : Messages.getString(MessageIds.GDE_MSGT0748));
-				selectorCombos[i].addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent event) {
-						Combo combo = (Combo) event.getSource();
-						record.setTrailTextSelectedIndex(combo.getSelectionIndex());
-						HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);
+		if (recordSet != null) {
+			Combo[] selectorCombos = new Combo[recordSet.size()];
+			this.editors = new TableEditor[recordSet.size()];
+			// get records by insertion order
+			Iterator<Entry<String, Record>> iterator = recordSet.entrySet().iterator();
+			for (int i = 0; iterator.hasNext(); ++i) {
+				TrailRecord record = (TrailRecord) iterator.next().getValue();
+				if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, record.getName());
+				textSize = record.getName().length() * 8;
+				if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
+				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
+				if (record.isDisplayable()) {
+					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
+					item.setForeground(record.getColor());
+					item.setText(record.getName().intern());
+	
+					this.editors[i] = new TableEditor(this.curveSelectorTable);
+					selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
+					this.editors[i].grabHorizontal = true;
+					this.editors[i].setEditor(selectorCombos[i], item, 1);
+					selectorCombos[i].setItems(record.getApplicableTrailsTexts().toArray(new String[0]));
+					selectorCombos[i].setText(record.getTrailText());
+					selectorCombos[i].setToolTipText(record.getLabel() != null ? record.getLabel() : Messages.getString(MessageIds.GDE_MSGT0748));
+					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent event) {
+							Combo combo = (Combo) event.getSource();
+							record.setTrailTextSelectedIndex(combo.getSelectionIndex());
+							HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);
+						}
+					});
+					if (record.isVisible()) {
+						isOneVisible = true;
+						item.setChecked(true);
+						item.setData(DataExplorer.OLD_STATE, true);
 					}
-				});
-				if (record.isVisible()) {
-					isOneVisible = true;
-					item.setChecked(true);
-					item.setData(DataExplorer.OLD_STATE, true);
+					else {
+						item.setChecked(false);
+						item.setData(DataExplorer.OLD_STATE, false);
+					}
+					setHeaderSelection(isOneVisible);
 				}
-				else {
-					item.setChecked(false);
-					item.setData(DataExplorer.OLD_STATE, false);
-				}
-				setHeaderSelection(isOneVisible);
 			}
+			this.selectorColumnWidth = itemWidth;
+			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+			recordSet.updateVisibleAndDisplayableRecordsForTable();
 		}
-		this.selectorColumnWidth = itemWidth;
-		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
-		recordSet.updateVisibleAndDisplayableRecordsForTable();
-
 		this.tableCurveTypeColumn.setWidth(122); // todo column width
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth - 1, this.curveSelectorHeader.getSize().y);
