@@ -263,140 +263,145 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws FileNotFoundException 
 	 */
 	public boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		long startTime = System.nanoTime() / 1000000;
-		boolean isRebuilt = false;
-		log.log(Level.INFO, rebuildStep.toString());
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(2, sThreadId);
+		try {
+			long startTime = System.nanoTime() / 1000000;
+			boolean isRebuilt = false;
+			log.log(Level.INFO, rebuildStep.toString());
+			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(2, sThreadId);
 
-		long startTimeFileValid = new Date().getTime();
-		boolean isHistoFilePathsValid = this.validateHistoFilePaths(rebuildStep);
-		{
-			if (!isHistoFilePathsValid) {
-				this.clear();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             clear")); //$NON-NLS-1$
-				if ((new Date().getTime() - startTimeFileValid) > 0) log.log(Level.TIME, String.format("%,5d files          select folders     time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
-						new Date().getTime() - startTimeFileValid, this.histoFilePaths.size() * 1000 / (new Date().getTime() - startTimeFileValid)));
+			long startTimeFileValid = new Date().getTime();
+			boolean isHistoFilePathsValid = this.validateHistoFilePaths(rebuildStep);
+			{
+				if (!isHistoFilePathsValid) {
+					this.clear();
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             clear")); //$NON-NLS-1$
+					if ((new Date().getTime() - startTimeFileValid) > 0) log.log(Level.TIME, String.format("%,5d files          select folders     time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
+							new Date().getTime() - startTimeFileValid, this.histoFilePaths.size() * 1000 / (new Date().getTime() - startTimeFileValid)));
+				}
+				else { // histo record sets are ready to use
+					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d files    file paths verified     time=%s [ss.SSS]", this.getHistoFilePaths().size(), //$NON-NLS-1$
+							StringHelper.getFormatedTime("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
+				}
+				if (isWithUi) this.application.setProgress(5, sThreadId);
 			}
-			else { // histo record sets are ready to use
-				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d files    file paths verified     time=%s [ss.SSS]", this.getHistoFilePaths().size(), //$NON-NLS-1$
-						StringHelper.getFormatedTime("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
+			{
+				if (RebuildStep.A_HISTOSET == rebuildStep) {
+					isRebuilt = true;
+					this.initialize();
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             initialize")); //$NON-NLS-1$
+					if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 2, sThreadId);
+				}
 			}
-			if (isWithUi) this.application.setProgress(5, sThreadId);
-		}
-		{
-			if (RebuildStep.A_HISTOSET == rebuildStep) {
-				isRebuilt = true;
-				this.initialize();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             initialize")); //$NON-NLS-1$
-				if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 2, sThreadId);
-			}
-		}
-		{
-			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
-				isRebuilt = true;
-				this.fileSizeSum_B = 0;
-				if (this.getHistoFilePaths().size() > 0) {
-					long nanoTimeCheckFilesSum = -System.nanoTime();
-					// step: build the workload map consisting of the cache key and the file path
-					Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(isWithUi, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
-					nanoTimeCheckFilesSum += System.nanoTime();
-					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
-						log.log(Level.TIME, String.format("%,5d files          job check          time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
-								TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), this.histoFilePaths.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
+			{
+				if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
+					isRebuilt = true;
+					this.fileSizeSum_B = 0;
+					if (this.getHistoFilePaths().size() > 0) {
+						long nanoTimeCheckFilesSum = -System.nanoTime();
+						// step: build the workload map consisting of the cache key and the file path
+						Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(isWithUi, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+						nanoTimeCheckFilesSum += System.nanoTime();
+						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
+							log.log(Level.TIME, String.format("%,5d files          job check          time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
+									TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), this.histoFilePaths.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
 
-					if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 10, sThreadId);
+						if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 10, sThreadId);
 
-					// step: put cached vaults into the histoSet map and reduce workload map
-					long nanoTimeReadVaultSum = -System.nanoTime();
-					int timeStepsSize = -this.size();
-					long fileSizeSumCached_B = this.fileSizeSum_B = loadVaultsFromCache(trussJobs);
-					timeStepsSize += this.size();
-					nanoTimeReadVaultSum += System.nanoTime();
-					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum) > 0) log.log(Level.TIME,
-							String.format("%,5d trailTimeSteps load from cache    time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", timeStepsSize, //$NON-NLS-1$
-									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum), timeStepsSize * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum),
-									this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
+						// step: put cached vaults into the histoSet map and reduce workload map
+						long nanoTimeReadVaultSum = -System.nanoTime();
+						int timeStepsSize = -this.size();
+						long fileSizeSumCached_B = this.fileSizeSum_B = loadVaultsFromCache(trussJobs);
+						timeStepsSize += this.size();
+						nanoTimeReadVaultSum += System.nanoTime();
+						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum) > 0) log.log(Level.TIME,
+								String.format("%,5d trailTimeSteps load from cache    time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", timeStepsSize, //$NON-NLS-1$
+										TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum), timeStepsSize * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum),
+										this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
 
-					// step: calculate progress bar parameters
-					double progressCycle = 0.;
-					int progressStart = 0;
-					if (isWithUi) {
-						progressStart = DataExplorer.application.getProgressPercentage()
-								+ (int) ((95 - DataExplorer.application.getProgressPercentage()) * this.size() / (double) (this.size() + 10 * trussJobs.size())); // 10 is the estimated processing time ratio between reading from files and reading from cache
-						this.application.setProgress(progressStart, sThreadId);
-						progressCycle = trussJobs.size() > 0 ? (95 - progressStart) / (double) trussJobs.size() : 1;
-					}
+						// step: calculate progress bar parameters
+						double progressCycle = 0.;
+						int progressStart = 0;
+						if (isWithUi) {
+							progressStart = DataExplorer.application.getProgressPercentage()
+									+ (int) ((95 - DataExplorer.application.getProgressPercentage()) * this.size() / (double) (this.size() + 10 * trussJobs.size())); // 10 is the estimated processing time ratio between reading from files and reading from cache
+							this.application.setProgress(progressStart, sThreadId);
+							progressCycle = trussJobs.size() > 0 ? (95 - progressStart) / (double) trussJobs.size() : 1;
+						}
 
-					// step: transform log files from workload map into vaults and put them into the histoSet map
-					long nanoTimeReadRecordSetSum = -System.nanoTime();
-					ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
-					int i = 0;
-					for (Map.Entry<Path, Map<String, HistoVault>> trussJobsEntry : trussJobs.entrySet()) {
-						newVaults.addAll(loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue()));
-						this.fileSizeSum_B += new File(trussJobsEntry.getKey().toString()).length();
-						if (isWithUi) this.application.setProgress((int) (++i * progressCycle + progressStart), sThreadId);
-					}
-					nanoTimeReadRecordSetSum += System.nanoTime();
-					if (newVaults.size() > 0) log.log(Level.TIME,
-							String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
-									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
-									(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
+						// step: transform log files from workload map into vaults and put them into the histoSet map
+						long nanoTimeReadRecordSetSum = -System.nanoTime();
+						ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
+						int i = 0;
+						for (Map.Entry<Path, Map<String, HistoVault>> trussJobsEntry : trussJobs.entrySet()) {
+							newVaults.addAll(loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue()));
+							this.fileSizeSum_B += new File(trussJobsEntry.getKey().toString()).length();
+							if (isWithUi) this.application.setProgress((int) (++i * progressCycle + progressStart), sThreadId);
+						}
+						nanoTimeReadRecordSetSum += System.nanoTime();
+						if (newVaults.size() > 0) log.log(Level.TIME,
+								String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+										TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
+										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
 
-					// step: save vaults in the file system
-					long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
-					if (newVaults.size() > 0) {
-						cacheSize_B = storeVaultsInCache(newVaults);
-					}
-					if (isWithUi) this.application.setProgress(95, sThreadId);
-					nanoTimeWriteVaultSum += System.nanoTime();
-					if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
-							String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
-									TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
-									(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
-					log.log(Level.TIME, String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.size(), //$NON-NLS-1$
-							new Date().getTime() - startTimeFileValid, this.size() * 1000 / (new Date().getTime() - startTimeFileValid), this.fileSizeSum_B / 1000 / (new Date().getTime() - startTimeFileValid)));
-					for (List<HistoVault> vaultList : this.values()) {
-						if (vaultList.size() > 1) {
-							for (HistoVault histoVault : vaultList) {
-								log.log(Level.WARNING, "same timeStamp: " + histoVault.toString());
+						// step: save vaults in the file system
+						long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
+						if (newVaults.size() > 0) {
+							cacheSize_B = storeVaultsInCache(newVaults);
+						}
+						if (isWithUi) this.application.setProgress(95, sThreadId);
+						nanoTimeWriteVaultSum += System.nanoTime();
+						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
+								String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+										TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
+										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
+						log.log(Level.TIME, String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.size(), //$NON-NLS-1$
+								new Date().getTime() - startTimeFileValid, this.size() * 1000 / (new Date().getTime() - startTimeFileValid), this.fileSizeSum_B / 1000 / (new Date().getTime() - startTimeFileValid)));
+						for (List<HistoVault> vaultList : this.values()) {
+							if (vaultList.size() > 1) {
+								for (HistoVault histoVault : vaultList) {
+									log.log(Level.WARNING, "same timeStamp: " + histoVault.toString());
+								}
 							}
 						}
 					}
 				}
+				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(95, sThreadId);
 			}
-			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(95, sThreadId);
-		}
 
-		{
-			if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
-				isRebuilt = true;
-				long nanoTimeTrailRecordSet = -System.nanoTime();
-				this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
-				this.trailRecordSet.defineTrailTypes();
-				// this.trailRecordSet.checkAllDisplayable();
-				this.trailRecordSet.setPoints();
-				this.trailRecordSet.setTags();
-				this.trailRecordSet.applyTemplate(true); // needs reasonable data
-				nanoTimeTrailRecordSet += System.nanoTime();
-				if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
-					log.log(Level.TIME, String.format("%,5d trailTimeSteps build and populate time=%,6d [ms]  ::  per second:%5d", this.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
-							this.size() > 0 ? this.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
+			{
+				if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
+					isRebuilt = true;
+					long nanoTimeTrailRecordSet = -System.nanoTime();
+					this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
+					this.trailRecordSet.defineTrailTypes();
+					// this.trailRecordSet.checkAllDisplayable();
+					this.trailRecordSet.setPoints();
+					this.trailRecordSet.setTags();
+					this.trailRecordSet.applyTemplate(true); // needs reasonable data
+					nanoTimeTrailRecordSet += System.nanoTime();
+					if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
+						log.log(Level.TIME, String.format("%,5d trailTimeSteps build and populate time=%,6d [ms]  ::  per second:%5d", this.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
+								this.size() > 0 ? this.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
+				}
+				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(97, sThreadId);
 			}
-			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(97, sThreadId);
-		}
-		{
-			if (EnumSet.of(RebuildStep.D_TRAIL_DATA).contains(rebuildStep)) { // saves some time compared to the logic above
-				isRebuilt = true;
-				this.trailRecordSet.cleanup();
-				this.trailRecordSet.setPoints();
-				this.trailRecordSet.setTags();
+			{
+				if (EnumSet.of(RebuildStep.D_TRAIL_DATA).contains(rebuildStep)) { // saves some time compared to the logic above
+					isRebuilt = true;
+					this.trailRecordSet.cleanup();
+					this.trailRecordSet.setPoints();
+					this.trailRecordSet.setTags();
+				}
+				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(98, sThreadId);
 			}
-			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(98, sThreadId);
+			if(log.isLoggable(Level.TIME))
+				log.logp(Level.TIME, "HistoSet", "rebuild4screening()", "time = "	+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
+			return isRebuilt;
 		}
-		if(log.isLoggable(Level.TIME))
-			log.logp(Level.TIME, "HistoSet", "rebuild4screening()", "time = "	+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
-		return isRebuilt;
+		finally {
+			this.application.setProgress(100, sThreadId);
+		}
 	}
 
 	/**
