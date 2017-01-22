@@ -380,7 +380,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					else {
 						trailRecord.add(point);
 					}
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, trailRecord.getName() + " trail " + trailRecord.toString()); //$NON-NLS-1$
+					log.log(Level.FINEST, trailRecord.getName() + " trail " , trailRecord); //$NON-NLS-1$
 				}
 				if (minVal != Integer.MAX_VALUE && maxVal != Integer.MIN_VALUE) {
 					this.setMinMax(minVal, maxVal);
@@ -388,7 +388,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.getName() + " trail " + this.toString()); //$NON-NLS-1$
+		log.log(Level.FINEST, this.getName() + " trail " , this); //$NON-NLS-1$
 	}
 
 	/**
@@ -598,7 +598,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				applicablePrimitiveTrails[TrailType.Q_LOWER_WHISKER.ordinal()] = true;
 				applicablePrimitiveTrails[TrailType.Q_UPPER_WHISKER.ordinal()] = true;
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " " + measurementStatistics.toString()); //$NON-NLS-1$
+			log.log(Level.FINER, this.getName() + " " , measurementStatistics); //$NON-NLS-1$
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
 		}
 		else if (this.settlementType != null) {
@@ -640,7 +640,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					applicablePrimitiveTrails[TrailType.Q_LOWER_WHISKER.ordinal()] = true;
 					applicablePrimitiveTrails[TrailType.Q_UPPER_WHISKER.ordinal()] = true;
 				}
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " " + settlementEvaluation.toString()); // $NON-NLS-1$ //$NON-NLS-1$
+				log.log(Level.FINER, this.getName() + " " , settlementEvaluation);  //$NON-NLS-1$
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
 			}
 		}

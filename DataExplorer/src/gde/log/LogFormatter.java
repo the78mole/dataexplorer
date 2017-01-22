@@ -20,10 +20,14 @@ package gde.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
+
+import gde.GDE;
 
 /**
  * class to format the trace log string
@@ -48,6 +52,8 @@ public class LogFormatter extends Formatter {
 
 	/**
 	 * A Custom format implementation that is designed for brevity.
+	 * supports these syntax options: log.log(Level.FINE, "message")   and   	log.log(Level.FINE, "message", anyObject)
+	 * 
 	 */
 	@Override
 	public synchronized String format(LogRecord logRecord) {
@@ -59,7 +65,21 @@ public class LogFormatter extends Formatter {
 		this.args[2] = String.format("%-7s",logRecord.getLevel());
 		this.args[3] = logRecord.getLoggerName();
 		this.args[4] = logRecord.getSourceMethodName();
-		this.args[5] = logRecord.getMessage();
+		if (logRecord.getParameters() != null && logRecord.getParameters().length > 0) {
+			if (logRecord.getParameters()[0] == null) {
+				this.args[5] = logRecord.getMessage();
+			} else if (logRecord.getParameters()[0] instanceof String) {
+				this.args[5] = logRecord.getMessage() + GDE.STRING_BLANK + (String) logRecord.getParameters()[0];
+			} else if (logRecord.getParameters()[0] instanceof Number) {
+				this.args[5] = logRecord.getMessage() + GDE.STRING_BLANK + NumberFormat.getInstance().format(logRecord.getParameters()[0]);
+			} else if (logRecord.getParameters()[0] instanceof Date) {
+				this.args[5] = logRecord.getMessage() + GDE.STRING_BLANK + DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).format(logRecord.getParameters()[0]);
+			} else {
+				this.args[5] = logRecord.getMessage() + GDE.STRING_BLANK + logRecord.getParameters()[0].toString();
+			}
+		} else {
+			this.args[5] = logRecord.getMessage();
+		}
 		StringBuffer text = new StringBuffer();
 		if (this.formatter == null) {
 			this.formatter = new MessageFormat(format);

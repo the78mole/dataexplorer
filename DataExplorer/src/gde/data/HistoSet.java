@@ -268,7 +268,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		try {
 			long startTime = System.nanoTime() / 1000000;
 			boolean isRebuilt = false;
-			log.log(Level.INFO, rebuildStep.toString());
+		log.log(Level.INFO, GDE.STRING_GREATER, rebuildStep);
 			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(2, sThreadId);
 
 			long startTimeFileValid = new Date().getTime();
@@ -361,7 +361,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						for (List<HistoVault> vaultList : this.values()) {
 							if (vaultList.size() > 1) {
 								for (HistoVault histoVault : vaultList) {
-									log.log(Level.WARNING, "same timeStamp: " + histoVault.toString());
+								log.log(Level.WARNING, "same timeStamp: ", histoVault); //$NON-NLS-1$
 								}
 							}
 						}
@@ -455,7 +455,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	private long loadVaultsFromCache(Map<Path, Map<String, HistoVault>> trussJobs) throws IOException {
 		long localSizeSum_B = 0;
 		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("cacheFilePath=%s", cacheFilePath.toString())); //$NON-NLS-1$
+		log.log(Level.FINER, "cacheFilePath=", cacheFilePath); //$NON-NLS-1$
 		if (this.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
 				Iterator<Map.Entry<Path, Map<String, HistoVault>>> trussJobsIterator = trussJobs.entrySet().iterator();
@@ -524,14 +524,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		for (HistoVault tmpHistoVault : timeStampTrusses.values()) {
 			if (histoVault.getVaultChannelNumber() == tmpHistoVault.getVaultChannelNumber() && histoVault.getLogChannelNumber() == tmpHistoVault.getLogChannelNumber() // 
 					&& histoVault.getVaultDeviceName().equals(tmpHistoVault.getVaultDeviceName())) {
-				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("duplicate vault was discarded: device=%s  logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s",
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("duplicate vault was discarded: device=%s  logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s", //$NON-NLS-1$
 						histoVault.getVaultDeviceName(), histoVault.getLogChannelNumber(), histoVault.getLogRecordSetOrdinal(), histoVault.getStartTimeStampFormatted(), histoVault.getLogFilePath()));
 				isDuplicate = true;
 				break;
 			}
 		}
 		if (!isDuplicate) {
-			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("WARN same startTimeStamp=%s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(),
+			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("WARN same startTimeStamp=%s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(), //$NON-NLS-1$
 					histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
 		}
 		return isDuplicate;
@@ -732,7 +732,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (path.equals(actualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
 						log.log(Level.FINER, "Dead OSD link " + path + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
 						if (!path.toFile().delete()) {
-							log.log(Level.FINE, "could not delete link file " + path.toString()); //$NON-NLS-1$
+							log.log(Level.FINE, "could not delete link file " , path); //$NON-NLS-1$
 						}
 					}
 					else {
@@ -749,7 +749,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								// discard truss
 							}
 							else if (this.application.getActiveObject() != null && truss.getValidatedObjectKey().isEmpty()) {
-								log.log(Level.INFO, String.format("OSD candidate found for empty object \"%s\" in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
+								log.log(Level.INFO, String.format("OSD candidate found for empty object \"%s\" in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								if (!this.settings.skipFilesWithoutObject()) {
 									if (ask4FilesWithoutObject) {
 										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0065, new String[] { path.toString() }))) {
@@ -764,7 +764,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								}
 							}
 							else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
-								log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
+								log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								if (!this.settings.skipFilesWithOtherObject()) {
 									if (ask4FilesWithOtherObject) {
 										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { truss.getLogObjectKey(), path.toString() }))) {
@@ -779,7 +779,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								}
 							}
 							else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
-								log.log(Level.FINER, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted()));
+								log.log(Level.FINER, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								isValidObject = true;
 							}
 
