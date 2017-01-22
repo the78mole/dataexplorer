@@ -436,7 +436,7 @@ public class HistoTableWindow extends CTabItem {
 
 		// set the data columns of the new header line
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null && this.histoSet != null) {
+		if (activeChannel != null && this.histoSet != null && this.histoSet.getTrailRecordSet() != null) {
 			String[] tableHeaderRow = this.histoSet.getTrailRecordSet().getTableHeaderRow();
 			if (tableHeaderRow.length > 0) {
 				for (String headerString : tableHeaderRow) {

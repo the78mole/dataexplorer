@@ -236,7 +236,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	/**
 	 * @return the graphicsComposite
 	 */
-	public GraphicsComposite getGraphicsComposite() {
+	public HistoGraphicsComposite getHistoGraphicsComposite() {
 		return this.graphicsComposite;
 	}
 

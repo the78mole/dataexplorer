@@ -954,7 +954,8 @@ public class DataExplorer extends Composite {
 				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()) 
 					if (forceClean || !(DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !(DataExplorer.this.histoTableTabItem.isHeaderTextValid()))) {
 						TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
+						if (trailRecordSet != null)
+							DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
 					}
 			}
 		});
@@ -1304,7 +1305,6 @@ public class DataExplorer extends Composite {
 			doneRxOn[0] = false;
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					DataExplorer.this.statusBar.setSerialRxOff();
 					DataExplorer.this.statusBar.setSerialRxOn();
 					doneRxOn[0] = true;
 				}
@@ -1319,7 +1319,6 @@ public class DataExplorer extends Composite {
 			doneRxOff[0] = false;
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					DataExplorer.this.statusBar.setSerialRxOn();
 					DataExplorer.this.statusBar.setSerialRxOff();
 					doneRxOff[0] = true;
 				}
@@ -2066,7 +2065,8 @@ public class DataExplorer extends Composite {
 	 * update the graphicsWindow
 	 */
 	public void updateGraphicsWindow() {
-		updateGraphicsWindow(true);
+		if (this.graphicsTabItem != null) //testing without UI
+			updateGraphicsWindow(true);
 	}
 
 	/**

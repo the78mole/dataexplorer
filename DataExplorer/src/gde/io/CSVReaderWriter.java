@@ -437,7 +437,13 @@ public class CSVReaderWriter {
 			writer.write(sb.toString());
 
 			// write data
-			long startTime = new Date(recordSet.getTime(0)).getTime();
+			long startTime;
+			try {
+				startTime = new Date(recordSet.getTime(0)).getTime();
+			}
+			catch (Exception e) {
+				startTime = new Date().getTime();
+			}
 			int recordEntries = recordSet.getRecordDataSize(true);
 			boolean isTimeFormatAbsolute = Settings.getInstance().isTimeFormatAbsolute();
 			int progressCycle = 0;
