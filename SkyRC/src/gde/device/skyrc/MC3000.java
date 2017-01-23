@@ -1582,7 +1582,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 
 		if (this.settings.isReduceChargeDischarge() && !this.isContinuousRecordSet()) 
 			return dataBuffer[5] > 0 && dataBuffer[5] < 3;
-		return dataBuffer[5] > 0;
+		return dataBuffer[5] > 0 && dataBuffer[5] < 4;
 	}
 
 	/**
