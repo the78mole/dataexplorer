@@ -890,27 +890,32 @@ public class DataExplorer extends Composite {
 	 * updates the data table with current record set data
 	 * @param requestingRecordSetName
 	 */
-	public synchronized void updateDataTable(String requestingRecordSetName, boolean forceClean) {
+	public synchronized void updateDataTable(String requestingRecordSetName, final boolean forceClean) {
 		final Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
 		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 
 		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
-			if (forceClean) {
+			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+				if (forceClean) {
+					//DataExplorer.this.dataTableTabItem.setAbsoluteDateTime(false);
+					DataExplorer.this.dataTableTabItem.setHeader();
+				}
+				DataExplorer.this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));
+				DataExplorer.this.dataTableTabItem.updateTopIndex();
+			}
+			else {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
-						//DataExplorer.this.dataTableTabItem.setAbsoluteDateTime(false);
-						DataExplorer.this.dataTableTabItem.setHeader();
+						if (forceClean) {
+							//DataExplorer.this.dataTableTabItem.setAbsoluteDateTime(false);
+							DataExplorer.this.dataTableTabItem.setHeader();
+						}
+						DataExplorer.this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));
+						DataExplorer.this.dataTableTabItem.updateTopIndex();
 					}
 				});
 			}
-			GDE.display.asyncExec(new Runnable() {
-
-				public void run() {
-					DataExplorer.this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));
-					DataExplorer.this.dataTableTabItem.updateTopIndex();
-				}
-			});
 		}
 		else {
 			if (activeRecordSet == null || requestingRecordSetName.equals(GDE.STRING_EMPTY)) {
@@ -930,7 +935,6 @@ public class DataExplorer extends Composite {
 						}
 					});
 				}
-
 			}
 		}
 	}
