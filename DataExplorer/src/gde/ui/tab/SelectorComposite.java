@@ -308,7 +308,7 @@ public class SelectorComposite extends Composite {
 				}
 				activeRecord.getParent().syncScaleOfSyncableRecords();
 				activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
-				if (activeRecord.getParent().getVisibleAndDisplayableRecordsForMeasurement().size() == 0)
+				if (activeRecord.getParent().getVisibleAndDisplayableRecords().size() == 0)
 					SelectorComposite.this.application.clearMeasurementModes();
 			}
 		}

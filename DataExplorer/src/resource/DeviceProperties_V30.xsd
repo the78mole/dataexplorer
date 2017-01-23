@@ -134,27 +134,31 @@
 								<xs:field xpath="@scoregroupId" />
 							</xs:key>
 							<xs:key name="transitionKey">
-								<xs:selector xpath="Transition" />
+								<xs:selector xpath="Transitions/Transition" />
 								<xs:field xpath="@transitionId" />
 							</xs:key>
 							<xs:key name="referenceGroupKey">
-								<xs:selector xpath="ReferenceGroup" />
+								<xs:selector xpath="ReferenceGroups/ReferenceGroup" />
 								<xs:field xpath="@referenceGroupId" />
 							</xs:key>
 							<xs:key name="transitionGroupKey">
-								<xs:selector xpath="TransitionGroup" />
+								<xs:selector xpath="TransitionGroups/TransitionGroup" />
 								<xs:field xpath="@transitionGroupId" />
 							</xs:key>
 							<xs:keyref name="transitionKeyref" refer="transitionKey">
-								<xs:selector xpath="TransitionMapping" />
+								<xs:selector xpath="TransitionGroups/TransitionGroup/*" />
 								<xs:field xpath="@transitionId" />
 							</xs:keyref>
 							<xs:keyref name="referenceGroupKeyref" refer="referenceGroupKey">
-								<xs:selector xpath="Settlement" />
+								<xs:selector xpath="Settlement/evaluation/*" />
 								<xs:field xpath="@referenceGroupId" />
 							</xs:keyref>
+							<xs:keyref name="referenceGroupKeyrefDivisor" refer="referenceGroupKey">
+								<xs:selector xpath="Settlement/evaluation/transitionCalculus" />
+								<xs:field xpath="@referenceGroupIdDivisor" />
+							</xs:keyref>
 							<xs:keyref name="transitionGroupKeyref" refer="transitionGroupKey">
-								<xs:selector xpath="Settlement" />
+								<xs:selector xpath="Settlement/evaluation/*" />
 								<xs:field xpath="@transitionGroupId" />
 							</xs:keyref>
 						</xs:element>
@@ -328,27 +332,54 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Settlement" type="SettlementType" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Defines calculation capabilities depending on measurements</xs:documentation>
-				</xs:annotation>
+			<xs:element name="Settlements" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Settlement" type="SettlementType" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Defines calculation capabilities depending on measurements
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
-			<xs:element name="ReferenceGroup" type="ReferenceGroupType" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>m:n relationship between measurements and settlements. Also supports
-						referencing settlements from settlements for intermediate calculations.
-					</xs:documentation>
-				</xs:annotation>
+			<xs:element name="ReferenceGroups" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReferenceGroup" type="ReferenceGroupType" minOccurs="1"
+							maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>m:n relationship between measurements and settlements. Also supports
+									referencing settlements from settlements for intermediate calculations.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
-			<xs:element name="TransitionGroup" type="TransitionGroupType" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>m:n relationship between transitions and settlements</xs:documentation>
-				</xs:annotation>
+			<xs:element name="TransitionGroups" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TransitionGroup" type="TransitionGroupType" minOccurs="1"
+							maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>m:n relationship between transitions and settlements</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
-			<xs:element name="Transition" type="TransitionType" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Defines trigger mechanisms</xs:documentation>
-				</xs:annotation>
+			<xs:element name="Transitions" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Transition" type="TransitionType" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Defines trigger mechanisms</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
 			<xs:element name="Scoregroup" type="ScoregroupType" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
@@ -376,10 +407,12 @@
 		<xs:attribute name="comment" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="ReferenceGroupType">
-			<xs:sequence>
-				<xs:element name="MeasurementMapping" type="MeasurementMappingType"  minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="SettlementMapping" type="SettlementMappingType"  minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
+		<xs:sequence>
+			<xs:element name="MeasurementMapping" type="MeasurementMappingType" minOccurs="0"
+				maxOccurs="unbounded" />
+			<xs:element name="SettlementMapping" type="SettlementMappingType" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
 		<xs:attribute name="referenceGroupId" type="xs:int" use="required" />
 		<xs:attribute name="referenceRule" type="reference_rule_types" use="required" />
 		<xs:attribute name="comment" type="xs:string" />

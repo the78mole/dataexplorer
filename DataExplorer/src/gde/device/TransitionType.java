@@ -263,6 +263,9 @@ public class TransitionType {
 		this.comment = value;
 	}
 
+	/**
+	 * @return true if the transition type defines a transition with a positive gradient 
+	 */
 	public boolean isGreater() {
 		return this.getValueType() == TransitionValueTypes.DELTA_FACTOR ? getThresholdValue() > 1. //
 				: this.getValueType() == TransitionValueTypes.DELTA_VALUE ? getThresholdValue() > 0. //

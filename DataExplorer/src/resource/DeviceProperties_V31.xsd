@@ -722,13 +722,13 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="referenceGroupIdDivisor" type="xs:int" use="required">
+		<xs:attribute name="referenceGroupIdDivisor" type="xs:int">
 			<xs:annotation>
 				<xs:documentation>second operand for the calculation based on recovery values
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="divisorLeveling" type="leveling_types" use="required">
+		<xs:attribute name="divisorLeveling" type="leveling_types">
 			<xs:annotation>
 				<xs:documentation>procedure how to determine the second operand (referenceGroupIdDivisor) value
 				</xs:documentation>
@@ -975,6 +975,9 @@
 	</xs:simpleType>
 	<xs:simpleType name="calculus_types">
 		<xs:restriction base="xs:string">
+			<xs:enumeration value="delta" />
+			<xs:enumeration value="delta_permille" />
+			<xs:enumeration value="relative_delta_percent" />
 			<xs:enumeration value="ratio" />
 			<xs:enumeration value="ratio_permille" />
 		</xs:restriction>

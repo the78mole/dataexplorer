@@ -21,6 +21,7 @@ package gde.device;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -111,9 +112,9 @@ public class HistoRandomSample {
 
 		// find the maximum sampling timespan
 		int proposedTimespan_ms = this.settings.getSamplingTimespan_ms();
-		List<TransitionType> transitionTypes = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransition();
+		Map<Integer, TransitionType> transitionTypes = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions();
 		if (!transitionTypes.isEmpty()) {
-			for (TransitionType transitionType : transitionTypes) {
+			for (TransitionType transitionType : transitionTypes.values()) {
 				if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 					proposedTimespan_ms = this.recordTimespan_ms;
 					if (log.isLoggable(Level.FINE))

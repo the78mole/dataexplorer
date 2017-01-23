@@ -147,7 +147,7 @@ public class Settings extends Properties {
 	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";																															//$NON-NLS-1$
 
 	final static String							IS_HISTO_ACTIVE									= "is_histo_active";																																							//$NON-NLS-1$
-	final static String							IS_QUANTILE_ACTIVE							= "is_quantile_active";																																						//$NON-NLS-1$
+	final static String							IS_SMART_STATISTICS								= "is_smart_statistics";																																					//$NON-NLS-1$
 	final static String							BOXPLOT_SCALE_ORDINAL						= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
 	final static String							BOXPLOT_SIZE_ADAPTATION_ORDINAL	= "boxplot_size_adaptation_ordinal";																															//$NON-NLS-1$
 	final static String							X_SPREAD_GRADE_ORDINAL					= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
@@ -164,6 +164,9 @@ public class Settings extends Properties {
 	final static String							MINMAX_QUANTILE_DISTANCE				= "minmax_quantile_distance";																																			//$NON-NLS-1$
 	final static String							ABSOLUTE_TRANSITION_LEVEL				= "absolute_transition_level";																																		//$NON-NLS-1$
 	final static String							IS_DATETIME_UTC									= "is_datetime_utc";																																							//$NON-NLS-1$
+	final static String							IS_DISPLAY_SETTLEMENTS					= "is_display_settlements";																																				//$NON-NLS-1$
+	final static String							IS_DISPLAY_SCORES								= "is_display_scores";																																						//$NON-NLS-1$
+	final static String							IS_DISPLAY_TAGS									= "is_display_tags";																																							//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -711,7 +714,7 @@ public class Settings extends Properties {
 
 			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_QUANTILE_ACTIVE, isQuantilesActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SMART_STATISTICS, isSmartStatistics())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, getBoxplotScaleOrdinal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
@@ -728,6 +731,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MINMAX_QUANTILE_DISTANCE, getMinmaxQuantileDistance())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ABSOLUTE_TRANSITION_LEVEL, getAbsoluteTransitionLevel())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATETIME_UTC, isDateTimeUtc())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SETTLEMENTS, isDisplaySettlements())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SCORES, isDisplayScores())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_TAGS, isDisplayTags())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2369,18 +2375,18 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set boolean value if the history analysis contains quantile values
+	 * set boolean value if the history analysis contains quantile values instead on the legacy statistics
 	 * @param isActive
 	 */
-	public void setQuantilesActive(boolean isActive) {
-		this.setProperty(Settings.IS_QUANTILE_ACTIVE, String.valueOf(isActive));
+	public void setSmartStatistics(boolean isActive) {
+		this.setProperty(Settings.IS_SMART_STATISTICS, String.valueOf(isActive));
 	}
 
 	/**
-	 * @return boolean true if the history analysis contains quantile values
+	 * @return boolean true if the history analysis contains quantile values instead on the legacy statistics
 	 */
-	public boolean isQuantilesActive() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_QUANTILE_ACTIVE, "false")); //$NON-NLS-1$
+	public boolean isSmartStatistics() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SMART_STATISTICS, "true")); //$NON-NLS-1$
 	}
 
 	/**
@@ -2701,6 +2707,48 @@ public class Settings extends Properties {
 	 */
 	public boolean isDateTimeUtc() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_DATETIME_UTC, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param isDisplayActive true if the log properties are displayed in the histo table tab
+	 */
+	public void setDisplayTags(boolean isDisplayActive) {
+		this.setProperty(Settings.IS_DISPLAY_TAGS, String.valueOf(isDisplayActive));
+	}
+
+	/**
+	 * @return true if the log properties are displayed in the histo table tab
+	 */
+	public boolean isDisplayTags() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DISPLAY_TAGS, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param isDisplayActive true if the history scores are displayed in the histo tabs
+	 */
+	public void setDisplayScores(boolean isDisplayActive) {
+		this.setProperty(Settings.IS_DISPLAY_SCORES, String.valueOf(isDisplayActive));
+	}
+
+	/**
+	 * @return true if the history scores are displayed in the histo tabs
+	 */
+	public boolean isDisplayScores() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DISPLAY_SCORES, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param isDisplayActive true if the history settlements are displayed in the histo tabs
+	 */
+	public void setDisplaySettlements(boolean isDisplayActive) {
+		this.setProperty(Settings.IS_DISPLAY_SETTLEMENTS, String.valueOf(isDisplayActive));
+	}
+
+	/**
+	 * @return true if the history settlements are displayed in the histo tabs
+	 */
+	public boolean isDisplaySettlements() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DISPLAY_SETTLEMENTS, "false")); //$NON-NLS-1$
 	}
 
 }

@@ -21,6 +21,9 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;simpleType name="calculus_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *     &lt;enumeration value="delta"/>
+ *     &lt;enumeration value="delta_permille"/>
+ *     &lt;enumeration value="relative_delta_permille"/>
  *     &lt;enumeration value="ratio"/>
  *     &lt;enumeration value="ratio_permille"/>
  *   &lt;/restriction>
@@ -32,11 +35,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum CalculusTypes {
 
-    @XmlEnumValue("ratio")
-    RATIO("ratio"),
-    @XmlEnumValue("ratio_permille")
-    RATIO_PERMILLE("ratio_permille");
-    private final String value;
+  @XmlEnumValue("delta")
+  DELTA("delta"),
+  @XmlEnumValue("delta_permille")
+  DELTA_PERMILLE("delta_permille"),
+  @XmlEnumValue("relative_delta_percent")
+  RELATIVE_DELTA_PERCENT("relative_delta_percent"),
+  @XmlEnumValue("ratio")
+  RATIO("ratio"),
+  @XmlEnumValue("ratio_permille")
+  RATIO_PERMILLE("ratio_permille");
+  private final String value;
 
     CalculusTypes(String v) {
         value = v;

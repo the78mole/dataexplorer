@@ -949,6 +949,16 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		return hasReasonableData;
 	}
 
+	/**
+	 * @return true if the record is the scale sync master and if the record is for display according to histo display settings
+	 */
+	@Override // reason are the histo display settings which hide records
+	public boolean isScaleVisible() {
+		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoregroup() && this.settings.isDisplayScores());
+		return isValidDisplayRecord && super.isScaleVisible();
+	}
+
+
 	// WBrueg a bunch of base class methods is not applicable for this class (e.g. trigger): Common base class for TrailRecord and Record???
 
 }

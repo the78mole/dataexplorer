@@ -162,15 +162,15 @@ public class TrailRecordSet extends RecordSet {
 		{// display section 1: look for settlements at the top - settlements' ordinals start after measurements due to GraphicsTemplate compatibility
 			int myIndex = channelMeasurements.size(); // myIndex is used as recordOrdinal
 			for (SettlementType settlement : channelSettlements.values()) {
-			PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
-			if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
-				TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
-				newTrailRecordSet.put(settlement.getName(), tmpRecord);
-				tmpRecord.setColorDefaultsAndPosition(myIndex);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
+				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
+				if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
+					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
+					newTrailRecordSet.put(settlement.getName(), tmpRecord);
+					tmpRecord.setColorDefaultsAndPosition(myIndex);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				myIndex++;
 			}
-			myIndex++;
-		}
 		}
 		// display section 2: all measurements
 		for (int i = 0; i < channelMeasurements.size(); i++) {
@@ -183,15 +183,15 @@ public class TrailRecordSet extends RecordSet {
 		{// display section 3: take remaining settlements
 			int myIndex = channelMeasurements.size(); // myIndex is used as recordOrdinal
 			for (SettlementType settlement : channelSettlements.values()) {
-			PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
-			if (!(topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
-				TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
-				newTrailRecordSet.put(settlement.getName(), tmpRecord);
-				tmpRecord.setColorDefaultsAndPosition(myIndex);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
+				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
+				if (!(topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
+					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
+					newTrailRecordSet.put(settlement.getName(), tmpRecord);
+					tmpRecord.setColorDefaultsAndPosition(myIndex);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				myIndex++; // 
 			}
-			myIndex++; // 
-		}
 		}
 		// display section 4: take remaining scores
 		for (int i = 0, myIndex = channelMeasurements.size() + channelSettlements.size(); i < channelScoreGroups.size(); i++) { // myIndex is used as recordOrdinal
@@ -632,26 +632,22 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * method to get the sorted record names as array for display purpose
 	 * sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
-	 * support trail suites.
-	 * @return Record[] containing records
+	 * @return all measurement records and settlement / score records based on display settings 
 	 */
-	@Override // reason is:The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
+	@Override // reasons: 1. Harmonize display records collections  2. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
 	public Record[] getRecordsSortedForDisplay() {
 		Vector<Record> displayRecords = new Vector<Record>();
 		// add the record with horizontal grid
-		for (Record record : this.values()) {
-			log.log(Level.FINER, record.name);
+		for (Record record : this.getDisplayRecords()) {
 			if (record.ordinal == this.horizontalGridRecordOrdinal) displayRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
-		for (int i = 0; i < this.size(); ++i) {
-			final Record record = this.get(i);
+		for (Record record : this.getDisplayRecords()) {
 			if (record.ordinal != this.horizontalGridRecordOrdinal && record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 		// add all others
-		for (int i = 0; i < this.size(); ++i) {
-			final Record record = this.get(i);
-			if (record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
+		for (Record record : this.getDisplayRecords()) {
+				if (record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 
 		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
@@ -680,7 +676,7 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * update the collection of visible and displayable records in this record set for table view.
+	 * update the collection of visible and displayable records in this record set.
 	 * the sort order conforms to the record insertion order.
 	 */
 	@Override // reason is display sequence independent from record names sequence (record ordinal)
@@ -690,20 +686,14 @@ public class TrailRecordSet extends RecordSet {
 		// get by insertion order
 		for (Map.Entry<String, Record> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
-			record.setDisplayable(record.isActive() && record.hasReasonableData());
-			if (record.isVisible && record.isDisplayable) //only selected records get displayed
-				this.visibleAndDisplayableRecords.add(record);
-			if (record.isDisplayable) // only records with reasonable data get displayed
-				this.allRecords.add(record);
+			if (record.isMeasurement() || (record.isSettlement() && this.settings.isDisplaySettlements()) || (record.isScoregroup() && this.settings.isDisplayScores())) {
+				record.setDisplayable(record.isActive() && record.hasReasonableData());
+				if (record.isVisible && record.isDisplayable) //only selected records get displayed
+					this.visibleAndDisplayableRecords.add(record);
+				if (record.isDisplayable) // only records with reasonable data get displayed
+					this.allRecords.add(record);
+			}
 		}
-	}
-
-	/**
-	 * @return visible and displayable records (p.e. to build the partial data table) in record insertion order.
-	 */
-	@Override // reason is display sequence independent from record names sequence (record ordinal)
-	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
-		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords;
 	}
 
 	/**
@@ -760,7 +750,7 @@ public class TrailRecordSet extends RecordSet {
 		if (this.settings.isXAxisReversed()) {
 			for (int i = 0; i < this.timeStep_ms.size(); i++) {
 				StringBuilder sb = new StringBuilder();
-				sb.append(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeStep_ms.getTime_ms(i))); 
+				sb.append(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeStep_ms.getTime_ms(i)));
 				headerRow[i] = sb.toString();
 			}
 		}

@@ -677,8 +677,15 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
-	public Vector<Record> getVisibleAndDisplayableRecordsForMeasurement() {
+	public Vector<Record> getVisibleAndDisplayableRecords() {
 		return this.visibleAndDisplayableRecords;
+	}
+
+	/**
+	 * @return all records for display
+	 */
+	public Vector<Record> getDisplayRecords() {
+		return this.allRecords;
 	}
 
 	/**

@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -119,6 +118,18 @@ public class HistoSettlement extends Vector<Integer> {
 		}
 
 		/**
+		 * @return true if at least one of the records contains reasonable data which can be displayed
+		 */
+		public boolean hasReasonableData() {
+			for (Record record : this.records) {
+				if (record.hasReasonableData()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
 		 * @param fromIndex
 		 * @param toIndex
 		 * @return the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal a NoSuchElementException is thrown.) 
@@ -128,72 +139,44 @@ public class HistoSettlement extends Vector<Integer> {
 		}
 
 		public double getPropertyFactor() {
-			String factor = this.records[0].getProperty(IDevice.FACTOR).getValue();
+			double factor = this.records[0].getFactor();
 			for (Record record : this.records) {
-				if (factor.equals(record.getProperty(IDevice.FACTOR))) throw new UnsupportedOperationException();
+				if (factor != record.getFactor()) throw new UnsupportedOperationException();
 			}
-			return Double.valueOf(factor);
+			return factor;
 		}
 
 		/**
-		 * @param index
-		 * @return the aggregated un-translated value at this real index position (irrespective of zoom / scope)
+		 * @return the aggregated translated maximum value
 		 */
-		public Integer getRaw(int index) {
-			Double result = 0.;
+		public double getRealMax() {
+			double result = 0;
 			for (int i = 0; i < this.records.length; i++) {
 				Record record = this.records[i];
-				if (record.realRealGet(index) == null) {
-					result = null;
-					break;
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.AVG) {
-					result += ((double) record.realRealGet(index) - result) / (i + 1);
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MAX) {
-					if (i == 0)
-						result = (double) record.realRealGet(index);
-					else
-						result = Math.max(result, (double) record.realRealGet(index));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MIN) {
-					if (i == 0)
-						result = (double) record.realRealGet(index);
-					else
-						result = Math.max(result, (double) record.realRealGet(index));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.PRODUCT) {
-					if (i == 0)
-						result = (double) record.realRealGet(index);
-					else
-						result *= (double) record.realRealGet(index);
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.QUOTIENT) {
-					if (i == 0)
-						result = (double) record.realRealGet(index);
-					else
-						result /= (double) record.realRealGet(index);
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SPREAD) {
-					if (i == 0)
-						result = (double) record.realRealGet(index);
-					else
-						result -= (double) record.realRealGet(index);
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SUM) {
-					result += (double) record.realRealGet(index);
-				}
-				else
-					throw new UnsupportedOperationException();
+				final double translatedValue = this.device.translateValue(record, record.getRealMaxValue());
+				result = calculateAggregate(result, i, translatedValue);
 			}
-			return result == null ? null : result.intValue();
+			return result;
+		}
+
+		/**
+		 * @return the aggregated translated minimum value
+		 */
+		public double getRealMin() {
+			double result = 0;
+			for (int i = 0; i < this.records.length; i++) {
+				Record record = this.records[i];
+				final double translatedValue = this.device.translateValue(record, record.getRealMinValue());
+				result = calculateAggregate(result, i, translatedValue);
+			}
+			return result;
 		}
 
 		/**
 		 * @param index
 		 * @return the aggregated translated value at this real index position (irrespective of zoom / scope)
 		 */
-		public Double get(int index) {
+		public Double getReal(int index) {
 			Double result = 0.;
 			for (int i = 0; i < this.records.length; i++) {
 				Record record = this.records[i];
@@ -201,46 +184,60 @@ public class HistoSettlement extends Vector<Integer> {
 					result = null;
 					break;
 				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.AVG) {
-					result += (this.device.translateValue(record, record.realRealGet(index)) - result) / (i + 1);
+				else {
+					final double translatedValue = this.device.translateValue(record, record.realRealGet(index));
+					result = calculateAggregate(result, i, translatedValue);
 				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MAX) {
-					if (i != 0)
-						result = Math.max(result, this.device.translateValue(record, record.realRealGet(index)));
-					else
-						result = this.device.translateValue(record, record.realRealGet(index));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MIN) {
-					if (i == 0)
-						result = this.device.translateValue(record, record.realRealGet(index));
-					else
-						result = Math.max(result, this.device.translateValue(record, record.realRealGet(index)));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.PRODUCT) {
-					if (i == 0)
-						result = this.device.translateValue(record, record.realRealGet(index));
-					else
-						result *= this.device.translateValue(record, record.realRealGet(index));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.QUOTIENT) {
-					if (i == 0)
-						result = this.device.translateValue(record, record.realRealGet(index));
-					else
-						result /= this.device.translateValue(record, record.realRealGet(index));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SPREAD) {
-					if (i == 0)
-						result = this.device.translateValue(record, record.realRealGet(index));
-					else
-						result -= this.device.translateValue(record, record.realRealGet(index));
-				}
-				else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SUM) {
-					result += this.device.translateValue(record, record.realRealGet(index));
-				}
-				else
-					throw new UnsupportedOperationException();
 			}
 			return result;
+		}
+
+		/**
+		 * @param recurrentResult from the previous aggregation step
+		 * @param aggregationStepIndex is the 0-based number of the current aggregation step
+		 * @param translatedValue
+		 * @return the recurrentResult aggregated based on the translated value
+		 */
+		private double calculateAggregate(double recurrentResult, int aggregationStepIndex, final double translatedValue) {
+			if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.AVG) {
+				recurrentResult += (translatedValue - recurrentResult) / (aggregationStepIndex + 1);
+			}
+			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MAX) {
+				if (aggregationStepIndex != 0)
+					recurrentResult = Math.max(recurrentResult, translatedValue);
+				else
+					recurrentResult = translatedValue;
+			}
+			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MIN) {
+				if (aggregationStepIndex == 0)
+					recurrentResult = translatedValue;
+				else
+					recurrentResult = Math.max(recurrentResult, translatedValue);
+			}
+			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.PRODUCT) {
+				if (aggregationStepIndex == 0)
+					recurrentResult = translatedValue;
+				else
+					recurrentResult *= translatedValue;
+			}
+			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.QUOTIENT) {
+				if (aggregationStepIndex == 0)
+					recurrentResult = translatedValue;
+				else
+					recurrentResult /= translatedValue;
+			}
+			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SPREAD) {
+				if (aggregationStepIndex == 0)
+					recurrentResult = translatedValue;
+				else
+					recurrentResult -= translatedValue;
+			}
+			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SUM) {
+				recurrentResult += translatedValue;
+			}
+			else
+				throw new UnsupportedOperationException();
+			return recurrentResult;
 		}
 
 		/**
@@ -259,7 +256,7 @@ public class HistoSettlement extends Vector<Integer> {
 			int recordSize = toIndex - fromIndex;
 			Vector<Double> result = new Vector<Double>(recordSize);
 			for (int i = fromIndex; i < toIndex; i++) {
-				result.add(get(i));
+				result.add(getReal(i));
 			}
 			log.log(Level.FINER, getComment(), result);
 			return result;
@@ -327,15 +324,13 @@ public class HistoSettlement extends Vector<Integer> {
 	/**
 	 * walks through the measurement record and calculates the difference between the threshold level value and the base level value (reference or recovery).
 	 * skips null measurement values. 
-	 * @param record holds the measurement points
+	 * @param recordGroup holds the measurement points
 	 * @param leveling rule for determining the level value from the device configuration
 	 * @param transition holds the transition properties which are used to access the measurement data
 	 * @return peak spread value as translatedValue
 	 */
-	private double calculateLevelDelta(int referenceGroupId, LevelingTypes leveling, Transition transition) {
+	private double calculateLevelDelta(RecordGroup recordGroup, LevelingTypes leveling, Transition transition) {
 		double deltaValue = 0.;
-		final ChannelType logChannel = this.device.getDeviceConfiguration().getChannel(this.logChannelNumber);
-		final RecordGroup recordGroup = new RecordGroup(this.device, this.parent, logChannel.getReferenceGroupById(referenceGroupId));
 		TransitionCalculusType transitionCalculus = this.settlement.getEvaluation().getTransitionCalculus();
 
 		// determine the direction of the peak or pulse or jump
@@ -356,7 +351,7 @@ public class HistoSettlement extends Vector<Integer> {
 		double recoveryExtremum = 0.;
 		if (leveling == LevelingTypes.FIRST) {
 			for (int j = transition.referenceStartIndex; j < transition.referenceEndIndex + 1; j++) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) {
 					referenceExtremum = aggregatedValue;
 					break;
@@ -364,7 +359,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			// one additional time step before and after in order to cope with potential measurement latencies
 			for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) {
 					thresholdExtremum = aggregatedValue;
 					break;
@@ -372,7 +367,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			if (transition.recoveryStartIndex > 0) {
 				for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) {
 						recoveryExtremum = aggregatedValue;
 						break;
@@ -382,7 +377,7 @@ public class HistoSettlement extends Vector<Integer> {
 		}
 		else if (leveling == LevelingTypes.LAST) {
 			for (int j = transition.referenceEndIndex; j >= transition.referenceStartIndex; j--) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) {
 					referenceExtremum = aggregatedValue;
 					break;
@@ -390,7 +385,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			// one additional time step before and after in order to cope with potential measurement latencies
 			for (int j = transition.thresholdEndIndex + 1; j >= transition.thresholdStartIndex - 1; j--) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) {
 					thresholdExtremum = aggregatedValue;
 					break;
@@ -398,7 +393,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			if (transition.recoveryStartIndex > 0) {
 				for (int j = transition.recoveryEndIndex; j >= transition.recoveryStartIndex; j--) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) {
 						recoveryExtremum = aggregatedValue;
 						break;
@@ -410,12 +405,12 @@ public class HistoSettlement extends Vector<Integer> {
 			if (transition.referenceSize > 1) {
 				int midIndex = (transition.referenceStartIndex + transition.referenceEndIndex) / 2;
 				for (int i = midIndex, j = midIndex + 1; i <= transition.referenceEndIndex && j >= transition.referenceStartIndex; i++, j--) {
-					Double aggregatedValue = recordGroup.get(i);
+					Double aggregatedValue = recordGroup.getReal(i);
 					if (aggregatedValue != null) {
 						referenceExtremum = aggregatedValue;
 						break;
 					}
-					aggregatedValue = recordGroup.get(j);
+					aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) {
 						referenceExtremum = aggregatedValue;
 						break;
@@ -423,17 +418,17 @@ public class HistoSettlement extends Vector<Integer> {
 				}
 			}
 			else {
-				referenceExtremum = recordGroup.get(transition.referenceStartIndex);
+				referenceExtremum = recordGroup.getReal(transition.referenceStartIndex);
 			}
 			if (transition.thresholdSize > 1) {
 				int midIndex = (transition.thresholdStartIndex + transition.thresholdEndIndex) / 2;
 				for (int i = midIndex, j = midIndex; i <= transition.thresholdEndIndex && j >= transition.thresholdStartIndex; j--) {
-					Double aggregatedValue = recordGroup.get(i);
+					Double aggregatedValue = recordGroup.getReal(i);
 					if (aggregatedValue != null) {
 						thresholdExtremum = aggregatedValue;
 						break;
 					}
-					aggregatedValue = recordGroup.get(j);
+					aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) {
 						thresholdExtremum = aggregatedValue;
 						break;
@@ -441,18 +436,18 @@ public class HistoSettlement extends Vector<Integer> {
 				}
 			}
 			else {
-				thresholdExtremum = recordGroup.get(transition.thresholdStartIndex);
+				thresholdExtremum = recordGroup.getReal(transition.thresholdStartIndex);
 			}
 			if (transition.recoveryStartIndex > 0) {
 				if (transition.recoverySize > 1) {
 					int midIndex = (transition.recoveryStartIndex + transition.recoveryEndIndex) / 2;
 					for (int i = midIndex, j = midIndex; i <= transition.recoveryEndIndex && j >= transition.recoveryStartIndex; j--) {
-						Double aggregatedValue = recordGroup.get(i);
+						Double aggregatedValue = recordGroup.getReal(i);
 						if (aggregatedValue != null) {
 							recoveryExtremum = aggregatedValue;
 							break;
 						}
-						aggregatedValue = recordGroup.get(j);
+						aggregatedValue = recordGroup.getReal(j);
 						if (aggregatedValue != null) {
 							recoveryExtremum = aggregatedValue;
 							break;
@@ -460,7 +455,7 @@ public class HistoSettlement extends Vector<Integer> {
 					}
 				}
 				else {
-					recoveryExtremum = recordGroup.get(transition.recoveryStartIndex);
+					recoveryExtremum = recordGroup.getReal(transition.recoveryStartIndex);
 				}
 			}
 		}
@@ -468,7 +463,7 @@ public class HistoSettlement extends Vector<Integer> {
 			double value = 0.;
 			int skipCount = 0;
 			for (int j = transition.referenceStartIndex; j < transition.referenceEndIndex + 1; j++) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null)
 					value += (aggregatedValue - value) / (j - transition.referenceStartIndex + 1);
 				else
@@ -479,7 +474,7 @@ public class HistoSettlement extends Vector<Integer> {
 			skipCount = 0;
 			// one additional time step before and after in order to cope with potential measurement latencies
 			for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null)
 					value += (aggregatedValue - value) / (j - transition.thresholdStartIndex + 1);
 				else
@@ -490,7 +485,7 @@ public class HistoSettlement extends Vector<Integer> {
 				value = 0.;
 				skipCount = 0;
 				for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null)
 						value += (aggregatedValue - value) / (j - transition.recoveryStartIndex + 1);
 					else
@@ -503,19 +498,19 @@ public class HistoSettlement extends Vector<Integer> {
 			if (isPositiveDirection) {
 				referenceExtremum = Double.MAX_VALUE;
 				for (int j = transition.referenceStartIndex; j < transition.referenceEndIndex + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null && aggregatedValue < referenceExtremum) referenceExtremum = aggregatedValue;
 				}
 				thresholdExtremum = -Double.MAX_VALUE;
 				// one additional time step before and after in order to cope with potential measurement latencies
 				for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null && aggregatedValue > thresholdExtremum) thresholdExtremum = aggregatedValue;
 				}
 				if (transition.recoveryStartIndex > 0) {
 					recoveryExtremum = Double.MAX_VALUE;
 					for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
-						Double aggregatedValue = recordGroup.get(j);
+						Double aggregatedValue = recordGroup.getReal(j);
 						if (aggregatedValue != null && aggregatedValue < recoveryExtremum) recoveryExtremum = aggregatedValue;
 					}
 				}
@@ -523,19 +518,19 @@ public class HistoSettlement extends Vector<Integer> {
 			else {
 				referenceExtremum = -Double.MAX_VALUE;
 				for (int j = transition.referenceStartIndex; j < transition.referenceEndIndex + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null && aggregatedValue > referenceExtremum) referenceExtremum = aggregatedValue;
 				}
 				thresholdExtremum = Double.MAX_VALUE;
 				// one additional time step before and after in order to cope with potential measurement latencies
 				for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null && aggregatedValue < thresholdExtremum) thresholdExtremum = aggregatedValue;
 				}
 				if (transition.recoveryStartIndex > 0) {
 					recoveryExtremum = -Double.MAX_VALUE;
 					for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
-						Double aggregatedValue = recordGroup.get(j);
+						Double aggregatedValue = recordGroup.getReal(j);
 						if (aggregatedValue != null && aggregatedValue > recoveryExtremum) recoveryExtremum = aggregatedValue;
 					}
 				}
@@ -544,7 +539,7 @@ public class HistoSettlement extends Vector<Integer> {
 		else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
 			List<Double> values = new ArrayList<Double>();
 			for (int j = transition.referenceStartIndex; j < transition.referenceEndIndex + 1; j++) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
 			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class));
@@ -552,7 +547,7 @@ public class HistoSettlement extends Vector<Integer> {
 			values = new ArrayList<Double>();
 			// one additional time step before and after in order to cope with potential measurement latencies
 			for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
-				Double aggregatedValue = recordGroup.get(j);
+				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
 			quantile = new Quantile(values, EnumSet.noneOf(Fixings.class));
@@ -560,7 +555,7 @@ public class HistoSettlement extends Vector<Integer> {
 			if (transition.recoveryStartIndex > 0) {
 				values = new ArrayList<Double>();
 				for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
-					Double aggregatedValue = recordGroup.get(j);
+					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
 				quantile = new Quantile(values, EnumSet.noneOf(Fixings.class));
@@ -700,29 +695,47 @@ public class HistoSettlement extends Vector<Integer> {
 		log.log(Level.FINEST, GDE.STRING_GREATER, calculus);
 		final ChannelType logChannel = this.device.getDeviceConfiguration().getChannel(this.logChannelNumber);
 		final RecordGroup recordGroup = new RecordGroup(this.device, this.parent, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
-		final int reverseTranslatedResult;
-		if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
-			final double denominator = calculateLevelDelta(calculus.getReferenceGroupId(), calculus.getLeveling(), transition);
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator + recordGroup.getSubGrouped(transition.referenceStartIndex, transition.thresholdEndIndex + 1)); //$NON-NLS-1$
-			final RecordGroup divisorRecordGroup = new RecordGroup(this.device, this.parent, logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
-			final double divisor = calculateLevelDelta(calculus.getReferenceGroupIdDivisor(), calculus.getDivisorLeveling(), transition);
-			if (calculus.getCalculusType() == CalculusTypes.RATIO) {
-				reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000. * denominator / divisor) : (int) (1000. * denominator / divisor); // all internal values are multiplied by 1000
+		if (recordGroup.hasReasonableData()) {
+			final int reverseTranslatedResult;
+			if (calculus.getCalculusType() == CalculusTypes.DELTA) {
+				final double deltaValue = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
+				reverseTranslatedResult = (int) reverseTranslateValue(calculus.isUnsigned() ? (int) Math.abs(deltaValue) : (int) (deltaValue));
+			}
+			else if (calculus.getCalculusType() == CalculusTypes.DELTA_PERMILLE) {
+				final double deltaValue = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
+				reverseTranslatedResult = (int) reverseTranslateValue(calculus.isUnsigned() ? (int) Math.abs(1000. * deltaValue) : (int) (1000. * deltaValue));
+			}
+			else if (calculus.getCalculusType() == CalculusTypes.RELATIVE_DELTA_PERCENT) {
+				final double relativeDeltaValue = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition) / (recordGroup.getRealMax() - recordGroup.getRealMin());
+				reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000. * 100. * relativeDeltaValue) : (int) (1000. * 100. * relativeDeltaValue);  // all internal values are multiplied by 1000
+			}
+			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
+				final double denominator = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
+				if (log.isLoggable(Level.FINER))
+					log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator + recordGroup.getSubGrouped(transition.referenceStartIndex, transition.thresholdEndIndex + 1)); //$NON-NLS-1$
+				final RecordGroup divisorRecordGroup = new RecordGroup(this.device, this.parent, logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
+				if (!divisorRecordGroup.hasReasonableData()) {
+					return;
+				}
+
+				final double divisor = calculateLevelDelta(divisorRecordGroup, calculus.getDivisorLeveling(), transition);
+				if (calculus.getCalculusType() == CalculusTypes.RATIO) {
+					reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000. * denominator / divisor) : (int) (1000. * denominator / divisor); // all internal values are multiplied by 1000
+				}
+				else {
+					reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000. * 1000. * denominator / divisor) : (int) (1000. * 1000. * denominator / divisor); // all internal values are multiplied by 1000
+				}
 			}
 			else {
-				reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000000. * denominator / divisor) : (int) (1000000. * denominator / divisor); // all internal values are multiplied by 1000, ratio in permille
+				reverseTranslatedResult = 0;
+				throw new UnsupportedOperationException();
 			}
+			// add to settlement record  
+			addNullableRaw(reverseTranslatedResult, (long) this.parent.getTime_ms(transition.thresholdStartIndex) * 10);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
+						, reverseTranslatedResult, calculus.getCalculusType()));
 		}
-		else {
-			reverseTranslatedResult = 0;
-			throw new UnsupportedOperationException();
-		}
-		// add to settlement record  
-		addNullableRaw(reverseTranslatedResult, (long) this.parent.getTime_ms(transition.thresholdStartIndex) * 10);
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
-					, reverseTranslatedResult, calculus.getCalculusType()));
 	}
 
 	/**
@@ -811,8 +824,9 @@ public class HistoSettlement extends Vector<Integer> {
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null)
 			value = Double.valueOf(property.getValue()).doubleValue();
-		else
-			throw new UnsupportedOperationException();
+		else {
+			// take default
+		}
 		return value;
 	}
 
@@ -829,8 +843,9 @@ public class HistoSettlement extends Vector<Integer> {
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
 			value = Double.valueOf(property.getValue()).doubleValue();
-		else
-			throw new UnsupportedOperationException();
+		else {
+			// take default
+		}
 		return value;
 	}
 
@@ -848,7 +863,7 @@ public class HistoSettlement extends Vector<Integer> {
 		if (property != null)
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else {
-			throw new UnsupportedOperationException();
+			// take default
 		}
 		return value;
 	}

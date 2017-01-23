@@ -281,7 +281,7 @@ public class HistoTableWindow extends CTabItem {
 						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
 						item.setText(trailRecord.getHistoTableRow());
 					}
-					else {
+					else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
 						item.setText(trailRecordSet.getTagTableRow(index));
 					}
@@ -385,7 +385,7 @@ public class HistoTableWindow extends CTabItem {
 			boolean isValid = true;
 			for (int i = 0; i < tableHeaderRow.length; i++) {
 				isValid = tableHeaderRow[i].equals(this.dataTable.getColumn(i + 2).getText());
-				if (!isValid) 
+				if (!isValid) //
 					break;
 			}
 			return isValid;
@@ -407,7 +407,7 @@ public class HistoTableWindow extends CTabItem {
 			else {
 				isValid = tableItem.getText().isEmpty();
 			}
-			if (!isValid) 
+			if (!isValid) //
 				break;
 		}
 		return isValid;

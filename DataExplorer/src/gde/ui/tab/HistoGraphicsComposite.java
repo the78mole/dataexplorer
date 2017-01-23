@@ -1826,7 +1826,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE + 1, SWT.BOLD)); //$NON-NLS-1$
-			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecordsForMeasurement();
+			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecords();
 			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
 			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET)))); //$NON-NLS-1$
 			for (Record record : records) {

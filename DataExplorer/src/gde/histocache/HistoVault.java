@@ -69,6 +69,7 @@ import gde.data.TrailRecord.TrailType;
 import gde.device.EvaluationType;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.device.ReferenceGroupType;
 import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
@@ -646,6 +647,7 @@ public class HistoVault {
 	 *     
 	 */
 	public HashMap<Integer, CompartmentType> getMeasurements() {
+		if (this.measurements == null) this.measurements = new HashMap<Integer, CompartmentType>();
 		return measurements;
 	}
 
@@ -670,9 +672,7 @@ public class HistoVault {
 	 *     
 	 */
 	public HashMap<Integer, CompartmentType> getSettlements() {
-		if (this.settlements == null) {
-			this.settlements = new HashMap<Integer, CompartmentType>();
-		}
+		if (this.settlements == null) this.settlements = new HashMap<Integer, CompartmentType>();
 		return settlements;
 	}
 
@@ -697,9 +697,7 @@ public class HistoVault {
 	 *     
 	 */
 	public HashMap<Integer, PointType> getScores() {
-		if (this.scores == null) {
-			this.scores = new HashMap<Integer, PointType>();
-		}
+		if (this.scores == null) this.scores = new HashMap<Integer, PointType>();
 		return scores;
 	}
 
@@ -782,9 +780,6 @@ public class HistoVault {
 			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
 		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName,
 				logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey);
-		newHistoVault.measurements = new HashMap<Integer, CompartmentType>();
-		newHistoVault.settlements = new HashMap<Integer, CompartmentType>();
-		newHistoVault.scores = new HashMap<Integer, PointType>();
 		return newHistoVault;
 	}
 
@@ -1060,7 +1055,7 @@ public class HistoVault {
 				for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 					MeasurementType measurementType = channelMeasurements.get(i);
 					CompartmentType entryPoints = new CompartmentType(i, measurementType.getName());
-					this.measurements.put(i, entryPoints);
+					this.getMeasurements().put(i, entryPoints);
 					entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 					Record record = recordSet.get(recordSet.getRecordNames()[i]);
@@ -1173,7 +1168,7 @@ public class HistoVault {
 					// step: calculate the histo settlements
 					LinkedHashMap<String, HistoSettlement> histoSettlements = new LinkedHashMap<String, HistoSettlement>();
 					if (transitions.getTransitionCount() > 0) { // todo implement evaluations w/o transitions
-						for (SettlementType settlementType : this.device.getDeviceConfiguration().getChannel(this.logChannelNumber).getSettlement()) {
+						for (SettlementType settlementType : this.device.getDeviceConfiguration().getChannel(this.logChannelNumber).getSettlements().values()) {
 							if (settlementType.getEvaluation() != null) { // todo decide if evaluations without transition are useful
 								final TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
 								final TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
@@ -1205,7 +1200,7 @@ public class HistoVault {
 						HistoSettlement histoSettlement = entry.getValue();
 						SettlementType settlementType = histoSettlement.getSettlement();
 						CompartmentType entryPoints = new CompartmentType(settlementType.getSettlementId(), settlementType.getName());
-						this.settlements.put(settlementType.getSettlementId(), entryPoints);
+						this.getSettlements().put(settlementType.getSettlementId(), entryPoints);
 						entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 						if (histoSettlement.realSize() > 0 && settlementType.getEvaluation() != null) {
@@ -1245,7 +1240,7 @@ public class HistoVault {
 							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
 							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
 						}
-						log.log(Level.FINER, histoSettlement.getName() + " data ", this.settlements); //$NON-NLS-1$
+						log.log(Level.FINER, histoSettlement.getName() + " data ", this.getSettlements()); //$NON-NLS-1$
 					}
 					{
 						// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
@@ -1256,13 +1251,12 @@ public class HistoVault {
 						scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (recordSet.getSigmaTimeStep_ms() * 1000.);
 						scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = recordSet.getRecordDataSize(true);
 
-						this.scores = new HashMap<Integer, PointType>();
 						for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
 							if (scorePoints[scoreLabelTypes.ordinal()] != null) {
-								this.scores.put(scoreLabelTypes.ordinal(), new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]));
+								this.getScores().put(scoreLabelTypes.ordinal(), new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]));
 							}
 						}
-						log.log(Level.FINE, "scores ", this.scores); //$NON-NLS-1$
+						log.log(Level.FINE, "scores ", this.getScores()); //$NON-NLS-1$
 					}
 				}
 			}
@@ -1274,7 +1268,7 @@ public class HistoVault {
 	 * @return empty in case of unavailable measurement
 	 */
 	public HashMap<Integer, PointType> getMeasurementPoints(int measurementOrdinal) {
-		return this.measurements.containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>() : this.measurements.get(measurementOrdinal).getTrails();
+		return this.getMeasurements().containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>() : this.getMeasurements().get(measurementOrdinal).getTrails();
 	}
 
 	/**
@@ -1283,8 +1277,8 @@ public class HistoVault {
 	 * @return null in case of unavailable measurement or trail
 	 */
 	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) { // todo handle xml null values for points
-		if (this.measurements.containsKey(measurementOrdinal)) {
-			return this.measurements.get(measurementOrdinal).getTrails().containsKey(trailOrdinal) ? this.measurements.get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal) ? this.getMeasurements().get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
 		}
 		else {
 			return null;
@@ -1296,7 +1290,7 @@ public class HistoVault {
 	 * @return empty in case of unavailable settlementId
 	 */
 	public HashMap<Integer, PointType> getSettlementPoints(int settlementId) {
-		return this.settlements.containsKey(settlementId) ? new HashMap<Integer, PointType>() : this.settlements.get(settlementId).getTrails();
+		return this.getSettlements().containsKey(settlementId) ? new HashMap<Integer, PointType>() : this.getSettlements().get(settlementId).getTrails();
 	}
 
 	/**
@@ -1305,8 +1299,8 @@ public class HistoVault {
 	 * @return null in case of unavailable settlement or trail
 	 */
 	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
-		if (this.settlements.containsKey(settlementId)) {
-				return this.settlements.get(settlementId).getTrails().containsKey(trailOrdinal) ? this.settlements.get(settlementId).getTrails().get(trailOrdinal).value : null;
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal) ? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
 		}
 		else {
 			return null;
@@ -1314,7 +1308,7 @@ public class HistoVault {
 	}
 
 	public HashMap<Integer, PointType> getScorePoints() {
-		return this.scores;
+		return this.getScores();
 	}
 
 	/**
@@ -1322,7 +1316,7 @@ public class HistoVault {
 	 * @return null in case of unavailable score
 	 */
 	public Integer getScorePoint(int scoreLabelOrdinal) {
-		return this.scores.get(scoreLabelOrdinal).getValue();
+		return this.getScores().get(scoreLabelOrdinal).getValue();
 	}
 
 	/**
@@ -1358,7 +1352,7 @@ public class HistoVault {
 	}
 
 	public boolean isTruss() {
-		return this.measurements.isEmpty();
+		return this.getMeasurements().isEmpty();
 	}
 
 	@Override
@@ -1384,16 +1378,17 @@ public class HistoVault {
 		@Override
 		public HashMap<Integer, CompartmentType> unmarshal(CompartmentsType values) {
 			HashMap<Integer, CompartmentType> map = new HashMap<Integer, CompartmentType>();
-			for (CompartmentType value : values.compartment)
-				map.put(value.id, value);
+			if (values != null) {
+				for (CompartmentType value : values.compartment)
+					map.put(value.id, value);
+			}
 			return map;
 		}
 
 		@Override
 		public CompartmentsType marshal(HashMap<Integer, CompartmentType> map) {
 			CompartmentsType aList = new CompartmentsType();
-			Collection<CompartmentType> values = map.values();
-			aList.compartment = new ArrayList<CompartmentType>(values);
+			aList.compartment = map == null ? new ArrayList<CompartmentType>() : new ArrayList<CompartmentType>(map.values());
 			return aList;
 		}
 	}
@@ -1406,16 +1401,17 @@ public class HistoVault {
 		@Override
 		public HashMap<Integer, PointType> unmarshal(PointsType values) {
 			HashMap<Integer, PointType> map = new HashMap<Integer, PointType>();
-			for (PointType value : values.point)
-				map.put(value.id, value);
+			if (values != null) {
+				for (PointType value : values.point)
+					map.put(value.id, value);
+			}
 			return map;
 		}
 
 		@Override
 		public PointsType marshal(HashMap<Integer, PointType> map) {
 			PointsType aList = new PointsType();
-			Collection<PointType> values = map.values();
-			aList.point = new ArrayList<PointType>(values);
+			aList.point = map == null ? new ArrayList<PointType>() : new ArrayList<PointType>(map.values());
 			return aList;
 		}
 	}

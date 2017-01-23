@@ -193,7 +193,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		this.trailRecordSet = null;
 		if (log.isLoggable(Level.OFF))
 			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
-				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
+					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
 	/* 
@@ -213,7 +213,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		// this.trailRecordSet = null;
 		if (log.isLoggable(Level.OFF))
 			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
-				this.application.getActiveChannelNumber(), this.application.getObjectKey()));
+					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
 	public void rebuild4Test(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
@@ -267,7 +267,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		try {
 			long startTime = System.nanoTime() / 1000000;
 			boolean isRebuilt = false;
-		log.log(Level.INFO, GDE.STRING_GREATER, rebuildStep);
+			log.log(Level.FINER, GDE.STRING_GREATER, rebuildStep);
 			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(2, sThreadId);
 
 			long startTimeFileValid = new Date().getTime();
@@ -276,12 +276,13 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				if (!isHistoFilePathsValid) {
 					this.clear();
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             clear")); //$NON-NLS-1$
-					if ((new Date().getTime() - startTimeFileValid) > 0) log.log(Level.TIME, String.format("%,5d files          select folders     time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
-							new Date().getTime() - startTimeFileValid, this.histoFilePaths.size() * 1000 / (new Date().getTime() - startTimeFileValid)));
+					if ((new Date().getTime() - startTimeFileValid) > 0)
+						log.log(Level.TIME, String.format("%,5d files          select folders     time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
+								new Date().getTime() - startTimeFileValid, this.histoFilePaths.size() * 1000 / (new Date().getTime() - startTimeFileValid)));
 				}
 				else { // histo record sets are ready to use
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d files    file paths verified     time=%s [ss.SSS]", this.getHistoFilePaths().size(), //$NON-NLS-1$
-						StringHelper.getFormatedDuration("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
+							StringHelper.getFormatedDuration("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
 				}
 				if (isWithUi) this.application.setProgress(5, sThreadId);
 			}
@@ -360,7 +361,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						for (List<HistoVault> vaultList : this.values()) {
 							if (vaultList.size() > 1) {
 								for (HistoVault histoVault : vaultList) {
-								log.log(Level.WARNING, "same timeStamp: ", histoVault); //$NON-NLS-1$
+									log.log(Level.WARNING, "same timeStamp: ", histoVault); //$NON-NLS-1$
 								}
 							}
 						}
@@ -395,8 +396,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(98, sThreadId);
 			}
-			if(log.isLoggable(Level.TIME))
-				log.logp(Level.TIME, "HistoSet", "rebuild4screening()", "time = "	+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.TIME, "time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
 			return isRebuilt;
 		}
 		finally {
@@ -417,8 +417,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 */
 	private List<HistoVault> loadVaultsFromFile(Path filePath, Map<String, HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		List<HistoVault> histoVaults = null;
-		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
-		if (!supportedImportExtention.isEmpty() && filePath.toString().endsWith(supportedImportExtention) ) {
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
+				: GDE.STRING_EMPTY;
+		if (!supportedImportExtention.isEmpty() && filePath.toString().endsWith(supportedImportExtention)) {
 			histoVaults = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
 		}
 		else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
@@ -629,14 +630,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 		this.validatedDevice = this.application.getActiveDevice();
 		this.validatedChannel = this.application.getActiveChannel();
-		
+
 		//special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder
 		String validatedDeviceName = validatedDevice.getName();
 		if (validatedDeviceName.startsWith("MC3000")) {
 			validatedDeviceName = "MC3000"; //store MC3000-Set record set as well in MC3000 directory
 		}
 		else if (validatedDeviceName.startsWith("Q200")) {
-			validatedDeviceName = "Q200";	//store Q00-Set record set as well in Q200 directory
+			validatedDeviceName = "Q200"; //store Q00-Set record set as well in Q200 directory
 		}
 
 		String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();
@@ -644,7 +645,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
 		this.validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
 		this.validatedImportDir = this.settings.getSearchImportPath() && this.validatedImportDir != null ? this.validatedImportDir.resolve(subPathImport) : null;
-		this.validatedImportExtention = this.validatedDevice instanceof  IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
+		this.validatedImportExtention = this.validatedDevice instanceof IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
 
 		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.histoFilePaths.size() == 0;
 		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(validatedDeviceName) : this.validatedDevice != null);
@@ -714,7 +715,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		else
 			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });
 		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
+				: GDE.STRING_EMPTY;
 
 		boolean ask4FilesWithoutObject = isWithUi;
 		boolean ask4FilesWithOtherObject = isWithUi;
@@ -731,7 +733,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (path.equals(actualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
 						log.log(Level.FINER, "Dead OSD link " + path + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
 						if (!path.toFile().delete()) {
-							log.log(Level.FINE, "could not delete link file " , path); //$NON-NLS-1$
+							log.log(Level.FINE, "could not delete link file ", path); //$NON-NLS-1$
 						}
 					}
 					else {
