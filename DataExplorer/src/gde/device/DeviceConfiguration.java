@@ -1400,40 +1400,6 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the channel settlements by given channel configuration key (name)
-	 */
-	public List<SettlementType> getChannelSettlements(int channelConfigNumber) {
-		return this.getChannel(channelConfigNumber).getSettlement();
-	}
-
-	/**
-	 * @return the number of settlements of a channel by given channel number
-	 */
-	public int getNumberOfSettlements(int channelConfigNumber) {
-		return this.getChannel(channelConfigNumber).getSettlement().size();
-	}
-
-	/**
-	 * add (append) a new SettlementType object to channel with channel number as given
-	 * @param channelNumber
-	 * @param newSettlementType
-	 */
-	public void addSettlement2Channel(int channelNumber, SettlementType newSettlementType) {
-		this.isChangePropery = true;
-		this.getChannel(channelNumber).settlement.add(newSettlementType);
-	}
-
-	/**
-	 * remove a SettlementType object from channel with channel number as given
-	 * @param channelConfigNumber
-	 * @param removeSettlementType
-	 */
-	public void removeSettlementFromChannel(int channelConfigNumber, SettlementType removeSettlementType) {
-		this.isChangePropery = true;
-		this.getChannel(channelConfigNumber).settlement.remove(removeSettlementType);
-	}
-
-	/**
 	 * get the channel type by given channel configuration key (name)
 	 * @param channelConfigNumber
 	 * @return the channel type
@@ -1739,12 +1705,16 @@ public class DeviceConfiguration {
 			for (MeasurementType measurementType : channel.getMeasurement()) {
 				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
-			for (SettlementType settlement : channel.getSettlement()) {
+			if (channel.getSettlements() != null) {
+				for (SettlementType settlement : channel.getSettlements().values()) {
 				sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
 			}
-			for (ScoregroupType scoregroup : channel.getScoregroup()) {
+			}
+			if (channel.getScoreGroups() != null) {
+				for (ScoreGroupType scoregroup : channel.getScoreGroups().values()) {
 				sb.append(scoregroup.getName()).append(GDE.STRING_SEMICOLON);
 			}
+		}
 		}
 		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}

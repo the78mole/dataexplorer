@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -41,8 +42,8 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.device.ScoreGroupType;
 import gde.device.ScoreLabelTypes;
-import gde.device.ScoregroupType;
 import gde.device.SettlementType;
 import gde.exception.DataInconsitsentException;
 import gde.histocache.HistoVault;
@@ -141,12 +142,12 @@ public class TrailRecordSet extends RecordSet {
 		printRecordNames("createRecordSet() " + newTrailRecordSet.name + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 		newTrailRecordSet.timeStep_ms = new TimeSteps(-1, initialRecordCapacity);
 		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
-		List<SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlement();
-		List<ScoregroupType> channelScoregroups = device.getDeviceConfiguration().getChannel(channelConfigNumber).getScoregroup();
+		LinkedHashMap<Integer, SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlements();
+		LinkedHashMap<Integer, ScoreGroupType> channelScoreGroups = device.getDeviceConfiguration().getChannel(channelConfigNumber).getScoreGroups();
 
 		// display section 0: look for scores at the top - scores' ordinals start after measurements + settlements due to GraphicsTemplate compatibility
-		for (int i = 0, myIndex = channelMeasurements.size() + channelSettlements.size(); i < channelScoregroups.size(); i++) { // myIndex is used as recordOrdinal
-			ScoregroupType scoregroup = channelScoregroups.get(i);
+		for (int i = 0, myIndex = channelMeasurements.size() + channelSettlements.size(); i < channelScoreGroups.size(); i++) { // myIndex is used as recordOrdinal
+			ScoreGroupType scoregroup = channelScoreGroups.get(i);
 			PropertyType topPlacementProperty = scoregroup.getProperty("histo_top_placement"); //$NON-NLS-1$
 			if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
 				TrailRecord tmpRecord = new TrailRecord(device, myIndex, scoregroup.getName(), scoregroup, newTrailRecordSet, scoregroup.getProperty().size());
@@ -154,13 +155,13 @@ public class TrailRecordSet extends RecordSet {
 				tmpRecord.setColorDefaultsAndPosition(myIndex);
 				if (i == 0) //top score group entry, set color to black
 					tmpRecord.setColor(SWTResourceManager.getColor(0, 0, 0));
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added scoregroup record for " + scoregroup.getName() + " - " + myIndex); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added scoregroup record for " + scoregroup.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			myIndex++;
 		}
-		// display section 1: look for settlements at the top - settlements' ordinals start after measurements due to GraphicsTemplate compatibility
-		for (int i = 0, myIndex = channelMeasurements.size(); i < channelSettlements.size(); i++) { // myIndex is used as recordOrdinal
-			SettlementType settlement = channelSettlements.get(i);
+		{// display section 1: look for settlements at the top - settlements' ordinals start after measurements due to GraphicsTemplate compatibility
+			int myIndex = channelMeasurements.size(); // myIndex is used as recordOrdinal
+			for (SettlementType settlement : channelSettlements.values()) {
 			PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 			if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
 				TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
@@ -169,6 +170,7 @@ public class TrailRecordSet extends RecordSet {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			myIndex++;
+		}
 		}
 		// display section 2: all measurements
 		for (int i = 0; i < channelMeasurements.size(); i++) {
@@ -178,9 +180,9 @@ public class TrailRecordSet extends RecordSet {
 			tmpRecord.setColorDefaultsAndPosition(i);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added measurement record for " + measurement.getName() + " - " + i); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		// display section 3: take remaining settlements
-		for (int i = 0, myIndex = channelMeasurements.size(); i < channelSettlements.size(); i++) { // myIndex is used as recordOrdinal
-			SettlementType settlement = channelSettlements.get(i);
+		{// display section 3: take remaining settlements
+			int myIndex = channelMeasurements.size(); // myIndex is used as recordOrdinal
+			for (SettlementType settlement : channelSettlements.values()) {
 			PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 			if (!(topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
 				TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
@@ -190,9 +192,10 @@ public class TrailRecordSet extends RecordSet {
 			}
 			myIndex++; // 
 		}
+		}
 		// display section 4: take remaining scores
-		for (int i = 0, myIndex = channelMeasurements.size() + channelSettlements.size(); i < channelScoregroups.size(); i++) { // myIndex is used as recordOrdinal
-			ScoregroupType scoregroup = channelScoregroups.get(i);
+		for (int i = 0, myIndex = channelMeasurements.size() + channelSettlements.size(); i < channelScoreGroups.size(); i++) { // myIndex is used as recordOrdinal
+			ScoreGroupType scoregroup = channelScoreGroups.get(i);
 			PropertyType topPlacementProperty = scoregroup.getProperty("histo_top_placement"); //$NON-NLS-1$
 			if (!(topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
 				TrailRecord tmpRecord = new TrailRecord(device, myIndex, scoregroup.getName(), scoregroup, newTrailRecordSet, scoregroup.getProperty().size());
@@ -543,8 +546,7 @@ public class TrailRecordSet extends RecordSet {
 				}
 			}
 			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-			if (log.isLoggable(Level.OFF))
-				log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
 				updateVisibilityStatus(true);
@@ -765,7 +767,7 @@ public class TrailRecordSet extends RecordSet {
 		else {
 			for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--) {
 				StringBuilder sb = new StringBuilder();
-				sb.append(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeStep_ms.getTime_ms(i))); //$NON-NLS-1$
+				sb.append(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeStep_ms.getTime_ms(i)));
 				headerRow[j] = sb.toString();
 			}
 		}

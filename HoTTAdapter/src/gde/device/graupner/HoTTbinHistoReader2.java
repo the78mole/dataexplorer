@@ -133,7 +133,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			catch (DataTypeException e) {
 				HoTTbinHistoReader2.log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), HoTTbinHistoReader2.filePath)); // 'GRAUPNER SD LOG8'
 			}
-			if (header != null && header.size() > 0) {
+			if (header != null && header.size() > 0 && HoTTAdapter.Sensor.getChannelNumbers(HoTTAdapter.isSensorType).contains(truss.getVaultChannelNumber())) {
 				if (!header.get(HoTTAdapter.FILE_PATH).equals(HoTTbinHistoReader2.filePath.toString())) {
 					// accept this 'GRAUPNER SD LOG8' file, extracted file starts with '~'
 					HoTTbinHistoReader2.filePath = Paths.get(header.get(HoTTAdapter.FILE_PATH));
@@ -477,7 +477,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 							TimeUnit.NANOSECONDS.toMillis(finishTime)));
 			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 				if (tmpRecordSet.getMaxTime_ms() > 0) {
-					if (log.isLoggable(Level.INFO)) log.log(Level.INFO,
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
 							String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
 									(int) (countPackageLoss / tmpRecordSet.getMaxTime_ms() * 1000. * recordTimespan_ms), fileLength / HoTTbinHistoReader2.dataBlockSize, HoTTbinReader.lostPackages.getMaxValue() * 10,
 									(int) HoTTbinReader.lostPackages.getAvgValue() * 10));
@@ -814,7 +814,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 							TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime),
 							TimeUnit.NANOSECONDS.toMillis(finishTime)));
 			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO,
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
 						String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
 								(int) (countPackageLoss / tmpRecordSet.getTime_ms((int) fileLength / HoTTbinHistoReader2.dataBlockSize - 1) * 1000. * recordTimespan_ms), fileLength / HoTTbinHistoReader2.dataBlockSize,
 								HoTTbinReader.lostPackages.getMaxValue() * 10, (int) HoTTbinReader.lostPackages.getAvgValue() * 10));

@@ -32,7 +32,7 @@ import gde.device.EvaluationType;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
-import gde.device.ScoregroupType;
+import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
 import gde.histocache.HistoVault;
@@ -121,7 +121,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 
 		public static TrailType fromDisplayName(String displayName) {
 			if (displayName != null) {
-				for (TrailType trailType : TrailType.values()) {
+				for (TrailType trailType : TrailType.values) {
 					if (displayName.equalsIgnoreCase(trailType.displayName)) {
 						return trailType;
 					}
@@ -225,7 +225,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	private final TrailRecordSet	parentTrail;
 	private final MeasurementType	measurementType;							// measurement / settlement / scoregroup are options
 	private final SettlementType	settlementType;								// measurement / settlement / scoregroup are options
-	private final ScoregroupType	scoregroupType;								// measurement / settlement / scoregroup are options
+	private final ScoreGroupType	scoregroupType;								// measurement / settlement / scoregroup are options
 	private int										trailTextSelectedIndex	= -1;	// user selection from applicable trails, is saved in the graphics template
 	private List<String>					applicableTrailsTexts;				// the user may select one of these entries
 	private List<Integer>					applicableTrailsOrdinals;			// maps all applicable trails in order to convert the user selection into a valid trail
@@ -274,7 +274,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	 * @param settlementType
 	 * @param parentTrail
 	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, ScoregroupType scoregroupType, TrailRecordSet parentTrail, int initialCapacity) {
+	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, ScoreGroupType scoregroupType, TrailRecordSet parentTrail, int initialCapacity) {
 		super(newDevice, newOrdinal, newName, scoregroupType.getSymbol(), scoregroupType.getUnit(), scoregroupType.isActive(), null, scoregroupType.getProperty(), initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, scoregroupType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, ScoregroupType scoregroupType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
@@ -335,9 +335,9 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		else {
 			if (this.trailRecordSuite.length == 1) {
 				if (this.isMeasurement())
-					super.add(histoVault.getMeasurementPoint(this.ordinal, this.trailTextSelectedIndex, this.getTrailOrdinal()));
+					super.add(histoVault.getMeasurementPoint(this.ordinal, this.getTrailOrdinal()));
 				else if (this.isSettlement())
-					super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.trailTextSelectedIndex, this.getTrailOrdinal()));
+					super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
 				else if (this.isScoregroup()) {
 					if (log.isLoggable(Level.FINEST))
 						log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
@@ -354,9 +354,9 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					TrailRecord trailRecord = this.trailRecordSuite[i];
 					Integer point;
 					if (this.isMeasurement())
-						point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
+						point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.getTrailOrdinal());
 					else if (this.isSettlement())
-						point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(), trailRecord.trailTextSelectedIndex, trailRecord.getTrailOrdinal());
+						point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(),  trailRecord.getTrailOrdinal());
 					else if (this.isScoregroup()) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
 						point = histoVault.getScorePoint(this.getTrailOrdinal());
@@ -805,7 +805,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		return this.settlementType;
 	}
 
-	public ScoregroupType getScoregroup() {
+	public ScoreGroupType getScoregroup() {
 		return this.scoregroupType;
 	}
 

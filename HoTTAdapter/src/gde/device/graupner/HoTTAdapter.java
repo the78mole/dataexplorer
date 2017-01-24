@@ -53,6 +53,7 @@ import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecordSet;
+import gde.data.TrailRecord.TrailType;
 import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.HistoRandomSample;
@@ -126,12 +127,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 	public enum Sensor {
-		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GAM("General-Air"), EAM("Electric-Air"), CHANNEL("Channel"), ESC("MotorDriver");
+		RECEIVER("Receiver", 1), //$NON-NLS-1$
+		VARIO("Vario", 2), //$NON-NLS-1$
+		GPS("GPS", 3), //$NON-NLS-1$
+		GAM("General-Air", 4), //$NON-NLS-1$
+		EAM("Electric-Air", 5), //$NON-NLS-1$
+		CHANNEL("Channel", 6), //$NON-NLS-1$
+		ESC("MotorDriver", 7); //$NON-NLS-1$
 		private final String				value;
+		private final int						channelNumber;
 		public static final Sensor	values[]	= values();	// use this to avoid cloning if calling values()
 
-		private Sensor(String v) {
+		private Sensor(String v, int channelNumber) {
 			this.value = v;
+			this.channelNumber = channelNumber;
 		}
 
 		public String value() {
@@ -140,6 +149,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 		public static Sensor fromOrdinal(int ordinal) {
 			return Sensor.values[ordinal];
+		}
+
+		public static Sensor fromChannelNumber(int channelNumber) {
+			for (Sensor sensor : Sensor.values) {
+				if (channelNumber == sensor.channelNumber) {
+					return sensor;
+				}
+			}
+			return null;
 		}
 
 		/**
@@ -154,9 +172,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			return sensors;
 		}
 
+		/**
+		 * @param isSensorType sensors which are available are marked with true
+		 * @return channel numbers of the sensors which are available including the receiver
+		 */
+		public static List<Integer> getChannelNumbers(boolean[] isSensorType) {
+			List<Integer> sensors = new ArrayList<Integer>();
+			sensors.add(Sensor.RECEIVER.channelNumber); // always present
+			sensors.add(Sensor.CHANNEL.channelNumber); // always present
+			for (int i = 1; i < HoTTAdapter.isSensorType.length; i++) {
+				if (HoTTAdapter.isSensorType[i]) sensors.add(HoTTAdapter.Sensor.fromOrdinal(i).channelNumber);
+			}
+			return sensors;
+		}
+
 		public static List<Sensor> getAsList() {
 			List<HoTTAdapter.Sensor> sensors = new ArrayList<HoTTAdapter.Sensor>();
-			for (Sensor sensor : Sensor.values()) {
+			for (Sensor sensor : Sensor.values) {
 				sensors.add(sensor);
 			}
 			return sensors;
@@ -165,7 +197,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	// protocol definitions
 	public enum Protocol {
-		TYPE_19200_V3("19200 V3"), TYPE_19200_V4("19200 V4"), TYPE_115200("115200");
+		TYPE_19200_V3("19200 V3"), TYPE_19200_V4("19200 V4"), TYPE_115200("115200"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		private final String value;
 
@@ -209,7 +241,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	static double								latitudeToleranceFactor				= 90.0;
 	static double								longitudeToleranceFactor			= 25.0;
 
-	protected HistoRandomSample		histoRandomSample;
+	protected HistoRandomSample	histoRandomSample;
 
 	/**
 	 * constructor using properties file
@@ -232,11 +264,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 
-		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != ""
+		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != ""
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != ""
+		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
 		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
 				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
@@ -268,11 +300,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 
-		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != ""
+		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != ""
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != ""
+		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
 		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
 				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
@@ -838,15 +870,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 			else if (this.histoRandomSample.isValidSample(points,
 					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
-			recordSet.addPoints(points,
-					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
+				recordSet.addPoints(points,
+						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 			}
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		if (this.histoRandomSample != null) {
-			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize,
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize, //$NON-NLS-1$
 					this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
 		}
 		recordSet.syncScaleOfSyncableRecords();
@@ -935,11 +967,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @throws DataInconsitsentException 
 	 */
 	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
-		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points");
+		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points"); //$NON-NLS-1$
 		int recordTimespan_ms = 10;
-		List<TransitionType> transitionTypes = this.getChannelType(channelNumber).getTransition();
 		this.histoRandomSample = HistoRandomSample.createHistoRandomSample(channelNumber, maxPoints, minPoints, recordTimespan_ms);
-		}
+	}
 
 	/**
 	 * create history recordSet and add record data size points from binary file to each measurement.
@@ -956,19 +987,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
 	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-			log.log(Level.INFO, String.format("start  %s", filePath)); //$NON-NLS-1$
-			List<HistoVault> histoVaults = new ArrayList<HistoVault>();
-			for (HistoVault truss : trusses) {
-				if (truss.getLogFilePath().equals(filePath.toString())) {
-					// add aggregated measurement and settlement points and score points to the truss
-					HoTTbinHistoReader.read(truss);
-					histoVaults.add(truss);
-				}
-				else
-					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
+		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
+		for (HistoVault truss : trusses) {
+			if (truss.getLogFilePath().equals(filePath.toString())) {
+				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
+				// add aggregated measurement and settlement points and score points to the truss
+				HoTTbinHistoReader.read(truss);
+				histoVaults.add(truss);
 			}
-			return histoVaults;
+			else
+				throw new UnsupportedOperationException("all trusses must carry the same logFilePath"); //$NON-NLS-1$
 		}
+		return histoVaults;
+	}
 
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
@@ -991,7 +1022,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				}
 				// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 				else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { // Receiver
-					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0));
+					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
 				}
 				else {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
@@ -1080,19 +1111,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			record = recordSet.get(i);
 			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
-			// update active state and displayable state if configuration switched with other names
-			if (recordSet instanceof TrailRecordSet) {
-				if (includeReasonableDataCheck) {
-					record.setDisplayable(record.isActive() && record.hasReasonableData());
-					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
-				}
-	
-				if (record.isActive() && record.isDisplayable()) {
-					++displayableCounter;
-					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
-				}
-			}
-			else {
 				MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
 				if (record.isActive() != measurement.isActive()) {
 					record.setActive(measurement.isActive());
@@ -1104,12 +1122,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					record.setDisplayable(measurement.isActive() && record.hasReasonableData());
 					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
 				}
-	
+
 				if (record.isActive() && record.isDisplayable()) {
 					++displayableCounter;
 					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				}
-			}
 		}
 		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
@@ -1194,7 +1211,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * import device specific *.bin data files
 	 */
 	protected void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2400), "LogData");
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2400), "LogData"); //$NON-NLS-1$
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -1365,8 +1382,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		Record gpsAlitude = recordSet.get(3);
 
 		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", //$NON-NLS-1$
-				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S", //$NON-NLS-1$
-				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W", //$NON-NLS-1$
+				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S", //$NON-NLS-1$ //$NON-NLS-2$
+				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W", //$NON-NLS-1$ //$NON-NLS-2$
 				fixValidity, (this.translateValue(gpsAlitude, gpsAlitude.get(index) / 1000.0) + offsetAltitude), (this.translateValue(gpsAlitude, gpsAlitude.get(index) / 1000.0) + offsetAltitude));
 	}
 
@@ -1499,15 +1516,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (constructor != null) {
 
 				// set directory where to start search for mdl files
-				System.setProperty("log.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
-				HoTTAdapter.log.log(java.util.logging.Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$
+				System.setProperty("log.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$ //$NON-NLS-2$
 				System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
-				HoTTAdapter.log.log(java.util.logging.Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$ //$NON-NLS-2$
 				URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 				System.setProperty("program.dir", url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName())));//$NON-NLS-1$
-				HoTTAdapter.log.log(java.util.logging.Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$
-				System.setProperty("template.dir", "");// load from classpath //$NON-NLS-1$
-				HoTTAdapter.log.log(java.util.logging.Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "program.dir =  " + System.getProperty("program.dir")); //$NON-NLS-1$ //$NON-NLS-2$
+				System.setProperty("template.dir", "");// load from classpath //$NON-NLS-1$ //$NON-NLS-2$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "template.dir =  " + System.getProperty("template.dir")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				inst = constructor.newInstance(new Object[] { this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount() });
 			}
@@ -1639,17 +1656,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							if (lastRxDbmValue > 0 && recordDiffRx_dbm.get(i) <= 0) { //lap event detected 
 								isLapEvent = true;
 								if (lastLapTimeStamp_ms != 0) {
-									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
+									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0)); //$NON-NLS-1$
 									lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
 								}
 								lastLapTimeStamp_ms = recordSet.getTime_ms(i);
 								recordLapsRx_dbm.set(i, lapTime);
 								if (lapTime != 0) {
 									if (lapCount % 2 == 0) {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 									else {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 								}
 								if (isLapEvent && lapTime == 0) { //first lap start
@@ -1726,17 +1743,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							if (lastDistanceValue < 0 && recordDiffDistance.get(i) >= 0) { //lap event detected
 								isLapEvent = true;
 								if (lastLapTimeStamp_ms != 0) {
-									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0));
+									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0)); //$NON-NLS-1$
 									lapTime = (int) (recordSet.getTime_ms(i) - lastLapTimeStamp_ms);
 								}
 								lastLapTimeStamp_ms = recordSet.getTime_ms(i);
 								recordLapsDistance.set(i, lapTime);
 								if (lapTime != 0) {
 									if (lapCount % 2 == 0) {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 									else {
-										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0));
+										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 								}
 								if (isLapEvent && lapTime == 0) //first lap start

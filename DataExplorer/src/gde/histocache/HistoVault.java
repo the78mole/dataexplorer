@@ -35,10 +35,13 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
@@ -52,6 +55,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.validation.SchemaFactory;
 
 import gde.GDE;
@@ -76,12 +81,13 @@ import gde.io.HistoOsdReaderWriter;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Quantile;
-import gde.utils.StringHelper;
 import gde.utils.Quantile.Fixings;
+import gde.utils.StringHelper;
 
 /**
- * aggregated history recordset data related to
- * 				measurements, settlements and scores
+ * aggregated history recordset data related to measurements, settlements and
+ * 				scores.
+ * 				No localization required.
  * 			
  * 
  * <p>Java class for histoVault complex type.
@@ -114,13 +120,13 @@ import gde.utils.Quantile.Fixings;
  *         &lt;element name="logChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="logObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="logStartTimestamp_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="measurements" type="{}entries"/>
- *         &lt;element name="settlements" type="{}entries"/>
+ *         &lt;element name="measurements" type="{}entryCompartments"/>
+ *         &lt;element name="settlements" type="{}entryCompartments"/>
  *         &lt;element name="scores" type="{}entryPoints"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *        &lt;/sequence>
+ *      &lt;/restriction>
+ *    &lt;/complexContent>
+ *  &lt;/complexType>
  * </pre>
  * 
  * 
@@ -140,69 +146,72 @@ import gde.utils.Quantile.Fixings;
 		"vaultSamplingTimespanMs", "logFilePath", "logFileLastModified", "logFileLength", "logObjectDirectory", "logFileVersion", "logRecordSetSize", "logRecordSetOrdinal", "logRecordsetBaseName",
 		"logDeviceName", "logChannelNumber", "logObjectKey", "logStartTimestampMs", "measurements", "settlements", "scores" })
 public class HistoVault {
-	final private static String	$CLASS_NAME									= HistoVault.class.getName();
-	final private static Logger	log													= Logger.getLogger($CLASS_NAME);
+	final private static String									$CLASS_NAME					= HistoVault.class.getName();
+	final private static Logger									log									= Logger.getLogger($CLASS_NAME);
 
-	private static Path					activeDevicePath;																									// criterion for the active device version key cache
-	private static String				activeDeviceKey;																									// caches the version key for the active device which is calculated only if the device is changed by the user
-	private static long					activeDeviceLastModified_ms;																			// caches the version key for the active device which is calculated only if the device is changed by the user
-	private static JAXBContext	jaxbContext;
-	private static Unmarshaller	jaxbUnmarshaller;
-	private static Marshaller		jaxbMarshaller;
-
-	@XmlTransient
-	private final DataExplorer	application									= DataExplorer.getInstance();
-	@XmlTransient
-	private final Settings			settings										= Settings.getInstance();
-	@XmlTransient
-	private final IDevice				device											= this.application.getActiveDevice();
+	private static Path													activeDevicePath;																					// criterion for the active device version key cache
+	private static String												activeDeviceKey;																					// caches the version key for the active device which is calculated only if the device is changed by the user
+	private static long													activeDeviceLastModified_ms;															// caches the version key for the active device which is calculated only if the device is changed by the user
+	private static JAXBContext									jaxbContext;
+	private static Unmarshaller									jaxbUnmarshaller;
+	private static Marshaller										jaxbMarshaller;
 
 	@XmlTransient
-	private int									warnedMeasurementID					= Integer.MAX_VALUE;
+	private final DataExplorer									application					= DataExplorer.getInstance();
 	@XmlTransient
-	private int									warnedSettlementID					= Integer.MAX_VALUE;
+	private final Settings											settings						= Settings.getInstance();
+	@XmlTransient
+	private final IDevice												device							= this.application.getActiveDevice();
+
+	@XmlTransient
+	private int																	warnedMeasurementID	= Integer.MAX_VALUE;
+	@XmlTransient
+	private int																	warnedSettlementID	= Integer.MAX_VALUE;
 
 	@XmlElement(required = true)
-	protected String						vaultName;
+	protected String														vaultName;
 	@XmlElement(required = true)
-	protected String						vaultDirectory;
+	protected String														vaultDirectory;
 	@XmlElement(name = "vaultCreated_ms")
-	protected long							vaultCreatedMs;
+	protected long															vaultCreatedMs;
 	@XmlElement(required = true)
-	protected String						vaultDataExplorerVersion;
+	protected String														vaultDataExplorerVersion;
 	@XmlElement(required = true)
-	protected String						vaultDeviceKey;
+	protected String														vaultDeviceKey;
 	@XmlElement(required = true)
-	protected String						vaultDeviceName;
-	protected int								vaultChannelNumber;
+	protected String														vaultDeviceName;
+	protected int																vaultChannelNumber;
 	@XmlElement(required = true)
-	protected String						vaultObjectKey;
+	protected String														vaultObjectKey;
 	@XmlElement(name = "vaultSamplingTimespan_ms")
-	protected long							vaultSamplingTimespanMs;
+	protected long															vaultSamplingTimespanMs;
 	@XmlElement(required = true)
-	protected String						logFilePath;
-	protected long							logFileLastModified;
-	protected long							logFileLength;
+	protected String														logFilePath;
+	protected long															logFileLastModified;
+	protected long															logFileLength;
 	@XmlElement(required = true)
-	protected String						logObjectDirectory;
-	protected int								logFileVersion;
-	protected int								logRecordSetSize;
-	protected int								logRecordSetOrdinal;
+	protected String														logObjectDirectory;
+	protected int																logFileVersion;
+	protected int																logRecordSetSize;
+	protected int																logRecordSetOrdinal;
 	@XmlElement(required = true)
-	protected String						logRecordsetBaseName;
+	protected String														logRecordsetBaseName;
 	@XmlElement(required = true)
-	protected String						logDeviceName;
-	protected int								logChannelNumber;
+	protected String														logDeviceName;
+	protected int																logChannelNumber;
 	@XmlElement(required = true)
-	protected String						logObjectKey;
+	protected String														logObjectKey;
 	@XmlElement(name = "logStartTimestamp_ms")
-	protected long							logStartTimestampMs;
+	protected long															logStartTimestampMs;
 	@XmlElement(required = true)
-	protected Entries						measurements;
+	@XmlJavaTypeAdapter(CompartmentsTypeAdapter.class)
+	protected HashMap<Integer, CompartmentType>	measurements;
 	@XmlElement(required = true)
-	protected Entries						settlements;
+	@XmlJavaTypeAdapter(CompartmentsTypeAdapter.class)
+	protected HashMap<Integer, CompartmentType>	settlements;
 	@XmlElement(required = true)
-	protected EntryPoints				scores;
+	@XmlJavaTypeAdapter(PointsTypeAdapter.class)
+	protected HashMap<Integer, PointType>				scores;
 
 	/**
 	   * Gets the value of the vaultName property.
@@ -217,7 +226,19 @@ public class HistoVault {
 	}
 
 	/**
-	 * Gets the value of the vaultDirectory property.
+	   * Sets the value of the vaultName property.
+	   * 
+	   * @param value
+	   *     allowed object is
+	   *     {@link String }
+	   *     
+	   */
+	public void setVaultName(String value) {
+		this.vaultName = value;
+	}
+
+	/**
+	* Gets the value of the vaultDirectory property.
 	* 
 	* @return
 	*     possible object is
@@ -229,6 +250,18 @@ public class HistoVault {
 	}
 
 	/**
+	 * Sets the value of the vaultDirectory property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setVaultDirectory(String value) {
+		this.vaultDirectory = value;
+	}
+
+	/**
 	 * Gets the value of the vaultCreatedMs property.
 	 * 
 	 */
@@ -237,15 +270,35 @@ public class HistoVault {
 	}
 
 	/**
-	   * Gets the value of the vaultDataExplorerVersion property.
+	   * Sets the value of the vaultCreatedMs property.
+	   * 
+	   */
+	public void setVaultCreated_Ms(long value) {
+		this.vaultCreatedMs = value;
+	}
+
+	/**
+	 * Gets the value of the vaultDataExplorerVersion property.
+	*     
+	 * @return
+	 *     possible object is
+	 *     {@link String }
 	 *     
-	   * @return
-	   *     possible object is
-	   *     {@link String }
-	   *     
-	 */
+	*/
 	public String getVaultDataExplorerVersion() {
 		return vaultDataExplorerVersion;
+	}
+
+	/**
+	 * Sets the value of the vaultDataExplorerVersion property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setVaultDataExplorerVersion(String value) {
+		this.vaultDataExplorerVersion = value;
 	}
 
 	/**
@@ -261,6 +314,18 @@ public class HistoVault {
 	}
 
 	/**
+	 * Sets the value of the vaultDeviceKey property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setVaultDeviceKey(String value) {
+		this.vaultDeviceKey = value;
+	}
+
+	/**
 	   * Gets the value of the vaultDeviceName property.
 	   * 
 	   * @return
@@ -273,6 +338,18 @@ public class HistoVault {
 	}
 
 	/**
+	 * Sets the value of the vaultDeviceName property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setVaultDeviceName(String value) {
+		this.vaultDeviceName = value;
+	}
+
+	/**
 	   * Gets the value of the vaultChannelNumber property.
 	 * 
 	 */
@@ -281,15 +358,35 @@ public class HistoVault {
 	}
 
 	/**
-	   * Gets the value of the vaultObjectKey property.
+	   * Sets the value of the vaultChannelNumber property.
+	   * 
+	   */
+	public void setVaultChannelNumber(int value) {
+		this.vaultChannelNumber = value;
+	}
+
+	/**
+	 * Gets the value of the vaultObjectKey property.
+	* 
+	* @return
+	*     possible object is
+	*     {@link String }
+	*     
+	*/
+	public String getVaultObjectKey() {
+		return vaultObjectKey;
+	}
+
+	/**
+	 * Sets the value of the vaultObjectKey property.
 	 * 
-	 * @return
-	 *     possible object is
+	 * @param value
+	 *     allowed object is
 	 *     {@link String }
 	 *     
 	 */
-	public String getVaultObjectKey() {
-		return vaultObjectKey;
+	public void setVaultObjectKey(String value) {
+		this.vaultObjectKey = value;
 	}
 
 	/**
@@ -298,6 +395,14 @@ public class HistoVault {
 	 */
 	public long getVaultSamplingTimespan_ms() {
 		return vaultSamplingTimespanMs;
+	}
+
+	/**
+	 * Sets the value of the vaultSamplingTimespanMs property.
+	 * 
+	 */
+	public void setVaultSamplingTimespan_Ms(long value) {
+		this.vaultSamplingTimespanMs = value;
 	}
 
 	/**
@@ -313,6 +418,18 @@ public class HistoVault {
 	}
 
 	/**
+	 * Sets the value of the logFilePath property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setLogFilePath(String value) {
+		this.logFilePath = value;
+	}
+
+	/**
 	 * Gets the value of the logFileLastModified property.
 	 * 
 	 */
@@ -321,11 +438,27 @@ public class HistoVault {
 	}
 
 	/**
+	 * Sets the value of the logFileLastModified property.
+	 * 
+	 */
+	public void setLogFileLastModified(long value) {
+		this.logFileLastModified = value;
+	}
+
+	/**
 	 * Gets the value of the logFileLength property.
 	 * 
 	 */
 	public long getLogFileLength() {
 		return logFileLength;
+	}
+
+	/**
+	 * Sets the value of the logFileLength property.
+	 * 
+	 */
+	public void setLogFileLength(long value) {
+		this.logFileLength = value;
 	}
 
 	/**
@@ -341,11 +474,31 @@ public class HistoVault {
 	}
 
 	/**
-	 * Gets the value of the logFileVersion property.
-	 * 
-	 */
+	   * Sets the value of the logObjectDirectory property.
+	   * 
+	   * @param value
+	   *     allowed object is
+	   *     {@link String }
+	   *     
+	   */
+	public void setLogObjectDirectory(String value) {
+		this.logObjectDirectory = value;
+	}
+
+	/**
+	* Gets the value of the logFileVersion property.
+	* 
+	*/
 	public int getLogFileVersion() {
 		return logFileVersion;
+	}
+
+	/**
+	 * Sets the value of the logFileVersion property.
+	 * 
+	 */
+	public void setLogFileVersion(int value) {
+		this.logFileVersion = value;
 	}
 
 	/**
@@ -357,23 +510,51 @@ public class HistoVault {
 	}
 
 	/**
-	 * Gets the value of the logRecordSetOrdinal property (0-based).
-	 * 
-	 */
+	   * Sets the value of the logRecordSetSize property.
+	   * 
+	   */
+	public void setLogRecordSetSize(int value) {
+		this.logRecordSetSize = value;
+	}
+
+	/**
+	 * Gets the value of the logRecordSetOrdinal property.
+	* 
+	*/
 	public int getLogRecordSetOrdinal() {
 		return logRecordSetOrdinal;
 	}
 
 	/**
-	 * Gets the value of the logRecordsetName property.
+	   * Sets the value of the logRecordSetOrdinal property.
+	   * 
+	   */
+	public void setLogRecordSetOrdinal(int value) {
+		this.logRecordSetOrdinal = value;
+	}
+
+	/**
+	 * Gets the value of the logRecordsetBaseName property.
+	* 
+	* @return
+	*     possible object is
+	*     {@link String }
+	*     
+	*/
+	public String getLogRecordsetBaseName() {
+		return logRecordsetBaseName;
+	}
+
+	/**
+	 * Sets the value of the logRecordsetBaseName property.
 	 * 
-	 * @return
-	 *     possible object is
+	 * @param value
+	 *     allowed object is
 	 *     {@link String }
 	 *     
 	 */
-	public String getLogRecordsetBaseName() {
-		return logRecordsetBaseName;
+	public void setLogRecordsetBaseName(String value) {
+		this.logRecordsetBaseName = value;
 	}
 
 	/**
@@ -389,11 +570,31 @@ public class HistoVault {
 	}
 
 	/**
-	 * Gets the value of the logChannelNumber property.
-	 * 
-	 */
+	   * Sets the value of the logDeviceName property.
+	   * 
+	   * @param value
+	   *     allowed object is
+	   *     {@link String }
+	   *     
+	   */
+	public void setLogDeviceName(String value) {
+		this.logDeviceName = value;
+	}
+
+	/**
+	* Gets the value of the logChannelNumber property.
+	* 
+	*/
 	public int getLogChannelNumber() {
 		return logChannelNumber;
+	}
+
+	/**
+	 * Sets the value of the logChannelNumber property.
+	 * 
+	 */
+	public void setLogChannelNumber(int value) {
+		this.logChannelNumber = value;
 	}
 
 	/**
@@ -409,11 +610,110 @@ public class HistoVault {
 	}
 
 	/**
+	 * Sets the value of the logObjectKey property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setLogObjectKey(String value) {
+		this.logObjectKey = value;
+	}
+
+	/**
 	 * Gets the value of the logStartTimestampMs property.
 	 * 
 	 */
 	public long getLogStartTimestamp_ms() {
 		return logStartTimestampMs;
+	}
+
+	/**
+	 * Sets the value of the logStartTimestampMs property.
+	 * 
+	 */
+	public void setLogStartTimestampMs(long value) {
+		this.logStartTimestampMs = value;
+	}
+
+	/**
+	 * Gets the value of the measurements property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link CompartmentsType }
+	 *     
+	 */
+	public HashMap<Integer, CompartmentType> getMeasurements() {
+		return measurements;
+	}
+
+	/**
+	 * Sets the value of the measurements property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link CompartmentsType }
+	 *     
+	 */
+	public void setMeasurements(HashMap<Integer, CompartmentType> value) {
+		this.measurements = value;
+	}
+
+	/**
+	 * Gets the value of the settlements property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link CompartmentsType }
+	 *     
+	 */
+	public HashMap<Integer, CompartmentType> getSettlements() {
+		if (this.settlements == null) {
+			this.settlements = new HashMap<Integer, CompartmentType>();
+		}
+		return settlements;
+	}
+
+	/**
+	 * Sets the value of the settlements property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link CompartmentsType }
+	 *     
+	 */
+	public void setSettlements(HashMap<Integer, CompartmentType> value) {
+		this.settlements = value;
+	}
+
+	/**
+	 * Gets the value of the scores property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link PointsType }
+	 *     
+	 */
+	public HashMap<Integer, PointType> getScores() {
+		if (this.scores == null) {
+			this.scores = new HashMap<Integer, PointType>();
+		}
+		return scores;
+	}
+
+	/**
+	 * Sets the value of the scores property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link PointsType }
+	 *     
+	 */
+
+	public void setScores(HashMap<Integer, PointType> value) {
+		this.scores = value;
 	}
 
 	@Deprecated // for marshalling purposes only
@@ -482,9 +782,9 @@ public class HistoVault {
 			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
 		HistoVault newHistoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName,
 				logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey);
-		newHistoVault.measurements = new Entries();
-		newHistoVault.settlements = new Entries();
-		newHistoVault.scores = new EntryPoints(0, "truss"); //$NON-NLS-1$
+		newHistoVault.measurements = new HashMap<Integer, CompartmentType>();
+		newHistoVault.settlements = new HashMap<Integer, CompartmentType>();
+		newHistoVault.scores = new HashMap<Integer, PointType>();
 		return newHistoVault;
 	}
 
@@ -759,8 +1059,9 @@ public class HistoVault {
 				List<MeasurementType> channelMeasurements = this.device.getChannelMeasuremts(this.getLogChannelNumber());
 				for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 					MeasurementType measurementType = channelMeasurements.get(i);
-					EntryPoints entryPoints = new EntryPoints(i, measurementType.getName());
-					this.measurements.getEntries().add(entryPoints);
+					CompartmentType entryPoints = new CompartmentType(i, measurementType.getName());
+					this.measurements.put(i, entryPoints);
+					entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 					Record record = recordSet.get(recordSet.getRecordNames()[i]);
 					if (record == null) {
@@ -861,7 +1162,7 @@ public class HistoVault {
 							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
 							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
 						}
-						log.log(Level.FINER, record.getName() + " data " , entryPoints); //$NON-NLS-1$
+						log.log(Level.FINER, record.getName() + " data ", entryPoints); //$NON-NLS-1$
 					}
 				}
 				{
@@ -903,8 +1204,9 @@ public class HistoVault {
 					for (Entry<String, HistoSettlement> entry : histoSettlements.entrySet()) {
 						HistoSettlement histoSettlement = entry.getValue();
 						SettlementType settlementType = histoSettlement.getSettlement();
-						EntryPoints entryPoints = new EntryPoints(settlementType.getSettlementId(), settlementType.getName());
-						this.settlements.getEntries().add(entryPoints);
+						CompartmentType entryPoints = new CompartmentType(settlementType.getSettlementId(), settlementType.getName());
+						this.settlements.put(settlementType.getSettlementId(), entryPoints);
+						entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 						if (histoSettlement.realSize() > 0 && settlementType.getEvaluation() != null) {
 							EvaluationType settlementEvaluations = settlementType.getEvaluation();
@@ -930,7 +1232,7 @@ public class HistoVault {
 								}
 							}
 						}
-						if (histoSettlement.realSize() != 0) {
+						if (histoSettlement.realSize() != 0 && histoSettlement.hasReasonableData()) {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
 							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
@@ -943,7 +1245,7 @@ public class HistoVault {
 							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
 							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
 						}
-						log.log(Level.FINER, histoSettlement.getName() + " data " , this.settlements); //$NON-NLS-1$
+						log.log(Level.FINER, histoSettlement.getName() + " data ", this.settlements); //$NON-NLS-1$
 					}
 					{
 						// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
@@ -954,13 +1256,13 @@ public class HistoVault {
 						scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (recordSet.getSigmaTimeStep_ms() * 1000.);
 						scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = recordSet.getRecordDataSize(true);
 
-						this.scores = new EntryPoints(0, "All"); //$NON-NLS-1$
+						this.scores = new HashMap<Integer, PointType>();
 						for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
 							if (scorePoints[scoreLabelTypes.ordinal()] != null) {
-								this.scores.addPoint(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]);
+								this.scores.put(scoreLabelTypes.ordinal(), new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]));
 							}
 						}
-						log.log(Level.FINE, "scores " , this.scores); //$NON-NLS-1$
+						log.log(Level.FINE, "scores ", this.scores); //$NON-NLS-1$
 					}
 				}
 			}
@@ -969,117 +1271,58 @@ public class HistoVault {
 
 	/**
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @return null in case of unavailable measurement
+	 * @return empty in case of unavailable measurement
 	 */
-	public List<Point> getMeasurementPoints(int measurementOrdinal) {
-		if (this.measurements.getEntries().size() < measurementOrdinal) {
-			if (this.warnedMeasurementID != measurementOrdinal) {
-				this.warnedMeasurementID = measurementOrdinal;
-				log.log(Level.WARNING, String.format("measurement does not exist for measurementOrdinal=%d %s", measurementOrdinal, this.logFilePath)); //$NON-NLS-1$ }
-			}
-			return null;
-		}
-		else {
-			if (this.measurements.getEntries().get(measurementOrdinal).getId() != measurementOrdinal) {
-				throw new RuntimeException("measurementOrdinal sequence or numbering mismatch"); //$NON-NLS-1$
-			}
-			return this.measurements.getEntries().get(measurementOrdinal).getPoints();
-		}
+	public HashMap<Integer, PointType> getMeasurementPoints(int measurementOrdinal) {
+		return this.measurements.containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>() : this.measurements.get(measurementOrdinal).getTrails();
 	}
 
 	/**
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @param trailTextSelectedIndex
 	 * @param trailOrdinal
-	 * @return null in case of unavailable measurement
+	 * @return null in case of unavailable measurement or trail
 	 */
-	public Integer getMeasurementPoint(int measurementOrdinal, int trailTextSelectedIndex, int trailOrdinal) { // todo handle xml null values for points
-		Integer point = null;
-		List<Point> measurementPoints = getMeasurementPoints(measurementOrdinal);
-		if (measurementPoints != null && !measurementPoints.isEmpty()) {
-			if (trailTextSelectedIndex > measurementPoints.size()) //
-				throw new UnsupportedOperationException();
-			if (measurementPoints.get(trailTextSelectedIndex).getId() != trailOrdinal) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", measurementOrdinal, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
-				for (Point tmpPoint : measurementPoints) {
-					if (tmpPoint.getId() == trailOrdinal) {
-						point = tmpPoint.getValue();
-						break;
-					}
-				}
-			}
-			else
-				point = measurementPoints.get(trailTextSelectedIndex).getValue();
-		}
-		return point;
-	}
-
-	/**
-	 * @param settlementId may specify an id which is not present in the vault (settlement did not provide values)
-	 * @return null in case of unavailable settlement
-	 */
-	public List<Point> getSettlementPoints(int settlementId) {
-		if (settlementId >= this.settlements.getEntries().size()) {
-			if (this.warnedSettlementID <= settlementId) {
-				this.warnedSettlementID = settlementId;
-				log.log(Level.WARNING, String.format("settlement does not exist for settlementId=%d %s", settlementId, this.logFilePath)); //$NON-NLS-1$ }
-			}
-			return null;
+	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) { // todo handle xml null values for points
+		if (this.measurements.containsKey(measurementOrdinal)) {
+			return this.measurements.get(measurementOrdinal).getTrails().containsKey(trailOrdinal) ? this.measurements.get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
 		}
 		else {
-			if (this.settlements.getEntries().get(settlementId).getId() != settlementId) {
-				throw new RuntimeException("settlementId sequence or numbering mismatch"); //$NON-NLS-1$
-			}
-			return this.settlements.getEntries().get(settlementId).getPoints();
+			return null;
 		}
 	}
 
 	/**
-	 * @param settlementId may specify an id which is not present in the vault (settlement did not provide values)
-	 * @param trailTextSelectedIndex
-	 * @param trailOrdinal
-	 * @return null in case of unavailable settlement
+	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
+	 * @return empty in case of unavailable settlementId
 	 */
-	public Integer getSettlementPoint(int settlementId, int trailTextSelectedIndex, int trailOrdinal) {
-		Integer point = null;
-		List<Point> settlementPoints = getSettlementPoints(settlementId);
-		if (settlementPoints != null && !settlementPoints.isEmpty()) {
-			if (trailTextSelectedIndex >= settlementPoints.size()) //
-				throw new UnsupportedOperationException();
-			if (settlementPoints.get(trailTextSelectedIndex).getId() != trailOrdinal) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("shortcut access to the point is not possible %d %d %d", settlementId, trailTextSelectedIndex, trailOrdinal)); //$NON-NLS-1$
-				for (Point tmpPoint : settlementPoints) {
-					if (tmpPoint.getId() == trailOrdinal) {
-						point = tmpPoint.getValue();
-						break;
-					}
-				}
-			}
-			else
-				point = settlementPoints.get(trailTextSelectedIndex).getValue();
-		}
-		return point;
-	}
-
-	public List<Point> getScorePoints() {
-		return this.scores.getPoints();
+	public HashMap<Integer, PointType> getSettlementPoints(int settlementId) {
+		return this.settlements.containsKey(settlementId) ? new HashMap<Integer, PointType>() : this.settlements.get(settlementId).getTrails();
 	}
 
 	/**
-	 * @param scoreLabelOrdinal may specify an id which is not present in the vault (settlement did not provide values)
+	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
+	 * @param trailOrdinal
+	 * @return null in case of unavailable settlement or trail
+	 */
+	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
+		if (this.settlements.containsKey(settlementId)) {
+				return this.settlements.get(settlementId).getTrails().containsKey(trailOrdinal) ? this.settlements.get(settlementId).getTrails().get(trailOrdinal).value : null;
+		}
+		else {
+			return null;
+		}
+	}
+
+	public HashMap<Integer, PointType> getScorePoints() {
+		return this.scores;
+	}
+
+	/**
+	 * @param scoreLabelOrdinal 
 	 * @return null in case of unavailable score
 	 */
 	public Integer getScorePoint(int scoreLabelOrdinal) {
-		Integer point = null;
-		if (this.scores.getPoints() != null) {
-			if (scoreLabelOrdinal >= this.scores.getPoints().size())//
-				throw new UnsupportedOperationException();
-			if (this.scores.getPoints().get(scoreLabelOrdinal).getId() != scoreLabelOrdinal) {
-				throw new RuntimeException("scoreLabelOrdinal sequence or numbering mismatch"); //$NON-NLS-1$
-			}
-			point = this.scores.getPoints().get(scoreLabelOrdinal).getValue();
-		}
-		return point;
+		return this.scores.get(scoreLabelOrdinal).getValue();
 	}
 
 	/**
@@ -1108,15 +1351,14 @@ public class HistoVault {
 	}
 
 	/**
-	 * @return the validated object key or alternatively (if empty) the validated object directory
+	 * @return the validated object key
 	 */
-	public String getValidatedObjectKey() {
-		String validObjectKey = this.settings.getValidatedObjectKey(this.logObjectKey).orElse(GDE.STRING_EMPTY);
-		return this.logObjectKey.isEmpty() ? this.settings.getValidatedObjectKey(this.logObjectKey).orElse(GDE.STRING_EMPTY) : validObjectKey;
+	public Optional<String> getValidatedObjectKey() {
+		return this.settings.getValidatedObjectKey(this.logObjectKey);
 	}
 
 	public boolean isTruss() {
-		return this.measurements.entryPoints == null;
+		return this.measurements.isEmpty();
 	}
 
 	@Override
@@ -1133,4 +1375,49 @@ public class HistoVault {
 		sb.append("vaultDirectory=").append(this.vaultDirectory); //$NON-NLS-1$
 		return sb.toString();
 	}
+
+	/**
+	* leverages the xml marshalling to key value pairs.
+	*/
+	public static class CompartmentsTypeAdapter extends XmlAdapter<CompartmentsType, HashMap<Integer, CompartmentType>> {
+
+		@Override
+		public HashMap<Integer, CompartmentType> unmarshal(CompartmentsType values) {
+			HashMap<Integer, CompartmentType> map = new HashMap<Integer, CompartmentType>();
+			for (CompartmentType value : values.compartment)
+				map.put(value.id, value);
+			return map;
+		}
+
+		@Override
+		public CompartmentsType marshal(HashMap<Integer, CompartmentType> map) {
+			CompartmentsType aList = new CompartmentsType();
+			Collection<CompartmentType> values = map.values();
+			aList.compartment = new ArrayList<CompartmentType>(values);
+			return aList;
+		}
+	}
+
+	/**
+	* leverages the xml marshalling to key value pairs.
+	*/
+	public static class PointsTypeAdapter extends XmlAdapter<PointsType, HashMap<Integer, PointType>> {
+
+		@Override
+		public HashMap<Integer, PointType> unmarshal(PointsType values) {
+			HashMap<Integer, PointType> map = new HashMap<Integer, PointType>();
+			for (PointType value : values.point)
+				map.put(value.id, value);
+			return map;
+		}
+
+		@Override
+		public PointsType marshal(HashMap<Integer, PointType> map) {
+			PointsType aList = new PointsType();
+			Collection<PointType> values = map.values();
+			aList.point = new ArrayList<PointType>(values);
+			return aList;
+		}
+	}
+
 }

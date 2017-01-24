@@ -69,7 +69,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
-import gde.utils.LocalizedDateTime;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
@@ -748,7 +747,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 							else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber()) || truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 								// discard truss
 							}
-							else if (this.application.getActiveObject() != null && truss.getValidatedObjectKey().isEmpty()) {
+							else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().isPresent()) {
 								log.log(Level.INFO, String.format("OSD candidate found for empty object \"%s\" in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								if (!this.settings.skipFilesWithoutObject()) {
 									if (ask4FilesWithoutObject) {

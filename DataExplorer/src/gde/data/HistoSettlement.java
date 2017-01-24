@@ -261,7 +261,7 @@ public class HistoSettlement extends Vector<Integer> {
 			for (int i = fromIndex; i < toIndex; i++) {
 				result.add(get(i));
 			}
-			log.log(Level.OFF, getComment(), result);
+			log.log(Level.FINER, getComment(), result);
 			return result;
 		}
 

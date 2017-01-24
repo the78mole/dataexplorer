@@ -9,12 +9,16 @@
 package gde.device;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -28,11 +32,61 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="Measurement" type="{}MeasurementType" maxOccurs="unbounded"/>
- *         &lt;element name="Settlement" type="{}SettlementType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="ReferenceGroup" type="{}ReferenceGroupType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="TransitionGroup" type="{}TransitionGroupType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="Transition" type="{}TransitionType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="Scoregroup" type="{}ScoregroupType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Settlements" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="Settlement" type="{}SettlementType" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
+ *         &lt;element name="ReferenceGroups" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="ReferenceGroup" type="{}ReferenceGroupType" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
+ *         &lt;element name="TransitionGroups" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="TransitionGroup" type="{}TransitionGroupType" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
+ *         &lt;element name="Transitions" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="Transition" type="{}TransitionType" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
+ *         &lt;element name="ScoreGroups" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="Scoregroup" type="{}ScoreGroupType" maxOccurs="unbounded"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="type" use="required" type="{}channel_types" />
@@ -46,26 +100,31 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ChannelType", propOrder = {
     "measurement",
-    "settlement",
-    "referenceGroup",
-    "transitionGroup",
-    "transition",
-    "scoregroup"
+    "settlements",
+    "referenceGroups",
+    "transitionGroups",
+    "transitions",
+    "scoreGroups"
 })
 public class ChannelType {
 
     @XmlElement(name = "Measurement", required = true)
     protected List<MeasurementType> measurement;
-    @XmlElement(name = "Settlement")
-    protected List<SettlementType> settlement;
-    @XmlElement(name = "ReferenceGroup")
-    protected List<ReferenceGroupType> referenceGroup;
-    @XmlElement(name = "TransitionGroup")
-    protected List<TransitionGroupType> transitionGroup;
-    @XmlElement(name = "Transition")
-    protected List<TransitionType> transition;
-    @XmlElement(name = "Scoregroup")
-    protected List<ScoregroupType> scoregroup;
+	@XmlElement(name = "Settlements")
+	@XmlJavaTypeAdapter(SettlementsAdapter.class)
+	protected LinkedHashMap<Integer, SettlementType>			settlements;
+	@XmlElement(name = "ReferenceGroups")
+	@XmlJavaTypeAdapter(ReferenceGroupsAdapter.class)
+	protected LinkedHashMap<Integer, ReferenceGroupType>	referenceGroups;
+	@XmlElement(name = "TransitionGroups")
+	@XmlJavaTypeAdapter(TransitionGroupsAdapter.class)
+	protected LinkedHashMap<Integer, TransitionGroupType>	transitionGroups;
+	@XmlElement(name = "Transitions")
+	@XmlJavaTypeAdapter(TransitionsAdapter.class)
+	protected LinkedHashMap<Integer, TransitionType>			transitions;
+	@XmlElement(name = "ScoreGroups")
+	@XmlJavaTypeAdapter(ScoreGroupsAdapter.class)
+	protected LinkedHashMap<Integer, ScoreGroupType>			scoreGroups;
     @XmlAttribute(required = true)
     protected String name;
     @XmlAttribute(required = true)
@@ -101,35 +160,237 @@ public class ChannelType {
     }
 
     /**
-     * Gets the value of the settlement property.
+	   * Gets the value of the settlements property.
+	 * 
+	   * @return
+	   *     possible object is
+	   *     {@link ChannelType.Settlements }
+	 * 
+	   */
+	public LinkedHashMap<Integer, SettlementType> getSettlements() {
+		if (this.settlements == null) {
+			this.settlements = new LinkedHashMap<Integer, SettlementType>();
+		}
+		return settlements;
+	}
+
+	/**
+	 * Sets the value of the settlements property.
+	* 
+	 * @param value
+	 *     allowed object is
+	 *     {@link ChannelType.Settlements }
+	* 
+	*/
+	public void setSettlements(LinkedHashMap<Integer, SettlementType> value) {
+		this.settlements = value;
+	}
+
+	/**
+	   * Gets the value of the referenceGroups property.
+	 * 
+	 * @return
+	 *     possible object is
+	   *     {@link ReferenceGroupsType }
+	 * 
+	 */
+	public LinkedHashMap<Integer, ReferenceGroupType> getReferenceGroups() {
+		if (this.referenceGroups == null) {
+			this.referenceGroups = new LinkedHashMap<Integer, ReferenceGroupType>();
+		}
+		return referenceGroups;
+	}
+
+	/**
+	   * Sets the value of the referenceGroups property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	   *     {@link ReferenceGroupsType }
+	 * 
+	 */
+	public void setReferenceGroups(LinkedHashMap<Integer, ReferenceGroupType> value) {
+		this.referenceGroups = value;
+	}
+
+	/**
+	   * Gets the value of the transitionGroups property.
+	 * 
+	   * @return
+	   *     possible object is
+	   *     {@link TransitionGroupsType }
+	 * 
+	   */
+	public LinkedHashMap<Integer, TransitionGroupType> getTransitionGroups() {
+		if (this.transitionGroups == null) {
+			this.transitionGroups = new LinkedHashMap<Integer, TransitionGroupType>();
+		}
+		return transitionGroups;
+	}
+
+	/**
+	 * Sets the value of the transitionGroups property.
+	* 
+	 * @param value
+	 *     allowed object is
+	 *     {@link TransitionGroupsType }
+	* 
+	*/
+	public void setTransitionGroups(LinkedHashMap<Integer, TransitionGroupType> value) {
+		this.transitionGroups = value;
+	}
+
+	/**
+	   * Gets the value of the transitions property.
+	 * 
+	   * @return
+	   *     possible object is
+	   *     {@link TransitionsType2 }
+	 * 
+	 */
+	public LinkedHashMap<Integer, TransitionType> getTransitions() {
+		if (this.transitions == null) {
+			this.transitions = new LinkedHashMap<Integer, TransitionType>();
+		}
+		return transitions;
+	}
+
+	/**
+	   * Sets the value of the transitions property.
+	 * 
+	   * @param value
+	   *     allowed object is
+	   *     {@link TransitionsType2 }
+	 * 
+	 */
+	public void setTransitions(LinkedHashMap<Integer, TransitionType> value) {
+		this.transitions = value;
+	}
+
+	/**
+	 * Gets the value of the scoreGroups property.
+	* 
+	 * @return
+	 *     possible object is
+	 *     {@link scoreGroups }
+	* 
+	*/
+	public LinkedHashMap<Integer, ScoreGroupType> getScoreGroups() {
+		if (this.scoreGroups == null) {
+			this.scoreGroups = new LinkedHashMap<Integer, ScoreGroupType>();
+		}
+		return scoreGroups;
+	}
+
+	/**
+	 * Sets the value of the scoreGroups property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link scoreGroups }
+	 * 
+	 */
+	public void setScoreGroups(LinkedHashMap<Integer, ScoreGroupType> value) {
+		this.scoreGroups = value;
+	}
+
+	/**
+	 * Gets the value of the name property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Sets the value of the name property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the settlement property.
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
      * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSettlement().add(newItem);
-     * </pre>
+	 */
+	public void setName(String value) {
+		this.name = value;
+	}
+
+	/**
+	 * Gets the value of the type property.
      * 
+	 * @return
+	 *     possible object is
+	 *     {@link ChannelTypes }
      * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SettlementType }
+	 */
+	public ChannelTypes getType() {
+		return type;
+	}
+
+	/**
+	 * Sets the value of the type property.
      * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link ChannelTypes }
      * 
      */
-    public List<SettlementType> getSettlement() {
-        if (settlement == null) {
-            settlement = new ArrayList<SettlementType>();
+	public void setType(ChannelTypes value) {
+		this.type = value;
+	}
+
+	public SettlementType getSettlementById(int settlementId) {
+		return this.getSettlements().get(settlementId);
+	}
+
+	public ReferenceGroupType getReferenceGroupById(int ReferenceGroupId) {
+		return this.getReferenceGroups().get(ReferenceGroupId);
+	}
+
+	public TransitionGroupType getTransitionGroupById(int transitionGroupId) {
+		return this.getTransitionGroups().get(transitionGroupId);
+	}
+
+	public TransitionType getTransitionById(int transitionId) {
+		return this.getTransitions().get(transitionId);
         }
-        return this.settlement;
+
+	public ScoreGroupType getScoreGroupById(int scoreGroupId) {
+		return this.getScoreGroups().get(scoreGroupId);
     }
 
   	/**
+	   * <p>Java class for anonymous complex type.
+	   * 
+	   * <p>The following schema fragment specifies the expected content contained within this class.
+	   * 
+	   * <pre>
+	   * &lt;complexType>
+	   *   &lt;complexContent>
+	   *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	   *       &lt;sequence>
+	   *         &lt;element name="ReferenceGroup" type="{}ReferenceGroupType" maxOccurs="unbounded"/>
+	   *       &lt;/sequence>
+	   *     &lt;/restriction>
+	   *   &lt;/complexContent>
+	   * &lt;/complexType>
+	   * </pre>
+	   * 
+	   * 
+	   */
+	@XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "referenceGroup"
+    })
+	public static class ReferenceGroups {
+
+		@XmlElement(name = "ReferenceGroup", required = true)
+		protected List<ReferenceGroupType> referenceGroup;
+
+		/**
      * Gets the value of the referenceGroup property.
      * 
      * <p>
@@ -158,195 +419,353 @@ public class ChannelType {
         return this.referenceGroup;
     }
 
+	}
+
     /**
-     * Gets the value of the transitionGroup property.
+	 * <p>Java class for anonymous complex type.
+	 * 
+	 * <p>The following schema fragment specifies the expected content contained within this class.
+	 * 
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	 *         &lt;element name="Scoregroup" type="{}ScoreGroupType" maxOccurs="unbounded"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 * 
+	 * 
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "scoreGroup"
+    })
+	public static class ScoreGroups {
+
+		@XmlElement(name = "Scoregroup", required = true)
+		protected List<ScoreGroupType> scoreGroup;
+
+		/**
+		 * Gets the value of the scoregroup property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the transitionGroup property.
+		 * This is why there is not a <CODE>set</CODE> method for the scoregroup property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getTransitionGroup().add(newItem);
+		 *    getScoregroup().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link TransitionGroupType }
+		 * {@link ScoreGroupType }
      * 
      * 
      */
-    public List<TransitionGroupType> getTransitionGroup() {
-        if (transitionGroup == null) {
-            transitionGroup = new ArrayList<TransitionGroupType>();
+		public List<ScoreGroupType> getScoreGroup() {
+			if (scoreGroup == null) {
+				scoreGroup = new ArrayList<ScoreGroupType>();
+			}
+			return this.scoreGroup;
         }
-        return this.transitionGroup;
+
     }
 
     /**
-     * Gets the value of the transition property.
+	 * <p>Java class for anonymous complex type.
+	 * 
+	 * <p>The following schema fragment specifies the expected content contained within this class.
+	 * 
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	 *         &lt;element name="Settlement" type="{}SettlementType" maxOccurs="unbounded"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 * 
+	 * 
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "settlement"
+    })
+	public static class Settlements {
+
+		@XmlElement(name = "Settlement", required = true)
+		protected List<SettlementType> settlement;
+
+		/**
+		 * Gets the value of the settlement property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the transition property.
+		 * This is why there is not a <CODE>set</CODE> method for the settlement property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getTransition().add(newItem);
+		 *    getSettlement().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link TransitionType }
+		 * {@link SettlementType }
      * 
      * 
      */
-    public List<TransitionType> getTransition() {
-        if (transition == null) {
-            transition = new ArrayList<TransitionType>();
+		public List<SettlementType> getSettlement() {
+			if (settlement == null) {
+				settlement = new ArrayList<SettlementType>();
+			}
+			return this.settlement;
         }
-        return this.transition;
     }
 
     /**
-     * Gets the value of the scoregroup property.
+	 * <p>Java class for anonymous complex type.
+	 * 
+	 * <p>The following schema fragment specifies the expected content contained within this class.
+	 * 
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	   *         &lt;element name="TransitionGroup" type="{}TransitionGroupType" maxOccurs="unbounded"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 * 
+	 * 
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "transitionGroup"
+    })
+	public static class TransitionGroups {
+
+		@XmlElement(name = "TransitionGroup", required = true)
+		protected List<TransitionGroupType> transitionGroup;
+
+		/**
+		   * Gets the value of the transitionGroup property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the scoregroup property.
+		   * This is why there is not a <CODE>set</CODE> method for the transitionGroup property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getScoregroup().add(newItem);
+		   *    getTransitionGroup().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ScoregroupType }
+		 * {@link TransitionGroupType }
      * 
      * 
      */
-    public List<ScoregroupType> getScoregroup() {
-        if (scoregroup == null) {
-            scoregroup = new ArrayList<ScoregroupType>();
+		public List<TransitionGroupType> getTransitionGroup() {
+			if (transitionGroup == null) {
+				transitionGroup = new ArrayList<TransitionGroupType>();
+			}
+			return this.transitionGroup;
         }
-        return this.scoregroup;
+
     }
 
     /**
-     * Gets the value of the name property.
+	 * <p>Java class for anonymous complex type.
+	 * 
+	 * <p>The following schema fragment specifies the expected content contained within this class.
+	 * 
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	   *         &lt;element name="Transition" type="{}TransitionType" maxOccurs="unbounded"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+	@XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "transition"
+    })
+	public static class Transitions {
+
+		@XmlElement(name = "Transition", required = true)
+		protected List<TransitionType> transition;
+
+    /**
+		   * Gets the value of the transition property.
+		 * 
+		 * <p>
+		 * This accessor method returns a reference to the live list,
+		 * not a snapshot. Therefore any modification you make to the
+		 * returned list will be present inside the JAXB object.
+		   * This is why there is not a <CODE>set</CODE> method for the transition property.
+		 * 
+		 * <p>
+		 * For example, to add a new item, do as follows:
+		 * <pre>
+		   *    getTransition().add(newItem);
+		 * </pre>
+		 * 
+		 * 
+		 * <p>
+		 * Objects of the following type(s) are allowed in the list
+		 * {@link TransitionType }
+     * 
+     *     
+     */
+		public List<TransitionType> getTransition() {
+			if (transition == null) {
+				transition = new ArrayList<TransitionType>();
+			}
+			return this.transition;
+		}
+
     }
 
     /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+	* leverages the xml marshalling to key value pairs.
      */
-    public void setName(String value) {
-        this.name = value;
+	public static class SettlementsAdapter extends XmlAdapter<ChannelType.Settlements, LinkedHashMap<Integer, SettlementType>> {
+
+		@Override
+		public LinkedHashMap<Integer, SettlementType> unmarshal(ChannelType.Settlements values) {
+			LinkedHashMap<Integer, SettlementType> map = new LinkedHashMap<Integer, SettlementType>();
+			for (SettlementType value : values.settlement)
+				map.put(value.settlementId, value);
+			return map;
     }
 
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ChannelTypes }
-     *     
-     */
-    public ChannelTypes getType() {
-        return type;
-    }
-
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ChannelTypes }
-     *     
-     */
-    public void setType(ChannelTypes value) {
-        this.type = value;
+		@Override
+		public ChannelType.Settlements marshal(LinkedHashMap<Integer, SettlementType> map) {
+			ChannelType.Settlements aList = new ChannelType.Settlements();
+			Collection<SettlementType> values = map.values();
+			aList.settlement = new ArrayList<SettlementType>(values);
+			return aList;
+		}
     }
 
   	/**
-  	 * @param referenceGroupId
-  	 * @return the value of the ReferenceGroupType property
+	* leverages the xml marshalling to key value pairs.
   	 */
-  	public ReferenceGroupType getReferenceGroupById(int referenceGroupId) {
-  		ReferenceGroupType result = null;
-  		for (ReferenceGroupType transitionType : this.referenceGroup) {
-  			if (transitionType.getReferenceGroupId() == referenceGroupId) {
-  				result = transitionType;
-  				break;
+	public static class ReferenceGroupsAdapter extends XmlAdapter<ChannelType.ReferenceGroups, LinkedHashMap<Integer, ReferenceGroupType>> {
+
+		@Override
+		public LinkedHashMap<Integer, ReferenceGroupType> unmarshal(ChannelType.ReferenceGroups values) {
+			LinkedHashMap<Integer, ReferenceGroupType> map = new LinkedHashMap<Integer, ReferenceGroupType>();
+			for (ReferenceGroupType value : values.referenceGroup)
+				map.put(value.referenceGroupId, value);
+			return map;
   			}
+
+		@Override
+		public ChannelType.ReferenceGroups marshal(LinkedHashMap<Integer, ReferenceGroupType> map) {
+			ChannelType.ReferenceGroups aList = new ChannelType.ReferenceGroups();
+			Collection<ReferenceGroupType> values = map.values();
+			aList.referenceGroup = new ArrayList<ReferenceGroupType>(values);
+			return aList;
   		}
-  		return result;
   	}
 
-  	public SettlementType getSettlementById(int settlementId) {
-  		SettlementType result = null;
-  		for (SettlementType settlementType : this.settlement) {
-  			if (settlementType.getSettlementId() == settlementId) {
-  				result = settlementType;
-  				break;
+	/**
+	* leverages the xml marshalling to key value pairs.
+	*/
+	public static class TransitionGroupsAdapter extends XmlAdapter<ChannelType.TransitionGroups, LinkedHashMap<Integer, TransitionGroupType>> {
+
+		@Override
+		public LinkedHashMap<Integer, TransitionGroupType> unmarshal(ChannelType.TransitionGroups values) {
+			LinkedHashMap<Integer, TransitionGroupType> map = new LinkedHashMap<Integer, TransitionGroupType>();
+			for (TransitionGroupType value : values.transitionGroup)
+				map.put(value.transitionGroupId, value);
+			return map;
   			}
+
+		@Override
+		public ChannelType.TransitionGroups marshal(LinkedHashMap<Integer, TransitionGroupType> map) {
+			ChannelType.TransitionGroups aList = new ChannelType.TransitionGroups();
+			Collection<TransitionGroupType> values = map.values();
+			aList.transitionGroup = new ArrayList<TransitionGroupType>(values);
+			return aList;
   		}
-  		return result;
   	}
 
   	/**
-  	 * @param referenceGroupId
-  	 * @return the value of the ReferenceGroupType property
+	* leverages the xml marshalling to key value pairs.
   	 */
-  	public TransitionGroupType getTransitionGroupById(int transitionGroupId) {
-  		TransitionGroupType result = null;
-  		for (TransitionGroupType transitionGroupType : this.transitionGroup) {
-  			if (transitionGroupType.getTransitionGroupId() == transitionGroupId) {
-  				result = transitionGroupType;
-  				break;
+	public static class TransitionsAdapter extends XmlAdapter<ChannelType.Transitions, LinkedHashMap<Integer, TransitionType>> {
+
+		@Override
+		public LinkedHashMap<Integer, TransitionType> unmarshal(ChannelType.Transitions values) {
+			LinkedHashMap<Integer, TransitionType> map = new LinkedHashMap<Integer, TransitionType>();
+			for (TransitionType value : values.transition)
+				map.put(value.transitionId, value);
+			return map;
   			}
+
+		@Override
+		public ChannelType.Transitions marshal(LinkedHashMap<Integer, TransitionType> map) {
+			ChannelType.Transitions aList = new ChannelType.Transitions();
+			Collection<TransitionType> values = map.values();
+			aList.transition = new ArrayList<TransitionType>(values);
+			return aList;
   		}
-  		return result;
+
   	}
 
   	/**
-  	 * @param transitionId
-  	 * @return the value of the transition property
+	* leverages the xml marshalling to key value pairs.
   	 */
-  	public TransitionType getTransitionById(int transitionId) {
-  		TransitionType result = null;
-  		for (TransitionType transitionType : this.transition) {
-  			if (transitionType.getTransitionId() == transitionId) {
-  				result = transitionType;
-  				break;
+	public static class ScoreGroupsAdapter extends XmlAdapter<ChannelType.ScoreGroups, LinkedHashMap<Integer, ScoreGroupType>> {
+
+		@Override
+		public LinkedHashMap<Integer, ScoreGroupType> unmarshal(ChannelType.ScoreGroups values) {
+			LinkedHashMap<Integer, ScoreGroupType> map = new LinkedHashMap<Integer, ScoreGroupType>();
+			for (ScoreGroupType value : values.scoreGroup)
+				map.put(value.scoreGroupId, value);
+			return map;
   			}
+
+		@Override
+		public ChannelType.ScoreGroups marshal(LinkedHashMap<Integer, ScoreGroupType> map) {
+			ChannelType.ScoreGroups aList = new ChannelType.ScoreGroups();
+			Collection<ScoreGroupType> values = map.values();
+			aList.scoreGroup = new ArrayList<ScoreGroupType>(values);
+			return aList;
   		}
-  		return result;
+
   	}
 
 }
