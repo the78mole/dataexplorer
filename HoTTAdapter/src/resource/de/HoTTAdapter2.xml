@@ -593,7 +593,7 @@
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
 				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am EAM</label>
-             </Measurement>
+            </Measurement>
             <Measurement>
                 <name>Spannung M</name>
                 <symbol>U</symbol>
@@ -3615,7 +3615,7 @@
                 <property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
 				<label>Zellenspannung 14 am EAM</label>
-           </Measurement>
+            </Measurement>
             <Measurement>
                 <name>Spannung ES1</name>
                 <symbol>U1</symbol>
@@ -4388,9 +4388,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="Anzahl Steigflüge" sumTriggerTimeText="Motorlaufzeit:">
-                    <trigger level="5000" isGreater="true" minTimeSec="5" comment="Strom &gt; 5 A über &gt; 5 Sekunden"/>
-                </statistics>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>

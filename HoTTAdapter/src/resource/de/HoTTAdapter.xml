@@ -1214,7 +1214,7 @@
 				<unit></unit>
 				<active>false</active>
 				<statistics min="true" max="true" avg="false" sigma="false" />
-				<label>Spannungsverlust des Empfängers</label>
+				<label>Ausschalten des Senders</label>
 			</Measurement>
 			<Measurement>
 				<name>Batt Low</name>
@@ -1222,7 +1222,7 @@
 				<unit></unit>
 				<active>false</active>
 				<statistics min="true" max="true" avg="false" sigma="false" />
-				<label>Spannungseinbruch des Empfängers</label>
+				<label>Senderspannung unter Limit</label>
 			</Measurement>
 			<Measurement>
 				<name>Reset</name>
@@ -1230,7 +1230,7 @@
 				<unit></unit>
 				<active>false</active>
 				<statistics min="true" max="true" avg="false" sigma="false" />
-				<label>Reset des Empfängers</label>
+				<label>Reset des Senders</label>
 			</Measurement>
 			<Measurement>
 				<name>Reserve</name>

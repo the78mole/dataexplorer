@@ -396,6 +396,7 @@
 				<unit>km/h</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
+				<label>Speed calculated using geo-coordinates and altitude difference</label>
 			</Measurement>
 			<Measurement>
 				<name>DistanceStart</name>
@@ -403,6 +404,7 @@
 				<unit>m</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
+				<label>Distance bewteen log start position of GPS sensot and actual position</label>
 			</Measurement>
 			<Measurement>
 				<name>Azimuth</name>
@@ -411,6 +413,8 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="2.0" name="factor" />
+				<suppressQuantiles>true</suppressQuantiles>
+				<label>Movement direction</label>
 			</Measurement>
 			<Measurement>
 				<name>TripLength</name>
@@ -419,6 +423,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Pathlength of the flight</label>
 			</Measurement>
 			<Measurement>
 				<name>VoltageRx</name>
@@ -465,7 +470,7 @@
 				<score label="logDataVersion" value="Device" type="String" />
 				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
 				<score label="logFileVersion" value="Log file" type="String" />
-				<label>Program versions of recording and analytic software</label>
+				<label>Versions of recording and analytic software</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="3">
 				<name>Data volume</name>
@@ -502,6 +507,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Batterie voltage GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Current</name>
@@ -512,6 +518,7 @@
 					<trigger comment="Current &gt; 3 A over &gt; 5 Seconds" minTimeSec="5" isGreater="true" level="3000" />
 				</statistics>
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Current from connected batterie GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Capacity</name>
@@ -520,6 +527,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="10.0" name="factor" />
+				<label>Capacity taken from connected batterie GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Power</name>
@@ -528,6 +536,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.01" name="factor" />
+				<label>Input power motor GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Balance</name>
@@ -536,6 +545,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="2.0" name="factor" />
+				<label>Voltage difference connected cells GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 1</name>
@@ -544,6 +554,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 1 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 2</name>
@@ -553,6 +564,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 2 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 3</name>
@@ -562,6 +574,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 3 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 4</name>
@@ -571,6 +584,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 4 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 5</name>
@@ -580,6 +594,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 5 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 6</name>
@@ -589,6 +604,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 6 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Revolution</name>
@@ -597,6 +613,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="10.0" name="factor" />
+				<label>RPM including gear factor GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Height</name>
@@ -632,6 +649,7 @@
 				<unit>ml</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+				<label>Fuel used up</label>
 			</Measurement>
 			<Measurement>
 				<name>Voltage S1</name>
@@ -640,6 +658,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Voltage sensor 1 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Voltage S2</name>
@@ -649,6 +668,7 @@
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
 				<property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="17" name="scale_sync_ref_ordinal" />
+				<label>Voltage sensor 2 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 1</name>
@@ -657,6 +677,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction" />
+				<label>Temperature Sensor 1 GAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 2</name>
@@ -666,6 +687,7 @@
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction" />
 				<property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal" />
+				<label>Temperature Sensor 2 GAM</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Duration</name>
@@ -694,7 +716,7 @@
 				<score label="logDataVersion" value="Device" type="String" />
 				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
 				<score label="logFileVersion" value="Log file" type="String" />
-				<label>Program versions of recording and analytic software</label>
+				<label>Progrversions of recording and analytic software</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="3">
 				<name>Data volume</name>
@@ -731,6 +753,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Batterie voltage EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Current</name>
@@ -741,6 +764,7 @@
 					<trigger comment="Current &gt; 3 A over &gt; 5 Seconds" minTimeSec="5" isGreater="true" level="3000" />
 				</statistics>
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Batterie current EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Capacity</name>
@@ -749,6 +773,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false" />
 				<property description="Factor to a measured value" type="Double" value="10.0" name="factor" />
+				<label>Capacity taken from connected batterie EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Power</name>
@@ -757,6 +782,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.01" name="factor" />
+				<label>Input power connected motor EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Balance</name>
@@ -765,6 +791,7 @@
 				<active>true</active>
 				<statistics sigma="true" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="2.0" name="factor" />
+				<label>Voltage difference between cells of connected batterie EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 1</name>
@@ -773,6 +800,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 1 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 2</name>
@@ -782,6 +810,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 2 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 3</name>
@@ -791,6 +820,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 3 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 4</name>
@@ -800,6 +830,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 4 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 5</name>
@@ -809,6 +840,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 5 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 6</name>
@@ -818,6 +850,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 6 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 7</name>
@@ -827,6 +860,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 7 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 8</name>
@@ -836,6 +870,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 8 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 9</name>
@@ -845,6 +880,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 9 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 10</name>
@@ -854,6 +890,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 10 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 11</name>
@@ -863,6 +900,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 11 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 12</name>
@@ -872,6 +910,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 12 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 13</name>
@@ -881,6 +920,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 13 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>CellVoltage 14</name>
@@ -890,6 +930,7 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<property description="Factor to a measured value" type="Double" value="0.02" name="factor" />
+				<label>Cell voltage 14 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Height</name>
@@ -926,6 +967,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Voltage sensor 1 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Voltage S2</name>
@@ -935,6 +977,7 @@
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
 				<property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="23" name="scale_sync_ref_ordinal" />
+				<label>Voltage sensor 2 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 1</name>
@@ -943,6 +986,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction" />
+				<label>Temperature sensor 1 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 2</name>
@@ -952,6 +996,7 @@
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction" />
 				<property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="25" name="scale_sync_ref_ordinal" />
+				<label>Temperature sensor 2 EAM</label>
 			</Measurement>
 			<Measurement>
 				<name>Revolution</name>
@@ -960,6 +1005,7 @@
 				<active>true</active>
 				<statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true" />
 				<property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor" />
+				<label>RPM including gear factor motor EAM</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Duration</name>
@@ -978,8 +1024,6 @@
 				<active>true</active>
 				<score label="totalReadings" value="Total readings" type="String" description="Total number of readings" />
 				<score label="sampledReadings" value="Sampled readings" type="String" description="Number of sampled readings" />
-				<score label="totalPackages" value="Total packages" type="String" description="Total number of packages" />
-				<score label="lostPackages" value="Lost packages" type="String" description="Number of lost packages" />
 				<label>Number of log measurement data blocks</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="2">
@@ -990,7 +1034,7 @@
 				<score label="logDataVersion" value="Device" type="String" />
 				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
 				<score label="logFileVersion" value="Log file" type="String" />
-				<label>Program versions of recording and analytic software</label>
+				<label>Progrversions of recording and analytic software</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="3">
 				<name>Data volume</name>
@@ -1170,7 +1214,7 @@
 				<unit></unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
-				<label>Receiver power loss</label>
+				<label>Transmitter power off</label>
 			</Measurement>
 			<Measurement>
 				<name>Batt Low</name>
@@ -1178,7 +1222,7 @@
 				<unit></unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
-				<label>Receiver reset</label>
+				<label>Transmitter voltage low</label>
 			</Measurement>
 			<Measurement>
 				<name>Reset</name>
@@ -1186,6 +1230,7 @@
 				<unit></unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+				<label>Transmitter reset</label>
 			</Measurement>
 			<Measurement>
 				<name>Reserve</name>
@@ -1222,7 +1267,7 @@
 				<score label="logDataVersion" value="Device" type="String" />
 				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
 				<score label="logFileVersion" value="Log file" type="String" />
-				<label>Program versions of recording and analytic software</label>
+				<label>Progrversions of recording and analytic software</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="3">
 				<name>Data volume</name>
@@ -1250,6 +1295,7 @@
 				<unit>%</unit>
 				<active>true</active>
 				<statistics sigma="true" avg="true" max="true" min="true" />
+				<label>Quality radio connection transmitter to receiver</label>
 			</Measurement>
 			<Measurement>
 				<name>Voltage</name>
@@ -1258,6 +1304,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Voltage of batterie ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Current</name>
@@ -1268,6 +1315,7 @@
 					<trigger comment="Current &gt; 3 A over &gt; 5 Seconds" minTimeSec="5" isGreater="true" level="3000" />
 				</statistics>
 				<property description="Factor to a measured value" type="Double" value="0.1" name="factor" />
+				<label>Current connected batterie ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Capacity</name>
@@ -1276,6 +1324,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="10.0" name="factor" />
+				<label>Capacity taken from connected batterie ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Power</name>
@@ -1284,6 +1333,7 @@
 				<active>true</active>
 				<statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="0.01" name="factor" />
+				<label>Input power motor ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Revolution</name>
@@ -1292,6 +1342,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="10.0" name="factor" />
+				<label>RPM including gear factor motor ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 1</name>
@@ -1299,6 +1350,7 @@
 				<unit>°C</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
+				<label>Temperature FETs ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 2</name>
@@ -1307,6 +1359,7 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal" />
+				<label>Temperature motor ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Voltage_min</name>
@@ -1316,6 +1369,7 @@
 				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="1" name="scale_sync_ref_ordinal" />
 				<property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Lowest voltage batterie ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Current_max</name>
@@ -1325,6 +1379,7 @@
 				<property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor" />
 				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Maximum current batterie ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Revolution_max</name>
@@ -1334,6 +1389,7 @@
 				<property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor" />
 				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="5" name="scale_sync_ref_ordinal" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Maximum RPM including gear factor motor ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 1_max</name>
@@ -1342,6 +1398,7 @@
 				<active>true</active>
 				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<suppressQuantiles>true</suppressQuantiles>
+				<label>Maximum temperature FETs ESC</label>
 			</Measurement>
 			<Measurement>
 				<name>Temperature 2_max</name>
@@ -1350,6 +1407,7 @@
 				<active>true</active>
 				<property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal" />
 				<suppressQuantiles>true</suppressQuantiles>
+ 				<label>Maximum temperature motor ESC</label>
 			</Measurement>
 			<Scoregroup scoregroupId="0">
 				<name>Duration</name>
@@ -1378,7 +1436,7 @@
 				<score label="logDataVersion" value="Device" type="String" />
 				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
 				<score label="logFileVersion" value="Log file" type="String" />
-				<label>Program versions of recording and analytic software</label>
+				<label>Progrversions of recording and analytic software</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="3">
 				<name>Data volume</name>
