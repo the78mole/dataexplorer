@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.2.9 - yy xxx 2016
+Version 3.2.9 - 26 Jan 2017
 +++++ important update Java Runtime Version prerequisite to 1.8 +++++
 +++++ important update Java 32 Bit -Xmx1024m, 64 Bit -Xmx3096m  +++++
 - fix early rounding while importing CSV data
