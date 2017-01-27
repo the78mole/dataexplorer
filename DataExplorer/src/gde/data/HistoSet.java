@@ -457,9 +457,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("cacheFilePath=%s", cacheFilePath.toString())); //$NON-NLS-1$
 		if (this.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
-				Iterator<Map.Entry<Path, Map<String, HistoVault>>> timeStampsIterator = trussJobs.entrySet().iterator();
-				while (timeStampsIterator.hasNext()) {
-					final Map<String, HistoVault> map = timeStampsIterator.next().getValue();
+				Iterator<Map.Entry<Path, Map<String, HistoVault>>> trussJobsIterator = trussJobs.entrySet().iterator();
+				while (trussJobsIterator.hasNext()) {
+					final Map<String, HistoVault> map = trussJobsIterator.next().getValue();
 					final Iterator<Map.Entry<String, HistoVault>> trussesIterator = map.entrySet().iterator();
 					while (trussesIterator.hasNext()) {
 						HistoVault truss = trussesIterator.next().getValue();
@@ -467,24 +467,24 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 							HistoVault histoVault = HistoVault.load(new BufferedInputStream(zf.getInputStream(zf.getEntry(truss.getVaultName()))));
 							// put the vault into the histoSet map and sum up the file length
 							if (!histoVault.isTruss()) {
-								List<HistoVault> vaultsList = this.get(truss.getLogStartTimestamp_ms());
-								if (vaultsList == null) this.put(truss.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
+								List<HistoVault> vaultsList = this.get(histoVault.getLogStartTimestamp_ms());
+								if (vaultsList == null) this.put(histoVault.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
 								vaultsList.add(histoVault);
 								if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
 										histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
-								localSizeSum_B += Paths.get(truss.getLogFilePath()).toFile().length();
+								localSizeSum_B += Paths.get(histoVault.getLogFilePath()).toFile().length();
 							}
 							trussesIterator.remove();
 						}
 					}
-					if (map.size() == 0) timeStampsIterator.remove();
+					if (map.size() == 0) trussJobsIterator.remove();
 				}
 			}
 		}
 		else if (!this.settings.isZippedCache() && FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
-			Iterator<Map.Entry<Path, Map<String, HistoVault>>> timeStampsIterator = trussJobs.entrySet().iterator();
-			while (timeStampsIterator.hasNext()) {
-				final Map<String, HistoVault> map = timeStampsIterator.next().getValue();
+			Iterator<Map.Entry<Path, Map<String, HistoVault>>> trussJobsIterator = trussJobs.entrySet().iterator();
+			while (trussJobsIterator.hasNext()) {
+				final Map<String, HistoVault> map = trussJobsIterator.next().getValue();
 				final Iterator<Map.Entry<String, HistoVault>> trussesIterator = map.entrySet().iterator();
 				while (trussesIterator.hasNext()) {
 					HistoVault truss = trussesIterator.next().getValue();
@@ -495,17 +495,17 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						}
 						// put the vault into the histoSet map and sum up the file length
 						if (histoVault != null && !histoVault.isTruss()) {
-							List<HistoVault> vaultsList = this.get(truss.getLogStartTimestamp_ms());
-							if (vaultsList == null) this.put(truss.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
+							List<HistoVault> vaultsList = this.get(histoVault.getLogStartTimestamp_ms());
+							if (vaultsList == null) this.put(histoVault.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
 							vaultsList.add(histoVault);
 							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
 									histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
-							localSizeSum_B += Paths.get(truss.getLogFilePath()).toFile().length();
+							localSizeSum_B += Paths.get(histoVault.getLogFilePath()).toFile().length();
 						}
 						trussesIterator.remove();
 					}
 				}
-				if (map.size() == 0) timeStampsIterator.remove();
+				if (map.size() == 0) trussJobsIterator.remove();
 			}
 		}
 		return localSizeSum_B;
