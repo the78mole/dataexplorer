@@ -99,7 +99,7 @@
             <Measurement>
                 <name>TemperatureRx</name>
                 <symbol>Trx</symbol>
-				<unit>°C</unit>
+				<unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -161,7 +161,7 @@
 			<Scoregroup scoregroupId="4">
 				<name>Packages lost</name>
 				<symbol></symbol>
-				<unit>‰</unit>
+				<unit>ï¿½</unit>
 				<active>true</active>
 				<score label="lostPackagesPerMille" value="Package lost ratio" type="String" description="lost packages / total packages" />
 				<property name="factor" value="0.1" type="Double" />
@@ -279,7 +279,7 @@
             <Measurement>
                 <name>TemperatureRx</name>
                 <symbol>Trx</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -345,7 +345,7 @@
             <Measurement>
                 <name>Latitude</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit>ï¿½</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="100.0" name="filter_factor"/>
@@ -354,7 +354,7 @@
             <Measurement>
                 <name>Longitude</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit>ï¿½</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="25.0" name="filter_factor"/>
@@ -409,7 +409,7 @@
             <Measurement>
                 <name>Azimuth</name>
                 <symbol></symbol>
-				<unit>°</unit>
+				<unit>ï¿½</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
@@ -437,7 +437,7 @@
             <Measurement>
                 <name>TemperatureRx</name>
                 <symbol>Trx</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -673,7 +673,7 @@
             <Measurement>
                 <name>Temperature 1</name>
                 <symbol>T1</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -682,7 +682,7 @@
             <Measurement>
                 <name>Temperature 2</name>
                 <symbol>T2</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -982,7 +982,7 @@
             <Measurement>
                 <name>Temperature 1</name>
                 <symbol>T1</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -991,7 +991,7 @@
             <Measurement>
                 <name>Temperature 2</name>
                 <symbol>T2</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
@@ -1084,14 +1084,14 @@
             <Measurement>
                 <name>Ch 1</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Ch 2</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1099,7 +1099,7 @@
             <Measurement>
                 <name>Ch 3</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1107,7 +1107,7 @@
             <Measurement>
                 <name>Ch 4</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1115,7 +1115,7 @@
             <Measurement>
                 <name>Ch 5</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1123,7 +1123,7 @@
             <Measurement>
                 <name>Ch 6</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1131,7 +1131,7 @@
             <Measurement>
                 <name>Ch 7</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1139,7 +1139,7 @@
             <Measurement>
                 <name>Ch 8</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1147,7 +1147,7 @@
             <Measurement>
                 <name>Ch 9</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1155,7 +1155,7 @@
             <Measurement>
                 <name>Ch 10</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1163,7 +1163,7 @@
             <Measurement>
                 <name>Ch 11</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1171,7 +1171,7 @@
             <Measurement>
                 <name>Ch 12</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1179,7 +1179,7 @@
             <Measurement>
                 <name>Ch 13</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1187,7 +1187,7 @@
             <Measurement>
                 <name>Ch 14</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1195,7 +1195,7 @@
             <Measurement>
                 <name>Ch 15</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1203,7 +1203,7 @@
             <Measurement>
                 <name>Ch 16</name>
                 <symbol></symbol>
-				<unit>µsec</unit>
+				<unit>ï¿½sec</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
@@ -1347,7 +1347,7 @@
             <Measurement>
                 <name>Temperature 1</name>
                 <symbol>T</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
 				<label>Temperature FETs ESC</label>
@@ -1355,7 +1355,7 @@
             <Measurement>
                 <name>Temperature 2</name>
                 <symbol>T</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
@@ -1394,7 +1394,7 @@
             <Measurement>
                 <name>Temperature 1_max</name>
                 <symbol>T_max</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
 				<suppressQuantiles>true</suppressQuantiles>
@@ -1403,7 +1403,7 @@
             <Measurement>
                 <name>Temperature 2_max</name>
                 <symbol>T_max</symbol>
-				<unit>°C</unit>
+				<unit>ï¿½C</unit>
                 <active>true</active>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="6" name="scale_sync_ref_ordinal"/>
 				<suppressQuantiles>true</suppressQuantiles>

@@ -159,7 +159,7 @@
 				<suppressQuantiles>true</suppressQuantiles>
             </Measurement>
             <Measurement>
-                <name>Longitude</name
+                <name>Longitude</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
