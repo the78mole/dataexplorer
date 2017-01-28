@@ -1997,6 +1997,7 @@ public class DataExplorer extends Composite {
 					isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
 					if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
+						DataExplorer.this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
 						DataExplorer.this.updateHistoGraphicsWindow(true);
 						DataExplorer.this.updateHistoTable(true);
 					}

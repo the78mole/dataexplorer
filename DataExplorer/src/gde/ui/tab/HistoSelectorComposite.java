@@ -251,7 +251,6 @@ public class HistoSelectorComposite extends Composite {
 			}
 			this.selectorColumnWidth = itemWidth;
 			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
-			recordSet.updateVisibleAndDisplayableRecordsForTable();
 		}
 		this.tableCurveTypeColumn.setWidth(122); // todo column width
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
