@@ -937,7 +937,8 @@
 	<target name="copy_misc" description="copy misc files to build/target/install" depends="init" >
 		<copy todir="${build.target.dir}" overwrite="true">
 			<fileset dir="build/misc" >
-				<include name="*MC3000*/*" />
+				<include name="*USB_D*/**" />
+				<include name="*UDEV*/*" />
 				<include name="*DUO*/*" />
 				<include name="GNULinux_cp210x/*" />
 				<include name="udev_rules/*" />
