@@ -65,6 +65,7 @@ public class Quantile {
 	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings) {
 		this.dPopulation = null;
 		this.iPopulation = new ArrayList<>(iPopulation);
+		if (this.iPopulation.isEmpty() ) throw new UnsupportedOperationException();
 		this.fixings = fixings;
 		if (fixings.contains(Fixings.REMOVE_NULLS) && fixings.contains(Fixings.REMOVE_ZEROS)) {
 			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {
@@ -115,6 +116,7 @@ public class Quantile {
 	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings) {
 		this.dPopulation = new ArrayList<>(dPopulation);
 		this.iPopulation = null;
+		if (this.dPopulation.isEmpty() ) throw new UnsupportedOperationException();
 		this.fixings = fixings;
 		if (fixings.contains(Fixings.REMOVE_NULLS) && fixings.contains(Fixings.REMOVE_ZEROS)) {
 			for (int i = this.iPopulation.size() - 1; i >= 0; i--) {

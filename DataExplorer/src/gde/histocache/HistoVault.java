@@ -351,8 +351,7 @@ public class HistoVault {
 	}
 
 	/**
-	   * Gets the value of the vaultChannelNumber property.
-	 * 
+	 * @return the channel number which was active during vault creation.
 	 */
 	public int getVaultChannelNumber() {
 		return vaultChannelNumber;

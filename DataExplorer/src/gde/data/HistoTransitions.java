@@ -440,14 +440,18 @@ public class HistoTransitions {
 		public double getQuantileValue(double probabilityCutPoint) {
 			// IS_SAMPLE
 			final int realSize = this.getSortedValues().size();
-			if (probabilityCutPoint >= 1. / (realSize + 1) && probabilityCutPoint < (double) realSize / (realSize + 1)) {
-				double position = (realSize + 1) * probabilityCutPoint;
-				return this.getSortedValues().get((int) position - 1) + (position - (int) position) * (this.getSortedValues().get((int) position) - this.getSortedValues().get((int) position - 1));
+			if (realSize > 0) {
+				if (probabilityCutPoint >= 1. / (realSize + 1) && probabilityCutPoint < (double) realSize / (realSize + 1)) {
+					double position = (realSize + 1) * probabilityCutPoint;
+					return this.getSortedValues().get((int) position - 1) + (position - (int) position) * (this.getSortedValues().get((int) position) - this.getSortedValues().get((int) position - 1));
+				}
+				else if (probabilityCutPoint < 1. / (realSize + 1))
+					return this.getSortedValues().get(0);
+				else
+					return this.getSortedValues().get(realSize - 1);
 			}
-			else if (probabilityCutPoint < 1. / (realSize + 1))
-				return this.getSortedValues().get(0);
 			else
-				return this.getSortedValues().get(realSize - 1);
+				throw new UnsupportedOperationException();
 		}
 
 		/**
@@ -455,17 +459,12 @@ public class HistoTransitions {
 		 * @return NaN for empty deque or a leveled extremum value for comparisons, i.e. a more stable value than the extremum value  
 		 */
 		public double getBenchmarkValue() {
-			if (this.isEmpty()) {
-				return Double.NaN;
+			if (Settings.getInstance().getMinmaxQuantileDistance() == 0.) {
+				// bypass deque sort
+				return this.extremeValue;
 			}
 			else {
-				if (Settings.getInstance().getMinmaxQuantileDistance() == 0.) {
-					// bypass deque sort
-					return this.extremeValue;
-				}
-				else {
-					return this.isMinimumExtremum ? this.getQuantileValue(Settings.getInstance().getMinmaxQuantileDistance()) : this.getQuantileValue(1. - Settings.getInstance().getMinmaxQuantileDistance());
-				}
+				return this.isMinimumExtremum ? this.getQuantileValue(Settings.getInstance().getMinmaxQuantileDistance()) : this.getQuantileValue(1. - Settings.getInstance().getMinmaxQuantileDistance());
 			}
 		}
 
@@ -580,7 +579,7 @@ public class HistoTransitions {
 
 			if (!transitionsFromRecord.isEmpty()) {
 				this.transitionCount += transitionsFromRecord.size();
-				log.log(Level.FINER, String.valueOf(transitionType.getTransitionId()) + "  transitionCount =", this.transitionCount); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d  transitionCount=%d", transitionType.getTransitionId(), this.transitionCount)); //$NON-NLS-1$
 
 				// assign the transitions to all transition groups which have a mapping to this transition type 
 				Iterable<TransitionGroupType> iterable = channelType.getTransitionGroups().values().stream()
@@ -610,7 +609,7 @@ public class HistoTransitions {
 							});
 						}
 						if (!intersection.isEmpty()) {
-							log.log(Level.OFF, "removals due to same timestamp:  ", intersection.size()); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d  removals due to same timestamp:  intersectionSize=%d", transitionType.getTransitionId(), intersection.size())); //$NON-NLS-1$
 						}
 					}
 					// merge the new transitions with existing transitions for the current group and class
@@ -641,7 +640,7 @@ public class HistoTransitions {
 						selectedTransitions.remove(timeStamp_ms);
 					}
 					if (!duplicates.isEmpty()) {
-						log.log(Level.OFF, "removals due to general overlap:  transitionCount =", duplicates.size()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d  removals due to general overlap:  duplicatesSize=%d", transitionType.getTransitionId(), duplicates.size())); //$NON-NLS-1$
 					}
 				} // for transitionGroupTypes
 			} // transitionsFromRecord.isEmpty()
@@ -738,7 +737,7 @@ public class HistoTransitions {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
-						log.log(Level.OFF, Integer.toString(transitionType.getTransitionId()), this);
+						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
 					else { // continue waiting for trigger fire
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -1046,9 +1045,12 @@ public class HistoTransitions {
 		sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(GDE.STRING_BLANK_AT_BLANK + this.referenceDeque.getTimestamps_100ns()).append(GDE.STRING_NEW_LINE);
 		sb.append(String.format("%38s threshold bench=%.1f extreme=", "", this.thresholdDeque.getBenchmarkValue()) + this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(GDE.STRING_BLANK_AT_BLANK + this.thresholdDeque.getTimestamps_100ns()).append(GDE.STRING_NEW_LINE);
-		sb.append(String.format("%38s recovery  bench=%.1f extreme=", "", this.recoveryDeque.getBenchmarkValue()) + this.recoveryDeque.getExtremeValue() + this.recoveryDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(GDE.STRING_BLANK_AT_BLANK + this.recoveryDeque.getTimestamps_100ns());
+		sb.append(GDE.STRING_BLANK_AT_BLANK + this.thresholdDeque.getTimestamps_100ns());
+		if (!this.recoveryDeque.isEmpty()) {
+			sb.append(GDE.STRING_NEW_LINE);
+			sb.append(String.format("%38s recovery  bench=%.1f extreme=", "", this.recoveryDeque.getBenchmarkValue()) + this.recoveryDeque.getExtremeValue() + this.recoveryDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(GDE.STRING_BLANK_AT_BLANK + this.recoveryDeque.getTimestamps_100ns());
+		}
 		return sb.toString();
 	}
 
