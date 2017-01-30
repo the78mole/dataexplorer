@@ -768,13 +768,13 @@ public class HistoVault {
 					}
 					else {
 						StatisticsType measurementStatistics = measurementType.getStatistics();
+						int triggerRefOrdinal = -1;
 						if (measurementStatistics != null) { // todo this creates trail types mismatch  :  && record.hasReasonableData()) {
-							int triggerRefOrdinal = -1;
 							if (measurementStatistics.getTriggerRefOrdinal() != null) {
 								int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
-								if (record != null && record.isDisplayable()) {
-									triggerRefOrdinal = tmpOrdinal;
-								}
+								//todo	if (record.isDisplayable()) { the record may be displayable later --- but note that calculating trigger ranges requires displayable true 
+								triggerRefOrdinal = tmpOrdinal;
+								//								}
 							}
 							boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
 							boolean isGpsCoordinates = this.device.isGPSCoordinates(record);

@@ -462,11 +462,11 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		if (this.getTrailRecordSuite().length == 1) { // standard curve
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++)
-					if (masterRecord.realRealGet(i) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.realRealGet(i) / 1000. - reduction) * factor + offset).intern();
+					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? this.getDecimalFormat().format((masterRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR;
 			}
 			else {
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-					if (masterRecord.realRealGet(j) != null) dataTableRow[i + 2] = this.getDecimalFormat().format((masterRecord.realRealGet(j) / 1000. - reduction) * factor + offset).intern();
+					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? this.getDecimalFormat().format((masterRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR;
 			}
 		}
 		else {
@@ -478,10 +478,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0; i < masterRecord.size(); i++) {
 						if (masterRecord.realRealGet(i) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.realGet(i) / 1000. - reduction) * factor + offset));
+							sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+							sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 					}
@@ -490,10 +490,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 						if (masterRecord.realRealGet(j) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
+							sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((medianRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+							sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 				}
@@ -506,10 +506,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0; i < masterRecord.size(); i++) {
 						if (masterRecord.realRealGet(i) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
+							sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.realRealGet(i) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+							sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 					}
@@ -518,10 +518,10 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 						if (masterRecord.realRealGet(j) != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(this.getDecimalFormat().format((lowerRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
+							sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(this.getDecimalFormat().format((middleRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
-							sb.append(delimiter).append(this.getDecimalFormat().format((upperRecord.realRealGet(j) / 1000. - reduction) * factor + offset));
+							sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+							sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
 							dataTableRow[i + 2] = sb.toString().intern();
 						}
 				}

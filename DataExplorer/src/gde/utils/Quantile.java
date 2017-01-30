@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
@@ -52,7 +54,7 @@ public class Quantile {
 	private int											realSize;																		// size of the population without zero values
 
 	public enum Fixings {
-		ALLOW_NULLS, REMOVE_NULLS, REMOVE_ZEROS, IS_SAMPLE
+		ALLOW_NULLS, REMOVE_NULLS, REMOVE_ZEROS, REMOVE_TYPEMAXMIN, IS_SAMPLE
 	};
 
 	/**
@@ -84,6 +86,10 @@ public class Quantile {
 					this.iPopulation.remove(i);
 				}
 			}
+		}
+		else if (fixings.contains(Fixings.REMOVE_TYPEMAXMIN)) {
+			Integer[] excludes = { Integer.MIN_VALUE, Integer.MAX_VALUE};
+			this.iPopulation.removeAll(Arrays.asList(excludes));
 		}
 		if (fixings.contains(Fixings.ALLOW_NULLS)) {
 			Collections.sort(this.iPopulation, Comparator.nullsLast(Integer::compareTo)); // approx. 20% performance loss 
@@ -130,6 +136,10 @@ public class Quantile {
 					this.dPopulation.remove(i);
 				}
 			}
+		}
+		else if (fixings.contains(Fixings.REMOVE_TYPEMAXMIN)) {
+			Double[] excludes = { -Double.MAX_VALUE, Double.MAX_VALUE};
+			this.iPopulation.removeAll(Arrays.asList(excludes));
 		}
 		if (fixings.contains(Fixings.ALLOW_NULLS)) {
 			Collections.sort(this.dPopulation, Comparator.nullsLast(Double::compareTo)); // approx. 20% performance loss 

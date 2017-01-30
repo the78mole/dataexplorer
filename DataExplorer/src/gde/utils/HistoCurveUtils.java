@@ -273,13 +273,16 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 						gc.drawLine(oldPosX, oldSuitePoints[0].y, posX, newSuitePoints[0].y);
 						// draw two extremum curves
 						gc.setLineStyle(SWT.LINE_DASH);
-						gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
-						gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
+//						gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
+//						gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
+						drawNullableLine(gc, oldSuitePoints[1], newSuitePoints[1]);
+						drawNullableLine(gc, oldSuitePoints[2], newSuitePoints[2]);
 					}
 					// draw vertical connection lines sparsely dotted
 					gc.setLineStyle(SWT.LINE_CUSTOM);
 					gc.setLineDash(new int[] { 2, 9 });
-					gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
+//					gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
+					drawNullableLine(gc, newSuitePoints[1], newSuitePoints[2]);
 					gc.setLineStyle(SWT.LINE_SOLID);
 				}
 				else {
@@ -290,6 +293,16 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, sb.toString());
 	}
 
+	/**
+	 * draws a line from posA to posB.
+	 * the y coordinate may be null.
+	 */
+	private static void drawNullableLine(GC gc, Point posA, Point posB) {
+		if (posA != null && posB != null) {
+			gc.drawLine(posA.x, posA.y, posB.x, posB.y);
+		}
+	}
+	
 	private static void drawHistoMarker(GC gc, Point newPoint, Color color, Density density) {
 		if (density == HistoTimeLine.Density.LOW) {
 			//Color last = gc.getBackground();
