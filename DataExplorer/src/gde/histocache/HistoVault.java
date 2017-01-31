@@ -66,6 +66,8 @@ import gde.data.HistoTransitions;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord.TrailType;
+import gde.device.ChannelPropertyType;
+import gde.device.ChannelPropertyTypes;
 import gde.device.EvaluationType;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
@@ -1145,7 +1147,9 @@ public class HistoVault {
 						}
 						if (record.realSize() != 0) {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
-							Quantile quantile = new Quantile(record, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
+							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
+							final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
+							Quantile quantile = new Quantile(record, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
 							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
 							entryPoints.addPoint(TrailType.Q1.ordinal(), TrailType.Q1.name(), (int) quantile.getQuartile1());
 							entryPoints.addPoint(TrailType.Q2.ordinal(), TrailType.Q2.name(), (int) quantile.getQuartile2());
@@ -1228,7 +1232,9 @@ public class HistoVault {
 						}
 						if (histoSettlement.realSize() != 0 && histoSettlement.hasReasonableData()) {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
-							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class));
+							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
+							final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
+							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
 							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
 							entryPoints.addPoint(TrailType.Q1.ordinal(), TrailType.Q1.name(), (int) quantile.getQuartile1());
 							entryPoints.addPoint(TrailType.Q2.ordinal(), TrailType.Q2.name(), (int) quantile.getQuartile2());

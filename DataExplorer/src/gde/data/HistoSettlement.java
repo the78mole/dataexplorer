@@ -30,6 +30,8 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.AmountTypes;
 import gde.device.CalculusTypes;
+import gde.device.ChannelPropertyType;
+import gde.device.ChannelPropertyTypes;
 import gde.device.ChannelType;
 import gde.device.DataTypes;
 import gde.device.DeltaBasisTypes;
@@ -135,7 +137,9 @@ public class HistoSettlement extends Vector<Integer> {
 		 * @return the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal a NoSuchElementException is thrown.) 
 		 */
 		public Double getRawMedian(int fromIndex, int toIndex) {
-			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class)).getQuartile2();
+			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
+			final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
+			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), sigmaOutlierFringe).getQuartile2();
 		}
 
 		public double getPropertyFactor() {
@@ -542,7 +546,9 @@ public class HistoSettlement extends Vector<Integer> {
 				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
-			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class));
+			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
+			final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
+			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
 			referenceExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 			values = new ArrayList<Double>();
 			// one additional time step before and after in order to cope with potential measurement latencies
@@ -550,7 +556,7 @@ public class HistoSettlement extends Vector<Integer> {
 				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
-			quantile = new Quantile(values, EnumSet.noneOf(Fixings.class));
+			quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
 			thresholdExtremum = quantile.getQuantile(isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 			if (transition.recoveryStartIndex > 0) {
 				values = new ArrayList<Double>();
@@ -558,7 +564,7 @@ public class HistoSettlement extends Vector<Integer> {
 					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				quantile = new Quantile(values, EnumSet.noneOf(Fixings.class));
+				quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
 				recoveryExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 			}
 		}
@@ -707,7 +713,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RELATIVE_DELTA_PERCENT) {
 				final double relativeDeltaValue = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition) / (recordGroup.getRealMax() - recordGroup.getRealMin());
-				reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000. * 100. * relativeDeltaValue) : (int) (1000. * 100. * relativeDeltaValue);  // all internal values are multiplied by 1000
+				reverseTranslatedResult = calculus.isUnsigned() ? (int) Math.abs(1000. * 100. * relativeDeltaValue) : (int) (1000. * 100. * relativeDeltaValue); // all internal values are multiplied by 1000
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);

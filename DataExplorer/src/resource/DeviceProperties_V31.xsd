@@ -945,6 +945,7 @@
 			<xs:enumeration value="status_fields" />
 			<xs:enumeration value="time_info" />
 			<xs:enumeration value="minimum_transition_steps" />
+			<xs:enumeration value="sigma_outlier_fringe" />
 			<xs:enumeration value="none_specified" />
 		</xs:restriction>
 	</xs:simpleType>

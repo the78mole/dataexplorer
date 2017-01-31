@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.device.ChannelPropertyType;
 import gde.device.ChannelPropertyTypes;
 import gde.device.ChannelType;
 import gde.device.IDevice;
@@ -709,7 +710,8 @@ public class HistoTransitions {
 		final double translatedThresholdValue = this.device.translateValue(transitionRecord, transitionType.getThresholdValue());
 		final double translatedRecoveryValue = transitionType.getClassType() != TransitionClassTypes.SLOPE ? this.device.translateValue(transitionRecord, transitionType.getRecoveryValue()) : 0;
 
-		final int minimumTransitionSteps = Integer.parseInt(this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.MINIMUM_TRANSITION_STEPS).getValue());
+		final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.MINIMUM_TRANSITION_STEPS);
+		final int minimumTransitionSteps = channelProperty != null && !channelProperty.getValue().isEmpty() ?  Integer.parseInt(channelProperty.getValue()) : 2;
 		final int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms());
 		final int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms());
 		final int recoveryDequeSize = (int) (transitionType.getClassType() != TransitionClassTypes.SLOPE ? transitionType.getRecoveryTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms() : 1);

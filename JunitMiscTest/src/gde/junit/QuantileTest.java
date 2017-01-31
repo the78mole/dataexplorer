@@ -19,11 +19,17 @@
 ****************************************************************************************/
 package gde.junit;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
@@ -71,7 +77,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 	private final double				qxSize1Array									= -99999.;
 	private final Integer[]			size1ArrayNull								= { null };
 
-	private static final double	DELTA													= 1e-13;
+	private static final double	DELTA													= 1e-9;
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -83,29 +89,160 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 		log.setUseParentHandlers(true);
 	}
 
-	public void testSampleWithZerosAllowNulls() {
+	public void testSigma() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.ALLOW_NULLS, Fixings.IS_SAMPLE));
-		assertEquals("q0SampleWithZeros=" + q0SampleWithZeros, q0SampleWithZeros, this.quantile.getQuartile0(), DELTA);
-		assertEquals("q1SampleWithZeros=" + q1SampleWithZeros, q1SampleWithZeros, this.quantile.getQuartile1(), DELTA);
-		assertEquals("q2SampleWithZeros=" + q2SampleWithZeros, q2SampleWithZeros, this.quantile.getQuartile2(), DELTA);
-		assertEquals("q3SampleWithZeros=" + q3SampleWithZeros, q3SampleWithZeros, this.quantile.getQuartile3(), DELTA);
-		assertEquals("q4SampleWithZeros=" + q4SampleWithZeros, q4SampleWithZeros, this.quantile.getQuartile4(), DELTA);
-		assertEquals("q33PerCentSampleWithZeros=" + q33PerCentSampleWithZeros, q33PerCentSampleWithZeros, this.quantile.getQuantile(.33), DELTA);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS),6);
+		final double avg = this.quantile.getAvgFigure();
+		final double avgSlow = this.quantile.getAvgSlow();
+		final double sigmaOBS = this.quantile.getSigmaOBS();
+		final double sigmaRunningOBS = this.quantile.getSigmaRunningOBS();
+		final double sigma = this.quantile.getSigmaFigure();
+		assertEquals("getAvgFigure=" + avg, avg, avgSlow, DELTA);
+		assertEquals("getSigmaOBS=" + sigmaOBS, sigmaOBS, sigmaRunningOBS, DELTA);
+		assertEquals("getSigmaFigure=" + sigma, sigma, sigmaRunningOBS, DELTA);
 	}
 
-	public void testSampleWhiskerWithZerosAllowNulls() {
+	public void testSortPerformance() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.ALLOW_NULLS, Fixings.IS_SAMPLE));
-		assertEquals("qLowerWhiskerSampleWithZeros=" + qLowerWhiskerSampleWithZeros, qLowerWhiskerSampleWithZeros, this.quantile.getQuantileLowerWhisker(), DELTA);
-		assertEquals("qUpperWhiskerSampleWithZeros=" + qUpperWhiskerSampleWithZeros, qUpperWhiskerSampleWithZeros, this.quantile.getQuantileUpperWhisker(), DELTA);
-		log.log(Level.INFO, " ---> " + this.quantile.getQuantileLowerWhisker());
-		log.log(Level.INFO, " ---> " + this.quantile.getQuantileUpperWhisker());
+		for (int i = 0; i < 15; i++) {
+			record.addAll(record);
+		}
+
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6);
+		ArrayList<Double> arrayList = new ArrayList<Double>();
+		for (Integer value : record) {
+			arrayList.add(value != null ? value.doubleValue() : null);
+		}
+		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS),6);
+		log.log(Level.INFO, "Avg   " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
+		log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaOBS());
+		log.log(Level.INFO, "Avg   " + quantileArray.getAvgFigure() + " bisher " + quantileArray.getAvgOBS());
+		log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaOBS());
+
+		for (int j = 0; j < 4; j++) {
+			long nanoTime = System.nanoTime(), nanoTimeSigma =0;
+			int qCount = 100;
+			for (int i = 0; i < qCount / 2; i++) {
+				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS),6);
+				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS),6);
+				nanoTimeSigma -= System.nanoTime();
+				this.quantile.getSigmaOBS();
+				quantileArray.getSigmaOBS();
+				nanoTimeSigma += System.nanoTime();
+			}
+			log.log(Level.INFO, "ms bisher ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
+			nanoTime = System.nanoTime();
+			nanoTimeSigma = 0;
+			for (int i = 0; i < qCount / 2; i++) {
+				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), true);
+				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), true);
+				nanoTimeSigma -= System.nanoTime();
+				this.quantile.getSigmaFigure();
+				quantileArray.getSigmaFigure();
+				nanoTimeSigma += System.nanoTime();
+			}
+			log.log(Level.INFO, "ms neu    ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
+			nanoTime = System.nanoTime();
+			nanoTimeSigma = 0;
+			for (int i = 0; i < qCount / 2; i++) {
+				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS),6);
+				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS),6);
+				nanoTimeSigma -= System.nanoTime();
+				this.quantile.getSigmaFigure();
+				quantileArray.getSigmaFigure();
+				nanoTimeSigma += System.nanoTime();
+			}
+			log.log(Level.INFO, "ms opt    ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
+		}
+	}
+
+	/**
+	 * ET: Vector    Integer performance for sigma based on parallel streams vs. conventional: 17 sec vs. 23 sec
+	 * ET: Vector    Double  performance for sigma based on parallel streams vs. conventional: 39 sec vs. 71 sec
+	 * ET: ArrayList Double  performance for sigma based on parallel streams vs. conventional: 38 sec vs. 69 sec
+	 * ET figures: 10.000 calculations for a Vector / ArrayList with 589.824 elements 
+	 */
+	private void estSigmaPerformance() {
+		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
+		for (int i = 0; i < 15; i++) {
+			record.addAll(record);
+		}
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6);
+		ArrayList<Double> arrayList = new ArrayList<Double>();
+		for (Integer value : record) {
+			arrayList.add(value != null ? value.doubleValue() : null);
+		}
+		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6);
+		log.log(Level.INFO, " ---> " + this.quantile.getAvgFigure());
+		log.log(Level.INFO, " ---> " + this.quantile.getAvgSlow());
+		log.log(Level.INFO, " ---> " + this.quantile.getSigmaOBS());
+		log.log(Level.INFO, " ---> " + this.quantile.getSigmaRunningOBS());
+		log.log(Level.INFO, " ---> " + this.quantile.getSigmaFigure());
+		long nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			this.quantile.getSigmaOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			this.quantile.getSigmaRunningOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			this.quantile.getSigmaFigure();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			this.quantile.getSigmaOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			this.quantile.getSigmaRunningOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			this.quantile.getSigmaFigure();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			quantileArray.getSigmaOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			quantileArray.getSigmaRunningOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			quantileArray.getSigmaFigure();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			quantileArray.getSigmaOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			quantileArray.getSigmaRunningOBS();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
+		nanoTime = System.nanoTime();
+		for (int i = 0; i < 9999; i++) {
+			quantileArray.getSigmaFigure();
+		}
+		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
 	}
 
 	public void testSampleZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS, Fixings.IS_SAMPLE));
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS, Fixings.IS_SAMPLE),6);
 		assertEquals("q0SampleZeros2Null=" + q0SampleZeros2Null, q0SampleZeros2Null, this.quantile.getQuartile0(), DELTA);
 		assertEquals("q1SampleZeros2Null=" + q1SampleZeros2Null, q1SampleZeros2Null, this.quantile.getQuartile1(), DELTA);
 		assertEquals("q2SampleZeros2Null=" + q2SampleZeros2Null, q2SampleZeros2Null, this.quantile.getQuartile2(), DELTA);
@@ -118,7 +255,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 	public void testPopulationWithZerosForbiddenNulls() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		try {
-			this.quantile = new Quantile(record, EnumSet.noneOf(Fixings.class));
+			this.quantile = new Quantile(record, EnumSet.noneOf(Fixings.class),6);
 			fail("Should throw an exception");
 		}
 		catch (Exception e) {
@@ -126,20 +263,9 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 		}
 	}
 
-	public void testQuantilesWithZerosAllowNulls() {
-		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.ALLOW_NULLS));
-		assertEquals("q0WithZeros=" + q0WithZeros, q0WithZeros, this.quantile.getQuartile0());
-		assertEquals("q1WithZeros=" + q1WithZeros, q1WithZeros, this.quantile.getQuartile1());
-		assertEquals("q2WithZeros=" + q2WithZeros, q2WithZeros, this.quantile.getQuartile2());
-		assertEquals("q3WithZeros=" + q3WithZeros, q3WithZeros, this.quantile.getQuartile3());
-		assertEquals("q4WithZeros=" + q4WithZeros, q4WithZeros, this.quantile.getQuartile4());
-		assertEquals("q33PerCentWithZeros=" + q33PerCentWithZeros, q33PerCentWithZeros, this.quantile.getQuantile(.33));
-	}
-
 	public void testPopulationZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS));
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
 		assertEquals("q0Zeros2Null=" + q0Zeros2Null, q0Zeros2Null, this.quantile.getQuartile0());
 		assertEquals("q1Zeros2Null=" + q1Zeros2Null, q1Zeros2Null, this.quantile.getQuartile1());
 		assertEquals("q2Zeros2Null=" + q2Zeros2Null, q2Zeros2Null, this.quantile.getQuartile2());
@@ -151,7 +277,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testQuantilesWhiskerZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS));
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
 		assertEquals("qLowerWhiskerZeros2Null=" + qLowerWhiskerZeros2Null, qLowerWhiskerZeros2Null, this.quantile.getQuantileLowerWhisker(), DELTA);
 		assertEquals("qUpperWhiskerZeros2Null=" + qUpperWhiskerZeros2Null, qUpperWhiskerZeros2Null, this.quantile.getQuantileUpperWhisker(), DELTA);
 		log.log(Level.INFO, " ---> " + this.quantile.getQuantileLowerWhisker());
@@ -160,7 +286,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testQuantilesAtSize1() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(size1Array));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS));
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
 		assertEquals("q0Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile0());
 		assertEquals("q1Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile1());
 		assertEquals("q2Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile2());
@@ -171,7 +297,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testQuantilesAtSize1ArrayNull() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(size1ArrayNull));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS));
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
 		try {
 			this.quantile.getQuartile2();
 			fail("Should throw an exception");

@@ -112,8 +112,12 @@ public class HistoRandomSample {
 
 		// find the maximum sampling timespan
 		int proposedTimespan_ms = this.settings.getSamplingTimespan_ms();
+		final ChannelPropertyType channelProperty = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.MINIMUM_TRANSITION_STEPS);
 		Map<Integer, TransitionType> transitionTypes = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions();
-		if (!transitionTypes.isEmpty()) {
+		if (channelProperty != null && !channelProperty.getValue().isEmpty()) {
+			proposedTimespan_ms = this.recordTimespan_ms;
+		}
+		else if (!transitionTypes.isEmpty()) {
 			for (TransitionType transitionType : transitionTypes.values()) {
 				if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 					proposedTimespan_ms = this.recordTimespan_ms;
