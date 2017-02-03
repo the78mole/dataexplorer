@@ -11,6 +11,8 @@ package gde.device;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="active" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *         &lt;element name="evaluation" type="{}EvaluationType" minOccurs="0"/>
  *         &lt;element name="property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="suppressQuantiles" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
+ *         &lt;element name="trailDisplay" type="{}TrailDisplayType" minOccurs="0"/>
  *         &lt;element name="label" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="settlementId" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
@@ -53,7 +55,7 @@ import javax.xml.bind.annotation.XmlType;
     "active",
     "evaluation",
     "property",
-    "suppressQuantiles",
+    "trailDisplay",
     "label"
 })
 public class SettlementType {
@@ -67,7 +69,7 @@ public class SettlementType {
     protected boolean active;
     protected EvaluationType evaluation;
     protected List<PropertyType> property;
-    protected Boolean suppressQuantiles;
+    protected TrailDisplayType trailDisplay;
     protected String label;
     @XmlAttribute(required = true)
     protected int settlementId;
@@ -297,27 +299,27 @@ public class SettlementType {
     }
 
     /**
-     * Gets the value of the suppressQuantiles property.
+     * Gets the value of the trailDisplay property.
      * 
      * @return
      *     possible object is
-     *     {@link Boolean }
+     *     {@link TrailDisplayType }
      *     
      */
-    public Boolean isSuppressQuantiles() {
-        return suppressQuantiles;
+    public Optional<TrailDisplayType> getTrailDisplay() {
+      return Optional.ofNullable(trailDisplay);
     }
 
     /**
-     * Sets the value of the suppressQuantiles property.
+     * Sets the value of the trailDisplay property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Boolean }
+     *     {@link TrailDisplayType }
      *     
      */
-    public void setSuppressQuantiles(Boolean value) {
-        this.suppressQuantiles = value;
+    public void setTrailDisplay(TrailDisplayType value) {
+        this.trailDisplay = value;
     }
 
     /**

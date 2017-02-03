@@ -15,16 +15,15 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for SettlementMappingType complex type.
+ * <p>Java class for TrailVisibilityType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="SettlementMappingType">
+ * &lt;complexType name="TrailVisibilityType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="settlementId" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="trail" type="{}trail_types" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -33,52 +32,34 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SettlementMappingType")
-public class SettlementMappingType {
+@XmlType(name = "TrailVisibilityType")
+public class TrailVisibilityType {
 
-    @XmlAttribute(required = true)
-    protected int settlementId;
     @XmlAttribute
-    protected String comment;
+    protected TrailTypes trail;
 
     /**
-     * Gets the value of the settlementId property.
-     * 
-     */
-    public int getSettlementId() {
-        return settlementId;
-    }
-
-    /**
-     * Sets the value of the settlementId property.
-     * 
-     */
-    public void setSettlementId(int value) {
-        this.settlementId = value;
-    }
-
-    /**
-     * Gets the value of the comment property.
+     * Gets the value of the trail property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link TrailTypes }
      *     
      */
-    public String getComment() {
-        return comment;
+    public TrailTypes getTrail() {
+        return trail;
     }
 
     /**
-     * Sets the value of the comment property.
+     * Sets the value of the trail property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link TrailTypes }
      *     
      */
-    public void setComment(String value) {
-        this.comment = value;
+    public void setTrail(TrailTypes value) {
+        this.trail = value;
     }
 
 }

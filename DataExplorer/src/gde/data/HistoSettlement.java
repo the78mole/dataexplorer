@@ -19,6 +19,7 @@
 package gde.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -81,14 +82,8 @@ public class HistoSettlement extends Vector<Integer> {
 	String												symbol;																																// symbol h
 
 	List<PropertyType>						properties						= new ArrayList<PropertyType>();								// offset, factor, reduction, ...
-	private int										maxValue							= 0;																						// max value of the curve
-	private int										minValue							= 0;																						// min value of the curve
-
-	// statistics
-	private int										avgValue							= Integer.MIN_VALUE;														// average value (avg = sum(xi)/n)
-	private int										sigmaValue						= Integer.MIN_VALUE;														// sigma value of data
-	private int										sumValue							= Integer.MIN_VALUE;														// sum value of data
 	private int										transitionCounter			= 0;
+	private Quantile							quantile							= null;
 
 	/**
 	 * @author Thomas Eickert
@@ -98,20 +93,16 @@ public class HistoSettlement extends Vector<Integer> {
 	 */
 	private class RecordGroup {
 
-		private IDevice							device;
-		private RecordSet						recordSet;
 		private ReferenceGroupType	referenceGroupType;
 		private Record[]						records;
 
-		public RecordGroup(IDevice device, RecordSet recordSet, ReferenceGroupType referenceGroupType) {
-			this.device = device;
-			this.recordSet = recordSet;
+		public RecordGroup(ReferenceGroupType referenceGroupType) {
 			this.referenceGroupType = referenceGroupType;
 			this.records = new Record[referenceGroupType.getMeasurementMapping().size() + referenceGroupType.getSettlementMapping().size()];
 
 			int i = 0;
 			for (MeasurementMappingType measurementMappingType : referenceGroupType.getMeasurementMapping()) {
-				this.records[i] = this.recordSet.get(this.recordSet.recordNames[measurementMappingType.getMeasurementOrdinal()]);
+				this.records[i] = HistoSettlement.this.parent.get(HistoSettlement.this.parent.recordNames[measurementMappingType.getMeasurementOrdinal()]);
 				i++;
 			}
 			for (SettlementMappingType settlementMappingType : referenceGroupType.getSettlementMapping()) {
@@ -137,9 +128,13 @@ public class HistoSettlement extends Vector<Integer> {
 		 * @return the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal a NoSuchElementException is thrown.) 
 		 */
 		public Double getRawMedian(int fromIndex, int toIndex) {
-			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
-			final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
-			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), sigmaOutlierFringe).getQuartile2();
+			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
+			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
+					: HistoSettlement.this.settings.getOutlierSigmaDefault();
+			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
+			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+					: HistoSettlement.this.settings.getOutlierRangeFactorDefault();
+			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor).getQuartile2();
 		}
 
 		public double getPropertyFactor() {
@@ -157,7 +152,7 @@ public class HistoSettlement extends Vector<Integer> {
 			double result = 0;
 			for (int i = 0; i < this.records.length; i++) {
 				Record record = this.records[i];
-				final double translatedValue = this.device.translateValue(record, record.getRealMaxValue());
+				final double translatedValue = HistoSettlement.this.device.translateValue(record, record.getRealMaxValue());
 				result = calculateAggregate(result, i, translatedValue);
 			}
 			return result;
@@ -170,7 +165,7 @@ public class HistoSettlement extends Vector<Integer> {
 			double result = 0;
 			for (int i = 0; i < this.records.length; i++) {
 				Record record = this.records[i];
-				final double translatedValue = this.device.translateValue(record, record.getRealMinValue());
+				final double translatedValue = HistoSettlement.this.device.translateValue(record, record.getRealMinValue());
 				result = calculateAggregate(result, i, translatedValue);
 			}
 			return result;
@@ -189,7 +184,7 @@ public class HistoSettlement extends Vector<Integer> {
 					break;
 				}
 				else {
-					final double translatedValue = this.device.translateValue(record, record.realRealGet(index));
+					final double translatedValue = HistoSettlement.this.device.translateValue(record, record.realRealGet(index));
 					result = calculateAggregate(result, i, translatedValue);
 				}
 			}
@@ -546,26 +541,32 @@ public class HistoSettlement extends Vector<Integer> {
 				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
-			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
-			final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
-			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
+			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
+			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : this.settings.getOutlierSigmaDefault();
+			final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
+			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+					: this.settings.getOutlierRangeFactorDefault();
+			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
 			referenceExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
 			values = new ArrayList<Double>();
 			// one additional time step before and after in order to cope with potential measurement latencies
 			for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
 				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
-			quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
+			quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
 			thresholdExtremum = quantile.getQuantile(isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
 			if (transition.recoveryStartIndex > 0) {
 				values = new ArrayList<Double>();
 				for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
 					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
+				quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
 				recoveryExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
 			}
 		}
 		else {
@@ -585,7 +586,7 @@ public class HistoSettlement extends Vector<Integer> {
 		else
 			throw new UnsupportedOperationException();
 
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s %s %s referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%s %s %s referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
 				, this.getName(), recordGroup.getComment(), leveling.value(), referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, transitionCalculus.getDeltaBasis()));
 		return deltaValue;
 	}
@@ -673,12 +674,6 @@ public class HistoSettlement extends Vector<Integer> {
 					skipCount++;
 			reverseTranslatedResult = (int) reverseTranslateValue(Math.sqrt(q / (transition.thresholdSize - skipCount - 1)));
 		}
-		else if (transitionAmount.getAmountType() == AmountTypes.SUM) {
-			double sum = 0.;
-			for (int j = transition.thresholdStartIndex; j < transition.thresholdEndIndex + 1; j++)
-				sum += transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.realRealGet(j))) : this.device.translateValue(record, record.realRealGet(j));
-			reverseTranslatedResult = (int) reverseTranslateValue(sum);
-		}
 		else {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
@@ -700,7 +695,7 @@ public class HistoSettlement extends Vector<Integer> {
 		TransitionCalculusType calculus = this.settlement.getEvaluation().getTransitionCalculus();
 		log.log(Level.FINEST, GDE.STRING_GREATER, calculus);
 		final ChannelType logChannel = this.device.getDeviceConfiguration().getChannel(this.logChannelNumber);
-		final RecordGroup recordGroup = new RecordGroup(this.device, this.parent, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
+		final RecordGroup recordGroup = new RecordGroup(logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
 		if (recordGroup.hasReasonableData()) {
 			final int reverseTranslatedResult;
 			if (calculus.getCalculusType() == CalculusTypes.DELTA) {
@@ -719,7 +714,7 @@ public class HistoSettlement extends Vector<Integer> {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
 				if (log.isLoggable(Level.FINER))
 					log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator + recordGroup.getSubGrouped(transition.referenceStartIndex, transition.thresholdEndIndex + 1)); //$NON-NLS-1$
-				final RecordGroup divisorRecordGroup = new RecordGroup(this.device, this.parent, logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
+				final RecordGroup divisorRecordGroup = new RecordGroup(logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
@@ -761,35 +756,12 @@ public class HistoSettlement extends Vector<Integer> {
 	@Override
 	@Deprecated // use elaborated add methods for settlements 
 	public synchronized boolean add(Integer point) {
-		final String $METHOD_NAME = "add"; //$NON-NLS-1$
-		if (point != null) {
-			if (super.size() == 0) {
-				this.minValue = this.maxValue = point;
-			}
-			else {
-				if (point > this.maxValue)
-					this.maxValue = point;
-				else if (point < this.minValue) this.minValue = point;
-			}
-			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
-			if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		return super.add(point);
 	}
 
 	@Override
+	@Deprecated // use elaborated add methods for settlements 
 	public synchronized Integer set(int index, Integer point) {
-		final String $METHOD_NAME = "set"; //$NON-NLS-1$
-		if (super.size() == 0) {
-			this.minValue = this.maxValue = point;
-		}
-		else {
-			if (point > this.maxValue)
-				this.maxValue = point;
-			else if (point < this.minValue) this.minValue = point;
-		}
-		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		return super.set(index, point);
 	}
 
@@ -882,12 +854,12 @@ public class HistoSettlement extends Vector<Integer> {
 			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
-	public int getRealMaxValue() {
-		return this.maxValue;
+	public int getMaxFigure() {
+		return (int) getQuantile().getMaxFigure();
 	}
 
-	public int getRealMinValue() {
-		return this.minValue;
+	public int getMinFigure() {
+		return (int) getQuantile().getMinFigure();
 	}
 
 	/**
@@ -907,12 +879,12 @@ public class HistoSettlement extends Vector<Integer> {
 		return super.size();
 	}
 
-	public Integer getFirst() {
-		return super.size() > 0 ? super.get(0) : 0;
+	public Integer getFirstFigure() {
+		return (int) getQuantile().getFirstFigure();
 	}
 
-	public Integer getLast() {
-		return super.size() > 0 ? super.get(super.size() - 1) : 0;
+	public Integer getLastFigure() {
+		return (int) getQuantile().getLastFigure();
 	}
 
 	/**
@@ -955,203 +927,25 @@ public class HistoSettlement extends Vector<Integer> {
 		}
 	}
 
-	/**
-	 * @return the parent
-	 */
 	public RecordSet getParent() {
 		return this.parent;
 	}
 
-	//	/** 
-	//	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of this record (set)
-	//	 * @return time stamp of the date and time when the record starts
-	//	 */
-	//	public long getStartTimeStamp() {
-	//		return this.timeStep_ms == null ? this.parent.timeStep_ms.getStartTimeStamp() : this.timeStep_ms.getStartTimeStamp();
-	//	}
-	//
-	//	/** 
-	//	 * query time step time in mills seconds at index
-	//	 * @return time step in msec
-	//	 */
-	//	public double getTime_ms(int index) {
-	//		return this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index) : this.timeStep_ms.getTime_ms(index);
-	//	}
-	//
-	//	/** 
-	//	 * query time step time in mills seconds at index
-	//	 * @return time step in msec
-	//	 */
-	//	public double getLastTime_ms() {
-	//		return this.timeStep_ms == null ? this.parent.timeStep_ms.lastElement() / 10.0 : this.timeStep_ms.lastElement() / 10.0;
-	//	}
-	//
-	//	/** 
-	//	 * query time step in mills seconds, this property is hold local to be independent (compare window)
-	//	 * @return time step in msec
-	//	 */
-	//	public double getAverageTimeStep_ms() {
-	//		return this.timeStep_ms == null ? this.parent.getAverageTimeStep_ms() : this.timeStep_ms.getAverageTimeStep_ms();
-	//	}
-	//
-	//	/**
-	//	 * set the time step in milli seconds, this property is hold local to be independent
-	//	 * @param timeStep_ms the timeStep_ms to set
-	//	 */
-	//	void setTimeStep_ms(double newTimeStep_ms) {
-	//		this.timeStep_ms = new TimeSteps(newTimeStep_ms, HistoSettlement.initialRecordCapacity);
-	//	}
-	//
-	//	/**
-	//	 * @return the maximum time of this record, which should correspondence to the last entry in timeSteps
-	//	 */
-	//	public double getMaxTime_ms() {
-	//		return this.timeStep_ms == null ? this.parent.getMaxTime_ms() : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.elementCount - 1) : this.timeStep_ms.getMaxTime_ms();
-	//	}
-	//
-	//	/**
-	//	 * Find the indexes in this time vector where the given time value is placed
-	//	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
-	//	 * only in case where the given time matches an existing entry both indexes are equal.
-	//	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
-	//	 * @param time_ms
-	//	 * @return two index values around the given time 
-	//	 */
-	//	public int[] findBoundingIndexes(double time_ms) {
-	//		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
-	//		if (this.elementCount > 0) {
-	//			indexs[0] = indexs[0] > this.elementCount - 1 ? this.elementCount - 1 : indexs[0];
-	//			indexs[1] = indexs[1] > this.elementCount - 1 ? this.elementCount - 1 : indexs[1];
-	//		}
-	//		return indexs;
-	//	}
-	//
-	//	/**
-	//	 * find the index closest to given time in msec
-	//	 * @param time_ms
-	//	 * @return index nearest to given time
-	//	 */
-	//	public int findBestIndex(double time_ms) {
-	//		int index = this.timeStep_ms == null ? this.parent.timeStep_ms.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
-	//		return index > this.elementCount - 1 ? this.elementCount - 1 : index;
-	//	}
-	//
-	/**
-	 * reset the min-max-values to enable new settings after re-calculation
-	 */
-	public void resetMinMax() {
-		this.maxValue = 0;
-		this.minValue = 0;
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name);
-	}
-
-	/**
-	 * set new the min-max-values after external re-calculation
-	 */
-	public void setMinMax(int newMin, int newMax) {
-		this.maxValue = newMax;
-		this.minValue = newMin;
-	}
-
-	/**
-	 * reset all variables to enable re-calcualation of statistics
-	 */
-	public void resetStatiticCalculationBase() {
-		synchronized (this) {
-			this.avgValue = Integer.MIN_VALUE;
-			this.sigmaValue = Integer.MIN_VALUE;
-			this.sumValue = Integer.MIN_VALUE;
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name);
-		}
-	}
-
-	/**
-	 * @return the sumValue
-	 */
-	public int getSumValue() {
-		this.setSumValue();
-		return this.sumValue;
-	}
-
-	/**
-	 * calculates the sumValue
-	 */
-	public void setSumValue() {
-		synchronized (this) {
-			if (this.size() >= 1) {
-				long sum = 0;
-				for (Integer xi : this) {
-					sum += xi;
-				}
-				// all measurement values are int. so sum should also be int. pls adjust property type 'factor'.
-				if (sum > Integer.MAX_VALUE || sum < Integer.MIN_VALUE) throw new IllegalArgumentException();
-				this.sumValue = (int) sum;
-			}
-		}
+	public int getSumFigure() {
+		return (int) getQuantile().getSumFigure();
 	}
 
 	/**
 	 * @return the avgValue
 	 */
-	public int getAvgValue() {
-		this.setAvgValue();
-		return this.avgValue;
+	public int getAvgFigure() {
+		return (int) getQuantile().getAvgFigure();
 	}
 
-	/**
-	 * calculates the avgValue
-	 */
-	public void setAvgValue() {
-		synchronized (this) {
-			if (this.size() >= 1) { // ET changed from 2 to 1
-				long sum = 0;
-				int zeroCount = 0;
-				for (Integer xi : this) {
-					if (xi != 0) {
-						sum += xi;
-					}
-					else {
-						zeroCount++;
-					}
-				}
-				this.avgValue = (this.size() - zeroCount) != 0 ? (int) (sum / (this.size() - zeroCount)) : 0;
-			}
-			else {
-				this.avgValue = 0;
-			}
-		}
+	public int getSigmaFigure() {
+		return (int) getQuantile().getSigmaFigure();
 	}
 
-	/**
-	 * @return the sigmaValue
-	 */
-	public int getSigmaValue() {
-		this.setSigmaValue();
-		return this.sigmaValue;
-	}
-
-	/**
-	 * calculates the sigmaValue 
-	 */
-	public void setSigmaValue() {
-		synchronized (this) {
-			if (super.size() >= 2) {
-				double average = this.getAvgValue() / 1000.0;
-				double sumPoweredValues = 0;
-				for (Integer xi : this) {
-					sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
-				}
-				this.sigmaValue = (int) (Math.sqrt(sumPoweredValues / (this.realSize() - 1)) * 1000);
-			}
-			else {
-				this.sigmaValue = 0;
-			}
-		}
-	}
-
-	/**
-	 * @return the sumValue
-	 */
 	public int getTransitionCounter() {
 		return this.transitionCounter;
 	}
@@ -1160,7 +954,7 @@ public class HistoSettlement extends Vector<Integer> {
 	 * @return true if the record contained reasonable date which can be displayed
 	 */
 	public boolean hasReasonableData() {
-		return this.realSize() > 0 && (this.minValue != this.maxValue || translateValue(this.maxValue / 1000.0) != 0.0);
+		return this.realSize() > 0 && (getMinFigure() != getMaxFigure() || translateValue(getMaxFigure() / 1000.0) != 0.0);
 	}
 
 	/**
@@ -1215,11 +1009,15 @@ public class HistoSettlement extends Vector<Integer> {
 		return this.name;
 	}
 
-	/**
-	 * @return the settlement
-	 */
 	public SettlementType getSettlement() {
 		return this.settlement;
+	}
+
+	public Quantile getQuantile() {
+		if (this.quantile == null) {
+			this.quantile = new Quantile(this, EnumSet.of(Fixings.IS_SAMPLE, Fixings.REMOVE_NULLS, Fixings.REMOVE_TYPEMAXMIN), 9, 9);
+		}
+		return this.quantile;
 	}
 
 }

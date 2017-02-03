@@ -35,7 +35,6 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -65,16 +64,14 @@ import gde.data.HistoSettlement;
 import gde.data.HistoTransitions;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.data.TrailRecord.TrailType;
 import gde.device.ChannelPropertyType;
 import gde.device.ChannelPropertyTypes;
-import gde.device.EvaluationType;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
-import gde.device.ReferenceGroupType;
 import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
+import gde.device.TrailTypes;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
@@ -1077,43 +1074,43 @@ public class HistoVault {
 							boolean isGpsCoordinates = this.device.isGPSCoordinates(record);
 							if (measurementStatistics.isAvg()) {
 								if (isTriggerLevel)
-									entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0);
+									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0);
 								else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
 									if (isGpsCoordinates)
-									entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), record.getAvgValue());
+									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), record.getAvgValue());
 									else
-									entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
+									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
 							}
 							if (measurementStatistics.isMax()) {
 								if (isTriggerLevel)
-									entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), record.getMaxValueTriggered());
+									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), record.getMaxValueTriggered());
 								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
 									if (isGpsCoordinates)
-									entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), record.getRealMaxValue());
+									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), record.getRealMaxValue());
 									else
-									entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
+									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
 							}
 							if (measurementStatistics.isMin()) {
 								if (isTriggerLevel)
-									entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), record.getMinValueTriggered());
+									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), record.getMinValueTriggered());
 								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) //
 									if (isGpsCoordinates)
-									entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), record.getRealMinValue());
+									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), record.getRealMinValue());
 									else
-									entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
+									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
 							}
 							if (measurementStatistics.isSigma()) {
 								if (isTriggerLevel)
-									entryPoints.addPoint(TrailType.REAL_SD.ordinal(), TrailType.REAL_SD.name(), record.getSigmaValueTriggered());
+									entryPoints.addPoint(TrailTypes.REAL_SD.ordinal(), TrailTypes.REAL_SD.name(), record.getSigmaValueTriggered());
 								else if (triggerRefOrdinal < 0 || record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
-									entryPoints.addPoint(TrailType.REAL_SD.ordinal(), TrailType.REAL_SD.name(),
+									entryPoints.addPoint(TrailTypes.REAL_SD.ordinal(), TrailTypes.REAL_SD.name(),
 											triggerRefOrdinal < 0 ? (Integer) record.getSigmaValue() : (Integer) record.getSigmaValueTriggered(triggerRefOrdinal));
 							}
 							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1)
-									entryPoints.addPoint(TrailType.REAL_SUM_TRIGGERED.ordinal(), TrailType.REAL_SUM_TRIGGERED.name(), record.getSumTriggeredRange());
+									entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED.ordinal(), TrailTypes.REAL_SUM_TRIGGERED.name(), record.getSumTriggeredRange());
 								else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-									entryPoints.addPoint(TrailType.REAL_SUM_TRIGGERED.ordinal(), TrailType.REAL_SUM_TRIGGERED.name(), record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal()));
+									entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED.ordinal(), TrailTypes.REAL_SUM_TRIGGERED.name(), record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal()));
 								}
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 									Record referencedRecord = recordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
@@ -1121,44 +1118,47 @@ public class HistoVault {
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax()))
 										// todo trigger ratio is multiplied by 1000 (per mille)
 										if (referencedStatistics.isAvg())
-										entryPoints.addPoint(TrailType.REAL_AVG_RATIO_TRIGGERED.ordinal(), TrailType.REAL_AVG_RATIO_TRIGGERED.name(), (int) Math.round(referencedRecord.getAvgValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
+										entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal(), TrailTypes.REAL_AVG_RATIO_TRIGGERED.name(), (int) Math.round(referencedRecord.getAvgValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
 										else if (referencedStatistics.isMax()) //
-											entryPoints.addPoint(TrailType.REAL_MAX_RATIO_TRIGGERED.ordinal(), TrailType.REAL_MAX_RATIO_TRIGGERED.name(),
+											entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal(), TrailTypes.REAL_MAX_RATIO_TRIGGERED.name(),
 													(int) Math.round(referencedRecord.getMaxValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
 								}
 							}
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
-								entryPoints.addPoint(TrailType.REAL_TIME_SUM_TRIGGERED.ordinal(), TrailType.REAL_TIME_SUM_TRIGGERED.name(), record.getTimeSumTriggeredRange_ms());
+								entryPoints.addPoint(TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal(), TrailTypes.REAL_TIME_SUM_TRIGGERED.name(), record.getTimeSumTriggeredRange_ms());
 							}
 							if (measurementStatistics.isCountByTrigger() != null) {
-								entryPoints.addPoint(TrailType.REAL_COUNT_TRIGGERED.ordinal(), TrailType.REAL_COUNT_TRIGGERED.name(), record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0);
-							}
-						}
-						else {
-							// these trail types might act as default trails
-							for (TrailType trailType : TrailType.getSubstitutes()) {
-								if (trailType == TrailType.REAL_LAST)
-									entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), record.realRealGet(record.size() - 1));
-								else if (trailType == TrailType.REAL_FIRST)
-									entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), record.realRealGet(0));
-								else
-									throw new UnsupportedOperationException(record.getName());
+								entryPoints.addPoint(TrailTypes.REAL_COUNT_TRIGGERED.ordinal(), TrailTypes.REAL_COUNT_TRIGGERED.name(), record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0);
 							}
 						}
 						if (record.realSize() != 0) {
+							entryPoints.addPoint(TrailTypes.REAL_FIRST.ordinal(), TrailTypes.REAL_FIRST.name(), record.realRealGet(0));
+							entryPoints.addPoint(TrailTypes.REAL_LAST.ordinal(), TrailTypes.REAL_LAST.name(), record.realRealGet(record.size() - 1));
+
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
-							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
-							final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
-							Quantile quantile = new Quantile(record, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
-							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
-							entryPoints.addPoint(TrailType.Q1.ordinal(), TrailType.Q1.name(), (int) quantile.getQuartile1());
-							entryPoints.addPoint(TrailType.Q2.ordinal(), TrailType.Q2.name(), (int) quantile.getQuartile2());
-							entryPoints.addPoint(TrailType.Q3.ordinal(), TrailType.Q3.name(), (int) quantile.getQuartile3());
-							entryPoints.addPoint(TrailType.Q4.ordinal(), TrailType.Q4.name(), (int) quantile.getQuartile4());
-							entryPoints.addPoint(TrailType.Q_25_PERMILLE.ordinal(), TrailType.Q_25_PERMILLE.name(), (int) quantile.getQuantile(.025));
-							entryPoints.addPoint(TrailType.Q_975_PERMILLE.ordinal(), TrailType.Q_975_PERMILLE.name(), (int) quantile.getQuantile(.975));
-							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
-							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
+							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
+							final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : this.settings.getOutlierSigmaDefault();
+							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
+							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue()) : this.settings.getOutlierRangeFactorDefault();
+							Quantile quantile = new Quantile(record, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+							entryPoints.addPoint(TrailTypes.AVG.ordinal(), TrailTypes.AVG.name(), (int) quantile.getAvgFigure());
+							entryPoints.addPoint(TrailTypes.MAX.ordinal(), TrailTypes.MAX.name(), (int) quantile.getMaxFigure());
+							entryPoints.addPoint(TrailTypes.MIN.ordinal(), TrailTypes.MIN.name(), (int) quantile.getMinFigure());
+							entryPoints.addPoint(TrailTypes.SD.ordinal(), TrailTypes.SD.name(), (int) quantile.getSigmaFigure());
+							entryPoints.addPoint(TrailTypes.Q0.ordinal(), TrailTypes.Q0.name(), (int) quantile.getQuartile0());
+							entryPoints.addPoint(TrailTypes.Q1.ordinal(), TrailTypes.Q1.name(), (int) quantile.getQuartile1());
+							entryPoints.addPoint(TrailTypes.Q2.ordinal(), TrailTypes.Q2.name(), (int) quantile.getQuartile2());
+							entryPoints.addPoint(TrailTypes.Q3.ordinal(), TrailTypes.Q3.name(), (int) quantile.getQuartile3());
+							entryPoints.addPoint(TrailTypes.Q4.ordinal(), TrailTypes.Q4.name(), (int) quantile.getQuartile4());
+							entryPoints.addPoint(TrailTypes.Q_25_PERMILLE.ordinal(), TrailTypes.Q_25_PERMILLE.name(), (int) quantile.getQuantile(.025));
+							entryPoints.addPoint(TrailTypes.Q_975_PERMILLE.ordinal(), TrailTypes.Q_975_PERMILLE.name(), (int) quantile.getQuantile(.975));
+							entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER.ordinal(), TrailTypes.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
+							entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER.ordinal(), TrailTypes.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
+							entryPoints.addPoint(TrailTypes.FIRST.ordinal(), TrailTypes.FIRST.name(), (int) quantile.getFirstFigure());
+							entryPoints.addPoint(TrailTypes.LAST.ordinal(), TrailTypes.LAST.name(), (int) quantile.getLastFigure());
+							// trigger trail types sum are not supported for measurements
+							entryPoints.addPoint(TrailTypes.SUM.ordinal(), TrailTypes.SUM.name(), 0);
+							entryPoints.addPoint(TrailTypes.COUNT.ordinal(), TrailTypes.COUNT.name(), (int) quantile.getSizeFigure() * 1000);
 						}
 						log.log(Level.FINER, record.getName() + " data ", entryPoints); //$NON-NLS-1$
 					}
@@ -1206,44 +1206,30 @@ public class HistoVault {
 						this.getSettlements().put(settlementType.getSettlementId(), entryPoints);
 						entryPoints.setTrails(new HashMap<Integer, PointType>());
 
-						if (histoSettlement.realSize() > 0 && settlementType.getEvaluation() != null) {
-							EvaluationType settlementEvaluations = settlementType.getEvaluation();
-							if (histoSettlement.hasReasonableData()) {
-								if (settlementEvaluations.isAvg()) entryPoints.addPoint(TrailType.REAL_AVG.ordinal(), TrailType.REAL_AVG.name(), histoSettlement.getAvgValue());
-								if (settlementEvaluations.isMax()) entryPoints.addPoint(TrailType.REAL_MAX.ordinal(), TrailType.REAL_MAX.name(), histoSettlement.getRealMaxValue());
-								if (settlementEvaluations.isMin()) entryPoints.addPoint(TrailType.REAL_MIN.ordinal(), TrailType.REAL_MIN.name(), histoSettlement.getRealMinValue());
-								if (settlementEvaluations.isSigma()) entryPoints.addPoint(TrailType.REAL_SD.ordinal(), TrailType.REAL_SD.name(), histoSettlement.getSigmaValue());
-								if (settlementEvaluations.isSum()) entryPoints.addPoint(TrailType.REAL_SUM.ordinal(), TrailType.REAL_SUM.name(), histoSettlement.getSumValue());
-								if (settlementEvaluations.isFirst()) entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), histoSettlement.getFirst());
-								if (settlementEvaluations.isLast()) entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), histoSettlement.getLast());
-								if (settlementEvaluations.isCount()) entryPoints.addPoint(TrailType.REAL_COUNT.ordinal(), TrailType.REAL_COUNT.name(), histoSettlement.realSize() * 1000);
-							}
-							else {
-								// these trail types might act as default trails
-								for (TrailType trailType : TrailType.getSubstitutes()) {
-									if (trailType == TrailType.REAL_FIRST)
-										entryPoints.addPoint(TrailType.REAL_FIRST.ordinal(), TrailType.REAL_FIRST.name(), histoSettlement.getFirst());
-									else if (trailType == TrailType.REAL_LAST)
-										entryPoints.addPoint(TrailType.REAL_LAST.ordinal(), TrailType.REAL_LAST.name(), histoSettlement.getLast());
-									else
-										throw new UnsupportedOperationException(histoSettlement.getName());
-								}
-							}
-						}
 						if (histoSettlement.realSize() != 0 && histoSettlement.hasReasonableData()) {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
-							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.SIGMA_OUTLIER_FRINGE);
-							final int sigmaOutlierFringe = channelProperty != null && !channelProperty.getValue().isEmpty() ? Integer.parseInt(channelProperty.getValue()) : -1;
-							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaOutlierFringe);
-							entryPoints.addPoint(TrailType.Q0.ordinal(), TrailType.Q0.name(), (int) quantile.getQuartile0());
-							entryPoints.addPoint(TrailType.Q1.ordinal(), TrailType.Q1.name(), (int) quantile.getQuartile1());
-							entryPoints.addPoint(TrailType.Q2.ordinal(), TrailType.Q2.name(), (int) quantile.getQuartile2());
-							entryPoints.addPoint(TrailType.Q3.ordinal(), TrailType.Q3.name(), (int) quantile.getQuartile3());
-							entryPoints.addPoint(TrailType.Q4.ordinal(), TrailType.Q4.name(), (int) quantile.getQuartile4());
-							entryPoints.addPoint(TrailType.Q_25_PERMILLE.ordinal(), TrailType.Q_25_PERMILLE.name(), (int) quantile.getQuantile(.025));
-							entryPoints.addPoint(TrailType.Q_975_PERMILLE.ordinal(), TrailType.Q_975_PERMILLE.name(), (int) quantile.getQuantile(.975));
-							entryPoints.addPoint(TrailType.Q_LOWER_WHISKER.ordinal(), TrailType.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
-							entryPoints.addPoint(TrailType.Q_UPPER_WHISKER.ordinal(), TrailType.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
+							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
+							final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())  : this.settings.getOutlierSigmaDefault();
+							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
+							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue()) : this.settings.getOutlierRangeFactorDefault();
+							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+							entryPoints.addPoint(TrailTypes.AVG.ordinal(), TrailTypes.AVG.name(), (int) quantile.getAvgFigure());
+							entryPoints.addPoint(TrailTypes.MAX.ordinal(), TrailTypes.MAX.name(), (int) quantile.getMaxFigure());
+							entryPoints.addPoint(TrailTypes.MIN.ordinal(), TrailTypes.MIN.name(), (int) quantile.getMinFigure());
+							entryPoints.addPoint(TrailTypes.SD.ordinal(), TrailTypes.SD.name(), (int) quantile.getSigmaFigure());
+							entryPoints.addPoint(TrailTypes.Q0.ordinal(), TrailTypes.Q0.name(), (int) quantile.getQuartile0());
+							entryPoints.addPoint(TrailTypes.Q1.ordinal(), TrailTypes.Q1.name(), (int) quantile.getQuartile1());
+							entryPoints.addPoint(TrailTypes.Q2.ordinal(), TrailTypes.Q2.name(), (int) quantile.getQuartile2());
+							entryPoints.addPoint(TrailTypes.Q3.ordinal(), TrailTypes.Q3.name(), (int) quantile.getQuartile3());
+							entryPoints.addPoint(TrailTypes.Q4.ordinal(), TrailTypes.Q4.name(), (int) quantile.getQuartile4());
+							entryPoints.addPoint(TrailTypes.Q_25_PERMILLE.ordinal(), TrailTypes.Q_25_PERMILLE.name(), (int) quantile.getQuantile(.025));
+							entryPoints.addPoint(TrailTypes.Q_975_PERMILLE.ordinal(), TrailTypes.Q_975_PERMILLE.name(), (int) quantile.getQuantile(.975));
+							entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER.ordinal(), TrailTypes.Q_LOWER_WHISKER.name(), (int) quantile.getQuantileLowerWhisker());
+							entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER.ordinal(), TrailTypes.Q_UPPER_WHISKER.name(), (int) quantile.getQuantileUpperWhisker());
+							entryPoints.addPoint(TrailTypes.FIRST.ordinal(), TrailTypes.FIRST.name(), (int) quantile.getFirstFigure());
+							entryPoints.addPoint(TrailTypes.LAST.ordinal(), TrailTypes.LAST.name(), (int) quantile.getLastFigure());
+							entryPoints.addPoint(TrailTypes.SUM.ordinal(), TrailTypes.SUM.name(), (int) quantile.getSumFigure() );
+							entryPoints.addPoint(TrailTypes.COUNT.ordinal(), TrailTypes.COUNT.name(), (int) quantile.getSizeFigure() * 1000);
 						}
 						log.log(Level.FINER, histoSettlement.getName() + " data ", this.getSettlements()); //$NON-NLS-1$
 					}

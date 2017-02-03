@@ -20,12 +20,9 @@
 package gde.data;
 
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,26 +57,29 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * @author Thomas Eickert
  */
 public class TrailRecordSet extends RecordSet {
-	private final static String					$CLASS_NAME							= TrailRecordSet.class.getName();
-	private final static long						serialVersionUID				= -1580283867987273535L;
-	private final static Logger					log											= Logger.getLogger($CLASS_NAME);
+	private final static String								$CLASS_NAME							= TrailRecordSet.class.getName();
+	private final static long									serialVersionUID				= -1580283867987273535L;
+	private final static Logger								log											= Logger.getLogger($CLASS_NAME);
 
-	private final static int						initialRecordCapacity		= 111;
-	private final String								isoDateTimeDelimiter		= "T";																					//$NON-NLS-1$
+	private final static int									initialRecordCapacity		= 111;
 
-	private final HistoGraphicsTemplate	template;																																// graphics template holds view configuration
-	private final int[]									linkedOrdinals;																													// allows getting a trail record by ordinal without iterating the linked hashmap  
+	private final HistoGraphicsTemplate				template;																																// graphics template holds view configuration
+	private final int[]												linkedOrdinals;																													// allows getting a trail record by ordinal without iterating the linked hashmap  
 
-	private final List<Integer>					durations_mm						= new ArrayList<Integer>(initialRecordCapacity);
-	private double											averageDuration_mm			= 0;
-	private final List<String>					fileNames								= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					directoryNames					= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					basePaths								= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logChannelNumbers				= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logRecordsetBaseNames		= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>					logRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
-	private final List<List<String>>		logTags									= new ArrayList<List<String>>();
+	private final List<Integer>								durations_mm						= new ArrayList<Integer>(initialRecordCapacity);
+	private double														averageDuration_mm			= 0;
+	private final List<String>								fileNames								= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								directoryNames					= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								basePaths								= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								logChannelNumbers				= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								logRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								logRecordsetBaseNames		= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								logRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
+	private final Map<Integer, List<String>>	logTags									= new HashMap<>();
+
+	private enum LogTag {
+		FileName, DirectoryName, BasePath, ChannelNumber, RectifiedObjectKey, RecordSetBaseName, RecordSetOrdinal
+	};
 
 	/**
 	 * holds trail records for measurements, settlements and scores.
@@ -94,12 +94,12 @@ public class TrailRecordSet extends RecordSet {
 		this.linkedOrdinals = new int[recordNames.length];
 		if (this.template != null) this.template.load();
 
-		this.logTags.add(this.fileNames);
-		this.logTags.add(this.directoryNames);
-		this.logTags.add(this.basePaths);
-		this.logTags.add(this.logChannelNumbers);
-		this.logTags.add(this.logRectifiedObjectKeys);
-		this.logTags.add(this.logRecordsetBaseNames);
+		this.logTags.put(LogTag.FileName.ordinal(), this.fileNames);
+		this.logTags.put(LogTag.DirectoryName.ordinal(), this.directoryNames);
+		this.logTags.put(LogTag.BasePath.ordinal(), this.basePaths);
+		this.logTags.put(LogTag.ChannelNumber.ordinal(), this.logChannelNumbers);
+		this.logTags.put(LogTag.RectifiedObjectKey.ordinal(), this.logRectifiedObjectKeys);
+		this.logTags.put(LogTag.RecordSetBaseName.ordinal(), this.logRecordsetBaseNames);
 		// for test only		this.logTags.add(this.logRecordSetOrdinals);
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
@@ -647,7 +647,7 @@ public class TrailRecordSet extends RecordSet {
 		}
 		// add all others
 		for (Record record : this.getDisplayRecords()) {
-				if (record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 
 		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
@@ -705,19 +705,19 @@ public class TrailRecordSet extends RecordSet {
 		String[] dataTableRow = new String[this.get(0).size() + 2];
 
 		if (!this.timeStep_ms.isEmpty()) {
-			if (logTagOrdinal == 0)
+			if (logTagOrdinal == LogTag.FileName.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0838);
-			else if (logTagOrdinal == 1)
+			else if (logTagOrdinal == LogTag.DirectoryName.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0839);
-			else if (logTagOrdinal == 2)
+			else if (logTagOrdinal == LogTag.BasePath.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
-			else if (logTagOrdinal == 3)
+			else if (logTagOrdinal == LogTag.ChannelNumber.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0841);
-			else if (logTagOrdinal == 4)
+			else if (logTagOrdinal == LogTag.RectifiedObjectKey.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
-			else if (logTagOrdinal == 5)
+			else if (logTagOrdinal == LogTag.RecordSetBaseName.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
-			else if (logTagOrdinal == 6)
+			else if (logTagOrdinal == LogTag.RecordSetOrdinal.ordinal())
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843); // for test only
 			else
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
@@ -738,7 +738,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * @return the logTags
 	 */
-	public List<List<String>> getLogTags() {
+	public Map<Integer, List<String>> getLogTags() {
 		return this.logTags;
 	}
 

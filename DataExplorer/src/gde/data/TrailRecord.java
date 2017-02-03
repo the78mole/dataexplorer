@@ -21,24 +21,21 @@ package gde.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
-import gde.device.EvaluationType;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
+import gde.device.TrailTypes;
 import gde.histocache.HistoVault;
 import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.utils.HistoTimeLine;
 
 /**
@@ -48,195 +45,26 @@ import gde.utils.HistoTimeLine;
  * @author Thomas Eickert
  */
 public class TrailRecord extends Record { // WBrueg maybe a better option is to create a common base class for Record and TrailRecord.
-	private final static String		$CLASS_NAME					= TrailRecord.class.getName();
-	private final static long			serialVersionUID		= 110124007964748556L;
-	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME							= TrailRecord.class.getName();
+	private final static long			serialVersionUID				= 110124007964748556L;
+	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
 
-	public final static String		TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";								// reference to the selected trail //$NON-NLS-1$
-	public final static String[]	trailPropertyKeys		= new String[] { TRAIL_TEXT_ORDINAL };
-	public final static int				RANGE_PLOT_SIZE			= 3;
-	public final static int				BOX_PLOT_SIZE				= 7;
-
-	public enum TrailType {
-		REAL_AVG(0, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0750), false), // average
-		REAL_COUNT(12, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0751), false), // counter
-		REAL_MAX(1, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0754), false), //
-		REAL_MIN(2, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0755), false), //
-		REAL_SD(3, true, 1, false, Messages.getString(MessageIds.GDE_MSGT0756), false), //
-		REAL_FIRST(4, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0752), false), //
-		REAL_LAST(5, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0753), true), //
-		REAL_SUM_TRIGGERED(6, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0758), false), //
-		REAL_AVG_RATIO_TRIGGERED(8, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0760), false), //
-		REAL_MAX_RATIO_TRIGGERED(9, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0761), false), //
-		REAL_TIME_SUM_TRIGGERED(7, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0759), false), //
-		REAL_COUNT_TRIGGERED(10, false, 1, true, Messages.getString(MessageIds.GDE_MSGT0757), false), //
-		REAL_SUM(11, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0762), false), //
-		//		SCORE(13, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0763)),
-		//		AVG(14, false, false, false, Messages.getString(MessageIds.GDE_MSGT0764)), //
-		//		SUM(15, false, false, false, Messages.getString(MessageIds.GDE_MSGT0765)), //
-		//		COUNT_OBS(16, false, false, false, Messages.getString(MessageIds.GDE_MSGT0766)),
-		Q0(17, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0767), false), // quantile 0 is q(0%) which is the minimum
-		Q1(18, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0768), false), // quantile 1 is q(25%)
-		Q2(19, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0769), false), // quantile 2 is q(50%) which is the median
-		Q3(20, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0770), false), // quantile 3 is q(75%)
-		Q4(21, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0771), false), // quantile 4 is q(100%) which is the maximum
-		Q_25_PERMILLE(22, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0772), false), // octile 1 is q(12,5%)
-		Q_975_PERMILLE(23, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0773), false), // octile 7 is q(87,5%)
-		Q_LOWER_WHISKER(24, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0774), false), // quantile of the closest value to the 4 * IQR lower limit
-		Q_UPPER_WHISKER(25, false, 1, false, Messages.getString(MessageIds.GDE_MSGT0775), false), // quantile of the closest value to the 4 * IQR upper limit
-		//		SD(26, true, false, false, Messages.getString(MessageIds.GDE_MSGT0776)), //
-		SUITE_REAL_AVG_SD(1001, false, RANGE_PLOT_SIZE, false, Messages.getString(MessageIds.GDE_MSGT0781), false), //
-		SUITE_REAL_AVG_MIN_MAX(1002, false, RANGE_PLOT_SIZE, false, Messages.getString(MessageIds.GDE_MSGT0782), false), //
-		//		SUITE_AVG_SD(1003, false, true, false, Messages.getString(MessageIds.GDE_MSGT0783)), //
-		SUITE_BOX_PLOT(1004, false, BOX_PLOT_SIZE, false, Messages.getString(MessageIds.GDE_MSGT0784), false), // 4 * IQR range (John. W. Tukey)
-		SUITE_BOX_PLOT_95(1005, false, BOX_PLOT_SIZE, false, Messages.getString(MessageIds.GDE_MSGT0785), false), // 95% range
-		SUITE_Q0_Q2_Q4(1006, false, RANGE_PLOT_SIZE, false, Messages.getString(MessageIds.GDE_MSGT0786), false), //
-		SUITE_Q1_Q2_Q3(1007, false, RANGE_PLOT_SIZE, false, Messages.getString(MessageIds.GDE_MSGT0787), false);//
-
-		private final int												displaySequence;
-		private final boolean										isForSummation;
-		private final int												suiteSize;
-		private final boolean										isTriggered;
-		private final String										displayName;
-		private final boolean										isSubstitute;
-
-		/**
-		 * use this to avoid repeatedly cloning actions instead of values()
-		 */
-		public final static TrailType						values[]		= values();
-
-		/**
-		 * use these trail types if no trails have been assigned to a measurement or settlement
-		 */
-		public final static EnumSet<TrailType>	substitutes	= EnumSet.noneOf(TrailType.class);
-
-		private TrailType(int displaySequence, boolean isForSummation, int suiteSize, boolean isTriggered, String displayName, boolean isSubstitute) {
-			this.displaySequence = displaySequence;
-			this.isForSummation = isForSummation;
-			this.suiteSize = suiteSize;
-			this.isTriggered = isTriggered;
-			this.displayName = displayName;
-			this.isSubstitute = isSubstitute;
-		}
-
-		public static TrailType fromDisplayName(String displayName) {
-			if (displayName != null) {
-				for (TrailType trailType : TrailType.values) {
-					if (displayName.equalsIgnoreCase(trailType.displayName)) {
-						return trailType;
-					}
-				}
-			}
-			return null;
-		}
-
-		public static TrailType fromOrdinal(int ordinal) {
-			return TrailType.values[ordinal];
-		}
-
-		public static EnumSet<TrailType> getSubstitutes() {
-			if (substitutes.size() == 0) {
-				for (TrailType trailType : values) {
-					if (trailType.isSubstitute) substitutes.add(trailType);
-				}
-			}
-			return substitutes;
-		}
-
-		public static EnumSet<TrailType> getPrimitives() {
-			List<TrailType> trailTypes = new ArrayList<TrailType>();
-			for (TrailType type : TrailType.values) {
-				if (!type.isSuite()) trailTypes.add(type);
-			}
-			return EnumSet.copyOf(trailTypes);
-		}
-
-		private static EnumSet<TrailType> getSuites() {
-			List<TrailType> trailTypes = new ArrayList<TrailType>();
-			for (TrailType type : TrailType.values) {
-				if (type.isSuite()) trailTypes.add(type);
-			}
-			return EnumSet.copyOf(trailTypes);
-		}
-
-		public static List<TrailType> getSuite(TrailType trailType) {
-			List<TrailType> trailTypes = new ArrayList<TrailType>();
-			if (trailType.isSuite()) {
-				if (trailType.equals(SUITE_REAL_AVG_SD)) {
-					trailTypes.add(REAL_AVG); // master record for adding sd must be in front of the sd records
-					trailTypes.add(REAL_SD); // avg - n times sd
-					trailTypes.add(REAL_SD); // avg + n times sd
-				}
-				else if (trailType.equals(SUITE_REAL_AVG_MIN_MAX)) {
-					trailTypes.add(REAL_AVG);
-					trailTypes.add(REAL_MIN);
-					trailTypes.add(REAL_MAX);
-				}
-				else if (trailType.equals(SUITE_BOX_PLOT)) {
-					trailTypes.add(Q0);
-					trailTypes.add(Q1);
-					trailTypes.add(Q2);
-					trailTypes.add(Q3);
-					trailTypes.add(Q4);
-					trailTypes.add(Q_LOWER_WHISKER);
-					trailTypes.add(Q_UPPER_WHISKER);
-				}
-				else if (trailType.equals(SUITE_BOX_PLOT_95)) {
-					trailTypes.add(Q0);
-					trailTypes.add(Q1);
-					trailTypes.add(Q2);
-					trailTypes.add(Q3);
-					trailTypes.add(Q4);
-					trailTypes.add(Q_25_PERMILLE);
-					trailTypes.add(Q_975_PERMILLE);
-				}
-				else if (trailType.equals(SUITE_Q0_Q2_Q4)) {
-					trailTypes.add(Q2); // master record 
-					trailTypes.add(Q0);
-					trailTypes.add(Q4);
-				}
-				else if (trailType.equals(SUITE_Q1_Q2_Q3)) {
-					trailTypes.add(Q2); // master record 
-					trailTypes.add(Q1);
-					trailTypes.add(Q3);
-				}
-				else
-					throw new IllegalArgumentException(String.valueOf(trailType));
-			}
-			else {
-				trailTypes.add(trailType);
-			}
-			return trailTypes;
-		}
-
-		public boolean isRangePlot() {
-			return this.suiteSize == RANGE_PLOT_SIZE;
-		}
-
-		public boolean isBoxPlot() {
-			return this.suiteSize == BOX_PLOT_SIZE;
-		}
-
-		public boolean isSuite() {
-			return this.suiteSize > 1;
-		}
-	};
+	public final static String		TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";					// reference to the selected trail //$NON-NLS-1$
 
 	private final TrailRecordSet	parentTrail;
-	private final MeasurementType	measurementType;							// measurement / settlement / scoregroup are options
-	private final SettlementType	settlementType;								// measurement / settlement / scoregroup are options
-	private final ScoreGroupType	scoregroupType;								// measurement / settlement / scoregroup are options
-	private int										trailTextSelectedIndex	= -1;	// user selection from applicable trails, is saved in the graphics template
-	private List<String>					applicableTrailsTexts;				// the user may select one of these entries
-	private List<Integer>					applicableTrailsOrdinals;			// maps all applicable trails in order to convert the user selection into a valid trail
-	private TrailRecord[]					trailRecordSuite;							// holds data points in case of trail suites
+	private final MeasurementType	measurementType;																				// measurement / settlement / scoregroup are options
+	private final SettlementType	settlementType;																					// measurement / settlement / scoregroup are options
+	private final ScoreGroupType	scoregroupType;																					// measurement / settlement / scoregroup are options
+	private int										trailTextSelectedIndex	= -1;														// user selection from applicable trails, is saved in the graphics template
+	private List<String>					applicableTrailsTexts;																	// the user may select one of these entries
+	private List<Integer>					applicableTrailsOrdinals;																// maps all applicable trails in order to convert the user selection into a valid trail
+	private TrailRecord[]					trailRecordSuite;																				// holds data points in case of trail suites
 
 	/**
 	 * creates a vector for a measurementType to hold data points.
 	 * @param newDevice
 	 * @param newOrdinal
 	 * @param measurementType
-	 * @param TrailType
 	 * @param parentTrail
 	 */
 	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, MeasurementType measurementType, TrailRecordSet parentTrail, int initialCapacity) {
@@ -271,7 +99,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	 * the scores are not related to time steps.
 	 * @param newDevice
 	 * @param newOrdinal
-	 * @param settlementType
+	 * @param scoregroupType
 	 * @param parentTrail
 	 */
 	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, ScoreGroupType scoregroupType, TrailRecordSet parentTrail, int initialCapacity) {
@@ -327,68 +155,67 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	 */
 	public void add(HistoVault histoVault) {
 		if (this.applicableTrailsOrdinals.size() != this.applicableTrailsTexts.size()) {
-			throw new UnsupportedOperationException(String.format("%,3d %,3d %,3d", this.applicableTrailsOrdinals.size(), TrailType.getPrimitives().size(), this.applicableTrailsTexts.size())); //$NON-NLS-1$
+			throw new UnsupportedOperationException(String.format("%,3d %,3d %,3d", this.applicableTrailsOrdinals.size(), TrailTypes.getPrimitives().size(), this.applicableTrailsTexts.size())); //$NON-NLS-1$
 		}
 		if (this.trailRecordSuite == null) { // ???
 			super.add(null);
 		}
+		else if (!this.isTrailSuite()) {
+			if (this.isMeasurement())
+				super.add(histoVault.getMeasurementPoint(this.ordinal, this.getTrailOrdinal()));
+			else if (this.isSettlement())
+				super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
+			else if (this.isScoregroup()) {
+				if (log.isLoggable(Level.FINEST))
+					log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
+				super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
+			}
+			else
+				throw new UnsupportedOperationException("length == 1"); //$NON-NLS-1$
+		}
 		else {
-			if (this.trailRecordSuite.length == 1) {
+			int minVal = Integer.MAX_VALUE, maxVal = Integer.MIN_VALUE; // min/max depends on all values of the suite
+			int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
+			boolean summationSign = false; // false means subtract, true means add
+			for (int i = 0; i < this.trailRecordSuite.length; i++) {
+				TrailRecord trailRecord = this.trailRecordSuite[i];
+				Integer point;
 				if (this.isMeasurement())
-					super.add(histoVault.getMeasurementPoint(this.ordinal, this.getTrailOrdinal()));
+					point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.getTrailOrdinal());
 				else if (this.isSettlement())
-					super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
+					point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(), trailRecord.getTrailOrdinal());
 				else if (this.isScoregroup()) {
-					if (log.isLoggable(Level.FINEST))
-						log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
-					super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
+					point = histoVault.getScorePoint(this.getTrailOrdinal());
 				}
 				else
-					throw new UnsupportedOperationException("length == 1"); //$NON-NLS-1$
-			}
-			if (this.trailRecordSuite.length > 1) {
-				int minVal = Integer.MAX_VALUE, maxVal = Integer.MIN_VALUE; // min/max depends on all values of the suite
-				int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
-				boolean summationSign = false; // false means subtract, true means add
-				for (int i = 0; i < this.trailRecordSuite.length; i++) {
-					TrailRecord trailRecord = this.trailRecordSuite[i];
-					Integer point;
-					if (this.isMeasurement())
-						point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.getTrailOrdinal());
-					else if (this.isSettlement())
-						point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(),  trailRecord.getTrailOrdinal());
-					else if (this.isScoregroup()) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
-						point = histoVault.getScorePoint(this.getTrailOrdinal());
-					}
-					else
-						throw new UnsupportedOperationException("length > 1"); //$NON-NLS-1$
+					throw new UnsupportedOperationException("length > 1"); //$NON-NLS-1$
 
-					if (point != null) { // trailRecord.getMinValue() is zero if trailRecord.size() == 0 or only nulls have been added
-						if (trailRecord.isSuiteForSummation()) {
-							point = summationSign ? masterPoint + 2 * point : masterPoint - 2 * point;
-							summationSign = !summationSign; // toggle the add / subtract mode
-						}
-						else {
-							masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
-							summationSign = false;
-						}
-						trailRecord.add(point);
-						minVal = Math.min(minVal, trailRecord.getRealMinValue());
-						maxVal = Math.max(maxVal, trailRecord.getRealMaxValue());
+				if (point != null) { // trailRecord.getMinValue() is zero if trailRecord.size() == 0 or only nulls have been added
+					if (trailRecord.isSuiteForSummation()) {
+						point = summationSign ? masterPoint + 2 * point : masterPoint - 2 * point;
+						summationSign = !summationSign; // toggle the add / subtract mode
 					}
 					else {
-						trailRecord.add(point);
+						masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
+						summationSign = false;
 					}
-					log.log(Level.FINEST, trailRecord.getName() + " trail " , trailRecord); //$NON-NLS-1$
+					trailRecord.add(point);
+					minVal = Math.min(minVal, trailRecord.getRealMinValue());
+					maxVal = Math.max(maxVal, trailRecord.getRealMaxValue());
 				}
-				if (minVal != Integer.MAX_VALUE && maxVal != Integer.MIN_VALUE) {
-					this.setMinMax(minVal, maxVal);
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + minVal + "," + maxVal); //$NON-NLS-1$ //$NON-NLS-2$
+				else {
+					trailRecord.add(point);
 				}
+				log.log(Level.FINEST, trailRecord.getName() + " trail ", trailRecord); //$NON-NLS-1$
+			}
+			if (minVal != Integer.MAX_VALUE && maxVal != Integer.MIN_VALUE) {
+				this.setMinMax(minVal, maxVal);
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + minVal + "," + maxVal); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		log.log(Level.FINEST, this.getName() + " trail " , this); //$NON-NLS-1$
+		log.log(Level.FINEST, this.getName() + " trail ", this); //$NON-NLS-1$
+
 	}
 
 	/**
@@ -459,7 +286,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		double factor = getFactor();
 		double offset = getOffset();
 		double reduction = getReduction();
-		if (this.getTrailRecordSuite().length == 1) { // standard curve
+		if (!this.isTrailSuite()) {
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++)
 					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? this.getDecimalFormat().format((masterRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR;
@@ -469,64 +296,67 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? this.getDecimalFormat().format((masterRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR;
 			}
 		}
-		else {
-			if (this.getTrailRecordSuite().length > 6) { // boxplot
-				final TrailRecord lowerWhiskerRecord = this.getTrailRecordSuite()[5];
-				final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
-				final TrailRecord upperWhiskerRecord = this.getTrailRecordSuite()[6];
-				if (this.settings.isXAxisReversed()) {
-					for (int i = 0; i < masterRecord.size(); i++) {
-						if (masterRecord.realRealGet(i) != null) {
-							StringBuilder sb = new StringBuilder();
-							sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							dataTableRow[i + 2] = sb.toString().intern();
-						}
+		else if (this.isBoxPlotSuite()) {
+			final TrailRecord lowerWhiskerRecord = this.getTrailRecordSuite()[5];
+			final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
+			final TrailRecord upperWhiskerRecord = this.getTrailRecordSuite()[6];
+			if (this.settings.isXAxisReversed()) {
+				for (int i = 0; i < masterRecord.size(); i++) {
+					if (masterRecord.realRealGet(i) != null) {
+						StringBuilder sb = new StringBuilder();
+						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter)
+								.append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						dataTableRow[i + 2] = sb.toString().intern();
 					}
-				}
-				else {
-					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-						if (masterRecord.realRealGet(j) != null) {
-							StringBuilder sb = new StringBuilder();
-							sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							dataTableRow[i + 2] = sb.toString().intern();
-						}
 				}
 			}
-			else if (this.getTrailRecordSuite().length > 2) { // envelope		
-				final TrailRecord lowerRecord = this.getTrailRecordSuite()[1];
-				final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
-				final TrailRecord upperRecord = this.getTrailRecordSuite()[2];
-				if (this.settings.isXAxisReversed()) {
-					for (int i = 0; i < masterRecord.size(); i++) {
-						if (masterRecord.realRealGet(i) != null) {
-							StringBuilder sb = new StringBuilder();
-							sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							dataTableRow[i + 2] = sb.toString().intern();
-						}
+			else {
+				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
+					if (masterRecord.realRealGet(j) != null) {
+						StringBuilder sb = new StringBuilder();
+						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter)
+								.append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						dataTableRow[i + 2] = sb.toString().intern();
 					}
-				}
-				else {
-					for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-						if (masterRecord.realRealGet(j) != null) {
-							StringBuilder sb = new StringBuilder();
-							sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-							sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-							dataTableRow[i + 2] = sb.toString().intern();
-						}
-				}
 			}
 		}
+		else if (isRangePlotSuite()) {
+			final TrailRecord lowerRecord = this.getTrailRecordSuite()[1];
+			final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
+			final TrailRecord upperRecord = this.getTrailRecordSuite()[2];
+			if (this.settings.isXAxisReversed()) {
+				for (int i = 0; i < masterRecord.size(); i++) {
+					if (masterRecord.realRealGet(i) != null) {
+						StringBuilder sb = new StringBuilder();
+						sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						dataTableRow[i + 2] = sb.toString().intern();
+					}
+				}
+			}
+			else {
+				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
+					if (masterRecord.realRealGet(j) != null) {
+						StringBuilder sb = new StringBuilder();
+						sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						dataTableRow[i + 2] = sb.toString().intern();
+					}
+			}
+		}
+		else
+			throw new UnsupportedOperationException();
+
 		return dataTableRow;
 	}
 
@@ -538,7 +368,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		this.applicableTrailsOrdinals = new ArrayList<Integer>(1);
 		this.applicableTrailsOrdinals.add(trailOrdinal);
 		this.applicableTrailsTexts = new ArrayList<String>(1);
-		this.applicableTrailsTexts.add(TrailType.fromOrdinal(trailOrdinal).displayName);
+		this.applicableTrailsTexts.add(TrailTypes.fromOrdinal(trailOrdinal).getDisplayName());
 		this.trailTextSelectedIndex = 0;
 	}
 
@@ -552,107 +382,180 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		boolean[] applicablePrimitiveTrails;
 		// step 1: analyze device entries to find applicable primitive trail types
 		if (this.measurementType != null) {
-			applicablePrimitiveTrails = new boolean[TrailType.getPrimitives().size()];
+			final boolean hideAllTrails = this.measurementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false);
+			if (this.measurementType.getTrailDisplay().map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false))
+				throw new UnsupportedOperationException("select a primitive trail as a device measurement default"); //$NON-NLS-1$
+			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 			StatisticsType measurementStatistics = getStatistics();
-			if (measurementStatistics != null) {
-				applicablePrimitiveTrails[TrailType.REAL_AVG.ordinal()] = measurementStatistics.isAvg();
-				applicablePrimitiveTrails[TrailType.REAL_MAX.ordinal()] = measurementStatistics.isMax();
-				applicablePrimitiveTrails[TrailType.REAL_MIN.ordinal()] = measurementStatistics.isMin();
-				applicablePrimitiveTrails[TrailType.REAL_SD.ordinal()] = measurementStatistics.isSigma();
+
+			// set legacy trail types
+			if (!hideAllTrails && measurementStatistics != null) {
+				applicablePrimitiveTrails[TrailTypes.REAL_AVG.ordinal()] = measurementStatistics.isAvg();
+				applicablePrimitiveTrails[TrailTypes.REAL_MAX.ordinal()] = measurementStatistics.isMax();
+				applicablePrimitiveTrails[TrailTypes.REAL_MIN.ordinal()] = measurementStatistics.isMin();
+				applicablePrimitiveTrails[TrailTypes.REAL_SD.ordinal()] = measurementStatistics.isSigma();
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-					applicablePrimitiveTrails[TrailType.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
+					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
 					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 						StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.parent.getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
-						applicablePrimitiveTrails[TrailType.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
-						applicablePrimitiveTrails[TrailType.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
+						applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
+						applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
 					}
 				}
-				applicablePrimitiveTrails[TrailType.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null
+				applicablePrimitiveTrails[TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null
 						&& measurementStatistics.getSumTriggerTimeText().length() > 1);
-				applicablePrimitiveTrails[TrailType.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
+				applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
 			}
-			applicablePrimitiveTrails[TrailType.REAL_SUM.ordinal()] = false; // in settlements only
+			// todo applicablePrimitiveTrails[TrailTypes.REAL_SUM.ordinal()] = false; // in settlements only
+
+			// set quantile-based non-suite trail types : triggered values like count/sum are not supported
+			if (!hideAllTrails && !this.getDevice().isGPSCoordinates(this) && this.settings.isQuantilesActive())
+				TrailTypes.getQuantilePrimitives().stream().filter(x -> !x.isTriggered()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+
+			// set visible trails based on device settlement settings 
+			this.measurementType.getTrailDisplay().ifPresent(x -> x.getExposed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = true));
+
+			// reset hidden trails based on device measurement settings 
+			this.measurementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = false));
+
 			// set at least one trail if no trail is applicable
-			boolean containsTrue = false;
+			boolean hasApplicablePrimitiveTrails = false;
 			for (boolean value : applicablePrimitiveTrails) {
-				if (value) {
-					containsTrue = true;
-					break;
-				}
+				hasApplicablePrimitiveTrails = value;
+				if (hasApplicablePrimitiveTrails ) break;
 			}
-			if (!containsTrue) TrailType.getSubstitutes().stream().map(x -> applicablePrimitiveTrails[x.ordinal()] = true);
-			if (!containsTrue) {
-				for (TrailType trailType : TrailType.getSubstitutes()) {
-					applicablePrimitiveTrails[trailType.ordinal()] = true;
-				}
-			}
-			if (this.settings.isQuantilesActive() && !(this.measurementType.isSuppressQuantiles() != null && this.measurementType.isSuppressQuantiles()) // 
-					&& !this.getDevice().isGPSCoordinates(this)) {
-				applicablePrimitiveTrails[TrailType.Q0.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q1.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q2.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q3.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q4.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q_25_PERMILLE.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q_975_PERMILLE.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q_LOWER_WHISKER.ordinal()] = true;
-				applicablePrimitiveTrails[TrailType.Q_UPPER_WHISKER.ordinal()] = true;
-			}
-			log.log(Level.FINER, this.getName() + " " , measurementStatistics); //$NON-NLS-1$
+			applicablePrimitiveTrails[this.measurementType.getTrailDisplay().map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
+
+			// build applicable trail type lists for display purposes
+			this.applicableTrailsOrdinals = new ArrayList<Integer>();
+			this.applicableTrailsTexts = new ArrayList<String>();
+			for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
+				if (applicablePrimitiveTrails[i]) {
+					this.applicableTrailsOrdinals.add(i);
+					this.applicableTrailsTexts.add(TrailTypes.values[i].getDisplayName().intern());
+				}
+			}
+
+			// decide about trail suites which are applicable for display
+			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
+				if (!this.measurementType.getTrailDisplay().map(x -> x.getDisclosed()).filter(x -> x.contains(suiteTrailType)).isPresent()) {
+					boolean bb = true;
+					for (TrailTypes trailType : suiteTrailType.getSuiteMembers()) {
+						bb &= applicablePrimitiveTrails[trailType.ordinal()];
+					}
+					if (bb) {
+						this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
+						this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
+					}
+				}
+			}
+
+			// build applicable trail type lists for display purposes
+			this.applicableTrailsOrdinals = new ArrayList<Integer>();
+			this.applicableTrailsTexts = new ArrayList<String>();
+			for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
+				if (applicablePrimitiveTrails[i]) {
+					this.applicableTrailsOrdinals.add(i);
+					if (TrailTypes.values[i].isTriggered()) {
+						if (TrailTypes.values[i].equals(TrailTypes.REAL_COUNT_TRIGGERED)) {
+							this.applicableTrailsTexts.add(getStatistics().getCountTriggerText().intern());
+						}
+						else if (TrailTypes.values[i].equals(TrailTypes.REAL_SUM_TRIGGERED)) {
+							this.applicableTrailsTexts.add(getStatistics().getSumTriggerText().intern());
+						}
+						else if (TrailTypes.values[i].equals(TrailTypes.REAL_TIME_SUM_TRIGGERED)) {
+							this.applicableTrailsTexts.add(getStatistics().getSumTriggerTimeText().intern());
+						}
+						else if (TrailTypes.values[i].equals(TrailTypes.REAL_AVG_RATIO_TRIGGERED)) {
+							this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
+						}
+						else if (TrailTypes.values[i].equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
+							this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
+						}
+						else
+							throw new UnsupportedOperationException("TrailTypes.isTriggered"); //$NON-NLS-1$
+					}
+					else {
+						this.applicableTrailsTexts.add(TrailTypes.values[i].getDisplayName().intern());
+					}
+				}
+			}
+
+			// decide about trail suites which are applicable for display
+			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
+				if (!this.measurementType.getTrailDisplay().map(x -> x.getDisclosed()).filter(x -> x.contains(suiteTrailType)).isPresent()) {
+					boolean bb = true;
+					for (TrailTypes trailType : suiteTrailType.getSuiteMembers()) {
+						bb &= applicablePrimitiveTrails[trailType.ordinal()];
+					}
+					if (bb) {
+						this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
+						this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
+					}
+				}
+			}
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
 		}
 		else if (this.settlementType != null) {
-			applicablePrimitiveTrails = new boolean[TrailType.getPrimitives().size()];
-			EvaluationType settlementEvaluation = this.settlementType.getEvaluation();
-			if (settlementEvaluation != null) {
-				applicablePrimitiveTrails[TrailType.REAL_AVG.ordinal()] = settlementEvaluation.isAvg();
-				applicablePrimitiveTrails[TrailType.REAL_MIN.ordinal()] = settlementEvaluation.isMin();
-				applicablePrimitiveTrails[TrailType.REAL_MAX.ordinal()] = settlementEvaluation.isMax();
-				applicablePrimitiveTrails[TrailType.REAL_SD.ordinal()] = settlementEvaluation.isSigma();
+			final boolean hideAllTrails = this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false);
+			if (this.settlementType.getTrailDisplay().map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false))
+				throw new UnsupportedOperationException("select a primitive trail as a device settlement default"); //$NON-NLS-1$
+			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 
-				applicablePrimitiveTrails[TrailType.REAL_SUM.ordinal()] = settlementEvaluation.isSum();
-				applicablePrimitiveTrails[TrailType.REAL_COUNT.ordinal()] = settlementEvaluation.isCount();
-				applicablePrimitiveTrails[TrailType.REAL_FIRST.ordinal()] = settlementEvaluation.isFirst();
-				applicablePrimitiveTrails[TrailType.REAL_LAST.ordinal()] = settlementEvaluation.isLast();
-				// set at least one trail if no trail is applicable
-				boolean containsTrue = false;
-				for (boolean value : applicablePrimitiveTrails) {
-					if (value) {
-						containsTrue = true;
-						break;
-					}
-				}
-				if (!containsTrue) TrailType.getSubstitutes().stream().map(x -> applicablePrimitiveTrails[x.ordinal()] = true);
-				if (!containsTrue) {
-					for (TrailType trailType : TrailType.getSubstitutes()) {
-						applicablePrimitiveTrails[trailType.ordinal()] = true;
-					}
-				}
-				if (this.settings.isQuantilesActive() && !(this.settlementType.isSuppressQuantiles() != null && this.settlementType.isSuppressQuantiles()) // 
-						&& !this.getDevice().isGPSCoordinates(this)) {
-					applicablePrimitiveTrails[TrailType.Q0.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q1.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q2.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q3.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q4.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q_25_PERMILLE.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q_975_PERMILLE.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q_LOWER_WHISKER.ordinal()] = true;
-					applicablePrimitiveTrails[TrailType.Q_UPPER_WHISKER.ordinal()] = true;
-				}
-				log.log(Level.FINER, this.getName() + " " , settlementEvaluation);  //$NON-NLS-1$
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
+			// todo set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
+			if (!hideAllTrails && !this.getDevice().isGPSCoordinates(this) && this.settings.isQuantilesActive())
+				if (this.settlementType.getEvaluation().getTransitionCalculus() != null)
+					TrailTypes.getQuantilePrimitives().stream().filter(x -> ! x.isTriggered()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+				else
+				TrailTypes.getQuantilePrimitives().forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+
+			// set visible trails based on device settlement settings 
+			this.settlementType.getTrailDisplay().ifPresent(x -> x.getExposed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = true));
+
+			// reset hidden trails based on device settlement settings 
+			this.settlementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = false));
+
+			// set at least one trail if no trail is applicable
+			boolean hasApplicablePrimitiveTrails = false;
+			for (boolean value : applicablePrimitiveTrails) {
+				hasApplicablePrimitiveTrails = value;
+				if (hasApplicablePrimitiveTrails ) break;
 			}
+			if (! hasApplicablePrimitiveTrails) applicablePrimitiveTrails[this.settlementType.getTrailDisplay().map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
+
+			// build applicable trail type lists for display purposes
+			this.applicableTrailsOrdinals = new ArrayList<Integer>();
+			this.applicableTrailsTexts = new ArrayList<String>();
+			for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
+				if (applicablePrimitiveTrails[i]) {
+					this.applicableTrailsOrdinals.add(i);
+					this.applicableTrailsTexts.add(TrailTypes.values[i].getDisplayName().intern());
+				}
+			}
+
+			// decide about trail suites which are applicable for display
+			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
+				if (!this.settlementType.getTrailDisplay().map(x -> x.getDisclosed()).filter(x -> x.contains(suiteTrailType)).isPresent()) {
+					boolean bb = true;
+					for (TrailTypes trailType : suiteTrailType.getSuiteMembers()) {
+						bb &= applicablePrimitiveTrails[trailType.ordinal()];
+					}
+					if (bb) {
+						this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
+						this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
+					}
+				}
+			}
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
 		}
 		else if (this.scoregroupType != null) {
 			applicablePrimitiveTrails = new boolean[0]; // not required
-		}
-		else {
-			throw new UnsupportedOperationException(" >>> no trails found <<< "); //$NON-NLS-1$
-		}
 
-		// step 2: build applicable trail type lists for display purposes
-		{
+			// build applicable trail type lists for display purposes
 			this.applicableTrailsOrdinals = new ArrayList<Integer>();
 			this.applicableTrailsTexts = new ArrayList<String>();
 			if (this.scoregroupType != null) {
@@ -662,50 +565,9 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				}
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " score "); //$NON-NLS-1$
 			}
-			else {
-				// step 2a: find primitive trail types which are applicable for display
-				for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
-					if (applicablePrimitiveTrails[i]) {
-						this.applicableTrailsOrdinals.add(i);
-						TrailType trailType = TrailType.values[i];
-						if (trailType.isTriggered) {
-							if (trailType.equals(TrailType.REAL_COUNT_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getCountTriggerText().intern());
-							}
-							else if (trailType.equals(TrailType.REAL_SUM_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getSumTriggerText().intern());
-							}
-							else if (trailType.equals(TrailType.REAL_TIME_SUM_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getSumTriggerTimeText().intern());
-							}
-							else if (trailType.equals(TrailType.REAL_AVG_RATIO_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
-							}
-							else if (trailType.equals(TrailType.REAL_MAX_RATIO_TRIGGERED)) {
-								this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
-							}
-							else
-								throw new UnsupportedOperationException("trailType.isTriggered"); //$NON-NLS-1$
-						}
-						else {
-							this.applicableTrailsTexts.add(trailType.displayName.intern());
-						}
-					}
-				}
-				// step 2b: decide about set trail types which are applicable for display
-				for (TrailType setTrailType : TrailType.getSuites()) {
-					boolean bb = true;
-					for (TrailType trailType : TrailType.getSuite(setTrailType)) {
-						bb &= applicablePrimitiveTrails[trailType.ordinal()];
-					}
-					if (bb) {
-						this.applicableTrailsOrdinals.add(setTrailType.ordinal());
-						this.applicableTrailsTexts.add(setTrailType.displayName.intern());
-					}
-				}
-			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
+		}
+		else {
+			throw new UnsupportedOperationException(" >>> no trails found <<< "); //$NON-NLS-1$
 		}
 	}
 
@@ -737,21 +599,21 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 			this.trailTextSelectedIndex = value;
 
 			if (isTrailSuite()) {
-				List<TrailType> suite = TrailType.getSuite(TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)));
+				List<TrailTypes> suite = TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).getSuiteMembers();
 				this.trailRecordSuite = new TrailRecord[suite.size()];
 				int i = 0;
-				for (TrailType trailType : suite) {
+				for (TrailTypes trailTypes : suite) {
 					if (this.measurementType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.displaySequence, this.measurementType, this.parentTrail, this.size()); //$NON-NLS-1$
-						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailTypes.getDisplaySequence(), this.measurementType, this.parentTrail, this.size()); //$NON-NLS-1$
+						this.trailRecordSuite[i].setApplicableTrailTypes(trailTypes.ordinal());
 					}
 					else if (this.settlementType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.displaySequence, this.settlementType, this.parentTrail, this.size()); //$NON-NLS-1$
-						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailTypes.getDisplaySequence(), this.settlementType, this.parentTrail, this.size()); //$NON-NLS-1$
+						this.trailRecordSuite[i].setApplicableTrailTypes(trailTypes.ordinal());
 					}
 					else if (this.scoregroupType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailType.displaySequence, this.scoregroupType, this.parentTrail, this.size()); //$NON-NLS-1$
-						this.trailRecordSuite[i].setApplicableTrailTypes(trailType.ordinal());
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailTypes.getDisplaySequence(), this.scoregroupType, this.parentTrail, this.size()); //$NON-NLS-1$
+						this.trailRecordSuite[i].setApplicableTrailTypes(trailTypes.ordinal());
 					}
 					else {
 						throw new UnsupportedOperationException();
@@ -770,19 +632,19 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	}
 
 	public boolean isTrailSuite() {
-		return this.scoregroupType == null ? TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isSuite() : false;
+		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isSuite() : false;
 	}
 
 	public boolean isRangePlotSuite() {
-		return this.scoregroupType == null ? TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isRangePlot() : false;
+		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isRangePlot() : false;
 	}
 
 	public boolean isBoxPlotSuite() {
-		return this.scoregroupType == null ? TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isBoxPlot() : false;
+		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isBoxPlot() : false;
 	}
 
 	public boolean isSuiteForSummation() {
-		return this.scoregroupType == null ? TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isForSummation : false;
+		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isForSummation() : false;
 	}
 
 	public boolean isMeasurement() {
@@ -824,7 +686,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		else {
 			int displaySequence = Integer.MAX_VALUE;
 			for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
-				int tmpDisplaySequence = (TrailType.fromOrdinal(this.applicableTrailsOrdinals.get(i))).displaySequence;
+				int tmpDisplaySequence = (TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(i))).getDisplaySequence();
 				if (tmpDisplaySequence < displaySequence) {
 					displaySequence = tmpDisplaySequence;
 					setTrailTextSelectedIndex(i);
@@ -957,8 +819,5 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoregroup() && this.settings.isDisplayScores());
 		return isValidDisplayRecord && super.isScaleVisible();
 	}
-
-
-	// WBrueg a bunch of base class methods is not applicable for this class (e.g. trigger): Common base class for TrailRecord and Record???
 
 }

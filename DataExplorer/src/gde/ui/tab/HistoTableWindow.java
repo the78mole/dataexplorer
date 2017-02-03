@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2016 Thomas Eickert
+    Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.tab;
 
@@ -67,6 +67,8 @@ public class HistoTableWindow extends CTabItem {
 	private final static String	$CLASS_NAME				= HistoTableWindow.class.getName();
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
+	private final static int		textExtentFactor	= 7;
+
 	private final HistoSet			histoSet					= HistoSet.getInstance();
 
 	Table												dataTable;
@@ -82,8 +84,6 @@ public class HistoTableWindow extends CTabItem {
 	final CTabFolder						tabFolder;
 	final Menu									popupmenu;
 	final TabAreaContextMenu		contextMenu;
-
-	final int										textExtentFactor	= 7;
 
 	public HistoTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
@@ -418,20 +418,20 @@ public class HistoTableWindow extends CTabItem {
 	 */
 	public void setHeader() {
 		// clean old header
-		this.dataTable.removeAll(); // prevent to display flickering (to some extent only)
+		this.dataTable.removeAll(); // prevents display flickering (to some extent only)
 		for (TableColumn tableColumn : this.dataTable.getColumns()) {
 			tableColumn.dispose();
 		}
 		setRowCount(0); // ET required for Listener firing on setRowCount(xyz)
 
-		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0352);
+		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0749);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.recordsColumn.setWidth(recordTitle.length() * this.textExtentFactor * 35 / 10);
+		this.recordsColumn.setWidth(recordTitle.length() * textExtentFactor * 18 / 10);
 		this.recordsColumn.setText(recordTitle);
 
 		String curveTypeHeader = Messages.getString(MessageIds.GDE_MSGT0828);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.LEFT);
-		this.recordsColumn.setWidth(curveTypeHeader.length() * this.textExtentFactor * 15 / 10);
+		this.recordsColumn.setWidth(curveTypeHeader.length() * textExtentFactor * 18 / 10);
 		this.recordsColumn.setText(curveTypeHeader);
 
 		// set the data columns of the new header line
@@ -441,7 +441,7 @@ public class HistoTableWindow extends CTabItem {
 			if (tableHeaderRow.length > 0) {
 				for (String headerString : tableHeaderRow) {
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-					column.setWidth(headerString.length() * this.textExtentFactor * 8 / 10);
+					column.setWidth(headerString.length() * textExtentFactor * 9 / 10);
 					column.setText(headerString.intern());
 				}
 			}
@@ -452,7 +452,7 @@ public class HistoTableWindow extends CTabItem {
 				}
 			}
 		}
-		log.log(java.util.logging.Level.FINER, "dataTable.getColumnCount() " + this.dataTable.getColumnCount()); //$NON-NLS-1$
+		log.log(Level.FINER, "dataTable.getColumnCount() ", this.dataTable.getColumnCount()); //$NON-NLS-1$
 	}
 
 	/**

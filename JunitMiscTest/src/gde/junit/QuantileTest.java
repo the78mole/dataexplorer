@@ -15,21 +15,17 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016 Winfried Bruegmann
-									2016 Thomas Eickert
+									2017 Thomas Eickert
 ****************************************************************************************/
 package gde.junit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
@@ -91,7 +87,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testSigma() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS),6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 		final double avg = this.quantile.getAvgFigure();
 		final double avgSlow = this.quantile.getAvgSlow();
 		final double sigmaOBS = this.quantile.getSigmaOBS();
@@ -108,26 +104,26 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 			record.addAll(record);
 		}
 
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 		ArrayList<Double> arrayList = new ArrayList<Double>();
 		for (Integer value : record) {
 			arrayList.add(value != null ? value.doubleValue() : null);
 		}
-		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS),6);
+		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 		log.log(Level.INFO, "Avg   " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
-		log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaOBS());
+		log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaRunningOBS());
 		log.log(Level.INFO, "Avg   " + quantileArray.getAvgFigure() + " bisher " + quantileArray.getAvgOBS());
-		log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaOBS());
+		log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaRunningOBS());
 
 		for (int j = 0; j < 4; j++) {
-			long nanoTime = System.nanoTime(), nanoTimeSigma =0;
+			long nanoTime = System.nanoTime(), nanoTimeSigma = 0;
 			int qCount = 100;
 			for (int i = 0; i < qCount / 2; i++) {
-				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS),6);
-				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS),6);
+				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 				nanoTimeSigma -= System.nanoTime();
-				this.quantile.getSigmaOBS();
-				quantileArray.getSigmaOBS();
+				this.quantile.getSigmaRunningOBS();
+				quantileArray.getSigmaRunningOBS();
 				nanoTimeSigma += System.nanoTime();
 			}
 			log.log(Level.INFO, "ms bisher ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
@@ -145,8 +141,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 			nanoTime = System.nanoTime();
 			nanoTimeSigma = 0;
 			for (int i = 0; i < qCount / 2; i++) {
-				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS),6);
-				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS),6);
+				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 				nanoTimeSigma -= System.nanoTime();
 				this.quantile.getSigmaFigure();
 				quantileArray.getSigmaFigure();
@@ -167,12 +163,12 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 		for (int i = 0; i < 15; i++) {
 			record.addAll(record);
 		}
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 		ArrayList<Double> arrayList = new ArrayList<Double>();
 		for (Integer value : record) {
 			arrayList.add(value != null ? value.doubleValue() : null);
 		}
-		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6);
+		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 		log.log(Level.INFO, " ---> " + this.quantile.getAvgFigure());
 		log.log(Level.INFO, " ---> " + this.quantile.getAvgSlow());
 		log.log(Level.INFO, " ---> " + this.quantile.getSigmaOBS());
@@ -242,7 +238,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testSampleZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS, Fixings.IS_SAMPLE),6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS, Fixings.IS_SAMPLE), 6, 9);
 		assertEquals("q0SampleZeros2Null=" + q0SampleZeros2Null, q0SampleZeros2Null, this.quantile.getQuartile0(), DELTA);
 		assertEquals("q1SampleZeros2Null=" + q1SampleZeros2Null, q1SampleZeros2Null, this.quantile.getQuartile1(), DELTA);
 		assertEquals("q2SampleZeros2Null=" + q2SampleZeros2Null, q2SampleZeros2Null, this.quantile.getQuartile2(), DELTA);
@@ -255,7 +251,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 	public void testPopulationWithZerosForbiddenNulls() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		try {
-			this.quantile = new Quantile(record, EnumSet.noneOf(Fixings.class),6);
+			this.quantile = new Quantile(record, EnumSet.noneOf(Fixings.class), 6, 9);
 			fail("Should throw an exception");
 		}
 		catch (Exception e) {
@@ -265,7 +261,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testPopulationZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		assertEquals("q0Zeros2Null=" + q0Zeros2Null, q0Zeros2Null, this.quantile.getQuartile0());
 		assertEquals("q1Zeros2Null=" + q1Zeros2Null, q1Zeros2Null, this.quantile.getQuartile1());
 		assertEquals("q2Zeros2Null=" + q2Zeros2Null, q2Zeros2Null, this.quantile.getQuartile2());
@@ -277,7 +273,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testQuantilesWhiskerZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		assertEquals("qLowerWhiskerZeros2Null=" + qLowerWhiskerZeros2Null, qLowerWhiskerZeros2Null, this.quantile.getQuantileLowerWhisker(), DELTA);
 		assertEquals("qUpperWhiskerZeros2Null=" + qUpperWhiskerZeros2Null, qUpperWhiskerZeros2Null, this.quantile.getQuantileUpperWhisker(), DELTA);
 		log.log(Level.INFO, " ---> " + this.quantile.getQuantileLowerWhisker());
@@ -286,7 +282,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testQuantilesAtSize1() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(size1Array));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		assertEquals("q0Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile0());
 		assertEquals("q1Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile1());
 		assertEquals("q2Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile2());
@@ -297,7 +293,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 	public void testQuantilesAtSize1ArrayNull() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(size1ArrayNull));
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS),6);
+		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		try {
 			this.quantile.getQuartile2();
 			fail("Should throw an exception");

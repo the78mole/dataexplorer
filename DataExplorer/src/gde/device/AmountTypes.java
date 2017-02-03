@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="max"/>
  *     &lt;enumeration value="avg"/>
  *     &lt;enumeration value="sigma"/>
- *     &lt;enumeration value="sum"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -42,9 +41,7 @@ public enum AmountTypes {
     @XmlEnumValue("avg")
     AVG("avg"),
     @XmlEnumValue("sigma")
-    SIGMA("sigma"),
-    @XmlEnumValue("sum")
-    SUM("sum");
+    SIGMA("sigma");
     private final String value;
 
     AmountTypes(String v) {

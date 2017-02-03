@@ -1018,7 +1018,7 @@ public class SettingsDialog extends Dialog {
 								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = -3;
 								this.histoDisplayGroup.setLayout(formLayout);
 								this.histoDisplayGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoDisplayGroup.setText(Messages.getString(MessageIds.GDE_MSGT0783));
+								this.histoDisplayGroup.setText(Messages.getString(MessageIds.GDE_MSGT0847));
 								{
 									this.histoDisplaySettlementsButton = new Button(this.histoDisplayGroup, SWT.CHECK);
 									FormData formData = new FormData();

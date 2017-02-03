@@ -14,11 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2016 Thomas Eickert
+    Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.utils;
-
-import gde.log.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +31,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import gde.log.Level;
+
 /**
- * calculates quantiles of a probability distribution.
+ * calculates quantiles of a probability distribution after removing outliers.
  * is based on a mergesort and thus avg O(n log n).
  * NB: a 500k records clone + sort takes 55 ms (in the arrayList version / on ET's machine).
  * quickselect should reduce this to 10 ms.
@@ -45,23 +45,111 @@ public class Quantile {
 	private final static String			$CLASS_NAME					= Quantile.class.getName();
 	private final static Logger			log									= Logger.getLogger($CLASS_NAME);
 
-	private final static double[]		sigmaProbabilities	= { .5, 3.17310508E-1, 4.5500264E-2, 2.699796E-3, 6.334E-5, 5.733303E-7, 1.973E-9, 2.56E-12, 0 };
-	private final static int				sigmaOutlierDefault	= 6;																																														// sixSigma
-
 	private final List<Integer>			iPopulation;
 	private final List<Double>			dPopulation;
 	private final EnumSet<Fixings>	fixings;
-	private final double						probabilityOutlier;
 
+	private double									firstFigure;
+	private double									lastFigure;
 	private Double									maxFigure;
 	private Double									minFigure;
 	private Double									sumFigure;
 	private Double									avgFigure;
-	private Double									sigmaValue;
+	private Double									sigmaFigure;
 
 	public enum Fixings {
 		REMOVE_NULLS, REMOVE_ZEROS, REMOVE_TYPEMAXMIN, IS_SAMPLE
 	};
+
+	/**
+	 *  Implements the Gauss error function.
+	 *              erf(z) = 2 / sqrt(pi) * integral(exp(-t*t), t = 0..z) 
+	 *  % java ErrorFunction 1.0
+	 *  erf(1.0) = 0.8427007877600067         // actual = 0.84270079294971486934
+	 *  Phi(1.0) = 0.8413447386043253         // actual = 0.8413447460
+	 *  % java ErrorFunction -1.0
+	 *  erf(-1.0) = -0.8427007877600068
+	 *  Phi(-1.0) = 0.15865526139567465
+	 *  % java ErrorFunction 3.0
+	 *  erf(3.0) = 0.9999779095015785         // actual = 0.99997790950300141456
+	 *  Phi(3.0) = 0.9986501019267444
+	 *  % java ErrorFunction 30
+	 *  erf(30.0) = 1.0
+	 *  Phi(30.0) = 1.0
+	 *  % java ErrorFunction -30
+	 *  erf(-30.0) = -1.0
+	 *  Phi(-30.0) = 0.0
+	 *  % java ErrorFunction 1E-20
+	 *  erf(1.0E-20)  = -3.0000000483809686E-8     // true anser 1.13E-20
+	 *  Phi(1.0E-20)  = 0.49999998499999976
+	 *
+	 *  Source:  http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html
+	 * @author Thomas Eickert
+	 */
+	private static class ErrorFunction {
+
+		/**
+		 * fractional error in math formula less than 1.2 * 10 ^ -7.
+		 * although subject to catastrophic cancellation when z in very close to 0.
+		 * @param z
+		 * @return from Chebyshev fitting formula for erf(z) from Numerical Recipes, 6.2
+		 */
+		public static double erf(double z) {
+			double t = 1.0 / (1.0 + 0.5 * Math.abs(z));
+			// use Horner's method
+			double ans = 1 - t * Math.exp(-z * z - 1.26551223
+					+ t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * (0.17087277))))))))));
+			if (z >= 0)
+				return ans;
+			else
+				return -ans;
+		}
+
+		/**
+		 * fractional error less than x.xx * 10 ^ -4.
+		 * @param z
+		 * @return erf(z) acc. to Algorithm 26.2.17 in Abromowitz and Stegun, Handbook of Mathematical
+		 */
+		public static double erf2(double z) {
+			double t = 1.0 / (1.0 + 0.47047 * Math.abs(z));
+			double poly = t * (0.3480242 + t * (-0.0958798 + t * (0.7478556)));
+			double ans = 1.0 - poly * Math.exp(-z * z);
+			if (z >= 0)
+				return ans;
+			else
+				return -ans;
+		}
+
+		/**
+		 * See Gaussia.java for a better way to compute Phi(z)
+		 * @param z
+		 * @return the cumulative normal distribution
+		 */
+		public static double Phi(double z) {
+			return 0.5 * (1.0 + erf(z / (Math.sqrt(2.0))));
+		}
+
+		/**
+		 * @param sigma
+		 * @return the probability for lower and upper outliers
+		 */
+		public static double getOutlierProbability(double sigma) {
+			return 1 - erf(sigma / Math.sqrt(2.));
+		}
+
+		/**
+		 * Test client
+		 * @param args
+		 */
+		public static void main(String[] args) {
+			double x = Double.parseDouble(args[0]);
+
+			System.out.println(String.format("erf(%f)  = %f", x, ErrorFunction.erf(x))); //$NON-NLS-1$
+			System.out.println(String.format("erf2(%f)  = %f", x, ErrorFunction.erf2(x))); //$NON-NLS-1$
+			System.out.println(String.format("Phi(%f)  = %f", x, ErrorFunction.Phi(x))); //$NON-NLS-1$
+			System.out.println();
+		}
+	}
 
 	/**
 	 * supports standard deviation calculation via parallel streams.
@@ -94,6 +182,7 @@ public class Quantile {
 		 */
 		public void combine(StatsHelper other) {
 			double tmpAvg = this.avg * count / (count + other.count) + other.avg * other.count / (count + other.count);
+			// the next line is also valid for samples as we work with varTimesN which is in fact var times (N-1) for the Bessel corrected version
 			varTimesN += other.varTimesN + count * (avg - tmpAvg) * (avg - tmpAvg) + other.count * (other.avg - tmpAvg) * (other.avg - tmpAvg);
 			avg = tmpAvg;
 			count += other.count;
@@ -104,14 +193,12 @@ public class Quantile {
 	 * constructor based on a vector, e.g. the record.
 	 * @param iPopulation
 	 * @param fixings defines how to proceed with the data
-	 * @param sigmaOutlier sigma limit for identifying measurement outliers
+	 * @param outlierBasePopulation sigma limit for identifying measurement outliers
 	 */
-	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings, int sigmaOutlier) {
+	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings, double outlierSigma, double outlierBaseRangeFactor) {
 		if (iPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.dPopulation = null;
 		this.fixings = fixings;
-		this.probabilityOutlier = sigmaOutlier < Quantile.sigmaProbabilities.length && sigmaOutlier > 0 ? Quantile.sigmaProbabilities[sigmaOutlier]
-				: Quantile.sigmaProbabilities[Quantile.sigmaProbabilities.length - 1];
 		ArrayList<Integer> fullList = new ArrayList<>(iPopulation);
 
 		List<Integer> excludes = new ArrayList<Integer>();
@@ -130,12 +217,19 @@ public class Quantile {
 				if (!excludes.contains(value)) this.iPopulation.add(value);
 			}
 		}
+		this.firstFigure = this.iPopulation.get(0) != null ? this.iPopulation.get(0) : -Double.MAX_VALUE;
+		this.lastFigure = this.iPopulation.get(this.iPopulation.size() - 1) != null ? this.iPopulation.get(this.iPopulation.size() - 1) : -Double.MAX_VALUE;
 
 		Collections.sort(this.iPopulation);
-		while (getQuantile(this.probabilityOutlier) != getQuartile0())
+
+		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m) 
+		double outlierProbability = ErrorFunction.getOutlierProbability(outlierSigma) / 2.;
+		double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
+		while (this.iPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierBaseRangeFactor)
 			this.iPopulation.remove(0);
-		while (getQuantile(1. - this.probabilityOutlier) != getQuartile4())
+		while (this.iPopulation.get(this.iPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierBaseRangeFactor)
 			this.iPopulation.remove(this.iPopulation.size() - 1);
+
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(iPopulation.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.iPopulation.toArray()));
 	}
@@ -144,14 +238,12 @@ public class Quantile {
 	 * constructor based on any collection.
 	 * @param dPopulation
 	 * @param fixings defines how to proceed with the data
-	 * @param sigmaOutlier sigma limit for identifying measurement outliers
+	 * @param outlierSigma sigma limit for identifying measurement outliers
 	 */
-	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings, int sigmaOutlier) {
+	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings, double outlierSigma, double outlierBaseRangeFactor) {
 		if (dPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.iPopulation = null;
 		this.fixings = fixings;
-		this.probabilityOutlier = sigmaOutlier < Quantile.sigmaProbabilities.length && sigmaOutlier > 0 ? Quantile.sigmaProbabilities[sigmaOutlier]
-				: Quantile.sigmaProbabilities[Quantile.sigmaOutlierDefault];
 		ArrayList<Double> fullList = new ArrayList<>(dPopulation);
 
 		List<Double> excludes = new ArrayList<Double>();
@@ -170,12 +262,19 @@ public class Quantile {
 				if (!excludes.contains(value)) this.dPopulation.add(value);
 			}
 		}
+		this.firstFigure = this.dPopulation.get(0) != null ? this.dPopulation.get(0) : -Double.MAX_VALUE;
+		this.lastFigure = this.dPopulation.get(this.dPopulation.size() - 1) != null ? this.dPopulation.get(this.dPopulation.size() - 1) : -Double.MAX_VALUE;
 
 		Collections.sort(this.dPopulation);
-		while (getQuantile(this.probabilityOutlier) != getQuartile0())
+
+		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m) 
+		double outlierProbability = ErrorFunction.getOutlierProbability(outlierSigma) / 2.;
+		double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
+		while (this.dPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierBaseRangeFactor)
 			this.dPopulation.remove(0);
-		while (getQuantile(1. - this.probabilityOutlier) != getQuartile4())
-			this.dPopulation.remove(this.iPopulation.size() - 1);
+		while (this.dPopulation.get(this.dPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierBaseRangeFactor)
+			this.dPopulation.remove(this.dPopulation.size() - 1);
+
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(dPopulation.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.dPopulation.toArray()));
 	}
@@ -189,7 +288,6 @@ public class Quantile {
 		this.dPopulation = null;
 		if (iPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.fixings = fixings;
-		this.probabilityOutlier = Quantile.sigmaProbabilities[6]; // 6Sigma
 
 		Stream<Integer> stream = iPopulation.parallelStream();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) stream = stream.filter(Objects::nonNull);
@@ -199,10 +297,9 @@ public class Quantile {
 			stream = stream.filter(x -> Arrays.asList(excludes).contains(x));
 		}
 		this.iPopulation = stream.sorted().collect(Collectors.toList());
-		while (getQuantile(this.probabilityOutlier) != getQuartile0())
-			this.dPopulation.remove(0);
-		while (getQuantile(1. - this.probabilityOutlier) != getQuartile4())
-			this.dPopulation.remove(this.iPopulation.size() - 1);
+
+		// do not remove outliers 
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "i " + iPopulation.size() + " " + this.iPopulation.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(iPopulation.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.iPopulation.toArray()));
@@ -217,7 +314,6 @@ public class Quantile {
 		this.iPopulation = null;
 		if (dPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.fixings = fixings;
-		this.probabilityOutlier = Quantile.sigmaProbabilities[6]; // 6Sigma
 
 		Stream<Double> stream = dPopulation.parallelStream();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) stream = stream.filter(Objects::nonNull);
@@ -227,10 +323,9 @@ public class Quantile {
 			stream = stream.filter(x -> Arrays.asList(excludes).contains(x));
 		}
 		this.dPopulation = stream.sorted().collect(Collectors.toList());
-		while (getQuantile(this.probabilityOutlier) != getQuartile0())
-			this.dPopulation.remove(0);
-		while (getQuantile(1. - this.probabilityOutlier) != getQuartile4())
-			this.dPopulation.remove(this.iPopulation.size() - 1);
+
+		// do not remove outliers 
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "d " + dPopulation.size() + " " + this.dPopulation.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(dPopulation.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.dPopulation.toArray()));
@@ -259,7 +354,7 @@ public class Quantile {
 	public double getSumFigure() {
 		if (this.sumFigure == null) {
 			if (this.dPopulation == null)
-				this.sumFigure = (double) this.iPopulation.parallelStream().mapToInt(x -> x).sum();
+				this.sumFigure = (double) this.iPopulation.parallelStream().mapToInt(x -> x).sum(); // do not extend to long as the vault only holds integer values
 			else
 				this.sumFigure = this.dPopulation.parallelStream().mapToDouble(x -> x).sum();
 		}
@@ -297,9 +392,9 @@ public class Quantile {
 
 	public double getAvgSlow() {
 		if (this.dPopulation == null)
-			return this.iPopulation.parallelStream().mapToDouble(x -> x).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getAvg();
+			return this.iPopulation.parallelStream().collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getAvg();
 		else
-			return this.dPopulation.parallelStream().mapToDouble(x -> x).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getAvg();
+			return this.dPopulation.parallelStream().collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getAvg();
 	}
 
 	public double getSigmaOBS() {
@@ -349,14 +444,15 @@ public class Quantile {
 	}
 
 	public double getSigmaFigure() {
-		if (this.sigmaValue == null) {
+		// takes about 310 ms for 100 iPopulations with 500k members on ET's machine (compared to 680/500 ms for sigmaOBS/sigmaRunningOBS  ) 
+		if (this.sigmaFigure == null) {
 			if (this.dPopulation == null) {
-				this.sigmaValue = this.iPopulation.parallelStream().mapToDouble(x -> x).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.fixings.contains(Fixings.IS_SAMPLE));
+				this.sigmaFigure = this.iPopulation.parallelStream().collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.fixings.contains(Fixings.IS_SAMPLE));
 			}
 			else
-				this.sigmaValue = this.dPopulation.parallelStream().mapToDouble(x -> x).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.fixings.contains(Fixings.IS_SAMPLE));
+				this.sigmaFigure = this.dPopulation.parallelStream().collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.fixings.contains(Fixings.IS_SAMPLE));
 		}
-		return this.sigmaValue;
+		return this.sigmaFigure;
 	}
 
 	/**
@@ -367,20 +463,20 @@ public class Quantile {
 	 */
 	public double getQuantile(double probabilityCutPoint) {
 		if (this.dPopulation == null) {
-			int realSize = this.iPopulation.size();
+			int pSize = this.iPopulation.size();
 			if (this.fixings.contains(Fixings.IS_SAMPLE)) {
-				if (probabilityCutPoint >= 1. / (realSize + 1) && probabilityCutPoint < (double) realSize / (realSize + 1)) {
-					double position = (realSize + 1) * probabilityCutPoint;
+				if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
+					double position = (pSize + 1) * probabilityCutPoint;
 					return this.iPopulation.get((int) position - 1) + (position - (int) position) * (this.iPopulation.get((int) position) - this.iPopulation.get((int) position - 1));
 				}
-				else if (probabilityCutPoint < 1. / (realSize + 1))
+				else if (probabilityCutPoint < 1. / (pSize + 1))
 					return this.iPopulation.get(0);
 				else
-					return this.iPopulation.get(realSize - 1);
+					return this.iPopulation.get(pSize - 1);
 			}
 			else {
-				if (probabilityCutPoint > 0. || probabilityCutPoint < 1.) {
-					double position = realSize * probabilityCutPoint;
+				if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
+					double position = pSize * probabilityCutPoint;
 					if (position % 2 == 0)
 						// take elements p-1 and p due to zerobased index
 						return (this.iPopulation.get((int) position) + this.iPopulation.get((int) (position + 1))) / 2.;
@@ -391,24 +487,24 @@ public class Quantile {
 				else if (probabilityCutPoint == 0.)
 					return this.iPopulation.get(0);
 				else
-					return this.iPopulation.get(realSize - 1);
+					return this.iPopulation.get(pSize - 1);
 			}
 		}
 		else {
-			int realSize = this.dPopulation.size();
+			int pSize = this.dPopulation.size();
 			if (this.fixings.contains(Fixings.IS_SAMPLE)) {
-				if (probabilityCutPoint >= 1. / (realSize + 1) && probabilityCutPoint < (double) realSize / (realSize + 1)) {
-					double position = (realSize + 1) * probabilityCutPoint;
+				if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
+					double position = (pSize + 1) * probabilityCutPoint;
 					return this.dPopulation.get((int) position - 1) + (position - (int) position) * (this.dPopulation.get((int) position) - this.dPopulation.get((int) position - 1));
 				}
-				else if (probabilityCutPoint < 1. / (realSize + 1))
+				else if (probabilityCutPoint < 1. / (pSize + 1))
 					return this.dPopulation.get(0);
 				else
-					return this.dPopulation.get(realSize - 1);
+					return this.dPopulation.get(pSize - 1);
 			}
 			else {
 				if (probabilityCutPoint > 0. || probabilityCutPoint < 1.) {
-					double position = realSize * probabilityCutPoint;
+					double position = pSize * probabilityCutPoint;
 					if (position % 2 == 0)
 						// take elements p-1 and p due to zerobased index
 						return (this.dPopulation.get((int) position) + this.dPopulation.get((int) (position + 1))) / 2.;
@@ -419,7 +515,7 @@ public class Quantile {
 				else if (probabilityCutPoint == 0.)
 					return this.dPopulation.get(0);
 				else
-					return this.dPopulation.get(realSize - 1);
+					return this.dPopulation.get(pSize - 1);
 			}
 		}
 	}
@@ -521,9 +617,23 @@ public class Quantile {
 	}
 
 	/**
-	 * @return size after removing nulls / zeros or 6sigma outliers as defined in the constructor
+	 * @return the first value after the fixing actions
 	 */
-	public int getRealSize() {
+	public double getFirstFigure() {
+		return this.firstFigure;
+	}
+
+	/**
+	 * @return the last value after the fixing actions
+	 */
+	public double getLastFigure() {
+		return this.lastFigure;
+	}
+
+	/**
+	 * @return the population size after the fixing actions
+	 */
+	public double getSizeFigure() {
 		return this.dPopulation == null ? this.iPopulation.size() : this.dPopulation.size();
 	}
 

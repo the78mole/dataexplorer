@@ -167,6 +167,9 @@ public class Settings extends Properties {
 	final static String							IS_DISPLAY_SETTLEMENTS					= "is_display_settlements";																																				//$NON-NLS-1$
 	final static String							IS_DISPLAY_SCORES								= "is_display_scores";																																						//$NON-NLS-1$
 	final static String							IS_DISPLAY_TAGS									= "is_display_tags";																																							//$NON-NLS-1$
+	final static String							MINIMUM_TRANSITION_STEPS_DEFAULT						= "minimum_transition_steps_default";																																							//$NON-NLS-1$
+	final static String							OUTLIER_SIGMA_DEFAULT						= "outlier_sigma_default";																																							//$NON-NLS-1$
+	final static String							OUTLIER_RANGE_FACTOR_DEFAULT						= "outlier_range_factor_default";																																							//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -734,6 +737,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SETTLEMENTS, isDisplaySettlements())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SCORES, isDisplayScores())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_TAGS, isDisplayTags())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MINIMUM_TRANSITION_STEPS_DEFAULT, getMinimumTransitionStepsDefault())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OUTLIER_SIGMA_DEFAULT, getOutlierSigmaDefault())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OUTLIER_RANGE_FACTOR_DEFAULT, getOutlierRangeFactorDefault())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2749,6 +2755,66 @@ public class Settings extends Properties {
 	 */
 	public boolean isDisplaySettlements() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_DISPLAY_SETTLEMENTS, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the minmax distance value used in quantile calculations for settlements based on transitions
+	 */
+	public int getMinimumTransitionStepsDefault() {
+		return Integer.valueOf(this.getProperty(Settings.MINIMUM_TRANSITION_STEPS_DEFAULT, "2")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param intValue is the number of transitions which are required in the reference, threshold or recovery phase of transitions
+	 */
+	public void setMinimumTransitionStepsDefault(String intValue) {
+		try {
+			double value = Integer.parseInt(intValue.trim());
+			if (value < 1) value = 2;
+			this.setProperty(Settings.MINIMUM_TRANSITION_STEPS_DEFAULT, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @return the sigma limit for outlier identification (default is 3.0 which allows 0.27% outliers, i.e. 1 lower and 1 upper outlier for a population of 740 measurements)
+	 */
+	public double getOutlierSigmaDefault() {
+		return Double.valueOf(this.getProperty(Settings.OUTLIER_SIGMA_DEFAULT, "3.")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param doubleValue is the sigma limit for the base population (default is 3.0 which allows 0.27% outliers, i.e. 1 lower and 1 upper outlier for a population of 740 measurements)
+	 */
+	public void setOutlierSigmaDefault(String doubleValue) {
+		try {
+			double value = Double.parseDouble(doubleValue.trim());
+			if (value < .1) value = 3.;
+			this.setProperty(Settings.OUTLIER_SIGMA_DEFAULT, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @return the sigma limit for the factor applied to the base population spread (default is 2.0 which ignores a good deal of outliers, i.e. outliers are identified only if they lie beyond the base population IQR multiplied by 2.0)
+	 */
+	public double getOutlierRangeFactorDefault() {
+		return Double.valueOf(this.getProperty(Settings.OUTLIER_RANGE_FACTOR_DEFAULT, "2.")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param doubleValue is the factor applied to the base population spread (default is 2.0 which ignores a good deal of outliers, i.e. outliers are identified only if they lie beyond the base population IQR multiplied by 2.0)
+	 */
+	public void setOutlierRangeFactorDefault(String doubleValue) {
+		try {
+			double value = Double.parseDouble(doubleValue.trim());
+			if (value < 1.) value = 2.;
+			this.setProperty(Settings.OUTLIER_RANGE_FACTOR_DEFAULT, String.valueOf(value));
+		}
+		catch (Exception e) {
+		}
 	}
 
 }

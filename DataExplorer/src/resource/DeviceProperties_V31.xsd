@@ -301,7 +301,7 @@
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="suppressQuantiles" type="xs:boolean" nillable="false" minOccurs="0" />
+			<xs:element name="trailDisplay" type="TrailDisplayType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="label" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 		<xs:attribute name="settlementId" type="xs:int" use="required" />
@@ -319,9 +319,20 @@
 			</xs:element>
 			<xs:element name="statistics" type="StatisticsType" minOccurs="0" />
 			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="suppressQuantiles" type="xs:boolean" nillable="false" minOccurs="0" />
+			<xs:element name="trailDisplay" type="TrailDisplayType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="label" type="xs:string" minOccurs="0" />
 		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TrailDisplayType">
+		<xs:sequence>
+			<xs:element name="expose" type="TrailVisibilityType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="disclose" type="TrailVisibilityType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="discloseAll" type="xs:boolean" use="required" />
+		<xs:attribute name="defaultTrail" type="trail_types"/>
+	</xs:complexType>
+	<xs:complexType name="TrailVisibilityType">
+		<xs:attribute name="trail" type="trail_types"/>
 	</xs:complexType>
 	<xs:complexType name="ChannelType">
 		<xs:sequence>
@@ -470,14 +481,6 @@
 				</xs:element>
 			</xs:sequence>
 		</xs:choice>
-		<xs:attribute name="min" type="xs:boolean" use="required" />
-		<xs:attribute name="max" type="xs:boolean" use="required" />
-		<xs:attribute name="avg" type="xs:boolean" use="required" />
-		<xs:attribute name="sigma" type="xs:boolean" use="required" />
-		<xs:attribute name="sum" type="xs:boolean" use="required" />
-		<xs:attribute name="first" type="xs:boolean" use="required" />
-		<xs:attribute name="last" type="xs:boolean" use="required" />
-		<xs:attribute name="count" type="xs:boolean" use="required" />
 		<xs:attribute name="comment" type="xs:string">
 			<xs:annotation>
 				<xs:documentation>comment for documentation purposes</xs:documentation>
@@ -631,7 +634,7 @@
 		</xs:attribute>
 		<xs:attribute name="referenceTimeMsec" type="xs:int" use="required">
 			<xs:annotation>
-				<xs:documentation>time length in seconds for finding the maximum / minimum reference value. The
+				<xs:documentation>time length in milliseconds for finding the maximum / minimum reference value. The
 					end of the reference time is the last time step before the trigger fired.
 				</xs:documentation>
 			</xs:annotation>
@@ -648,9 +651,16 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="peakMinimumTimeMsec" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>minimum threshold time length in milliseconds.
+				pls note that the threshold always has at least 2 measurements.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="recoveryTimeMsec" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>time length in seconds for finding the maximum / minimum hysteresis value.
+				<xs:documentation>time length in milliseconds for finding the maximum / minimum hysteresis value.
 					applicable for peaks only: if the recovery does not conform perfectly to the recovery level and
 					time
 					minimum, the trigger is cancelled.
@@ -944,8 +954,8 @@
 			<xs:enumeration value="main_gear" />
 			<xs:enumeration value="status_fields" />
 			<xs:enumeration value="time_info" />
-			<xs:enumeration value="minimum_transition_steps" />
-			<xs:enumeration value="sigma_outlier_fringe" />
+			<xs:enumeration value="outlier_sigma" />
+			<xs:enumeration value="outlier_range_factor" />
 			<xs:enumeration value="none_specified" />
 		</xs:restriction>
 	</xs:simpleType>
@@ -971,7 +981,6 @@
 			<xs:enumeration value="max" />
 			<xs:enumeration value="avg" />
 			<xs:enumeration value="sigma" />
-			<xs:enumeration value="sum" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="calculus_types">
@@ -1025,8 +1034,8 @@
 			<xs:enumeration value="logDataVersion" />
 			<xs:enumeration value="logDataExplorerVersion" />
 			<xs:enumeration value="logFileVersion" />
-			<xs:enumeration value="logRecordSetBytes" />
 			<xs:enumeration value="logFileBytes" />
+			<xs:enumeration value="logRecordSetBytes" />
 			<xs:enumeration value="logFileRecordSets" />
 			<xs:enumeration value="elapsedHistoRecordSet_ms" />
 		</xs:restriction>
@@ -1055,6 +1064,48 @@
 			<xs:enumeration value="quotient" />
 			<xs:enumeration value="spread" />
 			<xs:enumeration value="sum" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="trail_types">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="real_avg" />
+			<xs:enumeration value="real_count" />
+			<xs:enumeration value="real_max" />
+			<xs:enumeration value="real_min" />
+			<xs:enumeration value="real_sd" />
+			<xs:enumeration value="real_first" />
+			<xs:enumeration value="real_last" />
+			<xs:enumeration value="real_sum_triggered" />
+			<xs:enumeration value="real_avg_ratio_triggered" />
+			<xs:enumeration value="real_max_ratio_triggered" />
+			<xs:enumeration value="real_time_sum_triggered" />
+			<xs:enumeration value="real_count_triggered" />
+			<xs:enumeration value="real_sum" />
+			<xs:enumeration value="avg" />
+			<xs:enumeration value="max" />
+			<xs:enumeration value="min" />
+			<xs:enumeration value="sd" />
+			<xs:enumeration value="q0" />
+			<xs:enumeration value="q1" />
+			<xs:enumeration value="q2" />
+			<xs:enumeration value="q3" />
+			<xs:enumeration value="q4" />
+			<xs:enumeration value="q_25_permille" />
+			<xs:enumeration value="q_975_permille" />
+			<xs:enumeration value="q_lower_whisker" />
+			<xs:enumeration value="q_upper_whisker" />
+			<xs:enumeration value="first" />
+			<xs:enumeration value="last" />
+			<xs:enumeration value="sum" />
+			<xs:enumeration value="count" />
+			<xs:enumeration value="suite_real_avg_sd" />
+			<xs:enumeration value="suite_real_avg_min_max" />
+			<xs:enumeration value="suite_avg_sd" />
+			<xs:enumeration value="suite_avg_min_max" />
+			<xs:enumeration value="suite_box_plot" />
+			<xs:enumeration value="suite_box_plot_95" />
+			<xs:enumeration value="suite_q0_q2_q4" />
+			<xs:enumeration value="suite_q1_q2_q3" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

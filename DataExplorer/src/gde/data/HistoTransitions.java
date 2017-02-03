@@ -351,7 +351,7 @@ public class HistoTransitions {
 		 * @return false if the timestamp is beyond the deque time period or if the element already exists in the deque. 
 		 */
 		public boolean tryAddLast(double translatedValue, long timeStamp_100ns) {
-			if (this.timeStampDeque.peekFirst() + this.timePeriod_100ns >= timeStamp_100ns) {
+			if (this.timePeriod_100ns >= timeStamp_100ns - this.timeStampDeque.peekFirst()) {
 				this.addLast(translatedValue, timeStamp_100ns);
 				return true;
 			}
@@ -400,7 +400,7 @@ public class HistoTransitions {
 		 * @return true if the time distance of the first and the last deque elements equals the deque time period.
 		 */
 		public boolean isFilledToCapacity() {
-			return this.timeStampDeque.peekFirst() + this.timePeriod_100ns == this.timeStampDeque.peekLast();
+			return this.timePeriod_100ns == getDuration_ms();
 		}
 
 		/**
@@ -414,7 +414,7 @@ public class HistoTransitions {
 			this.isExhausted = false;
 			if (!this.timeStampDeque.isEmpty()) {
 				for (int i = 0; i < this.timeStampDeque.size(); i++) {
-					if (this.timeStampDeque.peekFirst() + this.timePeriod_100ns < this.timeStampDeque.peekLast()) {
+					if (this.timePeriod_100ns < getDuration_ms()) {
 						this.pollFirst(); // polls timestampDeque also
 						this.isExhausted = true;
 					}
@@ -423,6 +423,10 @@ public class HistoTransitions {
 					}
 				}
 			}
+		}
+
+		public long getDuration_ms() {
+			return !this.timeStampDeque.isEmpty() ? this.timeStampDeque.peekLast() - this.timeStampDeque.peekFirst() : 0;
 		}
 
 		public List<Double> getSortedValues() {
@@ -708,16 +712,18 @@ public class HistoTransitions {
 		final double translatedMinValue = this.device.translateValue(transitionRecord, transitionRecord.getMinValue());
 		final double absoluteDelta = Settings.getInstance().getAbsoluteTransitionLevel() * (translatedMaxValue - translatedMinValue);
 		final double translatedThresholdValue = this.device.translateValue(transitionRecord, transitionType.getThresholdValue());
-		final double translatedRecoveryValue = transitionType.getClassType() != TransitionClassTypes.SLOPE ? this.device.translateValue(transitionRecord, transitionType.getRecoveryValue()) : 0;
+		final double translatedRecoveryValue = transitionType.getClassType() != TransitionClassTypes.SLOPE ? this.device.translateValue(transitionRecord,
+				transitionType.getRecoveryValue().orElseThrow(() -> new UnsupportedOperationException("recovery value. transitionID=" + transitionType.getTransitionId()))) : 0; //$NON-NLS-1$
 
-		final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.MINIMUM_TRANSITION_STEPS);
-		final int minimumTransitionSteps = channelProperty != null && !channelProperty.getValue().isEmpty() ?  Integer.parseInt(channelProperty.getValue()) : 2;
 		final int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms());
 		final int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms());
-		final int recoveryDequeSize = (int) (transitionType.getClassType() != TransitionClassTypes.SLOPE ? transitionType.getRecoveryTimeMsec() / this.recordSet.timeStep_ms.getAverageTimeStep_ms() : 1);
+		final int recoveryDequeSize = (int) (transitionType.getClassType() != TransitionClassTypes.SLOPE
+				? transitionType.getRecoveryTimeMsec().orElseThrow(() -> new UnsupportedOperationException("recovery time. transitionID=" + transitionType.getTransitionId())) //$NON-NLS-1$
+						/ this.recordSet.timeStep_ms.getAverageTimeStep_ms()
+				: 1);
 		this.referenceDeque = new SettlementDeque(referenceDequeSize, transitionType.isGreater(), transitionType.getReferenceTimeMsec() * 10);
 		this.thresholdDeque = new SettlementDeque(thresholdDequeSize, !transitionType.isGreater(), transitionType.getThresholdTimeMsec() * 10);
-		this.recoveryDeque = new SettlementDeque(recoveryDequeSize, true, transitionType.getClassType() != TransitionClassTypes.SLOPE ? transitionType.getRecoveryTimeMsec() * 10 : 1); // initialize an empty deque just for avoiding a null reference
+		this.recoveryDeque = new SettlementDeque(recoveryDequeSize, true, transitionType.getClassType() != TransitionClassTypes.SLOPE ? transitionType.getRecoveryTimeMsec().orElse(null) * 10 : 1); // initialize an empty deque just for avoiding a null reference
 		this.triggerState = TriggerState.WAITING;
 		this.referenceDeque.initialize(0);
 
@@ -750,7 +756,8 @@ public class HistoTransitions {
 					boolean isRecovered = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
 					// minimumTransitionSteps prevents transitions provoked by jitters in the reference phase; should cover at least 2 'real' measurements
 					// also check if only a minimum of the threshold values actually passed the recovery level (in order to tolerate a minimum of jitters)
-					if (isRecovered && this.thresholdDeque.size() >= minimumTransitionSteps && !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue(), translatedRecoveryValue)) {
+					if (isRecovered && this.thresholdDeque.size() >= 2 && this.thresholdDeque.getDuration_ms() >= transitionType.getPeakMinimumTimeMsec().orElse(0)
+							&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue(), translatedRecoveryValue)) {
 						this.triggerState = TriggerState.RECOVERING;
 						this.recoveryDeque.initialize(i);
 						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
@@ -1094,7 +1101,8 @@ public class HistoTransitions {
 		final boolean isBeyond;
 		if (transitionType.getValueType() == TransitionValueTypes.DELTA_FACTOR) {
 			final double baseValue = this.referenceDeque.getBenchmarkValue();
-			isBeyond = transitionType.isGreater() ? translatedValue < baseValue + transitionType.getRecoveryValue() * baseValue : translatedValue > baseValue + transitionType.getRecoveryValue() * baseValue;
+			isBeyond = transitionType.isGreater() ? translatedValue < baseValue + transitionType.getRecoveryValue().orElse(null) * baseValue
+					: translatedValue > baseValue + transitionType.getRecoveryValue().orElse(null) * baseValue;
 		}
 		else if (transitionType.getValueType() == TransitionValueTypes.DELTA_VALUE) {
 			final double baseValue = this.referenceDeque.getBenchmarkValue();

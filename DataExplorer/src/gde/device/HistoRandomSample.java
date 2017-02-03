@@ -48,8 +48,6 @@ public class HistoRandomSample {
 
 	private final Settings			settings					= Settings.getInstance();
 
-	private static final int		samplesInBaseTime	= 5;																// the reference and thresholdTimeMsec time should have at last this number of samples 
-
 	private final int						recordTimespan_ms;																		// smallest time interval to the next sample: one record every 10 ms
 	private final int						samplingTimespan_ms;																	// actual used timespan; one sample in this time span + potential oversampling samples
 	private final Random				rand							= new Random();
@@ -112,26 +110,20 @@ public class HistoRandomSample {
 
 		// find the maximum sampling timespan
 		int proposedTimespan_ms = this.settings.getSamplingTimespan_ms();
-		final ChannelPropertyType channelProperty = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.MINIMUM_TRANSITION_STEPS);
-		Map<Integer, TransitionType> transitionTypes = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions();
-		if (channelProperty != null && !channelProperty.getValue().isEmpty()) {
-			proposedTimespan_ms = this.recordTimespan_ms;
-		}
-		else if (!transitionTypes.isEmpty()) {
-			for (TransitionType transitionType : transitionTypes.values()) {
-				if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
-					proposedTimespan_ms = this.recordTimespan_ms;
-					if (log.isLoggable(Level.FINE))
-						log.log(Level.FINE, String.format("peak transitions inhibit sampling  samplingTimespan_ms effective=%d user=%d", this.recordTimespan_ms, this.settings.getSamplingTimespan_ms())); //$NON-NLS-1$
-					break; // peaks are always based on short term measurements and this requires all measurement points
-				}
-				else {
-					// do not care about the recovery time because it might be 0 in case of slopes
-					int detectableTimespan_ms = Math.min(transitionType.referenceTimeMsec, transitionType.thresholdTimeMsec) / HistoRandomSample.samplesInBaseTime;
-					proposedTimespan_ms = Math.min(proposedTimespan_ms, detectableTimespan_ms);
-				}
+		for (TransitionType transitionType : DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions().values()) {
+			if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
+				// ensure that the peak consists of at least 2 measurements
+				if (transitionType.peakMinimumTimeMsec == null)
+					proposedTimespan_ms = Math.min(proposedTimespan_ms, this.recordTimespan_ms * 2);
+				else
+					proposedTimespan_ms = Math.min(proposedTimespan_ms, transitionType.peakMinimumTimeMsec / 2);
 			}
+			// ensure that both the reference time and the threshold time consists of at least 2 measurements
+			// do not care about the recovery time because it might be 0 in case of slopes
+			int detectableTimespan_ms = Math.min(transitionType.referenceTimeMsec, transitionType.thresholdTimeMsec) / 2;
+			proposedTimespan_ms = Math.min(proposedTimespan_ms, detectableTimespan_ms);
 		}
+		
 		this.samplingTimespan_ms = Math.max(proposedTimespan_ms, this.recordTimespan_ms); // sampling timespan must not be smaller than the recording timespan
 		if (proposedTimespan_ms != this.settings.getSamplingTimespan_ms()) {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,

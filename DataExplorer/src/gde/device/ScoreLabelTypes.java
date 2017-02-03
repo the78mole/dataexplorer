@@ -103,10 +103,10 @@ public enum ScoreLabelTypes {
     LOG_DATA_EXPLORER_VERSION("logDataExplorerVersion"),
     @XmlEnumValue("logFileVersion")
     LOG_FILE_VERSION("logFileVersion"),
-    @XmlEnumValue("logRecordSetBytes")
-    LOG_RECORD_SET_BYTES("logRecordSetBytes"),
     @XmlEnumValue("logFileBytes")
     LOG_FILE_BYTES("logFileBytes"),
+    @XmlEnumValue("logRecordSetBytes")
+    LOG_RECORD_SET_BYTES("logRecordSetBytes"),
     @XmlEnumValue("logFileRecordSets")
     LOG_FILE_RECORD_SETS("logFileRecordSets"),
     @XmlEnumValue("elapsedHistoRecordSet_ms")

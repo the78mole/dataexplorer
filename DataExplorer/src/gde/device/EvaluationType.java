@@ -36,14 +36,6 @@ import gde.GDE;
  *           &lt;element name="transitionCalculus" type="{}TransitionCalculusType"/>
  *         &lt;/sequence>
  *       &lt;/choice>
- *       &lt;attribute name="min" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="max" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="avg" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="sigma" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="sum" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="first" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="last" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="count" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -63,22 +55,6 @@ public class EvaluationType {
     protected TransitionFigureType transitionFigure;
     protected TransitionAmountType transitionAmount;
     protected TransitionCalculusType transitionCalculus;
-    @XmlAttribute(required = true)
-    protected boolean min;
-    @XmlAttribute(required = true)
-    protected boolean max;
-    @XmlAttribute(required = true)
-    protected boolean avg;
-    @XmlAttribute(required = true)
-    protected boolean sigma;
-    @XmlAttribute(required = true)
-    protected boolean sum;
-    @XmlAttribute(required = true)
-    protected boolean first;
-    @XmlAttribute(required = true)
-    protected boolean last;
-    @XmlAttribute(required = true)
-    protected boolean count;
     @XmlAttribute
     protected String comment;
 
@@ -155,134 +131,6 @@ public class EvaluationType {
     }
 
     /**
-     * Gets the value of the min property.
-     * 
-     */
-    public boolean isMin() {
-        return min;
-    }
-
-    /**
-     * Sets the value of the min property.
-     * 
-     */
-    public void setMin(boolean value) {
-        this.min = value;
-    }
-
-    /**
-     * Gets the value of the max property.
-     * 
-     */
-    public boolean isMax() {
-        return max;
-    }
-
-    /**
-     * Sets the value of the max property.
-     * 
-     */
-    public void setMax(boolean value) {
-        this.max = value;
-    }
-
-    /**
-     * Gets the value of the avg property.
-     * 
-     */
-    public boolean isAvg() {
-        return avg;
-    }
-
-    /**
-     * Sets the value of the avg property.
-     * 
-     */
-    public void setAvg(boolean value) {
-        this.avg = value;
-    }
-
-    /**
-     * Gets the value of the sigma property.
-     * 
-     */
-    public boolean isSigma() {
-        return sigma;
-    }
-
-    /**
-     * Sets the value of the sigma property.
-     * 
-     */
-    public void setSigma(boolean value) {
-        this.sigma = value;
-    }
-
-    /**
-     * Gets the value of the sum property.
-     * 
-     */
-    public boolean isSum() {
-        return sum;
-    }
-
-    /**
-     * Sets the value of the sum property.
-     * 
-     */
-    public void setSum(boolean value) {
-        this.sum = value;
-    }
-
-    /**
-     * Gets the value of the first property.
-     * 
-     */
-    public boolean isFirst() {
-        return first;
-    }
-
-    /**
-     * Sets the value of the first property.
-     * 
-     */
-    public void setFirst(boolean value) {
-        this.first = value;
-    }
-
-    /**
-     * Gets the value of the last property.
-     * 
-     */
-    public boolean isLast() {
-        return last;
-    }
-
-    /**
-     * Sets the value of the last property.
-     * 
-     */
-    public void setLast(boolean value) {
-        this.last = value;
-    }
-
-    /**
-     * Gets the value of the count property.
-     * 
-     */
-    public boolean isCount() {
-        return count;
-    }
-
-    /**
-     * Sets the value of the count property.
-     * 
-     */
-    public void setCount(boolean value) {
-        this.count = value;
-    }
-
-    /**
      * Gets the value of the comment property.
      * 
      * @return
@@ -305,15 +153,5 @@ public class EvaluationType {
     public void setComment(String value) {
         this.comment = value;
     }
-
-  	@Override
-  	public String toString() {
-  		StringBuilder sb = new StringBuilder();
-  		sb.append("max=").append(this.isMax()).append(GDE.STRING_COMMA_BLANK).append("min=").append(this.isMin()).append(GDE.STRING_COMMA_BLANK);
-  		sb.append("avg=").append(this.isAvg()).append(GDE.STRING_COMMA_BLANK).append("sigma=").append(this.isSigma()).append(GDE.STRING_COMMA_BLANK);
-  		sb.append("sum=").append(this.isSum()).append(GDE.STRING_COMMA_BLANK).append("count=").append(this.isCount()).append(GDE.STRING_COMMA_BLANK);
-  		sb.append("first=").append(this.isFirst()).append(GDE.STRING_COMMA_BLANK).append("last=").append(this.isLast()).append(GDE.STRING_COMMA_BLANK);
-  		return sb.toString();
-  	}
 
 }
