@@ -1969,8 +1969,9 @@ public class DataExplorer extends Composite {
 	 * update the histo tabs if visible.
 	 * @param readFromFiles if true then reload from files; if false then use histo vault data 
 	 */
-	public void updateHistoTabs(boolean readFromFiles) {
-		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : RebuildStep.E_USER_INTERFACE, true);
+	public void updateHistoTabs(boolean readFromFiles, boolean rebuildTrails) {
+		
+		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	/**

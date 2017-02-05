@@ -216,7 +216,7 @@ public class TabAreaContextMenu {
 						TabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
 						Settings.getInstance().setPartialDataTable(TabAreaContextMenu.this.partialTableItem.getSelection());
 						TabAreaContextMenu.this.application.updateAllTabs(true, false);
-						TabAreaContextMenu.this.application.updateHistoTabs(false);
+						TabAreaContextMenu.this.application.updateHistoTabs(false, false);
 					}
 				});
 			}

@@ -139,7 +139,7 @@ public class SettingsDialog extends Dialog {
 	Button															histoDisplayScoresButton;
 	Button															histoDisplayTagsButton;
 	Group																histoBoxplotGroup;
-	Button															histoQuantilesButton;
+	Button															histoSmartStatisticsButton;
 	CLabel															histoBoxplotScaleLabel;
 	CCombo															histoBoxplotScale;
 	CLabel															histoBoxplotSizeAdaptationLabel;
@@ -857,7 +857,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoReversedButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setXAxisReversed(SettingsDialog.this.histoReversedButton.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -889,7 +889,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoSpreadGrade.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setXAxisSpreadGrade(SettingsDialog.this.histoSpreadGrade.getText().trim());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -908,7 +908,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoLogarithmicDistanceButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setXAxisLogarithmicDistance(SettingsDialog.this.histoLogarithmicDistanceButton.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -925,27 +925,27 @@ public class SettingsDialog extends Dialog {
 								this.histoBoxplotGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoBoxplotGroup.setText(Messages.getString(MessageIds.GDE_MSGT0795));
 								{
-									this.histoQuantilesButton = new Button(this.histoBoxplotGroup, SWT.CHECK);
+									this.histoSmartStatisticsButton = new Button(this.histoBoxplotGroup, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 5);
-									this.histoQuantilesButton.setLayoutData(formData);
-									this.histoQuantilesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoQuantilesButton.setText(Messages.getString(MessageIds.GDE_MSGT0800));
-									this.histoQuantilesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
-									this.histoQuantilesButton.setSelection(this.settings.isSmartStatistics());
-									this.histoQuantilesButton.addSelectionListener(new SelectionAdapter() {
+									this.histoSmartStatisticsButton.setLayoutData(formData);
+									this.histoSmartStatisticsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoSmartStatisticsButton.setText(Messages.getString(MessageIds.GDE_MSGT0800));
+									this.histoSmartStatisticsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
+									this.histoSmartStatisticsButton.setSelection(this.settings.isSmartStatistics());
+									this.histoSmartStatisticsButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoQuantilesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoQuantilesButton.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoSmartStatisticsButton.getSelection());
+											SettingsDialog.this.application.updateHistoTabs(false, true);
 										}
 									});
 								}
 								{
 									this.histoBoxplotScaleLabel = new CLabel(this.histoBoxplotGroup, SWT.NONE);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoQuantilesButton, 5);
+									formData.top = new FormAttachment(this.histoSmartStatisticsButton, 5);
 									this.histoBoxplotScaleLabel.setLayoutData(formData);
 									this.histoBoxplotScaleLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoBoxplotScaleLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
@@ -955,7 +955,7 @@ public class SettingsDialog extends Dialog {
 								{
 									this.histoBoxplotScale = new CCombo(this.histoBoxplotGroup, SWT.BORDER | SWT.CENTER);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoQuantilesButton, 5);
+									formData.top = new FormAttachment(this.histoSmartStatisticsButton, 5);
 									formData.right = new FormAttachment(100, -5);
 									formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 									formData.width = GDE.IS_LINUX ? 80 : 70;
@@ -970,7 +970,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoBoxplotScale.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setBoxplotScale(SettingsDialog.this.histoBoxplotScale.getText().trim());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -1002,7 +1002,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoBoxplotSizeAdaptation.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setBoxplotSizeAdaptation(SettingsDialog.this.histoBoxplotSizeAdaptation.getText().trim());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -1033,7 +1033,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoDisplaySettlementsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDisplaySettlements(SettingsDialog.this.histoDisplaySettlementsButton.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -1052,7 +1052,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoDisplayScoresButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDisplayScores(SettingsDialog.this.histoDisplayScoresButton.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -1071,7 +1071,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoDisplayTagsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDisplayTags(SettingsDialog.this.histoDisplayTagsButton.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -1102,7 +1102,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "dateTimeUtc.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDateTimeUtc(SettingsDialog.this.dateTimeUtc.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false);
+											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
@@ -1218,7 +1218,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void focusLost(FocusEvent e) {
 										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
-											SettingsDialog.this.application.updateHistoTabs(true);
+											SettingsDialog.this.application.updateHistoTabs(true, false);
 										}
 									}
 
@@ -1244,7 +1244,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
-										SettingsDialog.this.application.updateHistoTabs(true);
+										SettingsDialog.this.application.updateHistoTabs(true, false);
 									}
 								});
 							}
@@ -1263,7 +1263,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										SettingsDialog.this.application.updateHistoTabs(true);
+										SettingsDialog.this.application.updateHistoTabs(true, false);
 									}
 								});
 							}
@@ -1510,7 +1510,7 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "partialDataTableButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPartialDataTable(SettingsDialog.this.partialDataTableButton.getSelection());
 										SettingsDialog.this.application.updateAllTabs(true, false);
-										SettingsDialog.this.application.updateHistoTabs(false);
+										SettingsDialog.this.application.updateHistoTabs(false, false);
 									}
 								});
 							}
