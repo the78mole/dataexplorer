@@ -83,11 +83,11 @@ import gde.utils.WaitTimer;
  * @author Winfried Brügmann
  */
 public class Settings extends Properties {
-	private final static long				serialVersionUID								= 26031957;
-	final static Logger							log															= Logger.getLogger(Settings.class.getName());
-	final static String							$CLASS_NAME											= Settings.class.getName();
+	private final static long				serialVersionUID									= 26031957;
+	final static Logger							log																= Logger.getLogger(Settings.class.getName());
+	final static String							$CLASS_NAME												= Settings.class.getName();
 
-	private static Settings					instance												= null;																																														// singelton
+	private static Settings					instance													= null;																																														// singelton
 
 	// JAXB XML environment
 	Schema													schema;
@@ -98,54 +98,55 @@ public class Settings extends Properties {
 	Thread													xsdThread;
 	Thread													migrationThread;
 
-	public static final String			EMPTY														= "---";																																													//$NON-NLS-1$
-	public static final String			EMPTY_SIGNATURE									= Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY;
-	static final String							UNIX_PORT_DEV_TTY								= "/dev/tty";
-	static final String							WINDOWS_PORT_COM								= "COM";
-	static final String							PERMISSION_555									= "555";
-	static final String							PATH_RESOURCE										= "resource/";
-	static final String							PATH_RESOURCE_TEMPLATE					= "resource/template/";
+	public static final String			EMPTY															= "---";																																													//$NON-NLS-1$
+	public static final String			EMPTY_SIGNATURE										= Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY;
+	static final String							UNIX_PORT_DEV_TTY									= "/dev/tty";
+	static final String							WINDOWS_PORT_COM									= "COM";
+	static final String							PERMISSION_555										= "555";
+	static final String							PATH_RESOURCE											= "resource/";
+	static final String							PATH_RESOURCE_TEMPLATE						= "resource/template/";
 
-	final static String							HEADER_TEXT											= "# -- DataExplorer Settings File -- ";																													//$NON-NLS-1$
-	final static String							DEVICE_BLOCK										= "#[Actual-Device-Port-Settings]";																																// Picolario;Renschler;COM2 //$NON-NLS-1$
-	final static String							WINDOW_BLOCK										= "#[Window-Settings]";																																						//$NON-NLS-1$
-	final static String							WINDOW_MAXIMIZED								= "window_maximized";																																							//$NON-NLS-1$
-	final static String							WINDOW_LEFT											= "window_left";																																									//$NON-NLS-1$
-	final static String							WINDOW_TOP											= "window_top";																																										//$NON-NLS-1$
-	final static String							WINDOW_WIDTH										= "window_width";																																									//$NON-NLS-1$
-	final static String							WINDOW_HEIGHT										= "window_height";																																								//$NON-NLS-1$
-	final static String							COOLBAR_ORDER										= "coolbar_order";																																								//$NON-NLS-1$
-	final static String							COOLBAR_WRAPS										= "coolbar_wraps";																																								//$NON-NLS-1$
-	final static String							COOLBAR_SIZES										= "coolbar_sizes";																																								//$NON-NLS-1$
-	final static String							RECORD_COMMENT_VISIBLE					= "record_comment_visible";																																				//$NON-NLS-1$
-	final static String							GRAPHICS_HEADER_VISIBLE					= "graphics_header_visible";																																			//$NON-NLS-1$
-	final static String							GRAPHICS_AREA_BACKGROUND				= "graphics_area_background";																																			//$NON-NLS-1$
-	final static String							GRAPHICS_SURROUND_BACKGRD				= "graphics_surround_backgrd";																																		//$NON-NLS-1$
-	final static String							GRAPHICS_BORDER_COLOR						= "graphics_border_color";																																				//$NON-NLS-1$
-	final static String							IS_GRAPHICS_SCALE_COLOR					= "is_graphics_scale_color";																																			//$NON-NLS-1$
-	final static String							IS_GRAPHICS_NUMBERS_COLOR				= "is_graphics_number_color";																																			//$NON-NLS-1$
-	final static String							IS_GRAPHICS_NAME_COLOR					= "is_graphics_text_color";																																				//$NON-NLS-1$
-	final static String							COMPARE_AREA_BACKGROUND					= "compare_area_background";																																			//$NON-NLS-1$
-	final static String							COMPARE_SURROUND_BACKGRD				= "compare_surround_backgrd";																																			//$NON-NLS-1$
-	final static String							COMPARE_BORDER_COLOR						= "compare_border_color";																																					//$NON-NLS-1$
-	final static String							IS_COMPARE_CHANNELCONFIG				= "is_compare_channel_config_name";																																//$NON-NLS-1$
-	final static String							UTILITY_AREA_BACKGROUND					= "utility_area_background";																																			//$NON-NLS-1$
-	final static String							UTILITY_SURROUND_BACKGRD				= "utility_surround_backgrd";																																			//$NON-NLS-1$
-	final static String							UTILITY_BORDER_COLOR						= "utility_border_color";																																					//$NON-NLS-1$
-	final static String							STATISTICS_INNER_BACKGROUND			= "statistics_inner_background";																																	//$NON-NLS-1$
-	final static String							STATISTICS_SURROUND_BACKGRD			= "statistics_surround_backgrd";																																	//$NON-NLS-1$
-	final static String							ANALOG_INNER_BACKGROUND					= "analog_inner_background";																																			//$NON-NLS-1$
-	final static String							ANALOG_SURROUND_BACKGRD					= "analog_surround_backgrd";																																			//$NON-NLS-1$
-	final static String							DIGITAL_INNER_BACKGROUND				= "digital_inner_background";																																			//$NON-NLS-1$
-	final static String							DIGITAL_SURROUND_BACKGRD				= "digital_surround_backgrd";																																			//$NON-NLS-1$
-	final static String							CELL_VOLTAGE_INNER_BACKGROUND		= "cell_voltage_inner_background";																																//$NON-NLS-1$
-	final static String							CELL_VOLTAGE_SURROUND_BACKGRD		= "cell_voltage_surround_backgrd";																																//$NON-NLS-1$
-	final static String							FILE_COMMENT_INNER_BACKGROUND		= "file_comment_inner_background";																																//$NON-NLS-1$
-	final static String							FILE_COMMENT_SURROUND_BACKGRD		= "file_comment_surround_backgrd";																																//$NON-NLS-1$
-	final static String							OBJECT_DESC_INNER_BACKGROUND		= "object_desciption_inner_background";																														//$NON-NLS-1$
-	final static String							OBJECT_DESC_SURROUND_BACKGRD		= "object_desciption_surround_backgrd";																														//$NON-NLS-1$
-	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";																															//$NON-NLS-1$
+	final static String							HEADER_TEXT												= "# -- DataExplorer Settings File -- ";																													//$NON-NLS-1$
+	final static String							DEVICE_BLOCK											= "#[Actual-Device-Port-Settings]";																																// Picolario;Renschler;COM2 //$NON-NLS-1$
+	final static String							WINDOW_BLOCK											= "#[Window-Settings]";																																						//$NON-NLS-1$
+	final static String							WINDOW_MAXIMIZED									= "window_maximized";																																							//$NON-NLS-1$
+	final static String							WINDOW_LEFT												= "window_left";																																									//$NON-NLS-1$
+	final static String							WINDOW_TOP												= "window_top";																																										//$NON-NLS-1$
+	final static String							WINDOW_WIDTH											= "window_width";																																									//$NON-NLS-1$
+	final static String							WINDOW_HEIGHT											= "window_height";																																								//$NON-NLS-1$
+	final static String							COOLBAR_ORDER											= "coolbar_order";																																								//$NON-NLS-1$
+	final static String							COOLBAR_WRAPS											= "coolbar_wraps";																																								//$NON-NLS-1$
+	final static String							COOLBAR_SIZES											= "coolbar_sizes";																																								//$NON-NLS-1$
+	final static String							RECORD_COMMENT_VISIBLE						= "record_comment_visible";																																				//$NON-NLS-1$
+	final static String							GRAPHICS_HEADER_VISIBLE						= "graphics_header_visible";																																			//$NON-NLS-1$
+	final static String							GRAPHICS_AREA_BACKGROUND					= "graphics_area_background";																																			//$NON-NLS-1$
+	final static String							GRAPHICS_SURROUND_BACKGRD					= "graphics_surround_backgrd";																																		//$NON-NLS-1$
+	final static String							GRAPHICS_BORDER_COLOR							= "graphics_border_color";																																				//$NON-NLS-1$
+	final static String							IS_GRAPHICS_SCALE_COLOR						= "is_graphics_scale_color";																																			//$NON-NLS-1$
+	final static String							IS_GRAPHICS_NUMBERS_COLOR					= "is_graphics_number_color";																																			//$NON-NLS-1$
+	final static String							IS_GRAPHICS_NAME_COLOR						= "is_graphics_text_color";																																				//$NON-NLS-1$
+	final static String							COMPARE_AREA_BACKGROUND						= "compare_area_background";																																			//$NON-NLS-1$
+	final static String							COMPARE_SURROUND_BACKGRD					= "compare_surround_backgrd";																																			//$NON-NLS-1$
+	final static String							COMPARE_BORDER_COLOR							= "compare_border_color";																																					//$NON-NLS-1$
+	final static String							IS_COMPARE_CHANNELCONFIG					= "is_compare_channel_config_name";																																//$NON-NLS-1$
+	final static String							UTILITY_AREA_BACKGROUND						= "utility_area_background";																																			//$NON-NLS-1$
+	final static String							UTILITY_SURROUND_BACKGRD					= "utility_surround_backgrd";																																			//$NON-NLS-1$
+	final static String							UTILITY_BORDER_COLOR							= "utility_border_color";																																					//$NON-NLS-1$
+	final static String							STATISTICS_INNER_BACKGROUND				= "statistics_inner_background";																																	//$NON-NLS-1$
+	final static String							STATISTICS_SURROUND_BACKGRD				= "statistics_surround_backgrd";																																	//$NON-NLS-1$
+	final static String							ANALOG_INNER_BACKGROUND						= "analog_inner_background";																																			//$NON-NLS-1$
+	final static String							ANALOG_SURROUND_BACKGRD						= "analog_surround_backgrd";																																			//$NON-NLS-1$
+	final static String							DIGITAL_INNER_BACKGROUND					= "digital_inner_background";																																			//$NON-NLS-1$
+	final static String							DIGITAL_SURROUND_BACKGRD					= "digital_surround_backgrd";																																			//$NON-NLS-1$
+	final static String							CELL_VOLTAGE_INNER_BACKGROUND			= "cell_voltage_inner_background";																																//$NON-NLS-1$
+	final static String							CELL_VOLTAGE_SURROUND_BACKGRD			= "cell_voltage_surround_backgrd";																																//$NON-NLS-1$
+	final static String							FILE_COMMENT_INNER_BACKGROUND			= "file_comment_inner_background";																																//$NON-NLS-1$
+	final static String							FILE_COMMENT_SURROUND_BACKGRD			= "file_comment_surround_backgrd";																																//$NON-NLS-1$
+	final static String							OBJECT_DESC_INNER_BACKGROUND			= "object_desciption_inner_background";																														//$NON-NLS-1$
+	final static String							OBJECT_DESC_SURROUND_BACKGRD			= "object_desciption_surround_backgrd";																														//$NON-NLS-1$
+	final static String							DISPLAY_DENSITY_FONT_CORRECT			= "display_density_font_correction";																															//$NON-NLS-1$
 
+<<<<<<< Upstream, based on 1a45f3611bd8d11cef44fd166c1e8e1da0e503ff
 	final static String							IS_HISTO_ACTIVE									= "is_histo_active";																																							//$NON-NLS-1$
 	final static String							IS_SMART_STATISTICS								= "is_smart_statistics";																																					//$NON-NLS-1$
 	final static String							BOXPLOT_SCALE_ORDINAL						= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
@@ -170,99 +171,125 @@ public class Settings extends Properties {
 	final static String							MINIMUM_TRANSITION_STEPS_DEFAULT						= "minimum_transition_steps_default";																																							//$NON-NLS-1$
 	final static String							OUTLIER_SIGMA_DEFAULT						= "outlier_sigma_default";																																							//$NON-NLS-1$
 	final static String							OUTLIER_RANGE_FACTOR_DEFAULT						= "outlier_range_factor_default";																																							//$NON-NLS-1$
+=======
+	final static String							IS_HISTO_ACTIVE										= "is_histo_active";																																							//$NON-NLS-1$
+	final static String							IS_SMART_STATISTICS								= "is_smart_statistics";																																					//$NON-NLS-1$
+	final static String							BOXPLOT_SCALE_ORDINAL							= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
+	final static String							BOXPLOT_SIZE_ADAPTATION_ORDINAL		= "boxplot_size_adaptation_ordinal";																															//$NON-NLS-1$
+	final static String							X_SPREAD_GRADE_ORDINAL						= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
+	final static String							IS_X_LOGARITHMIC_DISTANCE					= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
+	final static String							IS_X_REVERSED											= "is_x_reversed";																																								//$NON-NLS-1$
+	final static String							SEARCH_IMPORT_PATH								= "search_import_path";																																						//$NON-NLS-1$
+	final static String							SEARCH_DATAPATH_IMPORTS						= "search_datapath_imports";																																			//$NON-NLS-1$
+	final static String							IS_CHANNEL_MIX										= "is_channel_mix";																																								//$NON-NLS-1$
+	final static String							SAMPLING_TIMESPAN_ORDINAL					= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
+	final static String							SKIP_FILES_WITHOUT_OBJECT					= "skip_files_without_object";																																		//$NON-NLS-1$
+	final static String							SKIP_FILES_WITH_OTHER_OBJECT			= "skip_files_with_other_object";																																	//$NON-NLS-1$
+	final static String							RETROSPECT_MONTHS									= "retrospect_months";																																						//$NON-NLS-1$
+	final static String							IS_ZIPPED_CACHE										= "zipped_cache";																																									//$NON-NLS-1$
+	final static String							MINMAX_QUANTILE_DISTANCE					= "minmax_quantile_distance";																																			//$NON-NLS-1$
+	final static String							ABSOLUTE_TRANSITION_LEVEL					= "absolute_transition_level";																																		//$NON-NLS-1$
+	final static String							IS_DATETIME_UTC										= "is_datetime_utc";																																							//$NON-NLS-1$
+	final static String							IS_DISPLAY_SETTLEMENTS						= "is_display_settlements";																																				//$NON-NLS-1$
+	final static String							IS_DISPLAY_SCORES									= "is_display_scores";																																						//$NON-NLS-1$
+	final static String							IS_DISPLAY_TAGS										= "is_display_tags";																																							//$NON-NLS-1$
+	final static String							MINIMUM_TRANSITION_STEPS_DEFAULT	= "minimum_transition_steps_default";																															//$NON-NLS-1$
+	final static String							OUTLIER_SIGMA_DEFAULT							= "outlier_sigma_default";																																				//$NON-NLS-1$
+	final static String							OUTLIER_RANGE_FACTOR_DEFAULT			= "outlier_range_factor_default";																																	//$NON-NLS-1$
+>>>>>>> cd9eb7e reduce number of combobox trails
 
-	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
-	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
-	List<String>										fileHistory											= new ArrayList<String>();
+	final static String							FILE_HISTORY_BLOCK								= "#[File-History-List]";																																					//$NON-NLS-1$
+	final static String							FILE_HISTORY_BEGIN								= "history_file_";																																								//$NON-NLS-1$
+	List<String>										fileHistory												= new ArrayList<String>();
 
-	final static String							APPL_BLOCK											= "#[Program-Settings]";																																					//$NON-NLS-1$
-	final static String							TABLE_BLOCK											= "#[Table-Settings]";																																						//$NON-NLS-1$
-	final static String							LOGGING_BLOCK										= "#[Logging-Settings]";																																					//$NON-NLS-1$
-	final static String							HISTO_BLOCK											= "#[Histo-Settings]";																																						//$NON-NLS-1$
-	final static String							LOG_PATH												= "Logs";																																													//$NON-NLS-1$
-	final static String							LOG_FILE												= "trace.log";																																										//$NON-NLS-1$
-	final static String							SERIAL_LOG_FILE									= "serial.log";																																										//$NON-NLS-1$
-	public final static String[]		LOGGING_LEVEL										= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" };								//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+	final static String							APPL_BLOCK												= "#[Program-Settings]";																																					//$NON-NLS-1$
+	final static String							TABLE_BLOCK												= "#[Table-Settings]";																																						//$NON-NLS-1$
+	final static String							LOGGING_BLOCK											= "#[Logging-Settings]";																																					//$NON-NLS-1$
+	final static String							HISTO_BLOCK												= "#[Histo-Settings]";																																						//$NON-NLS-1$
+	final static String							LOG_PATH													= "Logs";																																													//$NON-NLS-1$
+	final static String							LOG_FILE													= "trace.log";																																										//$NON-NLS-1$
+	final static String							SERIAL_LOG_FILE										= "serial.log";																																										//$NON-NLS-1$
+	public final static String[]		LOGGING_LEVEL											= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" };								//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
-	public final static String			ACTIVE_DEVICE										= "active_device";																																								//$NON-NLS-1$
-	public final static String			OBJECT_LIST											= "object_list";																																									//$NON-NLS-1$
-	public final static String			ACTIVE_OBJECT										= "active_object";																																								//$NON-NLS-1$
-	public final static String			DATA_FILE_PATH									= "data_file_path";																																								//$NON-NLS-1$
-	public final static String			OBJECT_IMAGE_FILE_PATH					= "object_image_file_path";																																				//$NON-NLS-1$
-	public final static String			LIST_SEPARATOR									= "list_separator";																																								//$NON-NLS-1$
-	public final static String			DECIMAL_SEPARATOR								= "decimal_separator";																																						//$NON-NLS-1$
-	public final static String			USE_DATA_FILE_NAME_LEADER				= "use_date_file_name_leader";																																		//$NON-NLS-1$
-	public final static String			USE_OBJECT_KEY_IN_FILE_NAME			= "use_object_key_in_file_name";																																	//$NON-NLS-1$
-	public final static String			WRITE_TMP_FILES									= "write_tmp_files";																																							//$NON-NLS-1$
-	public static final String			ALPHA_BLENDING_VALUE						= "alpha_blending_value";																																					//$NON-NLS-1$
-	public static final String			APLHA_BLENDING_ENABLED					= "aplha_blending_enabled";																																				//$NON-NLS-1$
-	public static final String			KEEP_IMPORT_DIR_OBJECT_RELATED	= "keep_import_dir_object_related";																																//$NON-NLS-1$
-	public final static String			IS_GLOBAL_PORT									= "is_global_port";																																								//$NON-NLS-1$
-	public final static String			GLOBAL_PORT_NAME								= "global_port_name";																																							//$NON-NLS-1$
-	public final static String			SKIP_BLUETOOTH_DEVICES					= "skip_bluetooth_devices";																																				//$NON-NLS-1$
-	public final static String			DO_PORT_AVAILABLE_TEST					= "do_port_available_test";																																				//$NON-NLS-1$
-	public final static String			IS_PORT_BLACKLIST								= "is_port_black_list";																																						//$NON-NLS-1$
-	public final static String			PORT_BLACKLIST									= "port_black_list";																																							//$NON-NLS-1$
-	public final static String			IS_PORT_WHITELIST								= "is_port_white_list";																																						//$NON-NLS-1$
-	public final static String			PORT_WHITELIST									= "port_white_list";																																							//$NON-NLS-1$
-	public final static String			DEVICE_DIALOG_USE_MODAL					= "device_dialogs_modal";																																					//$NON-NLS-1$
-	public static final String			DEVICE_DIALOG_ON_TOP						= "device_dialogs_on_top";																																				//$NON-NLS-1$
-	public final static String			IS_GLOBAL_LOG_LEVEL							= "is_global_log_level";																																					//$NON-NLS-1$
-	public static final String			IS_REDUCE_CHARGE_DISCHARGE			= "is_reduce_charge_discharge";																																		//$NON-NLS-1$
-	public final static String			IS_ALL_IN_ONE_RECORDSET					= "is_all_in_one_record_set";																																			//$NON-NLS-1$
-	public final static String			IS_PARTIAL_DATA_TABLE						= "is_partial_data_table";																																				//$NON-NLS-1$
-	public final static String			IS_DATA_TABLE_EDITABLE					= "is_data_table_editable";																																				//$NON-NLS-1$
-	public final static String			GLOBAL_LOG_LEVEL								= "global_log_level";																																							//$NON-NLS-1$
-	public final static String			UI_LOG_LEVEL										= "ui_log_leve";																																									//$NON-NLS-1$
-	public final static String			DEVICE_LOG_LEVEL								= "device_log_level";																																							//$NON-NLS-1$
-	public final static String			DATA_LOG_LEVEL									= "data_log_level";																																								//$NON-NLS-1$
-	public final static String			CONFIG_LOG_LEVEL								= "config_log_level";																																							//$NON-NLS-1$
-	public final static String			UTILS_LOG_LEVEL									= "utils_log_level";																																							//$NON-NLS-1$
-	public final static String			FILE_IO_LOG_LEVEL								= "file_IO_log_level";																																						//$NON-NLS-1$
-	public final static String			SERIAL_IO_LOG_LEVEL							= "serial_IO_log_level";																																					//$NON-NLS-1$
-	public final static Properties	classbasedLogger								= new Properties();
+	public final static String			ACTIVE_DEVICE											= "active_device";																																								//$NON-NLS-1$
+	public final static String			OBJECT_LIST												= "object_list";																																									//$NON-NLS-1$
+	public final static String			ACTIVE_OBJECT											= "active_object";																																								//$NON-NLS-1$
+	public final static String			DATA_FILE_PATH										= "data_file_path";																																								//$NON-NLS-1$
+	public final static String			OBJECT_IMAGE_FILE_PATH						= "object_image_file_path";																																				//$NON-NLS-1$
+	public final static String			LIST_SEPARATOR										= "list_separator";																																								//$NON-NLS-1$
+	public final static String			DECIMAL_SEPARATOR									= "decimal_separator";																																						//$NON-NLS-1$
+	public final static String			USE_DATA_FILE_NAME_LEADER					= "use_date_file_name_leader";																																		//$NON-NLS-1$
+	public final static String			USE_OBJECT_KEY_IN_FILE_NAME				= "use_object_key_in_file_name";																																	//$NON-NLS-1$
+	public final static String			WRITE_TMP_FILES										= "write_tmp_files";																																							//$NON-NLS-1$
+	public static final String			ALPHA_BLENDING_VALUE							= "alpha_blending_value";																																					//$NON-NLS-1$
+	public static final String			APLHA_BLENDING_ENABLED						= "aplha_blending_enabled";																																				//$NON-NLS-1$
+	public static final String			KEEP_IMPORT_DIR_OBJECT_RELATED		= "keep_import_dir_object_related";																																//$NON-NLS-1$
+	public final static String			IS_GLOBAL_PORT										= "is_global_port";																																								//$NON-NLS-1$
+	public final static String			GLOBAL_PORT_NAME									= "global_port_name";																																							//$NON-NLS-1$
+	public final static String			SKIP_BLUETOOTH_DEVICES						= "skip_bluetooth_devices";																																				//$NON-NLS-1$
+	public final static String			DO_PORT_AVAILABLE_TEST						= "do_port_available_test";																																				//$NON-NLS-1$
+	public final static String			IS_PORT_BLACKLIST									= "is_port_black_list";																																						//$NON-NLS-1$
+	public final static String			PORT_BLACKLIST										= "port_black_list";																																							//$NON-NLS-1$
+	public final static String			IS_PORT_WHITELIST									= "is_port_white_list";																																						//$NON-NLS-1$
+	public final static String			PORT_WHITELIST										= "port_white_list";																																							//$NON-NLS-1$
+	public final static String			DEVICE_DIALOG_USE_MODAL						= "device_dialogs_modal";																																					//$NON-NLS-1$
+	public static final String			DEVICE_DIALOG_ON_TOP							= "device_dialogs_on_top";																																				//$NON-NLS-1$
+	public final static String			IS_GLOBAL_LOG_LEVEL								= "is_global_log_level";																																					//$NON-NLS-1$
+	public static final String			IS_REDUCE_CHARGE_DISCHARGE				= "is_reduce_charge_discharge";																																		//$NON-NLS-1$
+	public final static String			IS_ALL_IN_ONE_RECORDSET						= "is_all_in_one_record_set";																																			//$NON-NLS-1$
+	public final static String			IS_PARTIAL_DATA_TABLE							= "is_partial_data_table";																																				//$NON-NLS-1$
+	public final static String			IS_DATA_TABLE_EDITABLE						= "is_data_table_editable";																																				//$NON-NLS-1$
+	public final static String			GLOBAL_LOG_LEVEL									= "global_log_level";																																							//$NON-NLS-1$
+	public final static String			UI_LOG_LEVEL											= "ui_log_leve";																																									//$NON-NLS-1$
+	public final static String			DEVICE_LOG_LEVEL									= "device_log_level";																																							//$NON-NLS-1$
+	public final static String			DATA_LOG_LEVEL										= "data_log_level";																																								//$NON-NLS-1$
+	public final static String			CONFIG_LOG_LEVEL									= "config_log_level";																																							//$NON-NLS-1$
+	public final static String			UTILS_LOG_LEVEL										= "utils_log_level";																																							//$NON-NLS-1$
+	public final static String			FILE_IO_LOG_LEVEL									= "file_IO_log_level";																																						//$NON-NLS-1$
+	public final static String			SERIAL_IO_LOG_LEVEL								= "serial_IO_log_level";																																					//$NON-NLS-1$
+	public final static Properties	classbasedLogger									= new Properties();
 
-	public final static String			AUTO_OPEN_TOOL_BOX							= "auto_open_tool_box";																																						//$NON-NLS-1$
-	public static final String			LOCALE_IN_USE										= "locale_in_use";																																								//$NON-NLS-1$
-	public static final String			LOCALE_CHANGED									= "locale_changed";																																								//$NON-NLS-1$
-	public static final String			TIME_FORMAT_IN_USE							= "time_format_in_use";																																						//$NON-NLS-1$
-	public static final String			IS_DESKTOP_SHORTCUT_CREATED			= "is_desktop_shotcut_created";																																		//$NON-NLS-1$
-	public static final String			IS_APPL_REGISTERED							= "is_GDE_registered";																																						//$NON-NLS-1$
-	public static final String			IS_LOCK_UUCP_HINTED							= "is_lock_uucp_hinted";																																					//$NON-NLS-1$
-	public static final String			LAST_UPDATE_CHECK								= "last_update_check";																																						//$NON-NLS-1$
+	public final static String			AUTO_OPEN_TOOL_BOX								= "auto_open_tool_box";																																						//$NON-NLS-1$
+	public static final String			LOCALE_IN_USE											= "locale_in_use";																																								//$NON-NLS-1$
+	public static final String			LOCALE_CHANGED										= "locale_changed";																																								//$NON-NLS-1$
+	public static final String			TIME_FORMAT_IN_USE								= "time_format_in_use";																																						//$NON-NLS-1$
+	public static final String			IS_DESKTOP_SHORTCUT_CREATED				= "is_desktop_shotcut_created";																																		//$NON-NLS-1$
+	public static final String			IS_APPL_REGISTERED								= "is_GDE_registered";																																						//$NON-NLS-1$
+	public static final String			IS_LOCK_UUCP_HINTED								= "is_lock_uucp_hinted";																																					//$NON-NLS-1$
+	public static final String			LAST_UPDATE_CHECK									= "last_update_check";																																						//$NON-NLS-1$
 
-	public final static String			GRID_DASH_STYLE									= "grid_dash_style";																																							//$NON-NLS-1$
-	public final static String			GRID_COMPARE_WINDOW_HOR_TYPE		= "grid_compare_horizontal_type";																																	//$NON-NLS-1$
-	public final static String			GRID_COMPARE_WINDOW_HOR_COLOR		= "grid_compare_horizontal_color";																																//$NON-NLS-1$
-	public final static String			GRID_COMPARE_WINDOW_VER_TYPE		= "grid_compare_vertical_type";																																		//$NON-NLS-1$
-	public final static String			GRID_COMPARE_WINDOW_VER_COLOR		= "grid_compare_vertical_color";																																	//$NON-NLS-1$
+	public final static String			GRID_DASH_STYLE										= "grid_dash_style";																																							//$NON-NLS-1$
+	public final static String			GRID_COMPARE_WINDOW_HOR_TYPE			= "grid_compare_horizontal_type";																																	//$NON-NLS-1$
+	public final static String			GRID_COMPARE_WINDOW_HOR_COLOR			= "grid_compare_horizontal_color";																																//$NON-NLS-1$
+	public final static String			GRID_COMPARE_WINDOW_VER_TYPE			= "grid_compare_vertical_type";																																		//$NON-NLS-1$
+	public final static String			GRID_COMPARE_WINDOW_VER_COLOR			= "grid_compare_vertical_color";																																	//$NON-NLS-1$
 
-	public final static String			DEVICE_PROPERTIES_DIR_NAME			= "Devices";																																											//$NON-NLS-1$
-	public final static String			DEVICE_PROPERTIES_XSD_NAME			= "DeviceProperties" + GDE.DEVICE_PROPERTIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;								//$NON-NLS-1$
-	public final static String			GRAPHICS_TEMPLATES_DIR_NAME			= "GraphicsTemplates";																																						//$NON-NLS-1$
-	public final static String			GRAPHICS_TEMPLATES_XSD_NAME			= "GraphicsTemplates" + GDE.GRAPHICS_TEMPLATES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;							//$NON-NLS-1$
-	public final static String			GRAPHICS_TEMPLATES_EXTENSION		= GDE.FILE_ENDING_STAR_XML;
+	public final static String			DEVICE_PROPERTIES_DIR_NAME				= "Devices";																																											//$NON-NLS-1$
+	public final static String			DEVICE_PROPERTIES_XSD_NAME				= "DeviceProperties" + GDE.DEVICE_PROPERTIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;								//$NON-NLS-1$
+	public final static String			GRAPHICS_TEMPLATES_DIR_NAME				= "GraphicsTemplates";																																						//$NON-NLS-1$
+	public final static String			GRAPHICS_TEMPLATES_XSD_NAME				= "GraphicsTemplates" + GDE.GRAPHICS_TEMPLATES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;							//$NON-NLS-1$
+	public final static String			GRAPHICS_TEMPLATES_EXTENSION			= GDE.FILE_ENDING_STAR_XML;
 
-	public final static String			HISTO_CACHE_ENTRIES_DIR_NAME		= "Cache";																																												//$NON-NLS-1$
-	public final static String			HISTO_CACHE_ENTRIES_XSD_NAME		= "HistoVault" + GDE.HISTO_CACHE_ENTRIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;										//$NON-NLS-1$
+	public final static String			HISTO_CACHE_ENTRIES_DIR_NAME			= "Cache";																																												//$NON-NLS-1$
+	public final static String			HISTO_CACHE_ENTRIES_XSD_NAME			= "HistoVault" + GDE.HISTO_CACHE_ENTRIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;										//$NON-NLS-1$
 
-	BufferedReader									reader;																																																														// to read the application settings
-	BufferedWriter									writer;																																																														// to write the application settings
+	BufferedReader									reader;																																																															// to read the application settings
+	BufferedWriter									writer;																																																															// to write the application settings
 
-	boolean													isDevicePropertiesUpdated				= false;
-	boolean													isDevicePropertiesReplaced			= false;
-	boolean													isGraphicsTemplateUpdated				= false;
-	boolean													isHistocacheTemplateUpdated			= false;
+	boolean													isDevicePropertiesUpdated					= false;
+	boolean													isDevicePropertiesReplaced				= false;
+	boolean													isGraphicsTemplateUpdated					= false;
+	boolean													isHistocacheTemplateUpdated				= false;
 
 	Rectangle												window;
-	boolean													isWindowMaximized								= false;
+	boolean													isWindowMaximized									= false;
 	String													cbOrder;
 	private String									cbWraps;
 	String													cbSizes;
-	String													settingsFilePath;																																																									// full qualified path to settings file
-	String													applHomePath;																																																											// default path to application home directory
-	Comparator<String>							comparator											= new RecordSetNameComparator();																																	//used to sort object key list
-	Properties											measurementProperties						= new Properties();
+	String													settingsFilePath;																																																										// full qualified path to settings file
+	String													applHomePath;																																																												// default path to application home directory
+	Comparator<String>							comparator												= new RecordSetNameComparator();																																	//used to sort object key list
+	Properties											measurementProperties							= new Properties();
 
 	/**
 	 * a singleton needs a static method to get the instance of this calss

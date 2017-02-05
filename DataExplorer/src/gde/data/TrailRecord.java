@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.swt.graphics.Point;
 
@@ -34,6 +36,7 @@ import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
 import gde.device.TrailTypes;
+import gde.device.TrailVisibilityType;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
@@ -375,7 +378,6 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	/**
 	 * analyze device configuration entries to find applicable trail types.
 	 * build applicable trail type lists for display purposes.
-	 * a trail type suite is applicable if all type items of this suite are applicable.
 	 * use device settings trigger texts for trigger trail types and score labels for score trail types; message texts otherwise.
 	 */
 	public void setApplicableTrailTypes() {
@@ -384,72 +386,44 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 		if (this.measurementType != null) {
 			final boolean hideAllTrails = this.measurementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false);
 			if (this.measurementType.getTrailDisplay().map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false))
-				throw new UnsupportedOperationException("select a primitive trail as a device measurement default"); //$NON-NLS-1$
+				throw new UnsupportedOperationException("suite trail as a device measurement default"); //$NON-NLS-1$
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 			StatisticsType measurementStatistics = getStatistics();
 
 			// set legacy trail types
-			if (!hideAllTrails && measurementStatistics != null) {
-				applicablePrimitiveTrails[TrailTypes.REAL_AVG.ordinal()] = measurementStatistics.isAvg();
-				applicablePrimitiveTrails[TrailTypes.REAL_MAX.ordinal()] = measurementStatistics.isMax();
-				applicablePrimitiveTrails[TrailTypes.REAL_MIN.ordinal()] = measurementStatistics.isMin();
-				applicablePrimitiveTrails[TrailTypes.REAL_SD.ordinal()] = measurementStatistics.isSigma();
-				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
-					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-						StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.parent.getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
-						applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
-						applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
+			if (!this.settings.isSmartStatistics()) {
+				if (!hideAllTrails && measurementStatistics != null) {
+					if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+						applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
+						if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
+							StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.parent.getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
+							applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
+							applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
+						}
 					}
+					applicablePrimitiveTrails[TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null
+							&& measurementStatistics.getSumTriggerTimeText().length() > 1);
+					applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
 				}
-				applicablePrimitiveTrails[TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null
-						&& measurementStatistics.getSumTriggerTimeText().length() > 1);
-				applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
+				// todo applicablePrimitiveTrails[TrailTypes.REAL_SUM.ordinal()] = false; // in settlements only
 			}
-			// todo applicablePrimitiveTrails[TrailTypes.REAL_SUM.ordinal()] = false; // in settlements only
 
-			// set quantile-based non-suite trail types : triggered values like count/sum are not supported
-			if (!hideAllTrails && !this.getDevice().isGPSCoordinates(this) && this.settings.isQuantilesActive())
-				TrailTypes.getQuantilePrimitives().stream().filter(x -> !x.isTriggered()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+			// set non-suite trail types : triggered values like count/sum are not supported
+			if (!hideAllTrails && !this.getDevice().isGPSCoordinates(this))
+				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 
-			// set visible trails based on device settlement settings 
-			this.measurementType.getTrailDisplay().ifPresent(x -> x.getExposed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = true));
-
-			// reset hidden trails based on device measurement settings 
-			this.measurementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = false));
+			// set visible and reset hidden trails based on device settlement settings 
+			this.measurementType.getTrailDisplay().ifPresent(x -> x.getExposed().stream().filter(y -> !y.getTrail().isSuite()).forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = true));
+			this.measurementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().stream().filter(y -> !y.getTrail().isSuite()).forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = false));
 
 			// set at least one trail if no trail is applicable
 			boolean hasApplicablePrimitiveTrails = false;
 			for (boolean value : applicablePrimitiveTrails) {
 				hasApplicablePrimitiveTrails = value;
-				if (hasApplicablePrimitiveTrails ) break;
+				if (hasApplicablePrimitiveTrails) break;
 			}
-			applicablePrimitiveTrails[this.measurementType.getTrailDisplay().map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
+			if (!hasApplicablePrimitiveTrails) applicablePrimitiveTrails[this.measurementType.getTrailDisplay().map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
-
-			// build applicable trail type lists for display purposes
-			this.applicableTrailsOrdinals = new ArrayList<Integer>();
-			this.applicableTrailsTexts = new ArrayList<String>();
-			for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
-				if (applicablePrimitiveTrails[i]) {
-					this.applicableTrailsOrdinals.add(i);
-					this.applicableTrailsTexts.add(TrailTypes.values[i].getDisplayName().intern());
-				}
-			}
-
-			// decide about trail suites which are applicable for display
-			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
-				if (!this.measurementType.getTrailDisplay().map(x -> x.getDisclosed()).filter(x -> x.contains(suiteTrailType)).isPresent()) {
-					boolean bb = true;
-					for (TrailTypes trailType : suiteTrailType.getSuiteMembers()) {
-						bb &= applicablePrimitiveTrails[trailType.ordinal()];
-					}
-					if (bb) {
-						this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
-						this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
-					}
-				}
-			}
 
 			// build applicable trail type lists for display purposes
 			this.applicableTrailsOrdinals = new ArrayList<Integer>();
@@ -482,14 +456,12 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				}
 			}
 
-			// decide about trail suites which are applicable for display
-			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
-				if (!this.measurementType.getTrailDisplay().map(x -> x.getDisclosed()).filter(x -> x.contains(suiteTrailType)).isPresent()) {
-					boolean bb = true;
-					for (TrailTypes trailType : suiteTrailType.getSuiteMembers()) {
-						bb &= applicablePrimitiveTrails[trailType.ordinal()];
-					}
-					if (bb) {
+			if (!this.measurementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false)) {
+				// define trail suites which are applicable for display
+				List<TrailTypes> exposed = this.measurementType.getTrailDisplay().map(x -> x.getExposed().stream().map(y -> y.getTrail()).collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
+				List<TrailTypes> disclosed = this.measurementType.getTrailDisplay().map(x -> x.getDisclosed().stream().map(y -> y.getTrail()).collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
+				for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
+					if ((suiteTrailType.isSmartStatistics() == this.settings.isSmartStatistics() || exposed.contains(suiteTrailType)) && !disclosed.contains(suiteTrailType)) {
 						this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
 						this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
 					}
@@ -498,32 +470,37 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
 		}
-		else if (this.settlementType != null) {
-			final boolean hideAllTrails = this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false);
+		else if (this.settlementType != null)
+
+		{
 			if (this.settlementType.getTrailDisplay().map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false))
-				throw new UnsupportedOperationException("select a primitive trail as a device settlement default"); //$NON-NLS-1$
+				throw new UnsupportedOperationException("suite trail as a device settlement default"); //$NON-NLS-1$
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 
 			// todo set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
-			if (!hideAllTrails && !this.getDevice().isGPSCoordinates(this) && this.settings.isQuantilesActive())
-				if (this.settlementType.getEvaluation().getTransitionCalculus() != null)
-					TrailTypes.getQuantilePrimitives().stream().filter(x -> ! x.isTriggered()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+			if (!this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false) && !this.getDevice().isGPSCoordinates(this) ) {
+				if (this.settlementType.getEvaluation().getTransitionAmount() == null)
+					TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 				else
-				TrailTypes.getQuantilePrimitives().forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+					throw new UnsupportedOperationException("TransitionAmount not implemented");
+			}
 
-			// set visible trails based on device settlement settings 
-			this.settlementType.getTrailDisplay().ifPresent(x -> x.getExposed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = true));
+			// set visible non-suite trails based on device settlement settings 
+			this.settlementType.getTrailDisplay()
+					.ifPresent(x -> x.getExposed().stream().map(z -> z.getTrail()) //
+							.filter(o -> !o.isSuite()) //
+							.forEach(y -> applicablePrimitiveTrails[y.ordinal()] = true));
 
-			// reset hidden trails based on device settlement settings 
-			this.settlementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = false));
+			// reset hidden non-suite trails based on device settlement settings 
+			this.settlementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().stream().map(z -> z.getTrail()).filter(o -> !o.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = false));
 
 			// set at least one trail if no trail is applicable
 			boolean hasApplicablePrimitiveTrails = false;
 			for (boolean value : applicablePrimitiveTrails) {
 				hasApplicablePrimitiveTrails = value;
-				if (hasApplicablePrimitiveTrails ) break;
+				if (hasApplicablePrimitiveTrails) break;
 			}
-			if (! hasApplicablePrimitiveTrails) applicablePrimitiveTrails[this.settlementType.getTrailDisplay().map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
+			if (!hasApplicablePrimitiveTrails) applicablePrimitiveTrails[this.settlementType.getTrailDisplay().map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
 
 			// build applicable trail type lists for display purposes
@@ -536,14 +513,14 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 				}
 			}
 
-			// decide about trail suites which are applicable for display
-			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
-				if (!this.settlementType.getTrailDisplay().map(x -> x.getDisclosed()).filter(x -> x.contains(suiteTrailType)).isPresent()) {
-					boolean bb = true;
-					for (TrailTypes trailType : suiteTrailType.getSuiteMembers()) {
-						bb &= applicablePrimitiveTrails[trailType.ordinal()];
-					}
-					if (bb) {
+			if (!this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false)) {
+				// define trail suites which are applicable for display
+				List<TrailTypes> exposed = this.settlementType.getTrailDisplay() //
+						.map(x -> x.getExposed().stream().map(y -> y.getTrail()).collect(Collectors.toList())) // collect all the trails from the collection of exposed TrailVisibility members
+						.orElse(new ArrayList<TrailTypes>()); // 																									get an empty list if there is no trailDisplay tag in the device.xml for this settlement
+				List<TrailTypes> disclosed = this.settlementType.getTrailDisplay().map(x -> x.getDisclosed().stream().map(y -> y.getTrail()).collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
+				for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
+					if ((suiteTrailType.isSmartStatistics() == this.settings.isSmartStatistics() || exposed.contains(suiteTrailType)) && !disclosed.contains(suiteTrailType)) {
 						this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
 						this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
 					}

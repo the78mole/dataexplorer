@@ -10,13 +10,11 @@ package gde.device;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-import gde.data.TrailRecord;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 
@@ -78,7 +76,7 @@ public enum TrailTypes {
 	@XmlEnumValue("real_avg")
 	REAL_AVG(0, false, false, Messages.getString(MessageIds.GDE_MSGT0750)), // average
 	@XmlEnumValue("real_count")
-	REAL_COUNT(12, false, false, Messages.getString(MessageIds.GDE_MSGT0751)), // counter
+	REAL_COUNT(12, false, true, Messages.getString(MessageIds.GDE_MSGT0751)), // counter
 	@XmlEnumValue("real_max")
 	REAL_MAX(1, false, false, Messages.getString(MessageIds.GDE_MSGT0754)), //
 	@XmlEnumValue("real_min")
@@ -100,7 +98,7 @@ public enum TrailTypes {
 	@XmlEnumValue("real_count_triggered")
 	REAL_COUNT_TRIGGERED(10, false, true, Messages.getString(MessageIds.GDE_MSGT0757)), //
 	@XmlEnumValue("real_sum")
-	REAL_SUM(11, false, false, Messages.getString(MessageIds.GDE_MSGT0762)), //
+	REAL_SUM(11, false, true, Messages.getString(MessageIds.GDE_MSGT0762)), //
 
 	@XmlEnumValue("avg")
 	AVG(13, false, false, Messages.getString(MessageIds.GDE_MSGT0763), false), // average with zeros and without sigma fringe outliers
@@ -138,45 +136,44 @@ public enum TrailTypes {
 	COUNT(33, false, true, Messages.getString(MessageIds.GDE_MSGT0779), false), // counter
 
 	@XmlEnumValue("suite_real_avg_sd")
-	SUITE_REAL_AVG_SD(1001, Messages.getString(MessageIds.GDE_MSGT0780), new TrailTypes[] { REAL_AVG, REAL_SD, REAL_SD }), // avg, avg - n times sd, avg + n times sd
+	SUITE_REAL_AVG_SD(1001, Messages.getString(MessageIds.GDE_MSGT0780), false, new TrailTypes[] { REAL_AVG, REAL_SD, REAL_SD }), // avg, avg - n times sd, avg + n times sd
 	@XmlEnumValue("suite_real_avg_min_max")
-	SUITE_REAL_AVG_MIN_MAX(1002, Messages.getString(MessageIds.GDE_MSGT0781), new TrailTypes[] { REAL_AVG, REAL_MIN, REAL_MAX }), //
+	SUITE_REAL_AVG_MIN_MAX(1002, Messages.getString(MessageIds.GDE_MSGT0781), false, new TrailTypes[] { REAL_AVG, REAL_MIN, REAL_MAX }), //
 	@XmlEnumValue("suite_avg_sd")
-	SUITE_AVG_SD(1008, Messages.getString(MessageIds.GDE_MSGT0782), new TrailTypes[] { AVG, SD, SD }), // avg, avg - n times sd, avg + n times sd
+	SUITE_AVG_SD(1008, Messages.getString(MessageIds.GDE_MSGT0782), true, new TrailTypes[] { AVG, SD, SD }), // avg, avg - n times sd, avg + n times sd
 	@XmlEnumValue("suite_avg_min_max")
-	SUITE_AVG_MIN_MAX(1009, Messages.getString(MessageIds.GDE_MSGT0783), new TrailTypes[] { AVG, MIN, MAX }), //
+	SUITE_AVG_MIN_MAX(1009, Messages.getString(MessageIds.GDE_MSGT0783), true, new TrailTypes[] { AVG, MIN, MAX }), //
 	@XmlEnumValue("suite_box_plot")
-	SUITE_BOX_PLOT(1004, Messages.getString(MessageIds.GDE_MSGT0784), new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_LOWER_WHISKER, Q_UPPER_WHISKER }), // 4 * IQR range (John. W. Tukey)
+	SUITE_BOX_PLOT(1004, Messages.getString(MessageIds.GDE_MSGT0784), true, new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_LOWER_WHISKER, Q_UPPER_WHISKER }), // 4 * IQR range (John. W. Tukey)
 	@XmlEnumValue("suite_box_plot_95")
-	SUITE_BOX_PLOT_95(1005, Messages.getString(MessageIds.GDE_MSGT0785), new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_25_PERMILLE, Q_975_PERMILLE }), // 95% range
+	SUITE_BOX_PLOT_95(1005, Messages.getString(MessageIds.GDE_MSGT0785), true, new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_25_PERMILLE, Q_975_PERMILLE }), // 95% range
 	@XmlEnumValue("suite_q0_q2_q4")
-	SUITE_Q0_Q2_Q4(1006, Messages.getString(MessageIds.GDE_MSGT0786), new TrailTypes[] { Q2, Q0, Q4 }), //
+	SUITE_Q0_Q2_Q4(1006, Messages.getString(MessageIds.GDE_MSGT0786), true, new TrailTypes[] { Q2, Q0, Q4 }), //
 	@XmlEnumValue("suite_q1_q2_q3")
-	SUITE_Q1_Q2_Q3(1007, Messages.getString(MessageIds.GDE_MSGT0787), new TrailTypes[] { Q2, Q1, Q3 });
+	SUITE_Q1_Q2_Q3(1007, Messages.getString(MessageIds.GDE_MSGT0787), true, new TrailTypes[] { Q2, Q1, Q3 });
 
-	public final static int				RANGE_PLOT_SIZE					= 3;
-	public final static int				BOX_PLOT_SIZE						= 7;
+	public final static int										RANGE_PLOT_SIZE	= 3;
+	public final static int										BOX_PLOT_SIZE		= 7;
 
 	private final int													displaySequence;
 	private final boolean											isForSummation;
 	private final boolean											isTriggered;
 	private final String											displayName;
 	private final boolean											isSubstitute;
-	private final boolean											isLegacy;
+	private final boolean											isSmartStatistics;
 
 	/**
 	 * use this instead of values() to avoid repeatedly cloning actions
 	 */
-	public final static TrailTypes						values[]						= values();
-	private final static TrailTypes						displayValues[]			= values().clone();									// sorted
+	public final static TrailTypes						values[]				= values();
+	private final static TrailTypes						displayValues[]	= values().clone();									// sorted
 
-	private final static EnumSet<TrailTypes>	primitives					= EnumSet.noneOf(TrailTypes.class);
-	private final static EnumSet<TrailTypes>	quantilePrimitives	= EnumSet.noneOf(TrailTypes.class);
-	private final static EnumSet<TrailTypes>	suites							= EnumSet.noneOf(TrailTypes.class);
-	private final static EnumSet<TrailTypes>	substitutes					= EnumSet.noneOf(TrailTypes.class);
-	private static TrailTypes									substitute					= null;
+	private final static EnumSet<TrailTypes>	primitives			= EnumSet.noneOf(TrailTypes.class);
+	private final static EnumSet<TrailTypes>	suites					= EnumSet.noneOf(TrailTypes.class);
+	private final static EnumSet<TrailTypes>	substitutes			= EnumSet.noneOf(TrailTypes.class);
+	private static TrailTypes									substitute			= null;
 
-	private TrailTypes[]											suiteMembers				= new TrailTypes[0];
+	private TrailTypes[]											suiteMembers		= new TrailTypes[0];
 
 	private TrailTypes(int displaySequence, boolean isForSummation, boolean isTriggered, String displayName) { // legacy
 		this.displaySequence = displaySequence;
@@ -184,7 +181,7 @@ public enum TrailTypes {
 		this.isTriggered = isTriggered;
 		this.displayName = displayName;
 		this.isSubstitute = false;
-		this.isLegacy = true;
+		this.isSmartStatistics = false;
 	}
 
 	private TrailTypes(int displaySequence, boolean isForSummation, boolean isTriggered, String displayName, boolean isSubstitute) {
@@ -193,16 +190,16 @@ public enum TrailTypes {
 		this.isTriggered = isTriggered;
 		this.displayName = displayName;
 		this.isSubstitute = isSubstitute;
-		this.isLegacy = false;
+		this.isSmartStatistics = true;
 	}
 
-	private TrailTypes(int displaySequence, String displayName, TrailTypes[] suiteMembers) { // suites
+	private TrailTypes(int displaySequence, String displayName, boolean isSmartStatistics, TrailTypes[] suiteMembers) { // suites
 		this.displaySequence = displaySequence;
 		this.isForSummation = false;
 		this.isTriggered = false;
 		this.displayName = displayName;
 		this.isSubstitute = false;
-		this.isLegacy = false;
+		this.isSmartStatistics = isSmartStatistics;
 		this.suiteMembers = suiteMembers;
 	}
 
@@ -212,8 +209,6 @@ public enum TrailTypes {
 			if (trailType.isSubstitute) substitutes.add(trailType);
 			if (trailType.isSubstitute) substitute = trailType;
 			if (!trailType.isSuite()) primitives.add(trailType);
-			if (!trailType.isSuite() && !trailType.isLegacy) quantilePrimitives.add(trailType);
-			if (!trailType.isSuite() && !trailType.isLegacy && !trailType.isTriggered()) quantilePrimitives.add(trailType);
 			if (trailType.isSuite()) suites.add(trailType);
 		}
 	}
@@ -263,13 +258,6 @@ public enum TrailTypes {
 	}
 
 	/**
-	 * @return the non-Suite trail types which refer to values delivered by the quantile class
-	 */
-	public static EnumSet<TrailTypes> getQuantilePrimitives() {
-		return quantilePrimitives;
-	}
-
-	/**
 	 * @return the suite trail types
 	 */
 	public static EnumSet<TrailTypes> getSuites() {
@@ -313,6 +301,13 @@ public enum TrailTypes {
 	 */
 	public int getDisplaySequence() {
 		return this.displaySequence;
+	}
+
+	/**
+	 * @return the isLegacy
+	 */
+	public boolean isSmartStatistics() {
+		return this.isSmartStatistics;
 	}
 
 }

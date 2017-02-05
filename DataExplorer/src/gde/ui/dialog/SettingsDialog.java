@@ -932,12 +932,12 @@ public class SettingsDialog extends Dialog {
 									this.histoQuantilesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoQuantilesButton.setText(Messages.getString(MessageIds.GDE_MSGT0800));
 									this.histoQuantilesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
-									this.histoQuantilesButton.setSelection(this.settings.isQuantilesActive());
+									this.histoQuantilesButton.setSelection(this.settings.isSmartStatistics());
 									this.histoQuantilesButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoQuantilesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setQuantilesActive(SettingsDialog.this.histoQuantilesButton.getSelection());
+											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoQuantilesButton.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false);
 										}
 									});

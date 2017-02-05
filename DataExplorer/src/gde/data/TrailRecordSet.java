@@ -702,7 +702,7 @@ public class TrailRecordSet extends RecordSet {
 	 * @return empty record name and tag description as a trail text replacement followed by the tag values
 	 */
 	public String[] getTagTableRow(int logTagOrdinal) {
-		String[] dataTableRow = new String[this.get(0).size() + 2];
+		String[] dataTableRow = new String[this.timeStep_ms.size() + 2];
 
 		if (!this.timeStep_ms.isEmpty()) {
 			if (logTagOrdinal == LogTag.FileName.ordinal())
