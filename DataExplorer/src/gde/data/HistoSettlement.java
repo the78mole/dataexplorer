@@ -62,28 +62,37 @@ import gde.utils.Quantile.Fixings;
  * @author Thomas Eickert
  */
 public class HistoSettlement extends Vector<Integer> {
-	final static String						$CLASS_NAME						= HistoSettlement.class.getName();
-	final static long							serialVersionUID			= 6130190003229390899L;
-	final static Logger						log										= Logger.getLogger($CLASS_NAME);
+	final static String						$CLASS_NAME								= HistoSettlement.class.getName();
+	final static long							serialVersionUID					= 6130190003229390899L;
+	final static Logger						log												= Logger.getLogger($CLASS_NAME);
 
-	private final static int			initialRecordCapacity	= 111;
+	/**
+	 * we allow 1 lower and 1 upper outlier for a log with 740 measurements
+	 */
+	public final static double		outlierSigmaDefault				= 3.;
+	/**
+	 * outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0
+	 */
+	public final static double		outlierRangeFactorDefault	= 2.;
+	
+	private final static int			initialRecordCapacity			= 111;
 
-	private final IDevice					device								= DataExplorer.getInstance().getActiveDevice();
-	private final Settings				settings							= Settings.getInstance();
+	private final IDevice					device										= DataExplorer.getInstance().getActiveDevice();
+	private final Settings				settings									= Settings.getInstance();
 
-	private final TimeSteps				timeStep_ms						= null;																					// timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
+	private final TimeSteps				timeStep_ms								= null;																					// timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
 	private final SettlementType	settlement;
 	// device measurement configuration and used to find specific properties
 
 	private final RecordSet				parent;
 	private final int							logChannelNumber;
-	String												name;																																	// measurement name Höhe
-	String												unit;																																	// unit [m]
-	String												symbol;																																// symbol h
+	String												name;																																			// measurement name Höhe
+	String												unit;																																			// unit [m]
+	String												symbol;																																		// symbol h
 
-	List<PropertyType>						properties						= new ArrayList<PropertyType>();								// offset, factor, reduction, ...
-	private int										transitionCounter			= 0;
-	private Quantile							quantile							= null;
+	List<PropertyType>						properties								= new ArrayList<PropertyType>();								// offset, factor, reduction, ...
+	private int										transitionCounter					= 0;
+	private Quantile							quantile									= null;
 
 	/**
 	 * @author Thomas Eickert
@@ -130,10 +139,10 @@ public class HistoSettlement extends Vector<Integer> {
 		public Double getRawMedian(int fromIndex, int toIndex) {
 			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
-					: HistoSettlement.this.settings.getOutlierSigmaDefault();
+					: HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-					: HistoSettlement.this.settings.getOutlierRangeFactorDefault();
+					: HistoSettlement.outlierRangeFactorDefault;
 			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor).getQuartile2();
 		}
 
@@ -542,10 +551,10 @@ public class HistoSettlement extends Vector<Integer> {
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
 			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : this.settings.getOutlierSigmaDefault();
+			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-					: this.settings.getOutlierRangeFactorDefault();
+					: HistoSettlement.outlierRangeFactorDefault;
 			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
 			referenceExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));

@@ -1150,10 +1150,10 @@ public class HistoVault {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 							final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
-									: this.settings.getOutlierSigmaDefault();
+									: HistoSettlement.outlierSigmaDefault;
 							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-									: this.settings.getOutlierRangeFactorDefault();
+									: HistoSettlement.outlierRangeFactorDefault;
 							Quantile quantile = new Quantile(record, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
 							entryPoints.addPoint(TrailTypes.AVG.ordinal(), TrailTypes.AVG.name(), (int) quantile.getAvgFigure());
 							entryPoints.addPoint(TrailTypes.MAX.ordinal(), TrailTypes.MAX.name(), (int) quantile.getMaxFigure());
@@ -1225,10 +1225,10 @@ public class HistoVault {
 
 							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 							final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
-									: this.settings.getOutlierSigmaDefault();
+									: HistoSettlement.outlierSigmaDefault;
 							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-									: this.settings.getOutlierRangeFactorDefault();
+									: HistoSettlement.outlierRangeFactorDefault;
 							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
 							
 							entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), (int) quantile.getAvgFigure());
