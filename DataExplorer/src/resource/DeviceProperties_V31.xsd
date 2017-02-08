@@ -150,15 +150,15 @@
 								<xs:field xpath="@transitionId" />
 							</xs:keyref>
 							<xs:keyref name="referenceGroupKeyref" refer="referenceGroupKey">
-								<xs:selector xpath="Settlement/evaluation/*" />
+								<xs:selector xpath="Settlements/Settlement/evaluation/*" />
 								<xs:field xpath="@referenceGroupId" />
 							</xs:keyref>
 							<xs:keyref name="referenceGroupKeyrefDivisor" refer="referenceGroupKey">
-								<xs:selector xpath="Settlement/evaluation/transitionCalculus" />
+								<xs:selector xpath="Settlements/Settlement/evaluation/transitionCalculus" />
 								<xs:field xpath="@referenceGroupIdDivisor" />
 							</xs:keyref>
 							<xs:keyref name="transitionGroupKeyref" refer="transitionGroupKey">
-								<xs:selector xpath="Settlement/evaluation/*" />
+								<xs:selector xpath="Settlements/Settlement/evaluation/*" />
 								<xs:field xpath="@transitionGroupId" />
 							</xs:keyref>
 						</xs:element>
