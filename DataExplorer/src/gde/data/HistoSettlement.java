@@ -134,16 +134,16 @@ public class HistoSettlement extends Vector<Integer> {
 		/**
 		 * @param fromIndex
 		 * @param toIndex
-		 * @return the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal a NoSuchElementException is thrown.) 
+		 * @return the average of the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive 
 		 */
-		public Double getRawMedian(int fromIndex, int toIndex) {
+		public Double getRawAverage(int fromIndex, int toIndex) {
 			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
 					: HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 					: HistoSettlement.outlierRangeFactorDefault;
-			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor).getQuartile2();
+			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor).getAvgFigure();
 		}
 
 		public double getPropertyFactor() {
@@ -343,15 +343,16 @@ public class HistoSettlement extends Vector<Integer> {
 
 		// determine the direction of the peak or pulse or jump
 		final boolean isPositiveDirection;
-		final double referenceMedian = recordGroup.getRawMedian(transition.referenceStartIndex, transition.referenceEndIndex + 1);
-		// one additional time step before and after in order to cope with potential measurement latencies
-		final double thresholdMedian = recordGroup.getRawMedian(transition.thresholdStartIndex - 1, transition.thresholdEndIndex + 1 + 1);
+		// extend the threshold by one additional time step before and after in order to cope with potential measurement latencies
+		final int extendIndex = 1;
+		final double referenceAvg = recordGroup.getRawAverage(transition.referenceStartIndex, transition.referenceEndIndex + 1 - extendIndex);
+		final double thresholdAvg = recordGroup.getRawAverage(transition.thresholdStartIndex - extendIndex, transition.thresholdEndIndex + 1 + extendIndex);
 		if (transition.isSlope()) {
-			isPositiveDirection = (referenceMedian < thresholdMedian) ^ (recordGroup.getPropertyFactor() < 0.);
+			isPositiveDirection = (referenceAvg < thresholdAvg) ^ (recordGroup.getPropertyFactor() < 0.);
 		}
 		else {
-			final double recoveryMedian = recordGroup.getRawMedian(transition.recoveryStartIndex, transition.recoveryEndIndex + 1);
-			isPositiveDirection = (referenceMedian + recoveryMedian < 2. * thresholdMedian) ^ (recordGroup.getPropertyFactor() < 0.);
+			final double recoveryAvg = recordGroup.getRawAverage(transition.recoveryStartIndex + extendIndex, transition.recoveryEndIndex + 1);
+			isPositiveDirection = (referenceAvg + recoveryAvg < 2. * thresholdAvg) ^ (recordGroup.getPropertyFactor() < 0.);
 		}
 
 		double referenceExtremum = 0.;
