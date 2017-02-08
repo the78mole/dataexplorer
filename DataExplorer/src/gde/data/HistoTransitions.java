@@ -346,22 +346,6 @@ public class HistoTransitions {
 		}
 
 		/**
-		 * inserts the specified element if the deque time period is not exceeded. 
-		 * @param dequePair
-		 * @return false if the timestamp is beyond the deque time period or if the element already exists in the deque. 
-		 */
-		public boolean tryAddLast(double translatedValue, long timeStamp_100ns) {
-			if (this.timePeriod_100ns >= timeStamp_100ns - this.timeStampDeque.peekFirst()) {
-				this.addLast(translatedValue, timeStamp_100ns);
-				return true;
-			}
-			else {
-				this.isExhausted = true;
-				return false;
-			}
-		}
-
-		/**
 		 * moves all deque entries and leaves an cleared deque.
 		 * @param settlementDeque
 		 */
@@ -370,12 +354,13 @@ public class HistoTransitions {
 			for (Iterator<Double> iterator = settlementDeque.iterator(); iterator.hasNext();) {
 				this.addLast(iterator.next(), iteratorTimeStamp.next());
 			}
+			ensureTimePeriod();
 			settlementDeque.clear();
 		}
 
 		/**
 		 * moves entries until the deque time period is exceeded.
-		 * leaves a reduced deque.
+		 * leaves a reduced settlementDeque.
 		 * @param settlementDeque
 		 * @return the number of deque entries moved
 		 */
@@ -383,38 +368,29 @@ public class HistoTransitions {
 			int movedCount = 0;
 			Iterator<Long> iteratorTimeStamp = settlementDeque.timeStampDeque.iterator();
 			for (Iterator<Double> iterator = settlementDeque.iterator(); iterator.hasNext();) {
-				if (this.tryAddLast(iterator.next(), iteratorTimeStamp.next())) {
-					iterator.remove();
-					iteratorTimeStamp.remove();
-					movedCount++;
-				}
-				else {
-					break;
-				}
+				if (this.isStuffed()) break;
+				
+				addLast(iterator.next(), iteratorTimeStamp.next());
+				iterator.remove();
+				iteratorTimeStamp.remove();
+				movedCount++;
 			}
 			if (settlementDeque.isEmpty()) settlementDeque.clear();
 			return movedCount;
 		}
 
 		/**
-		 * @return true if the time distance of the first and the last deque elements equals the deque time period.
-		 */
-		public boolean isFilledToCapacity() {
-			return this.timePeriod_100ns == getDuration_ms();
-		}
-
-		/**
 		 * @return true if the next add will be most likely beyond the current time window position. however, a smaller timestep than the last one may fit.
 		 */
 		public boolean isStuffed() {
-			return this.isExhausted || isFilledToCapacity();
+			return this.isExhausted || getDuration_ms() >= this.timePeriod_100ns;
 		}
 
 		private void ensureTimePeriod() {
 			this.isExhausted = false;
 			if (!this.timeStampDeque.isEmpty()) {
 				for (int i = 0; i < this.timeStampDeque.size(); i++) {
-					if (this.timePeriod_100ns < getDuration_ms()) {
+					if (getDuration_ms() > this.timePeriod_100ns) {
 						this.pollFirst(); // polls timestampDeque also
 						this.isExhausted = true;
 					}
@@ -763,24 +739,21 @@ public class HistoTransitions {
 						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
 						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
-					else { // hysteresis
-						boolean isThresholdTimeExceeded = !this.thresholdDeque.tryAddLast(translatedValue, timeStamp_100ns);
-						if (isThresholdTimeExceeded) {
-							this.triggerState = TriggerState.WAITING;
-							log.log(Level.FINER, " isThresholdTimeExceeded ", this); //$NON-NLS-1$
-							this.referenceDeque.addLastByMoving(this.thresholdDeque);
-							// referenceStartIndex is not modified by jitters
-							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-						}
-						else { // threshold phase continues
-						}
+					else if (this.thresholdDeque.isStuffed()) {
+						this.triggerState = TriggerState.WAITING;
+						log.log(Level.FINER, " isThresholdTimeExceeded ", this); //$NON-NLS-1$
+						this.referenceDeque.addLastByMoving(this.thresholdDeque);
+						// referenceStartIndex is not modified by jitters
+						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
+					}
+					else { // threshold phase continues
+						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 					break;
 				case RECOVERING:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentRecovery = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
-					boolean isRecoveryFinalized = !this.recoveryDeque.tryAddLast(translatedValue, timeStamp_100ns);
-					if (isRecoveryFinalized) {
+					if (this.recoveryDeque.isStuffed()) {
 						// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue) //
 								&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue(), translatedRecoveryValue) //
@@ -804,11 +777,13 @@ public class HistoTransitions {
 							this.referenceDeque.addLastByMoving(this.thresholdDeque);
 							this.referenceDeque.addLastByMoving(this.recoveryDeque);
 							// referenceStartIndex is not modified by jitters
+							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 					}
-					else if (!isRecoveryFinalized && isPersistentRecovery) { // go on with the recovery
+					else if (isPersistentRecovery) { // go on with the recovery
+						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
 					}
-					else if (!isRecoveryFinalized && !isPersistentRecovery) {
+					else {
 						log.log(Level.FINER, " recovery level not stable ", this); //$NON-NLS-1$
 						// try to extend the threshold time
 						int removedCount = this.thresholdDeque.tryAddLastByMoving(this.recoveryDeque);
@@ -818,6 +793,7 @@ public class HistoTransitions {
 							// all recovery entries including the current entry are now in the threshold phase
 							this.triggerState = TriggerState.TRIGGERED;
 							// thresholdStartIndex is not modified by jitters;
+							this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 						else {
 							// now the threshold time is exceeded and the current value does not fit in the recovery phase 
@@ -825,6 +801,7 @@ public class HistoTransitions {
 							this.referenceDeque.addLastByMoving(this.thresholdDeque);
 							this.referenceDeque.addLastByMoving(this.recoveryDeque);
 							// referenceStartIndex is not modified by jitters
+							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 					}
 					break;
@@ -867,7 +844,7 @@ public class HistoTransitions {
 				case TRIGGERED:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentTrigger = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					boolean isInThresholdTime = this.thresholdDeque.tryAddLast(translatedValue, timeStamp_100ns);
+					boolean isInThresholdTime = !this.thresholdDeque.isStuffed(); // no tryAdd because 
 					boolean isRecovered = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
 					if (!isInThresholdTime && isRecovered) {
 						// check if only a minimum of the threshold values actually passed the recovery level (in order to tolerate a minimum of jitters)
@@ -886,17 +863,10 @@ public class HistoTransitions {
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 					}
-					else if (!isInThresholdTime && isPersistentTrigger) {
+					else if (!isPersistentTrigger && !isInThresholdTime) { // hysteresis is traversed while falling back to recovery
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 					}
-					else if (!isInThresholdTime && !isPersistentTrigger) { // no hysteresis 
-						this.triggerState = TriggerState.WAITING;
-						log.log(Level.FINER, " !isInThresholdTime && !isPersistentTrigger ", this); //$NON-NLS-1$
-						this.thresholdDeque.clear();
-						this.referenceDeque.initialize(i);
-						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-					}
-					else if (isInThresholdTime && !isPersistentTrigger) { // no hysteresis 
+					else if (!isPersistentTrigger && isInThresholdTime) { // no hysteresis within threshold time
 						this.triggerState = TriggerState.WAITING;
 						log.log(Level.FINER, " !isPersistentTrigger ", this); //$NON-NLS-1$
 						this.thresholdDeque.clear();
@@ -904,14 +874,13 @@ public class HistoTransitions {
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 					else {
-						// currently within thresholdTime --- entry has been added to deque already
+						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 					break;
 				case RECOVERING:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentRecovery = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
-					boolean isRecoveryFinalized = !this.recoveryDeque.tryAddLast(translatedValue, timeStamp_100ns);
-					if (isRecoveryFinalized) {
+					if (this.recoveryDeque.isStuffed()) {
 						// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue) //
 								&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue(), translatedRecoveryValue) //
@@ -938,7 +907,7 @@ public class HistoTransitions {
 							this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 					}
-					else if (!isRecoveryFinalized && !isPersistentRecovery) {
+					else if (!isPersistentRecovery) {
 						this.triggerState = TriggerState.WAITING;
 						log.log(Level.FINER, " !isPersistentRecovery " + transitionType.getTransitionId(), this); //$NON-NLS-1$
 						this.thresholdDeque.clear();
@@ -947,7 +916,7 @@ public class HistoTransitions {
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 					else {
-						// go on recovering
+						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns); // go on recovering
 					}
 					break;
 				} // end switch
@@ -994,8 +963,7 @@ public class HistoTransitions {
 				case TRIGGERED:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentTrigger = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					boolean isInThresholdTime = this.thresholdDeque.tryAddLast(translatedValue, timeStamp_100ns);
-					if (!isInThresholdTime) {
+					if (this.thresholdDeque.isStuffed()) {
 						// final check if the majority of the reference values did not pass the threshold and if the majority of the threshold values passed the threshold 
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 							this.triggerState = TriggerState.WAITING;
@@ -1019,14 +987,15 @@ public class HistoTransitions {
 							this.thresholdDeque.clear();
 						}
 					}
-					else if (isInThresholdTime && !isPersistentTrigger) { // threshold must conform perfectly to the threshold requirements which are level and time
+					else if (!isPersistentTrigger) { // threshold must conform perfectly to the threshold requirements which are level and time
 						this.triggerState = TriggerState.WAITING;
 						log.log(Level.FINE, " !isPersistentTrigger " + transitionType.getTransitionId(), this); //$NON-NLS-1$
 						this.referenceDeque.initialize(i - this.thresholdDeque.size());
 						this.referenceDeque.addLastByMoving(this.thresholdDeque);
+						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
-					else if (isInThresholdTime && isPersistentTrigger) {
-						// go on and try to confirm the trigger
+					else {
+						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns); // go on and try to confirm the trigger
 					}
 					break;
 				case RECOVERING: // is not relevant for slope
