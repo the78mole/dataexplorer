@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="DeviceProperties_V30.xsd">
+	xsi:noNamespaceSchemaLocation="DeviceProperties_V31.xsd">
 	<Device>
 		<name implementation="gde.device.graupner.HoTTAdapter">HoTTAdapter</name>
 		<manufacturer>Graupner</manufacturer>
@@ -118,111 +118,113 @@
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer"
 					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<suppressQuantiles>true</suppressQuantiles>
+				<trailDisplay discloseAll="true" defaultTrail="last" />
 				<label>Minimale Empfängerspannung</label>
 			</Measurement>
-			<Scoregroup scoregroupId="0">
-				<name>Dauer</name>
-				<symbol></symbol>
-				<unit>h</unit>
-				<active>true</active>
-				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-				<property name="histo_top_placement" value="true" type="Boolean" />
-				<label>Zeitdauer der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="1">
-				<name>Zeitschritte</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
-				<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
-				<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
-				<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-				<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="2">
-				<name>Zählerwerte</name>
-				<symbol></symbol>
-				<unit>Tsd</unit>
-				<active>true</active>
-				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-				<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
-				<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
-				<label>Anzahl von Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="3">
-				<name>Paketverlustdauer</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
-				<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
-				<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
-				<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-				<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="4">
-				<name>Paketverluste</name>
-				<symbol></symbol>
-				<unit>‰</unit>
-				<active>true</active>
-				<score label="lostPackagesPerMille" value="Paketverlustquote" type="String"
-					description="lostPackages / totalPackages" />
-				<property name="factor" value="0.1" type="Double" />
-				<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="5">
-				<name>Sensoren</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="sensors" value="Anzahl" type="String" />
-				<score label="sensorVario" value="Vario" type="String" />
-				<score label="sensorGps" value="GPS" type="String" />
-				<score label="sensorGam" value="GAM" type="String" />
-				<score label="sensorEam" value="EAM" type="String" />
-				<score label="sensorEsc" value="Regler" type="String" />
-				<label>Vorhandensein von Sensoren</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="6">
-				<name>Versionen</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logDataVersion" value="Gerät" type="String" />
-				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-				<score label="logFileVersion" value="Log-Datei" type="String" />
-				<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="7">
-				<name>Datenmenge</name>
-				<symbol></symbol>
-				<unit>kiB</unit>
-				<active>true</active>
-				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-				<score label="logFileBytes" value="Dateigröße" type="String" />
-				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-				<label>Größe der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="8">
-				<name>Datensätze</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logFileRecordSets" value="Anzahl" type="String" />
-				<label>Anzahl an Log-Aufzeichnungen</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="9">
-				<name>Laufzeiten</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-				<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
-			</Scoregroup>
+			<ScoreGroups>
+				<Scoregroup scoregroupId="0">
+					<name>Dauer</name>
+					<symbol></symbol>
+					<unit>h</unit>
+					<active>true</active>
+					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+					<property name="histo_top_placement" value="true" type="Boolean" />
+					<label>Zeitdauer der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="1">
+					<name>Zeitschritte</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
+					<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
+					<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
+					<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
+					<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="2">
+					<name>Zählerwerte</name>
+					<symbol></symbol>
+					<unit>Tsd</unit>
+					<active>true</active>
+					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+					<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
+					<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
+					<label>Anzahl von Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="3">
+					<name>Paketverlustdauer</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
+					<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
+					<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
+					<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
+					<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="4">
+					<name>Paketverluste</name>
+					<symbol></symbol>
+					<unit>‰</unit>
+					<active>true</active>
+					<score label="lostPackagesPerMille" value="Paketverlustquote" type="String"
+						description="lostPackages / totalPackages" />
+					<property name="factor" value="0.1" type="Double" />
+					<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="5">
+					<name>Sensoren</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="sensors" value="Anzahl" type="String" />
+					<score label="sensorVario" value="Vario" type="String" />
+					<score label="sensorGps" value="GPS" type="String" />
+					<score label="sensorGam" value="GAM" type="String" />
+					<score label="sensorEam" value="EAM" type="String" />
+					<score label="sensorEsc" value="Regler" type="String" />
+					<label>Vorhandensein von Sensoren</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="6">
+					<name>Versionen</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logDataVersion" value="Gerät" type="String" />
+					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+					<score label="logFileVersion" value="Log-Datei" type="String" />
+					<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="7">
+					<name>Datenmenge</name>
+					<symbol></symbol>
+					<unit>kiB</unit>
+					<active>true</active>
+					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+					<score label="logFileBytes" value="Dateigröße" type="String" />
+					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+					<label>Größe der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="8">
+					<name>Datensätze</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logFileRecordSets" value="Anzahl" type="String" />
+					<label>Anzahl an Log-Aufzeichnungen</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="9">
+					<name>Laufzeiten</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+					<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+				</Scoregroup>
+			</ScoreGroups>
 		</Channel>
 		<Channel name="Vario" type="TYPE_CONFIG">
 			<Measurement>
@@ -299,6 +301,436 @@
 				<property name="reduction" value="20.0" type="Double"
 					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
 				<label>Temperatur des Empfängers</label>
+			</Measurement>
+			<ScoreGroups>
+				<Scoregroup scoregroupId="0">
+					<name>Dauer</name>
+					<symbol></symbol>
+					<unit>h</unit>
+					<active>true</active>
+					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+					<property name="histo_top_placement" value="true" type="Boolean" />
+					<label>Zeitdauer der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="1">
+					<name>Zählerwerte</name>
+					<symbol></symbol>
+					<unit>Tsd</unit>
+					<active>true</active>
+					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+					<label>Anzahl von Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="2">
+					<name>Versionen</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logDataVersion" value="Gerät" type="String" />
+					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+					<score label="logFileVersion" value="Log-Datei" type="String" />
+					<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="3">
+					<name>Datenmenge</name>
+					<symbol></symbol>
+					<unit>kiB</unit>
+					<active>true</active>
+					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+					<score label="logFileBytes" value="Dateigröße" type="String" />
+					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+					<label>Größe der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="4">
+					<name>Laufzeiten</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+					<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
+				</Scoregroup>
+			</ScoreGroups>
+		</Channel>
+		<Channel name="GPS" type="TYPE_CONFIG">
+			<Measurement>
+				<name>RXSQ</name>
+				<symbol></symbol>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true" />
+				<label>Qualität der Funkverbindung vom Sender zum Empfänger</label>
+			</Measurement>
+			<Measurement>
+				<name>Breitengrad</name>
+				<symbol></symbol>
+				<unit>° '</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="filter_factor" value="100.0" type="Double"
+					description="Filterfaktor - höherer Wert, stärkerer Filter" />
+				<trailDisplay discloseAll="true" defaultTrail="last" />
+			</Measurement>
+			<Measurement>
+				<name>Längengrad</name>
+				<symbol></symbol>
+				<unit>° '</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="filter_factor" value="25.0" type="Double"
+					description="Filterfaktor - höherer Wert, stärkerer Filter" />
+				<trailDisplay discloseAll="true" defaultTrail="last" />
+			</Measurement>
+			<Measurement>
+				<name>Höhe (relativ)</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="4"
+					sumTriggerText="Summe Motorhöhe" countTriggerText="Ermittelt im Steigungstriggerbereich" />
+				<property name="reduction" value="500.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Höhe des Empfängers im Vergleich zum Startpunkt</label>
+			</Measurement>
+			<Measurement>
+				<name>Steigen 1</name>
+				<symbol>vh</symbol>
+				<unit>m/sec</unit>
+				<active>true</active>
+				<statistics min="false" max="true" avg="false" sigma="false" countByTrigger="true"
+					countTriggerText="Anzahl gewerteter Steigflüge" sumTriggerTimeText="~ Motorlaufzeit">
+					<trigger level="1500" isGreater="true" minTimeSec="10"
+						comment="Trigger: Steigrate &gt; 1.5 m/sec &gt; 10 sec" />
+				</statistics>
+				<property name="reduction" value="30000.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Steig-Sinkrate pro 1 Sekunde</label>
+			</Measurement>
+			<Measurement>
+				<name>Steigen 3</name>
+				<symbol>vh</symbol>
+				<unit>m/3sec</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="reduction" value="120.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Steig-Sinkrate pro 3 Sekunden in m/3s</label>
+			</Measurement>
+			<Measurement>
+				<name>Geschwindigkeit</name>
+				<symbol>v</symbol>
+				<unit>km/h</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<label>Geschwindigkeit berechnet aus den GPS-Koordinaten und Höhe</label>
+			</Measurement>
+			<Measurement>
+				<name>EntfernungStart</name>
+				<symbol></symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<label>Entfernung des GPS-Sensors von Aufzeichnungsbegin zur aktuellen Position</label>
+			</Measurement>
+			<Measurement>
+				<name>Kurswinkel</name>
+				<symbol></symbol>
+				<unit>°</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<trailDisplay discloseAll="true" defaultTrail="last" />
+				<label>Bewegungsrichtung</label>
+			</Measurement>
+			<Measurement>
+				<name>Strecke</name>
+				<symbol></symbol>
+				<unit>km</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<trailDisplay discloseAll="true" defaultTrail="last" />
+				<label>Zurück gelegte Weglänge während des Fluges</label>
+			</Measurement>
+			<Measurement>
+				<name>SpannungRx</name>
+				<symbol>Urx</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true" />
+				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannungslage des Empfängers</label>
+			</Measurement>
+			<Measurement>
+				<name>TemperaturRx</name>
+				<symbol>Trx</symbol>
+				<unit>°C</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="reduction" value="20.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Temperatur des Empfängers</label>
+			</Measurement>
+			<ScoreGroups>
+				<Scoregroup scoregroupId="0">
+					<name>Dauer</name>
+					<symbol></symbol>
+					<unit>h</unit>
+					<active>true</active>
+					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+					<property name="histo_top_placement" value="true" type="Boolean" />
+					<label>Zeitdauer der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="1">
+					<name>Zählerwerte</name>
+					<symbol></symbol>
+					<unit>Tsd</unit>
+					<active>true</active>
+					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+					<label>Anzahl von Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="2">
+					<name>Versionen</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logDataVersion" value="Gerät" type="String" />
+					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+					<score label="logFileVersion" value="Log-Datei" type="String" />
+					<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="3">
+					<name>Datenmenge</name>
+					<symbol></symbol>
+					<unit>kiB</unit>
+					<active>true</active>
+					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+					<score label="logFileBytes" value="Dateigröße" type="String" />
+					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+					<label>Größe der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="4">
+					<name>Laufzeiten</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+					<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
+				</Scoregroup>
+			</ScoreGroups>
+		</Channel>
+		<Channel name="Universal" type="TYPE_CONFIG">
+			<Measurement>
+				<name>RXSQ</name>
+				<symbol></symbol>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true" />
+				<label>Qualität der Funkverbindung vom Sender zum Empfänger</label>
+			</Measurement>
+			<Measurement>
+				<name>Spannung</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2"
+					comment="Bezogen auf Stromtrigger" />
+				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannungslage des angeschlossen Akkus am GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Strom</name>
+				<symbol>I</symbol>
+				<unit>A</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true"
+					countTriggerText="Anzahl Steigflüge" sumTriggerTimeText="Motorlaufzeit:">
+					<trigger level="3000" isGreater="true" minTimeSec="5" comment="Strom &gt; 3 A über &gt; 5 Sekunden" />
+				</statistics>
+				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Strom aus dem angeschlossen Akkus am GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Kapazität</name>
+				<symbol>C</symbol>
+				<unit>mAh</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2"
+					comment="Bezogen auf Stromtrigger" />
+				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Kapazizät entnommen aus dem angeschlossen Akkus am GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Leistung</name>
+				<symbol>P</symbol>
+				<unit>W</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2"
+					comment="Bezogen auf Stromtrigger" />
+				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Eingangsleistung des angeschlossenem Motor am GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Balance</name>
+				<symbol></symbol>
+				<unit>mV</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Unterschied der Zellenspannung am GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>ZellenSpannung 1</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 1 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>ZellenSpannung 2</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 2 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>ZellenSpannung 3</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 3 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>ZellenSpannung 4</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 4 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>ZellenSpannung 5</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 5 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>ZellenSpannung 6</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Zellenspannung 6 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Drehzahl</name>
+				<symbol>rpm</symbol>
+				<unit>1/min</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2"
+					comment="Bezogen auf Stromtrigger" />
+				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Höhe (relativ)</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="2"
+					sumTriggerText="Motorhöhe" ratioRefOrdinal="3" ratioText="Kapazität/Motorhöhe" />
+				<property name="reduction" value="500.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Höhe des Empfängers im Vergleich zum Startpunkt</label>
+			</Measurement>
+			<Measurement>
+				<name>Steigen 1</name>
+				<symbol>vh</symbol>
+				<unit>m/sec</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="reduction" value="30000.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Steig-Sinkrate pro 1 Sekunde</label>
+			</Measurement>
+			<Measurement>
+				<name>Steigen 3</name>
+				<symbol>vh</symbol>
+				<unit>m/3sec</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<property name="reduction" value="120.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Steig-Sinkrate pro 3 Sekunden in m/3s</label>
+			</Measurement>
+			<Measurement>
+				<name>Kraftstoff</name>
+				<symbol></symbol>
+				<unit>ml</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="false" sigma="false" />
+				<label>Menge des verbrauchten Kraftstoffs</label>
+			</Measurement>
+			<Measurement>
+				<name>Spannung S1</name>
+				<symbol>U1</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<label>Spannunglage Sensor 1 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Spannung S2</name>
+				<symbol>U2</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
+				<property name="scale_sync_ref_ordinal" value="17" type="Integer"
+					description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Spannunglage Sensor 2 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Temperatur 1</name>
+				<symbol>T1</symbol>
+				<unit>°C</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="reduction" value="20.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<label>Temperatur Sensor 1 GAM</label>
+			</Measurement>
+			<Measurement>
+				<name>Temperatur 2</name>
+				<symbol>T2</symbol>
+				<unit>°C</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false" />
+				<property name="reduction" value="20.0" type="Double"
+					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
+				<property name="scale_sync_ref_ordinal" value="19" type="Integer"
+					description="Skalasynchronisations Messwertreferenz als Zahl" />
+				<label>Temperatur Sensor 2 GAM</label>
 			</Measurement>
 			<Settlements>
 				<Settlement settlementId="0">
@@ -871,432 +1303,6 @@
 				</Scoregroup>
 			</ScoreGroups>
 		</Channel>
-		<Channel name="GPS" type="TYPE_CONFIG">
-			<Measurement>
-				<name>RXSQ</name>
-				<symbol></symbol>
-				<unit>%</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="true" />
-				<label>Qualität der Funkverbindung vom Sender zum Empfänger</label>
-			</Measurement>
-			<Measurement>
-				<name>Breitengrad</name>
-				<symbol></symbol>
-				<unit>° '</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="filter_factor" value="100.0" type="Double"
-					description="Filterfaktor - höherer Wert, stärkerer Filter" />
-				<suppressQuantiles>true</suppressQuantiles>
-			</Measurement>
-			<Measurement>
-				<name>Längengrad</name>
-				<symbol></symbol>
-				<unit>° '</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="filter_factor" value="25.0" type="Double"
-					description="Filterfaktor - höherer Wert, stärkerer Filter" />
-				<suppressQuantiles>true</suppressQuantiles>
-			</Measurement>
-			<Measurement>
-				<name>Höhe (relativ)</name>
-				<symbol>h</symbol>
-				<unit>m</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="4"
-					sumTriggerText="Summe Motorhöhe" countTriggerText="Ermittelt im Steigungstriggerbereich" />
-				<property name="reduction" value="500.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Höhe des Empfängers im Vergleich zum Startpunkt</label>
-			</Measurement>
-			<Measurement>
-				<name>Steigen 1</name>
-				<symbol>vh</symbol>
-				<unit>m/sec</unit>
-				<active>true</active>
-				<statistics min="false" max="true" avg="false" sigma="false" countByTrigger="true"
-					countTriggerText="Anzahl gewerteter Steigflüge" sumTriggerTimeText="~ Motorlaufzeit">
-					<trigger level="1500" isGreater="true" minTimeSec="10"
-						comment="Trigger: Steigrate &gt; 1.5 m/sec &gt; 10 sec" />
-				</statistics>
-				<property name="reduction" value="30000.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Steig-Sinkrate pro 1 Sekunde</label>
-			</Measurement>
-			<Measurement>
-				<name>Steigen 3</name>
-				<symbol>vh</symbol>
-				<unit>m/3sec</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="reduction" value="120.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Steig-Sinkrate pro 3 Sekunden in m/3s</label>
-			</Measurement>
-			<Measurement>
-				<name>Geschwindigkeit</name>
-				<symbol>v</symbol>
-				<unit>km/h</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<label>Geschwindigkeit berechnet aus den GPS-Koordinaten und Höhe</label>
-			</Measurement>
-			<Measurement>
-				<name>EntfernungStart</name>
-				<symbol></symbol>
-				<unit>m</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<label>Entfernung des GPS-Sensors von Aufzeichnungsbegin zur aktuellen Position</label>
-			</Measurement>
-			<Measurement>
-				<name>Kurswinkel</name>
-				<symbol></symbol>
-				<unit>°</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<suppressQuantiles>true</suppressQuantiles>
-				<label>Bewegungsrichtung</label>
-			</Measurement>
-			<Measurement>
-				<name>Strecke</name>
-				<symbol></symbol>
-				<unit>km</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<suppressQuantiles>true</suppressQuantiles>
-				<label>Zurück gelegte Weglänge während des Fluges</label>
-			</Measurement>
-			<Measurement>
-				<name>SpannungRx</name>
-				<symbol>Urx</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="true" />
-				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Spannungslage des Empfängers</label>
-			</Measurement>
-			<Measurement>
-				<name>TemperaturRx</name>
-				<symbol>Trx</symbol>
-				<unit>°C</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="reduction" value="20.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Temperatur des Empfängers</label>
-			</Measurement>
-			<Scoregroup scoregroupId="0">
-				<name>Dauer</name>
-				<symbol></symbol>
-				<unit>h</unit>
-				<active>true</active>
-				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-				<property name="histo_top_placement" value="true" type="Boolean" />
-				<label>Zeitdauer der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="1">
-				<name>Zählerwerte</name>
-				<symbol></symbol>
-				<unit>Tsd</unit>
-				<active>true</active>
-				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-				<label>Anzahl von Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="2">
-				<name>Versionen</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logDataVersion" value="Gerät" type="String" />
-				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-				<score label="logFileVersion" value="Log-Datei" type="String" />
-				<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="3">
-				<name>Datenmenge</name>
-				<symbol></symbol>
-				<unit>kiB</unit>
-				<active>true</active>
-				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-				<score label="logFileBytes" value="Dateigröße" type="String" />
-				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-				<label>Größe der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="4">
-				<name>Laufzeiten</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-				<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
-			</Scoregroup>
-		</Channel>
-		<Channel name="Universal" type="TYPE_CONFIG">
-			<Measurement>
-				<name>RXSQ</name>
-				<symbol></symbol>
-				<unit>%</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="true" />
-				<label>Qualität der Funkverbindung vom Sender zum Empfänger</label>
-			</Measurement>
-			<Measurement>
-				<name>Spannung</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2"
-					comment="Bezogen auf Stromtrigger" />
-				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Spannungslage des angeschlossen Akkus am GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Strom</name>
-				<symbol>I</symbol>
-				<unit>A</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true"
-					countTriggerText="Anzahl Steigflüge" sumTriggerTimeText="Motorlaufzeit:">
-					<trigger level="3000" isGreater="true" minTimeSec="5" comment="Strom &gt; 3 A über &gt; 5 Sekunden" />
-				</statistics>
-				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Strom aus dem angeschlossen Akkus am GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Kapazität</name>
-				<symbol>C</symbol>
-				<unit>mAh</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2"
-					comment="Bezogen auf Stromtrigger" />
-				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Kapazizät entnommen aus dem angeschlossen Akkus am GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Leistung</name>
-				<symbol>P</symbol>
-				<unit>W</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2"
-					comment="Bezogen auf Stromtrigger" />
-				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Eingangsleistung des angeschlossenem Motor am GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Balance</name>
-				<symbol></symbol>
-				<unit>mV</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Unterschied der Zellenspannung am GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>ZellenSpannung 1</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Zellenspannung 1 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>ZellenSpannung 2</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Zellenspannung 2 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>ZellenSpannung 3</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Zellenspannung 3 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>ZellenSpannung 4</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Zellenspannung 4 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>ZellenSpannung 5</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Zellenspannung 5 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>ZellenSpannung 6</name>
-				<symbol>U</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<property name="factor" value="0.02" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Zellenspannung 6 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Drehzahl</name>
-				<symbol>rpm</symbol>
-				<unit>1/min</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2"
-					comment="Bezogen auf Stromtrigger" />
-				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Höhe (relativ)</name>
-				<symbol>h</symbol>
-				<unit>m</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="2"
-					sumTriggerText="Motorhöhe" ratioRefOrdinal="3" ratioText="Kapazität/Motorhöhe" />
-				<property name="reduction" value="500.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Höhe des Empfängers im Vergleich zum Startpunkt</label>
-			</Measurement>
-			<Measurement>
-				<name>Steigen 1</name>
-				<symbol>vh</symbol>
-				<unit>m/sec</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="reduction" value="30000.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<property name="factor" value="0.01" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Steig-Sinkrate pro 1 Sekunde</label>
-			</Measurement>
-			<Measurement>
-				<name>Steigen 3</name>
-				<symbol>vh</symbol>
-				<unit>m/3sec</unit>
-				<active>false</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<property name="reduction" value="120.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Steig-Sinkrate pro 3 Sekunden in m/3s</label>
-			</Measurement>
-			<Measurement>
-				<name>Kraftstoff</name>
-				<symbol></symbol>
-				<unit>ml</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="false" sigma="false" />
-				<label>Menge des verbrauchten Kraftstoffs</label>
-			</Measurement>
-			<Measurement>
-				<name>Spannung S1</name>
-				<symbol>U1</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<label>Spannunglage Sensor 1 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Spannung S2</name>
-				<symbol>U2</symbol>
-				<unit>V</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<property name="scale_sync_ref_ordinal" value="17" type="Integer"
-					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<label>Spannunglage Sensor 2 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Temperatur 1</name>
-				<symbol>T1</symbol>
-				<unit>°C</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="reduction" value="20.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<label>Temperatur Sensor 1 GAM</label>
-			</Measurement>
-			<Measurement>
-				<name>Temperatur 2</name>
-				<symbol>T2</symbol>
-				<unit>°C</unit>
-				<active>true</active>
-				<statistics min="true" max="true" avg="true" sigma="false" />
-				<property name="reduction" value="20.0" type="Double"
-					description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" />
-				<property name="scale_sync_ref_ordinal" value="19" type="Integer"
-					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<label>Temperatur Sensor 2 GAM</label>
-			</Measurement>
-			<Scoregroup scoregroupId="0">
-				<name>Dauer</name>
-				<symbol></symbol>
-				<unit>h</unit>
-				<active>true</active>
-				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-				<property name="histo_top_placement" value="true" type="Boolean" />
-				<label>Zeitdauer der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="1">
-				<name>Zählerwerte</name>
-				<symbol></symbol>
-				<unit>Tsd</unit>
-				<active>true</active>
-				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-				<label>Anzahl von Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="2">
-				<name>Versionen</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logDataVersion" value="Gerät" type="String" />
-				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-				<score label="logFileVersion" value="Log-Datei" type="String" />
-				<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="3">
-				<name>Datenmenge</name>
-				<symbol></symbol>
-				<unit>kiB</unit>
-				<active>true</active>
-				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-				<score label="logFileBytes" value="Dateigröße" type="String" />
-				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-				<label>Größe der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="4">
-				<name>Laufzeiten</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-				<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
-			</Scoregroup>
-		</Channel>
 		<Channel name="Elektro" type="TYPE_CONFIG">
 			<Measurement>
 				<name>RXSQ</name>
@@ -1580,53 +1586,55 @@
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am EAM</label>
 			</Measurement>
-			<Scoregroup scoregroupId="0">
-				<name>Dauer</name>
-				<symbol></symbol>
-				<unit>h</unit>
-				<active>true</active>
-				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-				<property name="histo_top_placement" value="true" type="Boolean" />
-				<label>Zeitdauer der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="1">
-				<name>Zählerwerte</name>
-				<symbol></symbol>
-				<unit>Tsd</unit>
-				<active>true</active>
-				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-				<label>Anzahl von Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="2">
-				<name>Versionen</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logDataVersion" value="Gerät" type="String" />
-				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-				<score label="logFileVersion" value="Log-Datei" type="String" />
-				<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="3">
-				<name>Datenmenge</name>
-				<symbol></symbol>
-				<unit>kiB</unit>
-				<active>true</active>
-				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-				<score label="logFileBytes" value="Dateigröße" type="String" />
-				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-				<label>Größe der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="4">
-				<name>Laufzeiten</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-				<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
-			</Scoregroup>
+			<ScoreGroups>
+				<Scoregroup scoregroupId="0">
+					<name>Dauer</name>
+					<symbol></symbol>
+					<unit>h</unit>
+					<active>true</active>
+					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+					<property name="histo_top_placement" value="true" type="Boolean" />
+					<label>Zeitdauer der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="1">
+					<name>Zählerwerte</name>
+					<symbol></symbol>
+					<unit>Tsd</unit>
+					<active>true</active>
+					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+					<label>Anzahl von Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="2">
+					<name>Versionen</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logDataVersion" value="Gerät" type="String" />
+					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+					<score label="logFileVersion" value="Log-Datei" type="String" />
+					<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="3">
+					<name>Datenmenge</name>
+					<symbol></symbol>
+					<unit>kiB</unit>
+					<active>true</active>
+					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+					<score label="logFileBytes" value="Dateigröße" type="String" />
+					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+					<label>Größe der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="4">
+					<name>Laufzeiten</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+					<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
+				</Scoregroup>
+			</ScoreGroups>
 		</Channel>
 		<Channel name="Kanäle" type="TYPE_CONFIG">
 			<Measurement>
@@ -1829,53 +1837,55 @@
 				<statistics min="true" max="true" avg="false" sigma="false" />
 				<label>for future use</label>
 			</Measurement>
-			<Scoregroup scoregroupId="0">
-				<name>Dauer</name>
-				<symbol></symbol>
-				<unit>h</unit>
-				<active>true</active>
-				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-				<property name="histo_top_placement" value="true" type="Boolean" />
-				<label>Zeitdauer der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="1">
-				<name>Zählerwerte</name>
-				<symbol></symbol>
-				<unit>Tsd</unit>
-				<active>true</active>
-				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-				<label>Anzahl von Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="2">
-				<name>Versionen</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logDataVersion" value="Gerät" type="String" />
-				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-				<score label="logFileVersion" value="Log-Datei" type="String" />
-				<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="3">
-				<name>Datenmenge</name>
-				<symbol></symbol>
-				<unit>kiB</unit>
-				<active>true</active>
-				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-				<score label="logFileBytes" value="Dateigröße" type="String" />
-				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-				<label>Größe der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="4">
-				<name>Laufzeiten</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-				<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
-			</Scoregroup>
+			<ScoreGroups>
+				<Scoregroup scoregroupId="0">
+					<name>Dauer</name>
+					<symbol></symbol>
+					<unit>h</unit>
+					<active>true</active>
+					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+					<property name="histo_top_placement" value="true" type="Boolean" />
+					<label>Zeitdauer der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="1">
+					<name>Zählerwerte</name>
+					<symbol></symbol>
+					<unit>Tsd</unit>
+					<active>true</active>
+					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+					<label>Anzahl von Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="2">
+					<name>Versionen</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logDataVersion" value="Gerät" type="String" />
+					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+					<score label="logFileVersion" value="Log-Datei" type="String" />
+					<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="3">
+					<name>Datenmenge</name>
+					<symbol></symbol>
+					<unit>kiB</unit>
+					<active>true</active>
+					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+					<score label="logFileBytes" value="Dateigröße" type="String" />
+					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+					<label>Größe der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="4">
+					<name>Laufzeiten</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+					<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
+				</Scoregroup>
+			</ScoreGroups>
 		</Channel>
 		<Channel name="Regler" type="TYPE_CONFIG">
 			<Measurement>
@@ -1964,7 +1974,7 @@
 				<property name="scale_sync_ref_ordinal" value="1" type="Integer"
 					description="Skalasynchronisations Messwertreferenz als Zahl" />
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
-				<suppressQuantiles>true</suppressQuantiles>
+				<trailDisplay discloseAll="true" defaultTrail="last" />
 				<label>Minimalspannung des Akkus am ESC</label>
 			</Measurement>
 			<Measurement>
@@ -1975,7 +1985,7 @@
 				<property name="factor" value="0.1" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="2" type="Integer"
 					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<suppressQuantiles>true</suppressQuantiles>
+				<trailDisplay discloseAll="true" defaultTrail="last" />
 				<label>Maximalstrom entnommen aus dem Akku am ESC</label>
 			</Measurement>
 			<Measurement>
@@ -1986,7 +1996,7 @@
 				<property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert" />
 				<property name="scale_sync_ref_ordinal" value="5" type="Integer"
 					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<suppressQuantiles>true</suppressQuantiles>
+				<trailDisplay discloseAll="true" defaultTrail="last" />
 				<label>Maximaldrehzahl mit Berücksichtigung eines Getreibefaktors des Motors am ESC</label>
 			</Measurement>
 			<Measurement>
@@ -1996,7 +2006,7 @@
 				<active>true</active>
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer"
 					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<suppressQuantiles>true</suppressQuantiles>
+				<trailDisplay discloseAll="true" defaultTrail="last" />
 				<label>Maximaltemperatur der Endstufe des ESC</label>
 			</Measurement>
 			<Measurement>
@@ -2006,56 +2016,58 @@
 				<active>true</active>
 				<property name="scale_sync_ref_ordinal" value="6" type="Integer"
 					description="Skalasynchronisations Messwertreferenz als Zahl" />
-				<suppressQuantiles>true</suppressQuantiles>
+				<trailDisplay discloseAll="true" defaultTrail="last" />
 				<label>Maximaltemperatur des Motors am ESC</label>
 			</Measurement>
-			<Scoregroup scoregroupId="0">
-				<name>Dauer</name>
-				<symbol></symbol>
-				<unit>h</unit>
-				<active>true</active>
-				<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-				<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-				<property name="histo_top_placement" value="true" type="Boolean" />
-				<label>Zeitdauer der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="1">
-				<name>Zählerwerte</name>
-				<symbol></symbol>
-				<unit>Tsd</unit>
-				<active>true</active>
-				<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-				<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-				<label>Anzahl von Messwerten</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="2">
-				<name>Versionen</name>
-				<symbol></symbol>
-				<unit></unit>
-				<active>true</active>
-				<score label="logDataVersion" value="Gerät" type="String" />
-				<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-				<score label="logFileVersion" value="Log-Datei" type="String" />
-				<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="3">
-				<name>Datenmenge</name>
-				<symbol></symbol>
-				<unit>kiB</unit>
-				<active>true</active>
-				<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-				<score label="logFileBytes" value="Dateigröße" type="String" />
-				<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-				<label>Größe der Log-Aufzeichnung</label>
-			</Scoregroup>
-			<Scoregroup scoregroupId="4">
-				<name>Laufzeiten</name>
-				<symbol></symbol>
-				<unit>ms</unit>
-				<active>true</active>
-				<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-				<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
-			</Scoregroup>
+			<ScoreGroups>
+				<Scoregroup scoregroupId="0">
+					<name>Dauer</name>
+					<symbol></symbol>
+					<unit>h</unit>
+					<active>true</active>
+					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
+					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
+					<property name="histo_top_placement" value="true" type="Boolean" />
+					<label>Zeitdauer der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="1">
+					<name>Zählerwerte</name>
+					<symbol></symbol>
+					<unit>Tsd</unit>
+					<active>true</active>
+					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
+					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
+					<label>Anzahl von Messwerten</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="2">
+					<name>Versionen</name>
+					<symbol></symbol>
+					<unit></unit>
+					<active>true</active>
+					<score label="logDataVersion" value="Gerät" type="String" />
+					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
+					<score label="logFileVersion" value="Log-Datei" type="String" />
+					<label>Versionen der Aufzeichnungs- und Auswertesoftware</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="3">
+					<name>Datenmenge</name>
+					<symbol></symbol>
+					<unit>kiB</unit>
+					<active>true</active>
+					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
+					<score label="logFileBytes" value="Dateigröße" type="String" />
+					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
+					<label>Größe der Log-Aufzeichnung</label>
+				</Scoregroup>
+				<Scoregroup scoregroupId="4">
+					<name>Laufzeiten</name>
+					<symbol></symbol>
+					<unit>ms</unit>
+					<active>true</active>
+					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
+					<label>Rechnerlaufzeit bei der Auswertung der Log-Aufzeichnung</label>
+				</Scoregroup>
+			</ScoreGroups>
 		</Channel>
 		<property name="enable_filter" value="true" type="Boolean" />
 		<property name="enable_channel" value="false" type="Boolean" />
