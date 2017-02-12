@@ -200,10 +200,13 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.countLostPackages = 0;
 		HoTTbinHistoReader2.isJustParsed = false;
 		int countPackageLoss = 0;
+		
+		maxPoints = new int[HoTTbinReader2.points.length];
 		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, maxPoints, minPoints,  recordTimespan_ms);
-
+		maxPoints = new int[0];
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
+		
 		// read all the data blocks from the file, parse only for the active channel
 		setTimeMarks(TimeMark.INITIATED);
 		boolean isChannelsChannel = activeChannelNumber == 4;
@@ -554,10 +557,13 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.isJustParsed = false;
 		HoTTbinHistoReader2.isTextModusSignaled = false;
 		int countPackageLoss = 0;
+		
+		maxPoints = new int[HoTTbinReader2.points.length];
 		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, maxPoints, minPoints,  recordTimespan_ms);
-
+		maxPoints = new int[0];
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
+		
 		// read all the data blocks from the file, parse only for the active channel
 		setTimeMarks(TimeMark.INITIATED);
 		boolean doFullRead = initializeBlocks <= 0;

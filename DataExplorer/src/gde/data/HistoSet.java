@@ -764,9 +764,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 									}
 								}
 							}
-							else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+							else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
 								log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								if (!this.settings.skipFilesWithOtherObject()) {
+									// ET this will result in a thread violation!!!!!
 									if (ask4FilesWithOtherObject) {
 										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { truss.getLogObjectKey(), path.toString() }))) {
 											isValidObject = true;
@@ -779,8 +780,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 									}
 								}
 							}
-							else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
-								log.log(Level.FINER, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+							else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
+								log.log(Level.OFF, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								isValidObject = true;
 							}
 
@@ -813,10 +814,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 						// discard truss
 					}
-					else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+					else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
 						log.log(Level.INFO, String.format("BIN candidate found for wrong object \"%s\" in %s lastModified=%d", objectDirectory, actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
 						if (!this.settings.skipFilesWithOtherObject()) {
 							if (ask4FilesWithOtherObject) {
+								// ET this will result in a thread violation and does it really make sense since plain transmitter log file never has object key!!!!!
 								if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { objectDirectory, path.toString() }))) {
 									isValidObject = true;
 									this.settings.setFilesWithOtherObject(false);
@@ -828,7 +830,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 							}
 						}
 					}
-					else if (this.application.getActiveObject() == null || truss.getValidatedObjectKey().equals(this.application.getObjectKey())) {
+					else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
+						log.log(Level.OFF, String.format("BIN candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 						isValidObject = true;
 					}
 

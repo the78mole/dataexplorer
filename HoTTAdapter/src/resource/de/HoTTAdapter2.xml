@@ -4658,6 +4658,8 @@
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
         <property name="text_mode" value="true" type="Boolean"/>
+        <property name="outlier_sigma" value="3.29" type="Double" description="3.29 sigma allows 0.1% outliers, i.e. we allow 1 lower and 1 upper outlier for a population of 2000 measurements"/>
+        <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0"/>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>

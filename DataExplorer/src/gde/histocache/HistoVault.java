@@ -1369,6 +1369,13 @@ public class HistoVault {
 		return this.settings.getValidatedObjectKey(this.logObjectKey);
 	}
 
+	/**
+	 * @return boolean value to verify if given object key is valid
+	 */
+	public boolean isValidObjectKey(final String objectKey) {
+		return this.settings.getValidatedObjectKey(objectKey).isPresent();
+	}
+
 	public boolean isTruss() {
 		return this.getMeasurements().isEmpty();
 	}
