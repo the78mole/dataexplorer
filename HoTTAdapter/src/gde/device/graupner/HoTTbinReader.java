@@ -1716,7 +1716,7 @@ public class HoTTbinReader {
 			// check if the zoned date is equal
 			GregorianCalendar lastModifiedDate = new GregorianCalendar();
 			lastModifiedDate.setTimeInMillis(file.lastModified() - numberDatablocks * 10);
-			if (year == lastModifiedDate.get(Calendar.YEAR) && month == lastModifiedDate.get(Calendar.MONTH) && day == lastModifiedDate.get(Calendar.DAY_OF_MONTH)) {
+			if (year == lastModifiedDate.get(Calendar.YEAR) && month == lastModifiedDate.get(Calendar.MONTH)+1 && day == lastModifiedDate.get(Calendar.DAY_OF_MONTH)) {
 				startTimeStamp = lastModifiedDate.getTimeInMillis();
 				log.log(Level.FINE,	"lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", file.lastModified()) + " " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", lastModifiedDate.getTimeInMillis()));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}

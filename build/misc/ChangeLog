@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+
+Version 3.3.0 - xx yyy 2017
+HoTTAdapter*
+	- fix start time stamp using last modified of log file
+	
 Version 3.2.9 - 26 Jan 2017
 +++++ important update Java Runtime Version prerequisite to 1.8 +++++
 +++++ important update Java 32 Bit -Xmx1024m, 64 Bit -Xmx3096m  +++++
