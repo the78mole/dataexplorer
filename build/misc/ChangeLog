@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 
 Version 3.3.0 - xx yyy 2017
 - update DeviceProperties schema to V31 to enable updates regarding history analysis
+- update Copyrights
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
 	
