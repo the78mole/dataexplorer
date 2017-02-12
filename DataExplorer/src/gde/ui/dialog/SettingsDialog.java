@@ -792,7 +792,7 @@ public class SettingsDialog extends Dialog {
 						RowLayout compositeHistoLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						compositeHistoLayout.marginLeft = GDE.IS_MAC ? 2 : 5;
 						compositeHistoLayout.spacing = GDE.IS_MAC ? 2 : 5;
-						compositeHistoLayout.marginTop = 11;
+						compositeHistoLayout.marginTop = GDE.IS_MAC ? 3 : 11;
 						this.miscComposite.setLayout(compositeHistoLayout);
 						{
 							this.histoActiveButton = new Button(this.miscComposite, SWT.CHECK);
@@ -814,28 +814,19 @@ public class SettingsDialog extends Dialog {
 							this.histoDisplayOptionGroup = new Group(this.miscComposite, SWT.NONE);
 							// kommt von histoXAxisGroup
 							RowData histoDisplayOptionGroupLData = new RowData();
-							histoDisplayOptionGroupLData.width = 475;
+							histoDisplayOptionGroupLData.width = 480;
 							this.histoDisplayOptionGroup.setLayoutData(histoDisplayOptionGroupLData);
-//							FormLayout displayOptionFormLayout = new FormLayout();
-//							displayOptionFormLayout.marginTop = displayOptionFormLayout.marginLeft = displayOptionFormLayout.marginRight = displayOptionFormLayout.marginHeight = 2;
-//							this.histoDisplayOptionGroup.setLayout(displayOptionFormLayout);
-//							this.histoDisplayOptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-//							this.histoDisplayOptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0806));
 							
 							// kommt von histoForceObjectGroup
 							RowLayout histoDisplayOptionGroupLLayout = new RowLayout(SWT.HORIZONTAL);
 							histoDisplayOptionGroupLLayout.marginTop = histoDisplayOptionGroupLLayout.marginLeft = histoDisplayOptionGroupLLayout.marginRight = histoDisplayOptionGroupLLayout.marginHeight = 2;
 							this.histoDisplayOptionGroup.setLayout(histoDisplayOptionGroupLLayout);
-//							FormData histoDisplayOptionGroupLData = new FormData();
-//							histoDisplayOptionGroupLData.top = new FormAttachment(this.histoActiveButton, 7);
-//							histoDisplayOptionGroupLData.width = 333;
-//							this.histoDisplayOptionGroup.setLayoutData(histoDisplayOptionGroupLData);
 							this.histoDisplayOptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.histoDisplayOptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0806));
 							{
 								this.histoXAxisGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
 								RowData histoXAxisGroupLData = new RowData();
-								histoXAxisGroupLData.width = 228;
+								histoXAxisGroupLData.width = 223;
 								this.histoXAxisGroup.setLayoutData(histoXAxisGroupLData);
 								FormLayout formLayout = new FormLayout();
 								formLayout.marginTop = 7;
@@ -916,11 +907,10 @@ public class SettingsDialog extends Dialog {
 							{
 								this.histoBoxplotGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
 								RowData histoXAxisGroupLData = new RowData();
-								histoXAxisGroupLData.width = 228;
+								histoXAxisGroupLData.width = 223;
 								this.histoBoxplotGroup.setLayoutData(histoXAxisGroupLData);
 								FormLayout formLayout = new FormLayout();
-								formLayout.marginTop = 7;
-								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 0;
+								formLayout.marginTop = formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
 								this.histoBoxplotGroup.setLayout(formLayout);
 								this.histoBoxplotGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoBoxplotGroup.setText(Messages.getString(MessageIds.GDE_MSGT0795));
@@ -1010,12 +1000,12 @@ public class SettingsDialog extends Dialog {
 							{
 								this.histoDisplayGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
 								RowData groupLData = new RowData();
-								groupLData.width = 228;
+								groupLData.width = 223;
 								this.histoDisplayGroup.setLayoutData(groupLData);
 								FormLayout formLayout = new FormLayout();
-								formLayout.marginTop = 7;
-								formLayout.marginBottom = 3;
-								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = -3;
+								formLayout.marginTop = 2;
+								formLayout.marginBottom = 2;
+								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
 								this.histoDisplayGroup.setLayout(formLayout);
 								this.histoDisplayGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoDisplayGroup.setText(Messages.getString(MessageIds.GDE_MSGT0847));
@@ -1079,12 +1069,12 @@ public class SettingsDialog extends Dialog {
 							{
 								this.timeZoneGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
 								RowData groupLData = new RowData();
-								groupLData.width = 228;
+								groupLData.width = 223;
 								this.timeZoneGroup.setLayoutData(groupLData);
 								FormLayout formLayout = new FormLayout();
-								formLayout.marginTop = 7;
-								formLayout.marginBottom = 3;
-								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 0;
+								formLayout.marginTop = 2;
+								formLayout.marginBottom = 2;
+								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
 								this.timeZoneGroup.setLayout(formLayout);
 								this.timeZoneGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.timeZoneGroup.setText(Messages.getString(MessageIds.GDE_MSGT0805));
@@ -1111,7 +1101,7 @@ public class SettingsDialog extends Dialog {
 						{
 							this.histoFileContentsGroup = new Group(this.miscComposite, SWT.NONE);
 							RowData histoFileContentsGroupLData = new RowData();
-							histoFileContentsGroupLData.width = 288;
+							histoFileContentsGroupLData.width = 215;
 							this.histoFileContentsGroup.setLayoutData(histoFileContentsGroupLData);
 							FormLayout formLayout1 = new FormLayout();
 							formLayout1.marginTop = formLayout1.marginLeft = formLayout1.marginRight = formLayout1.marginHeight = 2;
@@ -1172,7 +1162,7 @@ public class SettingsDialog extends Dialog {
 						{
 							this.histoScreeningGroup = new Group(this.miscComposite, SWT.NONE);
 							RowData histoScreeningGroupLData = new RowData();
-							histoScreeningGroupLData.width = 288;
+							histoScreeningGroupLData.width = 250;
 							this.histoScreeningGroup.setLayoutData(histoScreeningGroupLData);
 							FormLayout formLayout = new FormLayout();
 							formLayout.marginTop = formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
@@ -1270,8 +1260,8 @@ public class SettingsDialog extends Dialog {
 							{
 								this.histoForceObjectGroup = new Group(this.histoScreeningGroup, SWT.NONE);
 								RowLayout histoForceObjectGroupLLayout = new RowLayout(SWT.HORIZONTAL);
-								histoForceObjectGroupLLayout.marginTop = 5;
-								histoForceObjectGroupLLayout.marginLeft = 5;
+								histoForceObjectGroupLLayout.marginTop = 2;
+								histoForceObjectGroupLLayout.marginLeft = 2;
 								this.histoForceObjectGroup.setLayout(histoForceObjectGroupLLayout);
 								FormData histoForceObjectGroupLData = new FormData();
 								histoForceObjectGroupLData.top = new FormAttachment(this.histoSearchImportPath, 7);
