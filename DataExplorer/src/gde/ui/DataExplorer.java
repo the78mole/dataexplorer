@@ -1979,53 +1979,100 @@ public class DataExplorer extends Composite {
 	 * @param rebuildStep
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
-		if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
-				|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed()
-						&& this.histoTableTabItem.isVisible())) {
-			Thread rebuilThread = new Thread((Runnable) () -> {
-				boolean isRebuilt = false;
-				try {
-					DataExplorer.this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-					isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
+					|| (this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible())) {
+				Thread rebuilThread = new Thread((Runnable) () -> {
+					boolean isRebuilt = false;
+					try {
+						setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+						isRebuilt = this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
-					if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
-						DataExplorer.this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
-						DataExplorer.this.updateHistoGraphicsWindow(true);
-						DataExplorer.this.updateHistoTable(true);
+						if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
+							this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
+							updateHistoGraphicsWindow(true);
+							updateHistoTable(true);
+						}
+						String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+						setProgress(100, sThreadId);
+						if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
+							if (this.histoSet.getHistoFilePaths().size() == 0) {
+								openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+							}
+						}
+						// determine the rebuild action for the invisible histo tabs or those which are not selected
+						RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
+						// determine the maximum rebuild priority from the past updates
+						RebuildStep maximumRebuildStep = this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? this.rebuildStepInvisibleTab : performedRebuildStep;
+						// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
+						this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE : RebuildStep.F_FILE_CHECK;
+						if (log.isLoggable(Level.FINER))
+							log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
+									this.rebuildStepInvisibleTab));
 					}
-					String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-					DataExplorer.this.setProgress(100, sThreadId);
-					if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
-						if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
-							DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+					catch (Exception e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						if (isWithUi) openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+					}
+					finally {
+						this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+					}
+				}, "rebuild4Screening");
+				try {
+					rebuilThread.start();
+				}
+				catch (RuntimeException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
+			}
+		}
+		else {
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if ((DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow && DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed()
+							&& DataExplorer.this.histoGraphicsTabItem.isVisible()) //
+							|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed()
+									&& DataExplorer.this.histoTableTabItem.isVisible())) {
+						boolean isRebuilt = false;
+						try {
+							DataExplorer.this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+							isRebuilt = DataExplorer.this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
+
+							if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
+								DataExplorer.this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
+								DataExplorer.this.updateHistoGraphicsWindow(true);
+								DataExplorer.this.updateHistoTable(true);
+							}
+							String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+							DataExplorer.this.setProgress(100, sThreadId);
+							if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
+								if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
+									DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+								}
+							}
+							// determine the rebuild action for the invisible histo tabs or those which are not selected
+							RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
+							// determine the maximum rebuild priority from the past updates
+							RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab
+									: performedRebuildStep;
+							// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
+							DataExplorer.this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE
+									: RebuildStep.F_FILE_CHECK;
+							if (log.isLoggable(Level.FINER))
+								log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
+										DataExplorer.this.rebuildStepInvisibleTab));
+						}
+						catch (Exception e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
+							if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+						}
+						finally {
+							DataExplorer.this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 						}
 					}
-					// determine the rebuild action for the invisible histo tabs or those which are not selected
-					RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
-					// determine the maximum rebuild priority from the past updates
-					RebuildStep maximumRebuildStep = DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? DataExplorer.this.rebuildStepInvisibleTab
-							: performedRebuildStep;
-					// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
-					DataExplorer.this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > DataExplorer.this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE
-							: RebuildStep.F_FILE_CHECK;
-					if (log.isLoggable(Level.FINER))
-						log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
-								DataExplorer.this.rebuildStepInvisibleTab));
 				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					if (isWithUi) DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
-				}		
-				finally {
-					DataExplorer.this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));								
-				}
-			}, "rebuild4Screening");
-			try {
-				rebuilThread.start();
-			}
-			catch (RuntimeException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
+			});
 		}
 	}
 
