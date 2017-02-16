@@ -201,9 +201,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.isJustParsed = false;
 		int countPackageLoss = 0;
 		
-		maxPoints = new int[HoTTbinReader2.points.length];
-		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, maxPoints, minPoints,  recordTimespan_ms);
-		maxPoints = new int[0];
+		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinReader2.points.length,  recordTimespan_ms);
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		
@@ -558,9 +556,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 		
-		maxPoints = new int[HoTTbinReader2.points.length];
-		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, maxPoints, minPoints,  recordTimespan_ms);
-		maxPoints = new int[0];
+		HistoRandomSample histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinReader2.points.length,  recordTimespan_ms);
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		
