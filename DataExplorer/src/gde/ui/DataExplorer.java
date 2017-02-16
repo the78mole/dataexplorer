@@ -19,6 +19,8 @@
 ****************************************************************************************/
 package gde.ui;
 
+import static org.eclipse.swt.SWT.CURSOR_WAIT;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -1985,7 +1987,7 @@ public class DataExplorer extends Composite {
 				Thread rebuilThread = new Thread((Runnable) () -> {
 					boolean isRebuilt = false;
 					try {
-						setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+						setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));
 						isRebuilt = this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
 						if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
@@ -1997,7 +1999,9 @@ public class DataExplorer extends Composite {
 						setProgress(100, sThreadId);
 						if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
 							if (this.histoSet.getHistoFilePaths().size() == 0) {
-								openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+								String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? this.getActiveDevice().getName() : this.getObjectKey();
+								String importDir = this.histoSet.getValidatedImportDir() != null ? "\n" + this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY; //$NON-NLS-1$
+								this.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, this.histoSet.getValidatedDataDir(), importDir }));
 							}
 						}
 						// determine the rebuild action for the invisible histo tabs or those which are not selected
@@ -2017,7 +2021,7 @@ public class DataExplorer extends Composite {
 					finally {
 						this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 					}
-				}, "rebuild4Screening");
+				}, "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
 				}
@@ -2048,7 +2052,9 @@ public class DataExplorer extends Composite {
 							DataExplorer.this.setProgress(100, sThreadId);
 							if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
 								if (DataExplorer.this.histoSet.getHistoFilePaths().size() == 0) {
-									DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0066));
+									String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? DataExplorer.this.getActiveDevice().getName() : DataExplorer.this.getObjectKey();
+									String importDir = DataExplorer.this.histoSet.getValidatedImportDir() != null ? "\n" + DataExplorer.this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY; //$NON-NLS-1$
+									DataExplorer.this.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, DataExplorer.this.histoSet.getValidatedDataDir(), importDir }));
 								}
 							}
 							// determine the rebuild action for the invisible histo tabs or those which are not selected
