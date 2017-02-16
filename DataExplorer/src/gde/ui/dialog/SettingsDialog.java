@@ -814,7 +814,7 @@ public class SettingsDialog extends Dialog {
 							this.histoDisplayOptionGroup = new Group(this.miscComposite, SWT.NONE);
 							// kommt von histoXAxisGroup
 							RowData histoDisplayOptionGroupLData = new RowData();
-							histoDisplayOptionGroupLData.width = 480;
+							histoDisplayOptionGroupLData.width = 477;
 							this.histoDisplayOptionGroup.setLayoutData(histoDisplayOptionGroupLData);
 							
 							// kommt von histoForceObjectGroup
@@ -1265,7 +1265,7 @@ public class SettingsDialog extends Dialog {
 								this.histoForceObjectGroup.setLayout(histoForceObjectGroupLLayout);
 								FormData histoForceObjectGroupLData = new FormData();
 								histoForceObjectGroupLData.top = new FormAttachment(this.histoSearchImportPath, 7);
-								histoForceObjectGroupLData.width = 278;
+								histoForceObjectGroupLData.width = 242;
 								this.histoForceObjectGroup.setLayoutData(histoForceObjectGroupLData);
 								this.histoForceObjectGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoForceObjectGroup.setText(Messages.getString(MessageIds.GDE_MSGT0794));
