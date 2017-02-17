@@ -51,8 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
-import org.eclipse.swt.SWT;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
@@ -65,8 +63,6 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.histocache.HistoVault;
 import gde.io.HistoOsdReaderWriter;
 import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
@@ -146,7 +142,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 		/**
 		 * @param scopeOfWork zero is the lowest scopeOfWork
-		 * @return
+		 * @return the rebuild step corresponding to the scope of work
 		 */
 		public static RebuildStep area(int scopeOfWork) {
 			for (RebuildStep rebuildStep : values()) {
@@ -221,7 +217,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		{
 			if (this.getHistoFilePaths().size() > 0) {
 				// step: build the workload map consisting of the cache key and the file path
-				Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(false, deviceConfigurations);
+				Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(deviceConfigurations);
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
 
 				// step: put cached vaults into the histoSet map and reduce workload map
@@ -301,7 +297,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (this.getHistoFilePaths().size() > 0) {
 						long nanoTimeCheckFilesSum = -System.nanoTime();
 						// step: build the workload map consisting of the cache key and the file path
-						Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(isWithUi, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+						Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 						nanoTimeCheckFilesSum += System.nanoTime();
 						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
 							log.log(Level.TIME, String.format("%,5d files          job check          time=%,6d [ms]  ::  per second:%5d", this.histoFilePaths.size(), //$NON-NLS-1$
@@ -700,13 +696,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * determine the vaults which are required for the data access.
 	 * selects osd file candidates for the active device and the active channel; select as well for objectKey and start timestamp.
 	 * selects bin file candidates for object key based on the parent directory name and last modified.
-	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
 	 * @param deviceConfigurations 
 	 * @return trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
 	 * @throws IOException 
 	 * @throws NotSupportedFileFormatException 
 	*/
-	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(boolean isWithUi, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
+	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
 		final Map<Long, Map<String, HistoVault>> trusses4Start = new LinkedHashMap<Long, Map<String, HistoVault>>();
 		final List<Integer> channelMixConfigNumbers;
@@ -718,8 +713,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
 				: GDE.STRING_EMPTY;
 
-		boolean ask4FilesWithoutObject = isWithUi;
-		boolean ask4FilesWithOtherObject = isWithUi;
 		int invalidRecordSetsCount = 0;
 		for (Map.Entry<Long, Set<Path>> pathListEntry : this.histoFilePaths.entrySet()) {
 			for (Path path : pathListEntry.getValue()) {
@@ -751,34 +744,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 							}
 							else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().isPresent()) {
 								log.log(Level.INFO, String.format("OSD candidate found for empty object \"%s\" in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
-								if (!this.settings.skipFilesWithoutObject()) {
-									if (ask4FilesWithoutObject) {
-										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0065, new String[] { path.toString() }))) {
-											isValidObject = true;
-											this.settings.setFilesWithoutObject(false);
-										}
-										ask4FilesWithoutObject = false;
-									}
-									else {
-										isValidObject = true;
-									}
-								}
+								isValidObject = this.settings.getFilesWithoutObject();
 							}
 							else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
 								log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
-								if (!this.settings.skipFilesWithOtherObject()) {
-									// ET this will result in a thread violation!!!!!
-									if (ask4FilesWithOtherObject) {
-										if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { truss.getLogObjectKey(), path.toString() }))) {
-											isValidObject = true;
-											this.settings.setFilesWithOtherObject(false);
-										}
-										ask4FilesWithoutObject = false;
-									}
-									else {
-										isValidObject = true;
-									}
-								}
+								isValidObject = this.settings.getFilesWithOtherObject();
 							}
 							else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
 								log.log(Level.OFF, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
@@ -816,19 +786,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					}
 					else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
 						log.log(Level.INFO, String.format("BIN candidate found for wrong object \"%s\" in %s lastModified=%d", objectDirectory, actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
-						if (!this.settings.skipFilesWithOtherObject()) {
-							if (ask4FilesWithOtherObject) {
-								// ET this will result in a thread violation and does it really make sense since plain transmitter log file never has object key!!!!!
-								if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new String[] { objectDirectory, path.toString() }))) {
-									isValidObject = true;
-									this.settings.setFilesWithOtherObject(false);
-								}
-								ask4FilesWithoutObject = false;
-							}
-							else {
-								isValidObject = true;
-							}
-						}
+								isValidObject = this.settings.getFilesWithOtherObject();
 					}
 					else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
 						log.log(Level.OFF, String.format("BIN candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
