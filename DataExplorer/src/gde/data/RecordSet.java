@@ -2069,6 +2069,18 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 					}
 				}
 			}
+			Record syncRecord = this.get(syncRecordOrdinal);
+			synchronized (syncRecord) {
+				if (this.isScopeMode) {
+					syncRecord.scopeMin = tmpSyncMin;
+					syncRecord.scopeMax = tmpSyncMax;
+				}
+				else {
+					syncRecord.syncMinValue = tmpSyncMin;
+					syncRecord.syncMaxValue = tmpSyncMax;
+				}
+			}
+			
 			if (isAffected && log.isLoggable(Level.FINE)) log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}

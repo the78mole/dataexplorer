@@ -144,6 +144,7 @@ public class AnalogWindow extends CTabItem {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {
+				recordSet.updateSyncRecordScale();
 				String[] recordsToDisplay = recordSet.getDisplayableAndVisibleRecordNames();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, activeChannel.getName());
 				// if recordSet name signature changed new displays need to be created
