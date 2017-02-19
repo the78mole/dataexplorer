@@ -813,7 +813,7 @@ public class SettingsDialog extends Dialog {
 							this.histoDisplayOptionGroup = new Group(this.miscComposite, SWT.NONE);
 							// kommt von histoXAxisGroup
 							RowData histoDisplayOptionGroupLData = new RowData();
-							histoDisplayOptionGroupLData.width = 477;
+							histoDisplayOptionGroupLData.width = GDE.IS_MAC ? 480 : 477;
 							this.histoDisplayOptionGroup.setLayoutData(histoDisplayOptionGroupLData);
 							
 							// kommt von histoForceObjectGroup
