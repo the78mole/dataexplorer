@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -746,6 +747,53 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.reduction;
 	}
 
+	@Override // reason is formatting of values <= 100 with decimal places
+	public void setNumberFormat(int newNumberFormat) {
+		this.numberFormat = newNumberFormat;
+		switch (newNumberFormat) {
+		case -1:
+			final double delta = this.maxScaleValue - this.minScaleValue == 0 ? this.device.translateValue(this, (this.maxValue - this.minValue) / 1000) : this.maxScaleValue - this.minScaleValue;
+			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue / 1000));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, maxValueAbs, delta)); //$NON-NLS-1$
+			if (maxValueAbs <= 100) {
+				if (delta < 0.1)
+					this.df.applyPattern("0.000"); //$NON-NLS-1$
+				else if (delta <= 1)
+					this.df.applyPattern("0.00"); //$NON-NLS-1$
+				else
+					this.df.applyPattern("0.0"); //$NON-NLS-1$
+			}
+			else if (maxValueAbs < 500) {
+				if (delta <= 0.1)
+					this.df.applyPattern("0.00"); //$NON-NLS-1$
+				else if (delta <= 1)
+					this.df.applyPattern("0.0"); //$NON-NLS-1$
+				else
+					this.df.applyPattern("0"); //$NON-NLS-1$
+			}
+			else {
+				if (delta <= 5)
+					this.df.applyPattern("0.0"); //$NON-NLS-1$
+				else
+					this.df.applyPattern("0"); //$NON-NLS-1$
+			}
+			break;
+		case 0:
+			this.df.applyPattern("0"); //$NON-NLS-1$
+			break;
+		case 1:
+			this.df.applyPattern("0.0"); //$NON-NLS-1$
+			break;
+		case 2:
+		default:
+			this.df.applyPattern("0.00"); //$NON-NLS-1$
+			break;
+		case 3:
+			this.df.applyPattern("0.000"); //$NON-NLS-1$
+			break;
+		}
+	}
+
 	/**
 	 * @return the array of suite records; it may consist of the trail record itself which simplifies things
 	 */
@@ -799,15 +847,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public String getDeltaAsFormattedScaleValue(int index1, int index2) {
 		if (!this.isTrailSuite()) {
 			final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-			final double translatedDelta = trailRecord.device.translateValue(trailRecord, this.realRealGet(index1) / 1000.)
-					- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.);
+			final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
+					- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
 			return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
 		}
 		else if (this.isBoxPlotSuite()) {
 			if (this.getTrailRecordSuite()[0].realRealGet(index1) != null) {
 				final TrailRecord trailRecord = this.getTrailRecordSuite()[2];
-				final double translatedDelta = trailRecord.device.translateValue(trailRecord, this.realRealGet(index1) / 1000.)
-						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.);
+				final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
+						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
 				return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
 			}
 			else
@@ -816,8 +864,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		else if (isRangePlotSuite()) {
 			if (this.getTrailRecordSuite()[0].realRealGet(index1) != null) {
 				final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-				final double translatedDelta = trailRecord.device.translateValue(trailRecord, this.realRealGet(index1) / 1000.)
-						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.);
+				final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
+						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
 				return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
 			}
 			else
@@ -911,15 +959,18 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public int getVerticalDisplayPointPos(int index) {
 		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
 		if (!this.isTrailSuite()) {
-			return Double.valueOf(this.parent.drawAreaBounds.height - (((masterRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+			return Double.valueOf(this.parent.drawAreaBounds.height - (((masterRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
+					.intValue();
 		}
 		else if (this.isBoxPlotSuite()) {
 			final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
-			return Double.valueOf(this.parent.drawAreaBounds.height - (((medianRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+			return Double.valueOf(this.parent.drawAreaBounds.height - (((medianRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
+					.intValue();
 		}
 		else if (isRangePlotSuite()) {
 			final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
-			return Double.valueOf(this.parent.drawAreaBounds.height - (((middleRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+			return Double.valueOf(this.parent.drawAreaBounds.height - (((middleRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
+					.intValue();
 		}
 		else
 			throw new UnsupportedOperationException();
