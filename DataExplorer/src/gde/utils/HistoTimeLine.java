@@ -23,6 +23,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.HistoSet;
 import gde.data.RecordSet;
+import gde.data.TrailRecordSet;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -129,31 +130,7 @@ public class HistoTimeLine {
 		if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
 		// calculate the maximum time to be displayed and define the corresponding label format
-		final DateTimePattern timeFormat;
-		long totalTime_month = TimeUnit.DAYS.convert(this.trailRecordSet.getStartTimeStamp() - (long) this.trailRecordSet.getMaxTime_ms(), TimeUnit.MILLISECONDS) / 30;
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(this.leftmostTimeStamp); // start year
-		if (totalTime_month < 12 && Calendar.getInstance().get(Calendar.YEAR) == cal.get(Calendar.YEAR)) { // starts in the current year
-			if (this.density == Density.EXTREME)
-				timeFormat = DateTimePattern.MMdd;
-			else if (this.density == Density.HIGH)
-				timeFormat = DateTimePattern.MMdd_HH;
-			else if (this.density == Density.MEDIUM)
-				timeFormat = DateTimePattern.yyyyMMdd;
-			else
-				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
-		}
-		else {
-			if (this.density == Density.EXTREME)
-				timeFormat = DateTimePattern.yyyyMM;
-			else if (this.density == Density.HIGH)
-				timeFormat = DateTimePattern.yyyyMM;
-			else if (this.density == Density.MEDIUM)
-				timeFormat = DateTimePattern.yyyyMMdd;
-			else
-				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
-		}
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getStartTimeStamp() - (long) this.trailRecordSet.getMaxTime_ms());
 
 		String timeLineDescription;
 		Point pt; // to calculate the space required to draw the time values
@@ -185,11 +162,11 @@ public class HistoTimeLine {
 	 * @param totalDisplayTime_ms timespan
 	 * @return format (e.g. TimeLine.TIME_LINE_DATE_TIME)
 	 */
-	public DateTimePattern getScaleFormat(long totalDisplayTime_ms) {
+	private DateTimePattern getScaleFormat(long totalDisplayTime_ms) {
 		final DateTimePattern timeFormat;
 		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "totalDisplayTime_ms = " + totalDisplayTime_ms); //$NON-NLS-1$
 
-		long totalTime_month = TimeUnit.DAYS.convert(totalDisplayTime_ms / 1000, TimeUnit.SECONDS) / 30;
+		long totalTime_month = TimeUnit.DAYS.convert(totalDisplayTime_ms, TimeUnit.MILLISECONDS) / 30;
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(this.leftmostTimeStamp); // start year
 		if (totalTime_month < 12 && Calendar.getInstance().get(Calendar.YEAR) == cal.get(Calendar.YEAR)) { // starts in the current year
@@ -212,7 +189,7 @@ public class HistoTimeLine {
 			else
 				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
 		}
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$ 
 		return timeFormat;
 	}
 
@@ -417,6 +394,127 @@ public class HistoTimeLine {
 		}
 	}
 
+	/**
+	 * @param timestamp_ms
+	 * @return the timestamp position in the drawing area (relative to x0 which is the left position of the drawing canvas)
+	 */
+	public int getXPosTimestamp(long timestamp_ms) {
+		return this.getScalePositions().get(timestamp_ms);
+	}
+	
+	/**
+	 * @param xPos current position in the drawing area (relative to x0 which is the left position of the drawing canvas)
+	 * @return the time stamp of the trail recordset which is the closest one to xPos  ---  or null if xPos is too far away
+	 */
+	public Long getSnappedTimestamp(int xPos) {
+		final int xPosTolerance = 20;
+		if (this.settings.isXAxisReversed()) {
+			Entry<Long, Integer> previous = null;
+			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (previous != null && xPos < previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
+					if (xPos < previous.getValue() + xPosTolerance)
+						return previous.getKey();
+					else
+						return null; // far away on the right 
+				}
+				else if (xPos <= entry.getValue()) { // on the left 
+					if (xPos <= entry.getValue() - xPosTolerance)
+						return null; // far away on the left
+					else
+						return entry.getKey();
+				}
+				else {
+					previous = entry;
+				}
+			}
+			if (xPos < previous.getValue() + xPosTolerance)
+				return previous.getKey();
+			else
+				return null; // far away on the right 
+		}
+		else {
+			Entry<Long, Integer> previous = null;
+			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
+				if (HistoTimeLine.log.isLoggable(Level.OFF)) HistoTimeLine.log.log(Level.OFF, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (previous != null && xPos > previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
+					if (xPos > previous.getValue() - xPosTolerance)
+						return previous.getKey();
+					else
+						return null; // far away on the left 
+				}
+				else if (xPos >= entry.getValue()) {
+					if (xPos >= entry.getValue() + xPosTolerance)
+						return null; // far away on the right
+					else
+						return entry.getKey();
+				}
+				else {
+					previous = entry;
+				}
+			}
+			if (xPos > previous.getValue() - xPosTolerance)
+				return previous.getKey();
+			else
+				return null; // far away on the left 
+		}
+	}
+
+	/**
+	 * @param xPos current position in the drawing area (relative to x0 which is the left position of the drawing canvas)
+	 * @return the time stamp of the trail recordset which is the closest one to xPos
+	 */
+	public long getAdjacentTimestamp(int xPos) {
+		if (this.settings.isXAxisReversed()) {
+			Entry<Long, Integer> previous = null;
+			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (previous != null && xPos < previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
+					return previous.getKey();
+				}
+				else if (xPos <= entry.getValue()) { // on the left 
+					return entry.getKey();
+				}
+				else {
+					previous = entry;
+				}
+			}
+			return previous.getKey();
+		}
+		else {
+			Entry<Long, Integer> previous = null;
+			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (previous != null && xPos > previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
+					return previous.getKey();
+				}
+				else if (xPos >= entry.getValue()) {
+					return entry.getKey();
+				}
+				else {
+					previous = entry;
+				}
+			}
+			return previous.getKey();
+		}
+	}
+
+	public String getSnappedTimestampText(int xPos) {
+		final Long timestamp = getSnappedTimestamp(xPos);
+		if (timestamp == null)
+			return null;
+		else
+			return ((TrailRecordSet) this.trailRecordSet).getFileNameTag(timestamp);
+	}
+
+	/**
+	 * @param xPos current position in the drawing area (relative to x0 which is the left position of the drawing canvas)
+	 * @return the x axis position of the time stamp which is the closest one to xPos
+	 */
+	public int getAdjacentXPos(int xPos) {
+	return getXPosTimestamp(getAdjacentTimestamp(xPos));
+	}
+	
 	public Density getDensity() {
 		return this.density;
 	}

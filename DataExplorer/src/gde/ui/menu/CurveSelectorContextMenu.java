@@ -130,7 +130,6 @@ public class CurveSelectorContextMenu {
 											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
 											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(false);
 											CurveSelectorContextMenu.this.timeGrid.setEnabled(false);
-											CurveSelectorContextMenu.this.measurement.setEnabled(false);
 											CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 										}
 										if (CurveSelectorContextMenu.this.recordSet.getDevice().getName().startsWith("Ultra")) {
@@ -1091,6 +1090,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.actualRecord != null && !CurveSelectorContextMenu.this.isRecordVisible) {
 						CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
 					}
 					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.simpleMeasure.getSelection() == true) {
 						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);
@@ -1112,6 +1112,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.actualRecord != null && !CurveSelectorContextMenu.this.isRecordVisible) {
 						CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
 					}
 					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.deltaMeasure.getSelection() == true) {
 						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);

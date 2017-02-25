@@ -1,11 +1,16 @@
 package gde.utils;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.TimeZone;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 
 /**
  * dates, times and durations in the format applicable for the user's locale and for the user's UTC setting.
@@ -23,14 +28,14 @@ public class LocalizedDateTime {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //$NON-NLS-1$
 		SimpleDateFormat sdfUTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
 
-		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdf.format(localTime)); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdf.format(localTime)); //$NON-NLS-1$ 
 		//		2017-01-06 13:00:25.791  2017/01/06 13:00:25
-		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime)); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime)); //$NON-NLS-1$ 
 		//		2017-01-06 13:00:25.791  2017-01-06T13:00:25Z
 
 		// print UTC
 		sdfUTC.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime) + "  " + sdfUTC.format(ts)); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime) + "  " + sdfUTC.format(ts)); //$NON-NLS-1$//$NON-NLS-2$ 
 		//		2017-01-06 13:00:25.791  2017-01-06T12:00:25Z  2017-01-06T12:00:25Z
 	}
 
@@ -48,8 +53,9 @@ public class LocalizedDateTime {
 		dd_HHmm(16, "dd HH:mm", "dd'T'HH:mm'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
 		HHmmssSSS(17, "HH:mm:ss.SSS", "HH:mm:ss.SSS'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
 		HHmmss(18, "HH:mm:ss", "HH:mm:ss'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
-		mmssSSS(19, "mm:ss.SSS", "mm:ss.SSS'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
-		ssSSS(20, "ss.SSS", "ss.SSS'Z'"); //$NON-NLS-1$ //$NON-NLS-2$
+		HHmm(19, "HH:mm", "HH:mm'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
+		mmssSSS(20, "mm:ss.SSS", "mm:ss.SSS'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
+		ssSSS(28, "ss.SSS", "ss.SSS'Z'"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		private final int			displaySequence;
 		private final String	userPattern;
@@ -84,6 +90,7 @@ public class LocalizedDateTime {
 
 	public enum DurationPattern {
 		yy_MM_dd_HH_mm_ss_SSS(0, "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss.SSS"), //$NON-NLS-1$ //$NON-NLS-2$
+		yy_MM_dd_HH_mm(2, "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
 		yy_MM_dd(6, "yy-MM-dd", "yy-MM-dd"), //$NON-NLS-1$ //$NON-NLS-2$
 		MM_dd_HH_mm_ss_SSS(9, "MM-dd HH:mm:ss.SSS", "MM-dd HH:mm:ss.SSSZ"), //$NON-NLS-1$ //$NON-NLS-2$
 		MM_dd_HH(13, "MM-dd HH", "MM-dd HH"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -92,17 +99,18 @@ public class LocalizedDateTime {
 		dd_HH_mm(16, "dd HH:mm", "dd HH:mm"), //$NON-NLS-1$ //$NON-NLS-2$
 		HH_mm_ss_SSS(17, "HH:mm:ss.SSS", "HH:mm:ss.SSS"), //$NON-NLS-1$ //$NON-NLS-2$
 		HH_mm_ss(18, "HH:mm:ss", "HH:mm:ss"), //$NON-NLS-1$ //$NON-NLS-2$
-		mm_ss_SSS(19, "mm:ss.SSS", "mm:ss.SSS"), //$NON-NLS-1$ //$NON-NLS-2$
-		ss_SSS(20, "ss.SSS", "ss.SSS"); //$NON-NLS-1$ //$NON-NLS-2$
+		HH_mm(19, "HH:mm", "HH:mm"), //$NON-NLS-1$ //$NON-NLS-2$
+		mm_ss_SSS(24, "mm:ss.SSS", "mm:ss.SSS"), //$NON-NLS-1$ //$NON-NLS-2$
+		ss_SSS(28, "ss.SSS", "ss.SSS"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		private final int			displaySequence;
-		private final String	userPattern;
-		private final String	userUtcPattern;
+		private final int										displaySequence;
+		private final String								userPattern;
+		private final String								userUtcPattern;
 
 		/**
 		 * use this to avoid repeatedly cloning actions instead of values()
 		 */
-		public final static DurationPattern						values[]		= values();
+		public final static DurationPattern	values[]	= values();
 
 		private DurationPattern(int displaySequence, String userPattern, String userUtcPattern) {
 			this.displaySequence = displaySequence;
@@ -130,12 +138,12 @@ public class LocalizedDateTime {
 			sdf.getTimeZone().setRawOffset(0);
 			return sdf;
 		}
-		
+
 		/**
 		 * @param dateTimePattern
 		 * @return the duration pattern which fits best to the datetime pattern
 		 */
-		public static DurationPattern get(DateTimePattern dateTimePattern ) {
+		public static DurationPattern get(DateTimePattern dateTimePattern) {
 			DurationPattern result = DurationPattern.dd_HH_mm;
 			for (DurationPattern durationPattern : DurationPattern.values) {
 				if (durationPattern.toString().equals(dateTimePattern.toString())) {
@@ -176,6 +184,24 @@ public class LocalizedDateTime {
 			throw new UnsupportedOperationException();
 		}
 		return formatPattern.getFormatter().format(duration_ms);
+	}
+
+	/**
+	 * @param timestamp1_ms
+	 * @param timestamp2_ms
+	 * @return the duration between the epoch timestamps ('dd HH:mm' preceded by the number of months if applicable) 
+	 */
+	public static String getFormatedDistance(long timestamp1_ms, long timestamp2_ms) {
+		if (Math.abs(timestamp1_ms - timestamp2_ms) > GDE.ONE_HOUR_MS * 24) {
+			Period y = Period.between(Instant.ofEpochMilli(timestamp2_ms).atZone(ZoneId.systemDefault()).toLocalDate(), Instant.ofEpochMilli(timestamp1_ms).atZone(ZoneId.systemDefault()).toLocalDate());
+			if (Math.abs(y.toTotalMonths()) > 0)
+				return String.format("%d%s %d%s", Math.abs(y.toTotalMonths()), Messages.getString(MessageIds.GDE_MSGT0868), Math.abs(y.getDays()), Messages.getString(MessageIds.GDE_MSGT0869)); //$NON-NLS-1$
+			else
+				return String.format("%d%s %s", Math.abs(y.getDays()), Messages.getString(MessageIds.GDE_MSGT0869), getFormatedDuration(DurationPattern.HH_mm, Math.abs(timestamp1_ms - timestamp2_ms))); //$NON-NLS-1$
+		}
+		else {
+			return getFormatedDuration(DurationPattern.HH_mm, Math.abs(timestamp1_ms - timestamp2_ms));
+		}
 	}
 
 }

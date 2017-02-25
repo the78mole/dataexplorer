@@ -18,7 +18,36 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Text;
+
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoSet;
@@ -31,59 +60,91 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.utils.HistoCurveUtils;
+import gde.ui.menu.TabAreaContextMenu;
 import gde.utils.GraphicsUtils;
+import gde.utils.HistoCurveUtils;
 import gde.utils.HistoTimeLine;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.StringHelper;
-import gde.utils.TimeLine;
-
-import java.util.Date;
-import java.util.Properties;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.GestureEvent;
-import org.eclipse.swt.events.GestureListener;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * curve definition table for the histo graphics window.
  * @author Thomas Eickert
  */
-public class HistoGraphicsComposite extends GraphicsComposite {
-	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+public class HistoGraphicsComposite extends Composite {
+	private final static String	$CLASS_NAME					= HistoGraphicsComposite.class.getName();
+	private final static Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	private final HistoSet			histoSet		= HistoSet.getInstance();
+	private final HistoSet			histoSet						= HistoSet.getInstance();
+	private final DataExplorer	application					= DataExplorer.getInstance();
+	private final Settings			settings						= Settings.getInstance();
+	private final Channels			channels						= Channels.getInstance();
+	private final HistoTimeLine	timeLine						= new HistoTimeLine();
+	private final SashForm			graphicSashForm;
+	private final int						windowType;
 
-	private final HistoTimeLine	timeLine		= new HistoTimeLine();
+	Menu												popupmenu;
+	TabAreaContextMenu					contextMenu;
+	Color												curveAreaBackground;
+	Color												surroundingBackground;
+	Color												curveAreaBorderColor;
+
+	// drawing canvas
+	Text												graphicsHeader;
+	Text												recordSetComment;
+
+	Canvas											graphicCanvas;
+	int													headerHeight				= 0;
+	int													headerGap						= 0;
+	int													commentHeight				= 0;
+	int													commentGap					= 0;
+	String											graphicsHeaderText, recordSetCommentText;
+	Point												oldSize							= new Point(0, 0);												// composite size - control resized
+
+	HashMap<String, Integer>		leftSideScales			= new HashMap<String, Integer>();
+	HashMap<String, Integer>		rightSideScales			= new HashMap<String, Integer>();
+	int													oldScopeLevel				= 0;
+	boolean											oldZoomLevel				= false;
+
+	// mouse actions
+	int													xDown								= 0;
+	int													xUp									= 0;
+	int													xLast								= 0;
+	int													yDown								= 0;
+	int													yUp									= 0;
+	int													yLast								= 0;
+	int													leftLast						= 0;
+	int													topLast							= 0;
+	int													rightLast						= 0;
+	int													bottomLast					= 0;
+	int													offSetX, offSetY;
+	Rectangle										canvasBounds;
+	Image												canvasImage;
+	GC													canvasImageGC;
+	GC													canvasGC;
+	Rectangle										curveAreaBounds			= new Rectangle(0, 0, 1, 1);
+
+	boolean											isLeftMouseMeasure	= false;
+	boolean											isRightMouseMeasure	= false;
+	int													xPosMeasure					= 0, yPosMeasure = 0;
+	int													xPosDelta						= 0, yPosDelta = 0;
 
 	HistoGraphicsComposite(final SashForm useParent) {
 		super(useParent, GraphicsWindow.TYPE_HISTO);
+		SWTResourceManager.registerResourceUser(this);
+		this.graphicSashForm = useParent;
+		this.windowType = GraphicsWindow.TYPE_HISTO;
+
+		//get the background colors
+		this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
+		this.surroundingBackground = this.settings.getGraphicsSurroundingBackground();
+		this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
+
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+
+		init();
 	}
 
 	void init() {
@@ -118,12 +179,6 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				case GraphicsWindow.TYPE_NORMAL:
 					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
-				case GraphicsWindow.TYPE_COMPARE:
-					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_91.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-				case GraphicsWindow.TYPE_UTIL:
-					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
 				}
 			}
 		});
@@ -132,72 +187,18 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 3, SWT.BOLD));
 			this.graphicsHeader.setBackground(this.surroundingBackground);
 			this.graphicsHeader.setMenu(this.popupmenu);
-			this.graphicsHeader.addHelpListener(new HelpListener() {
-				@Override
-				public void helpRequested(HelpEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.helpRequested " + evt); //$NON-NLS-1$
-					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
 			this.graphicsHeader.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					// System.out.println("width = " + GraphicsComposite.this.getSize().x);
-					if (HistoGraphicsComposite.this.windowType == GraphicsWindow.TYPE_UTIL) {
-						RecordSet utilitySet = HistoGraphicsComposite.this.application.getUtilitySet();
-						if (utilitySet != null) {
-							String tmpHeader = utilitySet.getRecordSetDescription();
-							if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
-								HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeader);
-							}
-						}
+					final String dataDirName = HistoGraphicsComposite.this.histoSet.getValidatedDataDir() != null ? HistoGraphicsComposite.this.histoSet.getValidatedDataDir().getFileName().toString()
+							: GDE.STRING_EMPTY;
+					final String importDirName = HistoGraphicsComposite.this.histoSet.getValidatedImportDir() != null ? HistoGraphicsComposite.this.histoSet.getValidatedImportDir().getFileName().toString()
+							: GDE.STRING_EMPTY;
+					final String tmpHeader = dataDirName.isEmpty() || importDirName.isEmpty() ? dataDirName + importDirName : dataDirName + GDE.STRING_EMPTY + GDE.STRING_PLUS + GDE.STRING_EMPTY + importDirName;
+					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
+						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeader);
 					}
-					else {
-						Channel activeChannel = HistoGraphicsComposite.this.channels.getActiveChannel();
-						if (activeChannel != null) {
-							RecordSet recordSet = activeChannel.getActiveRecordSet();
-							if (recordSet != null) {
-								String tmpDescription = activeChannel.getFileDescription();
-								if (tmpDescription.contains(":")) { //$NON-NLS-1$
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":")); //$NON-NLS-1$
-								}
-								if (tmpDescription.contains(";")) { //$NON-NLS-1$
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(";")); //$NON-NLS-1$
-								}
-								if (tmpDescription.contains("\r")) { //$NON-NLS-1$
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\r")); //$NON-NLS-1$
-								}
-								if (tmpDescription.contains("\n")) { //$NON-NLS-1$
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n")); //$NON-NLS-1$
-								}
-								String tmpHeader = tmpDescription + GDE.STRING_MESSAGE_CONCAT + recordSet.getName();
-								if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
-									HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeader);
-								}
-							}
-						}
-					}
-				}
-			});
-			this.graphicsHeader.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyPressed(KeyEvent e) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
-					HistoGraphicsComposite.this.isFileCommentChanged = true;
-				}
-			});
-			this.graphicsHeader.addFocusListener(new FocusListener() {
-				@Override
-				public void focusLost(FocusEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
-					HistoGraphicsComposite.this.isFileCommentChanged = false;
-					setFileComment();
-				}
-
-				@Override
-				public void focusGained(FocusEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -236,296 +237,6 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 					}
 				}
 			});
-			this.graphicCanvas.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyPressed(KeyEvent e) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyPressed() , event=" + e); //$NON-NLS-1$
-					if (HistoGraphicsComposite.this.isTransientZoom && !HistoGraphicsComposite.this.isTransientGesture) {
-						HistoGraphicsComposite.this.isResetZoomPosition = false;
-						Channel activeChannel = Channels.getInstance().getActiveChannel();
-						if (activeChannel != null) {
-							RecordSet recordSet = (HistoGraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
-									: HistoGraphicsComposite.this.application.getCompareSet();
-							if (HistoGraphicsComposite.this.canvasImage != null && recordSet != null) {
-
-								if (e.keyCode == 'x') {
-									// System.out.println("x-direction");
-									HistoGraphicsComposite.this.isZoomX = true;
-									HistoGraphicsComposite.this.isZoomY = false;
-								}
-								else if (e.keyCode == 'y') {
-									// System.out.println("y-direction");
-									HistoGraphicsComposite.this.isZoomY = true;
-									HistoGraphicsComposite.this.isZoomX = false;
-								}
-								else if (e.keyCode == '+' || e.keyCode == 0x100002b) {
-									// System.out.println("enlarge");
-
-									float boundsRelation = 1.0f * HistoGraphicsComposite.this.curveAreaBounds.width / HistoGraphicsComposite.this.curveAreaBounds.height;
-									Point point = new Point(HistoGraphicsComposite.this.canvasBounds.width / 2, HistoGraphicsComposite.this.canvasBounds.height / 2);
-									float mouseRelationX = 1.0f * point.x / HistoGraphicsComposite.this.curveAreaBounds.width * 2;
-									float mouseRelationY = 1.0f * point.y / HistoGraphicsComposite.this.curveAreaBounds.height * 2;
-									// System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
-
-									int xStart, xEnd, yMin, yMax;
-									if (HistoGraphicsComposite.this.isZoomX) {
-										xStart = (int) (50 * boundsRelation * mouseRelationX);
-										xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
-										yMin = 0;
-										yMax = HistoGraphicsComposite.this.curveAreaBounds.height - HistoGraphicsComposite.this.curveAreaBounds.y;
-									}
-									else if (HistoGraphicsComposite.this.isZoomY) {
-										xStart = 0;
-										xEnd = HistoGraphicsComposite.this.curveAreaBounds.width;
-										yMin = (int) (50 * (2 - mouseRelationY));
-										yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
-									}
-									else {
-										xStart = (int) (50 * boundsRelation * mouseRelationX);
-										xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
-										yMin = (int) (50 * (2 - mouseRelationY));
-										yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
-									}
-
-									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-									if (xEnd - xStart > 5 && yMax - yMin > 5) {
-										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-										redrawGraphics();
-									}
-								}
-								else if (e.keyCode == '-' || e.keyCode == 0x100002d) {
-									// System.out.println("reduce");
-									if (HistoGraphicsComposite.this.isTransientZoom && !HistoGraphicsComposite.this.isTransientGesture) {
-
-										float boundsRelation = 1.0f * HistoGraphicsComposite.this.curveAreaBounds.width / HistoGraphicsComposite.this.curveAreaBounds.height;
-										Point point = new Point(HistoGraphicsComposite.this.canvasBounds.width / 2, HistoGraphicsComposite.this.canvasBounds.height / 2);
-										float mouseRelationX = 1.0f * point.x / HistoGraphicsComposite.this.curveAreaBounds.width * 2;
-										float mouseRelationY = 1.0f * point.y / HistoGraphicsComposite.this.curveAreaBounds.height * 2;
-										// System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
-
-										int xStart, xEnd, yMin, yMax;
-										if (HistoGraphicsComposite.this.isZoomX) {
-											xStart = (int) (-50 * boundsRelation * mouseRelationX);
-											xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
-											yMin = 0;
-											yMax = HistoGraphicsComposite.this.curveAreaBounds.height - HistoGraphicsComposite.this.curveAreaBounds.y;
-										}
-										else if (HistoGraphicsComposite.this.isZoomY) {
-											xStart = 0;
-											xEnd = HistoGraphicsComposite.this.curveAreaBounds.width;
-											yMin = (int) (-50 * (2 - mouseRelationY));
-											yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
-										}
-										else {
-											xStart = (int) (-50 * boundsRelation * mouseRelationX);
-											xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
-											yMin = (int) (-50 * (2 - mouseRelationY));
-											yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
-										}
-
-										if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-										if (xEnd - xStart > 5 && yMax - yMin > 5) {
-											recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-											redrawGraphics();
-										}
-									}
-								}
-								else if (e.keyCode == 0x1000001) {
-									// System.out.println("move top direction");
-									recordSet.shift(0, -5); // 10% each direction
-									redrawGraphics(); // this.graphicCanvas.redraw();?
-								}
-								else if (e.keyCode == 0x1000002) {
-									// System.out.println("move bottom direction");
-									recordSet.shift(0, +5); // 10% each direction
-									redrawGraphics(); // this.graphicCanvas.redraw();?
-								}
-								else if (e.keyCode == 0x1000003) {
-									// System.out.println("move left direction");
-									recordSet.shift(+5, 0); // 10% each direction
-									redrawGraphics(); // this.graphicCanvas.redraw();?
-								}
-								else if (e.keyCode == 0x1000004) {
-									// System.out.println("move right direction");
-									recordSet.shift(-5, 0); // 10% each direction
-									redrawGraphics(); // this.graphicCanvas.redraw();?
-								}
-								else {
-									// System.out.println("x,y off");
-									HistoGraphicsComposite.this.isZoomX = HistoGraphicsComposite.this.isZoomY = false;
-								}
-							}
-						}
-					}
-				}
-
-				@Override
-				public void keyReleased(KeyEvent e) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyReleased() , event=" + e); //$NON-NLS-1$
-					// System.out.println("x,y off");
-					HistoGraphicsComposite.this.isZoomX = HistoGraphicsComposite.this.isZoomY = false;
-				}
-			});
-			this.graphicCanvas.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(MouseEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
-					if (HistoGraphicsComposite.this.isTransientZoom && !HistoGraphicsComposite.this.isTransientGesture) {
-						HistoGraphicsComposite.this.isResetZoomPosition = false;
-						Channel activeChannel = Channels.getInstance().getActiveChannel();
-						if (activeChannel != null) {
-							RecordSet recordSet = (HistoGraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
-									: HistoGraphicsComposite.this.application.getCompareSet();
-							if (HistoGraphicsComposite.this.canvasImage != null && recordSet != null) {
-
-								float boundsRelation = 1.0f * HistoGraphicsComposite.this.curveAreaBounds.width / HistoGraphicsComposite.this.curveAreaBounds.height;
-								Point point = checkCurveBounds(evt.x, evt.y);
-								float mouseRelationX = 1.0f * point.x / HistoGraphicsComposite.this.curveAreaBounds.width * 2;
-								float mouseRelationY = 1.0f * point.y / HistoGraphicsComposite.this.curveAreaBounds.height * 2;
-								// System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
-
-								int xStart, xEnd, yMin, yMax;
-								if (evt.count < 0) { // reduce
-									if (HistoGraphicsComposite.this.isZoomX) {
-										xStart = (int) (-50 * boundsRelation * mouseRelationX);
-										xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
-										yMin = 0;
-										yMax = HistoGraphicsComposite.this.curveAreaBounds.height - HistoGraphicsComposite.this.curveAreaBounds.y;
-									}
-									else if (HistoGraphicsComposite.this.isZoomY) {
-										xStart = 0;
-										xEnd = HistoGraphicsComposite.this.curveAreaBounds.width;
-										yMin = (int) (-50 * (2 - mouseRelationY));
-										yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
-									}
-									else {
-										xStart = (int) (-50 * boundsRelation * mouseRelationX);
-										xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
-										yMin = (int) (-50 * (2 - mouseRelationY));
-										yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
-									}
-								}
-								else { // enlarge
-									if (HistoGraphicsComposite.this.isZoomX) {
-										xStart = (int) (50 * boundsRelation * mouseRelationX);
-										xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
-										yMin = 0;
-										yMax = HistoGraphicsComposite.this.curveAreaBounds.height - HistoGraphicsComposite.this.curveAreaBounds.y;
-									}
-									else if (HistoGraphicsComposite.this.isZoomY) {
-										xStart = 0;
-										xEnd = HistoGraphicsComposite.this.curveAreaBounds.width;
-										yMin = (int) (50 * (2 - mouseRelationY));
-										yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
-									}
-									else {
-										xStart = (int) (50 * boundsRelation * mouseRelationX);
-										xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
-										yMin = (int) (50 * (2 - mouseRelationY));
-										yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
-									}
-								}
-								if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-								if (xEnd - xStart > 5 && yMax - yMin > 5) {
-									recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-									redrawGraphics();
-								}
-							}
-						}
-					}
-				}
-			});
-			this.graphicCanvas.addGestureListener(new GestureListener() {
-				@Override
-				public void gesture(GestureEvent evt) {
-					if (evt.detail == SWT.GESTURE_BEGIN) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "BEGIN = " + evt); //$NON-NLS-1$
-						HistoGraphicsComposite.this.isTransientGesture = true;
-					}
-					else if (evt.detail == SWT.GESTURE_MAGNIFY) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "MAGIFY = " + evt); //$NON-NLS-1$
-						if (HistoGraphicsComposite.this.isTransientGesture) {
-							HistoGraphicsComposite.this.isResetZoomPosition = false;
-							Channel activeChannel = Channels.getInstance().getActiveChannel();
-							if (activeChannel != null) {
-								RecordSet recordSet = (HistoGraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
-										: HistoGraphicsComposite.this.application.getCompareSet();
-								if (HistoGraphicsComposite.this.canvasImage != null && recordSet != null) {
-
-									float boundsRelation = 1.0f * HistoGraphicsComposite.this.curveAreaBounds.width / HistoGraphicsComposite.this.curveAreaBounds.height;
-									Point point = checkCurveBounds(evt.x, evt.y);
-									float mouseRelationX = 1.0f * point.x / HistoGraphicsComposite.this.curveAreaBounds.width * 2;
-									float mouseRelationY = 1.0f * point.y / HistoGraphicsComposite.this.curveAreaBounds.height * 2;
-									// System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
-
-									int xStart, xEnd, yMin, yMax;
-									if (evt.magnification < 1) { // reduce
-										if (HistoGraphicsComposite.this.isZoomX) {
-											xStart = (int) (-25 * boundsRelation * mouseRelationX);
-											xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width + 25 * boundsRelation * (2 - mouseRelationX));
-											yMin = 0;
-											yMax = HistoGraphicsComposite.this.curveAreaBounds.height - HistoGraphicsComposite.this.curveAreaBounds.y;
-										}
-										else if (HistoGraphicsComposite.this.isZoomY) {
-											xStart = 0;
-											xEnd = HistoGraphicsComposite.this.curveAreaBounds.width;
-											yMin = (int) (-25 * (2 - mouseRelationY));
-											yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height + 25 * mouseRelationY);
-										}
-										else {
-											xStart = (int) (-25 * boundsRelation * mouseRelationX);
-											xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width + 25 * boundsRelation * (2 - mouseRelationX));
-											yMin = (int) (-25 * (2 - mouseRelationY));
-											yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height + 25 * mouseRelationY);
-										}
-									}
-									else { // enlarge
-										if (HistoGraphicsComposite.this.isZoomX) {
-											xStart = (int) (25 * boundsRelation * mouseRelationX);
-											xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width - 25 * boundsRelation * (2 - mouseRelationX));
-											yMin = 0;
-											yMax = HistoGraphicsComposite.this.curveAreaBounds.height - HistoGraphicsComposite.this.curveAreaBounds.y;
-										}
-										else if (HistoGraphicsComposite.this.isZoomY) {
-											xStart = 0;
-											xEnd = HistoGraphicsComposite.this.curveAreaBounds.width;
-											yMin = (int) (25 * (2 - mouseRelationY));
-											yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height - 25 * mouseRelationY);
-										}
-										else {
-											xStart = (int) (25 * boundsRelation * mouseRelationX);
-											xEnd = (int) (HistoGraphicsComposite.this.curveAreaBounds.width - 25 * boundsRelation * (2 - mouseRelationX));
-											yMin = (int) (25 * (2 - mouseRelationY));
-											yMax = (int) (HistoGraphicsComposite.this.curveAreaBounds.height - 25 * mouseRelationY);
-										}
-									}
-									if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-									if (xEnd - xStart > 5 && yMax - yMin > 5) {
-										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-										redrawGraphics();
-									}
-								}
-							}
-						}
-					}
-					else if (evt.detail == SWT.GESTURE_PAN) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "PAN = " + evt); //$NON-NLS-1$
-						Channel activeChannel = Channels.getInstance().getActiveChannel();
-						if (activeChannel != null && HistoGraphicsComposite.this.isTransientGesture) {
-							RecordSet recordSet = (HistoGraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet()
-									: HistoGraphicsComposite.this.application.getCompareSet();
-							if (recordSet != null && HistoGraphicsComposite.this.canvasImage != null) {
-								recordSet.shift(evt.xDirection, -1 * evt.yDirection); // 10% each direction
-								redrawGraphics(); // this.graphicCanvas.redraw();?
-							}
-						}
-					}
-					else if (evt.detail == SWT.GESTURE_END) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "END = " + evt); //$NON-NLS-1$
-						HistoGraphicsComposite.this.isTransientGesture = false;
-					}
-				}
-			});
 			this.graphicCanvas.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
@@ -549,12 +260,6 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
-					if (HistoGraphicsComposite.this.channels.getActiveChannel() != null) {
-						RecordSet recordSet = HistoGraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-						if (recordSet != null && (HistoGraphicsComposite.this.recordSetCommentText == null || !recordSet.getRecordSetDescription().equals(HistoGraphicsComposite.this.recordSetCommentText))) {
-							HistoGraphicsComposite.this.recordSetComment.setText(HistoGraphicsComposite.this.recordSetCommentText = recordSet.getRecordSetDescription());
-						}
-					}
 				}
 			});
 
@@ -563,25 +268,6 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
-			this.recordSetComment.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyPressed(KeyEvent e) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.keyPressed() , event=" + e); //$NON-NLS-1$
-					HistoGraphicsComposite.this.isRecordCommentChanged = true;
-				}
-			});
-			this.recordSetComment.addFocusListener(new FocusListener() {
-				@Override
-				public void focusLost(FocusEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.focusLost() , event=" + evt); //$NON-NLS-1$
-					updateRecordSetComment();
-				}
-
-				@Override
-				public void focusGained(FocusEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.focusGained() , event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -606,46 +292,19 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		// get gc for other drawing operations
 		this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
 
-		RecordSet recordSet = null;
-		switch (this.windowType) {
-		case GraphicsWindow.TYPE_COMPARE:
-			if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
-				recordSet = this.application.getCompareSet();
-			}
-			break;
-
-		case GraphicsWindow.TYPE_UTIL:
-			if (this.application.getUtilitySet() != null && this.application.getUtilitySet().size() > 0) {
-				recordSet = this.application.getUtilitySet();
-			}
-			break;
-
-		default: // TYPE_NORMAL
-			if (this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getActiveRecordSet() != null) {
-				recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-			}
-			break;
-
-		case GraphicsWindow.TYPE_HISTO:
-			if (this.channels.getActiveChannel() != null) {
-				recordSet = this.histoSet.getTrailRecordSet();
-			}
-			break;
+		TrailRecordSet trailRecordSet = null;
+		if (this.channels.getActiveChannel() != null) {
+			trailRecordSet = this.histoSet.getTrailRecordSet();
 		}
-		if (recordSet != null && recordSet.realSize() > 0) {
-			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
+
+		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+			drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
-			recordSet.syncScaleOfSyncableRecords();
+			trailRecordSet.syncScaleOfSyncableRecords();
 
-			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
-				drawMeasurePointer(recordSet, HistoGraphicsComposite.MODE_MEASURE, true);
-			}
-			else if (this.isLeftCutMode) {
-				drawCutPointer(HistoGraphicsComposite.MODE_CUT_LEFT, true, false);
-			}
-			else if (this.isRightCutMode) {
-				drawCutPointer(HistoGraphicsComposite.MODE_CUT_RIGHT, false, true);
+			if (trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement()) || trailRecordSet.isDeltaMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
+				drawMeasurePointer(trailRecordSet, GraphicsComposite.MODE_MEASURE, true);
 			}
 		}
 		else
@@ -658,29 +317,18 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 
 	/**
 	 * method to draw the curves with it scales and defines the curve area
-	 * @param recordSet the record set to be drawn
+	 * @param trailRecordSet the record set to be drawn
 	 * @param bounds the bounds where the curves and scales are drawn
 	 * @param gc the graphics context to be used for the graphics operations
 	 */
-	private void drawCurves(RecordSet recordSet, Rectangle bounds, GC gc) {
+	private void drawCurves(TrailRecordSet trailRecordSet, Rectangle bounds, GC gc) {
 		long startInitTime = new Date().getTime();
-		// prime the record set regarding scope mode and/or zoom mode
-		if (this.isScopeMode) {
-			int offset = recordSet.get(0).realSize() - recordSet.getScopeModeSize();
-			if (offset < 1) {
-				recordSet.setScopeModeOffset(0);
-				recordSet.setScopeMode(false);
-			}
-			else {
-				recordSet.setScopeModeOffset(offset);
-				recordSet.setScopeMode(true);
-			}
-		}
 
 		// calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
-		for (Record tmpRecord : recordSet.getRecordsSortedForDisplay()) {
+		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
+			TrailRecord tmpRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
 				if (tmpRecord.isPositionLeft())
@@ -688,11 +336,6 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				else
 					numberCurvesRight++;
 			}
-		}
-		// correct scales and scale position according compare set requirements
-		if (recordSet.isCompareSet()) {
-			numberCurvesLeft = 1; // numberCurvesLeft > 0 ? 1 : 0;
-			numberCurvesRight = 0; // numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
 		}
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -708,7 +351,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		int horizontalGap = pt.x / 5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
+		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
 
@@ -728,17 +371,17 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		this.offSetX = x0;
 		this.offSetY = y0 - height;
 
-		if (((TrailRecordSet) recordSet).getRecordDataSize(true) != 0) {
+		if (trailRecordSet.getRecordDataSize(true) > 0) {
 			// draw curves for each active record
 			this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
-			recordSet.setDrawAreaBounds(this.curveAreaBounds);
+			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 
 			gc.setBackground(this.curveAreaBackground);
 			gc.fillRectangle(this.curveAreaBounds);
 			gc.setBackground(this.surroundingBackground);
 
-			this.timeLine.initialize(recordSet, width, ((TrailRecordSet) recordSet).getFirstTimeStamp_ms(), ((TrailRecordSet) recordSet).getLastTimeStamp_ms());
+			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getFirstTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
 			this.timeLine.drawTimeLine(gc, x0, y0);
 
 			// draw draw area bounding
@@ -751,7 +394,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			long startTime = new Date().getTime();
-			drawTrailRecordSet((TrailRecordSet) recordSet, gc, dataScaleWidth, x0, y0, width, height);
+			drawTrailRecordSet(trailRecordSet, gc, dataScaleWidth, x0, y0, width, height);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
@@ -770,7 +413,8 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		boolean isDrawNameInRecordColor = this.settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
 		trailRecordSet.updateSyncRecordScale();
-		for (Record actualRecord : trailRecordSet.getRecordsSortedForDisplay()) {
+		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
+			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (log.isLoggable(Level.FINE) && isActualRecordEnabled)
 				log.log(Level.FINE, "record=" + actualRecord.getName() + "  isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -785,12 +429,12 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				// gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				// gc.drawRectangle(x0, y0-height, width, height);
 				gc.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
-				if (((TrailRecord) actualRecord).isTrailSuite()) {
-					HistoCurveUtils.drawHistoSuite((TrailRecord) actualRecord, gc, x0, y0, width, height, this.timeLine);
+				if (actualRecord.isTrailSuite()) {
+					HistoCurveUtils.drawHistoSuite(actualRecord, gc, x0, y0, width, height, this.timeLine);
 				}
 				else {
 					// CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
-					HistoCurveUtils.drawHistoCurve((TrailRecord) actualRecord, gc, x0, y0, width, height, this.timeLine);
+					HistoCurveUtils.drawHistoCurve(actualRecord, gc, x0, y0, width, height, this.timeLine);
 				}
 				gc.setClipping(this.canvasBounds);
 			}
@@ -855,8 +499,6 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	 * updates the graphics canvas, while repeatable redraw calls it optimized to the required area
 	 */
 	synchronized void doRedrawGraphics() {
-		this.graphicsHeader.redraw();
-
 		if (!GDE.IS_LINUX) { // old code changed due to Mountain Lion refresh problems
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
 			Point size = this.graphicCanvas.getSize();
@@ -877,16 +519,17 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	}
 
 	/**
-	 * draw the start pointer for measurement modes
-	 * @param recordSet
+	 * draw the start pointer for measurement modes.
+	 * select only valid timestamps on the x axis.
+	 * @param trailRecordSet
 	 * @param mode
 	 * @param isRefresh
 	 */
-	public void drawMeasurePointer(RecordSet recordSet, int mode, boolean isRefresh) {
-		this.setModeState(mode); // cleans old pointer if required
+	public void drawMeasurePointer(TrailRecordSet trailRecordSet, int mode, boolean isRefresh) {
+		this.setModeState(mode); // cleans old pointer if required 
 
-		String measureRecordKey = recordSet.getRecordKeyMeasurement();
-		Record record = recordSet.get(measureRecordKey);
+		String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
+		TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(measureRecordKey);
 
 		// set the gc properties
 		this.canvasGC = new GC(this.graphicCanvas);
@@ -894,10 +537,12 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 		this.canvasGC.setLineStyle(SWT.LINE_DASH);
 		this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-		if (recordSet.isMeasurementMode(measureRecordKey)) {
+		clearOldMeasureLines(trailRecordSet, trailRecord);
+
+		if (trailRecordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
-			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
-			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
+			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.timeLine.getAdjacentXPos(this.curveAreaBounds.width / 4);
+			this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
@@ -905,20 +550,21 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 
 			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
 
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { record.getName(),
-					record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }));
+			String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
+			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { trailRecord.getName(),
+					trailRecord.getFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(), formattedTimeWithUnit }));
 		}
-		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
-			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
+		else if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
+			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.timeLine.getAdjacentXPos(this.curveAreaBounds.width / 4);
+			this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
 
 			// measure position
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			// delta position
-			this.xPosDelta = isRefresh ? this.xPosDelta : this.curveAreaBounds.width / 3 * 2;
-			this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
+			this.xPosDelta = isRefresh ? this.xPosDelta : this.timeLine.getAdjacentXPos(this.curveAreaBounds.width / 3 * 2);
+			this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
 
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
@@ -928,10 +574,13 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
-					new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds),
-							record.getUnit(), TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
-							record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
+			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+
+			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
+					new Object[] { trailRecord.getName(),
+							trailRecord.getDeltaAsFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)),
+									trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta))),
+							trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
 		}
 		this.canvasGC.dispose();
 	}
@@ -1071,6 +720,9 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 				this.recordSetComment.setText(this.recordSetCommentText);
 			}
+			else {
+				this.recordSetComment.setText(GDE.STRING_EMPTY);
+			}
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
 		catch (RuntimeException e) {
@@ -1084,49 +736,15 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	 * @param leftEnabled
 	 * @param rightEnabled
 	 */
+	@Deprecated
 	public void drawCutPointer(int mode, boolean leftEnabled, boolean rightEnabled) {
-		this.setModeState(mode); // cleans old pointer if required
-
-		// allow only get the record set to work with
-		boolean isGraphicsWindow = this.windowType == GraphicsWindow.TYPE_NORMAL;
-		if (isGraphicsWindow) {
-			// set the gc properties
-			this.canvasGC = new GC(this.graphicCanvas);
-			this.canvasGC.setLineWidth(1);
-			this.canvasGC.setLineStyle(SWT.LINE_SOLID);
-			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-
-			if (leftEnabled) {
-				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0258));
-				// cleanCutPointer();
-				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 1 / 4;
-				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
-				this.canvasGC.fillRectangle(0 + this.offSetX, 0 + this.offSetY, this.xPosCut, this.curveAreaBounds.height);
-				this.canvasGC.setAdvanced(false);
-				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
-			}
-			else if (rightEnabled) {
-				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0259));
-				// cleanCutPointer();
-				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 3 / 4;
-				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
-				this.canvasGC.fillRectangle(this.xPosCut + this.offSetX, 0 + this.offSetY, this.curveAreaBounds.width - this.xPosCut, this.curveAreaBounds.height);
-				this.canvasGC.setAdvanced(false);
-				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
-			}
-			else {
-				cleanCutPointer();
-			}
-		}
-		this.canvasGC.dispose();
 	}
 
 	/**
 	 * clean cutting edge pointer
 	 */
+	@Deprecated
 	public void cleanCutPointer() {
-		this.application.setStatusMessage(" "); //$NON-NLS-1$
-		eraseVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height, 2);
 	}
 
 	/**
@@ -1134,93 +752,33 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
 	public void setModeState(int mode) {
-		this.cleanMeasurementPointer();
 		switch (mode) {
-		case MODE_ZOOM:
-			this.isZoomMouse = true;
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = false;
-			this.isPanMouse = false;
-			this.isScopeMode = false;
-			break;
-		case MODE_MEASURE:
-			this.isZoomMouse = false;
+		case GraphicsComposite.MODE_MEASURE:
+			if (!this.isLeftMouseMeasure) this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = true;
 			this.isRightMouseMeasure = false;
-			this.isPanMouse = false;
-			this.isScopeMode = false;
 			break;
-		case MODE_MEASURE_DELTA:
-			this.isZoomMouse = false;
+		case GraphicsComposite.MODE_MEASURE_DELTA:
+			if (!this.isRightMouseMeasure) this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = true;
-			this.isPanMouse = false;
-			this.isScopeMode = false;
 			break;
-		case MODE_PAN:
-			this.isZoomMouse = false;
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = false;
-			this.isPanMouse = true;
-			this.isScopeMode = false;
-			break;
-		case MODE_CUT_LEFT:
-			this.isZoomMouse = false;
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = false;
-			this.isPanMouse = false;
-			this.isLeftCutMode = true;
-			this.isRightCutMode = false;
-			this.isScopeMode = false;
-			break;
-		case MODE_CUT_RIGHT:
-			this.isZoomMouse = false;
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = false;
-			this.isPanMouse = false;
-			this.isLeftCutMode = false;
-			this.isRightCutMode = true;
-			this.isScopeMode = false;
-			break;
-		case MODE_SCOPE:
-			this.isZoomMouse = false;
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = false;
-			this.isPanMouse = false;
-			this.isLeftCutMode = false;
-			this.isRightCutMode = false;
-			this.isScopeMode = true;
-			break;
-		case MODE_RESET:
+		case GraphicsComposite.MODE_RESET:
 		default:
-			this.isZoomMouse = false;
+			this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
-			this.isPanMouse = false;
-			this.isLeftCutMode = false;
-			this.isRightCutMode = false;
-			this.isScopeMode = false;
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
-			this.xPosCut = -1;
 			this.xLast = 0;
 			this.yLast = 0;
 			this.leftLast = 0;
 			this.topLast = 0;
 			this.rightLast = 0;
 			this.bottomLast = 0;
-			updatePanMenueButton();
 			// updateCutModeButtons();
 			this.application.getMenuToolBar().resetZoomToolBar();
 			break;
 		}
-	}
-
-	/**
-	 * 
-	 */
-	private void updatePanMenueButton() {
-		this.application.getMenuBar().enablePanButton(this.isZoomMouse || this.isPanMouse);
-		this.application.getMenuToolBar().enablePanButton(this.isZoomMouse || this.isPanMouse);
 	}
 
 	/**
@@ -1251,72 +809,24 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	void mouseMoveAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
-			if (recordSet != null && this.canvasImage != null) {
+			TrailRecordSet trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+			if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0 && this.canvasImage != null) {
 				this.canvasGC = new GC(this.graphicCanvas);
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
 
-				String measureRecordKey = recordSet.getRecordKeyMeasurement();
+				String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
 				this.canvasGC.setLineWidth(1);
 				this.canvasGC.setLineStyle(SWT.LINE_DASH);
 
 				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
 					try {
-						if (this.isZoomMouse && recordSet.isZoomMode() && this.isResetZoomPosition) {
-							if (log.isLoggable(Level.FINER))
-								log.log(Level.FINER, String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", this.xDown, evt.x, this.xLast, this.yDown, evt.y, this.yLast)); //$NON-NLS-1$
+						if (this.isLeftMouseMeasure) {
+							TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
+							clearOldMeasureLines(trailRecordSet, trailRecord);
 
-							// clean obsolete rectangle
-							int left = this.xLast - this.xDown > 0 ? this.xDown : this.xLast;
-							int top = this.yLast - this.yDown > 0 ? this.yDown : this.yLast;
-							int width = this.xLast - this.xDown > 0 ? this.xLast - this.xDown : this.xDown - this.xLast;
-							int height = this.yLast - this.yDown > 0 ? this.yLast - this.yDown : this.yDown - this.yLast;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "clean left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							eraseHorizontalLine(top, left, width + 1, 1);
-							eraseVerticalLine(left, top, height + 1, 1);
-							eraseHorizontalLine(top + height, left + 1, width, 1);
-							eraseVerticalLine(left + width, top + 1, height, 1);
-
-							left = evt.x - this.xDown > 0 ? this.xDown + this.offSetX : evt.x + this.offSetX;
-							top = evt.y - this.yDown > 0 ? this.yDown + this.offSetY : evt.y + this.offSetY;
-							width = evt.x - this.xDown > 0 ? evt.x - this.xDown : this.xDown - evt.x;
-							height = evt.y - this.yDown > 0 ? evt.y - this.yDown : this.yDown - evt.y;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw  left = " + (left - this.offSetX) + " top = " + (top - this.offSetY) + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							this.canvasGC.drawRectangle(left, top, width, height);
-
-							// detect directions to enable zoom or reset
-							if (this.xDown < evt.x) { // left -> right
-								// System.out.println("left -> right -> zoom selected area");
-								this.isTransientZoom = true;
-							}
-							if (this.xDown > evt.x) { // right -> left
-								// System.out.println("right -> left -> zoom reset");
-								this.isTransientZoom = false;
-							}
-
-							this.xLast = evt.x;
-							this.yLast = evt.y;
-						}
-						else if (this.isLeftMouseMeasure) {
-							Record record = recordSet.getRecord(measureRecordKey);
-							// clear old measure lines
-							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
-							// no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
-
-							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-								// clear old delta measure lines
-								eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-								// no change don't needs to be calculated, but the calculation limits to bounds
-								this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
-								eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-
-								// clean obsolete rectangle of connecting line
-								cleanConnectingLineObsoleteRectangle();
-
+							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 								this.canvasGC.setLineStyle(SWT.LINE_DASH);
 								drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
@@ -1324,44 +834,32 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 							}
 							// all obsolete lines are cleaned up now draw new position marker
-							this.xPosMeasure = evt.x; // evt.x is already relative to curve area
+							this.xPosMeasure = this.timeLine.getAdjacentXPos(evt.x); // evt.x is already relative to curve area
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
+							this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
+							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
 									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 								}
-								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
-										new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212),
-												record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(),
-												TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
-												record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
+								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
+										new Object[] { trailRecord.getName(),
+												trailRecord.getDeltaAsFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)),
+														trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta))),
+												trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
 							}
 							else {
 								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-								this.application.setStatusMessage(
-										Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds),
-												record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }));
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256,
+										new Object[] { trailRecord.getName(), trailRecord.getFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(),
+												LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure)) }));
 							}
 						}
 						else if (this.isRightMouseMeasure) {
-							Record record = recordSet.getRecord(measureRecordKey);
-							// clear old delta measure lines
-							eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-							// no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-							eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-
-							// clear old measure lines
-							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
-							// no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
-							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
-
-							// clean obsolete rectangle of connecting line
-							cleanConnectingLineObsoleteRectangle();
+							TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
+							clearOldMeasureLines(trailRecordSet, trailRecord);
 
 							// always needs to draw measurement pointer
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
@@ -1369,11 +867,11 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 							// update the new delta position
-							this.xPosDelta = evt.x; // evt.x is already relative to curve area
+							this.xPosDelta = this.timeLine.getAdjacentXPos(evt.x); // evt.x is already relative to curve area
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 							this.canvasGC.setLineStyle(SWT.LINE_DASH);
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
-							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
+							this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
 							drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
 
 							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
@@ -1382,78 +880,19 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
-									new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds),
-											record.getUnit(), TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
-											record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
-						}
-						else if (this.isPanMouse) {
-							this.xDeltaPan = (this.xLast != 0 && this.xLast != evt.x) ? (this.xDeltaPan + (this.xLast < evt.x ? -1 : 1)) : 0;
-							this.yDeltaPan = (this.yLast != 0 && this.yLast != evt.y) ? (this.yDeltaPan + (this.yLast < evt.y ? 1 : -1)) : 0;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, " xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan); //$NON-NLS-1$ //$NON-NLS-2$
-							if ((this.xDeltaPan != 0 && this.xDeltaPan % 5 == 0) || (this.yDeltaPan != 0 && this.yDeltaPan % 5 == 0)) {
-								recordSet.shift(this.xDeltaPan, this.yDeltaPan); // 10% each direction
-								this.redrawGraphics(); // this.graphicCanvas.redraw();?
-								this.xDeltaPan = this.yDeltaPan = 0;
-							}
-							this.xLast = evt.x;
-							this.yLast = evt.y;
-						}
-						else if (this.isLeftCutMode) {
-							// clear old cut area
-							if (evt.x < this.xPosCut) {
-								this.canvasGC.drawImage(this.canvasImage, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY,
-										this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
-							}
-							else { // evt.x > this.xPosCut
-								this.canvasGC.drawImage(this.canvasImage, this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height, this.xPosCut + this.offSetX, this.offSetY,
-										evt.x - this.xPosCut, this.curveAreaBounds.height);
-								this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
-								this.canvasGC.fillRectangle(this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height);
-								this.canvasGC.setAdvanced(false);
-							}
-							this.xPosCut = evt.x;
-							this.canvasGC.setLineStyle(SWT.LINE_SOLID);
-							drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
-						}
-						else if (this.isRightCutMode) {
-							// clear old cut lines
-							if (evt.x > this.xPosCut) {
-								this.canvasGC.drawImage(this.canvasImage, this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height, this.offSetX + this.xPosCut, this.offSetY,
-										evt.x - this.xPosCut, this.curveAreaBounds.height);
-							}
-							else { // evt.x < this.xPosCut
-								this.canvasGC.drawImage(this.canvasImage, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY,
-										this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
-								this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
-								this.canvasGC.fillRectangle(evt.x + this.offSetX, 0 + this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
-								this.canvasGC.setAdvanced(false);
-							}
-							this.xPosCut = evt.x;
-							this.canvasGC.setLineStyle(SWT.LINE_SOLID);
-							drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
+							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
+									new Object[] { trailRecord.getName(),
+											trailRecord.getDeltaAsFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)),
+													trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta))),
+											trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
 						}
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, "mouse pointer out of range", e); //$NON-NLS-1$
 					}
 				}
-				else if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey))) {
+				else if (measureRecordKey != null && (trailRecordSet.isMeasurementMode(measureRecordKey) || trailRecordSet.isDeltaMeasurementMode(measureRecordKey))) {
 					if (this.xPosMeasure + 1 >= evt.x && this.xPosMeasure - 1 <= evt.x || this.xPosDelta + 1 >= evt.x && this.xPosDelta - 1 <= evt.x) { // snap mouse pointer
-						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
-					}
-					else {
-						this.graphicCanvas.setCursor(this.application.getCursor());
-					}
-				}
-				else if (this.isZoomMouse && !this.isPanMouse) {
-					this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_CROSS));
-				}
-				else if (this.isPanMouse) {
-					this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/Hand.gif")); //$NON-NLS-1$
-				}
-				else if (this.isLeftCutMode || this.isRightCutMode) {
-					if (this.xPosCut + 1 >= evt.x && this.xPosCut - 1 <= evt.x) { // snap mouse pointer
 						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
 					}
 					else {
@@ -1462,6 +901,14 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 				}
 				else {
 					this.graphicCanvas.setCursor(this.application.getCursor());
+					String text = String.valueOf(evt.x) + "|" + String.valueOf(evt.y) + "|" + this.timeLine.getAdjacentTimestamp(evt.x) + "|" + this.timeLine.getSnappedTimestampText(evt.x); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY) {
+						if (!(text.equals(this.graphicCanvas.getToolTipText()))) {
+							this.graphicCanvas.setToolTipText(text);
+						}
+					}
+					else
+						this.graphicCanvas.setToolTipText(null);
 				}
 				this.canvasGC.dispose();
 			}
@@ -1474,28 +921,21 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	void mouseDownAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
-			if (this.canvasImage != null && recordSet != null) {
-				String measureRecordKey = recordSet.getRecordKeyMeasurement();
+			TrailRecordSet trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+				String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xDown = point.x;
 				this.yDown = point.y;
 
-				if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey)) && this.xPosMeasure + 1 >= this.xDown
+				if (measureRecordKey != null && (trailRecordSet.isMeasurementMode(measureRecordKey) || trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) && this.xPosMeasure + 1 >= this.xDown
 						&& this.xPosMeasure - 1 <= this.xDown) { // snap mouse pointer
 					this.isLeftMouseMeasure = true;
 					this.isRightMouseMeasure = false;
 				}
-				else if (measureRecordKey != null && recordSet.isDeltaMeasurementMode(measureRecordKey) && this.xPosDelta + 1 >= this.xDown && this.xPosDelta - 1 <= this.xDown) { // snap mouse pointer
+				else if (measureRecordKey != null && trailRecordSet.isDeltaMeasurementMode(measureRecordKey) && this.xPosDelta + 1 >= this.xDown && this.xPosDelta - 1 <= this.xDown) { // snap mouse pointer
 					this.isRightMouseMeasure = true;
 					this.isLeftMouseMeasure = false;
-				}
-				else if (!this.isPanMouse && !this.isLeftCutMode && !this.isRightCutMode) {
-					if (!this.isZoomMouse) // setting zoom mode is only required at the beginning of zoom actions, it will reset scale values to initial values
-						this.application.setGraphicsMode(HistoGraphicsComposite.MODE_ZOOM, true);
-					this.xLast = this.xDown;
-					this.yLast = this.yDown;
-					this.isResetZoomPosition = true;
 				}
 				else {
 					this.isLeftMouseMeasure = false;
@@ -1512,48 +952,13 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	void mouseUpAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
-			if (this.canvasImage != null && recordSet != null) {
+			TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xUp = point.x;
 				this.yUp = point.y;
 
-				if (this.isZoomMouse) {
-					if (this.isTransientZoom) {
-						this.isResetZoomPosition = false;
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.isZoomMouse + " - " + recordSet.isZoomMode() + " - " + this.isResetZoomPosition); //$NON-NLS-1$ //$NON-NLS-2$
-
-						// sort the zoom values
-						int xStart, xEnd, yMin, yMax;
-						if (this.isZoomX) {
-							xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
-							xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp;
-							yMin = 0;
-							yMax = this.curveAreaBounds.height - this.curveAreaBounds.y;
-						}
-						else if (this.isZoomY) {
-							xStart = 0;
-							xEnd = this.curveAreaBounds.width;
-							yMin = this.curveAreaBounds.height - (this.yDown > this.yUp ? this.yDown : this.yUp);
-							yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
-						}
-						else {
-							xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
-							xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp;
-							yMin = this.curveAreaBounds.height - (this.yDown > this.yUp ? this.yDown : this.yUp);
-							yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
-						}
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-						if (xEnd - xStart > 5 && yMax - yMin > 5) {
-							recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-							this.redrawGraphics(); // this.graphicCanvas.redraw();
-						}
-					}
-					else {
-						this.application.setGraphicsMode(HistoGraphicsComposite.MODE_RESET, false);
-					}
-				}
-				else if (this.isLeftMouseMeasure) {
+				if (this.isLeftMouseMeasure) {
 					this.isLeftMouseMeasure = false;
 					// application.setStatusMessage(GDE.STRING_EMPTY);
 				}
@@ -1561,27 +966,7 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 					this.isRightMouseMeasure = false;
 					// application.setStatusMessage(GDE.STRING_EMPTY);
 				}
-				else if (this.isLeftCutMode) {
-					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGT0260))) {
-						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), true);
-						recordSet.setRecalculationRequired();
-						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
-						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
-						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						setModeState(HistoGraphicsComposite.MODE_RESET);
-					}
-				}
-				else if (this.isRightCutMode) {
-					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGT0260))) {
-						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), false);
-						recordSet.setRecalculationRequired();
-						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
-						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
-						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						setModeState(HistoGraphicsComposite.MODE_RESET);
-					}
-				}
-				updatePanMenueButton();
+				// updatePanMenueButton();
 				// updateCutModeButtons();
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -1592,24 +977,8 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	 * check if cut mode can be activated
 	 * @param recordSet
 	 */
+	@Deprecated
 	void updateCutModeButtons() {
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
-					: (this.windowType == GraphicsWindow.TYPE_COMPARE) ? this.application.getCompareSet() : this.application.getUtilitySet();
-			if (this.canvasImage != null && recordSet != null) {
-				//
-				if (recordSet.isCutLeftEdgeEnabled()) {
-					this.application.getMenuToolBar().enableCutButtons(true, false);
-				}
-				else if (recordSet.isCutRightEdgeEnabled()) {
-					this.application.getMenuToolBar().enableCutButtons(false, true);
-				}
-				else {
-					this.application.getMenuToolBar().enableCutButtons(false, false);
-				}
-			}
-		}
 	}
 
 	/**
@@ -1651,14 +1020,11 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 
 	public void clearHeaderAndComment() {
 		if (HistoGraphicsComposite.this.channels.getActiveChannel() != null) {
-			RecordSet recordSet = HistoGraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-			if (recordSet == null) {
-				HistoGraphicsComposite.this.recordSetComment.setText(GDE.STRING_EMPTY);
-				HistoGraphicsComposite.this.graphicsHeader.setText(GDE.STRING_EMPTY);
-				HistoGraphicsComposite.this.graphicsHeaderText = null;
-				HistoGraphicsComposite.this.recordSetCommentText = null;
-				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-			}
+			HistoGraphicsComposite.this.recordSetComment.setText(GDE.STRING_EMPTY);
+			HistoGraphicsComposite.this.graphicsHeader.setText(GDE.STRING_EMPTY);
+			HistoGraphicsComposite.this.graphicsHeaderText = null;
+			HistoGraphicsComposite.this.recordSetCommentText = null;
+			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 			updateCaptions();
 		}
 	}
@@ -1695,141 +1061,73 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 	/**
 	 * @return the isRecordCommentChanged
 	 */
+	@Deprecated
 	public boolean isRecordCommentChanged() {
-		return this.isRecordCommentChanged;
+		return false;
 	}
 
+	@Deprecated
 	public void updateRecordSetComment() {
-		Channel activeChannel = HistoGraphicsComposite.this.channels.getActiveChannel();
-		if (activeChannel != null) {
-			RecordSet recordSet = activeChannel.getActiveRecordSet();
-			if (recordSet != null) {
-				if (this.isRecordCommentChanged) {
-					recordSet.setRecordSetDescription(HistoGraphicsComposite.this.recordSetComment.getText());
-					recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-				}
-				else {
-					this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-					this.recordSetComment.setText(this.recordSetCommentText = recordSet.getRecordSetDescription());
-					String graphicsHeaderExtend = this.graphicsHeaderText == null ? GDE.STRING_MESSAGE_CONCAT + recordSet.getName() : this.graphicsHeaderText.substring(11);
-					this.graphicsHeader.setText(this.graphicsHeaderText = String.format("%s %s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd, recordSet.getStartTimeStamp()), graphicsHeaderExtend)); //$NON-NLS-1$ 
-					this.graphicsHeader.redraw();
-				}
-				this.isRecordCommentChanged = false;
-			}
-		}
+		String graphicsHeaderExtend = this.graphicsHeaderText == null ? "ET22" : this.graphicsHeaderText; //$NON-NLS-1$
+		this.graphicsHeader.setText(this.graphicsHeaderText = graphicsHeaderExtend);
+		this.graphicsHeader.redraw();
 	}
 
 	/**
-	 * @return the graphic window content as image - only if compare window is visible return the compare window graphics
+	 * @return the graphic window content as image 
 	 */
 	public Image getGraphicsPrintImage() {
 		Image graphicsImage = null;
 		int graphicsHeight = 30 + this.canvasBounds.height + 40;
-		// decide if normal graphics window or compare window should be copied
-		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
-			RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
-			int numberCompareSetRecords = compareRecordSet.size();
-			graphicsHeight = 30 + this.canvasBounds.height + 10 + numberCompareSetRecords * 20;
-			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
-			GC graphicsGC = new GC(graphicsImage);
-			graphicsGC.setBackground(this.surroundingBackground);
-			graphicsGC.setForeground(this.graphicsHeader.getForeground());
-			graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-			graphicsGC.setFont(this.graphicsHeader.getFont());
-			GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.GDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
-			graphicsGC.setFont(this.recordSetComment.getFont());
-			for (int i = 0, yPos = 30 + this.canvasBounds.height + 5; i < numberCompareSetRecords; ++i, yPos += 20) {
-				Record compareRecord = compareRecordSet.get(i);
-				if (compareRecord != null) {
-					graphicsGC.setForeground(compareRecord.getColor());
-					String recordName = "--- " + compareRecord.getName(); //$NON-NLS-1$
-					GraphicsUtils.drawText(recordName, 20, yPos, graphicsGC, SWT.HORIZONTAL);
-					graphicsGC.setForeground(this.recordSetComment.getForeground());
-					String description = compareRecord.getDescription();
-					description = description.contains("\n") ? description.substring(0, description.indexOf("\n")) : description; //$NON-NLS-1$ //$NON-NLS-2$
-					Point pt = graphicsGC.textExtent(recordName); // string dimensions
-					GraphicsUtils.drawText(description, pt.x + 30, yPos, graphicsGC, SWT.HORIZONTAL);
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+			if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+				if (this.canvasImage != null) this.canvasImage.dispose();
+				this.canvasImage = new Image(GDE.display, this.canvasBounds);
+				this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
+				this.canvasImageGC.setBackground(this.surroundingBackground);
+				this.canvasImageGC.fillRectangle(this.canvasBounds);
+				this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
+				drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
+				graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
+				GC graphicsGC = new GC(graphicsImage);
+				graphicsGC.setForeground(this.graphicsHeader.getForeground());
+				graphicsGC.setBackground(this.surroundingBackground);
+				graphicsGC.setFont(this.graphicsHeader.getFont());
+				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
+				if (this.graphicsHeader.getText().length() > 1) {
+					GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 				}
-			}
-			graphicsGC.drawImage(this.canvasImage, 0, 30);
-			graphicsGC.dispose();
-		}
-		else if (this.windowType == GraphicsWindow.TYPE_UTIL) {
-			graphicsHeight = 30 + this.canvasBounds.height;
-			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
-			GC graphicsGC = new GC(graphicsImage);
-			graphicsGC.setBackground(this.surroundingBackground);
-			graphicsGC.setForeground(this.graphicsHeader.getForeground());
-			graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-			graphicsGC.setFont(this.graphicsHeader.getFont());
-			GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
-			graphicsGC.drawImage(this.canvasImage, 0, 30);
-			graphicsGC.dispose();
-		}
-		else {
-			Channel activeChannel = this.channels.getActiveChannel();
-			if (activeChannel != null) {
-				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-				if (activeRecordSet != null) {
-					if (this.canvasImage != null) this.canvasImage.dispose();
-					this.canvasImage = new Image(GDE.display, this.canvasBounds);
-					this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
-					this.canvasImageGC.setBackground(this.surroundingBackground);
-					this.canvasImageGC.fillRectangle(this.canvasBounds);
-					this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
-					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
-					graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
-					GC graphicsGC = new GC(graphicsImage);
-					graphicsGC.setForeground(this.graphicsHeader.getForeground());
-					graphicsGC.setBackground(this.surroundingBackground);
-					graphicsGC.setFont(this.graphicsHeader.getFont());
-					graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-					if (this.graphicsHeader.getText().length() > 1) {
-						GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
-					}
-					graphicsGC.setFont(this.recordSetComment.getFont());
-					if (this.recordSetComment.getText().length() > 1) {
-						GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
-					}
-					graphicsGC.drawImage(this.canvasImage, 0, 30);
-					graphicsGC.dispose();
-					this.canvasGC.dispose();
-					this.canvasImageGC.dispose();
+				graphicsGC.setFont(this.recordSetComment.getFont());
+				if (this.recordSetComment.getText().length() > 1) {
+					GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
 				}
+				graphicsGC.drawImage(this.canvasImage, 0, 30);
+				graphicsGC.dispose();
+				this.canvasGC.dispose();
+				this.canvasImageGC.dispose();
 			}
 		}
 		return graphicsImage;
 	}
 
+	@Deprecated
 	public void setFileComment() {
-		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null) {
-			String fileComment = this.graphicsHeader.getText();
-			if (fileComment.indexOf(GDE.STRING_MESSAGE_CONCAT) > 1) {
-				fileComment = fileComment.substring(0, fileComment.indexOf(GDE.STRING_MESSAGE_CONCAT));
-			}
-			else {
-				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-				if (activeRecordSet != null && fileComment.indexOf(activeRecordSet.getName()) > 1) {
-					fileComment = fileComment.substring(0, fileComment.indexOf(activeRecordSet.getName()));
-				}
-			}
-			activeChannel.setFileDescription(fileComment);
-			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-		}
 	}
 
 	private String getSelectedMeasurementsAsTable() {
 		Properties displayProps = this.settings.getMeasurementDisplayProperties();
-		RecordSet activeRecordSet = this.application.getActiveRecordSet();
-		if (activeRecordSet != null) {
-			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE + 1, SWT.BOLD)); //$NON-NLS-1$
-			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecords();
-			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
-			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET)))); //$NON-NLS-1$
-			for (Record record : records) {
+		TrailRecordSet trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
+			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
+
+			final long timestamp_ms = this.timeLine.getAdjacentTimestamp(this.xPosMeasure);
+			StringBuilder sb = new StringBuilder().append(String.format("%-17s", Messages.getString(MessageIds.GDE_MSGT0652))); //$NON-NLS-1$
+			for (int i = 0; i < records.size(); i++) {
+				TrailRecord record = (TrailRecord) records.get(i);
 				if (displayProps.getProperty(record.getName()) != null)
 					sb.append(String.format("|%-10s", displayProps.getProperty(record.getName()))); //$NON-NLS-1$
 				else {
@@ -1839,13 +1137,34 @@ public class HistoGraphicsComposite extends GraphicsComposite {
 					sb.append(String.format(format, name, unit));
 				}
 			}
-			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET) - 1))); //$NON-NLS-1$ //$NON-NLS-2$
-			for (Record record : records) {
-				sb.append(String.format("|%7s   ", record.getVerticalDisplayPointAsFormattedScaleValue(record.getVerticalDisplayPointValue(this.xPosMeasure), this.curveAreaBounds))); //$NON-NLS-1$
+			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%-17s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms))); //$NON-NLS-1$ //$NON-NLS-2$
+			int index = trailRecordSet.getIndex(timestamp_ms);
+			for (int i = 0; i < records.size(); i++) {
+				TrailRecord record = (TrailRecord) records.get(i);
+				sb.append(String.format("|%7s   ", record.getFormattedScaleValue(index))); //$NON-NLS-1$
 			}
 			return sb.append("|").toString(); //$NON-NLS-1$
 		}
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		return this.recordSetCommentText != null ? this.recordSetCommentText : GDE.STRING_EMPTY;
 	}
+
+	/**
+	 * @param trailRecordSet
+	 * @param trailRecord
+	 */
+	private void clearOldMeasureLines(TrailRecordSet trailRecordSet, TrailRecord trailRecord) {
+		eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
+		// no change don't needs to be calculated, but the calculation limits to bounds
+		this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
+		eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
+
+		eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
+		// no change don't needs to be calculated, but the calculation limits to bounds
+		this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
+		eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+
+		cleanConnectingLineObsoleteRectangle();
+	}
+
 }

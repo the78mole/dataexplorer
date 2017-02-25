@@ -19,6 +19,7 @@
 
 package gde.data;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.device.IDevice;
@@ -38,6 +40,8 @@ import gde.device.TrailTypes;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
+import gde.utils.StringHelper;
+import gde.utils.TimeLine;
 
 /**
  * holds histo data points of one measurement or settlement; score points are a third option.
@@ -60,6 +64,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	private List<String>					applicableTrailsTexts;																	// the user may select one of these entries
 	private List<Integer>					applicableTrailsOrdinals;																// maps all applicable trails in order to convert the user selection into a valid trail
 	private TrailRecord[]					trailRecordSuite;																				// holds data points in case of trail suites
+	private double								factor									= Double.MIN_VALUE;
+	private double								offset									= Double.MIN_VALUE;
+	private double								reduction								= Double.MIN_VALUE;
 
 	/**
 	 * creates a vector for a measurementType to hold data points.
@@ -284,17 +291,14 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		String[] dataTableRow = new String[masterRecord.size() + 2];
 		dataTableRow[0] = getHistoTableRowText().intern();
 		dataTableRow[1] = this.getTrailText().intern();
-		double factor = getFactor();
-		double offset = getOffset();
-		double reduction = getReduction();
 		if (!this.isTrailSuite()) {
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++)
-					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? this.getDecimalFormat().format((masterRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR;
+					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? masterRecord.getFormattedTableValue(i) : GDE.STRING_STAR;
 			}
 			else {
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? this.getDecimalFormat().format((masterRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR;
+					dataTableRow[i + 2] = masterRecord.realRealGet(j) != null ? masterRecord.getFormattedTableValue(j) : GDE.STRING_STAR;
 			}
 		}
 		else if (this.isBoxPlotSuite()) {
@@ -305,11 +309,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0; i < masterRecord.size(); i++) {
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? lowerWhiskerRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-						sb.append(delimiter)
-								.append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? medianRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
+						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? upperWhiskerRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
@@ -318,11 +321,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(lowerWhiskerRecord.realRealGet(j) != null ? lowerWhiskerRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? this.getDecimalFormat().format((medianRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-						sb.append(delimiter)
-								.append(upperWhiskerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperWhiskerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter).append(medianRecord.realRealGet(j) != null ? medianRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
+						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(j) != null ? upperWhiskerRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -335,10 +337,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0; i < masterRecord.size(); i++) {
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(lowerRecord.realRealGet(i) != null ? lowerRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(i) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? middleRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
+						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? upperRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
@@ -347,10 +349,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerRecord.realRealGet(i) != null ? this.getDecimalFormat().format((lowerRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(lowerRecord.realRealGet(j) != null ? lowerRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? this.getDecimalFormat().format((middleRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
-						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? this.getDecimalFormat().format((upperRecord.realRealGet(j) / 1000. - reduction) * factor + offset) : GDE.STRING_STAR);
+						sb.append(delimiter).append(middleRecord.realRealGet(j) != null ? middleRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
+						sb.append(delimiter).append(upperRecord.realRealGet(j) != null ? upperRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -476,7 +478,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 
 			// todo set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
-			if (!this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false) && !this.getDevice().isGPSCoordinates(this) ) {
+			if (!this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false) && !this.getDevice().isGPSCoordinates(this)) {
 				if (this.settlementType.getEvaluation().getTransitionAmount() == null)
 					TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 				else
@@ -671,85 +673,77 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getFactor() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
-		double value = 1.0;
-		PropertyType property = this.getProperty(IDevice.FACTOR);
-		if (property != null) {
-			value = Double.valueOf(property.getValue()).doubleValue();
-		}
-		else if (this.scoregroupType != null) {
-			value = this.scoregroupType.getFactor();
-		}
-		else if (this.settlementType != null) {
-			value = this.settlementType.getFactor();
-		}
-		else if (this.measurementType != null) {
-			value = this.measurementType.getFactor();
-		}
-		else { // this is the old code which hopefully does never apply
-			try {
-				value = this.getDevice().getMeasurementFactor(this.parent.parent.number, this.ordinal);
+	public double getFactor() {
+		if (this.factor == Double.MIN_VALUE) {
+			this.factor = 1.0;
+			PropertyType property = this.getProperty(IDevice.FACTOR);
+			if (property != null)
+				this.factor = Double.valueOf(property.getValue()).doubleValue();
+			else if (this.scoregroupType != null)
+				this.factor = this.scoregroupType.getFactor();
+			else if (this.settlementType != null)
+				this.factor = this.settlementType.getFactor();
+			else if (this.measurementType != null) {
+				this.factor = this.measurementType.getFactor();
 			}
-			catch (RuntimeException e) {
-				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
-			}
+			else
+				try {
+					this.factor = this.getDevice().getMeasurementFactor(this.parent.parent.number, this.ordinal);
+				}
+				catch (RuntimeException e) {
+					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
+				}
 		}
-		return value;
+		return this.factor;
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getOffset() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
-		double value = 0.0;
-		PropertyType property = this.getProperty(IDevice.OFFSET);
-		if (property != null) {
-			value = Double.valueOf(property.getValue()).doubleValue();
+	public double getOffset() {
+		if (this.offset == Double.MIN_VALUE) {
+			this.offset = 0.0;
+			PropertyType property = this.getProperty(IDevice.OFFSET);
+			if (property != null)
+				this.offset = Double.valueOf(property.getValue()).doubleValue();
+			else if (this.scoregroupType != null)
+				this.offset = this.scoregroupType.getOffset();
+			else if (this.settlementType != null)
+				this.offset = this.settlementType.getOffset();
+			else if (this.measurementType != null)
+				this.offset = this.measurementType.getOffset();
+			else
+				try {
+					this.offset = this.getDevice().getMeasurementOffset(this.parent.parent.number, this.ordinal);
+				}
+				catch (RuntimeException e) {
+					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
+				}
 		}
-		else if (this.scoregroupType != null) {
-			value = this.scoregroupType.getOffset();
-		}
-		else if (this.settlementType != null) {
-			value = this.settlementType.getOffset();
-		}
-		else if (this.measurementType != null) {
-			value = this.measurementType.getOffset();
-		}
-		else { // this is the old code which hopefully does never apply
-			try {
-				value = this.getDevice().getMeasurementOffset(this.parent.parent.number, this.ordinal);
-			}
-			catch (RuntimeException e) {
-				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
-			}
-		}
-		return value;
+		return this.offset;
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getReduction() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
-		double value = 0.0;
-		PropertyType property = this.getProperty(IDevice.REDUCTION);
-		if (property != null) {
-			value = Double.valueOf(property.getValue()).doubleValue();
+	public double getReduction() {
+		if (this.reduction == Double.MIN_VALUE) {
+			this.reduction = 0.0;
+			PropertyType property = this.getProperty(IDevice.REDUCTION);
+			if (property != null)
+				this.reduction = Double.valueOf(property.getValue()).doubleValue();
+			else if (this.scoregroupType != null)
+				this.reduction = this.scoregroupType.getReduction();
+			else if (this.settlementType != null)
+				this.reduction = this.settlementType.getReduction();
+			else if (this.measurementType != null)
+				this.reduction = this.measurementType.getReduction();
+			else
+				try {
+					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parent.parent.number, this.ordinal, IDevice.REDUCTION);
+					if (strValue != null && strValue.length() > 0) this.reduction = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
+				}
+				catch (RuntimeException e) {
+					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
+				}
 		}
-		else if (this.scoregroupType != null) {
-			value = this.scoregroupType.getReduction();
-		}
-		else if (this.settlementType != null) {
-			value = this.settlementType.getReduction();
-		}
-		else if (this.measurementType != null) {
-			value = this.measurementType.getReduction();
-		}
-		else { // this is the old code which hopefully does never apply
-			try {
-				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parent.parent.number, this.ordinal, IDevice.REDUCTION);
-				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
-			}
-			catch (RuntimeException e) {
-				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
-			}
-		}
-		return value;
+		return this.reduction;
 	}
 
 	/**
@@ -793,6 +787,290 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public boolean isScaleVisible() {
 		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoregroup() && this.settings.isDisplayScores());
 		return isValidDisplayRecord && super.isScaleVisible();
+	}
+
+	/**
+	 * get the delta of the vertical display points
+	 * supports suites.
+	 * @param index1 is the position of the left value in the record collection 
+	 * @param index2 is the position of the right value in the record collection 
+	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
+	 */
+	public String getDeltaAsFormattedScaleValue(int index1, int index2) {
+		if (!this.isTrailSuite()) {
+			final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
+			final double translatedDelta = trailRecord.device.translateValue(trailRecord, this.realRealGet(index1) / 1000.)
+					- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.);
+			return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
+		}
+		else if (this.isBoxPlotSuite()) {
+			if (this.getTrailRecordSuite()[0].realRealGet(index1) != null) {
+				final TrailRecord trailRecord = this.getTrailRecordSuite()[2];
+				final double translatedDelta = trailRecord.device.translateValue(trailRecord, this.realRealGet(index1) / 1000.)
+						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.);
+				return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
+			}
+			else
+				return GDE.STRING_STAR;
+		}
+		else if (isRangePlotSuite()) {
+			if (this.getTrailRecordSuite()[0].realRealGet(index1) != null) {
+				final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
+				final double translatedDelta = trailRecord.device.translateValue(trailRecord, this.realRealGet(index1) / 1000.)
+						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.);
+				return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
+			}
+			else
+				return GDE.STRING_STAR;
+		}
+		else
+			throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * supports suites.
+	 * @param index
+	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
+	 */
+	public String getFormattedScaleValue(int index) {
+		if (!this.isTrailSuite()) {
+			final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
+			return trailRecord.realRealGet(index) != null ? trailRecord.getDecimalFormat().format(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+		}
+		else if (this.isBoxPlotSuite()) {
+			if (this.getTrailRecordSuite()[0].realRealGet(index) != null) {
+				final TrailRecord trailRecord = this.getTrailRecordSuite()[2];
+				return trailRecord.realRealGet(index) != null ? trailRecord.getDecimalFormat().format(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+			}
+			else
+				return GDE.STRING_STAR;
+		}
+		else if (isRangePlotSuite()) {
+			if (this.getTrailRecordSuite()[0].realRealGet(index) != null) {
+				final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
+				return trailRecord.realRealGet(index) != null ? trailRecord.getDecimalFormat().format(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+			}
+			else
+				return GDE.STRING_STAR;
+		}
+		else
+			throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * find the index closest to given time in msec
+	 * @param time_ms
+	 * @return index nearest to given time
+	 */
+	@Override
+	@Deprecated // replaced by gde.data.TrailRecordSet.getIndex(long)
+	public int findBestIndex(double time_ms) {
+		int index = this.timeStep_ms == null ? this.parent.timeStep_ms.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
+		return index > this.elementCount - 1 ? this.elementCount - 1 : index;
+	}
+
+	/**
+	* get the time in msec at given horizontal display position
+	* @param xPos of the display point
+	* @return time value in msec
+	*/
+	@Override
+	@Deprecated // replaced by gde.utils.HistoTimeLine.getTimestamp(int)
+	public double getHorizontalDisplayPointTime_ms(int xPos) {
+		return this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
+	}
+
+	/**
+	* get the formatted time with unit at given position
+	* @param xPos of the display point
+	* @return string of time value in simple date format HH:ss:mm:SSS
+	*/
+	@Override
+	@Deprecated // replaced by gde.utils.HistoTimeLine.getTimestamp(int)
+	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
+		return TimeLine.getFomatedTimeWithUnit(
+				this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + (this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 1292400000.0)); //1292400000 == 1970-01-16 00:00:00.000
+	}
+
+	/**
+	 * calculate best fit index in data vector from given display point relative to the (zoomed) display width
+	 * @param xPos
+	 * @return position integer value
+	 */
+	@Override
+	@Deprecated // replaced by gde.data.TrailRecordSet.getIndex(gde.utils.HistoTimeLine.getTimestamp(int))
+	public int getHorizontalPointIndexFromDisplayPoint(int xPos) {
+		return this.findBestIndex(getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms());
+	}
+
+	/**
+	 * query data value (not translated in device units) from a display position point 
+	 * @param index
+	 * @return displays yPos in pixel
+	 */
+	public int getVerticalDisplayPointPos(int index) {
+		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
+		if (!this.isTrailSuite()) {
+			return Double.valueOf(this.parent.drawAreaBounds.height - (((masterRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+		}
+		else if (this.isBoxPlotSuite()) {
+			final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
+			return Double.valueOf(this.parent.drawAreaBounds.height - (((medianRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+		}
+		else if (isRangePlotSuite()) {
+			final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
+			return Double.valueOf(this.parent.drawAreaBounds.height - (((middleRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+		}
+		else
+			throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * query data value (not translated in device units) from a display position point 
+	 * @param xPos
+	 * @return displays yPos in pixel
+	 */
+	@Override
+	@Deprecated // todo
+	public int getVerticalDisplayPointValue(int xPos) {
+		int pointPosY = 0;
+
+		try {
+			double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
+			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
+			if (super.size() > 0) {
+				if (this.getDevice().isGPSCoordinates(this)) {
+					int grad0 = this.get(indexs[0]) / 1000000;
+					if (indexs[0] == indexs[1]) {
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
+								- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+					}
+					else {
+						int grad1 = this.get(indexs[1]) / 1000000;
+						double deltaValueY = (grad1 + ((this.get(indexs[1]) / 1000000.0 - grad1) / 0.60)) - (grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60));
+						double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0])
+								: this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
+						double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						pointPosY = Double
+								.valueOf(this.parent.drawAreaBounds.height - ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) * 1000.0)
+										- (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)
+								.intValue();
+					}
+				}
+				else {
+					if (indexs[0] == indexs[1]) {
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
+								.intValue();
+					}
+					else {
+						int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
+						double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0])
+								: this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
+						double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						pointPosY = Double
+								.valueOf(this.parent.drawAreaBounds.height
+										- (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)
+								.intValue();
+					}
+				}
+			}
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", (long) tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
+
+			//check yPos out of range, the graph might not visible within this area
+			//		if(pointPosY > this.parent.drawAreaBounds.height) 
+			//			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
+			//		if(pointPosY < 0) 
+			//			log.log(Level.WARNING, "pointPosY < 0");
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage() + " xPos = " + xPos, e); //$NON-NLS-1$
+		}
+		return pointPosY > this.parent.drawAreaBounds.height ? this.parent.drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
+	}
+
+	/**
+	 * get the formatted scale value corresponding the vertical display point
+	 * @param yPos
+	 * @param drawAreaBounds
+	 * @return formated value
+	 */
+	@Override
+	@Deprecated // todo harmonize with getVerticalDisplayPointValue  ---  replaced by gde.data.TrailRecord.getVerticalDisplayPointAsFormattedScaleValue(int)
+	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
+		String displayPointValue;
+		//scales are all synchronized in viewpoint of end values (min/max)
+		//PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+		//if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+		//	Record syncRecord = this.parent.get(this.ordinal);
+		//		displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		//}	
+		//else 
+		if (this.parent.isZoomMode)
+			displayPointValue = this.df.format(Double.valueOf(this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height)));
+		else
+			displayPointValue = this.df.format(Double.valueOf(this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height)));
+
+		return displayPointValue;
+	}
+
+	/**
+	 * get the scale value corresponding the vertical display point
+	 * @param yPos
+	 * @param drawAreaBounds
+	 * @return formated value
+	 */
+	@Override
+	@Deprecated // todo harmonize with getVerticalDisplayPointValue  ---  replaced by gde.data.TrailRecord.getVerticalDisplayPointAsFormattedScaleValue(int)
+	public double getVerticalDisplayPointScaleValue(int yPos, Rectangle drawAreaBounds) {
+		double value;
+		if (this.parent.isZoomMode || this.parent.isScopeMode)
+			value = this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * yPos) / drawAreaBounds.height;
+		else
+			value = this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
+
+		return value;
+	}
+
+	/**
+	 * get the value corresponding the display point
+	 * @param deltaPos
+	 * @param drawAreaBounds
+	 * @return formated value
+	 */
+	@Override
+	@Deprecated
+	public String getVerticalDisplayDeltaAsFormattedValue(int deltaPos, Rectangle drawAreaBounds) {
+		String textValue;
+		if (this.parent.isZoomMode || this.parent.isScopeMode)
+			textValue = this.df.format(Double.valueOf((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
+		else
+			textValue = this.df.format(Double.valueOf((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+
+		return textValue;
+	}
+
+	/**
+	 * get the slope value of two given points, unit depends on device configuration
+	 * @param points describing the time difference (x) as well as the measurement difference (y)
+	 * @return formated string of value
+	 */
+	@Override
+	@Deprecated
+	public String getSlopeValue(Point points) {
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_EMPTY + points.toString());
+		double measureDelta;
+		if (this.parent.isZoomMode)
+			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / this.parent.drawAreaBounds.height;
+		else
+			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / this.parent.drawAreaBounds.height;
+		//double timeDelta = (1.0 * points.x * this.size() - 1) / drawAreaBounds.width * this.getTimeStep_ms() / 1000; //sec
+		//this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
+		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; //sec
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
+		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
 
 }

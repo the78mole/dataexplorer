@@ -18,8 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +44,6 @@ import org.eclipse.swt.widgets.TableItem;
 import gde.GDE;
 import gde.data.HistoSet;
 import gde.data.HistoSet.RebuildStep;
-import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
@@ -66,6 +63,8 @@ public class HistoSelectorComposite extends Composite {
 	private final static String			$CLASS_NAME							= HistoSelectorComposite.class.getName();
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
+	private final static int				textExtentFactor				= 8;
+
 	private final DataExplorer			application							= DataExplorer.getInstance();
 	private final HistoSet					histoSet								= HistoSet.getInstance();
 	final SashForm									parent;
@@ -73,7 +72,6 @@ public class HistoSelectorComposite extends Composite {
 	final Menu											popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
 
-	int															textExtentFactor				= 9;
 	Button													curveSelectorHeader;
 	Combo														curveTypeCombo;
 	int															initialSelectorHeaderWidth;
@@ -81,6 +79,7 @@ public class HistoSelectorComposite extends Composite {
 	Table														curveSelectorTable;
 	TableColumn											tableSelectorColumn;
 	TableColumn											tableCurveTypeColumn;
+	int															initialCurveTypeColumnWidth;
 	int															curveTypeColumnWidth;
 
 	TableEditor[]										editors									= new TableEditor[0];
@@ -197,14 +196,15 @@ public class HistoSelectorComposite extends Composite {
 		this.curveSelectorTable.removeAll();
 		for (TableEditor editor : this.editors) {
 			if (editor != null) { // non displayable records
-				if (editor.getEditor() != null)
-					editor.getEditor().dispose();
+				if (editor.getEditor() != null) editor.getEditor().dispose();
 				editor.dispose();
 			}
 		}
 		int itemWidth = this.initialSelectorHeaderWidth;
 		int checkBoxWidth = 20;
 		int textSize = 10;
+		int itemWidth2 = this.initialCurveTypeColumnWidth;
+		int textSize2 = 10;
 		boolean isOneVisible = false;
 		TrailRecordSet recordSet = this.histoSet.getTrailRecordSet();
 		if (recordSet != null) {
@@ -212,14 +212,16 @@ public class HistoSelectorComposite extends Composite {
 			this.editors = new TableEditor[recordSet.size()];
 			for (int i = 0; i < recordSet.getDisplayRecords().size(); i++) {
 				TrailRecord record = (TrailRecord) recordSet.getDisplayRecords().get(i);
-				textSize = record.getName().length() * 8;
-				if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
+				textSize = record.getName().length() * textExtentFactor;
+				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
+				textSize2 = ((int) record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10)) * (textExtentFactor -2);
+				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
 				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 				if (record.isDisplayable()) {
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
 					item.setText(record.getName().intern());
-	
+
 					this.editors[i] = new TableEditor(this.curveSelectorTable);
 					selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
 					this.editors[i].grabHorizontal = true;
@@ -247,15 +249,16 @@ public class HistoSelectorComposite extends Composite {
 				}
 			}
 			this.selectorColumnWidth = itemWidth;
+			this.curveTypeColumnWidth = itemWidth2;
 			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 		}
-		this.tableCurveTypeColumn.setWidth(122); // todo column width
+		this.tableCurveTypeColumn.setWidth(curveTypeColumnWidth);
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth - 1, this.curveSelectorHeader.getSize().y);
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
-			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth + 133, GraphicsWindow.TYPE_HISTO);
 		}
+		this.application.setGraphicsSashFormWeights(this.getCompositeWidth(), GraphicsWindow.TYPE_HISTO);
 
 		if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}
@@ -273,6 +276,15 @@ public class HistoSelectorComposite extends Composite {
 	public int getSelectorColumnWidth() {
 		synchronized (this) {
 			return this.selectorColumnWidth;
+		}
+	}
+
+	/**
+	 * @return the total width of all columns
+	 */
+	public int getCompositeWidth() {
+		synchronized (this) {
+			return this.selectorColumnWidth + this.curveTypeColumnWidth;
 		}
 	}
 

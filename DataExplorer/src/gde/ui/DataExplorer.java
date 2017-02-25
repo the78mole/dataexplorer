@@ -211,6 +211,7 @@ public class DataExplorer extends Composite {
 	Thread												writeTmpFileThread;
 	boolean												isTmpWriteStop										= false;
 
+	boolean												isCurveSelectorEnabled						= true;																											// always enabled during startup - there is no setting. So true is mandatory.
 	boolean												isRecordCommentVisible						= false;
 	boolean												isGraphicsHeaderVisible						= false;
 	boolean												isObjectWindowVisible							= false;
@@ -617,18 +618,22 @@ public class DataExplorer extends Composite {
 						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
 								+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
 					if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
-						if (DataExplorer.this.graphicsTabItem.isCurveSelectorEnabled()) {
+						if (DataExplorer.this.graphicsTabItem.isCurveSelectorEnabled())
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(DataExplorer.this.graphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
-						}
-						else {
+						else
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(0);
-						}
 					}
 					else if (isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) && DataExplorer.this.compareTabItem != null) {
 						DataExplorer.this.compareTabItem.setSashFormWeights(DataExplorer.this.compareTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
 					}
 					else if (isRecordSetVisible(GraphicsWindow.TYPE_UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
 						DataExplorer.this.utilGraphicsTabItem.setSashFormWeights(DataExplorer.this.utilGraphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
+					}
+					else if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO) && DataExplorer.this.histoGraphicsTabItem != null) {
+						if (DataExplorer.this.histoGraphicsTabItem.isCurveSelectorEnabled())
+							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(DataExplorer.this.histoGraphicsTabItem.getCurveSelectorComposite().getCompositeWidth());
+						else
+							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(0);
 					}
 					if (DataExplorer.this.objectDescriptionTabItem != null) {
 						if (DataExplorer.this.objectDescriptionTabItem.isVisible()) {
@@ -796,7 +801,7 @@ public class DataExplorer extends Composite {
 			//wait for possible migration and delay opening for migration
 			this.settings.startMigationThread();
 			// check configured device
-			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) { //$NON-NLS-1$
+			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) { 
 				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
 				this.deviceSelectionDialog.open();
 			}
@@ -2047,6 +2052,11 @@ public class DataExplorer extends Composite {
 		}
 	}
 
+	public void updateHistoGraphicsWindow() {
+		if (this.histoGraphicsTabItem != null) // histo not active or testing without UI
+			updateHistoGraphicsWindow(true);
+	}
+
 	/**
 	 * update the histoGraphicsWindow from the histo recordset.
 	 * @param redrawCurveSelector
@@ -2100,12 +2110,9 @@ public class DataExplorer extends Composite {
 					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
 						this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 					}
-					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) {
-						this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 					}
 				}
 			}
-		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
@@ -2164,6 +2171,7 @@ public class DataExplorer extends Composite {
 	/**
 	 * method to make record comment window visible
 	 */
+	@Deprecated // ET seems to be replaced by enableRecordSetComment(boolean) in the meanwhile
 	public void setRecordCommentEnabled(boolean enabled) {
 		this.settings.setRecordCommentVisible(enabled);
 		this.isRecordCommentVisible = enabled;
@@ -2174,6 +2182,8 @@ public class DataExplorer extends Composite {
 	 */
 	public void setCurveSelectorEnabled(boolean value) {
 		this.graphicsTabItem.setCurveSelectorEnabled(value);
+		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.setCurveSelectorEnabled(value);
+		this.isCurveSelectorEnabled = value;
 	}
 
 	/**
@@ -2379,18 +2389,23 @@ public class DataExplorer extends Composite {
 	 * clear measurement pointer
 	 */
 	public void clearMeasurementModes() {
-		boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
-		RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
-		if (recordSet != null) {
-			if (isWindowTypeNormal) {
-				recordSet.clearMeasurementModes();
-				this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			}
-			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
-				recordSet = DataExplorer.application.getCompareSet();
-				if (recordSet != null) {
+		if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) {
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+		}
+		else {
+			boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
+			RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
+			if (recordSet != null) {
+				if (isWindowTypeNormal) {
 					recordSet.clearMeasurementModes();
-					this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+				}
+				else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+					recordSet = DataExplorer.application.getCompareSet();
+					if (recordSet != null) {
+						recordSet.clearMeasurementModes();
+						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					}
 				}
 			}
 		}
@@ -2402,6 +2417,14 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
+		if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+			this.histoSet.getTrailRecordSet().setMeasurementMode(recordKey, enabled);
+			if (enabled)
+				this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE, false);
+			else
+				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+		}
+		else {
 		boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
 		RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 		if (recordSet != null && recordSet.containsKey(recordKey)) {
@@ -2422,8 +2445,8 @@ public class DataExplorer extends Composite {
 						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
 			}
+			}}
 		}
-	}
 
 	/**
 	 * switch application into delta measurement mode for visible record set using selected record
@@ -2431,6 +2454,14 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
+		if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+			this.histoSet.getTrailRecordSet().setDeltaMeasurementMode(recordKey, enabled);
+			if (enabled)
+				this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE_DELTA, false);
+			else
+				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+		}
+		else {
 		boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
 		RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 		if (recordSet != null && recordSet.containsKey(recordKey)) {
@@ -2451,8 +2482,8 @@ public class DataExplorer extends Composite {
 						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
 			}
+			}}
 		}
-	}
 
 	/**
 	 * switch application graphics window into cut mode
@@ -2587,6 +2618,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void enableGraphicsHeader(boolean enabled) {
 		this.graphicsTabItem.enableGraphicsHeader(enabled);
+		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.enableGraphicsHeader(enabled);
 		this.settings.setGraphicsHeaderVisible(enabled);
 		this.isGraphicsHeaderVisible = enabled;
 	}
@@ -2596,6 +2628,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void enableRecordSetComment(boolean enabled) {
 		this.graphicsTabItem.enableRecordSetComment(enabled);
+		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.enableRecordSetComment(enabled);
 		this.settings.setRecordCommentVisible(enabled);
 		this.isRecordCommentVisible = enabled;
 	}
@@ -2995,6 +3028,10 @@ public class DataExplorer extends Composite {
 				int position = (this.displayTab.getItems().length < DataExplorer.TAB_INDEX_HISTO_GRAPHIC ? this.displayTab.getItems().length : DataExplorer.TAB_INDEX_HISTO_GRAPHIC);
 				this.histoGraphicsTabItem = new HistoGraphicsWindow(this.displayTab, SWT.NONE, position);
 				this.histoGraphicsTabItem.create();
+				//restore window settings
+				this.setCurveSelectorEnabled(this.isCurveSelectorEnabled);
+				this.enableRecordSetComment(this.isRecordCommentVisible);
+				this.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			}
 		}
 		else {
@@ -3147,7 +3184,7 @@ public class DataExplorer extends Composite {
 		if (visible) {
 			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
 				this.utilGraphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, tabName.length() < 3 ? Messages.getString(MessageIds.GDE_MSGT0282) : tabName,
-						this.displayTab.getItemCount()); //$NON-NLS-1$
+						this.displayTab.getItemCount()); 
 				this.utilGraphicsTabItem.create();
 			}
 		}

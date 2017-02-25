@@ -369,7 +369,7 @@ public class TrailRecordSet extends RecordSet {
 		else {
 			for (String recordKey : this.recordNames) {
 				if (get(recordKey).isActive()) {
-					size = ((TrailRecord) get(recordKey)).getTrailRecordSuite()[0].realSize();
+					size = ((TrailRecord) get(recordKey)).getTrailRecordSuite()[0].size();
 					break;
 				}
 			}
@@ -414,6 +414,26 @@ public class TrailRecordSet extends RecordSet {
 				this.logRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
 			}
 		}
+	}
+	
+	/**
+	 * @param timestamp_ms is a time stamp from the timestep range
+	 * @return the position of the timestep which is smaller or equal to the timestamp or -1 if not found 
+	 */
+	public int getIndex(long timestamp_ms ) {
+		for (int i = 0; i < this.timeStep_ms.size(); i++) {
+			long tmpTimestep_ms = this.timeStep_ms.get(i) / 10;
+			if (tmpTimestep_ms <= timestamp_ms) return i;
+		}
+		return -1;
+	}
+
+	public String getFileNameTag(long timestamp_ms ) {
+		for (int i = 0; i < this.timeStep_ms.size(); i++) {
+			long tmpTimestep_ms = this.timeStep_ms.get(i) / 10;
+			if (tmpTimestep_ms <= timestamp_ms) return this.fileNames.get(i);
+		}
+		return GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -749,4 +769,5 @@ public class TrailRecordSet extends RecordSet {
 	public long getLastTimeStamp_ms() {
 		return this.timeStep_ms.lastElement() / 10;
 	}
+
 }

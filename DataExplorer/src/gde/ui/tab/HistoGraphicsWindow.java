@@ -77,7 +77,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	public void create() {
 		this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
 		this.setControl(this.graphicSashForm);
-		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
+		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm, "  " + Messages.getString(MessageIds.GDE_MSGT0254)); //$NON-NLS-1$
 		this.graphicsComposite = new HistoGraphicsComposite(this.graphicSashForm);
 		this.graphicSashForm.setWeights(new int[] { 117, GDE.shell.getClientArea().width - 117 });
 	}
@@ -147,26 +147,28 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @param newSelectorCompositeWidth the changed curve selector width
 	 */
 	public void setSashFormWeights(int newSelectorCompositeWidth) {
+		log.log(Level.FINER, "newSelectorCompositeWidth= " , newSelectorCompositeWidth); //$NON-NLS-1$
 		int tabFolderClientAreaWidth = this.tabFolder.getBounds().width;
 		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		int bestGuessWidth = this.application.getClientArea().width;
 		if (tabFolderClientAreaWidth > bestGuessWidth) {
-			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth);
+			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth); //$NON-NLS-1$ //$NON-NLS-2$
 			tabFolderClientAreaWidth = bestGuessWidth;
 			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		newSelectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth / 2 ? tabFolderClientAreaWidth / 2 : newSelectorCompositeWidth;
 		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth };
+		log.log(Level.FINER, "newSelectorCompositeWidth= ", newSelectorCompositeWidth); //$NON-NLS-1$
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			try {
 				this.graphicSashForm.setWeights(this.sashFormWeights);
 			}
 			catch (IllegalArgumentException e) {
-				log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e);
+				log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
 			}
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 
@@ -192,13 +194,13 @@ public class HistoGraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * enable curve selector which relect to the sash form weights using the selector colum width
+	 * enable curve selector which relect to the sash form weights using the colum widths
 	 * @param enabled
 	 */
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
 		if (enabled)
-			setSashFormWeights(this.curveSelectorComposite.getSelectorColumnWidth());
+			setSashFormWeights(this.curveSelectorComposite.getCompositeWidth());
 		else
 			setSashFormWeights(0);
 	}
@@ -214,6 +216,13 @@ public class HistoGraphicsWindow extends CTabItem {
 		this.graphicsComposite.enableGraphicsHeader(enabled);
 	}
 
+	/**
+	 * enable display of record set comment
+	 */
+	public void enableRecordSetComment(boolean enabled) {
+		this.graphicsComposite.enableRecordSetComment(enabled);
+	}
+	
 	public void clearHeaderAndComment() {
 		this.graphicsComposite.clearHeaderAndComment();
 	}
@@ -236,7 +245,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	/**
 	 * @return the graphicsComposite
 	 */
-	public HistoGraphicsComposite getHistoGraphicsComposite() {
+	public HistoGraphicsComposite getGraphicsComposite() {
 		return this.graphicsComposite;
 	}
 
