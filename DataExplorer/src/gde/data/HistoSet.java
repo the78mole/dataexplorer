@@ -629,11 +629,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 		//special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder
 		String validatedDeviceName = validatedDevice.getName();
-		if (validatedDeviceName.startsWith("MC3000")) {
-			validatedDeviceName = "MC3000"; //store MC3000-Set record set as well in MC3000 directory
-		}
-		else if (validatedDeviceName.startsWith("Q200")) {
-			validatedDeviceName = "Q200"; //store Q00-Set record set as well in Q200 directory
+		if (this.application.getActiveDevice().getName().endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200
+			validatedDeviceName = this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length()-4);
 		}
 
 		String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();

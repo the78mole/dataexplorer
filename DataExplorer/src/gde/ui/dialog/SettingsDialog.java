@@ -1529,7 +1529,8 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "blankChargeDischargeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setReduceChargeDischarge(SettingsDialog.this.blankChargeDischargeButton.getSelection());
 										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge()
-												&& SettingsDialog.this.application.getActiveDevice().getName().equals("MC3000")) {
+												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("MC3000")
+												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("Q200")) {
 											// continuous recording without breaks like pauses or termination phase may lead in combination record sets to
 											// time gaps which can not be realized, so charger specific implementation take place here
 											SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0059));
@@ -1553,7 +1554,8 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "continiousRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setContinuousRecordSet(SettingsDialog.this.continiousRecordSetButton.getSelection());
 										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge()
-												&& SettingsDialog.this.application.getActiveDevice().getName().equals("MC3000")) {
+												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("MC3000")
+												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("Q200")) {
 											// continuous recording without breaks like pauses or termination phase may lead in combination record sets to
 											// time gaps which can not be realized, so charger specific implementation take place here
 											SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0059));
