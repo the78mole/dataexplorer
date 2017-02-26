@@ -1981,8 +1981,8 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if ((this.displayTab.getSelection() instanceof HistoGraphicsWindow && this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
-					|| (this.displayTab.getSelection() instanceof HistoTableWindow && this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible())) {
+			if ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
+					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible())) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
@@ -1994,10 +1994,8 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec((Runnable) () -> {
-				if ((DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow && DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed()
-						&& DataExplorer.this.histoGraphicsTabItem.isVisible()) //
-						|| (DataExplorer.this.displayTab.getSelection() instanceof HistoTableWindow && DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed()
-								&& DataExplorer.this.histoTableTabItem.isVisible())) {
+				if ((!DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) //
+						|| (!DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible())) {
 					Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 					try {
 						rebuilThread.start();
@@ -2056,22 +2054,14 @@ public class DataExplorer extends Composite {
 	public void updateHistoGraphicsWindow(boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
-				if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) {
-					if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
-						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
-					}
-				}
+				DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
 			}
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					if (!DataExplorer.this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
-						if (DataExplorer.this.histoGraphicsTabItem != null && !DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) {
-							if (DataExplorer.this.displayTab.getSelection() instanceof HistoGraphicsWindow) {
-								DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
-							}
-						}
+						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
 					}
 				}
 			});
