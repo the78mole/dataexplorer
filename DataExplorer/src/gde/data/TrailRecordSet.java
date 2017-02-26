@@ -549,7 +549,7 @@ public class TrailRecordSet extends RecordSet {
 			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
-				updateVisibilityStatus(true);
+				//updateVisibilityStatus(true);
 			}
 			// if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
 			this.application.updateGraphicsWindow(); // WBrueg histoGraphicsWindow
@@ -558,28 +558,28 @@ public class TrailRecordSet extends RecordSet {
 
 	}
 
-	/**
-	 * check and update visibility status of all records according to the available histo data.
-	 * at least an update of the graphics window should be included at the end of this method.
-	 */
-	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
-		// WBrueg check if setting records to displayable is required for trailRecordSets: the current isActive settings should be valid for display --> remove this method
-		int displayableCounter = 0;
-		for (int i = 0; i < this.size(); ++i) {
-			Record record = this.get(i);
-			if (includeReasonableDataCheck) {
-				// todo record.setDisplayable(record.isActive() || record.hasReasonableData()); // was initially: (record.hasReasonableData());
-				//	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
-			}
-
-			if (record.isActive() && record.isDisplayable()) {
-				++displayableCounter;
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
-			}
-		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-		this.setConfiguredDisplayable(displayableCounter);
-	}
+//	/**
+//	 * check and update visibility status of all records according to the available histo data.
+//	 * at least an update of the graphics window should be included at the end of this method.
+//	 */
+//	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
+//		// WBrueg check if setting records to displayable is required for trailRecordSets: the current isActive settings should be valid for display --> remove this method
+//		int displayableCounter = 0;
+//		for (int i = 0; i < this.size(); ++i) {
+//			Record record = this.get(i);
+//			if (includeReasonableDataCheck) {
+//				// todo record.setDisplayable(record.isActive() || record.hasReasonableData()); // was initially: (record.hasReasonableData());
+//				//	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
+//			}
+//
+//			if (record.isActive() && record.isDisplayable()) {
+//				++displayableCounter;
+//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+//			}
+//		}
+//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+//		this.setConfiguredDisplayable(displayableCounter);
+//	}
 
 	/**
 	 * synchronize scales according device properties.

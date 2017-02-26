@@ -187,8 +187,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		// this.histoFilePaths.clear(); is accomplished by files validation
 		this.fileSizeSum_B = 0;
 		this.trailRecordSet = null;
-		if (log.isLoggable(Level.OFF))
-			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+		if (log.isLoggable(Level.INFO))
+			log.log(Level.INFO, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
 					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
@@ -710,8 +710,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		else
 			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });
 		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
-				: GDE.STRING_EMPTY;
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
 
 		int invalidRecordSetsCount = 0;
 		for (Map.Entry<Long, Set<Path>> pathListEntry : this.histoFilePaths.entrySet()) {
@@ -734,8 +733,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
-							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
-									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // WBrueg hard wired for HoTTViewerAdapter?
+							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().startsWith(this.application.getActiveDevice().getName())) {
+									//&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // WBrueg hard wired for HoTTViewerAdapter?
 								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
 								break; // ignore all log file trusses 
 							}
@@ -751,7 +750,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								isValidObject = this.settings.getFilesWithOtherObject();
 							}
 							else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
-								log.log(Level.OFF, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+								log.log(Level.INFO, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 								isValidObject = true;
 							}
 
@@ -789,7 +788,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								isValidObject = this.settings.getFilesWithOtherObject();
 					}
 					else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
-						log.log(Level.OFF, String.format("BIN candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+						log.log(Level.INFO, String.format("BIN candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 						isValidObject = true;
 					}
 

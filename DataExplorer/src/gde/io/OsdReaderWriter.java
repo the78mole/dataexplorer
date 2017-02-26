@@ -371,13 +371,13 @@ public class OsdReaderWriter {
 		String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 		if (device.isVariableMeasurementSize()) {
-			int activeChannelConfigNumber = channelNumber; // WBrueg get rid of activeChannelConfigNumber after checking during merge
+			//int activeChannelConfigNumber = channelNumber; // WBrueg get rid of activeChannelConfigNumber after checking during merge
 			
 			//cleanup measurement, if count doesn't match
-			int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(activeChannelConfigNumber).length;
+			int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(channelNumber).length;
 			if (recordsProperties.length != existingNumberMeasurements) {
 				for (int i = recordsProperties.length; i < existingNumberMeasurements; i++) {
-					device.removeMeasurementFromChannel(activeChannelConfigNumber, device.getMeasurement(activeChannelConfigNumber, recordsProperties.length));
+					device.removeMeasurementFromChannel(channelNumber, device.getMeasurement(channelNumber, recordsProperties.length));
 				}
 			}
 			//build up the record set with variable number of records just fit the sensor data
@@ -386,13 +386,13 @@ public class OsdReaderWriter {
 			String[] recordUnits = new String[recordsProperties.length];
 			for (int i = 0; i < recordsProperties.length; i++) {
 				HashMap<String, String> recordProperties = StringHelper.splitString(recordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-				MeasurementType gdeMeasurement = device.getMeasurement(activeChannelConfigNumber, i);
+				MeasurementType gdeMeasurement = device.getMeasurement(channelNumber, i);
 				gdeMeasurement.setName(recordNames[i] = recordProperties.get(Record.NAME));
 				gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
 				gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
 				gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
 			}
-			recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true, true);
+			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true, true);
 		}
 		else {
 			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
