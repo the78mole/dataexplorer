@@ -109,7 +109,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	protected final Settings					settings												= Settings.getInstance();
 
 	// measurement
-	String														recordKeyMeasurement;
+	String														recordKeyMeasurement						= GDE.STRING_EMPTY;
 
 	//current drop, shadow point vector to mark data points capable to be smoothed
 	boolean														isSmoothAtCurrentDrop						= false;

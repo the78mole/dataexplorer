@@ -19,18 +19,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.HistoSet;
-import gde.data.RecordSet;
-import gde.data.TrailRecordSet;
-import gde.histocache.HistoVault;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.LocalizedDateTime.DateTimePattern;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -48,6 +36,18 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.HistoSet;
+import gde.data.RecordSet;
+import gde.data.TrailRecordSet;
+import gde.histocache.HistoVault;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.LocalizedDateTime.DateTimePattern;
 
 /**
  * Utility class to draw time line with tick marks and numbers.
@@ -95,7 +95,7 @@ public class HistoTimeLine {
 	private long									leftmostTimeStamp, rightmostTimeStamp;	// define the corners of the histo chart region
 	private TreeMap<Long, Double>	relativeTimeScale;											// maps histoset timestamps to x-axis with range 0 to 1
 	private Density								density;																// degree of population on the x -axis
-
+	private TreeMap<Long, Integer> scalePositions =  new TreeMap<>(Collections.reverseOrder());
 	/**
 	 * takes the timeline width and calculates the x-axis pixel positions for the histo timestamp values. 
 	 * @param trailRecordSet any recordset object (no trail recordset required)
@@ -108,19 +108,18 @@ public class HistoTimeLine {
 		this.width = width;
 		this.leftmostTimeStamp = leftmostTimeStamp;
 		this.rightmostTimeStamp = rightmostTimeStamp;
-		this.relativeTimeScale = getRelativeScale();
+		setRelativeScale();
 		defineDensity();
-	}
+		setScalePositions();
+		}
 
 	/**
 	 * draws the histo time line for the standard x-axis and the logarithmic distance axis.
 	 * respects left/right margin, i.e. uses the histo chart region only.
 	 * based on histo recordSets (not on trailRecordSet!).
-	 * @param recordSet any recordset object (no trail recordset required)
 	 * @param gc graphics context
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction
-	 * @param width the end point in points
 	 */
 	public void drawTimeLine(GC gc, int x0, int y0) {
 		gc.setLineWidth(1);
@@ -194,13 +193,19 @@ public class HistoTimeLine {
 	}
 
 	/**
-	 * takes the timeline width and calculates the pixel positions of the timestamp values. 
-	 * left and right margins are left free for boxplots.
-	 * in case of few timestamps the left and right margins will be increased. 
 	 * @return list holding the timestamps and pixel positions (leftmost: 0, rightmost: width)
 	 */
 	public TreeMap<Long, Integer> getScalePositions() {
-		TreeMap<Long, Integer> position = new TreeMap<>(Collections.reverseOrder());
+		return this.scalePositions;
+	}
+	
+	/**
+	 * takes the timeline width and calculates the pixel positions of the timestamp values. 
+	 * left and right margins are left free for boxplots.
+	 * in case of few timestamps the left and right margins will be increased. 
+	 */
+	public void setScalePositions() {
+		 this.scalePositions.clear();
 		int leftMargin;
 		int rightMargin;
 		if (this.settings.isXAxisLogarithmicDistance() || this.density == Density.LOW || this.relativeTimeScale.size() <= 2) {
@@ -225,17 +230,16 @@ public class HistoTimeLine {
 		HistoTimeLine.log.log(Level.FINER, String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", this.width, leftMargin, rightMargin, netWidth)); //$NON-NLS-1$
 
 		for (Entry<Long, Double> entry : this.relativeTimeScale.entrySet()) {
-			position.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
-			if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "timeStamp = " + entry.getKey() + " position = " + position.get(entry.getKey())); //$NON-NLS-1$
+			this.scalePositions.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
+			if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "timeStamp = " + entry.getKey() + " position = " + this.scalePositions.get(entry.getKey())); //$NON-NLS-1$
 		}
-		return position;
 	}
 
 	/**
 	 * calculates the relative position on the timescale based on isReversed and isTimeframeAdjustment.
-	 * @return relative positions (leftmost: 0, rightmost: 1)
+	 * (leftmost: 0, rightmost: 1)
 	 */
-	private TreeMap<Long, Double> getRelativeScale() {
+	private void setRelativeScale() {
 		long maxVerifiedTimeStamp = -1; // first timeStamp in the HistoSet after maximumTimeStamp which is the first one due to descending order
 
 		// pass 1: build distances list and distances sum for all timestamps in the timestamp sliding window
@@ -262,14 +266,13 @@ public class HistoTimeLine {
 		HistoTimeLine.log.log(Level.FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$
 
 		//pass 2: build the relative timeScale list from relative distances
-		TreeMap<Long, Double> relativeTimeScale = new TreeMap<>();
 		if (this.settings.isXAxisReversed()) {
-			relativeTimeScale = new TreeMap<>(Collections.reverseOrder());
-			relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
+			this.relativeTimeScale = new TreeMap<>(Collections.reverseOrder());
+			this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
 		}
 		else {
-			relativeTimeScale = new TreeMap<>();
-			relativeTimeScale.put(maxVerifiedTimeStamp, 1.); // highest timestamp is at the rightmost position
+			this.relativeTimeScale = new TreeMap<>();
+			this.relativeTimeScale.put(maxVerifiedTimeStamp, 1.); // highest timestamp is at the rightmost position
 		}
 		double applicableDistancesTotal = applicableDistancesSum;
 		final boolean isNaturalTimescale = false; // true is not used anymore: use 'non-logarithmic' with a spread ordinal of zero which results in values very close to the natural timescale
@@ -280,9 +283,9 @@ public class HistoTimeLine {
 				// relativeDistances.add(relativeDistance);
 				relativeTimeScaleSum += relativeDistance;
 				if (this.settings.isXAxisReversed())
-					relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
+					this.relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
 				else
-					relativeTimeScale.put(entry.getKey(), 1. - relativeTimeScaleSum);
+					this.relativeTimeScale.put(entry.getKey(), 1. - relativeTimeScaleSum);
 				if (HistoTimeLine.log.isLoggable(Level.FINEST)) {
 					HistoTimeLine.log.log(Level.FINEST, "relativeTimeScale = " + entry.getValue()); //$NON-NLS-1$
 				}
@@ -318,22 +321,20 @@ public class HistoTimeLine {
 				double relativeDistance = (1. + (entry2.getValue() - normalizedDistancesMin) / logBaseDivisor) / scaleConstant;
 				relativeTimeScaleSum += relativeDistance;
 				if (this.settings.isXAxisReversed())
-					relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
+					this.relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
 				else
-					relativeTimeScale.put(entry2.getKey(), 1. - relativeTimeScaleSum);
+					this.relativeTimeScale.put(entry2.getKey(), 1. - relativeTimeScaleSum);
 				if (HistoTimeLine.log.isLoggable(Level.FINEST)) {
-					HistoTimeLine.log.log(Level.FINEST, "relativeTimeScale=" + relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
+					HistoTimeLine.log.log(Level.FINEST, "relativeTimeScale=" + this.relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
 				}
 			}
 			HistoTimeLine.log.log(Level.FINER, "relativeTimeScaleSum=" + relativeTimeScaleSum); //$NON-NLS-1$
 		}
-		return relativeTimeScale;
 	}
 
 	/**
 	 * calculates a density indicator based on the current width and the boxplot element scaled sizes without width amplitude settings. 
 	 * Does not take elements which have a distance less than one pixel and will be thus positioned at the same place. 
-	 * @return density constant (e.g. DENSITY_EXTREME)
 	 */
 	private void defineDensity() {
 		List<Double> relativeDistances = new ArrayList<>();
@@ -399,7 +400,7 @@ public class HistoTimeLine {
 	 * @return the timestamp position in the drawing area (relative to x0 which is the left position of the drawing canvas)
 	 */
 	public int getXPosTimestamp(long timestamp_ms) {
-		return this.getScalePositions().get(timestamp_ms);
+		return this.scalePositions.get(timestamp_ms);
 	}
 	
 	/**
@@ -507,14 +508,6 @@ public class HistoTimeLine {
 			return ((TrailRecordSet) this.trailRecordSet).getFileNameTag(timestamp);
 	}
 
-	/**
-	 * @param xPos current position in the drawing area (relative to x0 which is the left position of the drawing canvas)
-	 * @return the x axis position of the time stamp which is the closest one to xPos
-	 */
-	public int getAdjacentXPos(int xPos) {
-	return getXPosTimestamp(getAdjacentTimestamp(xPos));
-	}
-	
 	public Density getDensity() {
 		return this.density;
 	}
