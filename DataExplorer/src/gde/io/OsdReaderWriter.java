@@ -18,27 +18,6 @@
 ****************************************************************************************/
 package gde.io;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.ChannelTypes;
-import gde.device.IDevice;
-import gde.device.MeasurementType;
-import gde.exception.DataInconsitsentException;
-import gde.exception.GDEInternalException;
-import gde.exception.NotSupportedFileFormatException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.menu.MenuToolBar;
-import gde.utils.FileUtils;
-import gde.utils.OperatingSystemHelper;
-import gde.utils.StringHelper;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -59,6 +38,27 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.ChannelTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
+import gde.exception.DataInconsitsentException;
+import gde.exception.GDEInternalException;
+import gde.exception.NotSupportedFileFormatException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.menu.MenuToolBar;
+import gde.utils.FileUtils;
+import gde.utils.OperatingSystemHelper;
+import gde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
@@ -371,8 +371,6 @@ public class OsdReaderWriter {
 		String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 		if (device.isVariableMeasurementSize()) {
-			//int activeChannelConfigNumber = channelNumber; // WBrueg get rid of activeChannelConfigNumber after checking during merge
-			
 			//cleanup measurement, if count doesn't match
 			int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(channelNumber).length;
 			if (recordsProperties.length != existingNumberMeasurements) {

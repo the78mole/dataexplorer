@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.eclipse.swt.graphics.Point;
 
@@ -36,7 +35,6 @@ import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
 import gde.device.TrailTypes;
-import gde.device.TrailVisibilityType;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
@@ -47,7 +45,7 @@ import gde.utils.HistoTimeLine;
  * supports multiple curves (trail suites).
  * @author Thomas Eickert
  */
-public class TrailRecord extends Record { // WBrueg maybe a better option is to create a common base class for Record and TrailRecord.
+public class TrailRecord extends Record { // todo maybe a better option is to create a common base class for Record and TrailRecord.
 	private final static String		$CLASS_NAME							= TrailRecord.class.getName();
 	private final static long			serialVersionUID				= 110124007964748556L;
 	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
@@ -673,7 +671,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getFactor() { // WBrueg maybe this is a better solution for the record class also (so we get rid of this override)
+	public double getFactor() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null) {
@@ -700,7 +698,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getOffset() { // WBrueg maybe this is a better solution for the record class also (so we get rid of this override)
+	public double getOffset() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null) {
@@ -727,7 +725,7 @@ public class TrailRecord extends Record { // WBrueg maybe a better option is to 
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
-	public double getReduction() { // WBrueg maybe this is a better solution for the record class also (so we get rid of this override)
+	public double getReduction() { // todo maybe this is a better solution for the record class also (so we get rid of this override)
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null) {

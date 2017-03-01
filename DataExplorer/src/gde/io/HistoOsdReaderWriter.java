@@ -121,15 +121,15 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 		ZipEntry zip_entry = zip_input.getNextEntry();
 		InputStream inputStream;
 		if (zip_entry != null) {
-			inputStream = (InputStream) zip_input;
+			inputStream = zip_input;
 		}
 		else {
 			zip_input.close();
 			zip_input = null;
-			inputStream = (InputStream) new FileInputStream(file);
+			inputStream = new FileInputStream(file);
 		}
 
-		try (DataInputStream data_in = new DataInputStream((InputStream) inputStream)) { // closes the inputStream also
+		try (DataInputStream data_in = new DataInputStream(inputStream)) { // closes the inputStream also
 			final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(filePath.toString());
 			final double logDataExplorerVersion = header.containsKey(GDE.DATA_EXPLORER_FILE_VERSION) ? Double.parseDouble(header.get(GDE.DATA_EXPLORER_FILE_VERSION)) : 1.; // OpenSerialData version : 1
 			final int numberRecordSets = Integer.parseInt(header.get(GDE.RECORD_SET_SIZE));
@@ -202,8 +202,6 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					}
 					histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
 
-					// WBrueg not sure if necessary OsdReaderWriter.application.getActiveDevice().makeInActiveDisplayable(histoRecordSet);
-
 					// extract additional data
 					final String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
 					final Double[] packagesLost = HistoOsdReaderWriter.parsePackageLoss(recordSetComment);
@@ -246,7 +244,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					histoRecordSet.getDevice().resetMeasurements(); // WBrueg not sure if channel manipulations affect logs which are currently displayed in the standard tabs and also rely on channel manipulations 
 
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
-							recordSetTrusses.get(i).getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); //$NON-NLS-1$
+							recordSetTrusses.get(i).getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); 
 				}
 			}
 			log.log(Level.TIME, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoVaults.size(), recordSetsInfo.size(), //$NON-NLS-1$

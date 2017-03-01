@@ -44,7 +44,7 @@
 				<symbol></symbol>
 				<unit>%</unit>
 				<active>true</active>
-				<label>Amount of lost packages compared to the last 100 telemetry packages</label>
+				<label>Amount of lost packages compared to the last 100 telemetry packages (Rx->Tx)</label>
 			</Measurement>
 			<Measurement>
 				<name>RXSQ</name>
@@ -68,7 +68,7 @@
 				<unit>ms</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
-				<label>Longest receiver timespan without data packages coming from the transmitter</label>
+				<label>Longest receiver timespan without data packages coming from the transmitter (Tx->Rx)</label>
 			</Measurement>
 			<Measurement>
 				<name>Tx</name>
@@ -156,7 +156,7 @@
 				<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
 				<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
 				<score label="lostPackagesSigma_ms" value="Standard deviation" type="String" description="Standard deviation" />
-				<label>Transmitter timespan without telemetry data packages</label>
+				<label>Transmitter timespan without telemetry data packages (Rx->Tx)</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="4">
 				<name>Packages lost</name>
@@ -165,7 +165,7 @@
 				<active>true</active>
 				<score label="lostPackagesPerMille" value="Package lost ratio" type="String" description="lost packages / total packages" />
 				<property name="factor" value="0.1" type="Double" />
-				<label>Lost packages ratio based on the full recording period</label>
+				<label>Lost packages ratio based on the full recording period (Rx->Tx)</label>
 			</Scoregroup>
 			<Scoregroup scoregroupId="5">
 				<name>Sensors</name>

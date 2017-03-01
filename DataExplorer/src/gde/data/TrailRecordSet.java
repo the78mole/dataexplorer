@@ -563,7 +563,6 @@ public class TrailRecordSet extends RecordSet {
 //	 * at least an update of the graphics window should be included at the end of this method.
 //	 */
 //	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
-//		// WBrueg check if setting records to displayable is required for trailRecordSets: the current isActive settings should be valid for display --> remove this method
 //		int displayableCounter = 0;
 //		for (int i = 0; i < this.size(); ++i) {
 //			Record record = this.get(i);

@@ -702,7 +702,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
 		final Map<Long, Map<String, HistoVault>> trusses4Start = new LinkedHashMap<Long, Map<String, HistoVault>>();
 		final List<Integer> channelMixConfigNumbers;
-		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER) // WBrueg is channel type a better criterion?
+		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER) 
 			channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelBundle(this.application.getActiveChannelNumber());
 		else
 			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });

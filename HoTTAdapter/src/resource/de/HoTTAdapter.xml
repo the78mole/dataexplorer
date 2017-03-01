@@ -44,7 +44,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <label>Anteil verlorener Pakete an den letzten 100 Paketen des Rückkanals</label>
+                <label>Anteil verlorener Pakete an den letzten 100 Paketen des Rückkanals (Rx->Tx)</label>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -68,7 +68,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <label>Größte zusammenhängende Zeitspanne, in der kein Datenpaket des Senders beim Empfänger ankam</label>
+                <label>Größte zusammenhängende Zeitspanne, in der kein Datenpaket des Senders beim Empfänger ankam (Tx->Rx)</label>
             </Measurement>
             <Measurement>
                 <name>Tx</name>
@@ -161,7 +161,7 @@
                     <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
                     <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
                     <score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals (Rx->Tx)</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="4">
                     <name>Paketverluste</name>
@@ -170,7 +170,7 @@
                     <active>true</active>
                     <score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages"/>
                     <property name="factor" value="0.1" type="Double"/>
-                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung (Rx->Tx)</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="5">
                     <name>Sensoren</name>
@@ -1454,7 +1454,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="Bezogen auf Stromtrigger"/>
                 <property name="factor" value="10.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-                <label>Drehzahl mit Berücksichtigung eines Getreibefaktors des Motors am EAM</label>
+                <label>Drehzahl mit Berücksichtigung eines Getriebefaktors des Motors am EAM</label>
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
