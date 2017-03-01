@@ -1089,8 +1089,9 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.actualRecord != null && !CurveSelectorContextMenu.this.isRecordVisible) {
 						CurveSelectorContextMenu.this.actualRecord.setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
+						// ET refresh is done by setMeasurementActive
+						//						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						//						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
 					}
 					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.simpleMeasure.getSelection() == true) {
 						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);
@@ -1111,8 +1112,9 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "deltaMeasure.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.actualRecord != null && !CurveSelectorContextMenu.this.isRecordVisible) {
 						CurveSelectorContextMenu.this.actualRecord.setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
+						// ET refresh is done by setDeltaMeasurementActive
+						//						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						//						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
 					}
 					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.deltaMeasure.getSelection() == true) {
 						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);

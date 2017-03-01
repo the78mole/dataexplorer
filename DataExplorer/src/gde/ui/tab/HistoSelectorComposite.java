@@ -171,7 +171,12 @@ public class HistoSelectorComposite extends Composite {
 				public void widgetSelected(SelectionEvent evt) {
 					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
-						toggleRecordSelection((TableItem) evt.item, true, false);
+						// avoid phantom measurements with invisible curves
+						final TableItem eventItem = (TableItem) evt.item;
+						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE)
+								&& HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(eventItem.getText()))
+							HistoSelectorComposite.this.application.setMeasurementActive(eventItem.getText(), false);
+						toggleRecordSelection(eventItem, true, false);
 						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
 						HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 					}
@@ -214,7 +219,7 @@ public class HistoSelectorComposite extends Composite {
 				TrailRecord record = (TrailRecord) recordSet.getDisplayRecords().get(i);
 				textSize = record.getName().length() * textExtentFactor;
 				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
-				textSize2 = ((int) record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10)) * (textExtentFactor -2);
+				textSize2 = ((int) record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10)) * (textExtentFactor - 2);
 				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
 				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 				if (record.isDisplayable()) {
