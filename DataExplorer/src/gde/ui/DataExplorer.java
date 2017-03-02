@@ -796,7 +796,7 @@ public class DataExplorer extends Composite {
 			//wait for possible migration and delay opening for migration
 			this.settings.startMigationThread();
 			// check configured device
-			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) { //$NON-NLS-1$
+			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) { 
 				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
 				this.deviceSelectionDialog.open();
 			}
@@ -2442,22 +2442,22 @@ public class DataExplorer extends Composite {
 			if (isWindowTypeNormal) {
 				recordSet.setMeasurementMode(recordKey, enabled);
 				if (enabled)
-					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
-				else
-					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			}
-			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
-				recordSet = DataExplorer.application.getCompareSet();
-				if (recordSet != null && recordSet.containsKey(recordKey)) {
-					recordSet.setMeasurementMode(recordKey, enabled);
-					if (enabled)
-						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
+						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, true); // true forces the xPosMeasure recalculation which is required due to zoom mode support
 					else
-						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+						this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+				}
+				else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+					recordSet = DataExplorer.application.getCompareSet();
+					if (recordSet != null && recordSet.containsKey(recordKey)) {
+						recordSet.setMeasurementMode(recordKey, enabled);
+						if (enabled)
+							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, true); // true forces the xPosMeasure recalculation which is required due to zoom mode support
+						else
+							this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					}
 				}
 			}
 		}
-	}
 
 	/**
 	 * switch application into delta measurement mode for visible record set using selected record
@@ -2477,15 +2477,15 @@ public class DataExplorer extends Composite {
 			}
 			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
 				recordSet = DataExplorer.application.getCompareSet();
-				if (recordSet != null && recordSet.containsKey(recordKey)) {
-					recordSet.setDeltaMeasurementMode(recordKey, enabled);
-					if (enabled)
-						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
-					else
-						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					if (recordSet != null && recordSet.containsKey(recordKey)) {
+						recordSet.setDeltaMeasurementMode(recordKey, enabled);
+						if (enabled)
+							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, true); // true forces the xPosMeasure recalculation which is required due to zoom mode support
+						else
+							this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					}
 				}
 			}
-		}
 	}
 
 	/**
@@ -3181,7 +3181,7 @@ public class DataExplorer extends Composite {
 		if (visible) {
 			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
 				this.utilGraphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, tabName.length() < 3 ? Messages.getString(MessageIds.GDE_MSGT0282) : tabName,
-						this.displayTab.getItemCount()); //$NON-NLS-1$
+						this.displayTab.getItemCount()); 
 				this.utilGraphicsTabItem.create();
 			}
 		}
