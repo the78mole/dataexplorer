@@ -133,7 +133,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			catch (DataTypeException e) {
 				HoTTbinHistoReader2.log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), HoTTbinHistoReader2.filePath)); // 'GRAUPNER SD LOG8'
 			}
-			if (header != null && header.size() > 0 && HoTTAdapter.Sensor.getChannelNumbers(HoTTAdapter.isSensorType).contains(truss.getVaultChannelNumber())) {
+			if (header != null && header.size() > 0) {
 				if (!header.get(HoTTAdapter.FILE_PATH).equals(HoTTbinHistoReader2.filePath.toString())) {
 					// accept this 'GRAUPNER SD LOG8' file, extracted file starts with '~'
 					HoTTbinHistoReader2.filePath = Paths.get(header.get(HoTTAdapter.FILE_PATH));
