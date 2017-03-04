@@ -2156,6 +2156,9 @@ public class DataExplorer extends Composite {
 						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
 							DataExplorer.this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) {
+							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+						}
 					}
 				}
 			});
