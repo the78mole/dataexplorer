@@ -19,7 +19,6 @@
 package gde.ui.tab;
 
 import java.util.HashMap;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -42,11 +41,13 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 
 /**
  * Display window parent of analog displays
@@ -107,7 +108,7 @@ public class AnalogWindow extends CTabItem {
 			this.analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					AnalogWindow.this.contextMenu.createMenu(AnalogWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+					AnalogWindow.this.contextMenu.createMenu(AnalogWindow.this.popupmenu, TabType.SIMPLE);
 					update(false);
 				}
 			});

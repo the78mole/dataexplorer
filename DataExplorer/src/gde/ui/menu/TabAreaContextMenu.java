@@ -36,7 +36,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.tab.GraphicsWindow;
 
 /**
  * @author Winfried Brügmann
@@ -44,14 +43,6 @@ import gde.ui.tab.GraphicsWindow;
  */
 public class TabAreaContextMenu {
 	final static Logger			log						= Logger.getLogger(TabAreaContextMenu.class.getName());
-
-	public final static int	TYPE_GRAPHICS	= GraphicsWindow.TYPE_NORMAL;
-	public final static int	TYPE_COMPARE	= GraphicsWindow.TYPE_COMPARE;
-	public final static int	TYPE_UTILITY	= GraphicsWindow.TYPE_UTIL;
-	public final static int	TYPE_HISTO	= GraphicsWindow.TYPE_HISTO;
-	public final static int	TYPE_SIMPLE		= 3;																										//only referenced in not specified else clause
-	public final static int	TYPE_TABLE		= 4;
-	public final static int	TYPE_DIGITAL	= 5;
 
 	final DataExplorer			application;
 
@@ -72,7 +63,7 @@ public class TabAreaContextMenu {
 	boolean									isCreated			= false;
 
 	public enum TabType {
-		TYPE_GRAPHICS, TYPE_COMPARE, TYPE_UTILITY, TYPE_HISTO, TYPE_SIMPLE, TYPE_TABLE, TYPE_DIGITAL
+		GRAPHICS, COMPARE, UTILITY, HISTO, SIMPLE, TABLE, DIGITAL
 	};
 
 	public enum TabMenuOnDemand {
@@ -83,7 +74,7 @@ public class TabAreaContextMenu {
 		this.application = DataExplorer.getInstance();
 	}
 
-	public void createMenu(Menu popupMenu, final int type) {
+	public void createMenu(Menu popupMenu, TabType type) {
 		popupMenu.addMenuListener(new MenuListener() {
 			public void menuShown(MenuEvent e) {
 				TabAreaContextMenu.log.log(Level.FINEST, "menuShown action " + e); //$NON-NLS-1$
@@ -93,7 +84,7 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
 				}
-				if (type == TYPE_TABLE && editTableItem != null) {
+				if (type == TabType.TABLE && editTableItem != null) {
 					editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
 				}
 			}
@@ -103,7 +94,7 @@ public class TabAreaContextMenu {
 			}
 		});
 		if (!isCreated) {
-			if (type == TYPE_GRAPHICS) { // -1 as index mean initialization phase
+			if (type == TabType.GRAPHICS) { // -1 as index mean initialization phase
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
 				this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
@@ -148,7 +139,7 @@ public class TabAreaContextMenu {
 				}
 			});
 
-			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
+			if (type == TabType.GRAPHICS || type == TabType.COMPARE || type == TabType.UTILITY) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
@@ -159,7 +150,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type != TYPE_TABLE) {
+			if (type != TabType.TABLE) {
 				this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
 				this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
@@ -186,7 +177,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
+			if (type == TabType.GRAPHICS || type == TabType.COMPARE || type == TabType.UTILITY) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
@@ -200,7 +191,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TYPE_TABLE) {
+			if (type == TabType.TABLE) {
 				this.dateTimeItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
 				this.dateTimeItem.setSelection(Settings.getInstance().isTimeFormatAbsolute());
@@ -232,7 +223,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TYPE_DIGITAL) {
+			if (type == TabType.DIGITAL) {
 				this.setDigitalFontItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.setDigitalFontItem.setText(Messages.getString(MessageIds.GDE_MSGT0726));
 				this.setDigitalFontItem.addListener(SWT.Selection, new Listener() {

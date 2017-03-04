@@ -18,16 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.CurveSelectorContextMenu;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +39,17 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import gde.GDE;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.CurveSelectorContextMenu;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
+
 /**
  * This class defines a composite with a header (Curve Selector, ..) and a table with checkable table items
  * The table has a popup menu to manipulate properties of the items behind the table items
@@ -60,7 +61,7 @@ public class SelectorComposite extends Composite {
 	final DataExplorer							application							= DataExplorer.getInstance();
 	final Channels									channels								= Channels.getInstance();
 	final SashForm									parent;
-	final int												windowType;
+	final GraphicsType												graphicsType;
 	final String										headerText;
 	final Menu											popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
@@ -77,13 +78,14 @@ public class SelectorComposite extends Composite {
 
 	/**
 	 * @param useParent
-	 * @param useWindowType
+	 * @param useGraphicsType
+	 * @param useHeaderText
 	 */
-	public SelectorComposite(final SashForm useParent, final int useWindowType, final String useHeaderText) {
+	public SelectorComposite(final SashForm useParent, GraphicsType useGraphicsType, final String useHeaderText) {
 		super(useParent, SWT.NONE);
 		//this = new Composite(this.graphicSashForm, SWT.NONE);
 		this.parent = useParent;
-		this.windowType = useWindowType;
+		this.graphicsType = useGraphicsType;
 		this.headerText = useHeaderText;
 		SWTResourceManager.registerResourceUser(this);
 
@@ -183,16 +185,16 @@ public class SelectorComposite extends Composite {
 		SelectorComposite.this.application.updateAllTabs(true, false);
 		int itemWidth = this.initialSelectorHeaderWidth;
 		RecordSet recordSet = null;
-		switch (this.windowType) {
-		case GraphicsWindow.TYPE_COMPARE:
+		switch (this.graphicsType) {
+		case COMPARE:
 			recordSet = this.application.getCompareSet();
 			break;
 
-		case GraphicsWindow.TYPE_UTIL:
+		case UTIL:
 			recordSet = this.application.getUtilitySet();
 			break;
 
-		case GraphicsWindow.TYPE_NORMAL:
+		case NORMAL:
 		default:
 			recordSet = this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getActiveRecordSet() : null;
 			break;
@@ -218,12 +220,12 @@ public class SelectorComposite extends Composite {
 							isOneVisible = true;
 							item.setChecked(true);
 							item.setData(DataExplorer.OLD_STATE, true);
-							item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+							item.setData(GraphicsWindow.GRAPHICS_TYPE, this.graphicsType);
 						}
 						else {
 							item.setChecked(false);
 							item.setData(DataExplorer.OLD_STATE, false);
-							item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+							item.setData(GraphicsWindow.GRAPHICS_TYPE, this.graphicsType);
 						}
 						setHeaderSelection(isOneVisible);
 					}
@@ -243,7 +245,7 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth - 1, this.curveSelectorHeader.getSize().y);
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
-			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.windowType);
+			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.graphicsType);
 		}
 
 		if (SelectorComposite.log.isLoggable(Level.FINER)) SelectorComposite.log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
@@ -277,12 +279,12 @@ public class SelectorComposite extends Composite {
 		if (!isTableSelection || item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
 			if (SelectorComposite.log.isLoggable(Level.FINE)) SelectorComposite.log.log(Level.FINE, "selection state changed = " + recordName); //$NON-NLS-1$
 			Record activeRecord;
-			switch (SelectorComposite.this.windowType) {
-			case GraphicsWindow.TYPE_COMPARE:
+			switch (SelectorComposite.this.graphicsType) {
+			case COMPARE:
 				activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
 				break;
 
-			case GraphicsWindow.TYPE_UTIL:
+			case UTIL:
 				activeRecord = SelectorComposite.this.application.getUtilitySet().getRecord(recordName);
 				break;
 
@@ -297,19 +299,18 @@ public class SelectorComposite extends Composite {
 					activeRecord.setVisible(true);
 					SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
 					item.setData(DataExplorer.OLD_STATE, true);
-					item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
+					item.setData(GraphicsWindow.GRAPHICS_TYPE, SelectorComposite.this.graphicsType);
 					setHeaderSelection(true);
 				}
 				else {
 					activeRecord.setVisible(false);
 					SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
 					item.setData(DataExplorer.OLD_STATE, false);
-					item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
+					item.setData(GraphicsWindow.GRAPHICS_TYPE, SelectorComposite.this.graphicsType);
 				}
 				activeRecord.getParent().syncScaleOfSyncableRecords();
 				activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
-				if (activeRecord.getParent().getVisibleAndDisplayableRecords().size() == 0)
-					SelectorComposite.this.application.clearMeasurementModes();
+				if (activeRecord.getParent().getVisibleAndDisplayableRecords().size() == 0) SelectorComposite.this.application.clearMeasurementModes();
 			}
 		}
 	}

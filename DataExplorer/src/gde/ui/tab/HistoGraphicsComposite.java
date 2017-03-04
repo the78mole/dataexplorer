@@ -64,6 +64,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
 import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.GraphicsUtils;
 import gde.utils.HistoCurveUtils;
 import gde.utils.HistoTimeLine;
@@ -85,7 +86,7 @@ public class HistoGraphicsComposite extends Composite {
 	private final Channels			channels						= Channels.getInstance();
 	private final HistoTimeLine	timeLine						= new HistoTimeLine();
 	private final SashForm			graphicSashForm;
-	private final int						windowType;
+	private final GraphicsType				graphicsType;
 
 	Menu												popupmenu;
 	TabAreaContextMenu					contextMenu;
@@ -135,10 +136,10 @@ public class HistoGraphicsComposite extends Composite {
 	private long								timestampMeasure_ms, timestampDelta_ms;
 
 	HistoGraphicsComposite(final SashForm useParent) {
-		super(useParent, GraphicsWindow.TYPE_HISTO);
+		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 		this.graphicSashForm = useParent;
-		this.windowType = GraphicsWindow.TYPE_HISTO;
+		this.graphicsType = GraphicsType.HISTO;
 
 		//get the background colors
 		this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
@@ -156,7 +157,7 @@ public class HistoGraphicsComposite extends Composite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, this.windowType);
+		this.contextMenu.createMenu(this.popupmenu, this.graphicsType.toTabType());
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
@@ -178,9 +179,9 @@ public class HistoGraphicsComposite extends Composite {
 			@Override
 			public void helpRequested(HelpEvent evt) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.helpRequested " + evt); //$NON-NLS-1$
-				switch (HistoGraphicsComposite.this.windowType) {
+				switch (HistoGraphicsComposite.this.graphicsType) {
 				default:
-				case GraphicsWindow.TYPE_NORMAL:
+				case NORMAL:
 					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				}

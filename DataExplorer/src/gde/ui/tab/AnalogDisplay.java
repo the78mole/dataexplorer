@@ -19,7 +19,6 @@
 package gde.ui.tab;
 
 import java.text.DecimalFormat;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -45,9 +44,11 @@ import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 import gde.utils.GraphicsUtils;
 import gde.utils.MathUtils;
 
@@ -125,7 +126,7 @@ public class AnalogDisplay extends Composite {
 		this.backgroundColor = Settings.getInstance().getAnalogInnerAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+		this.contextMenu.createMenu(this.popupmenu, TabType.SIMPLE);
 	}
 
 	public void create() {
@@ -147,7 +148,7 @@ public class AnalogDisplay extends Composite {
 			}
 		});
 		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
-		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD)); //$NON-NLS-1$
+		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD)); 
 		this.textAnalogLabel.setBackground(this.backgroundColor);
 		this.textAnalogLabel.setForeground(DataExplorer.COLOR_BLACK);
 		this.textAnalogLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);

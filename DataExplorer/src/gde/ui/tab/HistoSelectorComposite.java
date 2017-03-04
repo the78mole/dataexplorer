@@ -52,6 +52,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
 
 /**
  * composite with a header (Curve Selector, ..) and table rows for the curves.
@@ -219,7 +220,7 @@ public class HistoSelectorComposite extends Composite {
 				TrailRecord record = (TrailRecord) recordSet.getDisplayRecords().get(i);
 				textSize = record.getName().length() * textExtentFactor;
 				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
-				textSize2 = ((int) record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10)) * (textExtentFactor - 2);
+				textSize2 = (record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10)) * (textExtentFactor - 2);
 				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
 				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 				if (record.isDisplayable()) {
@@ -263,7 +264,7 @@ public class HistoSelectorComposite extends Composite {
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
 		}
-		this.application.setGraphicsSashFormWeights(this.getCompositeWidth(), GraphicsWindow.TYPE_HISTO);
+		this.application.setGraphicsSashFormWeights(this.getCompositeWidth(), GraphicsType.HISTO);
 
 		if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}

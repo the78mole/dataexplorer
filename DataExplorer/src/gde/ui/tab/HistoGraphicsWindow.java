@@ -147,7 +147,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	 * @param newSelectorCompositeWidth the changed curve selector width
 	 */
 	public void setSashFormWeights(int newSelectorCompositeWidth) {
-		log.log(Level.FINER, "newSelectorCompositeWidth= " , newSelectorCompositeWidth); //$NON-NLS-1$
+		log.log(Level.FINER, "newSelectorCompositeWidth= ", newSelectorCompositeWidth); //$NON-NLS-1$
 		int tabFolderClientAreaWidth = this.tabFolder.getBounds().width;
 		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		int bestGuessWidth = this.application.getClientArea().width;
@@ -222,7 +222,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	public void enableRecordSetComment(boolean enabled) {
 		this.graphicsComposite.enableRecordSetComment(enabled);
 	}
-	
+
 	public void clearHeaderAndComment() {
 		this.graphicsComposite.clearHeaderAndComment();
 	}

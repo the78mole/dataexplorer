@@ -19,9 +19,6 @@
 package gde.ui.tab;
 
 import java.text.DecimalFormat;
-
-import gde.GDE;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,17 +32,20 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 
 /**
  * Child display class displaying digital active measurements
@@ -81,7 +81,7 @@ public class DigitalDisplay extends Composite {
 		this.backgroundColor = Settings.getInstance().getDigitalInnerAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_DIGITAL);
+		this.contextMenu.createMenu(this.popupmenu, TabType.DIGITAL);
 	}
 
 	public void create() {

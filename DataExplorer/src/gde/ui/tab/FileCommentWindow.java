@@ -18,17 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
-
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -67,6 +56,18 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 
 /**
  * Class to enable a file comment
@@ -167,7 +168,7 @@ public class FileCommentWindow extends CTabItem {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (FileCommentWindow.log.isLoggable(java.util.logging.Level.FINER)) FileCommentWindow.log.log(java.util.logging.Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
-					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabType.SIMPLE);
 				}
 			});
 		}

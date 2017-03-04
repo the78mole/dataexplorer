@@ -18,8 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -40,10 +38,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 
+import gde.GDE;
 import gde.config.Settings;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 import gde.utils.CellVoltageValues;
 
 /**
@@ -121,7 +122,7 @@ public class CellVoltageDisplay extends Composite {
 		});
 		
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+		this.contextMenu.createMenu(this.popupmenu, TabType.SIMPLE);
 	}
 
 	public void create() {

@@ -18,16 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.TimeLine;
-
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -38,6 +28,17 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
+import gde.utils.TimeLine;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -63,14 +64,14 @@ public class UtilGraphicsWindow extends CTabItem {
 	final Settings								settings;
 	final String									tabName;
 	final TimeLine								timeLine								= new TimeLine();
-	final int											windowType;
+	final GraphicsType											graphicsType;
 	
-	public UtilGraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName, int index) {
+	public UtilGraphicsWindow(CTabFolder currentDisplayTab, int style, GraphicsType currentType, String useTabName, int index) {
 		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.application = DataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
-		this.windowType = currentType;
+		this.graphicsType = currentType;
 		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
@@ -84,11 +85,11 @@ public class UtilGraphicsWindow extends CTabItem {
 		this.setControl(this.graphicSashForm);
 
 		{ // curveSelector
-			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
+			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.graphicsType, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
 		} // curveSelector
 
 		{ // graphics composite
-			this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.windowType);
+			this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.graphicsType);
 		} // graphics composite
 
 		// graphicSashForm
@@ -154,7 +155,7 @@ public class UtilGraphicsWindow extends CTabItem {
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " windowType = " + this.windowType);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " graphicsType = " + this.graphicsType);
 		}
 	}
 	
@@ -288,9 +289,9 @@ public class UtilGraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * @return the windowType (TYPE_NORMAL or TYPE_COMPARE)
+	 * @return the type (TYPE_NORMAL or TYPE_COMPARE)
 	 */
-	public int getWindowType() {
-		return windowType;
+	public GraphicsType getGraphicsType() {
+		return this.graphicsType;
 	}
 }

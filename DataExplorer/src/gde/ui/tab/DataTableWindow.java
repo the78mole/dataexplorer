@@ -18,22 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DataTypes;
-import gde.device.IDevice;
-import gde.device.MeasurementType;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
-import gde.utils.StringHelper;
-
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -68,6 +52,23 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.utils.StringHelper;
 
 /**
  * Table display class, displays the data in table form
@@ -418,7 +419,7 @@ public class DataTableWindow extends CTabItem {
 				}
 			}
 		});
-		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_TABLE);
+		this.contextMenu.createMenu(this.popupmenu, TabType.TABLE);
 		this.cursor.setMenu(this.popupmenu);
 	}
 

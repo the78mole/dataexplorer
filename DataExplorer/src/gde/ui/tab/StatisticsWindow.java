@@ -2,9 +2,6 @@ package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-
-import gde.log.Level;
-
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -38,11 +35,13 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.StatisticsType;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 import gde.utils.TimeLine;
 
 /**
@@ -148,7 +147,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
-						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabType.SIMPLE);
 						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
 						if (activeChannel != null) {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();

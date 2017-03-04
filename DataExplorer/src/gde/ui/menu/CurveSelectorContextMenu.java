@@ -18,21 +18,6 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.data.TrailRecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.AxisEndValuesDialog;
-import gde.ui.tab.GraphicsComposite;
-import gde.ui.tab.GraphicsWindow;
-import gde.utils.TimeLine;
-
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -48,6 +33,20 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.AxisEndValuesDialog;
+import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
+import gde.utils.TimeLine;
 
 /**
  * Context menu class of the curve selection window acts as popup menu
@@ -84,9 +83,9 @@ public class CurveSelectorContextMenu {
 	boolean							isSmoothVoltageCurve	= false;
 	String							recordNameKey					= null;
 	String							recordNameMeasurement	= GDE.STRING_BLANK;
-	boolean							isWindowTypeCompare		= false;
-	boolean							isWindowTypeUtility		= false;
-	boolean							isWindowTypeHisto			= false;
+	boolean							isTypeCompare		= false;
+	boolean							isTypeUtility		= false;
+	boolean							isTypeHisto			= false;
 
 	public CurveSelectorContextMenu() {
 		super();
@@ -107,9 +106,9 @@ public class CurveSelectorContextMenu {
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
-							CurveSelectorContextMenu.this.isWindowTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE);
-							CurveSelectorContextMenu.this.isWindowTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_UTIL);
-							CurveSelectorContextMenu.this.isWindowTypeHisto = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_HISTO);
+							CurveSelectorContextMenu.this.isTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.COMPARE);
+							CurveSelectorContextMenu.this.isTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.UTIL);
+							CurveSelectorContextMenu.this.isTypeHisto = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.HISTO);
 							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.application.getRecordSetOfVisibleTab();
 
 							if (CurveSelectorContextMenu.this.recordSet != null) {
@@ -122,7 +121,7 @@ public class CurveSelectorContextMenu {
 										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
-										if (!CurveSelectorContextMenu.this.isWindowTypeHisto) {
+										if (!CurveSelectorContextMenu.this.isTypeHisto) {
 											CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
 											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
 										}
@@ -172,7 +171,7 @@ public class CurveSelectorContextMenu {
 								}
 
 								// compare window has fixed defined scale end values
-								if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+								if (CurveSelectorContextMenu.this.isTypeCompare) {
 									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
 									if (CurveSelectorContextMenu.this.smoothVoltageCurveItem != null) CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(false);
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
@@ -181,7 +180,7 @@ public class CurveSelectorContextMenu {
 								}
 
 								// utility window
-								if (CurveSelectorContextMenu.this.isWindowTypeUtility) {
+								if (CurveSelectorContextMenu.this.isTypeUtility) {
 									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
 									if (CurveSelectorContextMenu.this.smoothVoltageCurveItem != null) CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(false);
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
@@ -838,7 +837,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_NONE);
 						}
 					}
@@ -855,7 +854,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MAIN);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -874,7 +873,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MOD60);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -895,7 +894,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-							if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+							if (CurveSelectorContextMenu.this.isTypeCompare) {
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -972,7 +971,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_NONE);
 						}
 					}
@@ -991,7 +990,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_EVERY);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -1012,7 +1011,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_SECOND);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -1034,7 +1033,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-							if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+							if (CurveSelectorContextMenu.this.isTypeCompare) {
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -1150,7 +1149,7 @@ public class CurveSelectorContextMenu {
 							}
 							if (compareSet.size() > 0) {
 								// while adding a new curve to compare set - reset the zoom mode
-								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
+								CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsComposite.MODE_RESET, false);
 							}
 
 							String newRecordkey = CurveSelectorContextMenu.this.settings.isCurveCompareChannelConfigName() ? copyFromRecord.getChannelConfigKey() + GDE.STRING_UNDER_BAR + copyFromRecordKey
@@ -1233,7 +1232,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0005));
 
 						//TODO check, why this is required before zoom operation ?
-						CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
+						CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsComposite.MODE_RESET, false);
 					}
 				}
 			});

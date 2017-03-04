@@ -18,6 +18,21 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
@@ -33,28 +48,13 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.CalculationThread;
 import gde.utils.CellVoltageValues;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.LocalizedDateTime.DurationPattern;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
-
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Vector;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * RecordSet class holds all the data records for the configured measurement of a device
@@ -205,9 +205,9 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
 	 * @param newTimeStep_ms time in msec of device measures points
-	 * @param windowType GraphicsWindow.WINDOW_TYPE
+	 * @param graphicsType 
 	 */
-	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, int windowType) {
+	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, GraphicsType graphicsType) {
 		super();
 		this.application = DataExplorer.getInstance();
 		this.channels = null;
@@ -217,8 +217,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		this.recordNames = new String[0];
 		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
 		this.isRaw = true;
-		this.isCompareSet = GraphicsWindow.TYPE_COMPARE == windowType;
-		this.isUtilitySet = GraphicsWindow.TYPE_UTIL == windowType;
+		this.isCompareSet = GraphicsType.COMPARE == graphicsType;
+		this.isUtilitySet = GraphicsType.UTIL == graphicsType;
 	}
 
 	/**
@@ -1851,7 +1851,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public boolean isCutLeftEdgeEnabled() {
 		try {
-			return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (this.get(0).zoomTimeOffset == 0);
+			return this.application.isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (this.get(0).zoomTimeOffset == 0);
 		}
 		catch (Exception e) {
 			return false;
@@ -1870,7 +1870,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		catch (Exception e) {
 			return false;
 		}
-		return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (tmpRecord.zoomTimeOffset + tmpRecord.drawTimeWidth >= tmpRecord.getMaxTime_ms());
+		return this.application.isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (tmpRecord.zoomTimeOffset + tmpRecord.drawTimeWidth >= tmpRecord.getMaxTime_ms());
 	}
 
 	/**

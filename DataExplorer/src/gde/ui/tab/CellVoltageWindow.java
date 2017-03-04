@@ -18,24 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DesktopPropertyTypes;
-import gde.device.IDevice;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.CellVoltageValuesDialog;
-import gde.ui.menu.TabAreaContextMenu;
-import gde.utils.CellVoltageValues;
-import gde.utils.CellVoltageValues.CellVoltageTypes;
-
 import java.text.DecimalFormat;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -62,6 +44,25 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Menu;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DesktopPropertyTypes;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.CellVoltageValuesDialog;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.utils.CellVoltageValues;
+import gde.utils.CellVoltageValues.CellVoltageTypes;
 
 /**
  * Display window parent of cellVoltage displays
@@ -165,13 +166,13 @@ public class CellVoltageWindow extends CTabItem {
 			this.cellVoltageMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ 
 				}
 			});
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					CellVoltageWindow.this.contextMenu.createMenu(CellVoltageWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+					CellVoltageWindow.this.contextMenu.createMenu(CellVoltageWindow.this.popupmenu, TabType.SIMPLE);
 					updateAndResize();
 				}
 			});
@@ -186,7 +187,7 @@ public class CellVoltageWindow extends CTabItem {
 			this.voltageLimitsSelection.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "voltageLimitsSelection.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ 
 				}
 			});
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
@@ -365,28 +366,28 @@ public class CellVoltageWindow extends CTabItem {
 				this.voltageValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageValue.setText("00.00"); //$NON-NLS-1$
 				this.voltageValue.setBackground(this.surroundingBackground);
-				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); //$NON-NLS-1$
+				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); 
 				this.voltageValue.setMenu(this.popupmenu);
 			}
 			{
 				this.voltageUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageUnit.setText("[V]"); //$NON-NLS-1$
 				this.voltageUnit.setBackground(this.surroundingBackground);
-				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); //$NON-NLS-1$
+				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); 
 				this.voltageUnit.setMenu(this.popupmenu);
 			}
 			{
 				this.capacitiyValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacitiyValue.setText("0000"); //$NON-NLS-1$
 				this.capacitiyValue.setBackground(this.surroundingBackground);
-				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); //$NON-NLS-1$
+				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); 
 				this.capacitiyValue.setMenu(this.popupmenu);
 			}
 			{
 				this.capacityUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacityUnit.setText("[mAh]"); //$NON-NLS-1$
 				this.capacityUnit.setBackground(this.surroundingBackground);
-				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); //$NON-NLS-1$
+				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); 
 				this.capacityUnit.setMenu(this.popupmenu);
 			}
 		}

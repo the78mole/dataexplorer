@@ -114,6 +114,7 @@ import gde.ui.tab.DigitalWindow;
 import gde.ui.tab.FileCommentWindow;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.ui.tab.HistoGraphicsWindow;
 import gde.ui.tab.HistoTableWindow;
 import gde.ui.tab.ObjectDescriptionWindow;
@@ -314,7 +315,7 @@ public class DataExplorer extends Composite {
 				this.displayTab.setLayoutData(tabCompositeLData);
 				this.displayTab.setSimple(false);
 				{
-					this.graphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_NORMAL, Messages.getString(MessageIds.GDE_MSGT0143), 0);
+					this.graphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsType.NORMAL, Messages.getString(MessageIds.GDE_MSGT0143), 0);
 					this.graphicsTabItem.create();
 				}
 				this.displayTab.setSelection(0);
@@ -618,19 +619,19 @@ public class DataExplorer extends Composite {
 					if (log.isLoggable(Level.FINER) && DataExplorer.this.displayTab.getSelectionIndex() >= 0)
 						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
 								+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
-					if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
+					if (isRecordSetVisible(GraphicsType.NORMAL)) {
 						if (DataExplorer.this.graphicsTabItem.isCurveSelectorEnabled())
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(DataExplorer.this.graphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
 						else
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(0);
 					}
-					else if (isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) && DataExplorer.this.compareTabItem != null) {
+					else if (isRecordSetVisible(GraphicsType.COMPARE) && DataExplorer.this.compareTabItem != null) {
 						DataExplorer.this.compareTabItem.setSashFormWeights(DataExplorer.this.compareTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
 					}
-					else if (isRecordSetVisible(GraphicsWindow.TYPE_UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
+					else if (isRecordSetVisible(GraphicsType.UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
 						DataExplorer.this.utilGraphicsTabItem.setSashFormWeights(DataExplorer.this.utilGraphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
 					}
-					else if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO) && DataExplorer.this.histoGraphicsTabItem != null) {
+					else if (isRecordSetVisible(GraphicsType.HISTO)) {
 						if (DataExplorer.this.histoGraphicsTabItem.isCurveSelectorEnabled())
 							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(DataExplorer.this.histoGraphicsTabItem.getCurveSelectorComposite().getCompositeWidth());
 						else
@@ -669,12 +670,12 @@ public class DataExplorer extends Composite {
 						DataExplorer.this.updateGraphicsWindow();
 					}
 					else if (tabSelectionIndex > 0) {
-						if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+						if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 							DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
 							DataExplorer.this.enableZoomMenuButtons(true);
 							DataExplorer.this.updateGraphicsWindow();
 						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 							DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
 							DataExplorer.this.enableZoomMenuButtons(false);
 							DataExplorer.this.updateGraphicsWindow();
@@ -802,7 +803,7 @@ public class DataExplorer extends Composite {
 			//wait for possible migration and delay opening for migration
 			this.settings.startMigationThread();
 			// check configured device
-			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) { 
+			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
 				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
 				this.deviceSelectionDialog.open();
 			}
@@ -829,7 +830,6 @@ public class DataExplorer extends Composite {
 	/**
 	 * sets histo windows visibility.
 	 * if a histo window is selected: determine histo files, read histo data and initialize window tab.
-	 * @param invalidateHistoPaths refresh histo file list even if the histo paths are valid 
 	 */
 	public void setupHistoWindows() {
 		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("started")); //$NON-NLS-1$
@@ -1963,7 +1963,6 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * update the histo tabs if visible.
-	 * @param rebuildSteps
 	 * @param recordOrdinal this single record is updated from the histo recordset
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
@@ -2105,15 +2104,15 @@ public class DataExplorer extends Composite {
 					this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
 				}
 				else if (tabSelectionIndex > 0) {
-					if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+					if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 						this.compareTabItem.redrawGraphics(refreshCurveSelector);
 					}
-					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 						this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
-					}
 					}
 				}
 			}
+		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
@@ -2122,13 +2121,13 @@ public class DataExplorer extends Composite {
 						if (tabSelectionIndex == 0) {
 							DataExplorer.this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 							DataExplorer.this.compareTabItem.redrawGraphics(refreshCurveSelector);
 						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 							DataExplorer.this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) {
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO)) {
 							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
 					}
@@ -2190,17 +2189,17 @@ public class DataExplorer extends Composite {
 	/**
 	 * set the graphics window sashForm weights
 	 */
-	public void setGraphicsSashFormWeights(int newSelectorCopositeWidth, int windowType) {
-		switch (windowType) {
-		case GraphicsWindow.TYPE_COMPARE:
+	public void setGraphicsSashFormWeights(int newSelectorCopositeWidth, GraphicsType graphicsType) {
+		switch (graphicsType) {
+		case COMPARE:
 			this.compareTabItem.setSashFormWeights(newSelectorCopositeWidth);
 			break;
 
-		case GraphicsWindow.TYPE_UTIL:
+		case UTIL:
 			this.utilGraphicsTabItem.setSashFormWeights(newSelectorCopositeWidth);
 			break;
 
-		case GraphicsWindow.TYPE_HISTO:
+		case HISTO:
 			this.histoGraphicsTabItem.setSashFormWeights(newSelectorCopositeWidth);
 			break;
 
@@ -2227,11 +2226,11 @@ public class DataExplorer extends Composite {
 	}
 
 	public RecordSet getCompareSet() {
-		return this.compareSet == null ? this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsWindow.TYPE_COMPARE) : this.compareSet;
+		return this.compareSet == null ? this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE) : this.compareSet;
 	}
 
 	public RecordSet getUtilitySet() {
-		return this.utilitySet == null ? this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1, GraphicsWindow.TYPE_UTIL) : this.utilitySet;
+		return this.utilitySet == null ? this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1, GraphicsType.UTIL) : this.utilitySet;
 	}
 
 	public GraphicsWindow getUtilGraphicsWindow(String tabName) {
@@ -2243,22 +2242,22 @@ public class DataExplorer extends Composite {
 	 * @param type (GraphicsWindow.TYPE_NORMAL/GraphicsWindow.TYPE_COMPARE)
 	 * @return true if the the record set in it window is visible
 	 */
-	public boolean isRecordSetVisible(int type) {
+	public boolean isRecordSetVisible(GraphicsType type) {
 		boolean result = false;
 		switch (type) {
-		case GraphicsWindow.TYPE_COMPARE:
+		case COMPARE:
 			result = this.compareTabItem != null && !this.compareTabItem.isDisposed() && this.compareTabItem.isVisible();
 			break;
 
-		case GraphicsWindow.TYPE_HISTO:
+		case HISTO:
 			result = this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible();
 			break;
 
-		case GraphicsWindow.TYPE_UTIL:
+		case UTIL:
 			result = this.utilGraphicsTabItem != null && !this.utilGraphicsTabItem.isDisposed() && this.utilGraphicsTabItem.isVisible();
 			break;
 
-		case GraphicsWindow.TYPE_NORMAL:
+		case NORMAL:
 		default:
 			result = this.graphicsTabItem.isVisible();
 			break;
@@ -2271,13 +2270,13 @@ public class DataExplorer extends Composite {
 	 * @return
 	 */
 	public RecordSet getRecordSetOfVisibleTab() {
-		if (this.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL))
+		if (this.isRecordSetVisible(GraphicsType.NORMAL))
 			return this.getActiveRecordSet();
-		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE))
+		else if (this.isRecordSetVisible(GraphicsType.COMPARE))
 			return this.compareSet;
-		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL))
+		else if (this.isRecordSetVisible(GraphicsType.UTIL))
 			return this.utilitySet;
-		else if (this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) return this.histoSet.getTrailRecordSet();
+		else if (this.isRecordSetVisible(GraphicsType.HISTO)) return this.histoSet.getTrailRecordSet();
 
 		return this.getActiveRecordSet();
 	}
@@ -2305,15 +2304,15 @@ public class DataExplorer extends Composite {
 	 */
 	public void setGraphicsMode(int graphicsMode, boolean enabled) {
 		final String $METHOD_NAME = "setGraphicsMode"; //$NON-NLS-1$
-		if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
+		if (isRecordSetVisible(GraphicsType.NORMAL)) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "graphicsWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
-			setGraphicsWindowGraphicsMode(graphicsMode, enabled);
+			setGraphicsWindowMode(graphicsMode, enabled);
 		}
-		else if (isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) && graphicsMode != GraphicsComposite.MODE_SCOPE) {
+		else if (isRecordSetVisible(GraphicsType.COMPARE) && graphicsMode != GraphicsComposite.MODE_SCOPE) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compareWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
-			setCompareWindowGraphicsMode(graphicsMode, enabled);
+			setCompareWindowMode(graphicsMode, enabled);
 		}
-		else if (isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+		else if (isRecordSetVisible(GraphicsType.UTIL)) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "utilityWindow.getGraphicCanvas().isVisible() == true, it does not have a supported graphics mode"); //$NON-NLS-1$
 		}
 	}
@@ -2323,7 +2322,7 @@ public class DataExplorer extends Composite {
 	 * @param graphicsMode
 	 * @param enabled
 	 */
-	public void setGraphicsWindowGraphicsMode(int graphicsMode, boolean enabled) {
+	public void setGraphicsWindowMode(int graphicsMode , boolean enabled) {
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) {
 			switch (graphicsMode) {
@@ -2360,7 +2359,7 @@ public class DataExplorer extends Composite {
 	 * @param graphicsMode
 	 * @param enabled
 	 */
-	public void setCompareWindowGraphicsMode(int graphicsMode, boolean enabled) {
+	public void setCompareWindowMode(int graphicsMode, boolean enabled) {
 		RecordSet recordSet = DataExplorer.application.getCompareSet();
 		if (recordSet != null) {
 			switch (graphicsMode) {
@@ -2390,14 +2389,15 @@ public class DataExplorer extends Composite {
 	 * clear measurement pointer
 	 */
 	public void clearMeasurementModes() {
-		if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO)) {
-			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+		if (isRecordSetVisible(GraphicsType.HISTO)) {
+			// use setMeasurementActive
+			throw new UnsupportedOperationException();
 		}
 		else {
-			boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
-			RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
+			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
+			RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 			if (recordSet != null) {
-				if (isWindowTypeNormal) {
+				if (isGraphicsTypeNormal) {
 					recordSet.clearMeasurementModes();
 					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
@@ -2418,7 +2418,7 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
-		if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
 			this.histoSet.getTrailRecordSet().setMeasurementMode(recordKey, enabled);
 			if (enabled)
 				this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE, false);
@@ -2426,28 +2426,29 @@ public class DataExplorer extends Composite {
 				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 		}
 		else {
-		boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
-		RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
-		if (recordSet != null && recordSet.containsKey(recordKey)) {
-			if (isWindowTypeNormal) {
-				recordSet.setMeasurementMode(recordKey, enabled);
-				if (enabled)
-					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
-				else
-					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			}
-			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
-				recordSet = DataExplorer.application.getCompareSet();
-				if (recordSet != null && recordSet.containsKey(recordKey)) {
+			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
+			RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
+			if (recordSet != null && recordSet.containsKey(recordKey)) {
+				if (isGraphicsTypeNormal) {
 					recordSet.setMeasurementMode(recordKey, enabled);
 					if (enabled)
-						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
+						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
 					else
-						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+						this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+				}
+				else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+					recordSet = DataExplorer.application.getCompareSet();
+					if (recordSet != null && recordSet.containsKey(recordKey)) {
+						recordSet.setMeasurementMode(recordKey, enabled);
+						if (enabled)
+							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
+						else
+							this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					}
 				}
 			}
-			}}
 		}
+	}
 
 	/**
 	 * switch application into delta measurement mode for visible record set using selected record
@@ -2455,7 +2456,8 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
-		if (isRecordSetVisible(GraphicsWindow.TYPE_HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, recordKey);
+		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
 			this.histoSet.getTrailRecordSet().setDeltaMeasurementMode(recordKey, enabled);
 			if (enabled)
 				this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE_DELTA, false);
@@ -2463,29 +2465,29 @@ public class DataExplorer extends Composite {
 				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 		}
 		else {
-		boolean isWindowTypeNormal = isRecordSetVisible(GraphicsWindow.TYPE_NORMAL);
-		RecordSet recordSet = isWindowTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
-		if (recordSet != null && recordSet.containsKey(recordKey)) {
-			if (isWindowTypeNormal) {
-				recordSet.setDeltaMeasurementMode(recordKey, enabled);
-				if (enabled)
-					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
-				else
-					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			}
-			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
-				recordSet = DataExplorer.application.getCompareSet();
-				if (recordSet != null && recordSet.containsKey(recordKey)) {
+			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
+			RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
+			if (recordSet != null && recordSet.containsKey(recordKey)) {
+				if (isGraphicsTypeNormal) {
 					recordSet.setDeltaMeasurementMode(recordKey, enabled);
 					if (enabled)
-						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
+						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
 					else
-						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+						this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+				}
+				else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+					recordSet = DataExplorer.application.getCompareSet();
+					if (recordSet != null && recordSet.containsKey(recordKey)) {
+						recordSet.setDeltaMeasurementMode(recordKey, enabled);
+						if (enabled)
+							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
+						else
+							this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
+					}
 				}
 			}
 		}
 	}
-		}
 
 	/**
 	 * switch application graphics window into cut mode
@@ -2699,17 +2701,16 @@ public class DataExplorer extends Composite {
 	 * @return the canvasImage alias graphics w1ndow
 	 */
 	public Image getGraphicsPrintImage() {
-		return this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) ? this.compareTabItem.getGraphicsComposite().getGraphicsPrintImage()
-				: this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL) ? this.utilGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage()
-						: this.graphicsTabItem.getGraphicsComposite().getGraphicsPrintImage();
+		return this.isRecordSetVisible(GraphicsType.COMPARE) ? this.compareTabItem.getGraphicsComposite().getGraphicsPrintImage()
+				: this.isRecordSetVisible(GraphicsType.UTIL) ? this.utilGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage() : this.graphicsTabItem.getGraphicsComposite().getGraphicsPrintImage();
 	}
 
 	/**
 	 * return statistics window content as image
 	 */
 	public Image getGraphicsTabContentAsImage() {
-		return this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) ? this.compareTabItem.getContentAsImage()
-				: this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) ? this.utilGraphicsTabItem.getContentAsImage() : this.graphicsTabItem.getContentAsImage();
+		return this.isRecordSetVisible(GraphicsType.COMPARE) ? this.compareTabItem.getContentAsImage()
+				: this.isRecordSetVisible(GraphicsType.COMPARE) ? this.utilGraphicsTabItem.getContentAsImage() : this.graphicsTabItem.getContentAsImage();
 	}
 
 	/**
@@ -2806,10 +2807,10 @@ public class DataExplorer extends Composite {
 		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
 			graphicsImage = this.objectDescriptionTabItem.getContentAsImage();
 		}
-		else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+		else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			graphicsImage = this.compareTabItem.getContentAsImage();
 		}
-		else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+		else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 			graphicsImage = this.utilGraphicsTabItem.getContentAsImage();
 		}
 		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) {
@@ -2888,11 +2889,11 @@ public class DataExplorer extends Composite {
 			this.settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
 			this.objectDescriptionTabItem.setInnerAreaBackground(innerAreaBackground);
 		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			this.settings.setCompareCurveAreaBackground(innerAreaBackground);
 			this.compareTabItem.setCurveAreaBackground(innerAreaBackground);
 		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilityCurveAreaBackground(innerAreaBackground);
 			this.utilGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
 		}
@@ -2912,11 +2913,11 @@ public class DataExplorer extends Composite {
 			this.settings.setCurveGraphicsBorderColor(borderColor);
 			this.graphicsTabItem.setCurveAreaBorderColor(borderColor);
 		}
-		else if (tabItemIndex > 0) if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+		else if (tabItemIndex > 0) if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			this.settings.setCurveCompareBorderColor(borderColor);
 			this.compareTabItem.setCurveAreaBorderColor(borderColor);
 		}
-		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilityCurvesBorderColor(borderColor);
 			this.utilGraphicsTabItem.setCurveAreaBorderColor(borderColor);
 		}
@@ -2977,11 +2978,11 @@ public class DataExplorer extends Composite {
 			this.settings.setObjectDescriptionSurroundingAreaBackground(surroundingBackground);
 			this.objectDescriptionTabItem.setSurroundingAreaBackground(surroundingBackground);
 		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
+		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			this.settings.setCompareSurroundingBackground(surroundingBackground);
 			this.compareTabItem.setSurroundingBackground(surroundingBackground);
 		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilitySurroundingBackground(surroundingBackground);
 			this.utilGraphicsTabItem.setSurroundingBackground(surroundingBackground);
 		}
@@ -3137,7 +3138,7 @@ public class DataExplorer extends Composite {
 			for (int i = 0; i < this.displayTab.getItemCount(); ++i) {
 				CTabItem tabItem = this.displayTab.getItems()[i];
 				if (tabItem instanceof FileCommentWindow) {
-					this.compareTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_COMPARE, Messages.getString(MessageIds.GDE_MSGT0144), i);
+					this.compareTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsType.COMPARE, Messages.getString(MessageIds.GDE_MSGT0144), i);
 					this.compareTabItem.create();
 					break;
 				}
@@ -3185,8 +3186,8 @@ public class DataExplorer extends Composite {
 	public GraphicsWindow setUtilGraphicsWindowVisible(boolean visible, String tabName) {
 		if (visible) {
 			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
-				this.utilGraphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, tabName.length() < 3 ? Messages.getString(MessageIds.GDE_MSGT0282) : tabName,
-						this.displayTab.getItemCount()); 
+				this.utilGraphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsType.UTIL, tabName.length() < 3 ? Messages.getString(MessageIds.GDE_MSGT0282) : tabName,
+						this.displayTab.getItemCount());
 				this.utilGraphicsTabItem.create();
 			}
 		}
@@ -3196,7 +3197,7 @@ public class DataExplorer extends Composite {
 				this.utilGraphicsTabItem = null;
 			}
 		}
-		return utilGraphicsTabItem;
+		return this.utilGraphicsTabItem;
 	}
 
 	/**

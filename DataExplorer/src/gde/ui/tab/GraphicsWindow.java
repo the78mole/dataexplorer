@@ -18,16 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.TimeLine;
-
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -40,48 +30,74 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.utils.TimeLine;
+
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
  */
 public class GraphicsWindow extends CTabItem {
-	final static Logger						log											= Logger.getLogger(GraphicsWindow.class.getName());
+	final static Logger					log											= Logger.getLogger(GraphicsWindow.class.getName());
 
-	public static final int				TYPE_NORMAL							= 0;
-	public static final int				TYPE_COMPARE						= 1;
-	public static final int				TYPE_UTIL								= 2;
-	public static final int				TYPE_HISTO								= 3;
-	public static final String		WINDOW_TYPE							= "window_type"; //$NON-NLS-1$
+	public static final String	GRAPHICS_TYPE						= "graphics_type";																	//$NON-NLS-1$
 
-	final CTabFolder							tabFolder;
-	
-	SashForm											graphicSashForm;
-	boolean												isCurveSelectorEnabled	= true;
-	int[]													sashFormWeights					= new int[] { 100, 1000 };
-	
+	final CTabFolder						tabFolder;
+
+	SashForm										graphicSashForm;
+	boolean											isCurveSelectorEnabled	= true;
+	int[]												sashFormWeights					= new int[] { 100, 1000 };
+
 	// Curve Selector Table with popup menu
-	SelectorComposite							curveSelectorComposite;
+	SelectorComposite						curveSelectorComposite;
 
 	// drawing canvas
-	GraphicsComposite							graphicsComposite;
+	GraphicsComposite						graphicsComposite;
 
-	final DataExplorer						application;
-	final Channels								channels;
-	final Settings								settings;
-	final String									tabName;
-	final TimeLine								timeLine								= new TimeLine();
-	final int											windowType;
-	
-	public GraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName, int index) {
+	final DataExplorer					application;
+	final Channels							channels;
+	final Settings							settings;
+	final String								tabName;
+	final TimeLine							timeLine								= new TimeLine();
+	final GraphicsType					graphicsType;
+
+	public enum GraphicsType {
+		NORMAL, COMPARE, UTIL, HISTO;
+
+		public TabType toTabType() {
+			switch (this) {
+			case NORMAL:
+				return TabType.GRAPHICS;
+			case COMPARE:
+				return TabType.COMPARE;
+			case UTIL:
+				return TabType.UTILITY;
+			case HISTO:
+				return TabType.HISTO;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
+	};
+
+	public GraphicsWindow(CTabFolder currentDisplayTab, int style, GraphicsType currentType, String useTabName, int index) {
 		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.application = DataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
-		this.windowType = currentType;
+		this.graphicsType = currentType;
 		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.setText(this.tabName);
 	}
 
@@ -91,15 +107,15 @@ public class GraphicsWindow extends CTabItem {
 		this.setControl(this.graphicSashForm);
 
 		{ // curveSelector
-			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
+			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.graphicsType, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
 		} // curveSelector
 
 		{ // graphics composite
-			this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.windowType);
+			this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.graphicsType);
 		} // graphics composite
 
 		// graphicSashForm
-		this.graphicSashForm.setWeights(new int[] {117, GDE.shell.getClientArea().width - 117});
+		this.graphicSashForm.setWeights(new int[] { 117, GDE.shell.getClientArea().width - 117 });
 	}
 
 	/**
@@ -109,7 +125,7 @@ public class GraphicsWindow extends CTabItem {
 	public boolean isVisible() {
 		return this.graphicsComposite.isVisible();
 	}
-	
+
 	/**
 	 * redraws the graphics canvas as well as the curve selector table
 	 */
@@ -129,10 +145,10 @@ public class GraphicsWindow extends CTabItem {
 			});
 		}
 	}
-	
+
 	/**
 	 * update graphics window header and description
-   */ 
+	 */
 	public void updateCaptions() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.graphicsComposite.updateCaptions();
@@ -176,20 +192,21 @@ public class GraphicsWindow extends CTabItem {
 			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
-		newSelectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth/2 ? tabFolderClientAreaWidth/2 : newSelectorCompositeWidth;
-		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth};
+		newSelectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth / 2 ? tabFolderClientAreaWidth / 2 : newSelectorCompositeWidth;
+		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth };
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			try {
 				this.graphicSashForm.setWeights(this.sashFormWeights);
 			}
 			catch (IllegalArgumentException e) {
-				 log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e);
+				log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e);
 			}
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " windowType = " + this.windowType);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+					"sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " graphicsType = " + this.graphicsType);
 		}
 	}
-	
+
 	/**
 	 * query the width
 	 */
@@ -219,14 +236,14 @@ public class GraphicsWindow extends CTabItem {
 		this.isCurveSelectorEnabled = enabled;
 		if (enabled)
 			setSashFormWeights(this.curveSelectorComposite.getSelectorColumnWidth());
-		else 
+		else
 			setSashFormWeights(0);
 	}
 
 	public SashForm getGraphicSashForm() {
 		return this.graphicSashForm;
 	}
-	
+
 	/**
 	 * enable display of graphics header
 	 */
@@ -240,11 +257,11 @@ public class GraphicsWindow extends CTabItem {
 	public void enableRecordSetComment(boolean enabled) {
 		this.graphicsComposite.enableRecordSetComment(enabled);
 	}
-	
+
 	public void clearHeaderAndComment() {
 		this.graphicsComposite.clearHeaderAndComment();
 	}
-	
+
 	/**
 	 * switch graphics window mouse mode
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
@@ -274,7 +291,7 @@ public class GraphicsWindow extends CTabItem {
 	public boolean isActiveCurveSelectorContextMenu() {
 		return this.curveSelectorComposite.contextMenu.isActive();
 	}
-	
+
 	/**
 	 * create visible tab window content as image
 	 * @return image with content
@@ -286,33 +303,31 @@ public class GraphicsWindow extends CTabItem {
 		this.graphicSashForm.print(imageGC);
 		if (GDE.IS_MAC) {
 			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
-			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), 
-					bounds.width - graphics.getBounds().width, 0);
+			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), bounds.width - graphics.getBounds().width, 0);
 		}
 		imageGC.dispose();
 
 		return tabContentImage;
 	}
-	
-  ImageData flipHorizontal(ImageData inputImageData) {
-    int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
-    int outBytesPerLine = inputImageData.width * bytesPerPixel;
-    byte[] outDataBytes = new byte[inputImageData.data.length];
-    int outX = 0, outY = 0, inIndex = 0, outIndex = 0;
-    
-    for (int y = 0; y < inputImageData.height; y++) {
-      for (int x = 0; x < inputImageData.width; x++) {
-        outX = x;
-        outY = inputImageData.height - y - 1;       
-        inIndex = (y * inputImageData.bytesPerLine) + (x * bytesPerPixel);
-        outIndex = (outY * outBytesPerLine) + (outX * bytesPerPixel);
-        System.arraycopy(inputImageData.data, inIndex, outDataBytes, outIndex,  bytesPerPixel);
-      }
-    }
-    return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, outBytesPerLine, outDataBytes);
-  }
 
-	
+	ImageData flipHorizontal(ImageData inputImageData) {
+		int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
+		int outBytesPerLine = inputImageData.width * bytesPerPixel;
+		byte[] outDataBytes = new byte[inputImageData.data.length];
+		int outX = 0, outY = 0, inIndex = 0, outIndex = 0;
+
+		for (int y = 0; y < inputImageData.height; y++) {
+			for (int x = 0; x < inputImageData.width; x++) {
+				outX = x;
+				outY = inputImageData.height - y - 1;
+				inIndex = (y * inputImageData.bytesPerLine) + (x * bytesPerPixel);
+				outIndex = (outY * outBytesPerLine) + (outX * bytesPerPixel);
+				System.arraycopy(inputImageData.data, inIndex, outDataBytes, outIndex, bytesPerPixel);
+			}
+		}
+		return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, outBytesPerLine, outDataBytes);
+	}
+
 	/**
 	 * set the curve graphics background color
 	 * @param curveAreaBackground the curveAreaBackground to set
@@ -321,7 +336,7 @@ public class GraphicsWindow extends CTabItem {
 		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
 		this.graphicsComposite.graphicCanvas.redraw();
 	}
-	
+
 	/**
 	 * set the curve graphics background color
 	 * @param borderColor the curveAreaBackground to set
@@ -344,9 +359,9 @@ public class GraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * @return the windowType (TYPE_NORMAL or TYPE_COMPARE)
+	 * @return the type (TYPE_NORMAL or TYPE_COMPARE)
 	 */
-	public int getWindowType() {
-		return windowType;
+	public GraphicsType getGraphicsType() {
+		return this.graphicsType;
 	}
 }
