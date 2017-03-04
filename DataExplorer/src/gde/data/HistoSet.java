@@ -61,6 +61,7 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histocache.HistoVault;
+import gde.histoinventory.FileExclusionData;
 import gde.io.HistoOsdReaderWriter;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -374,7 +375,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					this.trailRecordSet.defineTrailTypes();
 					// this.trailRecordSet.checkAllDisplayable();
 					this.trailRecordSet.setPoints();
-					this.trailRecordSet.setTags();
+					this.trailRecordSet.setDataTags();
 					this.trailRecordSet.applyTemplate(true); // needs reasonable data
 					nanoTimeTrailRecordSet += System.nanoTime();
 					if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
@@ -388,7 +389,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					isRebuilt = true;
 					this.trailRecordSet.cleanup();
 					this.trailRecordSet.setPoints();
-					this.trailRecordSet.setTags();
+					this.trailRecordSet.setDataTags();
 				}
 				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(98, sThreadId);
 			}
@@ -630,7 +631,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		//special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder
 		String validatedDeviceName = validatedDevice.getName();
 		if (this.application.getActiveDevice().getName().endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200
-			validatedDeviceName = this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length()-4);
+			validatedDeviceName = this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length() - 4);
 		}
 
 		String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();
@@ -658,8 +659,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (this.settings.getSearchDataPathImports() && !this.validatedImportExtention.isEmpty()) {
 						for (File file : files) {
 							if (file.getName().endsWith(GDE.FILE_ENDING_OSD) || file.getName().endsWith(this.validatedImportExtention)) {
-								if (!this.histoFilePaths.containsKey(file.lastModified())) 
-									this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+								if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
 								this.histoFilePaths.get(file.lastModified()).add(file.toPath());
 							}
 						}
@@ -703,13 +703,16 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
 		final Map<Long, Map<String, HistoVault>> trusses4Start = new LinkedHashMap<Long, Map<String, HistoVault>>();
 		final List<Integer> channelMixConfigNumbers;
-		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER) 
+		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER)
 			channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelBundle(this.application.getActiveChannelNumber());
 		else
 			channelMixConfigNumbers = Arrays.asList(new Integer[] { this.application.getActiveChannelNumber() });
 		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
+				: GDE.STRING_EMPTY;
 
+		Path lastFileDir = null;
+		FileExclusionData fileExclusionData = null;
 		int invalidRecordSetsCount = 0;
 		for (Map.Entry<Long, Set<Path>> pathListEntry : this.histoFilePaths.entrySet()) {
 			for (Path path : pathListEntry.getValue()) {
@@ -731,8 +734,13 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
-							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
-								&& !(truss.getLogDeviceName().startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter
+							if (lastFileDir != actualFile.toPath().getParent() || fileExclusionData == null) fileExclusionData = new FileExclusionData(actualFile.toPath().getParent());
+							if (fileExclusionData.isExcluded(Paths.get(truss.getLogFilePath()), truss.getLogRecordsetBaseName())) {
+								log.log(Level.INFO, String.format("OSD candidate is in the excluded list %s  %s", actualFile, truss.getStartTimeStampFormatted()));
+								// discard truss
+							}
+							else if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
+									&& !(truss.getLogDeviceName().startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter
 								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
 								break; // ignore all log file trusses 
 							}
@@ -778,12 +786,17 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					int fileRecordSetSize = Channels.getInstance().size();
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(actualFile.getName());
 					HistoVault truss = HistoVault.createTruss(objectDirectory, actualFile, 0, fileRecordSetSize, recordSetBaseName);
-					if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
+					if (lastFileDir != actualFile.toPath().getParent() || fileExclusionData == null) fileExclusionData = new FileExclusionData(actualFile.toPath().getParent());
+					if (fileExclusionData.isExcluded(Paths.get(truss.getLogFilePath()), truss.getLogRecordsetBaseName())) {
+						log.log(Level.INFO, String.format("BIN candidate is in the excluded list %s  %s", actualFile, truss.getStartTimeStampFormatted()));
+						// discard truss
+					}
+					else if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 						// discard truss
 					}
 					else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
 						log.log(Level.INFO, String.format("BIN candidate found for wrong object \"%s\" in %s lastModified=%d", objectDirectory, actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
-								isValidObject = this.settings.getFilesWithOtherObject();
+						isValidObject = this.settings.getFilesWithOtherObject();
 					}
 					else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
 						log.log(Level.INFO, String.format("BIN candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
@@ -806,7 +819,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("isValidRecordSet=false  lastModified=%,d  %s", actualFile.lastModified(), actualFile.getAbsolutePath())); //$NON-NLS-1$
 					}
 				}
+
 				if (pathMap.size() > 0) trusses4Paths.put(actualFile.toPath(), pathMap);
+				lastFileDir = actualFile.toPath().getParent();
 			}
 		}
 		log.log(Level.INFO, String.format("%04d files taken --- %04d checked files --- %04d invalid recordsets", trusses4Paths.size(), this.histoFilePaths.size(), invalidRecordSetsCount)); //$NON-NLS-1$

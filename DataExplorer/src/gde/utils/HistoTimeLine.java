@@ -19,6 +19,7 @@
 ****************************************************************************************/
 package gde.utils;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -28,6 +29,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -40,8 +42,8 @@ import org.eclipse.swt.graphics.Point;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.HistoSet;
-import gde.data.RecordSet;
 import gde.data.TrailRecordSet;
+import gde.data.TrailRecordSet.DataTag;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -90,28 +92,29 @@ public class HistoTimeLine {
 		}
 	}
 
-	private RecordSet							trailRecordSet;													// this class does not utilize any specific trail recordset methods
-	private int										width;																	// number of pixels for the timescale length (includes left/right margins and the histo chart region)
-	private long									leftmostTimeStamp, rightmostTimeStamp;	// define the corners of the histo chart region
-	private TreeMap<Long, Double>	relativeTimeScale;											// maps histoset timestamps to x-axis with range 0 to 1
-	private Density								density;																// degree of population on the x -axis
-	private TreeMap<Long, Integer> scalePositions =  new TreeMap<>(Collections.reverseOrder());
+	private TrailRecordSet					trailRecordSet;																							// this class does not utilize any specific trail recordset methods
+	private int											width;																											// number of pixels for the timescale length (includes left/right margins and the histo chart region)
+	private long										leftmostTimeStamp, rightmostTimeStamp;											// define the corners of the histo chart region
+	private TreeMap<Long, Double>		relativeTimeScale;																					// maps histoset timestamps to x-axis with range 0 to 1
+	private Density									density;																										// degree of population on the x -axis
+	private TreeMap<Long, Integer>	scalePositions	= new TreeMap<>(Collections.reverseOrder());
+
 	/**
 	 * takes the timeline width and calculates the x-axis pixel positions for the histo timestamp values. 
-	 * @param trailRecordSet any recordset object (no trail recordset required)
-	 * @param width  number of pixels for the timescale length including left/right margins for boxplots 
-	 * @param leftmostTimeStamp  in modes zoom, pan, scope
-	 * @param rightmostTimeStamp  in modes zoom, pan, scope
+	 * @param newTrailRecordSet any recordset object (no trail recordset required)
+	 * @param newWidth  number of pixels for the timescale length including left/right margins for boxplots 
+	 * @param newLeftmostTimeStamp  in modes zoom, pan, scope
+	 * @param newRightmostTimeStamp  in modes zoom, pan, scope
 	 */
-	public void initialize(RecordSet trailRecordSet, int width, long leftmostTimeStamp, long rightmostTimeStamp) {
-		this.trailRecordSet = trailRecordSet;
-		this.width = width;
-		this.leftmostTimeStamp = leftmostTimeStamp;
-		this.rightmostTimeStamp = rightmostTimeStamp;
+	public void initialize(TrailRecordSet newTrailRecordSet, int newWidth, long newLeftmostTimeStamp, long newRightmostTimeStamp) {
+		this.trailRecordSet = newTrailRecordSet;
+		this.width = newWidth;
+		this.leftmostTimeStamp = newLeftmostTimeStamp;
+		this.rightmostTimeStamp = newRightmostTimeStamp;
 		setRelativeScale();
 		defineDensity();
 		setScalePositions();
-		}
+	}
 
 	/**
 	 * draws the histo time line for the standard x-axis and the logarithmic distance axis.
@@ -198,14 +201,14 @@ public class HistoTimeLine {
 	public TreeMap<Long, Integer> getScalePositions() {
 		return this.scalePositions;
 	}
-	
+
 	/**
 	 * takes the timeline width and calculates the pixel positions of the timestamp values. 
 	 * left and right margins are left free for boxplots.
 	 * in case of few timestamps the left and right margins will be increased. 
 	 */
 	public void setScalePositions() {
-		 this.scalePositions.clear();
+		this.scalePositions.clear();
 		int leftMargin;
 		int rightMargin;
 		if (this.settings.isXAxisLogarithmicDistance() || this.density == Density.LOW || this.relativeTimeScale.size() <= 2) {
@@ -402,7 +405,7 @@ public class HistoTimeLine {
 	public int getXPosTimestamp(long timestamp_ms) {
 		return this.scalePositions.get(timestamp_ms);
 	}
-	
+
 	/**
 	 * @param xPos current position in the drawing area (relative to x0 which is the left position of the drawing canvas)
 	 * @return the time stamp of the trail recordset which is the closest one to xPos  ---  or null if xPos is too far away
@@ -501,11 +504,13 @@ public class HistoTimeLine {
 	}
 
 	public String getSnappedTimestampText(int xPos) {
-		final Long timestamp = getSnappedTimestamp(xPos);
-		if (timestamp == null)
+		final Long timestamp_ms = getSnappedTimestamp(xPos);
+		if (timestamp_ms == null)
 			return null;
-		else
-			return ((TrailRecordSet) this.trailRecordSet).getFileNameTag(timestamp);
+		else {
+			final Map<Integer, String> dataTags = this.trailRecordSet.getDataTags(timestamp_ms);
+			return Paths.get(dataTags.get(DataTag.FILE_PATH.ordinal())).getFileName().toString();
+		}
 	}
 
 	public Density getDensity() {

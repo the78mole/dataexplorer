@@ -19,14 +19,6 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
-import gde.config.Settings;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.tab.GraphicsWindow;
-
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -38,37 +30,54 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.config.Settings;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
+
 /**
  * @author Winfried Brügmann
  * This class provides a context menu to tabulator area, curve graphics, compare window, etc. and enable selection of background color, ...
  */
 public class TabAreaContextMenu {
-	final static Logger						log	= Logger.getLogger(TabAreaContextMenu.class.getName());
-	
+	final static Logger			log						= Logger.getLogger(TabAreaContextMenu.class.getName());
+
 	public final static int	TYPE_GRAPHICS	= GraphicsWindow.TYPE_NORMAL;
 	public final static int	TYPE_COMPARE	= GraphicsWindow.TYPE_COMPARE;
 	public final static int	TYPE_UTILITY	= GraphicsWindow.TYPE_UTIL;
-	public final static int	TYPE_SIMPLE		= 3;														//only referenced in not specified else clause
-	public final static int	TYPE_TABLE		= 4;														
-	public final static int	TYPE_DIGITAL	= 5;														
-	
-	final DataExplorer						application;
+	public final static int	TYPE_HISTO	= GraphicsWindow.TYPE_HISTO;
+	public final static int	TYPE_SIMPLE		= 3;																										//only referenced in not specified else clause
+	public final static int	TYPE_TABLE		= 4;
+	public final static int	TYPE_DIGITAL	= 5;
 
-	MenuItem											curveSelectionItem;
-	MenuItem											displayGraphicsHeaderItem;
-	MenuItem											displayGraphicsCommentItem;
-	MenuItem											separatorView;
-	MenuItem											copyTabItem;
-	MenuItem											copyPrintImageItem;
-	MenuItem											separatorCopy;
-	MenuItem											outherAreaColorItem;
-	MenuItem											innerAreaColorItem;
-	MenuItem											borderColorItem;
-	MenuItem											dateTimeItem;
-	MenuItem											partialTableItem;
-	MenuItem											editTableItem;
-	MenuItem											setDigitalFontItem;
-	boolean												isCreated = false;
+	final DataExplorer			application;
+
+	MenuItem								curveSelectionItem;
+	MenuItem								displayGraphicsHeaderItem;
+	MenuItem								displayGraphicsCommentItem;
+	MenuItem								separatorView;
+	MenuItem								copyTabItem;
+	MenuItem								copyPrintImageItem;
+	MenuItem								separatorCopy;
+	MenuItem								outherAreaColorItem;
+	MenuItem								innerAreaColorItem;
+	MenuItem								borderColorItem;
+	MenuItem								dateTimeItem;
+	MenuItem								partialTableItem;
+	MenuItem								editTableItem;
+	MenuItem								setDigitalFontItem;
+	boolean									isCreated			= false;
+
+	public enum TabType {
+		TYPE_GRAPHICS, TYPE_COMPARE, TYPE_UTILITY, TYPE_HISTO, TYPE_SIMPLE, TYPE_TABLE, TYPE_DIGITAL
+	};
+
+	public enum TabMenuOnDemand {
+		DATA_FILE_PATH, RECORDSET_BASE_NAME
+	};
 
 	public TabAreaContextMenu() {
 		this.application = DataExplorer.getInstance();
@@ -85,9 +94,10 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
 				}
 				if (type == TYPE_TABLE && editTableItem != null) {
-					editTableItem.setSelection(Settings.getInstance().isDataTableEditable());	
+					editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
 				}
 			}
+
 			public void menuHidden(MenuEvent e) {
 				//ignore
 			}
@@ -130,17 +140,17 @@ public class TabAreaContextMenu {
 			}
 
 			this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0,Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
+			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0, Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
 			this.copyTabItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
 					TabAreaContextMenu.this.application.copyTabContentAsImage();
 				}
 			});
-			
+
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0,Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
+				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
@@ -148,11 +158,12 @@ public class TabAreaContextMenu {
 					}
 				});
 			}
-			
+
 			if (type != TYPE_TABLE) {
 				this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
 				this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
+				this.outherAreaColorItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0462));
 				this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -174,7 +185,7 @@ public class TabAreaContextMenu {
 					}
 				});
 			}
-			
+
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
@@ -228,8 +239,7 @@ public class TabAreaContextMenu {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "setDigitalFontItem action performed! " + e); //$NON-NLS-1$
 						int selectedFontSize = TabAreaContextMenu.this.application.openFontSizeDialog();
-						if (selectedFontSize != 0)
-							TabAreaContextMenu.this.application.setTabFontSize(TabAreaContextMenu.this.application.getTabSelectionIndex(), selectedFontSize);
+						if (selectedFontSize != 0) TabAreaContextMenu.this.application.setTabFontSize(TabAreaContextMenu.this.application.getTabSelectionIndex(), selectedFontSize);
 					}
 				});
 			}

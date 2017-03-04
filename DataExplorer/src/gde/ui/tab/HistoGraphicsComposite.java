@@ -20,6 +20,7 @@ package gde.ui.tab;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -55,12 +56,14 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
+import gde.data.TrailRecordSet.DataTag;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
 import gde.utils.GraphicsUtils;
 import gde.utils.HistoCurveUtils;
 import gde.utils.HistoTimeLine;
@@ -130,7 +133,7 @@ public class HistoGraphicsComposite extends Composite {
 	int													xPosMeasure					= 0, yPosMeasure = 0;
 	int													xPosDelta						= 0, yPosDelta = 0;
 	private long								timestampMeasure_ms, timestampDelta_ms;
-	
+
 	HistoGraphicsComposite(final SashForm useParent) {
 		super(useParent, GraphicsWindow.TYPE_HISTO);
 		SWTResourceManager.registerResourceUser(this);
@@ -935,9 +938,9 @@ public class HistoGraphicsComposite extends Composite {
 				}
 				else {
 					this.graphicCanvas.setCursor(this.application.getCursor());
-					String text = String.valueOf(evt.x) + "|" + String.valueOf(evt.y) + "|" + this.timeLine.getAdjacentTimestamp(evt.x) + "|" + this.timeLine.getSnappedTimestampText(evt.x); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY) {
-						if (!(text.equals(this.graphicCanvas.getToolTipText()))) {
+					String text = this.timeLine.getSnappedTimestampText(evt.x);
+					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY && text != null) {
+						if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) {
 							this.graphicCanvas.setToolTipText(text);
 						}
 					}
@@ -975,6 +978,11 @@ public class HistoGraphicsComposite extends Composite {
 					this.isLeftMouseMeasure = false;
 					this.isRightMouseMeasure = false;
 				}
+
+				final Map<Integer, String> dataTags = trailRecordSet.getDataTags(this.timeLine.getAdjacentTimestamp(evt.x)); // evt.x is already relative to curve area
+				HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+				HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}

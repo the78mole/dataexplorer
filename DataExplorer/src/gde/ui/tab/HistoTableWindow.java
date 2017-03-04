@@ -53,6 +53,7 @@ import gde.data.Channels;
 import gde.data.HistoSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
+import gde.data.TrailRecordSet.DisplayTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -283,7 +284,7 @@ public class HistoTableWindow extends CTabItem {
 					}
 					else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
-						item.setText(trailRecordSet.getTagTableRow(index));
+						item.setText(trailRecordSet.getTableTagRow(DisplayTag.fromOrdinal(index)));
 					}
 				}
 			}

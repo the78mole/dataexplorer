@@ -68,24 +68,34 @@ public class TrailRecordSet extends RecordSet {
 
 	private final List<Integer>								durations_mm						= new ArrayList<Integer>(initialRecordCapacity);
 	private double														averageDuration_mm			= 0;
-	private final List<String>								fileNames								= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>								directoryNames					= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>								basePaths								= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>								logChannelNumbers				= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>								logRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>								logRecordsetBaseNames		= new ArrayList<String>(initialRecordCapacity);
-	private final List<String>								logRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
-	private final Map<Integer, List<String>>	logTags									= new HashMap<>();
+	private final List<String>								dataFilePath						= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								dataChannelNumbers			= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								dataRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								dataRecordsetBaseNames	= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								dataRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
+	private final Map<Integer, List<String>>	dataTags								= new HashMap<>();
 
-	private enum LogTag {
-		FileName, DirectoryName, BasePath, ChannelNumber, RectifiedObjectKey, RecordSetBaseName, RecordSetOrdinal
-	};
+	public enum DisplayTag {
+		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME;
+		
+		/**
+		 * use this instead of values() to avoid repeatedly cloning actions.
+		 */
+		public final static DisplayTag						values[]				= values();
+
+		public static DisplayTag fromOrdinal(int ordinal) {
+			return DisplayTag.values[ordinal];
+		}
+	}
+	
+	public enum DataTag {
+		FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL};
 
 	/**
 	 * holds trail records for measurements, settlements and scores.
 	 * @param useDevice the instance of the device 
 	 * @param channelNumber the channel number to be used
-	 * @param settingsRecordSet holds the settings for the curves
+	 * @param recordNames
 	 */
 	public TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames) {
 		super(useDevice, channelNumber, "Trail", recordNames, -1, true, true); //$NON-NLS-1$
@@ -94,13 +104,11 @@ public class TrailRecordSet extends RecordSet {
 		this.linkedOrdinals = new int[recordNames.length];
 		if (this.template != null) this.template.load();
 
-		this.logTags.put(LogTag.FileName.ordinal(), this.fileNames);
-		this.logTags.put(LogTag.DirectoryName.ordinal(), this.directoryNames);
-		this.logTags.put(LogTag.BasePath.ordinal(), this.basePaths);
-		this.logTags.put(LogTag.ChannelNumber.ordinal(), this.logChannelNumbers);
-		this.logTags.put(LogTag.RectifiedObjectKey.ordinal(), this.logRectifiedObjectKeys);
-		this.logTags.put(LogTag.RecordSetBaseName.ordinal(), this.logRecordsetBaseNames);
-		// for test only		this.logTags.add(this.logRecordSetOrdinals);
+		this.dataTags.put(DataTag.FILE_PATH.ordinal(), this.dataFilePath);
+		this.dataTags.put(DataTag.CHANNEL_NUMBER.ordinal(), this.dataChannelNumbers);
+		this.dataTags.put(DataTag.RECTIFIED_OBJECTKEY.ordinal(), this.dataRectifiedObjectKeys);
+		this.dataTags.put(DataTag.RECORDSET_BASE_NAME.ordinal(), this.dataRecordsetBaseNames);
+		this.dataTags.put(DataTag.RECORDSET_ORDINAL.ordinal(), this.dataRecordsetBaseNames);
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
@@ -263,13 +271,11 @@ public class TrailRecordSet extends RecordSet {
 		this.durations_mm.clear();
 		this.averageDuration_mm = 0;
 
-		this.fileNames.clear();
-		this.directoryNames.clear();
-		this.basePaths.clear();
-		this.logChannelNumbers.clear();
-		this.logRectifiedObjectKeys.clear();
-		this.logRecordSetOrdinals.clear();
-		this.logRecordsetBaseNames.clear();
+		this.dataFilePath.clear();
+		this.dataChannelNumbers.clear();
+		this.dataRectifiedObjectKeys.clear();
+		this.dataRecordsetBaseNames.clear();
+		this.dataRecordSetOrdinals.clear();
 	}
 
 	/**
@@ -402,25 +408,23 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * sets tagging information for the trail entries.
 	 */
-	public void setTags() {
+	public void setDataTags() {
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
-				this.fileNames.add(Paths.get(histoVault.getLogFilePath()).getFileName().toString());
-				this.directoryNames.add(Paths.get(histoVault.getLogFilePath()).getParent().getFileName().toString().intern());
-				this.basePaths.add(Paths.get(histoVault.getLogFilePath()).getParent().getParent().toString().intern());
-				this.logChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
-				this.logRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
-				this.logRecordSetOrdinals.add(String.valueOf(histoVault.getLogRecordSetOrdinal()).intern());
-				this.logRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
+				this.dataFilePath.add(Paths.get(histoVault.getLogFilePath()).toString().intern());
+				this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
+				this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
+				this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
+				this.dataRecordSetOrdinals.add(String.valueOf(histoVault.getLogRecordSetOrdinal()).intern());
 			}
 		}
 	}
-	
+
 	/**
 	 * @param timestamp_ms is a time stamp from the timestep range
 	 * @return the position of the timestep which is smaller or equal to the timestamp or -1 if not found 
 	 */
-	public int getIndex(long timestamp_ms ) {
+	public int getIndex(long timestamp_ms) {
 		for (int i = 0; i < this.timeStep_ms.size(); i++) {
 			long tmpTimestep_ms = this.timeStep_ms.get(i) / 10;
 			if (tmpTimestep_ms <= timestamp_ms) return i;
@@ -428,12 +432,20 @@ public class TrailRecordSet extends RecordSet {
 		return -1;
 	}
 
-	public String getFileNameTag(long timestamp_ms ) {
-		for (int i = 0; i < this.timeStep_ms.size(); i++) {
-			long tmpTimestep_ms = this.timeStep_ms.get(i) / 10;
-			if (tmpTimestep_ms <= timestamp_ms) return this.fileNames.get(i);
+	/**
+	 * @return the dataTags
+	 */
+	public Map<Integer, String> getDataTags(long timestamp_ms) {
+		int index = getIndex(timestamp_ms);
+		if (index >= 0) {
+			HashMap<Integer, String> dataTags4Index = new HashMap<Integer, String>();
+			for (java.util.Map.Entry<Integer, List<String>> logTagEntry : this.dataTags.entrySet()) {
+				dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
+			}
+			return dataTags4Index;
 		}
-		return GDE.STRING_EMPTY;
+		else
+			return new HashMap<Integer, String>();
 	}
 
 	/**
@@ -553,27 +565,27 @@ public class TrailRecordSet extends RecordSet {
 
 	}
 
-//	/**
-//	 * check and update visibility status of all records according to the available histo data.
-//	 * at least an update of the graphics window should be included at the end of this method.
-//	 */
-//	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
-//		int displayableCounter = 0;
-//		for (int i = 0; i < this.size(); ++i) {
-//			Record record = this.get(i);
-//			if (includeReasonableDataCheck) {
-//				// todo record.setDisplayable(record.isActive() || record.hasReasonableData()); // was initially: (record.hasReasonableData());
-//				//	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
-//			}
-//
-//			if (record.isActive() && record.isDisplayable()) {
-//				++displayableCounter;
-//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
-//			}
-//		}
-//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-//		this.setConfiguredDisplayable(displayableCounter);
-//	}
+	//	/**
+	//	 * check and update visibility status of all records according to the available histo data.
+	//	 * at least an update of the graphics window should be included at the end of this method.
+	//	 */
+	//	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
+	//		int displayableCounter = 0;
+	//		for (int i = 0; i < this.size(); ++i) {
+	//			Record record = this.get(i);
+	//			if (includeReasonableDataCheck) {
+	//				// todo record.setDisplayable(record.isActive() || record.hasReasonableData()); // was initially: (record.hasReasonableData());
+	//				//	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
+	//			}
+	//
+	//			if (record.isActive() && record.isDisplayable()) {
+	//				++displayableCounter;
+	//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+	//			}
+	//		}
+	//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+	//		this.setConfiguredDisplayable(displayableCounter);
+	//	}
 
 	public HistoGraphicsTemplate getTemplate() {
 		return template;
@@ -696,48 +708,82 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * get all tags for all recordsets / vaults.
-	 * @param logTagOrdinal
-	 * @return empty record name and tag description as a trail text replacement followed by the tag values
+	 * @param displayTag
+	 * @return empty record name and display tag description as a trail text replacement followed by the tag values
 	 */
-	public String[] getTagTableRow(int logTagOrdinal) {
+	public String[] getTableTagRow(DisplayTag displayTag) {
 		String[] dataTableRow = new String[this.timeStep_ms.size() + 2];
 
 		if (!this.timeStep_ms.isEmpty()) {
-			if (logTagOrdinal == LogTag.FileName.ordinal())
+			if (displayTag == DisplayTag.FILE_NAME)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0838);
-			else if (logTagOrdinal == LogTag.DirectoryName.ordinal())
+			else if (displayTag == DisplayTag.DIRECTORY_NAME)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0839);
-			else if (logTagOrdinal == LogTag.BasePath.ordinal())
+			else if (displayTag == DisplayTag.BASE_PATH)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
-			else if (logTagOrdinal == LogTag.ChannelNumber.ordinal())
+			else if (displayTag == DisplayTag.CHANNEL_NUMBER)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0841);
-			else if (logTagOrdinal == LogTag.RectifiedObjectKey.ordinal())
+			else if (displayTag == DisplayTag.RECTIFIED_OBJECTKEY)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
-			else if (logTagOrdinal == LogTag.RecordSetBaseName.ordinal())
+			else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
-			else if (logTagOrdinal == LogTag.RecordSetOrdinal.ordinal())
-				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0843); // for test only
 			else
-				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
+				throw new UnsupportedOperationException();
 
-			List<String> logTag = this.logTags.get(logTagOrdinal);
+			List<String> logTag = this.dataTags.get(displayTag);
 			if (this.settings.isXAxisReversed()) {
-				for (int i = 0; i < this.timeStep_ms.size(); i++)
-					dataTableRow[i + 2] = logTag.get(i);
+				if (displayTag == DisplayTag.FILE_NAME)
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(i)).getFileName().toString();
+				else if (displayTag == DisplayTag.DIRECTORY_NAME)
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(i)).getParent().getFileName().toString();
+				else if (displayTag == DisplayTag.BASE_PATH)
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(i)).getParent().getParent().getFileName().toString();
+				else if (displayTag == DisplayTag.CHANNEL_NUMBER)
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER.ordinal()).get(i);
+				else if (displayTag == DisplayTag.RECTIFIED_OBJECTKEY)
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECTIFIED_OBJECTKEY.ordinal()).get(i);
+				else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME.ordinal()).get(i);
+				else
+					dataTableRow = null; // for test only
 			}
 			else {
-				for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-					dataTableRow[i + 2] = logTag.get(j);
+				if (displayTag == DisplayTag.FILE_NAME)
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(j)).getFileName().toString();
+				else if (displayTag == DisplayTag.DIRECTORY_NAME)
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(j)).getParent().getFileName().toString();
+				else if (displayTag == DisplayTag.BASE_PATH)
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(j)).getParent().getParent().getFileName().toString();
+				else if (displayTag == DisplayTag.CHANNEL_NUMBER)
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER.ordinal()).get(j);
+				else if (displayTag == DisplayTag.RECTIFIED_OBJECTKEY)
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECTIFIED_OBJECTKEY.ordinal()).get(j);
+				else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME.ordinal()).get(j);
+				else
+					dataTableRow = null; // for test only
 			}
 		}
 		return dataTableRow;
 	}
 
 	/**
-	 * @return the logTags
+	 * @return the dataTags
 	 */
-	public Map<Integer, List<String>> getLogTags() {
-		return this.logTags;
+	public Map<Integer, List<String>> getDataTags() {
+		return this.dataTags;
 	}
 
 	/**

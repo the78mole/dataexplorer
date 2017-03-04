@@ -91,6 +91,7 @@ import gde.data.HistoSet.RebuildStep;
 import gde.data.ObjectData;
 import gde.data.RecordSet;
 import gde.data.TrailRecordSet;
+import gde.data.TrailRecordSet.DisplayTag;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
@@ -956,7 +957,7 @@ public class DataExplorer extends Composite {
 					if (forceClean || !(DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !(DataExplorer.this.histoTableTabItem.isHeaderTextValid()))) {
 					DataExplorer.this.histoTableTabItem.setHeader();
 					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-					if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getLogTags().size());
+					if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + DisplayTag.values.length);
 				}
 			}
 		});
@@ -2482,7 +2483,8 @@ public class DataExplorer extends Composite {
 						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
 			}
-			}}
+		}
+	}
 		}
 
 	/**
