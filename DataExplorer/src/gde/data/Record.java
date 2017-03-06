@@ -18,20 +18,6 @@
 ****************************************************************************************/
 package gde.data;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.DataTypes;
-import gde.device.IDevice;
-import gde.device.MeasurementType;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
-import gde.device.StatisticsType;
-import gde.log.Level;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
-import gde.utils.TimeLine;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +32,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.DataTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.device.StatisticsType;
+import gde.log.Level;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+import gde.utils.TimeLine;
 
 /**
  * @author Winfried Brügmann
@@ -1546,7 +1546,7 @@ public class Record extends Vector<Integer> {
 	*/
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
 		return TimeLine.getFomatedTimeWithUnit(
-				this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + (this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 1292400000.0)); //1292400000 == 1970-01-16 00:00:00.000
+				this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + (this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 0)); // use GMT time zone for durations now. initially was 1292400000 == 1970-01-16 00:00:00.000
 	}
 
 	/**
