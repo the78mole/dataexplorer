@@ -73,7 +73,7 @@ import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
 /**
- * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas 
+ * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
  */
 public class GraphicsComposite extends Composite {
@@ -112,7 +112,7 @@ public class GraphicsComposite extends Composite {
 	int												commentHeight						= 0;
 	int												commentGap							= 0;
 	String										graphicsHeaderText, recordSetCommentText;
-	Point											oldSize									= new Point(0, 0);																		// composite size - control resized
+	Point											oldSize									= new Point(0, 0);																			// composite size - control resized
 
 	// update graphics only area required
 	RecordSet									oldActiveRecordSet			= null;
@@ -146,8 +146,6 @@ public class GraphicsComposite extends Composite {
 	boolean										isRightMouseMeasure			= false;
 	int												xPosMeasure							= 0, yPosMeasure = 0;
 	int												xPosDelta								= 0, yPosDelta = 0;
-
-	private int								indexMeasure, indexDelta;
 
 	boolean										isZoomMouse							= false;
 	boolean										isResetZoomPosition			= false;
@@ -437,7 +435,7 @@ public class GraphicsComposite extends Composite {
 											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
 										}
 
-										if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+										if (log.isLoggable(Level.FINE))	log.log(Level.FINE, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 										if (xEnd - xStart > 5 && yMax - yMin > 5) {
 											recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
 											redrawGraphics();
@@ -1009,15 +1007,7 @@ public class GraphicsComposite extends Composite {
 
 		if (recordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
-			//this.indexMeasure = isRefresh ? this.indexMeasure : record.getHorizontalPointIndexFromDisplayPoint(this.curveAreaBounds.width / 4); first try version
-			if (isRefresh) {
-					final int leftDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(0);
-					final int rightDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(this.curveAreaBounds.width);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "left= " + leftDisplayIndex + " right= " + rightDisplayIndex + " size= " + record.realSize()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					this.indexMeasure = (rightDisplayIndex - leftDisplayIndex) / 4;
-			}
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "indexMeasure=" + this.indexMeasure + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
-			this.xPosMeasure = record.getDisplayPoint(this.indexMeasure, 0, 0).x;
+			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
 			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1031,14 +1021,7 @@ public class GraphicsComposite extends Composite {
 							record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }));
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-			if (isRefresh) {
-				final int leftDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(0);
-				final int rightDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(this.curveAreaBounds.width);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "left= " + leftDisplayIndex + " right= " + rightDisplayIndex + " size= " + record.realSize()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				this.indexMeasure = (rightDisplayIndex - leftDisplayIndex) / 4;
-				this.indexDelta = (rightDisplayIndex - leftDisplayIndex) / 3 * 2;
-		}
-			this.xPosMeasure = record.getDisplayPoint(this.indexMeasure, 0, 0).x;
+			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
 			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 
 			// measure position
@@ -1046,7 +1029,7 @@ public class GraphicsComposite extends Composite {
 			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			// delta position
-			this.xPosDelta = record.getDisplayPoint(this.indexDelta, 0, 0).x;
+			this.xPosDelta = isRefresh ? this.xPosDelta : this.curveAreaBounds.width / 3 * 2;
 			this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
@@ -1131,24 +1114,24 @@ public class GraphicsComposite extends Composite {
 		int left = this.xPosMeasure <= this.xPosDelta
 			?	this.leftLast < this.xPosMeasure ? this.leftLast : this.xPosMeasure
 			:	this.leftLast < this.xPosDelta ? this.leftLast : this.xPosDelta;
-
+			
 		this.topLast = this.topLast == 0 ? this.yPosDelta : this.topLast;
 		int top = this.yPosDelta <= this.yPosMeasure
 			? this.topLast < this.yPosDelta ? this.topLast : this.yPosDelta
 			: this.topLast < this.yPosMeasure ? this.topLast : this.yPosMeasure;
-
+			
 		this.rightLast = this.rightLast == 0 ? this.xPosDelta - left : this.rightLast;
 		int width = this.xPosDelta >= this.xPosMeasure
 			? this.rightLast > this.xPosDelta  ? this.rightLast - left : this.xPosDelta - left
-				: this.rightLast > this.xPosMeasure ? this.rightLast - left : this.xPosMeasure - left;
-
+			: this.rightLast > this.xPosMeasure  ? this.rightLast - left : this.xPosMeasure - left;
+			
 		this.bottomLast = this.bottomLast == 0 ? this.yPosMeasure - top : this.bottomLast;
 		int height = this.yPosMeasure >= this.yPosDelta 
 			? this.bottomLast > this.yPosMeasure ? this.bottomLast - top : this.yPosMeasure - top
-				: this.bottomLast > this.yPosDelta ? this.bottomLast - top : this.yPosDelta - top;
-
+			: this.bottomLast > this.yPosDelta ? this.bottomLast - top : this.yPosDelta - top;
+		
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
+		
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY, width, height);
@@ -1458,14 +1441,10 @@ public class GraphicsComposite extends Composite {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 							}
 							// all obsolete lines are cleaned up now draw new position marker
-							final int leftDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(0);
-							final int rightDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(this.curveAreaBounds.width);
-							this.indexMeasure = (rightDisplayIndex - leftDisplayIndex) * evt.x / this.curveAreaBounds.width; // evt.x is already relative to curve area
-							this.xPosMeasure = record.getDisplayPoint(this.indexMeasure, 0, 0).x;
+							this.xPosMeasure = evt.x; // evt.x is already relative to curve area
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timestampMeasure_ms=" + this.indexMeasure); //$NON-NLS-1$ 
 
 							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
@@ -1507,10 +1486,7 @@ public class GraphicsComposite extends Composite {
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 							// update the new delta position
-							final int leftDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(0);
-							final int rightDisplayIndex = record.getHorizontalPointIndexFromDisplayPoint(this.curveAreaBounds.width);
-							this.indexDelta = (rightDisplayIndex - leftDisplayIndex) * evt.x / this.curveAreaBounds.width; // evt.x is already relative to curve area
-							this.xPosDelta = record.getDisplayPoint(this.indexDelta, 0, 0).x;
+							this.xPosDelta = evt.x; // evt.x is already relative to curve area
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 							this.canvasGC.setLineStyle(SWT.LINE_DASH);
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
@@ -1726,7 +1702,7 @@ public class GraphicsComposite extends Composite {
 				}
 				updatePanMenueButton();
 				//updateCutModeButtons();
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINER))	log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -1762,7 +1738,7 @@ public class GraphicsComposite extends Composite {
 		if (enabled) {
 			this.headerGap = 5;
 			GC gc = new GC(this.graphicsHeader);
-			int stringHeight = gc.stringExtent(this.graphicsHeader.getText()).y;
+	    int stringHeight = gc.stringExtent(this.graphicsHeader.getText()).y;
 			this.headerGap = 5;
 			this.headerHeight = stringHeight;
 			gc.dispose();
@@ -1781,8 +1757,8 @@ public class GraphicsComposite extends Composite {
 		if (enabled) {
 			this.commentGap = 0;
 			GC gc = new GC(this.recordSetComment);
-			int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
-			this.commentHeight = stringHeight * 2 + 8;
+	    int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
+			this.commentHeight = stringHeight*2 + 8;
 			gc.dispose();
 		}
 		else {
@@ -1965,7 +1941,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	private String getSelectedMeasurementsAsTable() {
-		Properties displayProps = this.settings.getMeasurementDisplayProperties();
+		Properties displayProps = this.settings.getMeasurementDisplayProperties(); 
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD));
