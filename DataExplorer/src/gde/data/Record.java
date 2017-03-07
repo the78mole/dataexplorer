@@ -1966,8 +1966,6 @@ public class Record extends Vector<Integer> {
 		if (tmpValue != null && tmpValue.length() > 0) this.isVisible = Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_POSITION_LEFT);
 		if (tmpValue != null && tmpValue.length() > 0) this.isPositionLeft = Boolean.valueOf(tmpValue.trim());
-		tmpValue = recordProps.get(IS_DIPLAYABLE);
-		if (tmpValue != null && tmpValue.length() > 0) this.isDisplayable = Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
 		if (tmpValue != null && tmpValue.length() >= 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]),
 				Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
