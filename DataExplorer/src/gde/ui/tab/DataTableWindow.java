@@ -67,7 +67,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.StringHelper;
 
 /**
@@ -419,7 +419,7 @@ public class DataTableWindow extends CTabItem {
 				}
 			}
 		});
-		this.contextMenu.createMenu(this.popupmenu, TabType.TABLE);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.TABLE);
 		this.cursor.setMenu(this.popupmenu);
 	}
 

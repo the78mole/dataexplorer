@@ -44,7 +44,7 @@ import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.CellVoltageValues;
 
 /**
@@ -122,7 +122,7 @@ public class CellVoltageDisplay extends Composite {
 		});
 		
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabType.SIMPLE);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.SIMPLE);
 	}
 
 	public void create() {

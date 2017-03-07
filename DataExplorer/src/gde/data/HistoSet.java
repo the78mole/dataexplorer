@@ -356,8 +356,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
 										TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
 										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
-						log.log(Level.TIME, String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.size(), //$NON-NLS-1$
-								new Date().getTime() - startTimeFileValid, this.size() * 1000 / (new Date().getTime() - startTimeFileValid), this.fileSizeSum_B / 1000 / (new Date().getTime() - startTimeFileValid)));
 						for (List<HistoVault> vaultList : this.values()) {
 							if (vaultList.size() > 1) {
 								for (HistoVault histoVault : vaultList) {
@@ -379,8 +377,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					this.trailRecordSet.applyTemplate(true); // needs reasonable data
 					nanoTimeTrailRecordSet += System.nanoTime();
 					if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
-						log.log(Level.TIME, String.format("%,5d trailTimeSteps build and populate time=%,6d [ms]  ::  per second:%5d", this.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
+						log.log(Level.TIME, String.format("%,5d trailTimeSteps to TrailRecordSet  time=%,6d [ms]  ::  per second:%5d", this.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
 								this.size() > 0 ? this.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
+					log.log(Level.TIME, String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.size(), //$NON-NLS-1$
+							new Date().getTime() - startTimeFileValid, this.size() * 1000 / (new Date().getTime() - startTimeFileValid), this.fileSizeSum_B / 1000 / (new Date().getTime() - startTimeFileValid)));
 				}
 				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(97, sThreadId);
 			}
@@ -447,7 +447,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @return total length (bytes) of the original log files of those vaults which were put into the histoset 
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	private long loadVaultsFromCache(Map<Path, Map<String, HistoVault>> trussJobs) throws IOException {
+	private synchronized long loadVaultsFromCache(Map<Path, Map<String, HistoVault>> trussJobs) throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		long localSizeSum_B = 0;
 		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
 		log.log(Level.FINER, "cacheFilePath=", cacheFilePath); //$NON-NLS-1$
@@ -644,19 +644,20 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				{
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.DATA).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), subDirLevelMax);
-				log.log(Level.OFF, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 			}
 			if (this.validatedDirectories.containsKey(DirectoryType.IMPORT)) {
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.IMPORT).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), subDirLevelMax);
-				log.log(Level.OFF, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT))); //$NON-NLS-1$
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 			}
-			log.log(Level.INFO, String.format("%04d files taken --- %04d included recordsets --- %04d excluded recordsets", this.validTrusses.size() + this.excludedTrusses.size(), this.validTrusses.size(), //$NON-NLS-1$
-					this.excludedTrusses.size()));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+					String.format("in total %04d trusses found --- %04d valid trusses --- %04d excluded trusses", this.validTrusses.size() + this.excludedTrusses.size(), this.validTrusses.size(), //$NON-NLS-1$
+							this.excludedTrusses.size()));
 		}
 		return !isFullChange;
 		}
@@ -678,9 +679,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
 				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
 				if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555)) {
-					log.log(Level.FINER, "Dead OSD link " + file + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.WARNING, "Dead OSD link " + file + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!file.delete()) {
-						log.log(Level.FINE, "could not delete link file ", file); //$NON-NLS-1$
+						log.log(Level.WARNING, "could not delete link file ", file); //$NON-NLS-1$
 					}
 				}
 				else {
@@ -729,7 +730,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				// file is discarded
 			}
 		}
-		log.log(Level.OFF, String.format("%04d files found --- %04d valid trusses --- %04d excluded trusses", files.size(), this.validTrusses.size(), this.excludedTrusses.size())); //$NON-NLS-1$
+		if (log.isLoggable(Level.INFO))
+			log.log(Level.INFO, String.format("%04d files found --- %04d valid trusses --- %04d excluded trusses", files.size(), this.validTrusses.size(), this.excludedTrusses.size())); //$NON-NLS-1$
 	}
 
 	/**
@@ -895,7 +897,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				fileExclusionData = new FileExclusionData(fileDir);
 				fileExclusionData.load();
 			}
-			//exclusionTexts.add(fileExclusionData.getFormattedProperty(truss.getLogFileAsPath()));
+			exclusionTexts.add(fileExclusionData.getFormattedProperty(truss.getLogFileAsPath()));
 			lastFileDir = fileDir;
 		}
 
@@ -908,9 +910,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 	/**
 	 * deletes the ignore files belonging to the directories with ignored files.
+	 * @param defaultPath this ignore information is deleted in any case, e.g. if the suppress mode is currently OFF
 	 */
-	public void clearIgnoreHistoLists() {
+	public void clearIgnoreHistoLists(Path defaultPath) {
 		Set<Path> exclusionDirectories = new HashSet<>();
+		exclusionDirectories.add(defaultPath);
 		for (HistoVault truss : this.excludedTrusses.values()) {
 			exclusionDirectories.add(truss.getLogFileAsPath().getParent());
 		}
@@ -941,6 +945,20 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 */
 	public Map<String, HistoVault> getValidTrusses() {
 		return this.validTrusses;
+	}
+
+	/**
+	 * cleans exclusion directories.
+	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path
+	 */
+	public void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
+		if (this.settings.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
+			ArrayList<Path> dataPaths = new ArrayList<Path>();
+			dataPaths.add(Paths.get(this.settings.getDataFilePath()));
+			FileExclusionData.deleteIgnoreDirectory(dataPaths);
+	
+			this.settings.setDataSettingsAtHomePath(isDataSettingsAtHomePath);
+		}
 	}
 
 }

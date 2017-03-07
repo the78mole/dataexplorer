@@ -21,6 +21,7 @@ package gde.histoinventory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,7 +31,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import gde.GDE;
@@ -41,7 +44,7 @@ import gde.utils.FileUtils;
 /**
  * supports excluding files from history analysis.
  * is based on property files for each data directory.
- * saves the information to the user directory if the data directory is not accessible for writing.
+ * stores the ignore file in the user directory if the data directory is not accessible for writing.
  * @author Thomas Eickert
  */
 public class FileExclusionData extends Properties {
@@ -68,6 +71,24 @@ public class FileExclusionData extends Properties {
 		this.dataFileDir = null;
 	}
 
+	/**
+	 * deletes all ignore files from the user directory and the data directories
+	 * @param dataDirectories
+	 */
+	public static void deleteIgnoreDirectory(List<Path> dataDirectories) {
+		FileUtils.deleteDirectory(exclusionsDir.toString());
+		for (Path dataPath : dataDirectories) {
+			try {
+				for (File file : FileUtils.getFileListing(dataPath.toFile(), 77, Settings.HISTO_EXCLUSIONS_FILE_NAME)) {
+					FileUtils.deleteFile(file.getPath());
+				}
+			}
+			catch (FileNotFoundException e) {
+				log.log(Level.OFF, e.getMessage(), e);
+			}
+		}
+	}
+	
 	@Override
 	public synchronized Object setProperty(String dataFileName, String recordsetBaseName) {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
@@ -103,7 +124,24 @@ public class FileExclusionData extends Properties {
 	}
 
 	/**
-	 * @param dataFileName
+	 * @param key is the data file name of the vault / truss
+	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname') 
+	 */
+	public String getFormattedProperty(String key) {
+		return getProperty(key).isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + getProperty(key);
+	}
+
+	/**
+	 * @param dataFilePath is the full data file path of the vault / truss
+	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname') 
+	 */
+	public String getFormattedProperty(Path dataFilePath) {
+		String dataFileName = dataFilePath.getFileName().toString();
+		return getFormattedProperty(dataFileName);
+	}
+
+	/**
+	 * @param dataFilePath
 	 * @param recordsetBaseName
 	 * @return true if the full data file path exists in the excluded list and the recordset base name is excluded (i.e. is in the list or is empty in the list)
 	 */
@@ -147,7 +185,7 @@ public class FileExclusionData extends Properties {
 	}
 
 	/**
-	 * write the file if excludes are defined.
+	 * write the file if excludes are defined, else delete the file.
 	 */
 	public void store() {
 		if (this.size() > 0) {
@@ -188,7 +226,12 @@ public class FileExclusionData extends Properties {
 
 	@Override
 	public synchronized String toString() {
-		return String.format("%s %d", this.dataFileDir, this.size()); //$NON-NLS-1$
+		StringBuilder sb = new StringBuilder();
+		for (String excludedKey : new TreeSet<String>(this.stringPropertyNames())) {
+			sb.append(GDE.STRING_NEW_LINE).append(excludedKey);
+			if (!getProperty(excludedKey).isEmpty()) sb.append(GDE.STRING_BLANK_COLON_BLANK).append(getProperty(excludedKey));
+		}
+		return sb.length() > 0 ? sb.substring(1) : GDE.STRING_EMPTY;
 	}
 
 	public Path getDataFileDir() {

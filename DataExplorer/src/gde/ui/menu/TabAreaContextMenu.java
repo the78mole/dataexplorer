@@ -19,82 +19,269 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.GDE;
 import gde.config.Settings;
+import gde.data.HistoSet;
+import gde.data.HistoSet.RebuildStep;
+import gde.data.RecordSet;
+import gde.device.IHistoDevice;
+import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.utils.FileUtils;
 
 /**
  * @author Winfried Brügmann
  * This class provides a context menu to tabulator area, curve graphics, compare window, etc. and enable selection of background color, ...
  */
 public class TabAreaContextMenu {
-	final static Logger	log				= Logger.getLogger(TabAreaContextMenu.class.getName());
+	private final static String	$CLASS_NAME	= TabAreaContextMenu.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	final DataExplorer	application;
+	private final DataExplorer	application	= DataExplorer.getInstance();
+	private final Settings			settings		= Settings.getInstance();
+	private final HistoSet			histoSet		= HistoSet.getInstance();
 
-	MenuItem						curveSelectionItem;
-	MenuItem						displayGraphicsHeaderItem;
-	MenuItem						displayGraphicsCommentItem;
-	MenuItem						separatorView;
-	MenuItem						copyTabItem;
-	MenuItem						copyPrintImageItem;
-	MenuItem						separatorCopy;
-	MenuItem						outherAreaColorItem;
-	MenuItem						innerAreaColorItem;
-	MenuItem						borderColorItem;
-	MenuItem						dateTimeItem;
-	MenuItem						partialTableItem;
-	MenuItem						editTableItem;
-	MenuItem						setDigitalFontItem;
-	boolean							isCreated	= false;
+	MenuItem										curveSelectionItem;
+	MenuItem										displayGraphicsHeaderItem;
+	MenuItem										displayGraphicsCommentItem;
+	MenuItem										separatorView;
+	MenuItem										copyTabItem;
+	MenuItem										copyPrintImageItem;
+	MenuItem										separatorCopy;
+	MenuItem										outherAreaColorItem;
+	MenuItem										innerAreaColorItem;
+	MenuItem										borderColorItem;
+	MenuItem										dateTimeItem;
+	MenuItem										partialTableItem;
+	MenuItem										editTableItem;
+	MenuItem										setDigitalFontItem;
+	boolean											isCreated		= false;
 
-	public enum TabType {
-		GRAPHICS, COMPARE, UTILITY, HISTO, SIMPLE, TABLE, DIGITAL
+	private MenuItem						fileName, openRecordSetItem, hideItem;
+	private Menu								hideMenu;
+	private MenuItem						hideMenuRecordSetItem, hideMenuFileItem, hideMenuRevokeItem;
+	private MenuItem						suppressModeItem, deleteFileItem;
+
+	public enum TabMenuType {
+		GRAPHICS, COMPARE, UTILITY, HISTOGRAPHICS, HISTOTABLE, SIMPLE, TABLE, DIGITAL
 	};
 
 	public enum TabMenuOnDemand {
-		DATA_FILE_PATH, RECORDSET_BASE_NAME
+		IS_CURSOR_IN_CANVAS, DATA_FILE_PATH, RECORDSET_BASE_NAME, EXCLUDED_LIST
 	};
 
-	public TabAreaContextMenu() {
-		this.application = DataExplorer.getInstance();
-	}
-
-	public void createMenu(Menu popupMenu, TabType type) {
+	public void createMenu(Menu popupMenu, TabMenuType type) {
 		popupMenu.addMenuListener(new MenuListener() {
 			public void menuShown(MenuEvent e) {
 				TabAreaContextMenu.log.log(Level.FINEST, "menuShown action " + e); //$NON-NLS-1$
-				int tabSelectionIndex = TabAreaContextMenu.this.application.getTabSelectionIndex();
-				if (tabSelectionIndex == 0) {
+				if (type == TabMenuType.GRAPHICS) {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
 				}
-				if (type == TabType.TABLE && editTableItem != null) {
-					editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
+				if (type == TabMenuType.HISTOGRAPHICS) {
+					TabAreaContextMenu.this.suppressModeItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.getSelection());
+					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+					
+					TabAreaContextMenu.this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
+					TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
+					
+					if (popupMenu.getData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString()) == null) { // not within the curve area canvas bounds
+						setAllEnabled(false);
+						TabAreaContextMenu.this.suppressModeItem.setEnabled(true);
+						TabAreaContextMenu.this.curveSelectionItem.setEnabled(true);
+						TabAreaContextMenu.this.displayGraphicsHeaderItem.setEnabled(true);
+						TabAreaContextMenu.this.displayGraphicsCommentItem.setEnabled(true);
+						TabAreaContextMenu.this.copyTabItem.setEnabled(true);
+						TabAreaContextMenu.this.copyPrintImageItem.setEnabled(true);
+					}
+					else {
+						String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
+						String recordSetBaseName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString();
+						RecordSet recordSet = TabAreaContextMenu.this.application.getRecordSetOfVisibleTab();
+						if (recordSet != null && recordSet.size() > 0) {
+							setAllEnabled(true);
+							if (dataFilePath.isEmpty()) {
+								TabAreaContextMenu.this.fileName.setEnabled(false);
+								TabAreaContextMenu.this.openRecordSetItem.setEnabled(false);
+								TabAreaContextMenu.this.deleteFileItem.setEnabled(false);
+
+								TabAreaContextMenu.this.hideMenuRecordSetItem.setEnabled(false);
+								TabAreaContextMenu.this.hideMenuFileItem.setEnabled(false);
+							}
+							else {
+								final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
+								TabAreaContextMenu.this.fileName.setText(">> " + (tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$//$NON-NLS-2$
+										+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", recordSetBaseName) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
+								TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
+							}
+						}
+						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
+						TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
+					}
 				}
+				if (type == TabMenuType.TABLE && TabAreaContextMenu.this.editTableItem != null) {
+					TabAreaContextMenu.this.editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
+				}
+				// clear consumed menu type selector
+				popupMenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString(),null);
 			}
 
 			public void menuHidden(MenuEvent e) {
 				//ignore
 			}
 		});
-		if (!isCreated) {
-			if (type == TabType.GRAPHICS) { // -1 as index mean initialization phase
+		if (!this.isCreated) {
+			if (type == TabMenuType.HISTOGRAPHICS) {
+				{
+					this.fileName = new MenuItem(popupMenu, SWT.None);
+					this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
+					this.fileName.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0863));
+				}
+				new MenuItem(popupMenu, SWT.SEPARATOR);
+				{
+					this.openRecordSetItem = new MenuItem(popupMenu, SWT.PUSH);
+					this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
+					this.openRecordSetItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0851));
+					this.openRecordSetItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							File file = new File(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString());
+							if (FileUtils.checkFileExist(file.getPath())) {
+								String validatedImportExtention = TabAreaContextMenu.this.application.getActiveDevice() instanceof IHistoDevice
+										? ((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
+
+								if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
+									new FileHandler().openOsdFile(file.getAbsolutePath());
+								}
+								else if (!validatedImportExtention.isEmpty() && file.getAbsolutePath().endsWith(validatedImportExtention)) {
+									((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).importDeviceData(file.toPath());
+								}
+								TabAreaContextMenu.this.application.selectTab(0);
+							}
+						}
+					});
+				}
+				{
+					this.deleteFileItem = new MenuItem(popupMenu, SWT.PUSH);
+					this.deleteFileItem.setText(Messages.getString(MessageIds.GDE_MSGT0861));
+					this.deleteFileItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0862));
+					this.deleteFileItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deleteFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							// check if the file exists and if the user really wants to delete it
+							File file = new File(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString());
+							if (FileUtils.checkFileExist(file.getPath())
+									&& TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
+								FileUtils.deleteFile(file.getPath());
+
+								TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+							}
+						}
+					});
+				}
+				new MenuItem(popupMenu, SWT.SEPARATOR);
+				{
+					this.hideItem = new MenuItem(popupMenu, SWT.CASCADE);
+					this.hideItem.setText(Messages.getString(MessageIds.GDE_MSGT0852));
+					this.hideMenu = new Menu(this.hideItem);
+					this.hideItem.setMenu(this.hideMenu);
+				}
+				{
+					this.hideMenuRecordSetItem = new MenuItem(this.hideMenu, SWT.PUSH);
+					this.hideMenuRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0853));
+					this.hideMenuRecordSetItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0854));
+					this.hideMenuRecordSetItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							TabAreaContextMenu.this.histoSet.setIgnoreHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()),
+									popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString());
+
+							TabAreaContextMenu.this.settings.setSuppressMode(true);
+							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
+
+							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+						}
+					});
+				}
+				{
+					this.hideMenuFileItem = new MenuItem(this.hideMenu, SWT.PUSH);
+					this.hideMenuFileItem.setText(Messages.getString(MessageIds.GDE_MSGT0855));
+					this.hideMenuFileItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0856));
+					this.hideMenuFileItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							TabAreaContextMenu.this.histoSet.setIgnoreHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()), GDE.STRING_EMPTY);
+
+							TabAreaContextMenu.this.settings.setSuppressMode(true);
+							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
+
+							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+						}
+					});
+				}
+				new MenuItem(this.hideMenu, SWT.SEPARATOR);
+				{
+					this.hideMenuRevokeItem = new MenuItem(this.hideMenu, SWT.PUSH);
+					this.hideMenuRevokeItem.setText(Messages.getString(MessageIds.GDE_MSGT0857));
+					this.hideMenuRevokeItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0858));
+					this.hideMenuRevokeItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							TabAreaContextMenu.this.histoSet.clearIgnoreHistoLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
+
+							TabAreaContextMenu.this.settings.setSuppressMode(false);
+							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(false);
+
+							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+						}
+					});
+				}
+				new MenuItem(popupMenu, SWT.SEPARATOR);
+				{
+					this.suppressModeItem = new MenuItem(popupMenu, SWT.CHECK);
+					this.suppressModeItem.setText(Messages.getString(MessageIds.GDE_MSGT0859));
+					this.suppressModeItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0860));
+					this.suppressModeItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "suppressModeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							TabAreaContextMenu.this.settings.setSuppressMode(TabAreaContextMenu.this.suppressModeItem.getSelection());
+							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(TabAreaContextMenu.this.suppressModeItem.getSelection());
+
+							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+						}
+					});
+				}
+			}
+
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.HISTOGRAPHICS) { // -1 as index mean initialization phase
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
 				this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
@@ -113,7 +300,8 @@ public class TabAreaContextMenu {
 						boolean selection = TabAreaContextMenu.this.displayGraphicsHeaderItem.getSelection();
 						TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.setSelection(selection);
 						TabAreaContextMenu.this.application.enableGraphicsHeader(selection);
-						TabAreaContextMenu.this.application.updateDisplayTab();
+						TabAreaContextMenu.this.application.updateHistoTabs(false, false);
+						;
 					}
 				});
 				this.displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
@@ -124,7 +312,8 @@ public class TabAreaContextMenu {
 						boolean selection = TabAreaContextMenu.this.displayGraphicsCommentItem.getSelection();
 						TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.setSelection(selection);
 						TabAreaContextMenu.this.application.enableRecordSetComment(selection);
-						TabAreaContextMenu.this.application.updateDisplayTab();
+						TabAreaContextMenu.this.application.updateHistoTabs(false, false);
+						;
 					}
 				});
 				this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
@@ -133,13 +322,14 @@ public class TabAreaContextMenu {
 			this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
 			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0, Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
 			this.copyTabItem.addListener(SWT.Selection, new Listener() {
+
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
 					TabAreaContextMenu.this.application.copyTabContentAsImage();
 				}
 			});
 
-			if (type == TabType.GRAPHICS || type == TabType.COMPARE || type == TabType.UTILITY) {
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type == TabMenuType.HISTOGRAPHICS) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
@@ -150,11 +340,12 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type != TabType.TABLE) {
+			if (type != TabMenuType.TABLE || type == TabMenuType.HISTOTABLE) {
+				//
+				//			{
 				this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
 				this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
-				this.outherAreaColorItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0462));
 				this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -177,7 +368,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TabType.GRAPHICS || type == TabType.COMPARE || type == TabType.UTILITY) {
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type == TabMenuType.HISTOGRAPHICS) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
@@ -191,7 +382,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TabType.TABLE) {
+			if (type == TabMenuType.TABLE || type == TabMenuType.HISTOTABLE) {
 				this.dateTimeItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
 				this.dateTimeItem.setSelection(Settings.getInstance().isTimeFormatAbsolute());
@@ -223,7 +414,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TabType.DIGITAL) {
+			if (type == TabMenuType.DIGITAL) {
 				this.setDigitalFontItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.setDigitalFontItem.setText(Messages.getString(MessageIds.GDE_MSGT0726));
 				this.setDigitalFontItem.addListener(SWT.Selection, new Listener() {
@@ -234,7 +425,35 @@ public class TabAreaContextMenu {
 					}
 				});
 			}
-			isCreated = true;
+			this.isCreated = true;
 		}
+
 	}
+
+	private void setAllEnabled(boolean enabled) {
+		if (this.fileName != null) this.fileName.setEnabled(enabled);
+		if (this.openRecordSetItem != null) this.openRecordSetItem.setEnabled(enabled);
+		if (this.deleteFileItem != null) this.deleteFileItem.setEnabled(enabled);
+		if (this.hideItem != null) this.hideItem.setEnabled(enabled);
+		if (this.hideMenuRecordSetItem != null) this.hideMenuRecordSetItem.setEnabled(enabled);
+		if (this.hideMenuFileItem != null) this.hideMenuFileItem.setEnabled(enabled);
+		if (this.hideMenuRevokeItem != null) this.hideMenuRevokeItem.setEnabled(enabled);
+		if (this.suppressModeItem != null) this.suppressModeItem.setEnabled(enabled);
+
+		if (this.curveSelectionItem != null) this.curveSelectionItem.setEnabled(enabled);
+		if (this.displayGraphicsHeaderItem != null) this.displayGraphicsHeaderItem.setEnabled(enabled);
+		if (this.displayGraphicsCommentItem != null) this.displayGraphicsCommentItem.setEnabled(enabled);
+		if (this.separatorView != null) this.separatorView.setEnabled(enabled);
+		if (this.copyTabItem != null) this.copyTabItem.setEnabled(enabled);
+		if (this.copyPrintImageItem != null) this.copyPrintImageItem.setEnabled(enabled);
+		if (this.separatorCopy != null) this.separatorCopy.setEnabled(enabled);
+		if (this.outherAreaColorItem != null) this.outherAreaColorItem.setEnabled(enabled);
+		if (this.innerAreaColorItem != null) this.innerAreaColorItem.setEnabled(enabled);
+		if (this.borderColorItem != null) this.borderColorItem.setEnabled(enabled);
+		if (this.dateTimeItem != null) this.dateTimeItem.setEnabled(enabled);
+		if (this.editTableItem != null) this.editTableItem.setEnabled(enabled);
+		if (this.partialTableItem != null) this.partialTableItem.setEnabled(enabled);
+		if (this.setDigitalFontItem != null) this.setDigitalFontItem.setEnabled(enabled);
+	}
+
 }

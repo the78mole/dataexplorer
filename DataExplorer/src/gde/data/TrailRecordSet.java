@@ -73,7 +73,7 @@ public class TrailRecordSet extends RecordSet {
 	private final List<String>								dataRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
 	private final List<String>								dataRecordsetBaseNames	= new ArrayList<String>(initialRecordCapacity);
 	private final List<String>								dataRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
-	private final Map<Integer, List<String>>	dataTags								= new HashMap<>();
+	private final Map<DataTag, List<String>>	dataTags								= new HashMap<>();
 
 	public enum DisplayTag {
 		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME;
@@ -95,7 +95,7 @@ public class TrailRecordSet extends RecordSet {
 	 * holds trail records for measurements, settlements and scores.
 	 * @param useDevice the instance of the device 
 	 * @param channelNumber the channel number to be used
-	 * @param recordNames
+	 * @param recordNames 
 	 */
 	public TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames) {
 		super(useDevice, channelNumber, "Trail", recordNames, -1, true, true); //$NON-NLS-1$
@@ -104,11 +104,11 @@ public class TrailRecordSet extends RecordSet {
 		this.linkedOrdinals = new int[recordNames.length];
 		if (this.template != null) this.template.load();
 
-		this.dataTags.put(DataTag.FILE_PATH.ordinal(), this.dataFilePath);
-		this.dataTags.put(DataTag.CHANNEL_NUMBER.ordinal(), this.dataChannelNumbers);
-		this.dataTags.put(DataTag.RECTIFIED_OBJECTKEY.ordinal(), this.dataRectifiedObjectKeys);
-		this.dataTags.put(DataTag.RECORDSET_BASE_NAME.ordinal(), this.dataRecordsetBaseNames);
-		this.dataTags.put(DataTag.RECORDSET_ORDINAL.ordinal(), this.dataRecordsetBaseNames);
+		this.dataTags.put(DataTag.FILE_PATH, this.dataFilePath);
+		this.dataTags.put(DataTag.CHANNEL_NUMBER, this.dataChannelNumbers);
+		this.dataTags.put(DataTag.RECTIFIED_OBJECTKEY, this.dataRectifiedObjectKeys);
+		this.dataTags.put(DataTag.RECORDSET_BASE_NAME, this.dataRecordsetBaseNames);
+		this.dataTags.put(DataTag.RECORDSET_ORDINAL, this.dataRecordsetBaseNames);
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
@@ -448,24 +448,23 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
+	 * @param index
 	 * @return the dataTags
 	 */
-	public Map<Integer, String> getDataTags(long timestamp_ms) {
-		int index = getIndex(timestamp_ms);
+	public Map<DataTag, String> getDataTags(int index) {
 		if (index >= 0) {
-			HashMap<Integer, String> dataTags4Index = new HashMap<Integer, String>();
-			for (java.util.Map.Entry<Integer, List<String>> logTagEntry : this.dataTags.entrySet()) {
+			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
+			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.dataTags.entrySet()) {
 				dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
 			}
 			return dataTags4Index;
 		}
 		else
-			return new HashMap<Integer, String>();
+			return new HashMap<DataTag, String>();
 	}
 
 	/**
 	 * inform displayable trail records about the trail types which are allowed, set trail selection list and current trailType / score. 
-	 * @param isLiveActive 
 	 */
 	public void defineTrailTypes() {
 		String[] trailRecordNames = this.getRecordNames();
@@ -645,7 +644,7 @@ public class TrailRecordSet extends RecordSet {
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-				sb.append("\n").append(syncRecordOrdinal).append(GDE.STRING_COLON); //$NON-NLS-1$
+				sb.append(GDE.STRING_NEW_LINE).append(syncRecordOrdinal).append(GDE.STRING_COLON); 
 				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
 				}
@@ -680,7 +679,7 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * @param sequenceNumber reflects the user sequence
-	 * @return
+	 * @return the record of the 0-based user sequence number
 	 */
 	public TrailRecord getRecord(int sequenceNumber) {
 		return (TrailRecord) super.get(this.linkedOrdinals[sequenceNumber]);
@@ -745,48 +744,47 @@ public class TrailRecordSet extends RecordSet {
 			else
 				throw new UnsupportedOperationException();
 
-			List<String> logTag = this.dataTags.get(displayTag);
 			if (this.settings.isXAxisReversed()) {
 				if (displayTag == DisplayTag.FILE_NAME)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(i)).getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(i)).getFileName().toString();
 				else if (displayTag == DisplayTag.DIRECTORY_NAME)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(i)).getParent().getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(i)).getParent().getFileName().toString();
 				else if (displayTag == DisplayTag.BASE_PATH)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(i)).getParent().getParent().getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(i)).getParent().getParent().getFileName().toString();
 				else if (displayTag == DisplayTag.CHANNEL_NUMBER)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER.ordinal()).get(i);
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER).get(i);
 				else if (displayTag == DisplayTag.RECTIFIED_OBJECTKEY)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECTIFIED_OBJECTKEY.ordinal()).get(i);
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECTIFIED_OBJECTKEY).get(i);
 				else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME.ordinal()).get(i);
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME).get(i);
 				else
 					dataTableRow = null; // for test only
 			}
 			else {
 				if (displayTag == DisplayTag.FILE_NAME)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(j)).getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(j)).getFileName().toString();
 				else if (displayTag == DisplayTag.DIRECTORY_NAME)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(j)).getParent().getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(j)).getParent().getFileName().toString();
 				else if (displayTag == DisplayTag.BASE_PATH)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH.ordinal()).get(j)).getParent().getParent().getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(j)).getParent().getParent().getFileName().toString();
 				else if (displayTag == DisplayTag.CHANNEL_NUMBER)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER.ordinal()).get(j);
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER).get(j);
 				else if (displayTag == DisplayTag.RECTIFIED_OBJECTKEY)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECTIFIED_OBJECTKEY.ordinal()).get(j);
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECTIFIED_OBJECTKEY).get(j);
 				else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME.ordinal()).get(j);
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME).get(j);
 				else
 					dataTableRow = null; // for test only
 			}
@@ -797,7 +795,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * @return the dataTags
 	 */
-	public Map<Integer, List<String>> getDataTags() {
+	public Map<DataTag, List<String>> getDataTags() {
 		return this.dataTags;
 	}
 

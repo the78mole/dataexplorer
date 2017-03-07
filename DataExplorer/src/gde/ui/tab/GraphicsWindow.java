@@ -38,7 +38,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.utils.TimeLine;
 
@@ -73,16 +73,16 @@ public class GraphicsWindow extends CTabItem {
 	public enum GraphicsType {
 		NORMAL, COMPARE, UTIL, HISTO;
 
-		public TabType toTabType() {
+		public TabMenuType toTabType() {
 			switch (this) {
 			case NORMAL:
-				return TabType.GRAPHICS;
+				return TabMenuType.GRAPHICS;
 			case COMPARE:
-				return TabType.COMPARE;
+				return TabMenuType.COMPARE;
 			case UTIL:
-				return TabType.UTILITY;
+				return TabMenuType.UTILITY;
 			case HISTO:
-				return TabType.HISTO;
+				return TabMenuType.HISTOGRAPHICS;
 			default:
 				throw new UnsupportedOperationException();
 			}

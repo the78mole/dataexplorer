@@ -41,7 +41,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.TimeLine;
 
 /**
@@ -147,7 +147,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
-						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabType.SIMPLE);
+						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabMenuType.SIMPLE);
 						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
 						if (activeChannel != null) {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();

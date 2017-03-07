@@ -83,7 +83,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.ObjectImageContextMenu;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
  * @author Winfried Brügmann
@@ -473,7 +473,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				this.imageCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
-						ObjectDescriptionWindow.this.contextMenu.createMenu(ObjectDescriptionWindow.this.popupmenu, TabType.SIMPLE);
+						ObjectDescriptionWindow.this.contextMenu.createMenu(ObjectDescriptionWindow.this.popupmenu, TabMenuType.SIMPLE);
 						if (ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED) != null
 								&& (Boolean) ObjectDescriptionWindow.this.imagePopupMenu.getData("OBJECT_IMAGE_CHANGED")) {
 							String imagePath = (String) ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);

@@ -19,6 +19,7 @@
 package gde.ui.tab;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +66,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
 import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.GraphicsUtils;
 import gde.utils.HistoCurveUtils;
@@ -92,7 +93,7 @@ public class HistoGraphicsComposite extends Composite {
 	private final Channels			channels						= Channels.getInstance();
 	private final HistoTimeLine	timeLine						= new HistoTimeLine();
 	private final SashForm			graphicSashForm;
-	private final GraphicsType				graphicsType;
+	private final GraphicsType	graphicsType;
 
 	Menu												popupmenu;
 	TabAreaContextMenu					contextMenu;
@@ -163,7 +164,7 @@ public class HistoGraphicsComposite extends Composite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, TabType.HISTO);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOGRAPHICS);
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
@@ -194,7 +195,7 @@ public class HistoGraphicsComposite extends Composite {
 			}
 		});
 		{
-			this.graphicsHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
+			this.graphicsHeader = new Text(this, SWT.SINGLE | SWT.CENTER | SWT.READ_ONLY);
 			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 3, SWT.BOLD));
 			this.graphicsHeader.setBackground(this.surroundingBackground);
 			this.graphicsHeader.setMenu(this.popupmenu);
@@ -202,12 +203,11 @@ public class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					StringBuilder sb = new StringBuilder(); 
+					StringBuilder sb = new StringBuilder();
 					for (Path path : HistoGraphicsComposite.this.histoSet.getValidatedDirectories().values()) {
-						sb.append (GDE.STRING_BLANK + GDE.STRING_PLUS + GDE.STRING_BLANK);
-						sb.append(path.getFileName().toString() );
+						sb.append(GDE.STRING_BLANK + GDE.STRING_PLUS + GDE.STRING_BLANK).append(path.getFileName().toString());
 					}
-					final String tmpHeaderText = sb.length() >=3 ?  sb.substring(3) : GDE.STRING_EMPTY;
+					final String tmpHeaderText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
 					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText))
 						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeaderText);
 				}
@@ -235,7 +235,7 @@ public class HistoGraphicsComposite extends Composite {
 				@Override
 				public void mouseDown(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseDown, event=" + evt); //$NON-NLS-1$
-					if (evt.button == 1) {
+					if (evt.button == 1 || evt.button == 3) {
 						mouseDownAction(evt);
 					}
 				}
@@ -243,7 +243,7 @@ public class HistoGraphicsComposite extends Composite {
 				@Override
 				public void mouseUp(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseUp, event=" + evt); //$NON-NLS-1$
-					if (evt.button == 1) {
+					if (evt.button == 1 || evt.button == 3) {
 						mouseUpAction(evt);
 					}
 				}
@@ -263,7 +263,7 @@ public class HistoGraphicsComposite extends Composite {
 			});
 		}
 		{
-			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
+			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT | SWT.READ_ONLY);
 			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 			this.recordSetComment.setBackground(this.surroundingBackground);
 			this.recordSetComment.setMenu(this.popupmenu);
@@ -303,11 +303,7 @@ public class HistoGraphicsComposite extends Composite {
 		// get gc for other drawing operations
 		this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
 
-		TrailRecordSet trailRecordSet = null;
-		if (this.channels.getActiveChannel() != null) {
-			trailRecordSet = this.histoSet.getTrailRecordSet();
-		}
-
+		TrailRecordSet trailRecordSet = getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 			drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
@@ -324,6 +320,14 @@ public class HistoGraphicsComposite extends Composite {
 		this.canvasGC.dispose();
 		this.canvasImageGC.dispose();
 		// this.canvasImage.dispose(); //zooming, marking, ... needs a reference to canvasImage
+	}
+
+	private TrailRecordSet getTrailRecordSet() {
+		TrailRecordSet trailRecordSet = null;
+		if (this.channels.getActiveChannel() != null) {
+			trailRecordSet = this.histoSet.getTrailRecordSet();
+		}
+		return trailRecordSet;
 	}
 
 	/**
@@ -636,7 +640,8 @@ public class HistoGraphicsComposite extends Composite {
 	 */
 	private void drawConnectingLine(int posFromLeft1, int posFromTop1, int posFromLeft2, int posFromTop2, int swtColor) {
 		this.canvasGC.setForeground(SWTResourceManager.getColor(swtColor));
-		this.canvasGC.setLineStyle(SWT.LINE_SOLID);
+		this.canvasGC.setLineDash(new int[] { 5, 2 });
+		this.canvasGC.setLineStyle(SWT.LINE_CUSTOM);
 		// support connecting lines with start or end beyond the y axis drawing area 
 		this.canvasGC.setClipping(this.curveAreaBounds.x, this.curveAreaBounds.y, this.curveAreaBounds.width, this.curveAreaBounds.height);
 		this.canvasGC.drawLine(posFromLeft1 + this.offSetX, posFromTop1 + this.offSetY, posFromLeft2 + this.offSetX, posFromTop2 + this.offSetY);
@@ -664,7 +669,7 @@ public class HistoGraphicsComposite extends Composite {
 	void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
 		// do not erase lines beyond the y axis drawing area 
 		if (posFromTop + this.offSetY >= 0 && posFromTop + this.offSetY <= this.curveAreaBounds.height)
-		this.canvasGC.drawImage(this.canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
+			this.canvasGC.drawImage(this.canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
 	}
 
 	/**
@@ -825,13 +830,23 @@ public class HistoGraphicsComposite extends Composite {
 	void mouseMoveAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0 && this.canvasImage != null) {
 				this.canvasGC = new GC(this.graphicCanvas);
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
 
+				{
+					this.graphicCanvas.setCursor(this.application.getCursor());
+					final Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
+					final String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
+					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY && text != null) {
+						if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) this.graphicCanvas.setToolTipText(text);
+					}
+					else
+						this.graphicCanvas.setToolTipText(null);
+				}
 				String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
 				this.canvasGC.setLineWidth(1);
 				this.canvasGC.setLineStyle(SWT.LINE_DASH);
@@ -849,7 +864,7 @@ public class HistoGraphicsComposite extends Composite {
 
 							this.timestampMeasure_ms = timestampMeasureNew_ms;
 							this.xPosMeasure = xPosMeasureNew;
-							this.yPosMeasure = yPosMeasureNew ;
+							this.yPosMeasure = yPosMeasureNew;
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timestampMeasure_ms=" + this.timestampMeasure_ms); //$NON-NLS-1$ 
 							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
@@ -891,7 +906,7 @@ public class HistoGraphicsComposite extends Composite {
 
 							this.timestampDelta_ms = timestampDeltaNew_ms;
 							this.xPosDelta = xPosDeltaNew;
-							this.yPosDelta = yPosDeltaNew ;
+							this.yPosDelta = yPosDeltaNew;
 							// always needs to draw measurement pointer
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 							// no change don't needs to be calculated yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
@@ -928,17 +943,6 @@ public class HistoGraphicsComposite extends Composite {
 						this.graphicCanvas.setCursor(this.application.getCursor());
 					}
 				}
-				else {
-					this.graphicCanvas.setCursor(this.application.getCursor());
-					String text = this.timeLine.getSnappedTimestampText(evt.x);
-					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY && text != null) {
-						if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) {
-							this.graphicCanvas.setToolTipText(text);
-						}
-					}
-					else
-						this.graphicCanvas.setToolTipText(null);
-				}
 				this.canvasGC.dispose();
 			}
 		}
@@ -950,30 +954,42 @@ public class HistoGraphicsComposite extends Composite {
 	void mouseDownAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 				String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xDown = point.x;
 				this.yDown = point.y;
 
-				if (measureRecordKey != null && (trailRecordSet.isMeasurementMode(measureRecordKey) || trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) && this.xPosMeasure + 1 >= this.xDown
-						&& this.xPosMeasure - 1 <= this.xDown) { // snap mouse pointer
-					this.isLeftMouseMeasure = true;
-					this.isRightMouseMeasure = false;
+				if (evt.button == 1) {
+					if (measureRecordKey != null && (trailRecordSet.isMeasurementMode(measureRecordKey) || trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) && this.xPosMeasure + 1 >= this.xDown
+							&& this.xPosMeasure - 1 <= this.xDown) { // snap mouse pointer
+						this.isLeftMouseMeasure = true;
+						this.isRightMouseMeasure = false;
+					}
+					else if (measureRecordKey != null && trailRecordSet.isDeltaMeasurementMode(measureRecordKey) && this.xPosDelta + 1 >= this.xDown && this.xPosDelta - 1 <= this.xDown) { // snap mouse pointer
+						this.isRightMouseMeasure = true;
+						this.isLeftMouseMeasure = false;
+					}
+					else {
+						this.isLeftMouseMeasure = false;
+						this.isRightMouseMeasure = false;
+					}
 				}
-				else if (measureRecordKey != null && trailRecordSet.isDeltaMeasurementMode(measureRecordKey) && this.xPosDelta + 1 >= this.xDown && this.xPosDelta - 1 <= this.xDown) { // snap mouse pointer
-					this.isRightMouseMeasure = true;
-					this.isLeftMouseMeasure = false;
+				else if (evt.button == 3) { // right button
+					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), this.histoSet.getExcludedTrussesAsText());
+					if (this.xDown == 0 || this.xDown == this.curveAreaBounds.width) {
+						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+					}
+					else {
+						final Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags(getTrailRecordSet().getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // evt.x is already relative to curve area
+						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+					}
+					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), this.histoSet.getExcludedTrussesAsText());
 				}
-				else {
-					this.isLeftMouseMeasure = false;
-					this.isRightMouseMeasure = false;
-				}
-
-				final Map<Integer, String> dataTags = trailRecordSet.getDataTags(this.timeLine.getAdjacentTimestamp(evt.x)); // evt.x is already relative to curve area
-				HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-				HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -986,23 +1002,23 @@ public class HistoGraphicsComposite extends Composite {
 	void mouseUpAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xUp = point.x;
 				this.yUp = point.y;
 
-				if (this.isLeftMouseMeasure) {
-					this.isLeftMouseMeasure = false;
-					// application.setStatusMessage(GDE.STRING_EMPTY);
+				if (evt.button == 1) {
+					if (this.isLeftMouseMeasure) {
+						this.isLeftMouseMeasure = false;
+						// application.setStatusMessage(GDE.STRING_EMPTY);
+					}
+					else if (this.isRightMouseMeasure) {
+						this.isRightMouseMeasure = false;
+						// application.setStatusMessage(GDE.STRING_EMPTY);
+					}
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				else if (this.isRightMouseMeasure) {
-					this.isRightMouseMeasure = false;
-					// application.setStatusMessage(GDE.STRING_EMPTY);
-				}
-				// updatePanMenueButton();
-				// updateCutModeButtons();
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -1115,7 +1131,7 @@ public class HistoGraphicsComposite extends Composite {
 		int graphicsHeight = 30 + this.canvasBounds.height + 40;
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 				if (this.canvasImage != null) this.canvasImage.dispose();
 				this.canvasImage = new Image(GDE.display, this.canvasBounds);
@@ -1153,7 +1169,7 @@ public class HistoGraphicsComposite extends Composite {
 
 	private String getSelectedMeasurementsAsTable() {
 		Properties displayProps = this.settings.getMeasurementDisplayProperties();
-		TrailRecordSet trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
@@ -1201,6 +1217,22 @@ public class HistoGraphicsComposite extends Composite {
 
 			cleanConnectingLineObsoleteRectangle();
 		}
+	}
+
+	/**
+	 * @return the index of the trail recordset item at the time of the last mouse up action or -1 in case there was no nearby item on the screen
+	 */
+	public int getMouseUpRecordSetIndex() {
+		TrailRecordSet trailRecordSet = getTrailRecordSet();
+		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0 && this.canvasImage != null) {
+			final Long timestamp_ms = this.timeLine.getSnappedTimestamp(this.xUp);
+			if (timestamp_ms == null)
+				return -1;
+			else
+				return trailRecordSet.getIndex(this.timestampMeasure_ms);
+		}
+		else
+			return -1;
 	}
 
 }

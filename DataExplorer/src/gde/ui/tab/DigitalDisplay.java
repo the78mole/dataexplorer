@@ -45,7 +45,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
  * Child display class displaying digital active measurements
@@ -81,7 +81,7 @@ public class DigitalDisplay extends Composite {
 		this.backgroundColor = Settings.getInstance().getDigitalInnerAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabType.DIGITAL);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.DIGITAL);
 	}
 
 	public void create() {

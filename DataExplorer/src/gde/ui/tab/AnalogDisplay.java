@@ -48,7 +48,7 @@ import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.GraphicsUtils;
 import gde.utils.MathUtils;
 
@@ -126,7 +126,7 @@ public class AnalogDisplay extends Composite {
 		this.backgroundColor = Settings.getInstance().getAnalogInnerAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
-		this.contextMenu.createMenu(this.popupmenu, TabType.SIMPLE);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.SIMPLE);
 	}
 
 	public void create() {

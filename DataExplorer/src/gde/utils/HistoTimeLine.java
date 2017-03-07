@@ -19,7 +19,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -29,7 +28,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +41,6 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.HistoSet;
 import gde.data.TrailRecordSet;
-import gde.data.TrailRecordSet.DataTag;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -500,16 +497,6 @@ public class HistoTimeLine {
 				}
 			}
 			return previous.getKey();
-		}
-	}
-
-	public String getSnappedTimestampText(int xPos) {
-		final Long timestamp_ms = getSnappedTimestamp(xPos);
-		if (timestamp_ms == null)
-			return null;
-		else {
-			final Map<Integer, String> dataTags = this.trailRecordSet.getDataTags(timestamp_ms);
-			return Paths.get(dataTags.get(DataTag.FILE_PATH.ordinal())).getFileName().toString();
 		}
 	}
 

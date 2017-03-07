@@ -47,7 +47,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
  * Display window parent of analog displays
@@ -108,7 +108,7 @@ public class AnalogWindow extends CTabItem {
 			this.analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					AnalogWindow.this.contextMenu.createMenu(AnalogWindow.this.popupmenu, TabType.SIMPLE);
+					AnalogWindow.this.contextMenu.createMenu(AnalogWindow.this.popupmenu, TabMenuType.SIMPLE);
 					update(false);
 				}
 			});

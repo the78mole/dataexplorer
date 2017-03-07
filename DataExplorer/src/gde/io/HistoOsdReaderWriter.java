@@ -327,8 +327,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 		// todo calculate Verlorene Rückkanalpakete from raw data
 		// GDE_MSGI2404=\nVerlorene Rückkanalpakete = {0} ~ {1} % ({2})
 		// "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec"
-		int idx0 = recordSetComment.indexOf("\n"); //$NON-NLS-1$
-		int idx1 = recordSetComment.indexOf("="); //$NON-NLS-1$
+		int idx0 = recordSetComment.indexOf(GDE.STRING_NEW_LINE); 
+		int idx1 = recordSetComment.indexOf(GDE.STRING_EQUAL);
 		int idx2 = recordSetComment.indexOf("~", idx1); //$NON-NLS-1$
 		int idx3 = recordSetComment.indexOf("%", idx2); //$NON-NLS-1$
 		if (idx0 > 0 && idx1 > idx0 && idx2 > idx1 && idx3 > idx2) {

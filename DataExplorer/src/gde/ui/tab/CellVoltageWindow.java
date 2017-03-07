@@ -60,7 +60,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.dialog.CellVoltageValuesDialog;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.CellVoltageValues;
 import gde.utils.CellVoltageValues.CellVoltageTypes;
 
@@ -172,7 +172,7 @@ public class CellVoltageWindow extends CTabItem {
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					CellVoltageWindow.this.contextMenu.createMenu(CellVoltageWindow.this.popupmenu, TabType.SIMPLE);
+					CellVoltageWindow.this.contextMenu.createMenu(CellVoltageWindow.this.popupmenu, TabMenuType.SIMPLE);
 					updateAndResize();
 				}
 			});

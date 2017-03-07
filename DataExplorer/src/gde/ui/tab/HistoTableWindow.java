@@ -59,7 +59,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
  * Histo display class, displays the histo in table form.
@@ -351,7 +351,7 @@ public class HistoTableWindow extends CTabItem {
 				}
 			}
 		});
-		this.contextMenu.createMenu(this.popupmenu, TabType.TABLE);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOTABLE);
 		this.cursor.setMenu(this.popupmenu);
 	}
 

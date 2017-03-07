@@ -72,6 +72,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
+import gde.data.HistoSet.RebuildStep;
 import gde.device.CommaSeparatorTypes;
 import gde.device.DecimalSeparatorTypes;
 import gde.log.Level;
@@ -1172,7 +1173,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
-										SettingsDialog.this.application.updateHistoTabs(true, false);
+										SettingsDialog.this.application.updateHistoTabs(RebuildStep.A_HISTOSET,true);
 									}
 								});
 							}
@@ -1191,7 +1192,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										SettingsDialog.this.application.updateHistoTabs(true, false);
+										SettingsDialog.this.application.updateHistoTabs(RebuildStep.A_HISTOSET,true);
 									}
 								});
 							}
@@ -2089,7 +2090,7 @@ public class SettingsDialog extends Dialog {
 							this.tree.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt); //$NON-NLS-1$ //$NON-NLS-2$
+									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt); //$NON-NLS-1$ 
 									TreeItem tmpItem = (TreeItem) evt.item;
 									if (tmpItem.getParentItem() != null) {
 										StringBuilder sb = new StringBuilder();
@@ -2387,7 +2388,7 @@ public class SettingsDialog extends Dialog {
 				sb.append(loggerName).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		String[] loggers = sb.toString().split(GDE.STRING_SEMICOLON); //$NON-NLS-1$
+		String[] loggers = sb.toString().split(GDE.STRING_SEMICOLON); 
 		Arrays.sort(loggers);
 		if (SettingsDialog.log.isLoggable(Level.FINER)) {
 			for (String string : loggers) {

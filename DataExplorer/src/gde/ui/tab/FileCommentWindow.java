@@ -67,7 +67,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
  * Class to enable a file comment
@@ -168,7 +168,7 @@ public class FileCommentWindow extends CTabItem {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (FileCommentWindow.log.isLoggable(java.util.logging.Level.FINER)) FileCommentWindow.log.log(java.util.logging.Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
-					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabType.SIMPLE);
+					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabMenuType.SIMPLE);
 				}
 			});
 		}
