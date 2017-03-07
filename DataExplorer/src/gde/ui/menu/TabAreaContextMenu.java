@@ -42,25 +42,25 @@ import gde.ui.SWTResourceManager;
  * This class provides a context menu to tabulator area, curve graphics, compare window, etc. and enable selection of background color, ...
  */
 public class TabAreaContextMenu {
-	final static Logger			log						= Logger.getLogger(TabAreaContextMenu.class.getName());
+	final static Logger	log				= Logger.getLogger(TabAreaContextMenu.class.getName());
 
-	final DataExplorer			application;
+	final DataExplorer	application;
 
-	MenuItem								curveSelectionItem;
-	MenuItem								displayGraphicsHeaderItem;
-	MenuItem								displayGraphicsCommentItem;
-	MenuItem								separatorView;
-	MenuItem								copyTabItem;
-	MenuItem								copyPrintImageItem;
-	MenuItem								separatorCopy;
-	MenuItem								outherAreaColorItem;
-	MenuItem								innerAreaColorItem;
-	MenuItem								borderColorItem;
-	MenuItem								dateTimeItem;
-	MenuItem								partialTableItem;
-	MenuItem								editTableItem;
-	MenuItem								setDigitalFontItem;
-	boolean									isCreated			= false;
+	MenuItem						curveSelectionItem;
+	MenuItem						displayGraphicsHeaderItem;
+	MenuItem						displayGraphicsCommentItem;
+	MenuItem						separatorView;
+	MenuItem						copyTabItem;
+	MenuItem						copyPrintImageItem;
+	MenuItem						separatorCopy;
+	MenuItem						outherAreaColorItem;
+	MenuItem						innerAreaColorItem;
+	MenuItem						borderColorItem;
+	MenuItem						dateTimeItem;
+	MenuItem						partialTableItem;
+	MenuItem						editTableItem;
+	MenuItem						setDigitalFontItem;
+	boolean							isCreated	= false;
 
 	public enum TabType {
 		GRAPHICS, COMPARE, UTILITY, HISTO, SIMPLE, TABLE, DIGITAL

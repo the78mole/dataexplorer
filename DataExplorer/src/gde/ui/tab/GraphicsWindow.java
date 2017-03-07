@@ -39,6 +39,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu.TabType;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.utils.TimeLine;
 
 /**
@@ -266,7 +267,7 @@ public class GraphicsWindow extends CTabItem {
 	 * switch graphics window mouse mode
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
-	public void setModeState(int mode) {
+	public void setModeState(GraphicsMode mode) {
 		this.graphicsComposite.setModeState(mode);
 	}
 

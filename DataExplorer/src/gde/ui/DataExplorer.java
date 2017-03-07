@@ -113,9 +113,10 @@ import gde.ui.tab.CellVoltageWindow;
 import gde.ui.tab.DataTableWindow;
 import gde.ui.tab.DigitalWindow;
 import gde.ui.tab.FileCommentWindow;
-import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
+import gde.ui.tab.HistoGraphicsComposite.HistoGraphicsMode;
 import gde.ui.tab.HistoGraphicsWindow;
 import gde.ui.tab.HistoTableWindow;
 import gde.ui.tab.ObjectDescriptionWindow;
@@ -2287,12 +2288,12 @@ public class DataExplorer extends Composite {
 	 */
 	public void resetGraphicsWindowZoomAndMeasurement() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			this.graphicsTabItem.setModeState(GraphicsComposite.MODE_RESET);
+			this.graphicsTabItem.setModeState(GraphicsMode.RESET);
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					DataExplorer.this.graphicsTabItem.setModeState(GraphicsComposite.MODE_RESET);
+					DataExplorer.this.graphicsTabItem.setModeState(GraphicsMode.RESET);
 				}
 			});
 		}
@@ -2303,13 +2304,13 @@ public class DataExplorer extends Composite {
 	 * @param graphicsMode (GraphicsWindow.MODE_ZOOM, GraphicsWindow.MODE_PAN)
 	 * @param enabled
 	 */
-	public void setGraphicsMode(int graphicsMode, boolean enabled) {
+	public void setGraphicsMode(GraphicsMode graphicsMode, boolean enabled) {
 		final String $METHOD_NAME = "setGraphicsMode"; //$NON-NLS-1$
 		if (isRecordSetVisible(GraphicsType.NORMAL)) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "graphicsWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
 			setGraphicsWindowMode(graphicsMode, enabled);
 		}
-		else if (isRecordSetVisible(GraphicsType.COMPARE) && graphicsMode != GraphicsComposite.MODE_SCOPE) {
+		else if (isRecordSetVisible(GraphicsType.COMPARE) && graphicsMode != GraphicsMode.SCOPE) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compareWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
 			setCompareWindowMode(graphicsMode, enabled);
 		}
@@ -2323,22 +2324,22 @@ public class DataExplorer extends Composite {
 	 * @param graphicsMode
 	 * @param enabled
 	 */
-	public void setGraphicsWindowMode(int graphicsMode , boolean enabled) {
+	public void setGraphicsWindowMode(GraphicsMode graphicsMode, boolean enabled) {
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) {
 			switch (graphicsMode) {
-			case GraphicsComposite.MODE_ZOOM:
+			case ZOOM:
 				recordSet.resetMeasurement();
 				recordSet.setZoomMode(enabled);
 				this.graphicsTabItem.setModeState(graphicsMode);
 				break;
-			case GraphicsComposite.MODE_SCOPE:
+			case SCOPE:
 				recordSet.resetZoomAndMeasurement();
 				recordSet.setScopeSizeRecordPoints(this.getMenuToolBar().getScopeModeLevelValue());
 				this.graphicsTabItem.setModeState(graphicsMode);
 				this.updateGraphicsWindow();
 				break;
-			case GraphicsComposite.MODE_PAN:
+			case PAN:
 				if (!recordSet.isPanMode())
 					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007));
 				else {
@@ -2347,7 +2348,7 @@ public class DataExplorer extends Composite {
 				}
 				break;
 			default:
-			case GraphicsComposite.MODE_RESET:
+			case RESET:
 				recordSet.resetZoomAndMeasurement();
 				this.graphicsTabItem.setModeState(graphicsMode);
 				this.updateGraphicsWindow();
@@ -2360,16 +2361,16 @@ public class DataExplorer extends Composite {
 	 * @param graphicsMode
 	 * @param enabled
 	 */
-	public void setCompareWindowMode(int graphicsMode, boolean enabled) {
+	public void setCompareWindowMode(GraphicsMode graphicsMode, boolean enabled) {
 		RecordSet recordSet = DataExplorer.application.getCompareSet();
 		if (recordSet != null) {
 			switch (graphicsMode) {
-			case GraphicsComposite.MODE_ZOOM:
+			case ZOOM:
 				recordSet.resetMeasurement();
 				recordSet.setZoomMode(enabled);
 				if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) this.compareTabItem.setModeState(graphicsMode);
 				break;
-			case GraphicsComposite.MODE_PAN:
+			case PAN:
 				if (!recordSet.isPanMode())
 					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007));
 				else {
@@ -2378,7 +2379,7 @@ public class DataExplorer extends Composite {
 				}
 				break;
 			default:
-			case GraphicsComposite.MODE_RESET:
+			case RESET:
 				recordSet.resetZoomAndMeasurement();
 				if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) this.compareTabItem.setModeState(graphicsMode);
 				this.updateGraphicsWindow();
@@ -2427,7 +2428,7 @@ public class DataExplorer extends Composite {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE, false);
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE, false);
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
@@ -2436,7 +2437,7 @@ public class DataExplorer extends Composite {
 				if (isGraphicsTypeNormal) {
 					recordSet.setMeasurementMode(recordKey, enabled);
 					if (enabled)
-						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
+						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE, false);
 					else
 						this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
@@ -2445,7 +2446,7 @@ public class DataExplorer extends Composite {
 					if (recordSet != null && recordSet.containsKey(recordKey)) {
 						recordSet.setMeasurementMode(recordKey, enabled);
 						if (enabled)
-							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, false);
+							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE, false);
 						else
 							this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 					}
@@ -2469,7 +2470,7 @@ public class DataExplorer extends Composite {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE_DELTA, false);
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE_DELTA, false);
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
@@ -2478,7 +2479,7 @@ public class DataExplorer extends Composite {
 				if (isGraphicsTypeNormal) {
 					recordSet.setDeltaMeasurementMode(recordKey, enabled);
 					if (enabled)
-						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
+						this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE_DELTA, false);
 					else
 						this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
@@ -2487,7 +2488,7 @@ public class DataExplorer extends Composite {
 					if (recordSet != null && recordSet.containsKey(recordKey)) {
 						recordSet.setDeltaMeasurementMode(recordKey, enabled);
 						if (enabled)
-							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE_DELTA, false);
+							this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE_DELTA, false);
 						else
 							this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 					}
@@ -2504,13 +2505,13 @@ public class DataExplorer extends Composite {
 	public void setCutModeActive(boolean leftEnabled, boolean rightEnabled) {
 		if (leftEnabled || rightEnabled)
 			if (leftEnabled)
-				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsComposite.MODE_CUT_LEFT, leftEnabled, rightEnabled);
+				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.CUT_LEFT, leftEnabled, rightEnabled);
 			else if (rightEnabled)
-				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsComposite.MODE_CUT_RIGHT, leftEnabled, rightEnabled);
+				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.CUT_RIGHT, leftEnabled, rightEnabled);
 			else
-				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsComposite.MODE_RESET, false, false);
+				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.RESET, false, false);
 		else
-			this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsComposite.MODE_RESET, false, false);
+			this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.RESET, false, false);
 	}
 
 	@Override

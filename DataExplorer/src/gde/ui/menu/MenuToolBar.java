@@ -19,6 +19,25 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import java.util.Date;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.CoolBar;
+import org.eclipse.swt.widgets.CoolItem;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -39,30 +58,11 @@ import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.GoogleEarthCustomizingDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.dialog.TimeSetDialog;
-import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
-
-import java.util.Date;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.CoolBar;
-import org.eclipse.swt.widgets.CoolItem;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Graphical menu tool bar class
@@ -177,7 +177,7 @@ public class MenuToolBar {
 				}
 				{
 					this.openToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.openToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0051)); //$NON-NLS-1$
+					this.openToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0051)); 
 					this.openToolItem.setImage(SWTResourceManager.getImage("gde/resource/Open.gif")); //$NON-NLS-1$
 					this.openToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
@@ -639,7 +639,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "zoomWindowItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsMode.ZOOM, true);
 							MenuToolBar.this.scopePointsCombo.setEnabled(false);
 						}
 					});
@@ -654,7 +654,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "resizeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsMode.PAN, true);
 						}
 					});
 				}
@@ -692,7 +692,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsMode.RESET, false);
 						}
 					});
 				}
@@ -713,11 +713,11 @@ public class MenuToolBar {
 								log.log(Level.FINEST, "scopePointsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
 									new Integer(MenuToolBar.this.scopePointsCombo.getText().trim());
-									MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_SCOPE, true);
+									MenuToolBar.this.application.setGraphicsMode(GraphicsMode.SCOPE, true);
 									MenuToolBar.this.zoomWindowItem.setEnabled(false);
 								}
 								catch(Exception e) {
-									MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
+									MenuToolBar.this.application.setGraphicsMode(GraphicsMode.RESET, false);
 								}
 							}
 						});

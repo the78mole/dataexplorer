@@ -64,6 +64,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
 import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
+import gde.ui.menu.TabAreaContextMenu.TabType;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.GraphicsUtils;
 import gde.utils.HistoCurveUtils;
@@ -77,8 +78,12 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert
  */
 public class HistoGraphicsComposite extends Composite {
-	private final static String	$CLASS_NAME					= HistoGraphicsComposite.class.getName();
-	private final static Logger	log									= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+
+	public enum HistoGraphicsMode {
+		MEASURE, MEASURE_DELTA
+	};
 
 	private final HistoSet			histoSet						= HistoSet.getInstance();
 	private final DataExplorer	application					= DataExplorer.getInstance();
@@ -104,7 +109,7 @@ public class HistoGraphicsComposite extends Composite {
 	int													commentHeight				= 0;
 	int													commentGap					= 0;
 	String											graphicsHeaderText, recordSetCommentText;
-	Point												oldSize							= new Point(0, 0);												// composite size - control resized
+	Point												oldSize							= new Point(0, 0);								// composite size - control resized
 
 	HashMap<String, Integer>		leftSideScales			= new HashMap<String, Integer>();
 	HashMap<String, Integer>		rightSideScales			= new HashMap<String, Integer>();
@@ -157,7 +162,7 @@ public class HistoGraphicsComposite extends Composite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, this.graphicsType.toTabType());
+		this.contextMenu.createMenu(this.popupmenu, TabType.HISTOGRAPHICS);
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
@@ -309,7 +314,7 @@ public class HistoGraphicsComposite extends Composite {
 			trailRecordSet.syncScaleOfSyncableRecords();
 
 			if (trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement()) || trailRecordSet.isDeltaMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
-				drawMeasurePointer(trailRecordSet, GraphicsComposite.MODE_MEASURE, true);
+				drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE, true);
 			}
 		}
 		else
@@ -532,7 +537,7 @@ public class HistoGraphicsComposite extends Composite {
 	 * @param mode
 	 * @param isRefresh
 	 */
-	public void drawMeasurePointer(TrailRecordSet trailRecordSet, int mode, boolean isRefresh) {
+	public void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode, boolean isRefresh) {
 		this.setModeState(mode); // cleans old pointer if required 
 
 		String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
@@ -720,16 +725,16 @@ public class HistoGraphicsComposite extends Composite {
 			if (this.canvasGC != null && this.canvasGC.isDisposed()) {
 				this.canvasGC = new GC(this.graphicCanvas);
 			}
-				if (this.xPosMeasure > 0) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xPosMeasure=" + this.xPosMeasure + " xPosTimestamp=" + this.timeLine.getXPosTimestamp(this.timestampMeasure_ms)); //$NON-NLS-1$ //$NON-NLS-2$ 
-					eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
-					eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
-				}
-				if (this.xPosDelta > 0) {
-					eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-					eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-					cleanConnectingLineObsoleteRectangle();
-				}
+			if (this.xPosMeasure > 0) {
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xPosMeasure=" + this.xPosMeasure + " xPosTimestamp=" + this.timeLine.getXPosTimestamp(this.timestampMeasure_ms)); //$NON-NLS-1$ //$NON-NLS-2$ 
+				eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
+				eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
+			}
+			if (this.xPosDelta > 0) {
+				eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
+				eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+				cleanConnectingLineObsoleteRectangle();
+			}
 			if (isGCset) this.canvasGC.dispose();
 			if (this.recordSetCommentText != null) {
 				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
@@ -766,32 +771,23 @@ public class HistoGraphicsComposite extends Composite {
 	 * switch graphics window mouse mode
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
-	public void setModeState(int mode) {
+	public void setModeState(HistoGraphicsMode mode) {
 		switch (mode) {
-		case GraphicsComposite.MODE_MEASURE:
+		case MEASURE:
 			if (!this.isLeftMouseMeasure) this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = true;
 			this.isRightMouseMeasure = false;
 			break;
-		case GraphicsComposite.MODE_MEASURE_DELTA:
+		case MEASURE_DELTA:
 			if (!this.isRightMouseMeasure) this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = true;
 			break;
-		case GraphicsComposite.MODE_RESET:
 		default:
 			this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
-			this.xLast = 0;
-			this.yLast = 0;
-			this.leftLast = 0;
-			this.topLast = 0;
-			this.rightLast = 0;
-			this.bottomLast = 0;
-			// updateCutModeButtons();
-			this.application.getMenuToolBar().resetZoomToolBar();
 			break;
 		}
 	}

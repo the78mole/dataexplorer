@@ -78,16 +78,11 @@ import gde.utils.TimeLine;
  * @author Winfried Brügmann
  */
 public class GraphicsComposite extends Composite {
-	final static Logger				log											= Logger.getLogger(GraphicsComposite.class.getName());
+	final static Logger log = Logger.getLogger(GraphicsComposite.class.getName());
 
-	public final static int		MODE_RESET							= 0;
-	public final static int		MODE_ZOOM								= 1;
-	public final static int		MODE_MEASURE						= 2;
-	public final static int		MODE_MEASURE_DELTA			= 3;
-	public final static int		MODE_PAN								= 4;
-	public final static int		MODE_CUT_LEFT						= 6;
-	public final static int		MODE_CUT_RIGHT					= 7;
-	public final static int		MODE_SCOPE							= 8;
+	public enum GraphicsMode {
+		RESET, ZOOM, MEASURE, MEASURE_DELTA, PAN, CUT_LEFT, CUT_RIGHT, SCOPE
+	};
 
 	final DataExplorer				application							= DataExplorer.getInstance();
 	final Settings						settings								= Settings.getInstance();
@@ -113,7 +108,7 @@ public class GraphicsComposite extends Composite {
 	int												commentHeight						= 0;
 	int												commentGap							= 0;
 	String										graphicsHeaderText, recordSetCommentText;
-	Point											oldSize									= new Point(0, 0);																		// composite size - control resized
+	Point											oldSize									= new Point(0, 0);								// composite size - control resized
 
 	// update graphics only area required
 	RecordSet									oldActiveRecordSet			= null;
@@ -743,13 +738,13 @@ public class GraphicsComposite extends Composite {
 			recordSet.syncScaleOfSyncableRecords();
 
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
-				drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, true);
+				drawMeasurePointer(recordSet, GraphicsMode.MEASURE, true);
 			}
 			else if (this.isLeftCutMode) {
-				drawCutPointer(GraphicsComposite.MODE_CUT_LEFT, true, false);
+				drawCutPointer(GraphicsMode.CUT_LEFT, true, false);
 			}
 			else if (this.isRightCutMode) {
-				drawCutPointer(GraphicsComposite.MODE_CUT_RIGHT, false, true);
+				drawCutPointer(GraphicsMode.CUT_RIGHT, false, true);
 			}
 		}
 		else
@@ -989,7 +984,7 @@ public class GraphicsComposite extends Composite {
 	 * @param mode
 	 * @param isRefresh
 	 */
-	public void drawMeasurePointer(RecordSet recordSet, int mode, boolean isRefresh) {
+	public void drawMeasurePointer(RecordSet recordSet, GraphicsMode mode, boolean isRefresh) {
 		this.setModeState(mode); // cleans old pointer if required
 
 		String measureRecordKey = recordSet.getRecordKeyMeasurement();
@@ -1191,7 +1186,7 @@ public class GraphicsComposite extends Composite {
 	 * @param leftEnabled
 	 * @param rightEnabled
 	 */
-	public void drawCutPointer(int mode, boolean leftEnabled, boolean rightEnabled) {
+	public void drawCutPointer(GraphicsMode mode, boolean leftEnabled, boolean rightEnabled) {
 		this.setModeState(mode); // cleans old pointer if required
 
 		// allow only get the record set to work with
@@ -1240,38 +1235,38 @@ public class GraphicsComposite extends Composite {
 	 * switch graphics window mouse mode
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
-	public void setModeState(int mode) {
+	public void setModeState(GraphicsMode mode) {
 		this.cleanMeasurementPointer();
 		switch (mode) {
-		case MODE_ZOOM:
+		case ZOOM:
 			this.isZoomMouse = true;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
 			this.isScopeMode = false;
 			break;
-		case MODE_MEASURE:
+		case MEASURE:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = true;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
 			this.isScopeMode = false;
 			break;
-		case MODE_MEASURE_DELTA:
+		case MEASURE_DELTA:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = true;
 			this.isPanMouse = false;
 			this.isScopeMode = false;
 			break;
-		case MODE_PAN:
+		case PAN:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = true;
 			this.isScopeMode = false;
 			break;
-		case MODE_CUT_LEFT:
+		case CUT_LEFT:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
@@ -1280,7 +1275,7 @@ public class GraphicsComposite extends Composite {
 			this.isRightCutMode = false;
 			this.isScopeMode = false;
 			break;
-		case MODE_CUT_RIGHT:
+		case CUT_RIGHT:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
@@ -1289,7 +1284,7 @@ public class GraphicsComposite extends Composite {
 			this.isRightCutMode = true;
 			this.isScopeMode = false;
 			break;
-		case MODE_SCOPE:
+		case SCOPE:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
@@ -1298,7 +1293,7 @@ public class GraphicsComposite extends Composite {
 			this.isRightCutMode = false;
 			this.isScopeMode = true;
 			break;
-		case MODE_RESET:
+		case RESET:
 		default:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
@@ -1599,7 +1594,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (!this.isPanMouse && !this.isLeftCutMode && !this.isRightCutMode) {
 					if (!this.isZoomMouse) //setting zoom mode is only required at the beginning of zoom actions, it will reset scale values to initial values
-						this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
+						this.application.setGraphicsMode(GraphicsMode.ZOOM, true);
 					this.xLast = this.xDown;
 					this.yLast = this.yDown;
 					this.isResetZoomPosition = true;
@@ -1657,7 +1652,7 @@ public class GraphicsComposite extends Composite {
 						}
 					}
 					else {
-						this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
+						this.application.setGraphicsMode(GraphicsMode.RESET, false);
 					}
 				}
 				else if (this.isLeftMouseMeasure) {
@@ -1675,7 +1670,7 @@ public class GraphicsComposite extends Composite {
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
 						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						setModeState(GraphicsComposite.MODE_RESET);
+						setModeState(GraphicsMode.RESET);
 					}
 				}
 				else if (this.isRightCutMode) {
@@ -1685,7 +1680,7 @@ public class GraphicsComposite extends Composite {
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
 						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						setModeState(GraphicsComposite.MODE_RESET);
+						setModeState(GraphicsMode.RESET);
 					}
 				}
 				updatePanMenueButton();

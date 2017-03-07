@@ -215,14 +215,6 @@ public class UtilGraphicsWindow extends CTabItem {
 	}
 	
 	/**
-	 * switch graphics window mouse mode
-	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
-	 */
-	public void setModeState(int mode) {
-		this.graphicsComposite.setModeState(mode);
-	}
-
-	/**
 	 * @return the curveSelectorComposite
 	 */
 	public SelectorComposite getCurveSelectorComposite() {

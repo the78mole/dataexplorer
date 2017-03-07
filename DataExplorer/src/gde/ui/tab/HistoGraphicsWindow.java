@@ -18,14 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -37,6 +29,14 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * defines the histo graphics window as a sash form of a curve selection table and a drawing canvas
@@ -223,14 +223,6 @@ public class HistoGraphicsWindow extends CTabItem {
 
 	public void clearHeaderAndComment() {
 		this.graphicsComposite.clearHeaderAndComment();
-	}
-
-	/**
-	 * switch graphics window mouse mode
-	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
-	 */
-	public void setModeState(int mode) {
-		this.graphicsComposite.setModeState(mode);
 	}
 
 	/**

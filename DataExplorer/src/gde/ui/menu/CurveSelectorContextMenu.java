@@ -44,7 +44,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.dialog.AxisEndValuesDialog;
-import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.TimeLine;
 
@@ -83,9 +83,9 @@ public class CurveSelectorContextMenu {
 	boolean							isSmoothVoltageCurve	= false;
 	String							recordNameKey					= null;
 	String							recordNameMeasurement	= GDE.STRING_BLANK;
-	boolean							isTypeCompare		= false;
-	boolean							isTypeUtility		= false;
-	boolean							isTypeHisto			= false;
+	boolean							isTypeCompare					= false;
+	boolean							isTypeUtility					= false;
+	boolean							isTypeHisto						= false;
 
 	public CurveSelectorContextMenu() {
 		super();
@@ -925,8 +925,8 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0118)
-								+ CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordOrdinal()).getName());
+						CurveSelectorContextMenu.this.horizontalGridRecordName
+								.setText(Messages.getString(MessageIds.GDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordOrdinal()).getName());
 						int gridType = CurveSelectorContextMenu.this.recordSet.getHorizontalGridType();
 						switch (gridType) {
 						case RecordSet.HORIZONTAL_GRID_EVERY:
@@ -985,7 +985,8 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.recordSet.isCompareSet() ? 0 : CurveSelectorContextMenu.this.actualRecord.getOrdinal());
+						CurveSelectorContextMenu.this.recordSet
+								.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.recordSet.isCompareSet() ? 0 : CurveSelectorContextMenu.this.actualRecord.getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -1086,7 +1087,7 @@ public class CurveSelectorContextMenu {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
-					setMeasurement( CurveSelectorContextMenu.this.recordNameKey, CurveSelectorContextMenu.this.simpleMeasure.getSelection());
+					setMeasurement(CurveSelectorContextMenu.this.recordNameKey, CurveSelectorContextMenu.this.simpleMeasure.getSelection());
 				}
 
 			});
@@ -1116,17 +1117,18 @@ public class CurveSelectorContextMenu {
 						if (copyFromRecord != null && copyFromRecord.isVisible()) {
 							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
-								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0004,
-										new Object[] { copyFromRecordKey + GDE.STRING_MESSAGE_CONCAT + compareSet.getFirstRecordName() }));
+								CurveSelectorContextMenu.this.application
+										.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0004, new Object[] { copyFromRecordKey + GDE.STRING_MESSAGE_CONCAT + compareSet.getFirstRecordName() }));
 								return;
 							}
 							if (compareSet.size() > 0) {
 								// while adding a new curve to compare set - reset the zoom mode
-								CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsComposite.MODE_RESET, false);
+								CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsMode.RESET, false);
 							}
 
-							String newRecordkey = CurveSelectorContextMenu.this.settings.isCurveCompareChannelConfigName() ? copyFromRecord.getChannelConfigKey() + GDE.STRING_UNDER_BAR + copyFromRecordKey
-									+ GDE.STRING_UNDER_BAR + compareSet.size() : copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
+							String newRecordkey = CurveSelectorContextMenu.this.settings.isCurveCompareChannelConfigName()
+									? copyFromRecord.getChannelConfigKey() + GDE.STRING_UNDER_BAR + copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size()
+									: copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
 							Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
 							newRecord.setOrdinal(copyFromRecord.getOrdinal());
 							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
@@ -1205,7 +1207,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0005));
 
 						//TODO check, why this is required before zoom operation ?
-						CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsComposite.MODE_RESET, false);
+						CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsMode.RESET, false);
 					}
 				}
 			});
@@ -1273,7 +1275,7 @@ public class CurveSelectorContextMenu {
 	 * @param isActive
 	 * @param tmpRecordNameMeasurement
 	 */
-	public void setMeasurement(final String tmpRecordNameMeasurement, final boolean isActive ) {
+	public void setMeasurement(final String tmpRecordNameMeasurement, final boolean isActive) {
 		if (isMeasurementWhileNameChanged(tmpRecordNameMeasurement) || isActive) {
 			CurveSelectorContextMenu.this.application.setMeasurementActive(tmpRecordNameMeasurement, true);
 			CurveSelectorContextMenu.this.simpleMeasure.setSelection(true);
@@ -1290,7 +1292,7 @@ public class CurveSelectorContextMenu {
 	 * @param isActive 
 	 * @param tmpRecordNameKey
 	 */
-	public void setDeltaMeasurement(final String tmpRecordNameKey, final boolean isActive ) {
+	public void setDeltaMeasurement(final String tmpRecordNameKey, final boolean isActive) {
 		if (isMeasurementWhileNameChanged(tmpRecordNameKey) || isActive) {
 			CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(tmpRecordNameKey, true);
 			CurveSelectorContextMenu.this.deltaMeasure.setSelection(true);

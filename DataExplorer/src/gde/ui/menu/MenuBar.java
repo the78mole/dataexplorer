@@ -18,6 +18,26 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.ArmEvent;
+import org.eclipse.swt.events.ArmListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.GraphicsTemplate;
@@ -40,28 +60,8 @@ import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.dialog.TimeSetDialog;
 import gde.ui.dialog.edit.DevicePropertiesEditor;
-import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
-
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.ArmEvent;
-import org.eclipse.swt.events.ArmListener;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * menu bar implementation class for the DataExplorer
@@ -142,7 +142,7 @@ public class MenuBar {
 				this.fileMenu.addMenuListener(new MenuListener() {
 					public void menuShown(MenuEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
-						MenuBar.this.updateSubHistoryMenuItem(GDE.STRING_EMPTY); //$NON-NLS-1$
+						MenuBar.this.updateSubHistoryMenuItem(GDE.STRING_EMPTY); 
 						
 						// check if the deleteFileMenuItem should be enabled
 						boolean fileIsLoaded = false;
@@ -162,7 +162,7 @@ public class MenuBar {
 				});
 				{
 					this.newFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.newFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0002, GDE.MOD1)); //$NON-NLS-1$
+					this.newFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0002, GDE.MOD1)); 
 					this.newFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newFileMenuItem.setAccelerator(SWT.MOD1  + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0002));
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
@@ -200,7 +200,7 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY);  //$NON-NLS-2$
+									MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY);  
 								else
 									MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0007), activeChannel.getFileName()); 
 							}
@@ -216,7 +216,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY); //$NON-NLS-1$
+							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY); 
 						}
 					});
 				}
@@ -386,7 +386,7 @@ public class MenuBar {
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ 
 				}
 			});
 			{
@@ -419,7 +419,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
+							MenuBar.this.application.setGraphicsMode(GraphicsMode.ZOOM, true);
 						}
 					});
 				}
@@ -431,7 +431,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
+							MenuBar.this.application.setGraphicsMode(GraphicsMode.RESET, false);
 						}
 					});
 				}
@@ -444,7 +444,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
+							MenuBar.this.application.setGraphicsMode(GraphicsMode.PAN, true);
 						}
 					});
 				}
@@ -483,7 +483,7 @@ public class MenuBar {
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ 
 				}
 			});
 			{
@@ -632,7 +632,7 @@ public class MenuBar {
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ 
 				}
 			});
 			{
@@ -1104,31 +1104,31 @@ public class MenuBar {
 			default:
 				if (isOpenStatus) {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/BulletHotGreen.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0048)); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0048)); 
 				}
 				else {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/BulletHotRed.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0049)); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0049)); 
 				}
 				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
 				if (isOpenStatus) {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/RectangleHotRed.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0071)); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0071)); 
 				}
 				else {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/TriangleGreen.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0070)); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0070)); 
 				}
 				break;
 			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
 				if (isOpenStatus) {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/RectangleHotRed.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0219)); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0219)); 
 				}
 				else {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/OpenHot.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0218)); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0218)); 
 				}
 				break;
 			}
@@ -1259,7 +1259,7 @@ public class MenuBar {
 		DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 		if (deviceDialog == null || deviceDialog.isDisposed()) {
 			MenuBar.this.application.openSettingsDialog();
-			MenuBar.this.application.setStatusMessage(GDE.STRING_EMPTY); //$NON-NLS-1$
+			MenuBar.this.application.setStatusMessage(GDE.STRING_EMPTY); 
 		}
 		else
 			MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI0001), SWT.COLOR_RED);
