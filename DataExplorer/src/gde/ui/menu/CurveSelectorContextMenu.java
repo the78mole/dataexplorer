@@ -1086,22 +1086,9 @@ public class CurveSelectorContextMenu {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
-					if (CurveSelectorContextMenu.this.actualRecord != null && !CurveSelectorContextMenu.this.isRecordVisible) {
-						CurveSelectorContextMenu.this.actualRecord.setVisible(true);
-						// ET refresh is done by setMeasurementActive
-						//						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						//						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
-					}
-					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.simpleMeasure.getSelection() == true) {
-						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);
-						CurveSelectorContextMenu.this.simpleMeasure.setSelection(true);
-						CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
-					}
-					else {
-						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
-						CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
-					}
+					setMeasurement( CurveSelectorContextMenu.this.recordNameKey, CurveSelectorContextMenu.this.simpleMeasure.getSelection());
 				}
+
 			});
 			this.deltaMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
 			this.deltaMeasure.setText(Messages.getString(MessageIds.GDE_MSGT0126));
@@ -1109,21 +1096,7 @@ public class CurveSelectorContextMenu {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "deltaMeasure.widgetSelected, event=" + evt); //$NON-NLS-1$
-					if (CurveSelectorContextMenu.this.actualRecord != null && !CurveSelectorContextMenu.this.isRecordVisible) {
-						CurveSelectorContextMenu.this.actualRecord.setVisible(true);
-						// ET refresh is done by setDeltaMeasurementActive
-						//						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						//						CurveSelectorContextMenu.this.application.updateHistoGraphicsWindow();
-					}
-					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.deltaMeasure.getSelection() == true) {
-						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);
-						CurveSelectorContextMenu.this.deltaMeasure.setSelection(true);
-						CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
-					}
-					else {
-						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
-						CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
-					}
+					setDeltaMeasurement(CurveSelectorContextMenu.this.recordNameKey, CurveSelectorContextMenu.this.deltaMeasure.getSelection());
 				}
 			});
 
@@ -1295,4 +1268,37 @@ public class CurveSelectorContextMenu {
 		return isActive;
 	}
 
+	/**
+	 * perform all activities as if the menu item was toggled.
+	 * @param isActive
+	 * @param tmpRecordNameMeasurement
+	 */
+	public void setMeasurement(final String tmpRecordNameMeasurement, final boolean isActive ) {
+		if (isMeasurementWhileNameChanged(tmpRecordNameMeasurement) || isActive) {
+			CurveSelectorContextMenu.this.application.setMeasurementActive(tmpRecordNameMeasurement, true);
+			CurveSelectorContextMenu.this.simpleMeasure.setSelection(true);
+			CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
+		}
+		else {
+			CurveSelectorContextMenu.this.application.setMeasurementActive(tmpRecordNameMeasurement, false);
+			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
+		}
+	}
+
+	/**
+	 * perform all activities as if the menu item was toggled.
+	 * @param isActive 
+	 * @param tmpRecordNameKey
+	 */
+	public void setDeltaMeasurement(final String tmpRecordNameKey, final boolean isActive ) {
+		if (isMeasurementWhileNameChanged(tmpRecordNameKey) || isActive) {
+			CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(tmpRecordNameKey, true);
+			CurveSelectorContextMenu.this.deltaMeasure.setSelection(true);
+			CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
+		}
+		else {
+			CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(tmpRecordNameKey, false);
+			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
+		}
+	}
 }

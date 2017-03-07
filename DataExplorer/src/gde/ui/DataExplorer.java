@@ -90,6 +90,7 @@ import gde.data.HistoSet;
 import gde.data.HistoSet.RebuildStep;
 import gde.data.ObjectData;
 import gde.data.RecordSet;
+import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
 import gde.data.TrailRecordSet.DisplayTag;
 import gde.device.ChannelTypes;
@@ -2419,11 +2420,14 @@ public class DataExplorer extends Composite {
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+			if (!enabled) this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			this.histoSet.getTrailRecordSet().setMeasurementMode(recordKey, enabled);
-			if (enabled)
-				this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE, false);
-			else
-				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
+			if (enabled && !trailRecord.isVisible()) {
+				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
+			}
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE, false);
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
@@ -2458,11 +2462,14 @@ public class DataExplorer extends Composite {
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, recordKey);
 		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+			if (!enabled) this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			this.histoSet.getTrailRecordSet().setDeltaMeasurementMode(recordKey, enabled);
-			if (enabled)
-				this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE_DELTA, false);
-			else
-				this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
+			if (enabled && !trailRecord.isVisible()) {
+				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
+			}
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), GraphicsComposite.MODE_MEASURE_DELTA, false);
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);

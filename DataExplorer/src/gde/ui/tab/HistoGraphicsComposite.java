@@ -718,15 +718,8 @@ public class HistoGraphicsComposite extends Composite {
 			if (this.canvasGC != null && this.canvasGC.isDisposed()) {
 				this.canvasGC = new GC(this.graphicCanvas);
 			}
-			if ((this.xPosMeasure != 0 && (this.xPosMeasure < this.offSetX || this.xPosMeasure > this.offSetX + this.curveAreaBounds.width))
-					|| (this.yPosMeasure != 0 && (this.yPosMeasure < this.offSetY || this.yPosMeasure > this.offSetY + this.curveAreaBounds.height))
-					|| (this.xPosDelta != 0 && (this.xPosDelta < this.offSetX || this.xPosDelta > this.offSetX + this.curveAreaBounds.width))
-					|| (this.yPosDelta != 0 && (this.yPosDelta < this.offSetY || this.yPosDelta > this.offSetY + this.curveAreaBounds.height))) {
-				this.redrawGraphics();
-				this.xPosMeasure = this.xPosDelta = 0;
-			}
-			else {
 				if (this.xPosMeasure > 0) {
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xPosMeasure=" + this.xPosMeasure + " xPosTimestamp=" + this.timeLine.getXPosTimestamp(this.timestampMeasure_ms)); //$NON-NLS-1$ //$NON-NLS-2$ 
 					eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 					eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 				}
@@ -735,7 +728,6 @@ public class HistoGraphicsComposite extends Composite {
 					eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 					cleanConnectingLineObsoleteRectangle();
 				}
-			}
 			if (isGCset) this.canvasGC.dispose();
 			if (this.recordSetCommentText != null) {
 				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));

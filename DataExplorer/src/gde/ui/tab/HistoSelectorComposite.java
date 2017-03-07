@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,7 +45,6 @@ import org.eclipse.swt.widgets.TableItem;
 import gde.GDE;
 import gde.data.HistoSet;
 import gde.data.HistoSet.RebuildStep;
-import gde.data.RecordSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
 import gde.messages.MessageIds;
@@ -140,12 +140,21 @@ public class HistoSelectorComposite extends Composite {
 					if (!HistoSelectorComposite.this.curveSelectorHeader.getSelection()) {
 						// use this check button to deselect all selected curves
 						for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
-							if (tableItem.getChecked()) toggleRecordSelection(tableItem, false, false);
+							if (tableItem.getChecked()) {
+								// avoid phantom measurements with invisible curves
+								if (HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(tableItem.getText())) {
+									HistoSelectorComposite.this.contextMenu.setMeasurement(tableItem.getText(), false);
+									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(tableItem.getText(), false);
+								}
+								toggleRecordSelection(tableItem, false, false);
+							}
 						}
 					}
 					else {
 						for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
-							if (!tableItem.getChecked()) toggleRecordSelection(tableItem, false, true);
+							if (!tableItem.getChecked()) {
+								toggleRecordSelection(tableItem, false, true);
+							}
 						}
 					}
 					doUpdateCurveSelectorTable();
@@ -172,11 +181,14 @@ public class HistoSelectorComposite extends Composite {
 				public void widgetSelected(SelectionEvent evt) {
 					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
-						// avoid phantom measurements with invisible curves
 						final TableItem eventItem = (TableItem) evt.item;
+						// avoid phantom measurements with invisible curves
+						if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE)
-								&& HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(eventItem.getText()))
-							HistoSelectorComposite.this.application.setMeasurementActive(eventItem.getText(), false);
+								&& HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(eventItem.getText())) {
+							HistoSelectorComposite.this.contextMenu.setMeasurement(eventItem.getText(), false);
+							HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(eventItem.getText(), false);
+						}
 						toggleRecordSelection(eventItem, true, false);
 						HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
 						HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
@@ -294,11 +306,39 @@ public class HistoSelectorComposite extends Composite {
 		}
 	}
 
+	public void setRecordSelection(TrailRecord activeRecord, boolean isVisible) {
+		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()).filter(c -> c.getText().equals(activeRecord.getName())).findFirst().orElseThrow(UnsupportedOperationException::new);
+		tableItem.setChecked(isVisible);
+		if (activeRecord != null) setRecordSelection(activeRecord, isVisible, tableItem);
+	}
+
+	private void setRecordSelection(TrailRecord activeRecord, boolean isVisible, final TableItem tableItem) {
+		// activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+		if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "isVisible old= " + activeRecord.isVisible()); //$NON-NLS-1$
+		if (isVisible) {
+			activeRecord.setVisible(true);
+			// activeRecord.setDisplayable(true);
+			HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(true);
+			tableItem.setData(DataExplorer.OLD_STATE, true);
+			setHeaderSelection(true);
+		}
+		else {
+			activeRecord.setVisible(false);
+			// activeRecord.setDisplayable(false);
+			HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(false);
+			tableItem.setData(DataExplorer.OLD_STATE, false);
+		}
+		activeRecord.getParent().syncScaleOfSyncableRecords();
+		activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
+	}
+
 	/**
 	 * toggles selection state of a record
 	 * @param item table were selection need toggle state
+	 * @param isTableSelection 
+	 * @param forceVisible
 	 */
-	public void toggleRecordSelection(TableItem item, boolean isTableSelection, boolean forceVisible) {
+	private void toggleRecordSelection(TableItem item, boolean isTableSelection, boolean forceVisible) {
 		String recordName = item.getText();
 		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
 		HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
@@ -307,26 +347,8 @@ public class HistoSelectorComposite extends Composite {
 			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selection state changed = " + recordName); //$NON-NLS-1$
 			// get newest timestamp and newest recordSet within this entry (both collections are in descending order)
 			TrailRecord activeRecord = (TrailRecord) this.histoSet.getTrailRecordSet().getRecord(recordName);
-			if (activeRecord != null) {
-				activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-				if (isTableSelection && item.getChecked() || forceVisible) {
-					activeRecord.setVisible(true);
-					activeRecord.setDisplayable(true);
-					HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(true);
-					item.setData(DataExplorer.OLD_STATE, true);
-					// ET item.setData(GraphicsWindow.WINDOW_TYPE, HistoSelectorComposite.this.windowType);
-					setHeaderSelection(true);
-				}
-				else {
-					activeRecord.setVisible(false);
-					activeRecord.setDisplayable(false);
-					HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(false);
-					item.setData(DataExplorer.OLD_STATE, false);
-					// ET item.setData(GraphicsWindow.WINDOW_TYPE, HistoSelectorComposite.this.windowType);
-				}
-				activeRecord.getParent().syncScaleOfSyncableRecords();
-				activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
-			}
+			if (activeRecord != null) setRecordSelection(activeRecord, isTableSelection && item.getChecked() || forceVisible, item);
 		}
+		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "isVisible= " + this.histoSet.getTrailRecordSet().getRecord(recordName).isVisible()); //$NON-NLS-1$
 	}
 }
