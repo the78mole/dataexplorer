@@ -654,11 +654,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				{
 					FileUtils.checkDirectoryAndCreate(this.validatedDataDir.toString());
 					List<File> files = FileUtils.getFileListing(this.validatedDataDir.toFile(), subDirLevelMax);
-					log.log(Level.INFO, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDataDir)); //$NON-NLS-1$
+					log.log(Level.OFF, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDataDir)); //$NON-NLS-1$
 					if (this.settings.getSearchDataPathImports() && !this.validatedImportExtention.isEmpty()) {
 						for (File file : files) {
 							if (file.getName().endsWith(GDE.FILE_ENDING_OSD) || file.getName().endsWith(this.validatedImportExtention)) {
-								if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
+								if (!this.histoFilePaths.containsKey(file.lastModified())) 
+									this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
 								this.histoFilePaths.get(file.lastModified()).add(file.toPath());
 							}
 						}
@@ -675,7 +676,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				if (this.validatedImportDir != null && this.settings.getSearchImportPath() && !this.validatedImportExtention.isEmpty()) {
 					FileUtils.checkDirectoryAndCreate(this.validatedImportDir.toString());
 					List<File> files = FileUtils.getFileListing(this.validatedImportDir.toFile(), subDirLevelMax);
-					log.log(Level.INFO, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedImportDir)); //$NON-NLS-1$
+					log.log(Level.OFF, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedImportDir)); //$NON-NLS-1$
 					for (File file : files) {
 						if (file.getName().endsWith(this.validatedImportExtention)) {
 							if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
@@ -683,7 +684,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						}
 					}
 				}
-				log.log(Level.INFO, String.format("%04d files selected", this.histoFilePaths.size())); //$NON-NLS-1$
+				log.log(Level.OFF, String.format("%04d files selected", this.histoFilePaths.size())); //$NON-NLS-1$
 			}
 		}
 		return !isFullChange;
@@ -730,9 +731,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						if (!deviceConfigurations.containsKey(path.getParent().getFileName().toString())) objectDirectory = path.getParent().getFileName().toString();
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
-							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().startsWith(this.application.getActiveDevice().getName())) {
-									//&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // WBrueg hard wired for HoTTViewerAdapter?
-								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
+							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
+									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // HoTTViewer V3 -> HoTTViewerAdapter
+								log.log(Level.OFF, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
 								break; // ignore all log file trusses 
 							}
 							else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber()) || truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
