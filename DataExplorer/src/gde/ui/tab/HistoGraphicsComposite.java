@@ -377,6 +377,9 @@ public class HistoGraphicsComposite extends Composite {
 		this.offSetY = y0 - height;
 
 		if (trailRecordSet.getRecordDataSize(true) > 0) {
+			// initialize early in order to avoid problems in mouse move events
+			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getFirstTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
+
 			// draw curves for each active record
 			this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
 			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
@@ -386,7 +389,6 @@ public class HistoGraphicsComposite extends Composite {
 			gc.fillRectangle(this.curveAreaBounds);
 			gc.setBackground(this.surroundingBackground);
 
-			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getFirstTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
 			this.timeLine.drawTimeLine(gc, x0, y0);
 
 			// draw draw area bounding

@@ -106,7 +106,7 @@ public class HistoTimeLine {
 	 * @param newLeftmostTimeStamp  in modes zoom, pan, scope
 	 * @param newRightmostTimeStamp  in modes zoom, pan, scope
 	 */
-	public void initialize(TrailRecordSet newTrailRecordSet, int newWidth, long newLeftmostTimeStamp, long newRightmostTimeStamp) {
+	public synchronized void initialize(TrailRecordSet newTrailRecordSet, int newWidth, long newLeftmostTimeStamp, long newRightmostTimeStamp) {
 		this.trailRecordSet = newTrailRecordSet;
 		this.width = newWidth;
 		this.leftmostTimeStamp = newLeftmostTimeStamp;
@@ -432,7 +432,7 @@ public class HistoTimeLine {
 					previous = entry;
 				}
 			}
-			if (xPos < previous.getValue() + xPosTolerance)
+			if (previous != null && xPos < previous.getValue() + xPosTolerance)
 				return previous.getKey();
 			else
 				return null; // far away on the right 

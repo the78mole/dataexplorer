@@ -56,10 +56,8 @@ public class HistoGraphicsWindow extends CTabItem {
 	HistoGraphicsComposite	graphicsComposite;
 
 	final DataExplorer			application;
-	// ET final Channels channels;
 	final Settings					settings;
 	final String						tabName;
-	// ET final int windowType;
 
 	public HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
@@ -74,7 +72,7 @@ public class HistoGraphicsWindow extends CTabItem {
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0792));
 	}
 
-	public void create() {
+	public synchronized void create() {
 		this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
 		this.setControl(this.graphicSashForm);
 		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm, "  " + Messages.getString(MessageIds.GDE_MSGT0254)); //$NON-NLS-1$

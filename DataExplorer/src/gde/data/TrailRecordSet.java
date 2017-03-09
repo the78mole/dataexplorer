@@ -144,7 +144,7 @@ public class TrailRecordSet extends RecordSet {
 	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
-	public static TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
+	public  static synchronized TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
 		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.name + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -220,6 +220,12 @@ public class TrailRecordSet extends RecordSet {
 		for (int i = 0; i < newTrailRecordSet.size(); i++) {
 			newTrailRecordSet.linkedOrdinals[i] = recordNameList.indexOf(iterator.next().getKey());
 		}
+		
+		// setting all data in this create procedure and the synchronized keyword makes this method thread safe 
+		newTrailRecordSet.defineTrailTypes();
+		newTrailRecordSet.setPoints();
+		newTrailRecordSet.setDataTags();
+
 		return newTrailRecordSet;
 	}
 
@@ -256,6 +262,15 @@ public class TrailRecordSet extends RecordSet {
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
 			boolean isRaw, boolean isFromFile) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * rebuild data contents except building the records list and the synchronized scales data
+	 */
+	public synchronized void refillRecordSet() {
+		this.cleanup();
+		this.setPoints();
+		this.setDataTags();
 	}
 
 	/**

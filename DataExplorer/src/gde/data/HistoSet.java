@@ -372,10 +372,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					isRebuilt = true;
 					long nanoTimeTrailRecordSet = -System.nanoTime();
 					this.trailRecordSet = TrailRecordSet.createRecordSet(this.application.getActiveDevice(), this.application.getActiveChannelNumber());
-					this.trailRecordSet.defineTrailTypes();
 					// this.trailRecordSet.checkAllDisplayable();
-					this.trailRecordSet.setPoints();
-					this.trailRecordSet.setDataTags();
 					this.trailRecordSet.applyTemplate(true); // needs reasonable data
 					nanoTimeTrailRecordSet += System.nanoTime();
 					if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME))
@@ -387,9 +384,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			{
 				if (EnumSet.of(RebuildStep.D_TRAIL_DATA).contains(rebuildStep)) { // saves some time compared to the logic above
 					isRebuilt = true;
-					this.trailRecordSet.cleanup();
-					this.trailRecordSet.setPoints();
-					this.trailRecordSet.setDataTags();
+					this.trailRecordSet.refillRecordSet();
 				}
 				if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(98, sThreadId);
 			}
