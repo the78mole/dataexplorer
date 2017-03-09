@@ -67,4 +67,10 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 */
 	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
 
+	/**
+	 * import device specific *.bin data files
+	 * @param filePath 
+	 */
+	public void importDeviceData(Path filePath);
+
 }
