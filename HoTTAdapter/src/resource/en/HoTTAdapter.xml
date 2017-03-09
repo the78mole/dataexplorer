@@ -161,7 +161,7 @@
 			<Scoregroup scoregroupId="4">
 				<name>Packages lost</name>
 				<symbol></symbol>
-				<unit>‰</unit>
+				<unit>%</unit>
 				<active>true</active>
 				<score label="lostPackagesPerMille" value="Package lost ratio" type="String" description="lost packages / total packages" />
 				<property name="factor" value="0.1" type="Double" />
