@@ -732,8 +732,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 							boolean isValidObject = false;
 							if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
-									&& !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName() + "Adapter")) { // HoTTViewer V3 -> HoTTViewerAdapter
-								log.log(Level.OFF, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
+								&& !(truss.getLogDeviceName().startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter
+								log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getVaultDeviceName(), actualFile, truss.getStartTimeStampFormatted()));
 								break; // ignore all log file trusses 
 							}
 							else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber()) || truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
