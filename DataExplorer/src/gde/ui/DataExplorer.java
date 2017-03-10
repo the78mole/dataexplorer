@@ -24,6 +24,7 @@ import static org.eclipse.swt.SWT.CURSOR_WAIT;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
@@ -2031,8 +2032,12 @@ public class DataExplorer extends Composite {
 			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
 				if (this.histoSet.getHistoFilePaths().size() == 0) {
 					String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? this.getActiveDevice().getName() : this.getObjectKey();
-					String importDir = this.histoSet.getValidatedImportDir() != null ? "\n" + this.histoSet.getValidatedImportDir() : GDE.STRING_EMPTY; //$NON-NLS-1$
-					this.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, this.histoSet.getValidatedDataDir(), importDir }));
+					StringBuilder sb = new StringBuilder(); 
+					for (Path path : this.histoSet.getValidatedDirectories().values()) {
+						sb.append(path.toString() );
+						sb.append ("\n"); //$NON-NLS-1$
+					}
+					this.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, sb.toString() }));
 				}
 			}
 			// determine the rebuild action for the invisible histo tabs or those which are not selected
@@ -2084,7 +2089,7 @@ public class DataExplorer extends Composite {
 	 * query if histoGraphicsWindow is visible
 	 */
 	public boolean isHistoGraphicsWindowVisible() {
-		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO);
+		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO);
 	}
 	
 	/**
@@ -2268,7 +2273,6 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * get
 	 * @return
 	 */
 	public RecordSet getRecordSetOfVisibleTab() {

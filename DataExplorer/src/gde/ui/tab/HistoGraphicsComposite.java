@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,7 +163,7 @@ public class HistoGraphicsComposite extends Composite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, TabType.HISTOGRAPHICS);
+		this.contextMenu.createMenu(this.popupmenu, TabType.HISTO);
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
@@ -201,14 +202,14 @@ public class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					final String dataDirName = HistoGraphicsComposite.this.histoSet.getValidatedDataDir() != null ? HistoGraphicsComposite.this.histoSet.getValidatedDataDir().getFileName().toString()
-							: GDE.STRING_EMPTY;
-					final String importDirName = HistoGraphicsComposite.this.histoSet.getValidatedImportDir() != null ? HistoGraphicsComposite.this.histoSet.getValidatedImportDir().getFileName().toString()
-							: GDE.STRING_EMPTY;
-					final String tmpHeader = dataDirName.isEmpty() || importDirName.isEmpty() ? dataDirName + importDirName : dataDirName + GDE.STRING_EMPTY + GDE.STRING_PLUS + GDE.STRING_EMPTY + importDirName;
-					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
-						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeader);
+					StringBuilder sb = new StringBuilder(); 
+					for (Path path : HistoGraphicsComposite.this.histoSet.getValidatedDirectories().values()) {
+						sb.append (GDE.STRING_BLANK + GDE.STRING_PLUS + GDE.STRING_BLANK);
+						sb.append(path.getFileName().toString() );
 					}
+					final String tmpHeaderText = sb.length() >=3 ?  sb.substring(3) : GDE.STRING_EMPTY;
+					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText))
+						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeaderText);
 				}
 			});
 		}
