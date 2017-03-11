@@ -163,11 +163,6 @@ public class HistoVault {
 	@XmlTransient
 	private final IDevice												device							= this.application.getActiveDevice();
 
-	@XmlTransient
-	private int																	warnedMeasurementID	= Integer.MAX_VALUE;
-	@XmlTransient
-	private int																	warnedSettlementID	= Integer.MAX_VALUE;
-
 	@XmlElement(required = true)
 	protected String														vaultName;
 	@XmlElement(required = true)
@@ -839,7 +834,7 @@ public class HistoVault {
 
 	/**
 	 * writes device properties XML to given full qualified file name
-	 * @param fullQualifiedFileName
+	 * @param outputStream
 	 */
 	public void store(OutputStream outputStream) {
 		try {
@@ -870,7 +865,7 @@ public class HistoVault {
 	 */
 	private static Unmarshaller getUnmarshaller() {
 		if (HistoVault.jaxbUnmarshaller == null) {
-			final Path path = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+			final Path path = getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			try {
 				HistoVault.jaxbUnmarshaller = getJaxbContext().createUnmarshaller();
 				HistoVault.jaxbUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
@@ -887,7 +882,7 @@ public class HistoVault {
 	 */
 	private static Marshaller getMarshaller() {
 		if (HistoVault.jaxbMarshaller == null) {
-			final Path path = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+			final Path path = getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			try {
 				HistoVault.jaxbMarshaller = getJaxbContext().createMarshaller();
 				HistoVault.jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -918,7 +913,7 @@ public class HistoVault {
 	 * @throws IOException 
 	 */
 	public boolean isSubstantiated() throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
-		File file = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME, this.vaultDirectory, this.vaultName).toFile();
+		File file = getCacheDirectory().resolve(this.vaultDirectory).resolve(this.vaultName).toFile();
 		if (this.vaultName.equals(HistoVault.getVaultName(Paths.get(this.logFilePath), file.lastModified(), file.length(), this.logRecordSetOrdinal))) {
 			List<HistoVault> trusses = new ArrayList<HistoVault>();
 			trusses.add(this);
@@ -931,7 +926,7 @@ public class HistoVault {
 	}
 
 	/**
-	 * @param newVaultDirectory directory or zip file name
+	 * @param newVaultsDirectory directory or zip file name
 	 * @return true if the vault directory name conforms to current versions of the Data Explorer / device XML, to the current channel and to user settings (e.g. sampling timespan) and to various additional attributes
 	 */
 	public static boolean isValidDirectory(String newVaultsDirectory) {
@@ -948,6 +943,17 @@ public class HistoVault {
 				Settings.getInstance().getSamplingTimespan_ms(), Settings.getInstance().getMinmaxQuantileDistance(), Settings.getInstance().getAbsoluteTransitionLevel());
 		return HistoVault.sha1(tmpSubDirectoryLongKey);
 
+	}
+
+	/**
+	 * @return the path to the directory or zip file
+	 */
+	public static Path getVaultsFolder() {
+		return getCacheDirectory().resolve(getVaultsDirectory());
+	}
+
+	public static Path getCacheDirectory() {
+		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 	}
 
 	/**
@@ -1116,7 +1122,7 @@ public class HistoVault {
 											triggerRefOrdinal < 0 ? (Integer) record.getSigmaValue() : (Integer) record.getSigmaValueTriggered(triggerRefOrdinal));
 							}
 							else {
-								entryPoints.addPoint(TrailTypes.REAL_SD.ordinal(), TrailTypes.REAL_SD.name(), (Integer) record.getSigmaValue());
+								entryPoints.addPoint(TrailTypes.REAL_SD.ordinal(), TrailTypes.REAL_SD.name(), record.getSigmaValue());
 							}
 							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1)
@@ -1230,12 +1236,12 @@ public class HistoVault {
 							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 									: HistoSettlement.outlierRangeFactorDefault;
 							Quantile quantile = new Quantile(histoSettlement, isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
-							
+
 							entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), (int) quantile.getAvgFigure());
-							entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(),  (int) quantile.getMaxFigure());
-							entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(),(int) quantile.getMinFigure());
-							entryPoints.addPoint(TrailTypes.REAL_SD.ordinal(), TrailTypes.REAL_SD.name(),  (int) quantile.getSigmaFigure());
-							entryPoints.addPoint(TrailTypes.REAL_FIRST.ordinal(), TrailTypes.REAL_FIRST.name(),  (int) quantile.getFirstFigure());
+							entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), (int) quantile.getMaxFigure());
+							entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), (int) quantile.getMinFigure());
+							entryPoints.addPoint(TrailTypes.REAL_SD.ordinal(), TrailTypes.REAL_SD.name(), (int) quantile.getSigmaFigure());
+							entryPoints.addPoint(TrailTypes.REAL_FIRST.ordinal(), TrailTypes.REAL_FIRST.name(), (int) quantile.getFirstFigure());
 							entryPoints.addPoint(TrailTypes.REAL_LAST.ordinal(), TrailTypes.REAL_LAST.name(), (int) quantile.getLastFigure());
 							entryPoints.addPoint(TrailTypes.REAL_SUM.ordinal(), TrailTypes.REAL_SUM.name(), (int) quantile.getSumFigure());
 							entryPoints.addPoint(TrailTypes.REAL_COUNT.ordinal(), TrailTypes.REAL_COUNT.name(), (int) quantile.getSizeFigure() * 1000);
@@ -1389,6 +1395,13 @@ public class HistoVault {
 
 	public boolean isTruss() {
 		return this.getMeasurements().isEmpty();
+	}
+
+	/**
+	 * @return the log file path
+	 */
+	public Path getLogFileAsPath() {
+		return Paths.get(this.logFilePath);
 	}
 
 	@Override

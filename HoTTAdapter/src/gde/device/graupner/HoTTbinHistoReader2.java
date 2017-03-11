@@ -90,7 +90,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.lastTime = System.nanoTime();
 
 		HoTTbinHistoReader2.truss = newTruss;
-		HoTTbinHistoReader2.filePath = Paths.get(truss.getLogFilePath());
+		HoTTbinHistoReader2.filePath = truss.getLogFileAsPath();
 		File file = HoTTbinHistoReader2.filePath.toFile();
 		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {
 			HoTTbinHistoReader2.read(data_in);

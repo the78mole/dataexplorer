@@ -41,7 +41,6 @@ import gde.exception.DataTypeException;
 import gde.histocache.HistoVault;
 import gde.io.DataParser;
 import gde.log.Level;
-import gde.utils.LocalizedDateTime;
 import gde.utils.StringHelper;
 
 /**
@@ -92,7 +91,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.lastTime = System.nanoTime();
 
 		HoTTbinHistoReader.truss = newTruss;
-		HoTTbinHistoReader.filePath = Paths.get(truss.getLogFilePath());
+		HoTTbinHistoReader.filePath = truss.getLogFileAsPath();
 		File file = HoTTbinHistoReader.filePath.toFile();
 		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {
 			HoTTbinHistoReader.read(data_in);

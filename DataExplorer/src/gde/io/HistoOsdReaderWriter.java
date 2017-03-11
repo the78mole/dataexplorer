@@ -110,7 +110,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 		// build job list consisting of recordset ordinal and the corresponding truss
 		Map<Integer, HistoVault> recordSetTrusses = new TreeMap<Integer, HistoVault>();
 		for (HistoVault truss : trusses) {
-			if (truss.getLogFilePath().equals(filePath.toString()))
+			if (truss.getLogFileAsPath().equals(filePath))
 				recordSetTrusses.put(truss.getLogRecordSetOrdinal(), truss);
 			else
 				throw new UnsupportedOperationException("all trusses must carry the same logFilePath");

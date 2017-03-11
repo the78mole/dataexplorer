@@ -411,7 +411,7 @@ public class TrailRecordSet extends RecordSet {
 	public void setDataTags() {
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
-				this.dataFilePath.add(Paths.get(histoVault.getLogFilePath()).toString().intern());
+				this.dataFilePath.add(histoVault.getLogFilePath().intern());
 				this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
 				this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
 				this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
