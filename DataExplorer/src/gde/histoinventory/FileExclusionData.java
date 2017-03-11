@@ -51,7 +51,7 @@ public class FileExclusionData extends Properties {
 
 	private static final Path		exclusionsDir			= Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 
-	private Path								dataFileDir;
+	private final Path					dataFileDir;
 
 	public FileExclusionData(Path newDataFileDir) {
 		super();
@@ -60,10 +60,12 @@ public class FileExclusionData extends Properties {
 
 	@Deprecated
 	public FileExclusionData() {
+		this.dataFileDir = null;
 	}
 
 	@Deprecated
 	public FileExclusionData(Properties newDefaults) {
+		this.dataFileDir = null;
 	}
 
 	@Override

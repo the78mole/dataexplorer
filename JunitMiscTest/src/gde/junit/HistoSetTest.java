@@ -97,7 +97,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 			fail(e.toString());
 		}
 
-		System.out.println(String.format("%,11d files processed from  %s", histoSet.getHistoFilePaths().size(), this.dataPath.getAbsolutePath()));
+		System.out.println(String.format("%,11d files processed from  %s", histoSet.getValidTrusses().size(), this.dataPath.getAbsolutePath()));
 		StringBuilder sb = new StringBuilder();
 		for (Entry<String, Exception> failure : failures.entrySet()) {
 			sb.append(failure).append("\n");

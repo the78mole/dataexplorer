@@ -2030,13 +2030,12 @@ public class DataExplorer extends Composite {
 			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 			setProgress(100, sThreadId);
 			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
-				if (this.histoSet.getHistoFilePaths().size() == 0) {
-					String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? this.getActiveDevice().getName() : this.getObjectKey();
-					StringBuilder sb = new StringBuilder(); 
+				if (this.histoSet.getValidTrusses().isEmpty()) {
+					StringBuilder sb = new StringBuilder();
 					for (Path path : this.histoSet.getValidatedDirectories().values()) {
-						sb.append(path.toString() );
-						sb.append ("\n"); //$NON-NLS-1$
+						sb.append(path.toString()).append(GDE.STRING_NEW_LINE); 
 					}
+					String objectOrDevice = DataExplorer.this.getObjectKey().isEmpty() ? this.getActiveDevice().getName() : this.getObjectKey();
 					this.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, sb.toString() }));
 				}
 			}
