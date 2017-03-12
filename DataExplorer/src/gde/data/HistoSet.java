@@ -272,6 +272,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			if (isWithUi && rebuildStep.scopeOfWork > RebuildStep.D_TRAIL_DATA.scopeOfWork) this.application.setProgress(2, sThreadId);
 
 			long startTimeFileValid = new Date().getTime();
+			{
+				if (RebuildStep.A_HISTOSET == rebuildStep) {
+					isRebuilt = true;
+					this.initialize();
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             initialize")); //$NON-NLS-1$
+					if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 2, sThreadId);
+				}
+			}
 			boolean isHistoFilePathsValid = this.validateHistoFilePaths(rebuildStep);
 			{
 				if (!isHistoFilePathsValid) {
@@ -284,15 +292,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d trusses  file paths verified     time=%s [ss.SSS]", this.validTrusses.size(), //$NON-NLS-1$
 							StringHelper.getFormatedDuration("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
 				}
-				if (isWithUi) this.application.setProgress(5, sThreadId);
-			}
-			{
-				if (RebuildStep.A_HISTOSET == rebuildStep) {
-					isRebuilt = true;
-					this.initialize();
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoSet             initialize")); //$NON-NLS-1$
-					if (isWithUi) this.application.setProgress(DataExplorer.application.getProgressPercentage() + 2, sThreadId);
-				}
+				if (isWithUi) this.application.setProgress(7, sThreadId);
 			}
 			{
 				if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
