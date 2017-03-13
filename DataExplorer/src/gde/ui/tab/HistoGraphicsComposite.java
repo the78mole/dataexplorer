@@ -546,10 +546,10 @@ public class HistoGraphicsComposite extends Composite {
 			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "timestampMeasure_ms=" + this.timestampMeasure_ms + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
 			this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+			if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
 
@@ -561,19 +561,21 @@ public class HistoGraphicsComposite extends Composite {
 			this.timestampMeasure_ms = isRefresh ? this.timestampMeasure_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
 			this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// measure position
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+			if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			// delta position
 			this.timestampDelta_ms = isRefresh ? this.timestampDelta_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 3 * 2);
 			this.xPosDelta = this.timeLine.getXPosTimestamp(this.timestampDelta_ms);
 			this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timestampDelta_ms));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xPosDelta = " + this.xPosDelta + " yPosDelta = " + this.yPosDelta); //$NON-NLS-1$ //$NON-NLS-2$
 
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
-			drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+			if (isYInCurveAreaBounds(this.yPosDelta)) drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
 
 			drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 
@@ -623,7 +625,10 @@ public class HistoGraphicsComposite extends Composite {
 	private void drawConnectingLine(int posFromLeft1, int posFromTop1, int posFromLeft2, int posFromTop2, int swtColor) {
 		this.canvasGC.setForeground(SWTResourceManager.getColor(swtColor));
 		this.canvasGC.setLineStyle(SWT.LINE_SOLID);
+		// support connecting lines with start or end beyond the y axis drawing area 
+		this.canvasGC.setClipping(this.curveAreaBounds.x, this.curveAreaBounds.y, this.curveAreaBounds.width, this.curveAreaBounds.height);
 		this.canvasGC.drawLine(posFromLeft1 + this.offSetX, posFromTop1 + this.offSetY, posFromLeft2 + this.offSetX, posFromTop2 + this.offSetY);
+		this.canvasGC.setClipping(this.curveAreaBounds);
 	}
 
 	/**
@@ -645,6 +650,8 @@ public class HistoGraphicsComposite extends Composite {
 	 * @param lineWidth
 	 */
 	void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
+		// do not erase lines beyond the y axis drawing area 
+		if (posFromTop + this.offSetY >= 0 && posFromTop + this.offSetY <= this.curveAreaBounds.height)
 		this.canvasGC.drawImage(this.canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
 	}
 
@@ -668,10 +675,14 @@ public class HistoGraphicsComposite extends Composite {
 
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY, width, height);
-		}
+		// support connecting lines with start or end beyond the y axis drawing area 
+		//		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
+		if (top + this.offSetY < 0) top = -this.offSetY;
+		if (top + this.offSetY > this.curveAreaBounds.height) top = this.curveAreaBounds.height - this.offSetY;
+		if (height > this.curveAreaBounds.height) height = this.curveAreaBounds.height - top;
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY, width, height);
+		//		}
 
 		this.leftLast = this.xPosMeasure <= this.xPosDelta ? this.xPosMeasure : this.xPosDelta;
 		this.topLast = this.yPosDelta <= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
@@ -687,6 +698,7 @@ public class HistoGraphicsComposite extends Composite {
 	 * @param posFromLeft2
 	 * @param posFromTop2
 	 */
+	@Deprecated
 	void eraseConnectingLine(int left, int top, int width, int height) {
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
 			this.canvasGC.drawImage(this.canvasImage, left, top, width, height, left + this.offSetX, top + this.offSetY, width, height);
@@ -808,6 +820,10 @@ public class HistoGraphicsComposite extends Composite {
 		return new Point(tmpxPos, tmpyPos);
 	}
 
+	private boolean isYInCurveAreaBounds(int yPos) {
+		return yPos <= this.curveAreaBounds.height && yPos >= this.curveAreaBounds.y;
+	}
+
 	/**
 	 * @param evt
 	 */
@@ -826,25 +842,30 @@ public class HistoGraphicsComposite extends Composite {
 				this.canvasGC.setLineStyle(SWT.LINE_DASH);
 
 				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-					try {
-						if (this.isLeftMouseMeasure) {
-							TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
+					//					try {
+					if (this.isLeftMouseMeasure) {
+						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
+						long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
+						int xPosMeasureNew = this.timeLine.getXPosTimestamp(timestampMeasureNew_ms);
+						int yPosMeasureNew = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(xPosMeasureNew)));
+						if (xPosMeasureNew != this.xPosMeasure || yPosMeasureNew != this.yPosMeasure) {
+							// all obsolete lines are cleaned up now draw new position marker
 							clearOldMeasureLines(trailRecordSet, trailRecord);
 
+							this.timestampMeasure_ms = timestampMeasureNew_ms;
+							this.xPosMeasure = xPosMeasureNew;
+							this.yPosMeasure = yPosMeasureNew ;
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timestampMeasure_ms=" + this.timestampMeasure_ms); //$NON-NLS-1$ 
 							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 								this.canvasGC.setLineStyle(SWT.LINE_DASH);
 								drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
-								drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+								if (isYInCurveAreaBounds(this.yPosDelta)) drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 							}
 							// all obsolete lines are cleaned up now draw new position marker
-							this.timestampMeasure_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
-							this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-							this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
-							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "timestampMeasure_ms=" + this.timestampMeasure_ms); //$NON-NLS-1$ 
+							if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
@@ -864,23 +885,27 @@ public class HistoGraphicsComposite extends Composite {
 												LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure)) }));
 							}
 						}
-						else if (this.isRightMouseMeasure) {
-							TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
+					}
+					else if (this.isRightMouseMeasure) {
+						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
+						long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
+						int xPosDeltaNew = this.timeLine.getXPosTimestamp(timestampDeltaNew_ms);
+						int yPosDeltaNew = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(xPosDeltaNew)));
+						if (xPosDeltaNew != this.xPosDelta || yPosDeltaNew != this.yPosDelta) {
 							clearOldMeasureLines(trailRecordSet, trailRecord);
 
+							this.timestampDelta_ms = timestampDeltaNew_ms;
+							this.xPosDelta = xPosDeltaNew;
+							this.yPosDelta = yPosDeltaNew ;
 							// always needs to draw measurement pointer
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 							// no change don't needs to be calculated yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+							if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-							// update the new delta position
-							this.timestampDelta_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
-							this.xPosDelta = this.timeLine.getXPosTimestamp(this.timestampDelta_ms); // evt.x is already relative to curve area
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 							this.canvasGC.setLineStyle(SWT.LINE_DASH);
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
-							this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
-							drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+							if (isYInCurveAreaBounds(this.yPosDelta)) drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
 
 							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
 								drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
@@ -895,9 +920,10 @@ public class HistoGraphicsComposite extends Composite {
 											trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
 						}
 					}
-					catch (RuntimeException e) {
-						log.log(Level.WARNING, "mouse pointer out of range", e); //$NON-NLS-1$
-					}
+					//					}
+					//					catch (RuntimeException e) {
+					//						log.log(Level.WARNING, "mouse pointer out of range", e); //$NON-NLS-1$
+					//					}
 				}
 				else if (measureRecordKey != null && (trailRecordSet.isMeasurementMode(measureRecordKey) || trailRecordSet.isDeltaMeasurementMode(measureRecordKey))) {
 					if (this.xPosMeasure + 1 >= evt.x && this.xPosMeasure - 1 <= evt.x || this.xPosDelta + 1 >= evt.x && this.xPosDelta - 1 <= evt.x) { // snap mouse pointer
@@ -1165,14 +1191,16 @@ public class HistoGraphicsComposite extends Composite {
 		eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 		// no change don't needs to be calculated, but the calculation limits to bounds
 		this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
-		eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
+		if (isYInCurveAreaBounds(this.yPosMeasure)) eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 
-		eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-		// no change don't needs to be calculated, but the calculation limits to bounds
-		this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
-		eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+		if (trailRecordSet.isDeltaMeasurementMode(trailRecord.getName())) {
+			eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
+			// no change don't needs to be calculated, but the calculation limits to bounds
+			this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
+			if (isYInCurveAreaBounds(this.yPosDelta)) eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 
-		cleanConnectingLineObsoleteRectangle();
+			cleanConnectingLineObsoleteRectangle();
+		}
 	}
 
 }
