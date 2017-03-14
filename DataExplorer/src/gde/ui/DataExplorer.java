@@ -834,7 +834,7 @@ public class DataExplorer extends Composite {
 	 * sets histo windows visibility.
 	 * if a histo window is selected: determine histo files, read histo data and initialize window tab.
 	 */
-	public void setupHistoWindows() {
+	public synchronized void setupHistoWindows() {
 		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("started")); //$NON-NLS-1$
 		this.histoSet = HistoSet.getInstance();
 		this.histoSet.initialize();
@@ -2015,7 +2015,7 @@ public class DataExplorer extends Composite {
 		}
 	}
 
-	public void rebuildHisto(RebuildStep rebuildStep, boolean isWithUi) {
+	public synchronized void rebuildHisto(RebuildStep rebuildStep, boolean isWithUi) {
 		boolean isRebuilt = false;
 		try {
 			setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));

@@ -181,7 +181,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	/**
 	 * re- initializes the singleton. 
 	 */
-	public void initialize() {
+	public synchronized void initialize() {
 		this.clear();
 
 		this.validatedDevice = null;
@@ -263,7 +263,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	public boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		try {
 			long startTime = System.nanoTime() / 1000000;
@@ -644,14 +644,14 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				{
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.DATA).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), subDirLevelMax);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 			}
 			if (this.validatedDirectories.containsKey(DirectoryType.IMPORT)) {
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.IMPORT).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), subDirLevelMax);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT))); //$NON-NLS-1$
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 			}
@@ -920,7 +920,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		}
 		for (Path ignorePath : exclusionDirectories) {
 			new FileExclusionData(ignorePath).delete();
-			log.log(Level.OFF, "deleted : ", ignorePath); //$NON-NLS-1$	
+			log.log(Level.FINE, "deleted : ", ignorePath); //$NON-NLS-1$	
 		}
 	}
 
@@ -928,7 +928,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @param filePath
 	 * @param recordsetBaseName empty string sets ignore to the file in total
 	 */
-	public void setIgnoreHistoRecordSet(Path filePath, String recordsetBaseName) {
+	public synchronized void setIgnoreHistoRecordSet(Path filePath, String recordsetBaseName) {
 		final FileExclusionData fileExclusionData = new FileExclusionData(filePath.getParent());
 		fileExclusionData.load();
 		if (recordsetBaseName.isEmpty()) {
@@ -948,10 +948,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	}
 
 	/**
-	 * cleans exclusion directories.
+	 * toggles the exclusion directory definition and cleans exclusion directories.
 	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path
 	 */
-	public void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
+	public synchronized void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
 		if (this.settings.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
 			ArrayList<Path> dataPaths = new ArrayList<Path>();
 			dataPaths.add(Paths.get(this.settings.getDataFilePath()));

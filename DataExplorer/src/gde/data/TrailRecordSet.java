@@ -353,7 +353,7 @@ public class TrailRecordSet extends RecordSet {
 	 * set time steps for the trail recordset and the data points for all displayable trail records.
 	 * every record takes the selected trail type / score data from the history vault and populates its data. 
 	 */
-	public void setPoints() {
+	public synchronized  void setPoints() {
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
@@ -403,7 +403,7 @@ public class TrailRecordSet extends RecordSet {
 	 * the record takes the selected trail type / score data from the trail record vault and populates its data. 
 	 * @param recordOrdinal
 	 */
-	public void setPoints(int recordOrdinal) {
+	public synchronized  void setPoints(int recordOrdinal) {
 		TrailRecord trailRecord = (TrailRecord) super.get(recordOrdinal);
 		// the vault does hot hold data for non displayable records (= inactive records)
 		if (trailRecord.isDisplayable) {
@@ -423,7 +423,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * sets tagging information for the trail entries.
 	 */
-	public void setDataTags() {
+	public synchronized void setDataTags() {
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				this.dataFilePath.add(histoVault.getLogFilePath().intern());
