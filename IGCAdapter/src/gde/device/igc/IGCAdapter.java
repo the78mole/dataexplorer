@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.device.igc;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -39,19 +52,6 @@ import gde.utils.CalculationThread;
 import gde.utils.FileUtils;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * IGC adapter class to read and verify ICG files
@@ -191,6 +191,15 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+	}
+
+	/**
+	 * @param record
+	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		return record.getOrdinal() == 0 || record.getOrdinal() == 1; // 0=GPS-latitude 1=GPS-longitude 
 	}
 
 	/**

@@ -18,25 +18,6 @@
 ****************************************************************************************/
 package gde.device.robbe;
 
-import gde.GDE;
-import gde.comm.DeviceCommPort;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.PropertyType;
-import gde.exception.DataInconsitsentException;
-import gde.io.FileHandler;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +39,26 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import gde.GDE;
+import gde.comm.DeviceCommPort;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.Record.DataType;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.io.FileHandler;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
 
 /**
  * Futaba telemetry data adapter device implementation class
@@ -629,7 +630,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 						additionalMeasurementOrdinal, 
 						findRecordByUnit(activeRecordSet, "m/s"), 
 						findRecordByUnit(activeRecordSet, "km"), 
-						-1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						-1, 
 						true, isExportTmpDir);
 			}
 		}
@@ -652,15 +653,15 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		return -1;
 	}
 
-	/**
-	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
-	 * @param record
-	 * @return
-	 */
-	@Override
-	public boolean isGPSCoordinates(Record record) {
-		return record.getDataType().value().startsWith("GPS l");
-	}
+		/**
+		 * @param record
+		 * @return true if if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+		 */
+		@Override
+		public boolean isGPSCoordinates(Record record) {
+//		return record.getDataType().value().startsWith("GPS l");
+			return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE ;
+		}
 
 	/**
 	 * exports the actual displayed data set to KML file format
