@@ -1016,7 +1016,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[ordinal + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
+					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 				}
 				// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 				else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { // Receiver
