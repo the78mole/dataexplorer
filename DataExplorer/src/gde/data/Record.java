@@ -1551,6 +1551,21 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
+	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
+	 * @return the translated and decimal formatted value at the given index
+	 */
+	public String getFormattedScaleValue(double finalValue) {
+		if (this.device.isGPSCoordinates(this)) {
+			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
+				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
+			else
+				return this.getDecimalFormat().format(finalValue);
+		}
+		else
+			return this.getDecimalFormat().format(finalValue);
+	}
+
+	/**
 	 * @param index
 	 * @return the formatted value also for GPS coordinates
 	 */

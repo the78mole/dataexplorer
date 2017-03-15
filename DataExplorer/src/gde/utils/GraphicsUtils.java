@@ -138,7 +138,7 @@ public class GraphicsUtils {
 				//draw numbers to the scale	
 				if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
 				else gc.setForeground(DataExplorer.COLOR_BLACK);
-				drawTextCentered(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+				drawTextCentered(record.getFormattedScaleValue(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 				gc.setForeground(DataExplorer.COLOR_BLACK);
 			}
 			//draw mini ticks above first main tick
@@ -155,7 +155,7 @@ public class GraphicsUtils {
 			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
 			if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
 			else gc.setForeground(DataExplorer.COLOR_BLACK);
-			drawTextCentered(df.format((minScaleValue + minScaleValue) /2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+			drawTextCentered(record.getFormattedScaleValue((minScaleValue + minScaleValue) /2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 		}
 		if (isBuildGridVector) {
