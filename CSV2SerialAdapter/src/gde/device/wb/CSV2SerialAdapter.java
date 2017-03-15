@@ -96,11 +96,11 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			}
 			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
-			} else { //InputTypes.FILE_IO
+			}
+			else { //InputTypes.FILE_IO
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
 			}
-			if (isFileIO)
-				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			if (isFileIO) updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -124,11 +124,11 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			}
 			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
-			} else { //InputTypes.FILE_IO
+			}
+			else { //InputTypes.FILE_IO
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
 			}
-			if (isFileIO)
-				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			if (isFileIO) updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -158,8 +158,9 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 69;  // sometimes first 4 bytes give the length of data + 4 bytes for number
+		return 69; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
+
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
@@ -173,13 +174,14 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)));
-		int[] startLength = new int[] {0,0};
+		DataParser data = new DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(),
+				Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)));
+		int[] startLength = new int[] { 0, 0 };
 		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-				
+
 		try {
 			for (int i = 0; i < recordDataSize; i++) {
 				setDataLineStartAndLength(dataBuffer, startLength);
@@ -216,14 +218,13 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		for (; startPos < dataBuffer.length; ++startPos) {
 			if (dataBuffer[startPos] == 0x24) {
-				if (dataBuffer[startPos+2] == 0x31 || dataBuffer[startPos+3] == 0x31) break; // "$ ;" or "$  ;" (record set number two digits
+				if (dataBuffer[startPos + 2] == 0x31 || dataBuffer[startPos + 3] == 0x31) break; // "$ ;" or "$  ;" (record set number two digits
 			}
 		}
 		int crlfPos = refStartLength[0] = startPos;
-		
+
 		for (; crlfPos < dataBuffer.length; ++crlfPos) {
-			if (dataBuffer[crlfPos] == 0x0D)
-				if(dataBuffer[crlfPos+1] == 0X0A) break; //0d0a (CRLF)
+			if (dataBuffer[crlfPos] == 0x0D) if (dataBuffer[crlfPos + 1] == 0X0A) break; //0d0a (CRLF)
 		}
 		refStartLength[1] = crlfPos - startPos;
 	}
@@ -234,11 +235,11 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//noop due to previous parsed CSV data
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
@@ -257,36 +258,37 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		int timeStampBufferSize = 0;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
-		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
+		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
-		if(!recordSet.isTimeStepConstant()) {
+
+		if (!recordSet.isTimeStepConstant()) {
 			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 			byte[] timeStampBuffer = new byte[timeStampBufferSize];
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
 			for (int i = 0; i < recordDataSize; i++) {
-				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
+				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)
+						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
 		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
-		
+
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
-			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-			
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
+
 			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
+				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8)
+						+ ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
-			
-			if(recordSet.isTimeStepConstant()) 
+
+			if (recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i)/10.0);
+				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
 
-			
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
@@ -308,30 +310,14 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				
 				switch (record.getDataType()) {
-				case GPS_LATITUDE:
-				case GPS_LONGITUDE:
-					if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
-						int grad = record.realGet(rowIndex) / 1000000;
-						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-						dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
-					}
-					else { // assume degree only
-						dataTableRow[index + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
-					}
-					break;
-					
 				case DATE_TIME:
 					dataTableRow[index + 1] = StringHelper.getFormatedTime(record.getUnit(), record.realGet(rowIndex));
-					dataTableRow[index + 1] =  dataTableRow[index + 1].substring(0, dataTableRow[index + 1].indexOf(GDE.STRING_COMMA) + 2);
+					dataTableRow[index + 1] = dataTableRow[index + 1].substring(0, dataTableRow[index + 1].indexOf(GDE.STRING_COMMA) + 2);
 					break;
 
 				default:
-					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 					break;
 				}
 				++index;
@@ -340,7 +326,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -352,7 +338,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
-		
+
 		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
@@ -369,25 +355,25 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		catch (Throwable e) {
 			reduction = 0;
 		}
-		
+
 		double newValue = 0;
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
 			if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
-				int grad = ((int)(value / 1000));
-				double minuten = (value - (grad*1000.0))/10.0;
-				newValue = grad + minuten/60.0;
+				int grad = ((int) (value / 1000));
+				double minuten = (value - (grad * 1000.0)) / 10.0;
+				newValue = grad + minuten / 60.0;
 			}
 			else { // assume degree only
 				newValue = value / 1000.0;
 			}
 			break;
-			
+
 		case DATE_TIME:
 			newValue = 0;
 			break;
-			
+
 		default:
 			newValue = (value - reduction) * factor + offset;
 			break;
@@ -429,15 +415,15 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
 			if (record.getUnit().contains("°") && record.getUnit().contains("'")) {
-				int grad = (int)value;
-				double minuten =  (value - grad*1.0) * 60.0;
-				newValue = (grad + minuten/100.0)*1000.0;
+				int grad = (int) value;
+				double minuten = (value - grad * 1.0) * 60.0;
+				newValue = (grad + minuten / 100.0) * 1000.0;
 			}
 			else { // assume degree only
 				newValue = value * 1000.0;
 			}
 			break;
-			
+
 		case DATE_TIME:
 			newValue = 0;
 			break;
@@ -469,18 +455,18 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(i);		
+			record = recordSet.get(i);
 			measurement = this.getMeasurement(channelConfigNumber, i);
 			log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
-			
+
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
 				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
-			}	
-			if(includeReasonableDataCheck) {
+			}
+			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
 				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
 			}
@@ -503,18 +489,18 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
-		
+
 		//set record data types if required and/or given with the device properties
 		String[] recordNames = recordSet.getRecordNames();
-		for (int i=0; i<recordNames.length; ++i) {
+		for (int i = 0; i < recordNames.length; ++i) {
 			MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
 			PropertyType dataTypeProperty = measurement.getProperty(MeasurementPropertyTypes.DATA_TYPE.value());
 			if (dataTypeProperty != null) {
 				switch (Record.DataType.fromValue(dataTypeProperty.getValue())) {
-				case GPS_ALTITUDE:	
-				case GPS_LATITUDE:	
-				case GPS_LONGITUDE:	
-				case DATE_TIME:	
+				case GPS_ALTITUDE:
+				case GPS_LATITUDE:
+				case GPS_LONGITUDE:
+				case DATE_TIME:
 					recordSet.get(recordNames[i]).setDataType(Record.DataType.fromValue(dataTypeProperty.getValue()));
 					break;
 
@@ -540,9 +526,9 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
 	public String[] getUsedPropertyKeys() {
-		return new String[] {IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION};
+		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
@@ -571,7 +557,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 					}
 					catch (SerialPortException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					}
 					catch (ApplicationConfigurationException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
@@ -614,12 +600,12 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 							try {
 								String recordNameExtend;
 								try {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 									Integer.valueOf(recordNameExtend);
 								}
 								catch (Exception e) {
 									try {
-										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 										Integer.valueOf(recordNameExtend);
 									}
 									catch (Exception e1) {
@@ -627,9 +613,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 									}
 								}
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, recordNameExtend, channelConfigNumber, 
-										new DataParser(CSV2SerialAdapter.this.getDataBlockTimeUnitFactor(), 
-												CSV2SerialAdapter.this.getDataBlockLeader(), CSV2SerialAdapter.this.getDataBlockSeparator().value(), 
+								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, recordNameExtend, channelConfigNumber,
+										new DataParser(CSV2SerialAdapter.this.getDataBlockTimeUnitFactor(), CSV2SerialAdapter.this.getDataBlockLeader(), CSV2SerialAdapter.this.getDataBlockSeparator().value(),
 												CSV2SerialAdapter.this.getDataBlockCheckSumType(), CSV2SerialAdapter.this.getDataBlockSize(InputTypes.FILE_IO)));
 							}
 							catch (Throwable e) {
@@ -645,7 +630,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		};
 		reader.start();
 	}
-	
+
 	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
@@ -653,7 +638,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
@@ -662,8 +647,10 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
-					if (!isSerialIO) open_closeCommPort();
-					else importCsvFiles();
+					if (!isSerialIO)
+						open_closeCommPort();
+					else
+						importCsvFiles();
 				}
 			});
 		}
@@ -698,7 +685,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		}
 		return recordNames;
 	}
-	
+
 	/**
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
@@ -712,14 +699,11 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 				//13=tripLength 14=distance 15=azimuth 16=directionStart
-				exportFileName = new FileHandler().exportFileKMZ(
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
-						-1, 																																		//azimuth
+				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
+						activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
+						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance 
+						-1, //azimuth
 						true, isExportTmpDir);
 			}
 		}
@@ -735,16 +719,12 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
-				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1710), 
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
-						-1, 																																		//azimuth
-						type == DeviceConfiguration.HEIGHT_RELATIVE, 
-						type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1710), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED), activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
+						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance 
+						-1, //azimuth
+						type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
 		}
 	}
@@ -767,8 +747,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 		}
-		if (containsGPSdata)
-			updateFileMenu(this.application.getMenuBar().getExportMenu());
+		if (containsGPSdata) updateFileMenu(this.application.getMenuBar().getExportMenu());
 
 		return containsGPSdata;
 	}
@@ -784,7 +763,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
 				int recordOrdinal = activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED);
-				return recordOrdinal >= 0 ? recordOrdinal : activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h", "kph"});	//speed;
+				return recordOrdinal >= 0 ? recordOrdinal : activeRecordSet.findRecordOrdinalByUnit(new String[] { "km/h", "kph" }); //speed;
 			}
 		}
 		return -1;

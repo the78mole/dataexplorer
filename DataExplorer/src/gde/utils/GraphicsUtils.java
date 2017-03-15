@@ -20,7 +20,6 @@ package gde.utils;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -31,6 +30,7 @@ import org.eclipse.swt.widgets.Display;
 
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 

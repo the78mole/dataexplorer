@@ -334,21 +334,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				switch (record.getDataType()) {
-				case GPS_LATITUDE:
-				case GPS_LONGITUDE:
-					int grad = record.realGet(rowIndex) / 1000000;
-					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
-					break;
-
-				default:
-					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-					break;
-				}
+				dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				++index;
 			}
 		}

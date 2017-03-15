@@ -680,9 +680,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
 				int ordinal = record.getOrdinal();
 				//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 				//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
@@ -692,17 +689,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
 				//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM
 				//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM
-				final int latOrdinal = 13, lonOrdinal = 14;
-				if (ordinal == latOrdinal || ordinal == lonOrdinal) { //13=Latitude, 14=Longitude 
-					int grad = record.realGet(rowIndex) / 1000000;
-					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
-				}
-				else if (ordinal >= 0 && ordinal <= 5) {
-					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0));
+				if (ordinal >= 0 && ordinal <= 5) {
+					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
 				}
 				else {
-					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				++index;
 			}

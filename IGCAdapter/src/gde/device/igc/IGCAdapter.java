@@ -210,12 +210,9 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//0=latitude 1=longitude  2=altitudeAbs 3=height
-				if (index > 1) {
-					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+				if (index > 1) { // ET the index decides about formatting? What about 3=height?  isGPSCoordinates method is missing.
+					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				else {
 					int grad = record.realGet(rowIndex) / 1000000;

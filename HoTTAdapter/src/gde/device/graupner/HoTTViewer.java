@@ -1,5 +1,16 @@
 package gde.device.graupner;
 
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.data.Channel;
@@ -12,17 +23,6 @@ import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
-
-import java.io.FileNotFoundException;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 public class HoTTViewer extends HoTTAdapter implements IDevice {
 	final static Logger									logg														= Logger.getLogger(HoTTViewer.class.getName());
@@ -267,25 +267,17 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
 				int ordinal = record.getOrdinal();
 				//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 				final int latOrdinal = 22, lonOrdinal = 23;
-				if (ordinal == latOrdinal || ordinal == lonOrdinal) { //13=Latitude, 14=Longitude 
-					int grad = record.realGet(rowIndex) / 1000000;
-					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
-				}
-				else if (ordinal >= 0 && ordinal <= 5){
-					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
+				if (ordinal >= 0 && ordinal <= 5){
+					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
 				}
 				else {
-					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				++index;
 			}

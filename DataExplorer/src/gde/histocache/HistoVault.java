@@ -146,22 +146,22 @@ import gde.utils.StringHelper;
 		"vaultSamplingTimespanMs", "logFilePath", "logFileLastModified", "logFileLength", "logObjectDirectory", "logFileVersion", "logRecordSetSize", "logRecordSetOrdinal", "logRecordsetBaseName",
 		"logDeviceName", "logChannelNumber", "logObjectKey", "logStartTimestampMs", "measurements", "settlements", "scores" })
 public class HistoVault {
-	final private static String									$CLASS_NAME					= HistoVault.class.getName();
-	final private static Logger									log									= Logger.getLogger($CLASS_NAME);
+	final private static String									$CLASS_NAME	= HistoVault.class.getName();
+	final private static Logger									log					= Logger.getLogger($CLASS_NAME);
 
-	private static Path													activeDevicePath;																					// criterion for the active device version key cache
-	private static String												activeDeviceKey;																					// caches the version key for the active device which is calculated only if the device is changed by the user
-	private static long													activeDeviceLastModified_ms;															// caches the version key for the active device which is calculated only if the device is changed by the user
+	private static Path													activeDevicePath;																	// criterion for the active device version key cache
+	private static String												activeDeviceKey;																	// caches the version key for the active device which is calculated only if the device is changed by the user
+	private static long													activeDeviceLastModified_ms;											// caches the version key for the active device which is calculated only if the device is changed by the user
 	private static JAXBContext									jaxbContext;
 	private static Unmarshaller									jaxbUnmarshaller;
 	private static Marshaller										jaxbMarshaller;
 
 	@XmlTransient
-	private final DataExplorer									application					= DataExplorer.getInstance();
+	private final DataExplorer									application	= DataExplorer.getInstance();
 	@XmlTransient
-	private final Settings											settings						= Settings.getInstance();
+	private final Settings											settings		= Settings.getInstance();
 	@XmlTransient
-	private final IDevice												device							= this.application.getActiveDevice();
+	private final IDevice												device			= this.application.getActiveDevice();
 
 	@XmlElement(required = true)
 	protected String														vaultName;
@@ -1077,15 +1077,12 @@ public class HistoVault {
 								//								}
 							}
 							boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
-							boolean isGpsCoordinates = this.device.isGPSCoordinates(record);
 							if (measurementStatistics.isAvg()) {
 								if (isTriggerLevel)
 									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0);
 								else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
-									if (isGpsCoordinates)
-									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), record.getAvgValue());
-									else
-									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
+									entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(),
+											triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
 							}
 							else {
 								entryPoints.addPoint(TrailTypes.REAL_AVG.ordinal(), TrailTypes.REAL_AVG.name(), record.getAvgValue());
@@ -1094,10 +1091,8 @@ public class HistoVault {
 								if (isTriggerLevel)
 									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), record.getMaxValueTriggered());
 								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
-									if (isGpsCoordinates)
-									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), record.getRealMaxValue());
-									else
-									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
+									entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(),
+											triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
 							}
 							else {
 								entryPoints.addPoint(TrailTypes.REAL_MAX.ordinal(), TrailTypes.REAL_MAX.name(), record.getRealMaxValue());
@@ -1106,10 +1101,8 @@ public class HistoVault {
 								if (isTriggerLevel)
 									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), record.getMinValueTriggered());
 								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) //
-									if (isGpsCoordinates)
-									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), record.getRealMinValue());
-									else
-									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
+									entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(),
+											triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
 							}
 							else {
 								entryPoints.addPoint(TrailTypes.REAL_MIN.ordinal(), TrailTypes.REAL_MIN.name(), record.getRealMinValue());
