@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import gde.GDE;
+import gde.device.TrailTypes;
 import gde.histocache.HistoVault.PointsTypeAdapter;
 
 /**
@@ -65,9 +66,9 @@ public class CompartmentType {
 		this.dataType = newDataType;
 	}
 
-	public void addPoint(int newId, String newName, int newValue) {
-		PointType newPoint = new PointType(newId, newName, newValue);
-		this.getTrails().put(newId, newPoint);
+	public void addPoint(TrailTypes newTrailType, int newValue) {
+		PointType newPoint = new PointType(newTrailType.ordinal(), newTrailType.name(), newValue);
+		this.getTrails().put(newTrailType.ordinal(), newPoint);
 	}
 
 	@Override

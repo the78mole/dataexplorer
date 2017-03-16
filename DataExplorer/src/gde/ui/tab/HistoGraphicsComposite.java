@@ -571,7 +571,7 @@ public class HistoGraphicsComposite extends Composite {
 
 			String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
 			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { trailRecord.getName(),
-					trailRecord.getFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(), formattedTimeWithUnit }));
+					trailRecord.getFormattedMeasureValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(), formattedTimeWithUnit }));
 		}
 		else if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 			this.timestampMeasure_ms = isRefresh ? this.timestampMeasure_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
@@ -891,7 +891,7 @@ public class HistoGraphicsComposite extends Composite {
 							else {
 								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
 								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256,
-										new Object[] { trailRecord.getName(), trailRecord.getFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(),
+										new Object[] { trailRecord.getName(), trailRecord.getFormattedMeasureValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(),
 												LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure)) }));
 							}
 						}
@@ -1191,7 +1191,7 @@ public class HistoGraphicsComposite extends Composite {
 			int index = trailRecordSet.getIndex(timestamp_ms);
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = (TrailRecord) records.get(i);
-				sb.append(String.format("|%7s   ", record.getFormattedScaleValue(index))); //$NON-NLS-1$
+				sb.append(String.format("|%.10s", StringHelper.center(record.getFormattedMeasureValue(index), 10))); //$NON-NLS-1$
 			}
 			return sb.append("|").toString(); //$NON-NLS-1$
 		}

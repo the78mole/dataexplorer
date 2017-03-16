@@ -156,7 +156,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -165,7 +164,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -190,7 +188,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
                 <label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
@@ -934,7 +931,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -943,7 +939,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -968,7 +963,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
                 <name>Strecke</name>
@@ -1712,7 +1707,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -1721,7 +1715,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -1746,7 +1739,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
                 <name>Strecke</name>
@@ -2509,6 +2502,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
                 <name>Strecke</name>
@@ -3249,7 +3243,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -3258,7 +3251,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -3283,7 +3275,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
                 <name>Strecke</name>
@@ -4044,6 +4036,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="Faktor zu einem gemessenem Wert"/>
+                <label>Bewegungsrichtung</label>
             </Measurement>
             <Measurement>
                 <name>Strecke</name>

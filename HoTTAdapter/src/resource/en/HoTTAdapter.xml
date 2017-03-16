@@ -349,7 +349,6 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="100.0" name="filter_factor" />
-				<suppressQuantiles>true</suppressQuantiles>
 			</Measurement>
 			<Measurement>
 				<name>Longitude</name>
@@ -358,7 +357,6 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="25.0" name="filter_factor" />
-				<suppressQuantiles>true</suppressQuantiles>
 			</Measurement>
 			<Measurement>
 				<name>Height</name>
@@ -413,7 +411,6 @@
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 				<property description="Factor to a measured value" type="Double" value="2.0" name="factor" />
-				<suppressQuantiles>true</suppressQuantiles>
 				<label>Movement direction</label>
 			</Measurement>
 			<Measurement>

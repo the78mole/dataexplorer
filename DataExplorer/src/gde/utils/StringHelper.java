@@ -131,7 +131,7 @@ public class StringHelper {
 	 * method to receive formated data and time with given format string like "yyyy-MM-dd, HH:mm:ss"
 	 */
 	public static String getDateAndTime(String format) {
-		return new SimpleDateFormat(format).format(new Date().getTime()); 
+		return new SimpleDateFormat(format).format(new Date().getTime());
 	}
 
 	/**
@@ -164,9 +164,9 @@ public class StringHelper {
 	 * @param value is the latitude / longitude value with the fraction range x.0000 to x.5999, e.g. 48,599,999
 	 * @return the degrees and minutes, e.g. 48 59.99
 	 */
-	@Deprecated // currently not used -> was replaced by StringHelper.getFormatedLatLon(String, double) for better code readability
+	@Deprecated // currently not used -> was replaced by StringHelper.getFormatedWithMinutes(String, double) for better code readability
 	public static String getFormatedLatLonWithMinutes(String format, int value) {
-		return  String.format(format, value / 1000000, value % 1000000 / 10000.0); 
+		return String.format(format, value / 1000000, value % 1000000 / 10000.0);
 	}
 
 	/**
@@ -175,7 +175,8 @@ public class StringHelper {
 	 * @return the degrees (hours) and minutes, e.g. 48 59.999880
 	 */
 	public static String getFormatedWithMinutes(String format, double translatedValue) {
-		return  String.format(format, (int) translatedValue , translatedValue % 1 * 60.0); 
+		String sign = translatedValue < 0. && (int) translatedValue == 0 ? GDE.STRING_MINUS : GDE.STRING_EMPTY; 
+		return String.format(sign + format, (int) translatedValue, Math.abs(translatedValue % 1 * 60.0));
 	}
 
 	/**
@@ -759,17 +760,17 @@ public class StringHelper {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < buffer.length; ++i) {
 			if (buffer[i] == DeviceSerialPortImpl.FF)
-				sb.append(DeviceSerialPortImpl.STRING_FF); 
+				sb.append(DeviceSerialPortImpl.STRING_FF);
 			else if (buffer[i] == DeviceSerialPortImpl.CR)
-				sb.append(DeviceSerialPortImpl.STRING_CR); 
+				sb.append(DeviceSerialPortImpl.STRING_CR);
 			else if (buffer[i] == DeviceSerialPortImpl.ACK)
-				sb.append(DeviceSerialPortImpl.STRING_ACK); 
+				sb.append(DeviceSerialPortImpl.STRING_ACK);
 			else if (buffer[i] == DeviceSerialPortImpl.NAK)
-				sb.append(DeviceSerialPortImpl.STRING_NAK); 
+				sb.append(DeviceSerialPortImpl.STRING_NAK);
 			else if (buffer[i] == -1)
-				sb.append('|'); 
+				sb.append('|');
 			else if (i == buffer.length - 6)
-				sb.append(GDE.STRING_OR).append((char) buffer[i]); 
+				sb.append(GDE.STRING_OR).append((char) buffer[i]);
 			else
 				sb.append((char) buffer[i]);
 			//sb.append(String.format("%X", buffer[i]));
@@ -945,6 +946,24 @@ public class StringHelper {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < array.length(); i++) {
 			sb.append(array.charAt(i));
+		}
+		return sb.toString();
+	}
+
+	public static String center(String s, int size) {
+		return center(s, size, ' ');
+	}
+
+	public static String center(String s, int size, char pad) {
+		if (s == null || size <= s.length()) return s;
+
+		StringBuilder sb = new StringBuilder(size);
+		for (int i = 0; i < (size - s.length()) / 2; i++) {
+			sb.append(pad);
+		}
+		sb.append(s);
+		while (sb.length() < size) {
+			sb.append(pad);
 		}
 		return sb.toString();
 	}

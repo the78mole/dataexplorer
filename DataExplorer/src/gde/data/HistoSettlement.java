@@ -937,6 +937,20 @@ public class HistoSettlement extends Vector<Integer> {
 		}
 	}
 
+	/**
+	 * @return all the translated record values including nulls (do not consider zoom, scope, ...)
+	 */
+	public Vector<Double> getTranslatedValues() {
+		Vector<Double> translatedValues = new Vector<>();
+		for (Integer value : this) { // loops without calling the overridden getter
+			if (value != null)
+				translatedValues.add(this.translateValue(value / 1000.));
+			else
+				translatedValues.add(null);
+		}
+		return translatedValues;
+	}
+
 	public RecordSet getParent() {
 		return this.parent;
 	}
@@ -997,7 +1011,7 @@ public class HistoSettlement extends Vector<Integer> {
 	 * does not support settlements based on GPS-longitude or GPS-latitude.
 	 * @return double of settlement dependent value
 	 */
-	private double reverseTranslateValue(double value) {
+	public double reverseTranslateValue(double value) { // todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
 		double factor = this.getFactor(); // != 1 if a unit translation is required
 		double offset = this.getOffset(); // != 0 if a unit translation is required
 		double reduction = this.getReduction(); // != 0 if a unit translation is required

@@ -241,7 +241,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		double offset = super.minDisplayValue * 1 / super.syncMasterFactor;
 		for (Integer xPos : timeLine.getScalePositions().values()) {
 			if ((value = super.realRealGet(i)) != null) {
-				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - Double.valueOf(((value / 1000.0) - offset) * super.displayScaleFactorValue).intValue());
+				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) (((value / 1000.0) - offset) * super.displayScaleFactorValue));
 			}
 			i++;
 		}
@@ -266,8 +266,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		for (Integer xPos : timeLine.getScalePositions().values()) {
 			if ((value = super.realRealGet(i)) != null) {
 				int grad = value / 1000000;
-				points[i] = new Point(xDisplayOffset + xPos,
-						yDisplayOffset - Double.valueOf((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue).intValue());
+				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue));
 				i++;
 			}
 		}
@@ -310,10 +309,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0; i < masterRecord.size(); i++) {
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? lowerWhiskerRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
+						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? medianRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
-						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? upperWhiskerRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
+						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
@@ -322,10 +321,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerWhiskerRecord.realRealGet(j) != null ? lowerWhiskerRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
+						sb.append(lowerWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(medianRecord.realRealGet(j) != null ? medianRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
-						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(j) != null ? upperWhiskerRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
+						sb.append(delimiter).append(medianRecord.realRealGet(j) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -338,10 +337,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0; i < masterRecord.size(); i++) {
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerRecord.realRealGet(i) != null ? lowerRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
+						sb.append(lowerRecord.realRealGet(i) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? middleRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
-						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? upperRecord.getFormattedTableValue(i) : GDE.STRING_STAR);
+						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
@@ -350,10 +349,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerRecord.realRealGet(j) != null ? lowerRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
+						sb.append(lowerRecord.realRealGet(j) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(middleRecord.realRealGet(j) != null ? middleRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
-						sb.append(delimiter).append(upperRecord.realRealGet(j) != null ? upperRecord.getFormattedTableValue(j) : GDE.STRING_STAR);
+						sb.append(delimiter).append(middleRecord.realRealGet(j) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperRecord.realRealGet(j) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -410,7 +409,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			}
 
 			// set non-suite trail types : triggered values like count/sum are not supported
-			if (!hideAllTrails && !this.getDevice().isGPSCoordinates(this))
+			if (!hideAllTrails)
 				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 
 			// set visible and reset hidden trails based on device settlement settings 
@@ -479,11 +478,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 
 			// todo set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
-			if (!this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false) && !this.getDevice().isGPSCoordinates(this)) {
+			if (!this.settlementType.getTrailDisplay().map(x -> x.isDiscloseAll()).orElse(false)) {
 				if (this.settlementType.getEvaluation().getTransitionAmount() == null)
 					TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 				else
-					throw new UnsupportedOperationException("TransitionAmount not implemented");
+					throw new UnsupportedOperationException("TransitionAmount not implemented"); //$NON-NLS-1$
 			}
 
 			// set visible non-suite trails based on device settlement settings 
@@ -679,7 +678,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			this.factor = 1.0;
 			PropertyType property = this.getProperty(IDevice.FACTOR);
 			if (property != null)
-				this.factor = Double.valueOf(property.getValue()).doubleValue();
+				this.factor = Double.valueOf(property.getValue());
 			else if (this.scoregroupType != null)
 				this.factor = this.scoregroupType.getFactor();
 			else if (this.settlementType != null)
@@ -704,7 +703,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			this.offset = 0.0;
 			PropertyType property = this.getProperty(IDevice.OFFSET);
 			if (property != null)
-				this.offset = Double.valueOf(property.getValue()).doubleValue();
+				this.offset = Double.valueOf(property.getValue());
 			else if (this.scoregroupType != null)
 				this.offset = this.scoregroupType.getOffset();
 			else if (this.settlementType != null)
@@ -728,7 +727,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			this.reduction = 0.0;
 			PropertyType property = this.getProperty(IDevice.REDUCTION);
 			if (property != null)
-				this.reduction = Double.valueOf(property.getValue()).doubleValue();
+				this.reduction = Double.valueOf(property.getValue());
 			else if (this.scoregroupType != null)
 				this.reduction = this.scoregroupType.getReduction();
 			else if (this.settlementType != null)
@@ -738,7 +737,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			else
 				try {
 					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parent.parent.number, this.ordinal, IDevice.REDUCTION);
-					if (strValue != null && strValue.length() > 0) this.reduction = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
+					if (strValue != null && strValue.length() > 0) this.reduction = Double.valueOf(strValue.trim().replace(',', '.'));
 				}
 				catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
@@ -880,15 +879,14 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @param index
 	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
 	 */
-	public String getFormattedScaleValue(int index) {
+	public String getFormattedMeasureValue(int index) {
 		if (!this.isTrailSuite()) {
-			final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-			return trailRecord.realRealGet(index) != null ? trailRecord.getDecimalFormat().format(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+			return super.getFormattedTableValue(index);
 		}
 		else if (this.isBoxPlotSuite()) {
 			if (this.getTrailRecordSuite()[0].realRealGet(index) != null) {
 				final TrailRecord trailRecord = this.getTrailRecordSuite()[2];
-				return trailRecord.realRealGet(index) != null ? trailRecord.getDecimalFormat().format(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+				return trailRecord.getFormattedMeasureValue(index);
 			}
 			else
 				return GDE.STRING_STAR;
@@ -896,7 +894,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		else if (isRangePlotSuite()) {
 			if (this.getTrailRecordSuite()[0].realRealGet(index) != null) {
 				final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-				return trailRecord.realRealGet(index) != null ? trailRecord.getDecimalFormat().format(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+				return trailRecord.getFormattedMeasureValue(index);
 			}
 			else
 				return GDE.STRING_STAR;
@@ -959,18 +957,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public int getVerticalDisplayPointPos(int index) {
 		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
 		if (!this.isTrailSuite()) {
-			return Double.valueOf(this.parent.drawAreaBounds.height - (((masterRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
-					.intValue();
+			return (int) (this.parent.drawAreaBounds.height - (((masterRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
 		}
 		else if (this.isBoxPlotSuite()) {
 			final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
-			return Double.valueOf(this.parent.drawAreaBounds.height - (((medianRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
-					.intValue();
+			return (int) (this.parent.drawAreaBounds.height - (((medianRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
 		}
 		else if (isRangePlotSuite()) {
 			final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
-			return Double.valueOf(this.parent.drawAreaBounds.height - (((middleRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
-					.intValue();
+			return (int) (this.parent.drawAreaBounds.height - (((middleRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
 		}
 		else
 			throw new UnsupportedOperationException();
@@ -994,8 +989,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				if (this.getDevice().isGPSCoordinates(this)) {
 					int grad0 = this.get(indexs[0]) / 1000000;
 					if (indexs[0] == indexs[1]) {
-						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
-								- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+						pointPosY = (int) (this.parent.drawAreaBounds.height
+								- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
 					}
 					else {
 						int grad1 = this.get(indexs[1]) / 1000000;
@@ -1012,8 +1007,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				}
 				else {
 					if (indexs[0] == indexs[1]) {
-						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
-								.intValue();
+						pointPosY = (int) (this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
 					}
 					else {
 						int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
@@ -1060,9 +1054,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		//}	
 		//else 
 		if (this.parent.isZoomMode)
-			displayPointValue = this.df.format(Double.valueOf(this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height)));
+			displayPointValue = this.df.format(this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height));
 		else
-			displayPointValue = this.df.format(Double.valueOf(this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height)));
+			displayPointValue = this.df.format(this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height));
 
 		return displayPointValue;
 	}
@@ -1096,9 +1090,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	public String getVerticalDisplayDeltaAsFormattedValue(int deltaPos, Rectangle drawAreaBounds) {
 		String textValue;
 		if (this.parent.isZoomMode || this.parent.isScopeMode)
-			textValue = this.df.format(Double.valueOf((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
+			textValue = this.df.format((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height);
 		else
-			textValue = this.df.format(Double.valueOf((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+			textValue = this.df.format((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height);
 
 		return textValue;
 	}
