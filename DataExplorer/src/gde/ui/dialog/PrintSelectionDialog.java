@@ -18,19 +18,6 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -69,6 +56,23 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
+import gde.ui.tab.ObjectDescriptionWindow;
+import gde.ui.tab.StatisticsWindow;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * simple print configuration dialog
@@ -126,16 +130,16 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 320);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
-	        switch (event.detail) {
-	        case SWT.TRAVERSE_ESCAPE:
-	        	PrintSelectionDialog.this.dialogShell.close();
-	          event.detail = SWT.TRAVERSE_NONE;
-	          event.doit = false;
-	          break;
-	        }
-	      }
-	    });
+				public void handleEvent(Event event) {
+					switch (event.detail) {
+					case SWT.TRAVERSE_ESCAPE:
+						PrintSelectionDialog.this.dialogShell.close();
+						event.detail = SWT.TRAVERSE_NONE;
+						event.doit = false;
+						break;
+					}
+				}
+			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent arg0) {
 					PrintSelectionDialog.this.application.resetShellIcon();
@@ -163,17 +167,17 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							if (activeRecordSet != null) isRecordSetGraphicsPrintable = activeRecordSet.size() > 0;
 						}
 						PrintSelectionDialog.this.graphicsButton.setEnabled(isRecordSetGraphicsPrintable);
-						//PrintSelectionDialog.this.graphicsButton.setSelection(isRecordSetGraphicsPrintable);
+						PrintSelectionDialog.this.graphicsButton.setSelection(isRecordSetGraphicsPrintable); // ET unclear why this line was set on comment
 						PrintSelectionDialog.this.statisticsButton.setEnabled(isRecordSetGraphicsPrintable);
-						//PrintSelectionDialog.this.statisticsButton.setSelection(isRecordSetGraphicsPrintable);
+						PrintSelectionDialog.this.statisticsButton.setSelection(isRecordSetGraphicsPrintable); // ET unclear why this line was set on comment
 
 						boolean isObjectOriented = PrintSelectionDialog.this.application.isObjectoriented();
 						PrintSelectionDialog.this.objectButton.setEnabled(isObjectOriented);
-						//PrintSelectionDialog.this.objectButton.setSelection(isObjectOriented);
+						PrintSelectionDialog.this.objectButton.setSelection(isObjectOriented); // ET unclear why this line was set on comment
 
 						boolean isCopareWindowPrintable = PrintSelectionDialog.this.application.getCompareSet().size() > 0;
 						PrintSelectionDialog.this.curveCompareButton.setEnabled(isCopareWindowPrintable);
-						//PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable);
+						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable); // ET unclear why this line was set on comment
 					}
 				});
 				{
@@ -309,22 +313,22 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	void initiatePrinting(final boolean isPrintRequestHeader, final int orientation, final boolean isGraphics, final boolean isCompare, final boolean isStatistics, final boolean isObject) {
-
+		final int currentTabIndex = this.application.getTabSelectionIndex();
 		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT;
 		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
 
 		//get all required images
 		if (isGraphics && this.application.getGraphicsPrintImage() != null) {
-			this.application.selectTab(0);
+			this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
 			WaitTimer.delay(250);
-			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsPrintImage()).getImageData());
+			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsTabContentAsImage()).getImageData());
 			graphicsImageSWT.dispose();
 		}
 		else
 			graphicsImageAWT = null;
 
 		if (isStatistics && this.application.getStatisticsTabContentAsImage() != null) {
-			this.application.selectTab(1);
+			this.application.selectTab(c -> c instanceof StatisticsWindow);
 			WaitTimer.delay(250);
 			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsTabContentAsImage()).getImageData());
 			statisticsImageSWT.dispose();
@@ -333,7 +337,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			statisticsImageAWT = null;
 
 		if (this.application.isObjectoriented() && isObject && this.application.getObjectTabContentAsImage() != null) {
-			this.application.selectTab(8);
+			this.application.selectTab(c -> c instanceof ObjectDescriptionWindow);
 			WaitTimer.delay(250);
 			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectTabContentAsImage()).getImageData());
 			objectImageSWT.dispose();
@@ -342,7 +346,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			objectImageAWT = null;
 
 		if (isCompare && this.application.getGraphicsPrintImage() != null) {
-			this.application.selectTab(6);
+			this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.COMPARE));
 			WaitTimer.delay(250);
 			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			compareImageSWT.dispose();
@@ -350,7 +354,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			compareImageAWT = null;
 
-		this.application.selectTab(0);
+		// select the tab which was active before 
+		this.application.selectTab(currentTabIndex);
 
 		Thread printThread = new Thread() {
 			@Override

@@ -25,9 +25,11 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.function.Predicate;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -2167,13 +2169,6 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * method to switch to another display tab
-	 */
-	public void switchDisplayTab(int tabIndex) {
-		this.displayTab.setSelection(tabIndex);
-	}
-
-	/**
 	 * method to make record comment window visible
 	 */
 	@Deprecated // ET seems to be replaced by enableRecordSetComment(boolean) in the meanwhile
@@ -2850,6 +2845,15 @@ public class DataExplorer extends Composite {
 		clipboard.dispose();
 		graphicsImage.dispose();
 	}
+
+	/**
+	 * switch tab to the first tab item found by applying the filter predicate to the current tabs.
+	 * @param tabFilter is filter predicate for one or more tab items
+	 */
+	public void selectTab(Predicate<? super CTabItem> tabFilter) {
+		this.displayTab.setSelection(Arrays.stream(this.getTabFolder().getItems()).filter(tabFilter).findFirst().orElseThrow(() -> new UnsupportedOperationException())); 
+		this.displayTab.showSelection();
+	} 
 
 	/**
 	 * switch tab by selection index

@@ -15,7 +15,6 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
-    							2016,2017 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.menu;
 
@@ -46,6 +45,8 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.FileUtils;
 
 /**
@@ -103,10 +104,10 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
-					
+
 					TabAreaContextMenu.this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
 					TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
-					
+
 					if (popupMenu.getData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString()) == null) { // not within the curve area canvas bounds
 						setAllEnabled(false);
 						TabAreaContextMenu.this.suppressModeItem.setEnabled(true);
@@ -145,7 +146,7 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
 				}
 				// clear consumed menu type selector
-				popupMenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString(),null);
+				popupMenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString(), null);
 			}
 
 			public void menuHidden(MenuEvent e) {
@@ -179,7 +180,7 @@ public class TabAreaContextMenu {
 								else if (!validatedImportExtention.isEmpty() && file.getAbsolutePath().endsWith(validatedImportExtention)) {
 									((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).importDeviceData(file.toPath());
 								}
-								TabAreaContextMenu.this.application.selectTab(0);
+								TabAreaContextMenu.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL)); 
 							}
 						}
 					});
