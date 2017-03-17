@@ -19,6 +19,21 @@
 package gde.device.wstech;
 
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -41,21 +56,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Class to implement WSTech DataVario device properties extending the CSV2SerialAdapter class
@@ -175,7 +175,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			}	
 			if(includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ //$NON-NLS-2$				
+				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -423,6 +423,19 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+	}
+
+	/**
+	 * @param record
+	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { 
+			// 7=GPS-Länge 8=GPS-Breite 
+			return true;
+		}
+		return false;
 	}
 
 	/**

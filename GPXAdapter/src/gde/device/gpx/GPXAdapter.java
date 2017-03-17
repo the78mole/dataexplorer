@@ -18,28 +18,6 @@
 ****************************************************************************************/
 package gde.device.gpx;
 
-import gde.GDE;
-import gde.comm.DeviceCommPort;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.device.InputTypes;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.MeasurementType;
-import gde.device.PropertyType;
-import gde.exception.DataInconsitsentException;
-import gde.io.FileHandler;
-import gde.io.LogViewReader;
-import gde.io.NMEAParser;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
-import gde.utils.StringHelper;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,6 +39,28 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import gde.GDE;
+import gde.comm.DeviceCommPort;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.InputTypes;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.io.FileHandler;
+import gde.io.LogViewReader;
+import gde.io.NMEAParser;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -338,6 +338,18 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
+	/**
+	 * @param record
+	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { 
+			// 0=GPS-latitude 1=GPS-longitude 
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
@@ -688,7 +700,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ 
 						true, isExportTmpDir);
 			}
 		}

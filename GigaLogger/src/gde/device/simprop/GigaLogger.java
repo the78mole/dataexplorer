@@ -18,6 +18,22 @@
 ****************************************************************************************/
 package gde.device.simprop;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -38,22 +54,6 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -256,6 +256,19 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+	}
+
+	/**
+	 * @param record
+	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) { // todo WBrueg prepareDataTableRow differs from translateValue
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) {
+			//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
+			return true;
+		}
+		return false;
 	}
 
 	/**
