@@ -2778,9 +2778,16 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * return histo tab window content as image
+	 * return the histo graphics window content as image
 	 */
-	public Image getHistoTabContentAsImage() {
+	public Image getHistoGraphicsContentAsImage() {
+		return this.histoGraphicsTabItem.getContentAsImage();
+	}
+
+	/**
+	 * return the histo table window content as image
+	 */
+	public Image getHistoTableContentAsImage() {
 		return this.histoTableTabItem.getContentAsImage();
 	}
 

@@ -33,6 +33,7 @@ import java.awt.print.Book;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterJob;
+import java.util.EnumSet;
 import java.util.logging.Logger;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -61,7 +62,9 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.HistoSet;
 import gde.data.RecordSet;
+import gde.data.TrailRecordSet;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -69,6 +72,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
+import gde.ui.tab.HistoGraphicsWindow;
 import gde.ui.tab.ObjectDescriptionWindow;
 import gde.ui.tab.StatisticsWindow;
 import gde.utils.StringHelper;
@@ -91,11 +95,16 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Button							statisticsButton;
 	Button							graphicsButton;
 	Button							curveCompareButton;
+	Button							histoGraphicsButton;
 	Group								orientationGroup;
 	Button							landscapeButton;
 
 	final DataExplorer	application;
 	private Button			headerButton;
+
+	private enum Artefact {
+		GRAPHICS, COMPARE, STATISTICS, OBJECT, HISTOGRAPHICS
+	};
 
 	/**
 	* Auto-generated main method to display this 
@@ -128,7 +137,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0441));
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			this.dialogShell.setSize(400, 320);
+			this.dialogShell.setSize(400, 400);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
 				public void handleEvent(Event event) {
 					switch (event.detail) {
@@ -156,7 +165,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.configurationGroup = new Group(this.dialogShell, SWT.NONE);
 				this.configurationGroup.setLayout(null);
 				this.configurationGroup.setText(Messages.getString(MessageIds.GDE_MSGT0448));
-				this.configurationGroup.setBounds(7, 36, 168, 206);
+				this.configurationGroup.setBounds(7, 36, 168, 286);
 				this.configurationGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "configurationGroup.paintControl, event=" + evt); //$NON-NLS-1$
@@ -178,6 +187,14 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						boolean isCopareWindowPrintable = PrintSelectionDialog.this.application.getCompareSet().size() > 0;
 						PrintSelectionDialog.this.curveCompareButton.setEnabled(isCopareWindowPrintable);
 						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable); // ET unclear why this line was set on comment
+
+						boolean isHistoWindowPrintable = false;
+						if (activeChannel != null) {
+							TrailRecordSet activeRecordSet = HistoSet.getInstance().getTrailRecordSet();
+							if (activeRecordSet != null) isHistoWindowPrintable = activeRecordSet.size() > 0;
+						}
+						PrintSelectionDialog.this.histoGraphicsButton.setEnabled(isHistoWindowPrintable);
+						PrintSelectionDialog.this.histoGraphicsButton.setSelection(isHistoWindowPrintable);
 					}
 				});
 				{
@@ -210,6 +227,14 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.curveCompareButton.setImage(SWTResourceManager.getImage("gde/resource/Graphics.gif")); //$NON-NLS-1$
 					this.curveCompareButton.setSelection(false);
 					this.curveCompareButton.setBounds(8, 155, 148, 45);
+				}
+				{
+					this.histoGraphicsButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
+					this.histoGraphicsButton.setText(Messages.getString(MessageIds.GDE_MSGT0865));
+					this.histoGraphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0866));
+					this.histoGraphicsButton.setImage(SWTResourceManager.getImage("gde/resource/HistoGraphics.gif")); //$NON-NLS-1$
+					this.histoGraphicsButton.setSelection(false);
+					this.histoGraphicsButton.setBounds(8, 200, 148, 45);
 				}
 			}
 			{
@@ -272,18 +297,20 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			{
 				this.printButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.printButton.setText(Messages.getString(MessageIds.GDE_MSGT0451));
-				this.printButton.setBounds(212, 250, 149, 30);
+				this.printButton.setBounds(212, 330, 149, 30);
 				this.printButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						final int orientation = PrintSelectionDialog.this.landscapeButton.getSelection() ? PageFormat.REVERSE_LANDSCAPE
 								: PrintSelectionDialog.this.portraitButton.getSelection() ? PageFormat.PORTRAIT : PageFormat.LANDSCAPE;
-						final boolean isGraphics = PrintSelectionDialog.this.graphicsButton.getSelection();
-						final boolean isCompare = PrintSelectionDialog.this.curveCompareButton.getSelection();
-						final boolean isStatistics = PrintSelectionDialog.this.statisticsButton.getSelection();
-						final boolean isObject = PrintSelectionDialog.this.objectButton.getSelection();
-						initiatePrinting(PrintSelectionDialog.this.headerButton.getSelection(), orientation, isGraphics, isCompare, isStatistics, isObject);
+						EnumSet<Artefact> artefacts = EnumSet.noneOf(Artefact.class);
+						if (PrintSelectionDialog.this.graphicsButton.getSelection()) artefacts.add(Artefact.GRAPHICS);
+						if (PrintSelectionDialog.this.curveCompareButton.getSelection()) artefacts.add(Artefact.COMPARE);
+						if (PrintSelectionDialog.this.statisticsButton.getSelection()) artefacts.add(Artefact.STATISTICS);
+						if (PrintSelectionDialog.this.objectButton.getSelection()) artefacts.add(Artefact.OBJECT);
+						if (PrintSelectionDialog.this.histoGraphicsButton.getSelection()) artefacts.add(Artefact.HISTOGRAPHICS);
+						initiatePrinting(PrintSelectionDialog.this.headerButton.getSelection(), orientation, artefacts);
 						PrintSelectionDialog.this.dialogShell.dispose();
 					}
 				});
@@ -291,7 +318,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			{
 				this.cancelButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.cancelButton.setText(Messages.getString(MessageIds.GDE_MSGT0452));
-				this.cancelButton.setBounds(29, 250, 149, 30);
+				this.cancelButton.setBounds(29, 330, 149, 30);
 				this.cancelButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -312,13 +339,13 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 	}
 
-	void initiatePrinting(final boolean isPrintRequestHeader, final int orientation, final boolean isGraphics, final boolean isCompare, final boolean isStatistics, final boolean isObject) {
+	private void initiatePrinting(final boolean isPrintRequestHeader, final int orientation, EnumSet<Artefact> artefacts) {
 		final int currentTabIndex = this.application.getTabSelectionIndex();
-		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT;
-		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
+		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT, histoGraphicsImageSWT;
+		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT, histoGraphicsImageAWT;
 
 		//get all required images
-		if (isGraphics && this.application.getGraphicsPrintImage() != null) {
+		if (artefacts.contains(Artefact.GRAPHICS) && this.application.getGraphicsPrintImage() != null) {
 			this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
 			WaitTimer.delay(250);
 			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsTabContentAsImage()).getImageData());
@@ -327,7 +354,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			graphicsImageAWT = null;
 
-		if (isStatistics && this.application.getStatisticsTabContentAsImage() != null) {
+		if (artefacts.contains(Artefact.STATISTICS) && this.application.getStatisticsTabContentAsImage() != null) {
 			this.application.selectTab(c -> c instanceof StatisticsWindow);
 			WaitTimer.delay(250);
 			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsTabContentAsImage()).getImageData());
@@ -336,7 +363,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			statisticsImageAWT = null;
 
-		if (this.application.isObjectoriented() && isObject && this.application.getObjectTabContentAsImage() != null) {
+		if (this.application.isObjectoriented() && artefacts.contains(Artefact.OBJECT) && this.application.getObjectTabContentAsImage() != null) {
 			this.application.selectTab(c -> c instanceof ObjectDescriptionWindow);
 			WaitTimer.delay(250);
 			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectTabContentAsImage()).getImageData());
@@ -345,7 +372,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			objectImageAWT = null;
 
-		if (isCompare && this.application.getGraphicsPrintImage() != null) {
+		if (artefacts.contains(Artefact.COMPARE) && this.application.getGraphicsPrintImage() != null) {
 			this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.COMPARE));
 			WaitTimer.delay(250);
 			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsPrintImage()).getImageData());
@@ -353,6 +380,15 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		else
 			compareImageAWT = null;
+
+		if (artefacts.contains(Artefact.HISTOGRAPHICS) && this.application.getHistoGraphicsContentAsImage() != null) {
+			this.application.selectTab(c -> c instanceof HistoGraphicsWindow);
+			WaitTimer.delay(250);
+			histoGraphicsImageAWT = convertToAWT((histoGraphicsImageSWT = this.application.getHistoGraphicsContentAsImage()).getImageData());
+			histoGraphicsImageSWT.dispose();
+		}
+		else
+			histoGraphicsImageAWT = null;
 
 		// select the tab which was active before 
 		this.application.selectTab(currentTabIndex);
@@ -400,70 +436,103 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 
 					if (documentPageFormat.getOrientation() == PageFormat.REVERSE_LANDSCAPE) {
-						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
-						if (isStatistics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
-						if (isObject) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-						if (isCompare) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.GRAPHICS))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.STATISTICS))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.OBJECT)) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.COMPARE))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.HISTOGRAPHICS))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
 					}
 					else if (documentPageFormat.getOrientation() == PageFormat.LANDSCAPE) {
-						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
-						if (isStatistics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
-						if (isObject) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-						if (isCompare) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.GRAPHICS))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.STATISTICS))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.OBJECT)) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.COMPARE))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.HISTOGRAPHICS))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
 					}
 					else if (documentPageFormat.getOrientation() == PageFormat.PORTRAIT) {
-						boolean isGraphicsToBePrinted = isGraphics;
-						boolean isStatisticsToBePrinted = isStatistics;
-						boolean isObjectToBePrinted = isObject;
-						boolean isCompareToBePrinted = isCompare;
+						EnumSet<Artefact> printJobs = artefacts.clone();
 
-						if (isGraphicsToBePrinted && isStatisticsToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, isPrintRequestHeader ? fileName
-											+ Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
-							isGraphicsToBePrinted = isStatisticsToBePrinted = false;
+						if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS, Artefact.STATISTICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS, Artefact.STATISTICS));
 						}
-						else if (isGraphicsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, isPrintRequestHeader ? fileName
-											+ Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-							isGraphicsToBePrinted = isObjectToBePrinted = false;
+						else if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS, Artefact.OBJECT))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS, Artefact.OBJECT));
 						}
-						else if (isGraphicsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, isPrintRequestHeader ? fileName
-											+ Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
-							isGraphicsToBePrinted = isObjectToBePrinted = false;
+						else if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS, Artefact.COMPARE))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS, Artefact.COMPARE));
 						}
-						else if (isGraphicsToBePrinted) {
+						else if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS, Artefact.HISTOGRAPHICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS, Artefact.HISTOGRAPHICS));
+						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
-							isGraphicsToBePrinted = false;
+							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS));
 						}
 
-						if (isStatisticsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, isPrintRequestHeader ? fileName
-											+ Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-							isStatisticsToBePrinted = isObjectToBePrinted = false;
+						if (printJobs.containsAll(EnumSet.of(Artefact.STATISTICS, Artefact.OBJECT))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS, Artefact.OBJECT));
 						}
-						else if (isStatisticsToBePrinted && isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, isPrintRequestHeader ? fileName
-											+ Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
-							isStatisticsToBePrinted = isCompareToBePrinted = false;
+						else if (printJobs.containsAll(EnumSet.of(Artefact.STATISTICS, Artefact.COMPARE))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS, Artefact.COMPARE));
 						}
-						else if (isStatisticsToBePrinted) {
+						else if (printJobs.containsAll(EnumSet.of(Artefact.STATISTICS, Artefact.HISTOGRAPHICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS, Artefact.HISTOGRAPHICS));
+						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.STATISTICS))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
-							isStatisticsToBePrinted = false;
+							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS));
 						}
 
-						if (isObjectToBePrinted && isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT, isPrintRequestHeader ? fileName
-											+ Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
-							isObjectToBePrinted = isCompareToBePrinted = false;
+						if (printJobs.containsAll(EnumSet.of(Artefact.OBJECT, Artefact.COMPARE))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.OBJECT, Artefact.COMPARE));
 						}
-						else if (isObjectToBePrinted) {
+						else if (printJobs.containsAll(EnumSet.of(Artefact.OBJECT, Artefact.HISTOGRAPHICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.OBJECT, Artefact.HISTOGRAPHICS));
+						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.OBJECT))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-							isObjectToBePrinted = false;
+							printJobs.removeAll(EnumSet.of(Artefact.OBJECT));
 						}
-						else if (isCompareToBePrinted) {
+
+						if (printJobs.containsAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOGRAPHICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOGRAPHICS));
+						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.COMPARE))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
-							isCompareToBePrinted = false;
+							printJobs.removeAll(EnumSet.of(Artefact.COMPARE));
+						}
+
+						if (printJobs.containsAll(EnumSet.of(Artefact.HISTOGRAPHICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.HISTOGRAPHICS));
 						}
 					}
 					try {
