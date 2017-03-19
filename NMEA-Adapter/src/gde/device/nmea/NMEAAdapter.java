@@ -18,6 +18,21 @@
 ****************************************************************************************/
 package gde.device.nmea;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -42,21 +57,6 @@ import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.LinearRegression;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -257,6 +257,18 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
+	/**
+	 * @param record
+	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { 
+			// 0=GPS-latitude 1=GPS-longitude 
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values

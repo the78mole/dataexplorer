@@ -18,6 +18,24 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.data.Channel;
@@ -40,24 +58,6 @@ import gde.messages.Messages;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -655,7 +655,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				recordSet.addNoneCalculationRecordsPoints(points,
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 			}
-			else if (histoRandomSample.isValidSample(points,
+			else if (this.histoRandomSample.isValidSample(points,
 					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
 				recordSet.addNoneCalculationRecordsPoints(points,
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
@@ -665,8 +665,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		if (this.histoRandomSample != null) {
-			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize,
-					histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize, //$NON-NLS-1$
+					this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
 		}
 		recordSet.syncScaleOfSyncableRecords();
 	}
@@ -850,7 +850,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 */
 	@Override
 	protected void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2400), "LogData");
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2400), "LogData"); //$NON-NLS-1$
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -867,7 +867,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						}
 						HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
-						if (fd.getFileName().length() > 4) {
+						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
 							Integer channelConfigNumber = HoTTAdapter2.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
@@ -1351,7 +1351,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 * @return true if the device supports a native file import for histo purposes
 	 */
 	public boolean isHistoImportSupported() {
-		return this.getClass().equals(HoTTAdapter2.class);
+		return this.getClass().equals(HoTTAdapter2.class) && !this.getClass().equals(HoTTAdapter2M.class);
 	}
 
 	/**

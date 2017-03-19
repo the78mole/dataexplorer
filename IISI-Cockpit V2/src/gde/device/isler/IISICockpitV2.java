@@ -18,25 +18,6 @@
 ****************************************************************************************/
 package gde.device.isler;
 
-import gde.GDE;
-import gde.comm.DeviceCommPort;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.PropertyType;
-import gde.exception.DataInconsitsentException;
-import gde.io.FileHandler;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
-
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,14 +35,34 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.GDE;
+import gde.comm.DeviceCommPort;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.Record.DataType;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.io.FileHandler;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
+
 /**
  * IISI Cockpit V2 adapter device implementation class
  */
 public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
-	final static Logger							log					= Logger.getLogger(IISICockpitV2.class.getName());
+	final static Logger	log	= Logger.getLogger(IISICockpitV2.class.getName());
 
-	final DataExplorer							application;
-	final Channels				channels;
+	final DataExplorer	application;
+	final Channels			channels;
 
 	/**
 	 * @param xmlFileName
@@ -118,7 +119,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
-	
+
 	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
@@ -126,7 +127,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
@@ -420,7 +421,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		int displayableCounter = 0;
 		Record record;
 		String[] measurementNames = recordSet.getRecordNames();
-		
+
 		//clean sync properties
 		for (int i = 0; i < measurementNames.length; i++) {
 			if (this.getMeasurement(channelConfigNumber, i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null) {
@@ -433,7 +434,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 						continue;
 					}
 				}
-			}		
+			}
 		}
 
 		// check if measurements isActive == false and set to isDisplayable == false
@@ -455,7 +456,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		}
 		if (log.isLoggable(java.util.logging.Level.FINER)) log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
-		
+
 		for (int i = 0; i < measurementNames.length; i++) {
 			for (int j = i; j < measurementNames.length; j++) {
 				String[] nameParts = measurementNames[j].split(GDE.STRING_BLANK);
@@ -497,7 +498,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-importCsvFiles();	}
+		importCsvFiles();
+	}
 
 	/**
 	 * import a CSV file, also called "OpenFormat" file
@@ -533,6 +535,7 @@ importCsvFiles();	}
 		};
 		reader.start();
 	}
+
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
@@ -585,8 +588,8 @@ importCsvFiles();	}
 						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
 						additionalMeasurementOrdinal,
 						findRecordByUnit(activeRecordSet, "m/s"), 	//$NON-NLS-1$
-						findRecordByUnit(activeRecordSet, "km"),		//$NON-NLS-1$
-						findRecordByUnit(activeRecordSet, "*"),		//$NON-NLS-1$
+						findRecordByUnit(activeRecordSet, "km"), //$NON-NLS-1$
+						findRecordByUnit(activeRecordSet, "*"), //$NON-NLS-1$
 						true, isExportTmpDir);
 			}
 		}
@@ -595,8 +598,7 @@ importCsvFiles();	}
 
 	private int findRecordByType(RecordSet recordSet, Record.DataType dataType) {
 		for (Record record : recordSet.values()) {
-			if (record.getDataType().equals(dataType)) 
-				return record.getOrdinal();
+			if (record.getDataType().equals(dataType)) return record.getOrdinal();
 		}
 		return -1;
 	}
@@ -609,15 +611,15 @@ importCsvFiles();	}
 		}
 		return -1;
 	}
-	
+
 	/**
-	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
-	 * @return
+	 * @return true if if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
-		return record.getDataType().value().startsWith("GPS l");
+		//		return record.getDataType().value().startsWith("GPS l");
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE ;
 	}
 
 	/**

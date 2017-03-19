@@ -63,7 +63,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 						}
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
-						if (fd.getFileName().length() > 4) {
+						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
 							Integer channelConfigNumber = HoTTAdapterX.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));

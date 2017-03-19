@@ -919,7 +919,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (this.histoRandomSample == null) {
 				recordSet.addPoints(points, intBuffer.get(i) / 10.0);
 			}
-			else if (histoRandomSample.isValidSample(points, intBuffer.get(i) / 10)) {
+			else if (this.histoRandomSample.isValidSample(points, intBuffer.get(i) / 10)) {
 				recordSet.addPoints(points, intBuffer.get(i) / 10.0);
 			}
 			// if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%,11d: points[0..3] %,11d/%,11d/%,11d/%,11d", (int) timeStamp, points[0] , points[1], points[2] , points[3])); //$NON-NLS-1$ // currentTime = System.nanoTime();
@@ -942,7 +942,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @return true if the device supports a native file import for histo purposes
 	 */
 	public boolean isHistoImportSupported() {
-		return this.getClass().equals(HoTTAdapter.class);
+		return this.getClass().equals(HoTTAdapter.class) && !this.getClass().equals(HoTTAdapterD.class) && !this.getClass().equals(HoTTAdapterM.class) && !this.getClass().equals(HoTTAdapterX.class)
+				&& !this.getClass().equals(HoTTViewer.class);
 	}
 
 	/**
@@ -1015,7 +1016,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[ordinal + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
+					dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 				}
 				// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 				else if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { // Receiver
@@ -1108,22 +1109,22 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			record = recordSet.get(i);
 			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
-				MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
-				if (record.isActive() != measurement.isActive()) {
-					record.setActive(measurement.isActive());
-					record.setVisible(measurement.isActive());
-					record.setDisplayable(measurement.isActive());
-					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				if (includeReasonableDataCheck) {
-					record.setDisplayable(measurement.isActive() && record.hasReasonableData());
-					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
-				}
+			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
+			if (record.isActive() != measurement.isActive()) {
+				record.setActive(measurement.isActive());
+				record.setVisible(measurement.isActive());
+				record.setDisplayable(measurement.isActive());
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (includeReasonableDataCheck) {
+				record.setDisplayable(measurement.isActive() && record.hasReasonableData());
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+			}
 
-				if (record.isActive() && record.isDisplayable()) {
-					++displayableCounter;
-					if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
-				}
+			if (record.isActive() && record.isDisplayable()) {
+				++displayableCounter;
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+			}
 		}
 		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
@@ -1225,7 +1226,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						}
 						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
-						if (fd.getFileName().length() > 4) {
+						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
 							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
@@ -1236,6 +1237,51 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							catch (Exception e) {
 								HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
+						}
+					}
+				}
+				finally {
+					HoTTAdapter.this.application.setPortConnected(false);
+				}
+			}
+		};
+		reader.start();
+	}
+
+	/**
+	 * import device specific *.bin data files
+	 * @param filePath 
+	 */
+	public void importDeviceData(Path filePath) {
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
+			@Override
+			public void run() {
+				try {
+					HoTTAdapter.this.application.setPortConnected(true);
+					if (filePath.getFileName().toString().length() > MIN_FILENAME_LENGTH) {
+						Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
+						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
+						try {
+							if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class))
+								HoTTbinReader.read(filePath.toString());
+							else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class))
+								HoTTbinReader2.read(filePath.toString());
+							else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class))
+								HoTTbinReader2.read(filePath.toString());
+							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class))
+								HoTTbinReaderD.read(filePath.toString());
+							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterM.class))
+								HoTTbinReader.read(filePath.toString());
+							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterX.class))
+								HoTTbinReaderX.read(filePath.toString());
+							else if (HoTTAdapter.this.getClass().equals(HoTTViewer.class))
+								HoTTbinReader.read(filePath.toString());
+							else
+								throw new UnsupportedOperationException();
+							WaitTimer.delay(500);
+						}
+						catch (Exception e) {
+							HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 						}
 					}
 				}
