@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.HistoSet;
-import gde.data.HistoSet.RebuildStep;
 import gde.data.RecordSet;
 import gde.device.IHistoDevice;
 import gde.io.FileHandler;
@@ -199,7 +198,7 @@ public class TabAreaContextMenu {
 									&& TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
 								FileUtils.deleteFile(file.getPath());
 
-								TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+								TabAreaContextMenu.this.application.setupHistoWindows();
 							}
 						}
 					});
@@ -225,7 +224,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
 
-							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+							TabAreaContextMenu.this.application.setupHistoWindows();
 						}
 					});
 				}
@@ -242,7 +241,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
 
-							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+							TabAreaContextMenu.this.application.setupHistoWindows();
 						}
 					});
 				}
@@ -260,7 +259,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(false);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(false);
 
-							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+							TabAreaContextMenu.this.application.setupHistoWindows();
 						}
 					});
 				}
@@ -276,7 +275,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(TabAreaContextMenu.this.suppressModeItem.getSelection());
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(TabAreaContextMenu.this.suppressModeItem.getSelection());
 
-							TabAreaContextMenu.this.application.updateHistoTabs(RebuildStep.A_HISTOSET, true);
+							TabAreaContextMenu.this.application.setupHistoWindows();
 						}
 					});
 				}

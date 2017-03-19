@@ -187,6 +187,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
+			 // this.application.cleanHeaderAndCommentInHistoGraphicsWindow(); is done in setupHistoWindows
 			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();

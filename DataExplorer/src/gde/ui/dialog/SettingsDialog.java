@@ -72,7 +72,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
-import gde.data.HistoSet.RebuildStep;
 import gde.device.CommaSeparatorTypes;
 import gde.device.DecimalSeparatorTypes;
 import gde.log.Level;
@@ -1173,7 +1172,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
-										SettingsDialog.this.application.updateHistoTabs(RebuildStep.A_HISTOSET,true);
+										SettingsDialog.this.application.setupHistoWindows();
 									}
 								});
 							}
@@ -1192,7 +1191,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										SettingsDialog.this.application.updateHistoTabs(RebuildStep.A_HISTOSET,true);
+										SettingsDialog.this.application.setupHistoWindows();
 									}
 								});
 							}

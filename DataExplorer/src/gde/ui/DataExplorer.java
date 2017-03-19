@@ -841,11 +841,13 @@ public class DataExplorer extends Composite {
 		this.histoSet = HistoSet.getInstance();
 		this.histoSet.initialize();
 
-		DataExplorer.this.setHistoGraphicsTabItemVisible(this.settings.isHistoActive());
-		DataExplorer.this.setHistoTableTabItemVisible(this.settings.isHistoActive());
+		if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
+
+		this.setHistoGraphicsTabItemVisible(this.settings.isHistoActive());
+		this.setHistoTableTabItemVisible(this.settings.isHistoActive());
 		// no rebuild steps as the rebuild will be triggered by the file path analysis
-		DataExplorer.this.rebuildStepInvisibleTab = RebuildStep.E_USER_INTERFACE; // file paths will determine which scope of histo data update is appropriate
-		DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // file paths will determine which scope of histo data update is appropriate
+		this.rebuildStepInvisibleTab = RebuildStep.E_USER_INTERFACE; // file paths will determine which scope of histo data update is appropriate
+		this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // file paths will determine which scope of histo data update is appropriate
 	}
 
 	/**
@@ -2297,6 +2299,24 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * reset the histo graphics window measurement pointer including table and header
+	 */
+	public void resetGraphicsWindowHeaderAndMeasurement() {
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			this.histoGraphicsTabItem.clearHeaderAndComment();
+			this.histoGraphicsTabItem.getGraphicsComposite().setModeState(HistoGraphicsMode.RESET);
+		}
+		else {
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					DataExplorer.this.histoGraphicsTabItem.clearHeaderAndComment();
+					DataExplorer.this.histoGraphicsTabItem.getGraphicsComposite().setModeState(HistoGraphicsMode.RESET);
+				}
+			});
+		}
+	}
+
+	/**
 	 * set the graphics window mode to the just visible window
 	 * @param graphicsMode (GraphicsWindow.MODE_ZOOM, GraphicsWindow.MODE_PAN)
 	 * @param enabled
@@ -2858,9 +2878,9 @@ public class DataExplorer extends Composite {
 	 * @param tabFilter is filter predicate for one or more tab items
 	 */
 	public void selectTab(Predicate<? super CTabItem> tabFilter) {
-		this.displayTab.setSelection(Arrays.stream(this.getTabFolder().getItems()).filter(tabFilter).findFirst().orElseThrow(() -> new UnsupportedOperationException())); 
+		this.displayTab.setSelection(Arrays.stream(this.getTabFolder().getItems()).filter(tabFilter).findFirst().orElseThrow(() -> new UnsupportedOperationException()));
 		this.displayTab.showSelection();
-	} 
+	}
 
 	/**
 	 * switch tab by selection index

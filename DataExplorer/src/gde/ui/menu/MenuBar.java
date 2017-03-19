@@ -46,7 +46,6 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoSet;
-import gde.data.HistoSet.RebuildStep;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
@@ -780,7 +779,7 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "suppressModeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.settings.setSuppressMode(MenuBar.this.suppressModeItem.getSelection());
 
-							MenuBar.this.application.updateHistoTabs(RebuildStep.A_HISTOSET,true);
+							MenuBar.this.application.setupHistoWindows();
 						}
 					});
 				}

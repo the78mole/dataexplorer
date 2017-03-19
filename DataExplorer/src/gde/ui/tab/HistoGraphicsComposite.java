@@ -84,7 +84,7 @@ public class HistoGraphicsComposite extends Composite {
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	public enum HistoGraphicsMode {
-		MEASURE, MEASURE_DELTA
+		MEASURE, MEASURE_DELTA, RESET
 	};
 
 	private final HistoSet			histoSet						= HistoSet.getInstance();
@@ -789,6 +789,7 @@ public class HistoGraphicsComposite extends Composite {
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = true;
 			break;
+		case RESET:
 		default:
 			this.cleanMeasurementPointer();
 			this.isLeftMouseMeasure = false;
