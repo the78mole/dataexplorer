@@ -746,15 +746,16 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.reduction;
 	}
 
-	@Override // reason is formatting of values <= 100 with decimal places
+	@Override // reason: formatting of values <= 100 with decimal places; define category based on maxValueAbs AND minValueAbs
 	public void setNumberFormat(int newNumberFormat) {
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
 		case -1:
-			final double delta = this.maxScaleValue - this.minScaleValue == 0 ? this.device.translateValue(this, (this.maxValue - this.minValue) / 1000) : this.maxScaleValue - this.minScaleValue;
 			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue / 1000));
+			final double minValueAbs = this.device.translateValue(this, Math.abs(this.minValue / 1000));
+			final double delta = this.device.translateValue(this, this.maxValue / 1000) - this.device.translateValue(this, this.minValue / 1000) ;
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, maxValueAbs, delta)); //$NON-NLS-1$
-			if (maxValueAbs <= 100) {
+			if (maxValueAbs <= 100 && minValueAbs <= 100) {
 				if (delta < 0.1)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
 				else if (delta <= 1)
@@ -762,7 +763,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				else
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 			}
-			else if (maxValueAbs < 500) {
+			else if (maxValueAbs < 500 && minValueAbs < 500) {
 				if (delta <= 0.1)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else if (delta <= 1)

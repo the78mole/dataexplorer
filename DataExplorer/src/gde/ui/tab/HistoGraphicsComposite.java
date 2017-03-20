@@ -822,7 +822,7 @@ public class HistoGraphicsComposite extends Composite {
 	}
 
 	private boolean isYInCurveAreaBounds(int yPos) {
-		return yPos <= this.curveAreaBounds.height && yPos >= this.curveAreaBounds.y;
+		return yPos + this.offSetY <= this.curveAreaBounds.height && yPos + this.offSetY >= this.curveAreaBounds.y;
 	}
 
 	/**
@@ -1175,26 +1175,30 @@ public class HistoGraphicsComposite extends Composite {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
 
-			final long timestamp_ms = this.timeLine.getAdjacentTimestamp(this.xPosMeasure);
-			StringBuilder sb = new StringBuilder().append(String.format("%-17s", Messages.getString(MessageIds.GDE_MSGT0652))); //$NON-NLS-1$
+			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799) )); //$NON-NLS-1$ 
+			sb.append(GDE.STRING_OR).append(String.format("%-16s", Messages.getString(MessageIds.GDE_MSGT0652))); //$NON-NLS-1$
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = (TrailRecord) records.get(i);
 				if (displayProps.getProperty(record.getName()) != null)
-					sb.append(String.format("|%-10s", displayProps.getProperty(record.getName()))); //$NON-NLS-1$
+					sb.append(GDE.STRING_OR).append(String.format("%-10s", displayProps.getProperty(record.getName()))); //$NON-NLS-1$
 				else {
 					final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
 					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length() : record.getName().length());
-					final String format = "|%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					sb.append(String.format(format, name, unit));
+					final String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append(GDE.STRING_OR).append(String.format(format, name, unit));
 				}
 			}
-			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%-17s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms))); //$NON-NLS-1$ //$NON-NLS-2$
-			int index = trailRecordSet.getIndex(timestamp_ms);
+			sb.append(GDE.STRING_OR).append(GDE.LINE_SEPARATOR);
+			
+			final long timestamp_ms = this.timeLine.getAdjacentTimestamp(this.xPosMeasure);
+			final int index = trailRecordSet.getIndex(timestamp_ms);
+			sb.append(String.format("%-11.11s", trailRecordSet.getDataTags(index).get(DataTag.RECORDSET_BASE_NAME))); //$NON-NLS-1$ 
+			sb.append(GDE.STRING_OR).append(String.format("%-16s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms))); //$NON-NLS-1$ 
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = (TrailRecord) records.get(i);
-				sb.append(String.format("|%.10s", StringHelper.center(record.getFormattedMeasureValue(index), 10))); //$NON-NLS-1$
+				sb.append(GDE.STRING_OR).append(String.format("%.10s", StringHelper.center(record.getFormattedMeasureValue(index), 10))); //$NON-NLS-1$
 			}
-			return sb.append("|").toString(); //$NON-NLS-1$
+			return sb.append(GDE.STRING_OR).toString();
 		}
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		return this.recordSetCommentText != null ? this.recordSetCommentText : GDE.STRING_EMPTY;
