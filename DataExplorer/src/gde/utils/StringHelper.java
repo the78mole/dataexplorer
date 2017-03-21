@@ -18,12 +18,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
-import gde.device.DataTypes;
-import gde.io.DataParser;
-import gde.log.Level;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,6 +30,12 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
+
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.device.DataTypes;
+import gde.io.DataParser;
+import gde.log.Level;
 
 /**
  * @author Winfried Brügmann
@@ -131,7 +131,7 @@ public class StringHelper {
 	 * method to receive formated data and time with given format string like "yyyy-MM-dd, HH:mm:ss"
 	 */
 	public static String getDateAndTime(String format) {
-		return new SimpleDateFormat(format).format(new Date().getTime()); //$NON-NLS-1$
+		return new SimpleDateFormat(format).format(new Date().getTime()); 
 	}
 
 	/**
@@ -152,11 +152,30 @@ public class StringHelper {
 	 * method to get formated duration by given format string and time in millis seconds
 	 */
 	public static String getFormatedDuration(String format, long millisec) {
-		if (millisec > GDE.ONE_HOUR_MS * 24 * 365 * 11) throw new UnsupportedOperationException("use getFormatedTime instead");
+		if (millisec > GDE.ONE_HOUR_MS * 24 * 365 * 11) throw new UnsupportedOperationException("use getFormatedTime instead"); //$NON-NLS-1$
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		// avoid wrong number of hours due to a locale setting other than UTC/GMT
 		sdf.getTimeZone().setRawOffset(0);
 		return sdf.format(millisec);
+	}
+
+	/**
+	 * @param format for degrees and minutes, e.g. "%2d %07.4f"
+	 * @param value is the latitude / longitude value with the fraction range x.0000 to x.5999, e.g. 48,599,999
+	 * @return the degrees and minutes, e.g. 48 59.99
+	 */
+	@Deprecated // currently not used -> was replaced by StringHelper.getFormatedLatLon(String, double) for better code readability
+	public static String getFormatedLatLonWithMinutes(String format, int value) {
+		return  String.format(format, value / 1000000, value % 1000000 / 10000.0); 
+	}
+
+	/**
+	 * @param format for degrees (hours) and minutes, e.g. "%2d %09.6f"
+	 * @param translatedValue is the decimal latitude / longitude (or hours) value, e.g. 48.999998
+	 * @return the degrees (hours) and minutes, e.g. 48 59.999880
+	 */
+	public static String getFormatedWithMinutes(String format, double translatedValue) {
+		return  String.format(format, (int) translatedValue , translatedValue % 1 * 60.0); 
 	}
 
 	/**
@@ -740,17 +759,17 @@ public class StringHelper {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < buffer.length; ++i) {
 			if (buffer[i] == DeviceSerialPortImpl.FF)
-				sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+				sb.append(DeviceSerialPortImpl.STRING_FF); 
 			else if (buffer[i] == DeviceSerialPortImpl.CR)
-				sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+				sb.append(DeviceSerialPortImpl.STRING_CR); 
 			else if (buffer[i] == DeviceSerialPortImpl.ACK)
-				sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+				sb.append(DeviceSerialPortImpl.STRING_ACK); 
 			else if (buffer[i] == DeviceSerialPortImpl.NAK)
-				sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+				sb.append(DeviceSerialPortImpl.STRING_NAK); 
 			else if (buffer[i] == -1)
-				sb.append('|'); //$NON-NLS-1$
+				sb.append('|'); 
 			else if (i == buffer.length - 6)
-				sb.append(GDE.STRING_OR).append((char) buffer[i]); //$NON-NLS-1$
+				sb.append(GDE.STRING_OR).append((char) buffer[i]); 
 			else
 				sb.append((char) buffer[i]);
 			//sb.append(String.format("%X", buffer[i]));

@@ -1101,6 +1101,20 @@ public class Record extends Vector<Integer> {
 		}
 	}
 
+	/**
+	 * @return all the translated record values including nulls (do not consider zoom, scope, ...)
+	 */
+	public Vector<Double> getTranslatedValues() {
+		Vector<Double> translatedValues = new Vector<>();
+		for (Integer value : this) { // loops without calling the overridden getter
+			if (value != null)
+				translatedValues.add(this.device.translateValue(this, value / 1000.));
+			else
+				translatedValues.add(null);
+		}
+		return translatedValues;
+	}
+
 	public boolean isPositionLeft() {
 		return this.isPositionLeft;
 	}
@@ -1519,6 +1533,63 @@ public class Record extends Vector<Integer> {
 		int grad = this.get(measurementPointIndex) / 1000000;
 		return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
 				.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
+	}
+
+	/**
+	 * @param index
+	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
+	 */
+	public String getFormattedMeasureValue(int index) {
+		if (this.device.isGPSCoordinates(this)) {
+			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
+				return this.realRealGet(index) != null ? StringHelper.getFormatedWithMinutes("%2d %04.1f", this.device.translateValue(this, this.realRealGet(index) / 1000.)).trim() : GDE.STRING_STAR; //$NON-NLS-1$
+			else
+				return this.realRealGet(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+		}
+		else
+			return this.realRealGet(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+	}
+
+	/**
+	 * @param index
+	 * @return the formatted value also for GPS coordinates
+	 */
+	public String getFormattedTableValue(int index) {
+		final String formattedValue;
+		if (this.device.isGPSCoordinates(this)) {
+			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
+			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, this.realGet(index) / 1000.)).trim(); //$NON-NLS-1$
+			}
+			else {
+				formattedValue = String.format("%8.6f", this.device.translateValue(this, this.realGet(index) / 1000.)); //$NON-NLS-1$
+			}
+		}
+		else {
+			formattedValue = this.getDecimalFormat().format(this.device.translateValue(this, (this.realGet(index) / 1000.0)));
+		}
+		return formattedValue;
+
+	}
+
+	/**
+	 * @param value double of device dependent value (which is the integer based value / 1000.0)
+	 * @return the formatted value also for GPS coordinates
+	 */
+	public String getFormattedStatisticsValue(double value) {
+		final String formattedValue;
+		if (this.device.isGPSCoordinates(this)) {
+			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
+			}
+			else {
+				formattedValue = String.format("%8.6f", this.device.translateValue(this, value)); //$NON-NLS-1$
+			}
+		}
+		else {
+			formattedValue = this.getDecimalFormat().format(this.device.translateValue(this, value));
+		}
+		return formattedValue;
 	}
 
 	/**
