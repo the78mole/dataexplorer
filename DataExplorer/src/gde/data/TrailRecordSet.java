@@ -829,4 +829,14 @@ public class TrailRecordSet extends RecordSet {
 		return this.timeStep_ms.lastElement() / 10;
 	}
 
+	public long getDisplayTimeStamp_ms(int index) {
+		if (this.settings.isXAxisReversed()) {
+			return this.timeStep_ms.get(index) / 10;
+		}
+		else {
+			return this.timeStep_ms.get(this.timeStep_ms.size() - 1 - index) / 10;
+		}
+	}
+
+
 }

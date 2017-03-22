@@ -1066,6 +1066,9 @@ public class HistoVault {
 					if (record == null) {
 						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.getLogFilePath())); //$NON-NLS-1$
 					}
+					else if (!record.hasReasonableData()) {
+						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.getLogFilePath())); //$NON-NLS-1$
+					}
 					else {
 						StatisticsType measurementStatistics = measurementType.getStatistics();
 						int triggerRefOrdinal = -1;

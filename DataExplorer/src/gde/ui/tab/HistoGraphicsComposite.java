@@ -310,8 +310,11 @@ public class HistoGraphicsComposite extends Composite {
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
 
-			if (trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement()) || trailRecordSet.isDeltaMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
+			if (trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE, true);
+			}
+			else if (trailRecordSet.isDeltaMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
+				drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE_DELTA, true);
 			}
 		}
 		else
@@ -560,50 +563,79 @@ public class HistoGraphicsComposite extends Composite {
 			// initial measure position
 			this.timestampMeasure_ms = isRefresh ? this.timestampMeasure_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
 			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "timestampMeasure_ms=" + this.timestampMeasure_ms + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
+			int yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
+			if (yPosMeasureNew == Integer.MIN_VALUE) {
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
+				for (int i = 0; i < trailRecord.size(); i++) {
+					this.timestampMeasure_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
+					if ((yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms))) > Integer.MIN_VALUE) break;
+				}
+			}
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
-			this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+			this.yPosMeasure = yPosMeasureNew;
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
 
-			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-			if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+			if (yPosMeasureNew > Integer.MIN_VALUE) {
+				drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
+				if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-
-			String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { trailRecord.getName(),
-					trailRecord.getFormattedMeasureValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(), formattedTimeWithUnit }));
+				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+				String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
+				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256,
+						new Object[] { trailRecord.getName(), trailRecord.getFormattedMeasureValue(trailRecordSet.getIndex(this.timestampMeasure_ms)), trailRecord.getUnit(), formattedTimeWithUnit }));
+			}
+			else {
+				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { trailRecord.getName(), GDE.STRING_STAR, trailRecord.getUnit(), GDE.STRING_STAR }));
+			}
 		}
 		else if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 			this.timestampMeasure_ms = isRefresh ? this.timestampMeasure_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
+			int yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
+			if (yPosMeasureNew == Integer.MIN_VALUE) {
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
+				for (int i = 0; i < trailRecord.size(); i++) {
+					this.timestampMeasure_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
+					if ((yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms))) > Integer.MIN_VALUE) break;
+				}
+			}
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
-			this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+			this.yPosMeasure = yPosMeasureNew;
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
 
-			// measure position
-			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-			if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
-
-			// delta position
 			this.timestampDelta_ms = isRefresh ? this.timestampDelta_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 3 * 2);
+			int yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampDelta_ms));
+			if (yPosDeltaNew == Integer.MIN_VALUE) {
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampDelta_ms=%d search first non-null value", this.timestampDelta_ms)); //$NON-NLS-1$
+				for (int i = trailRecord.size() - 1; i >= 0; i--) {
+					this.timestampDelta_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
+					if ((yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampDelta_ms))) > Integer.MIN_VALUE) break;
+				}
+			}
 			this.xPosDelta = this.timeLine.getXPosTimestamp(this.timestampDelta_ms);
-			this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timestampDelta_ms));
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xPosDelta = " + this.xPosDelta + " yPosDelta = " + this.yPosDelta); //$NON-NLS-1$ //$NON-NLS-2$
+			this.yPosDelta = yPosDeltaNew;
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", this.timestampDelta_ms, this.xPosDelta, this.yPosDelta)); //$NON-NLS-1$
 
-			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
-			if (isYInCurveAreaBounds(this.yPosDelta)) drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+			if (yPosMeasureNew > Integer.MIN_VALUE && yPosDeltaNew > Integer.MIN_VALUE) {
+				drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
+				if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-			drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
+				this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+				drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
+				if (isYInCurveAreaBounds(this.yPosDelta)) drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+				this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+				drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 
-			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
-					new Object[] { trailRecord.getName(),
-							trailRecord.getDeltaAsFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)),
-									trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta))),
-							trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
+				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
+						new Object[] { trailRecord.getName(), trailRecord.getFormattedDeltaStatisticsValue(trailRecordSet.getIndex(this.timestampMeasure_ms), trailRecordSet.getIndex(this.timestampDelta_ms)),
+								trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) }));
+			}
+			else {
+				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { trailRecord.getName(), GDE.STRING_STAR, trailRecord.getUnit(), GDE.STRING_STAR }));
+			}
 		}
 		this.canvasGC.dispose();
 	}
@@ -668,39 +700,47 @@ public class HistoGraphicsComposite extends Composite {
 	 */
 	void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
 		// do not erase lines beyond the y axis drawing area 
-		if (posFromTop + this.offSetY >= 0 && posFromTop + this.offSetY <= this.curveAreaBounds.height)
+		if (posFromTop >= 0 && posFromTop <= this.curveAreaBounds.height)
 			this.canvasGC.drawImage(this.canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
 	}
 
 	/**
-	 * clean connecting line by re-drawing the untouched curve area image of this area
+	 * clean connecting line by re-drawing the untouched curve area image of this area.
+	 * supports yPosMeasure and yPosDelta equal to Integer.MinValue which represents a null value.
 	 */
 	void cleanConnectingLineObsoleteRectangle() {
-		this.leftLast = this.leftLast == 0 ? this.xPosMeasure : this.leftLast;
-		int left = this.xPosMeasure <= this.xPosDelta ? this.leftLast < this.xPosMeasure ? this.leftLast : this.xPosMeasure : this.leftLast < this.xPosDelta ? this.leftLast : this.xPosDelta;
+		if (this.topLast > Integer.MIN_VALUE) { // topLast and bottomLast are valid values. This is the only case when a connection line exists.
+			int tmpLeftLast = this.leftLast == 0 ? this.xPosMeasure : this.leftLast;
+			int left = this.xPosMeasure <= this.xPosDelta ? tmpLeftLast < this.xPosMeasure ? tmpLeftLast : this.xPosMeasure : tmpLeftLast < this.xPosDelta ? tmpLeftLast : this.xPosDelta;
 
-		this.topLast = this.topLast == 0 ? this.yPosDelta : this.topLast;
-		int top = this.yPosDelta <= this.yPosMeasure ? this.topLast < this.yPosDelta ? this.topLast : this.yPosDelta : this.topLast < this.yPosMeasure ? this.topLast : this.yPosMeasure;
+			int tmpRightLast = this.rightLast == 0 ? this.xPosDelta - left : this.rightLast;
+			int width = this.xPosDelta >= this.xPosMeasure ? tmpRightLast > this.xPosDelta ? tmpRightLast - left : this.xPosDelta - left
+					: tmpRightLast > this.xPosMeasure ? tmpRightLast - left : this.xPosMeasure - left;
 
-		this.rightLast = this.rightLast == 0 ? this.xPosDelta - left : this.rightLast;
-		int width = this.xPosDelta >= this.xPosMeasure ? this.rightLast > this.xPosDelta ? this.rightLast - left : this.xPosDelta - left
-				: this.rightLast > this.xPosMeasure ? this.rightLast - left : this.xPosMeasure - left;
+			int top, height;
+			if (this.yPosMeasure > Integer.MIN_VALUE && this.yPosDelta > Integer.MIN_VALUE) { // check all the values for the maximum area
+				int tmpTopLast = this.topLast == 0 ? this.yPosDelta : this.topLast;
+				top = this.yPosDelta <= this.yPosMeasure ? tmpTopLast < this.yPosDelta ? tmpTopLast : this.yPosDelta : tmpTopLast < this.yPosMeasure ? tmpTopLast : this.yPosMeasure;
 
-		this.bottomLast = this.bottomLast == 0 ? this.yPosMeasure - top : this.bottomLast;
-		int height = this.yPosMeasure >= this.yPosDelta ? this.bottomLast > this.yPosMeasure ? this.bottomLast - top : this.yPosMeasure - top
-				: this.bottomLast > this.yPosDelta ? this.bottomLast - top : this.yPosDelta - top;
+				int tmpBottomLast = this.bottomLast == 0 ? this.yPosMeasure - top : this.bottomLast;
+				height = this.yPosMeasure >= this.yPosDelta ? tmpBottomLast > this.yPosMeasure ? tmpBottomLast - top : this.yPosMeasure - top
+						: tmpBottomLast > this.yPosDelta ? tmpBottomLast - top : this.yPosDelta - top;
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpLeftLast = " + tmpLeftLast + " tmpTopLast = " + tmpTopLast + " tmpRightLast = " + tmpRightLast + " tmpBottomLast = " + tmpBottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			else { // the maximum area is defined by topLast and bottomLast; yPosMeasure and yPosDelta are neglected because no new connecting line will be drawn
+				top = this.topLast;
+				height = this.bottomLast - this.topLast;
+			}
 
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-		// support connecting lines with start or end beyond the y axis drawing area 
-		//		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
-		if (top + this.offSetY < 0) top = -this.offSetY;
-		if (top + this.offSetY > this.curveAreaBounds.height) top = this.curveAreaBounds.height - this.offSetY;
-		if (height > this.curveAreaBounds.height) height = this.curveAreaBounds.height - top;
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY, width, height);
-		//		}
-
+			// support connecting lines with start or end beyond the y axis drawing area 
+			//		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
+			if (top + this.offSetY < 0) top = -this.offSetY;
+			if (top + this.offSetY > this.curveAreaBounds.height) top = this.curveAreaBounds.height - this.offSetY;
+			if (height > this.curveAreaBounds.height) height = this.curveAreaBounds.height - top;
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY, width, height);
+			//		}
+		}
 		this.leftLast = this.xPosMeasure <= this.xPosDelta ? this.xPosMeasure : this.xPosDelta;
 		this.topLast = this.yPosDelta <= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
 		this.rightLast = this.xPosDelta >= this.xPosMeasure ? this.xPosDelta : this.xPosMeasure;
@@ -822,7 +862,7 @@ public class HistoGraphicsComposite extends Composite {
 	}
 
 	private boolean isYInCurveAreaBounds(int yPos) {
-		return yPos + this.offSetY <= this.curveAreaBounds.height && yPos + this.offSetY >= this.curveAreaBounds.y;
+		return yPos <= this.curveAreaBounds.height && yPos >= 0;
 	}
 
 	/**
@@ -840,10 +880,14 @@ public class HistoGraphicsComposite extends Composite {
 
 				{
 					this.graphicCanvas.setCursor(this.application.getCursor());
-					final Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
-					final String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
-					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY && text != null) {
-						if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) this.graphicCanvas.setToolTipText(text);
+					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.offSetY) {
+						final Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
+						final String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
+						if (text != null) {
+							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) this.graphicCanvas.setToolTipText(text);
+						}
+						else
+							this.graphicCanvas.setToolTipText(null);
 					}
 					else
 						this.graphicCanvas.setToolTipText(null);
@@ -858,7 +902,7 @@ public class HistoGraphicsComposite extends Composite {
 						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
 						long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
 						int xPosMeasureNew = this.timeLine.getXPosTimestamp(timestampMeasureNew_ms);
-						int yPosMeasureNew = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(xPosMeasureNew)));
+						int yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(xPosMeasureNew)));
 						if (xPosMeasureNew != this.xPosMeasure || yPosMeasureNew != this.yPosMeasure) {
 							// all obsolete lines are cleaned up now draw new position marker
 							clearOldMeasureLines(trailRecordSet, trailRecord);
@@ -866,7 +910,8 @@ public class HistoGraphicsComposite extends Composite {
 							this.timestampMeasure_ms = timestampMeasureNew_ms;
 							this.xPosMeasure = xPosMeasureNew;
 							this.yPosMeasure = yPosMeasureNew;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timestampMeasure_ms=" + this.timestampMeasure_ms); //$NON-NLS-1$ 
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
+
 							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 								this.canvasGC.setLineStyle(SWT.LINE_DASH);
@@ -878,22 +923,25 @@ public class HistoGraphicsComposite extends Composite {
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 							if (isYInCurveAreaBounds(this.yPosMeasure)) drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
-								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
+							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey) && this.yPosMeasure >= Integer.MIN_VALUE && this.yPosDelta >= Integer.MIN_VALUE) {
+								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta && this.yPosMeasure != Integer.MIN_VALUE && this.yPosDelta != Integer.MIN_VALUE) {
 									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 								}
 								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
 								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
 										new Object[] { trailRecord.getName(),
-												trailRecord.getDeltaAsFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)),
-														trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta))),
-												trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
+												trailRecord.getFormattedDeltaStatisticsValue(trailRecordSet.getIndex(this.timestampMeasure_ms), trailRecordSet.getIndex(this.timestampDelta_ms)), trailRecord.getUnit(),
+												LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) }));
+							}
+							else if (trailRecordSet.isMeasurementMode(measureRecordKey) && this.yPosMeasure >= Integer.MIN_VALUE) {
+								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+								this.application.setStatusMessage(
+										Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { trailRecord.getName(), trailRecord.getFormattedMeasureValue(trailRecordSet.getIndex(this.timestampMeasure_ms)),
+												trailRecord.getUnit(), LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) }));
 							}
 							else {
 								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256,
-										new Object[] { trailRecord.getName(), trailRecord.getFormattedMeasureValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure))), trailRecord.getUnit(),
-												LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure)) }));
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { trailRecord.getName(), GDE.STRING_STAR, trailRecord.getUnit(), GDE.STRING_STAR }));
 							}
 						}
 					}
@@ -901,7 +949,7 @@ public class HistoGraphicsComposite extends Composite {
 						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getRecord(measureRecordKey);
 						long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
 						int xPosDeltaNew = this.timeLine.getXPosTimestamp(timestampDeltaNew_ms);
-						int yPosDeltaNew = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(xPosDeltaNew)));
+						int yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(xPosDeltaNew)));
 						if (xPosDeltaNew != this.xPosDelta || yPosDeltaNew != this.yPosDelta) {
 							clearOldMeasureLines(trailRecordSet, trailRecord);
 
@@ -917,18 +965,23 @@ public class HistoGraphicsComposite extends Composite {
 							this.canvasGC.setLineStyle(SWT.LINE_DASH);
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
 							if (isYInCurveAreaBounds(this.yPosDelta)) drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
-
-							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
-								drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
-							}
-
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
-									new Object[] { trailRecord.getName(),
-											trailRecord.getDeltaAsFormattedScaleValue(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)),
-													trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta))),
-											trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timeLine.getAdjacentTimestamp(this.xPosMeasure), this.timeLine.getAdjacentTimestamp(this.xPosDelta)) }));
+							if (this.yPosMeasure >= Integer.MIN_VALUE && this.yPosDelta >= Integer.MIN_VALUE) {
+								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta && this.yPosMeasure != Integer.MIN_VALUE && this.yPosDelta != Integer.MIN_VALUE) {
+									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
+								}
+
+								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848,
+										new Object[] { trailRecord.getName(),
+												trailRecord.getFormattedDeltaStatisticsValue(trailRecordSet.getIndex(this.timestampMeasure_ms), trailRecordSet.getIndex(this.timestampDelta_ms)), trailRecord.getUnit(),
+												LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) }));
+							}
+							else {
+								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { trailRecord.getName(), GDE.STRING_STAR, trailRecord.getUnit(), GDE.STRING_STAR }));
+							}
 						}
 					}
 					//					}
@@ -1175,7 +1228,7 @@ public class HistoGraphicsComposite extends Composite {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
 
-			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799) )); //$NON-NLS-1$ 
+			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799))); //$NON-NLS-1$ 
 			sb.append(GDE.STRING_OR).append(String.format("%-16s", Messages.getString(MessageIds.GDE_MSGT0652))); //$NON-NLS-1$
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = (TrailRecord) records.get(i);
@@ -1189,7 +1242,7 @@ public class HistoGraphicsComposite extends Composite {
 				}
 			}
 			sb.append(GDE.STRING_OR).append(GDE.LINE_SEPARATOR);
-			
+
 			final long timestamp_ms = this.timeLine.getAdjacentTimestamp(this.xPosMeasure);
 			final int index = trailRecordSet.getIndex(timestamp_ms);
 			sb.append(String.format("%-11.11s", trailRecordSet.getDataTags(index).get(DataTag.RECORDSET_BASE_NAME))); //$NON-NLS-1$ 
@@ -1209,15 +1262,17 @@ public class HistoGraphicsComposite extends Composite {
 	 * @param trailRecord
 	 */
 	private void clearOldMeasureLines(TrailRecordSet trailRecordSet, TrailRecord trailRecord) {
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPosMeasure = " + this.yPosMeasure + " yPosDelta = " + this.yPosDelta ); //$NON-NLS-1$ //$NON-NLS-2$ 
 		eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 		// no change don't needs to be calculated, but the calculation limits to bounds
-		this.yPosMeasure = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
+		this.yPosMeasure = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
 		if (isYInCurveAreaBounds(this.yPosMeasure)) eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 
 		if (trailRecordSet.isDeltaMeasurementMode(trailRecord.getName())) {
 			eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 			// no change don't needs to be calculated, but the calculation limits to bounds
-			this.yPosDelta = trailRecord.getVerticalDisplayPointPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
+			this.yPosDelta = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
 			if (isYInCurveAreaBounds(this.yPosDelta)) eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 
 			cleanConnectingLineObsoleteRectangle();

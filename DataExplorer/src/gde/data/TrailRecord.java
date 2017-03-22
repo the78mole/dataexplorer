@@ -267,10 +267,10 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			if ((value = super.realRealGet(i)) != null) {
 				int grad = value / 1000000;
 				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue));
-				i++;
 			}
+			i++;
 		}
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
 		return points;
 		// int grad = super.get(measurementPointIndex) / 1000000;
 		// return new Point(xDisplayOffset + Double.valueOf(super.getTime_ms(measurementPointIndex) * super.displayScaleFactorTime).intValue(), yDisplayOffset
@@ -753,7 +753,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		case -1:
 			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue / 1000));
 			final double minValueAbs = this.device.translateValue(this, Math.abs(this.minValue / 1000));
-			final double delta = this.device.translateValue(this, this.maxValue / 1000) - this.device.translateValue(this, this.minValue / 1000) ;
+			final double delta = this.device.translateValue(this, this.maxValue / 1000) - this.device.translateValue(this, this.minValue / 1000);
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, maxValueAbs, delta)); //$NON-NLS-1$
 			if (maxValueAbs <= 100 && minValueAbs <= 100) {
 				if (delta < 0.1)
@@ -839,69 +839,52 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 	/**
 	 * get the delta of the vertical display points
-	 * supports suites.
+	 * supports suites and null values.
 	 * @param index1 is the position of the left value in the record collection 
 	 * @param index2 is the position of the right value in the record collection 
 	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
 	 */
-	public String getDeltaAsFormattedScaleValue(int index1, int index2) {
-		if (!this.isTrailSuite()) {
-			final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-			final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
-					- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
-			return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
-		}
-		else if (this.isBoxPlotSuite()) {
-			if (this.getTrailRecordSuite()[0].realRealGet(index1) != null) {
-				final TrailRecord trailRecord = this.getTrailRecordSuite()[2];
-				final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
-						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
-				return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
-			}
-			else
-				return GDE.STRING_STAR;
-		}
-		else if (isRangePlotSuite()) {
-			if (this.getTrailRecordSuite()[0].realRealGet(index1) != null) {
-				final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-				final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
-						- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
-				return trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index1) != null ? trailRecord.getDecimalFormat().format(translatedDelta) : GDE.STRING_STAR;
-			}
-			else
-				return GDE.STRING_STAR;
-		}
+	public String getFormattedDeltaStatisticsValue(int index1, int index2) {
+		final TrailRecord trailRecord;
+		if (!this.isTrailSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
+		else if (this.isBoxPlotSuite())
+			trailRecord = this.getTrailRecordSuite()[2];
+		else if (isRangePlotSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
 		else
 			throw new UnsupportedOperationException();
+
+		if (trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index2) != null) {
+			final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
+					- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
+			return trailRecord.getFormattedScaleValue(translatedDelta);
+		}
+		else
+			return GDE.STRING_STAR;
 	}
 
 	/**
-	 * supports suites.
+	 * supports suites and null values.
 	 * @param index
 	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
 	 */
 	public String getFormattedMeasureValue(int index) {
-		if (!this.isTrailSuite()) {
-			return super.getFormattedTableValue(index);
-		}
-		else if (this.isBoxPlotSuite()) {
-			if (this.getTrailRecordSuite()[0].realRealGet(index) != null) {
-				final TrailRecord trailRecord = this.getTrailRecordSuite()[2];
-				return trailRecord.getFormattedMeasureValue(index);
-			}
-			else
-				return GDE.STRING_STAR;
-		}
-		else if (isRangePlotSuite()) {
-			if (this.getTrailRecordSuite()[0].realRealGet(index) != null) {
-				final TrailRecord trailRecord = this.getTrailRecordSuite()[0];
-				return trailRecord.getFormattedMeasureValue(index);
-			}
-			else
-				return GDE.STRING_STAR;
-		}
+		final TrailRecord trailRecord;
+		if (!this.isTrailSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
+		else if (this.isBoxPlotSuite())
+			trailRecord = this.getTrailRecordSuite()[2];
+		else if (isRangePlotSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
 		else
 			throw new UnsupportedOperationException();
+
+		if (trailRecord.realRealGet(index) != null) {
+			return trailRecord.getFormattedTableValue(index);
+		}
+		else
+			return GDE.STRING_STAR;
 	}
 
 	/**
@@ -955,6 +938,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @param index
 	 * @return displays yPos in pixel
 	 */
+	@Deprecated
 	public int getVerticalDisplayPointPos(int index) {
 		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
 		if (!this.isTrailSuite()) {
@@ -970,6 +954,35 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 		else
 			throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * supports suites and null values.
+	 * @param index
+	 * @return yPos in pixel (with top@0 and bottom@drawAreaBounds.height) or Integer.MIN_VALUE if the index value is null
+	 */
+	public int getVerticalDisplayPos(int index) {
+		final TrailRecord trailRecord;
+		if (!this.isTrailSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
+		else if (this.isBoxPlotSuite())
+			trailRecord = this.getTrailRecordSuite()[2];
+		else if (isRangePlotSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
+		else
+			throw new UnsupportedOperationException();
+
+		int verticalDisplayPos = Integer.MIN_VALUE;
+		if (this.device.isGPSCoordinates(this)) {
+			// multiply by 1000 due to special logic in setminDisplayValue
+			if (trailRecord.realRealGet(index) != null) verticalDisplayPos = (int) (trailRecord.parent.drawAreaBounds.height
+					- ((trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.0) * 1000. - (trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor))
+							* trailRecord.displayScaleFactorValue));
+		}
+		else if (trailRecord.realRealGet(index) != null) verticalDisplayPos = (int) (trailRecord.parent.drawAreaBounds.height
+				- (((trailRecord.realRealGet(index) / 1000.0) - (trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor)) * trailRecord.displayScaleFactorValue));
+
+		return verticalDisplayPos;
 	}
 
 	/**

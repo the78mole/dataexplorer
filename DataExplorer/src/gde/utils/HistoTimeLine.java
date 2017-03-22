@@ -231,7 +231,7 @@ public class HistoTimeLine {
 
 		for (Entry<Long, Double> entry : this.relativeTimeScale.entrySet()) {
 			this.scalePositions.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
-			if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "timeStamp = " + entry.getKey() + " position = " + this.scalePositions.get(entry.getKey())); //$NON-NLS-1$
+			if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "timeStamp = " + entry.getKey() + " position = " + this.scalePositions.get(entry.getKey())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -251,7 +251,7 @@ public class HistoTimeLine {
 			long currentTimeStamp = entry.getKey();
 			if (HistoTimeLine.log.isLoggable(Level.FINER)) {
 				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());
-				HistoTimeLine.log.log(Level.FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$
+				HistoTimeLine.log.log(Level.FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (lastTimeStamp != 0) {
 				long currentDistance = lastTimeStamp - currentTimeStamp;
@@ -263,7 +263,7 @@ public class HistoTimeLine {
 			}
 			lastTimeStamp = currentTimeStamp;
 		}
-		HistoTimeLine.log.log(Level.FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$
+		HistoTimeLine.log.log(Level.FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//pass 2: build the relative timeScale list from relative distances
 		if (this.settings.isXAxisReversed()) {
@@ -346,7 +346,7 @@ public class HistoTimeLine {
 				if (absoluteDistance > 0.5)
 					relativeDistances.add(Math.abs(lastEntry.getValue() - entry.getValue()));
 				else if (HistoTimeLine.log.isLoggable(Level.FINER))
-					HistoTimeLine.log.log(Level.FINER, String.format("subpixel distance discarded at %d    absoluteDistance = %f", entry.getKey(), absoluteDistance));
+					HistoTimeLine.log.log(Level.FINER, String.format("subpixel distance discarded at %d    absoluteDistance = %f", entry.getKey(), absoluteDistance)); //$NON-NLS-1$
 
 			}
 			lastEntry = entry;
@@ -367,10 +367,10 @@ public class HistoTimeLine {
 				this.density = Density.HIGH;
 			else
 				this.density = Density.EXTREME;
-			if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("absoluteDistance=%d  boxType=%s   relativeDistancesMin=%f relativeDistancesMax=%f",
+			if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("absoluteDistance=%d  boxType=%s   relativeDistancesMin=%f relativeDistancesMax=%f", //$NON-NLS-1$
 					absoluteDistance, this.density.toString(), relativeDistances.get(0), relativeDistances.get(relativeDistances.size() - 1)));
 		}
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, String.format("density = %s  ", this.density.toString()));
+		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, String.format("density = %s  ", this.density.toString())); //$NON-NLS-1$
 	}
 
 	private void drawTickMarks(GC gc, int x0, int y0, Point pt, DateTimePattern timeFormat) {
@@ -412,7 +412,7 @@ public class HistoTimeLine {
 		if (this.settings.isXAxisReversed()) {
 			Entry<Long, Integer> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
 				if (previous != null && xPos < previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
 					if (xPos < previous.getValue() + xPosTolerance)
 						return previous.getKey();
@@ -437,7 +437,7 @@ public class HistoTimeLine {
 		else {
 			Entry<Long, Integer> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.OFF)) HistoTimeLine.log.log(Level.OFF, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
 				if (previous != null && xPos > previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
 					if (xPos > previous.getValue() - xPosTolerance)
 						return previous.getKey();
@@ -469,7 +469,7 @@ public class HistoTimeLine {
 		if (this.settings.isXAxisReversed()) {
 			Entry<Long, Integer> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
 				if (previous != null && xPos < previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
 					return previous.getKey();
 				}
@@ -485,7 +485,7 @@ public class HistoTimeLine {
 		else {
 			Entry<Long, Integer> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue()));
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
 				if (previous != null && xPos > previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
 					return previous.getKey();
 				}
