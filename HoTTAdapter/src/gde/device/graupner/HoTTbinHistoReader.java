@@ -235,6 +235,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			HoTTbinHistoReader.recordSetESC = tmpRecordSet;
 			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsESC.length, recordTimespan_ms);
 		}
+		else
+			throw new UnsupportedOperationException();
+		
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		// read all the data blocks from the file, parse only for the active channel
@@ -314,13 +317,15 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 								if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 									final int versionOBS = -99;
 									HoTTbinHistoReader.parse4Vario(versionOBS, HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2);
-									setTimeMarks(TimeMark.READ);
-									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsVario, HoTTbinHistoReader.timeStep_ms);
-									setTimeMarks(TimeMark.REVIEWED);
-									if (isValidSample && doFullRead) {
-										HoTTbinHistoReader.recordSetVario.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
-										setTimeMarks(TimeMark.ADDED);
-										setTimeMarks(TimeMark.PICKED);
+									if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && HoTTbinReader.tmpClimb10 < 40000 && HoTTbinReader.tmpClimb10 > 20000)) {
+										setTimeMarks(TimeMark.READ);
+										boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsVario, HoTTbinHistoReader.timeStep_ms);
+										setTimeMarks(TimeMark.REVIEWED);
+										if (isValidSample && doFullRead) {
+											HoTTbinHistoReader.recordSetVario.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+											setTimeMarks(TimeMark.ADDED);
+											setTimeMarks(TimeMark.PICKED);
+										}
 									}
 								}
 								HoTTbinHistoReader.isJustParsed = true;
@@ -348,13 +353,15 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							if (HoTTbinHistoReader.buf1 != null && HoTTbinHistoReader.buf2 != null && HoTTbinHistoReader.buf3 != null) {
 								if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 									parse4GPS(HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2, HoTTbinHistoReader.buf3);
-									setTimeMarks(TimeMark.READ);
-									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsGPS, HoTTbinHistoReader.timeStep_ms);
-									setTimeMarks(TimeMark.REVIEWED);
-									if (isValidSample && doFullRead) {
-										HoTTbinHistoReader.recordSetGPS.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
-										setTimeMarks(TimeMark.ADDED);
-										setTimeMarks(TimeMark.PICKED);
+									if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb1 > 10000 && HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 4500)) {
+										setTimeMarks(TimeMark.READ);
+										boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsGPS, HoTTbinHistoReader.timeStep_ms);
+										setTimeMarks(TimeMark.REVIEWED);
+										if (isValidSample && doFullRead) {
+											HoTTbinHistoReader.recordSetGPS.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+											setTimeMarks(TimeMark.ADDED);
+											setTimeMarks(TimeMark.PICKED);
+										}
 									}
 								}
 								HoTTbinHistoReader.isJustParsed = true;
@@ -386,13 +393,16 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							if (HoTTbinHistoReader.buf1 != null && HoTTbinHistoReader.buf2 != null && HoTTbinHistoReader.buf3 != null && HoTTbinHistoReader.buf4 != null) {
 								if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 									HoTTbinHistoReader.parse4GAM(HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2, HoTTbinHistoReader.buf3, HoTTbinHistoReader.buf4);
-									setTimeMarks(TimeMark.READ);
-									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsGAM, HoTTbinHistoReader.timeStep_ms);
-									setTimeMarks(TimeMark.REVIEWED);
-									if (isValidSample && doFullRead) {
-										HoTTbinHistoReader.recordSetGAM.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
-										setTimeMarks(TimeMark.ADDED);
-										setTimeMarks(TimeMark.PICKED);
+									if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600
+											&& Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
+										setTimeMarks(TimeMark.READ);
+										boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsGAM, HoTTbinHistoReader.timeStep_ms);
+										setTimeMarks(TimeMark.REVIEWED);
+										if (isValidSample && doFullRead) {
+											HoTTbinHistoReader.recordSetGAM.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+											setTimeMarks(TimeMark.ADDED);
+											setTimeMarks(TimeMark.PICKED);
+										}
 									}
 								}
 								HoTTbinHistoReader.isJustParsed = true;
@@ -424,13 +434,16 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							if (HoTTbinHistoReader.buf1 != null && HoTTbinHistoReader.buf2 != null && HoTTbinHistoReader.buf3 != null && HoTTbinHistoReader.buf4 != null) {
 								if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 									HoTTbinHistoReader.parse4EAM(HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2, HoTTbinHistoReader.buf3, HoTTbinHistoReader.buf4);
-									setTimeMarks(TimeMark.READ);
-									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsEAM, HoTTbinHistoReader.timeStep_ms);
-									setTimeMarks(TimeMark.REVIEWED);
-									if (isValidSample && doFullRead) {
-										HoTTbinHistoReader.recordSetEAM.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
-										setTimeMarks(TimeMark.ADDED);
-										setTimeMarks(TimeMark.PICKED);
+									if (!HoTTAdapter.isFilterEnabled || (HoTTbinReader.tmpClimb3 > 30 && HoTTbinReader.tmpHeight > 10 && HoTTbinReader.tmpHeight < 5000 && Math.abs(HoTTbinReader.tmpVoltage1) < 600
+											&& Math.abs(HoTTbinReader.tmpVoltage2) < 600)) {
+										setTimeMarks(TimeMark.READ);
+										boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsEAM, HoTTbinHistoReader.timeStep_ms);
+										setTimeMarks(TimeMark.REVIEWED);
+										if (isValidSample && doFullRead) {
+											HoTTbinHistoReader.recordSetEAM.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+											setTimeMarks(TimeMark.ADDED);
+											setTimeMarks(TimeMark.PICKED);
+										}
 									}
 								}
 								HoTTbinHistoReader.isJustParsed = true;
@@ -458,13 +471,17 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							if (HoTTbinHistoReader.buf1 != null && HoTTbinHistoReader.buf2 != null && HoTTbinHistoReader.buf3 != null) {
 								if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 									HoTTbinHistoReader.parse4ESC(HoTTbinHistoReader.buf0, HoTTbinHistoReader.buf1, HoTTbinHistoReader.buf2, HoTTbinHistoReader.buf3);
-									setTimeMarks(TimeMark.READ);
-									boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsESC, HoTTbinHistoReader.timeStep_ms);
-									setTimeMarks(TimeMark.REVIEWED);
-									if (isValidSample && doFullRead) {
-										HoTTbinHistoReader.recordSetESC.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
-										setTimeMarks(TimeMark.ADDED);
-										setTimeMarks(TimeMark.PICKED);
+									if (!HoTTAdapter.isFilterEnabled
+											|| HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
+													&& HoTTbinReader.tmpRevolution < 20000 && !(HoTTbinReader.pointsESC[6] != 0 && HoTTbinReader.pointsESC[6] / 1000 - HoTTbinReader.tmpTemperatureFet > 20)) {
+										setTimeMarks(TimeMark.READ);
+										boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader.pointsESC, HoTTbinHistoReader.timeStep_ms);
+										setTimeMarks(TimeMark.REVIEWED);
+										if (isValidSample && doFullRead) {
+											HoTTbinHistoReader.recordSetESC.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+											setTimeMarks(TimeMark.ADDED);
+											setTimeMarks(TimeMark.PICKED);
+										}
 									}
 								}
 								HoTTbinHistoReader.isJustParsed = true;
@@ -647,6 +664,9 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			HoTTbinHistoReader.recordSetESC = tmpRecordSet;
 			histoRandomSample = HistoRandomSample.createHistoRandomSample(activeChannelNumber, HoTTbinHistoReader.pointsESC.length, recordTimespan_ms);
 		}
+		else
+			throw new UnsupportedOperationException();
+		
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		// read all the data blocks from the file, parse only for the active channel
