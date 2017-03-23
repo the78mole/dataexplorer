@@ -187,7 +187,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 	  //67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(activeChannelNumber)];
 		HoTTbinReader2.points[2] = 0;
-		HoTTbinReader.pointsGeneral = HoTTbinReader.pointsElectric = HoTTbinReader.pointsSpeedControl = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReader2.points;
+		HoTTbinReader.pointsGAM = HoTTbinReader.pointsEAM = HoTTbinReader.pointsESC = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReader2.points;
 		HoTTbinHistoReader2.timeStep_ms = 0;
 		HoTTbinHistoReader2.buf = new byte[HoTTbinHistoReader2.dataBlockSize];
 		HoTTbinHistoReader2.buf0 = new byte[30];
@@ -532,9 +532,9 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM 1, 66=TemperatureM 2
 	  //67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(activeChannelNumber)];
-		HoTTbinReader.pointsGeneral = new int[HoTTbinReader2.points.length];
-		HoTTbinReader.pointsElectric = new int[HoTTbinReader2.points.length];
-		HoTTbinReader.pointsSpeedControl = new int[HoTTbinReader2.points.length];
+		HoTTbinReader.pointsGAM = new int[HoTTbinReader2.points.length];
+		HoTTbinReader.pointsEAM = new int[HoTTbinReader2.points.length];
+		HoTTbinReader.pointsESC = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.pointsVario = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[HoTTbinReader2.points.length];
