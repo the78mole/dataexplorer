@@ -56,8 +56,8 @@ public class HistoGraphicsTemplate extends Properties {
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
 		this.setHistoFileName(deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
-		if (log.isLoggable(Level.OFF))
-			log.log(Level.OFF, "Histo graphics template file is " + this.templateFilePath); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, "Histo graphics template file is " + this.templateFilePath); //$NON-NLS-1$
 	}
 
 	/**
@@ -88,10 +88,10 @@ public class HistoGraphicsTemplate extends Properties {
 			else {
 				file = new File(this.templatePath + GDE.FILE_SEPARATOR_UNIX + this.defaultFileName);
 			}
-			log.log(Level.FINE, "opening template file " + file.getAbsolutePath()); //$NON-NLS-1$
+			log.log(Level.OFF, "opening template file " + file.getAbsolutePath()); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(file));
 			this.isAvailable = true;
-			log.log(Level.FINE, "template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
+			log.log(Level.OFF, "template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
 		}
 		catch (InvalidPropertiesFormatException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -158,7 +158,7 @@ public class HistoGraphicsTemplate extends Properties {
 	 * @return the default filename for the current device and channel configuration number
 	 */
 	public String getDefaultFileName() {
-		return this.defaultFileName;
+		return this.histoFileName;
 	}
 
 }

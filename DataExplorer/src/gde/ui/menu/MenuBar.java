@@ -21,9 +21,11 @@ package gde.ui.menu;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.GraphicsTemplate;
+import gde.config.HistoGraphicsTemplate;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.HistoSet;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
@@ -643,7 +645,12 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.channels.getActiveChannel().saveTemplate();
+							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
+								HistoSet.getInstance().getTrailRecordSet().saveTemplate();
+							}
+							else {
+								MenuBar.this.channels.getActiveChannel().saveTemplate();								
+							}
 						}
 					});
 				}
@@ -655,14 +662,22 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
-							GraphicsTemplate template = activeChannel.getTemplate();
-							template.setNewFileName(template.getDefaultFileName());
-							MenuBar.log.log(Level.FINE, "templateFilePath = " + template.getDefaultFileName()); //$NON-NLS-1$
-							template.load();
-							if (activeChannel.getActiveRecordSet() != null) {
-								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
-								activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
+								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
+								template.setHistoFileName(template.getDefaultFileName());
+								template.load();
+								HistoSet.getInstance().getTrailRecordSet().applyTemplate(true);
+							}
+							else {
+								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+								GraphicsTemplate template = activeChannel.getTemplate();
+								template.setNewFileName(template.getDefaultFileName());
+								MenuBar.log.log(Level.FINE, "templateFilePath = " + template.getDefaultFileName()); //$NON-NLS-1$
+								template.load();
+								if (activeChannel.getActiveRecordSet() != null) {
+									activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
+									activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+								}
 							}
 						}
 					});
@@ -675,17 +690,31 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
-							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
-							if (activeChannel != null) {
-								GraphicsTemplate template = activeChannel.getTemplate();
+							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
+								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
 								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 										.getGraphicsTemplatePath(), template.getDefaultFileName());
 								fileDialog.open();
 								String templateFileName = fileDialog.getFileName();
-								if (templateFileName != null && templateFileName.length() > 4) {
+								if (templateFileName != null && templateFileName.length() > 4 && !templateFileName.equals(template.getDefaultFileName())) {
 									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
-									template.setNewFileName(templateFileName);
-									activeChannel.saveTemplate();
+									template.setHistoFileName(templateFileName);
+									template.store();
+								}
+							}
+							else {
+								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+								if (activeChannel != null) {
+									GraphicsTemplate template = activeChannel.getTemplate();
+									FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
+											.getGraphicsTemplatePath(), template.getDefaultFileName());
+									fileDialog.open();
+									String templateFileName = fileDialog.getFileName();
+									if (templateFileName != null && templateFileName.length() > 4 && !templateFileName.equals(template.getDefaultFileName())) {
+										MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
+										template.setNewFileName(templateFileName);
+										activeChannel.saveTemplate();
+									}
 								}
 							}
 						}
@@ -700,14 +729,23 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 									.getGraphicsTemplatePath(), null, SWT.SINGLE);
-							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
-							GraphicsTemplate template = activeChannel.getTemplate();
-							template.setNewFileName(fileDialog.getFileName());
-							MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
-							template.load();
-							if (activeChannel.getActiveRecordSet() != null) {
-								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
-								activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
+								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
+								template.setHistoFileName(fileDialog.getFileName());
+								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
+								template.load();
+								HistoSet.getInstance().getTrailRecordSet().applyTemplate(true);
+							}
+							else {
+								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+								GraphicsTemplate template = activeChannel.getTemplate();
+								template.setNewFileName(fileDialog.getFileName());
+								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
+								template.load();
+								if (activeChannel.getActiveRecordSet() != null) {
+									activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
+									activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+								}
 							}
 						}
 					});

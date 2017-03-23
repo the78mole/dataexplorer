@@ -5,6 +5,7 @@ Version 3.3.0 - xx yyy 2017
 - update DeviceProperties schema to V31 to enable updates regarding history analysis
 - update Copyrights
 - fix analog display of synchronized master record
+- add history graphics template support (no default set of templates get delivered) 
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
 	

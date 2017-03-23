@@ -448,28 +448,6 @@ public class TrailRecordSet extends RecordSet {
 			this.template.setProperty(i + Record.IS_START_END_DEFINED, String.valueOf(record.isStartEndDefined()));
 			this.template.setProperty(i + Record.DEFINED_MAX_VALUE, String.valueOf(record.getMaxScaleValue()));
 			this.template.setProperty(i + Record.DEFINED_MIN_VALUE, String.valueOf(record.getMinScaleValue()));
-			// smooth current drop
-			// this.template.setProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
-			// recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
-			// smooth voltage curve
-			// this.template.setProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
-			// recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
-			// time grid
-			// color = this.getColorTimeGrid();
-			// rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
-			// this.template.setProperty(RecordSet.TIME_GRID_COLOR, rgb);
-			// this.template.setProperty(RecordSet.TIME_GRID_LINE_STYLE, Integer.valueOf(recordSet.getLineStyleTimeGrid()).toString());
-			// this.template.setProperty(RecordSet.TIME_GRID_TYPE, Integer.valueOf(recordSet.getTimeGridType()).toString());
-			// // curve grid
-			// color = this.getHorizontalGridColor();
-			// rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
-			// this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
-			// this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, Integer.valueOf(recordSet.getHorizontalGridLineStyle()).toString());
-			// this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, Integer.valueOf(recordSet.getHorizontalGridType()).toString());
-			// if (recordSet.get(recordSet.getHorizontalGridRecordOrdinal()) != null) {
-			// this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getHorizontalGridRecordOrdinal());
-			// }
-			// histo properties
 			this.template.setProperty(i + TrailRecord.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailTextSelectedIndex()));
 		}
 		this.template.store();
@@ -549,11 +527,8 @@ public class TrailRecordSet extends RecordSet {
 			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
-				//updateVisibilityStatus(true);
 			}
-			// if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-			this.application.updateGraphicsWindow(); // WBrueg histoGraphicsWindow
-			// }
+			this.application.updateHistoGraphicsWindow(true);
 		}
 
 	}
@@ -579,6 +554,10 @@ public class TrailRecordSet extends RecordSet {
 //		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 //		this.setConfiguredDisplayable(displayableCounter);
 //	}
+
+	public HistoGraphicsTemplate getTemplate() {
+		return template;
+	}
 
 	/**
 	 * synchronize scales according device properties.

@@ -2069,6 +2069,13 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * query if histoGraphicsWindow is visible
+	 */
+	public boolean isHistoGraphicsWindowVisible() {
+		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_HISTO);
+	}
+	
+	/**
 	 * update the graphicsWindow
 	 */
 	public void updateGraphicsWindow() {
