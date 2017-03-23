@@ -88,10 +88,10 @@ public class HistoGraphicsTemplate extends Properties {
 			else {
 				file = new File(this.templatePath + GDE.FILE_SEPARATOR_UNIX + this.defaultFileName);
 			}
-			log.log(Level.OFF, "opening template file " + file.getAbsolutePath()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "opening template file " + file.getAbsolutePath()); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(file));
 			this.isAvailable = true;
-			log.log(Level.OFF, "template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
 		}
 		catch (InvalidPropertiesFormatException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

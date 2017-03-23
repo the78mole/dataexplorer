@@ -524,7 +524,7 @@ public class TrailRecordSet extends RecordSet {
 				}
 			}
 			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
 			}

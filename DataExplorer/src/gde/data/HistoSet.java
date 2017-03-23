@@ -207,8 +207,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		// this.histoFilePaths.clear(); is accomplished by files validation
 		this.fileSizeSum_B = 0;
 		// this.trailRecordSet = null;
-		if (log.isLoggable(Level.OFF))
-			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
 					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
@@ -654,7 +654,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				{
 					FileUtils.checkDirectoryAndCreate(this.validatedDataDir.toString());
 					List<File> files = FileUtils.getFileListing(this.validatedDataDir.toFile(), subDirLevelMax);
-					log.log(Level.OFF, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDataDir)); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDataDir)); //$NON-NLS-1$
 					if (this.settings.getSearchDataPathImports() && !this.validatedImportExtention.isEmpty()) {
 						for (File file : files) {
 							if (file.getName().endsWith(GDE.FILE_ENDING_OSD) || file.getName().endsWith(this.validatedImportExtention)) {
@@ -676,7 +676,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				if (this.validatedImportDir != null && this.settings.getSearchImportPath() && !this.validatedImportExtention.isEmpty()) {
 					FileUtils.checkDirectoryAndCreate(this.validatedImportDir.toString());
 					List<File> files = FileUtils.getFileListing(this.validatedImportDir.toFile(), subDirLevelMax);
-					log.log(Level.OFF, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedImportDir)); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedImportDir)); //$NON-NLS-1$
 					for (File file : files) {
 						if (file.getName().endsWith(this.validatedImportExtention)) {
 							if (!this.histoFilePaths.containsKey(file.lastModified())) this.histoFilePaths.put(file.lastModified(), new HashSet<Path>());
@@ -684,7 +684,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						}
 					}
 				}
-				log.log(Level.OFF, String.format("%04d files selected", this.histoFilePaths.size())); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files selected", this.histoFilePaths.size())); //$NON-NLS-1$
 			}
 		}
 		return !isFullChange;
