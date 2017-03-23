@@ -8,6 +8,8 @@ Version 3.3.0 - xx yyy 2017
 - add history graphics template support (no default set of templates get delivered) 
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
+UT16E multimeter
+	- add support
 	
 Version 3.2.9 - 26 Jan 2017
 +++++ important update Java Runtime Version prerequisite to 1.8 +++++
