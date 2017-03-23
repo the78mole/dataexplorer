@@ -214,6 +214,7 @@
 		<ant antfile="build.xml" target="clean" dir="GigaLogger" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="SkyRC" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Weatronic-Telemetry" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="UniTrend" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -395,6 +396,7 @@
 		<ant antfile="build.xml" target="package" dir="GigaLogger" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="SkyRC" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Weatronic-Telemetry" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="UniTrend" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -431,6 +433,7 @@
 			<include name="GigaLogger/build/*.jar" />
 			<include name="SkyRC/build/*.jar" />
 			<include name="Weatronic-Telemetry/build/*.jar" />
+			<include name="UniTrend/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
