@@ -35,6 +35,7 @@ public class AllTests {
 		suite.addTestSuite(CleanupTestTemp.class);
 		suite.addTestSuite(QuantileTest.class);
 		suite.addTestSuite(HistoSetTest.class);
+		suite.addTestSuite(GpsClusterTest.class);
 		
 		//$JUnit-END$
 		return suite;
