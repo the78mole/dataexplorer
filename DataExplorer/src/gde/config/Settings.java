@@ -167,6 +167,10 @@ public class Settings extends Properties {
 	final static String							IS_DISPLAY_SETTLEMENTS					= "is_display_settlements";																																				//$NON-NLS-1$
 	final static String							IS_DISPLAY_SCORES								= "is_display_scores";																																						//$NON-NLS-1$
 	final static String							IS_DISPLAY_TAGS									= "is_display_tags";																																							//$NON-NLS-1$
+	final static String							IS_DATA_SETTINGS_AT_HOME_PATH		= "is_data_settings_at_home_path";																																//$NON-NLS-1$
+	final static String							IS_SUPPRESS_MODE								= "is_suppress_mode";																																							//$NON-NLS-1$
+	final static String							GPS_LOCATION_RADIUS							= "gps_location_radius";																																					//$NON-NLS-1$
+	final static String							GPS_ADDRESS_TYPE								= "gps_address_type";																																							//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -242,6 +246,10 @@ public class Settings extends Properties {
 
 	public final static String			HISTO_CACHE_ENTRIES_DIR_NAME		= "Cache";																																												//$NON-NLS-1$
 	public final static String			HISTO_CACHE_ENTRIES_XSD_NAME		= "HistoVault" + GDE.HISTO_CACHE_ENTRIES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD;										//$NON-NLS-1$
+	public static final String			HISTO_EXCLUSIONS_FILE_NAME			= ".gdeignore";																																										//$NON-NLS-1$
+	public static final String			HISTO_EXCLUSIONS_DIR_NAME				= ".gdeignore";																																										//$NON-NLS-1$
+	public static final String			GPS_LOCATIONS_DIR_NAME					= "Locations";																																										//$NON-NLS-1$
+	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
 
 	BufferedReader									reader;																																																														// to read the application settings
 	BufferedWriter									writer;																																																														// to write the application settings
@@ -260,6 +268,14 @@ public class Settings extends Properties {
 	String													applHomePath;																																																											// default path to application home directory
 	Comparator<String>							comparator											= new RecordSetNameComparator();																																	//used to sort object key list
 	Properties											measurementProperties						= new Properties();
+
+	public enum GeoCodeGoogle {
+		STREET_ADDRESS, ROUTE, POLITICAL, ADMINISTRATIVE_AREA_LEVEL_3, ADMINISTRATIVE_AREA_LEVEL_2;
+		/**
+		 * use this instead of values() to avoid repeatedly cloning actions.
+		 */
+		public final static GeoCodeGoogle values[] = values();
+	};
 
 	/**
 	 * a singleton needs a static method to get the instance of this calss
@@ -430,6 +446,10 @@ public class Settings extends Properties {
 		return Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 	}
 
+	public Path getHistoLocationsDirectory() {
+		return Paths.get(this.applHomePath, Settings.GPS_LOCATIONS_DIR_NAME);
+	}
+
 	public String resetHistoCache() {
 		final String $METHOD_NAME = "resetHistoCache"; //$NON-NLS-1$
 		int initialSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
@@ -438,9 +458,22 @@ public class Settings extends Properties {
 		int deletedSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
 		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, getHistoCacheDirectory().toString(), Settings.PERMISSION_555);
 		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, getHistoCacheDirectory() });
-		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message); //$NON-NLS-1$
+		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message);
 		return message;
 	}
+	
+	/**
+	 * @return true if files were actually deleted 
+	 */
+	public boolean resetHistolocations() {
+		final String $METHOD_NAME = "resetHistolocations"; //$NON-NLS-1$
+		int initialSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
+		FileUtils.deleteDirectory(getHistoLocationsDirectory().toString());
+		int deletedSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
+		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "histo geo locations deleted"); //$NON-NLS-1$
+		return initialSize_KiB > deletedSize_KiB;
+	}
+
 
 	/**
 	 * check existence of directory, create if required and update all
@@ -468,10 +501,10 @@ public class Settings extends Properties {
 				for (String plugin : plugins) {
 					if (existCheck) {
 						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
-							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555);
 					}
 					else {
-						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555);
 					}
 				}
 			}
@@ -480,7 +513,7 @@ public class Settings extends Properties {
 		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
 		if (existCheck) {
 			if (!FileUtils.checkFileExist(propertyFilePath))
-				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ 
 		}
 		else {
 			if (FileUtils.checkFileExist(propertyFilePath)) {
@@ -492,7 +525,7 @@ public class Settings extends Properties {
 					//ignore
 				}
 			}
-			FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ 
 		}
 	}
 
@@ -732,6 +765,10 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SETTLEMENTS, isDisplaySettlements())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SCORES, isDisplayScores())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_TAGS, isDisplayTags())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_SETTINGS_AT_HOME_PATH, isDataSettingsAtHomePath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUPPRESS_MODE, isSuppressMode())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_LOCATION_RADIUS, getGpsLocationRadius())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_ADDRESS_TYPE, getGpsAddressType())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -871,7 +908,7 @@ public class Settings extends Properties {
 	 */
 	public Optional<String> getValidatedObjectKey(String objectKeyCandidate) {
 		String key = objectKeyCandidate.trim();
-		return Arrays.asList(getObjectList()).stream().filter(s -> s.equalsIgnoreCase(key)).findFirst();
+		return Arrays.stream(getObjectList()).filter(s -> s.equalsIgnoreCase(key)).findFirst();
 	}
 
 	public String getObjectListAsString() {
@@ -2483,7 +2520,7 @@ public class Settings extends Properties {
 	 * @return true if the history x axis distances between the timesteps are based on logarithmic values
 	 */
 	public boolean isXAxisLogarithmicDistance() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, "false"));
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_LOGARITHMIC_DISTANCE, "false")); //$NON-NLS-1$
 	}
 
 	/**
@@ -2498,7 +2535,7 @@ public class Settings extends Properties {
 	 * @return true if the history x axis starts with the most recent timesteps
 	 */
 	public boolean isXAxisReversed() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true"));
+		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true")); //$NON-NLS-1$
 	}
 
 	/**
@@ -2509,7 +2546,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if import files from the data directory are read for the history
+	 * @return true if files from the device import directory are read for the history 
 	 */
 	public boolean getSearchImportPath() {
 		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(true)));
@@ -2523,7 +2560,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if files from the device import directory are read for the history
+	 * @return true if import files from the data directory are read for the history 
 	 */
 	public boolean getSearchDataPathImports() {
 		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(true)));
@@ -2744,6 +2781,68 @@ public class Settings extends Properties {
 	 */
 	public boolean isDisplaySettlements() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_DISPLAY_SETTLEMENTS, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path
+	 */
+	public void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
+		this.setProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, String.valueOf(isDataSettingsAtHomePath));
+	}
+
+	/**
+	 * @return true if the history data settings are stored in the user's home path
+	 */
+	public boolean isDataSettingsAtHomePath() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param isSuppressMode true if ignoring recordsets in the history is active
+	 */
+	public void setSuppressMode(boolean isSuppressMode) {
+		this.setProperty(Settings.IS_SUPPRESS_MODE, String.valueOf(isSuppressMode));
+	}
+
+	/**
+	 * @return true if ignoring recordsets in the history is active
+	 */
+	public boolean isSuppressMode() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SUPPRESS_MODE, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the radius in km for GPS coordinates assignment to the same cluster (default 0.5 km)
+	 */
+	public double getGpsLocationRadius() {
+		return Double.valueOf(this.getProperty(Settings.GPS_LOCATION_RADIUS, ".5")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param doubleValue the radius in km for GPS coordinates assignment to the same cluster  (default 0.5 km)
+	 */
+	public void setGpsLocationRadius(double doubleValue) {
+		this.setProperty(Settings.GPS_LOCATION_RADIUS, String.valueOf(doubleValue));
+	}
+
+	/**
+	 * @return the GPS address type (default is the 2nd entry) 
+	 */
+	public GeoCodeGoogle getGpsAddressType() {
+		return GeoCodeGoogle.valueOf(this.getProperty(Settings.GPS_ADDRESS_TYPE, String.valueOf(1)));
+	}
+
+	/**
+	 * @param geoCodeGoogleText
+	 */
+	public void setGpsAddressType(String geoCodeGoogleText) {
+		try {
+			final GeoCodeGoogle ordinal = GeoCodeGoogle.valueOf(geoCodeGoogleText);
+			this.setProperty(Settings.GPS_ADDRESS_TYPE, ordinal.name());
+		}
+		catch (Exception e) {
+			this.setProperty(Settings.GPS_ADDRESS_TYPE, GeoCodeGoogle.values[1].name());
+		}
 	}
 
 }

@@ -1809,6 +1809,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "clearHistoCacheButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.resetHistolocations();
 										SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.settings.resetHistoCache());
 									}
 								});
