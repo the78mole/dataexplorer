@@ -1052,11 +1052,11 @@ public class HistoVault {
 				List<MeasurementType> channelMeasurements = this.device.getChannelMeasuremts(this.getLogChannelNumber());
 				for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 					MeasurementType measurementType = channelMeasurements.get(i);
-					CompartmentType entryPoints = new CompartmentType(i, measurementType.getName());
+					Record record = recordSet.get(recordSet.getRecordNames()[i]);
+					CompartmentType entryPoints = new CompartmentType(i, measurementType.getName(), DataTypes.fromDataType(record.getDataType()));
 					this.getMeasurements().put(i, entryPoints);
 					entryPoints.setTrails(new HashMap<Integer, PointType>());
 
-					Record record = recordSet.get(recordSet.getRecordNames()[i]);
 					if (record == null) {
 						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.getLogFilePath())); //$NON-NLS-1$
 					}
@@ -1216,7 +1216,7 @@ public class HistoVault {
 					for (Entry<String, HistoSettlement> entry : histoSettlements.entrySet()) {
 						HistoSettlement histoSettlement = entry.getValue();
 						SettlementType settlementType = histoSettlement.getSettlement();
-						CompartmentType entryPoints = new CompartmentType(settlementType.getSettlementId(), settlementType.getName());
+						CompartmentType entryPoints = new CompartmentType(settlementType.getSettlementId(), settlementType.getName(), DataTypes.DEFAULT);
 						this.getSettlements().put(settlementType.getSettlementId(), entryPoints);
 						entryPoints.setTrails(new HashMap<Integer, PointType>());
 
@@ -1301,6 +1301,17 @@ public class HistoVault {
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * @param dataType 
+	 * @param trailType
+	 * @return the value of the first measurement tagged with the specified data type or null in case of unavailable measurement or trail
+	 */
+	public Optional<Integer> getMeasurementPoint(DataTypes dataType, TrailTypes trailType) { // todo DataType
+		return this.getMeasurements().values().stream().filter(c -> c.text.toLowerCase().startsWith("breitengr") && dataType == DataTypes.GPS_LATITUDE  //
+				|| c.text.toLowerCase().startsWith("längengr") && dataType == DataTypes.GPS_LONGITUDE).findFirst().map(c -> c.getTrails().get(trailType.ordinal())).map(p -> p.getValue());
+//		return this.getMeasurements().values().stream().filter(c -> c.dataType == dataType).findFirst().map(d -> d.getTrails().get(trailType.ordinal())).map(v -> v.getValue());
 	}
 
 	/**
