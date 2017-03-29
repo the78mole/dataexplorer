@@ -95,7 +95,6 @@ import gde.data.ObjectData;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
-import gde.data.TrailRecordSet.DisplayTag;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
@@ -957,15 +956,15 @@ public class DataExplorer extends Composite {
 	/**
 	 * updates the histo table.
 	 */
-	private synchronized void updateHistoTable(final boolean forceClean) {
+	public synchronized void updateHistoTable(final boolean forceClean) {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible())
-					if (forceClean || !(DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !(DataExplorer.this.histoTableTabItem.isHeaderTextValid()))) {
+					if (forceClean || !DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !DataExplorer.this.histoTableTabItem.isHeaderTextValid()) {
 					DataExplorer.this.histoTableTabItem.setHeader();
-					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-					if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + DisplayTag.values.length);
 				}
+				TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
+				if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getActiveDisplayTags().size());
 			}
 		});
 		//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {

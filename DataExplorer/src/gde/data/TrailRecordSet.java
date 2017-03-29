@@ -22,12 +22,15 @@ package gde.data;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -42,8 +45,13 @@ import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
 import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
+import gde.device.TrailTypes;
 import gde.exception.DataInconsitsentException;
+import gde.histocache.DataTypes;
 import gde.histocache.HistoVault;
+import gde.histoinventory.GeoCodes;
+import gde.histoinventory.GpsCluster;
+import gde.histoinventory.GpsCoordinate;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -73,23 +81,25 @@ public class TrailRecordSet extends RecordSet {
 	private final List<String>								dataRectifiedObjectKeys	= new ArrayList<String>(initialRecordCapacity);
 	private final List<String>								dataRecordsetBaseNames	= new ArrayList<String>(initialRecordCapacity);
 	private final List<String>								dataRecordSetOrdinals		= new ArrayList<String>(initialRecordCapacity);
+	private final List<String>								dataGpsLocations				= new ArrayList<String>(initialRecordCapacity);
 	private final Map<DataTag, List<String>>	dataTags								= new HashMap<>();
 
 	public enum DisplayTag {
-		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME;
-		
+		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, GPS_LOCATION;
+
 		/**
 		 * use this instead of values() to avoid repeatedly cloning actions.
 		 */
-		public final static DisplayTag						values[]				= values();
+		public final static DisplayTag values[] = values();
 
 		public static DisplayTag fromOrdinal(int ordinal) {
 			return DisplayTag.values[ordinal];
 		}
 	}
-	
+
 	public enum DataTag {
-		FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL};
+		FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
+	};
 
 	/**
 	 * holds trail records for measurements, settlements and scores.
@@ -109,6 +119,7 @@ public class TrailRecordSet extends RecordSet {
 		this.dataTags.put(DataTag.RECTIFIED_OBJECTKEY, this.dataRectifiedObjectKeys);
 		this.dataTags.put(DataTag.RECORDSET_BASE_NAME, this.dataRecordsetBaseNames);
 		this.dataTags.put(DataTag.RECORDSET_ORDINAL, this.dataRecordsetBaseNames);
+		this.dataTags.put(DataTag.GPS_LOCATION, this.dataGpsLocations);
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
@@ -144,7 +155,7 @@ public class TrailRecordSet extends RecordSet {
 	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
-	public  static synchronized TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
+	public static synchronized TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
 		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.name + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -220,7 +231,7 @@ public class TrailRecordSet extends RecordSet {
 		for (int i = 0; i < newTrailRecordSet.size(); i++) {
 			newTrailRecordSet.linkedOrdinals[i] = recordNameList.indexOf(iterator.next().getKey());
 		}
-		
+
 		// setting all data in this create procedure and the synchronized keyword makes this method thread safe 
 		newTrailRecordSet.defineTrailTypes();
 		newTrailRecordSet.setPoints();
@@ -291,6 +302,7 @@ public class TrailRecordSet extends RecordSet {
 		this.dataRectifiedObjectKeys.clear();
 		this.dataRecordsetBaseNames.clear();
 		this.dataRecordSetOrdinals.clear();
+		this.dataGpsLocations.clear();
 	}
 
 	/**
@@ -353,7 +365,7 @@ public class TrailRecordSet extends RecordSet {
 	 * set time steps for the trail recordset and the data points for all displayable trail records.
 	 * every record takes the selected trail type / score data from the history vault and populates its data. 
 	 */
-	public synchronized  void setPoints() {
+	public synchronized void setPoints() {
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
@@ -403,7 +415,7 @@ public class TrailRecordSet extends RecordSet {
 	 * the record takes the selected trail type / score data from the trail record vault and populates its data. 
 	 * @param recordOrdinal
 	 */
-	public synchronized  void setPoints(int recordOrdinal) {
+	public synchronized void setPoints(int recordOrdinal) {
 		TrailRecord trailRecord = (TrailRecord) super.get(recordOrdinal);
 		// the vault does hot hold data for non displayable records (= inactive records)
 		if (trailRecord.isDisplayable) {
@@ -422,8 +434,10 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * sets tagging information for the trail entries.
+	 * supports asynchronous geocode fetches from the internet.
 	 */
 	public synchronized void setDataTags() {
+		GpsCluster gpsCluster = new GpsCluster();
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				this.dataFilePath.add(histoVault.getLogFilePath().intern());
@@ -431,6 +445,70 @@ public class TrailRecordSet extends RecordSet {
 				this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
 				this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
 				this.dataRecordSetOrdinals.add(String.valueOf(histoVault.getLogRecordSetOrdinal()).intern());
+
+				// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
+				Double latitude = null;
+				Double longitude = null;
+				for (String recordName : this.getRecordNames()) {
+					if (recordName.toLowerCase().startsWith("breitengr")) { //$NON-NLS-1$
+						latitude = histoVault.getMeasurementPoint(DataTypes.GPS_LATITUDE, TrailTypes.Q2).map(c -> {
+							TrailRecord record = (TrailRecord) this.get(recordName);
+							return record.device.translateValue(record, c / 1000.);
+						}).orElse(null);
+					}
+					if (recordName.toLowerCase().startsWith("längengr")) { //$NON-NLS-1$
+						longitude = histoVault.getMeasurementPoint(DataTypes.GPS_LONGITUDE, TrailTypes.Q2).map(c -> {
+							TrailRecord record = (TrailRecord) this.get(recordName);
+							return record.device.translateValue(record, c / 1000.);
+						}).orElse(null);
+					}
+				}
+
+				if (latitude != null && longitude != null) {
+					GpsCoordinate gpsCoordinate = new GpsCoordinate(latitude, longitude);
+					gpsCluster.add(gpsCoordinate);
+				}
+				else
+					gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
+			}
+		}
+		// populate the GPS locations list for subsequently filling the histo table
+		if (gpsCluster.parallelStream().filter(Objects::nonNull).count() > 0) {
+			Thread gpsLocationsThread = new Thread((Runnable) () -> setGpsLocationTags(gpsCluster, this.dataGpsLocations), "setGpsLocationTags"); //$NON-NLS-1$
+			try {
+				gpsLocationsThread.start();
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * populate the GPS locations list if there are any GPS locations in this recordset.
+	 * trigger refilling the histo table.
+	 * @param gpsCluster holds the GPS coordinates and the assignment to clusters; null coordinates are allowed
+	 * @param dataGpsLocations is an empty list or GPS location strings for all vaults in the correct sequence
+	 */
+	public synchronized void setGpsLocationTags(GpsCluster gpsCluster, List<String> dataGpsLocations) {
+		long nanoTime = System.nanoTime();
+		gpsCluster.setClusters();
+		if (gpsCluster.size() > 0) {
+			List<String> tmpGpsLocations = new ArrayList<String>();
+			for (GpsCoordinate gpsCoordinate : gpsCluster) {
+				// preserve the correct vaults sequence
+				if (gpsCoordinate != null)
+					tmpGpsLocations.add(GeoCodes.getLocation(gpsCluster.getAssignedClusters().get(gpsCoordinate).getCenter()));
+				else
+					tmpGpsLocations.add(GDE.STRING_EMPTY);
+			}
+			// fill the data tags only if there is at least one GPS coordinate
+			if (tmpGpsLocations.parallelStream().filter(s -> !s.isEmpty()).count() > 0) dataGpsLocations.addAll(tmpGpsLocations);
+			// refresh the histo table which might already have been painted without the GPS coordinates
+			if (dataGpsLocations.size() > 0) {
+				this.application.updateHistoTable(false);
+				if (log.isLoggable(Level.FINER))
+					log.log(Level.FINER, "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -576,7 +654,6 @@ public class TrailRecordSet extends RecordSet {
 			}
 			this.application.updateHistoGraphicsWindow(true);
 		}
-
 	}
 
 	//	/**
@@ -644,7 +721,7 @@ public class TrailRecordSet extends RecordSet {
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-				sb.append(GDE.STRING_NEW_LINE).append(syncRecordOrdinal).append(GDE.STRING_COLON); 
+				sb.append(GDE.STRING_NEW_LINE).append(syncRecordOrdinal).append(GDE.STRING_COLON);
 				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
 				}
@@ -721,7 +798,18 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * get all tags for all recordsets / vaults.
+	 * @return the tags which have been filled 
+	 */
+	public EnumSet<DisplayTag> getActiveDisplayTags() {
+		EnumSet<DisplayTag> activeDisplayTags = EnumSet.allOf(DisplayTag.class);
+		if (this.dataTags.get(DataTag.GPS_LOCATION).size() != this.dataTags.get(DataTag.RECORDSET_BASE_NAME).size()) activeDisplayTags.remove(DisplayTag.GPS_LOCATION);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "activeDisplayTags.size()=", activeDisplayTags.size()); //$NON-NLS-1$
+		return activeDisplayTags;
+	}
+
+	/**
+	 * get all tags for all recordsets / vaults. 
+	 * please note that the GPS location tags are filled in asynchronously. 
 	 * @param displayTag
 	 * @return empty record name and display tag description as a trail text replacement followed by the tag values
 	 */
@@ -741,6 +829,9 @@ public class TrailRecordSet extends RecordSet {
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0842);
 			else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0844);
+			else if (displayTag == DisplayTag.GPS_LOCATION) {
+				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0845);
+			}
 			else
 				throw new UnsupportedOperationException();
 
@@ -763,6 +854,10 @@ public class TrailRecordSet extends RecordSet {
 				else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
 						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME).get(i);
+				else if (displayTag == DisplayTag.GPS_LOCATION) {
+					for (int i = 0; i < this.timeStep_ms.size(); i++)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.GPS_LOCATION).get(i);
+				}
 				else
 					dataTableRow = null; // for test only
 			}
@@ -785,6 +880,10 @@ public class TrailRecordSet extends RecordSet {
 				else if (displayTag == DisplayTag.RECORDSET_BASE_NAME)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
 						dataTableRow[i + 2] = this.dataTags.get(DataTag.RECORDSET_BASE_NAME).get(j);
+				else if (displayTag == DisplayTag.GPS_LOCATION) {
+					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
+						dataTableRow[i + 2] = this.dataTags.get(DataTag.GPS_LOCATION).get(j);
+				}
 				else
 					dataTableRow = null; // for test only
 			}
@@ -837,6 +936,5 @@ public class TrailRecordSet extends RecordSet {
 			return this.timeStep_ms.get(this.timeStep_ms.size() - 1 - index) / 10;
 		}
 	}
-
 
 }
