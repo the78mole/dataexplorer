@@ -296,7 +296,8 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
+				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8)
+						+ ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
 
 			if (recordSet.isTimeStepConstant())
@@ -323,6 +324,43 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// noop
+	}
+
+	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	@Override
+	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
+		if (true)
+			return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
+		else {
+			try {
+				int index = 0;
+				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+					double offset = record.getOffset(); // != 0 if curve has an defined offset
+					double reduction = record.getReduction();
+					double factor = record.getFactor(); // != 1 if a unit translation is required
+					switch (record.getDataType()) {
+					case GPS_LATITUDE:
+					case GPS_LONGITUDE:
+						int grad = record.realGet(rowIndex) / 1000000;
+						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+						dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
+						break;
+
+					default:
+						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+						break;
+					}
+					++index;
+				}
+			}
+			catch (RuntimeException e) {
+				OpenTxAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			}
+			return dataTableRow;
+		}
 	}
 
 	/**
@@ -446,7 +484,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 		int displayableCounter = 0;
 		Record record;
 		String[] measurementNames = recordSet.getRecordNames();
-		
+
 		//clean sync properties
 		for (int i = 0; i < measurementNames.length; i++) {
 			if (this.getMeasurement(channelConfigNumber, i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null) {
@@ -459,9 +497,9 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 						continue;
 					}
 				}
-			}		
+			}
 		}
-		
+
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
@@ -481,13 +519,13 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 		}
 		if (OpenTxAdapter.log.isLoggable(java.util.logging.Level.FINER)) OpenTxAdapter.log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
-		
+
 		for (int i = 0; i < measurementNames.length; i++) {
 			for (int j = i; j < measurementNames.length; j++) {
 				String[] nameParts = measurementNames[j].split(GDE.STRING_BLANK);
-				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j 
-						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null
-						&& recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit()) && recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
+				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j
+						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null && recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit())
+						&& recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
 					log.log(Level.FINE, "do synch " + measurementNames[j] + " to " + measurementNames[i]);
 					this.setMeasurementPropertyValue(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, i);
 				}
@@ -608,15 +646,9 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(
-						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
-						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
-						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-						additionalMeasurementOrdinal, 
-						findRecordByUnit(activeRecordSet, "m/s"), 
-						findRecordByUnit(activeRecordSet, "km"), 
-						-1, 
-						true, isExportTmpDir);
+				exportFileName = new FileHandler().exportFileKMZ(findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE),
+						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true,
+						isExportTmpDir);
 			}
 		}
 		return exportFileName;
@@ -624,16 +656,14 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
 		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) 
-				return entry.getValue().getOrdinal();
+			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
 		}
 		return -1;
 	}
 
 	private int findRecordByType(RecordSet recordSet, Record.DataType dataType) {
 		for (Record record : recordSet.values()) {
-			if (record.getDataType().equals(dataType)) 
-				return record.getOrdinal();
+			if (record.getDataType().equals(dataType)) return record.getOrdinal();
 		}
 		return -1;
 	}
@@ -644,7 +674,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
-		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE ;
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE;
 	}
 
 	/**
@@ -653,15 +683,8 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	public void export2KMZ3D(int type) {
 		RecordSet activeRecordSet = application.getActiveRecordSet();
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3310), 
-				findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
-				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
-				findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-				findRecordByUnit(activeRecordSet, "km/h"), 
-				findRecordByUnit(activeRecordSet, "m/s"), 
-				findRecordByUnit(activeRecordSet, "km"), 
-				-1, 
-				type == DeviceConfiguration.HEIGHT_RELATIVE, 
-				type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3310), findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE),
+				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"),
+				findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 }

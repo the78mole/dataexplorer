@@ -18,25 +18,6 @@
 ****************************************************************************************/
 package gde.device.simprop;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.IDevice;
-import gde.device.InputTypes;
-import gde.device.MeasurementType;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.exception.MissMatchDeviceException;
-import gde.exception.NotSupportedFileFormatException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -56,6 +37,25 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.device.InputTypes;
+import gde.device.MeasurementType;
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
+import gde.exception.MissMatchDeviceException;
+import gde.exception.NotSupportedFileFormatException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 
 /**
  * Class to read and write comma separated value files
@@ -121,8 +121,8 @@ public class CSVReaderWriter {
 			
 			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME));
 			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CHANNEL_CONFIG_NAME + (header.get(GDE.CHANNEL_CONFIG_NAME) != null ? header.get(GDE.CHANNEL_CONFIG_NAME) : "")); //$NON-NLS-1$
-			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CSV_DATA_HEADER_MEASUREMENTS + header.get(GDE.CSV_DATA_HEADER_MEASUREMENTS)); //$NON-NLS-1$
-			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CSV_DATA_HEADER_UNITS + header.get(GDE.CSV_DATA_HEADER_UNITS)); //$NON-NLS-1$
+			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CSV_DATA_HEADER_MEASUREMENTS + header.get(GDE.CSV_DATA_HEADER_MEASUREMENTS)); 
+			CSVReaderWriter.log.log(java.util.logging.Level.FINE, GDE.CSV_DATA_HEADER_UNITS + header.get(GDE.CSV_DATA_HEADER_UNITS)); 
 		}
 		catch (FileNotFoundException e) {
 			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
@@ -413,7 +413,7 @@ public class CSVReaderWriter {
 			if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
-				String[] row = recordSet.getDataTableRow(i, true);
+				String[] row = recordSet.getExportRow(i, true);
 
 				// add time entry
 				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);

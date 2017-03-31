@@ -792,6 +792,12 @@ public interface IDevice {
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex);
+
+		/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */

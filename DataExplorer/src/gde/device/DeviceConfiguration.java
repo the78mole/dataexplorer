@@ -118,7 +118,7 @@ public class DeviceConfiguration {
 	 * method to test this class
 	 * @param args
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		Handler ch = new ConsoleHandler();
 		LogFormatter lf = new LogFormatter();
@@ -162,7 +162,7 @@ public class DeviceConfiguration {
 		}
 	}
 
-	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) //$NON-NLS-1$
+	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) 
 	public DeviceConfiguration(String xmlFileName) throws FileNotFoundException, JAXBException {
 
 		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
@@ -189,7 +189,7 @@ public class DeviceConfiguration {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
-	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) //$NON-NLS-1$
+	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) 
 	public DeviceConfiguration(String xmlFileName, Unmarshaller tmpUnmarshaller) throws FileNotFoundException, JAXBException {
 
 		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
@@ -1435,7 +1435,7 @@ public class DeviceConfiguration {
 		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
-		this.getMeasurement(channelConfigNumber, measurementOrdinal).setActive(isActive); //$NON-NLS-1$
+		this.getMeasurement(channelConfigNumber, measurementOrdinal).setActive(isActive);
 	}
 
 	/**
@@ -1448,7 +1448,7 @@ public class DeviceConfiguration {
 	public void setMeasurementActive(String channelConfigKey, int measurementOrdinal, boolean isActive) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
-		this.getMeasurement(channelConfigKey, measurementOrdinal).setActive(isActive); //$NON-NLS-1$
+		this.getMeasurement(channelConfigKey, measurementOrdinal).setActive(isActive);
 	}
 
 	/**
@@ -1576,7 +1576,7 @@ public class DeviceConfiguration {
 	public String getMeasurementUnit(int channelConfigNumber, int measurementOrdinal) {
 		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getUnit(); //$NON-NLS-1$
+		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getUnit();
 	}
 
 	/**
@@ -1588,7 +1588,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public String getMeasurementUnit(String channelConfigKey, int measurementOrdinal) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return this.getMeasurement(channelConfigKey, measurementOrdinal).getUnit(); //$NON-NLS-1$
+		return this.getMeasurement(channelConfigKey, measurementOrdinal).getUnit();
 	}
 
 	/**
@@ -1707,14 +1707,14 @@ public class DeviceConfiguration {
 			}
 			if (channel.getSettlements() != null) {
 				for (SettlementType settlement : channel.getSettlements().values()) {
-				sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
-			}
+					sb.append(settlement.getName()).append(GDE.STRING_SEMICOLON);
+				}
 			}
 			if (channel.getScoreGroups() != null) {
 				for (ScoreGroupType scoregroup : channel.getScoreGroups().values()) {
-				sb.append(scoregroup.getName()).append(GDE.STRING_SEMICOLON);
+					sb.append(scoregroup.getName()).append(GDE.STRING_SEMICOLON);
+				}
 			}
-		}
 		}
 		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
@@ -2098,7 +2098,7 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, propertyKey);
 		if (property == null) {
-			createProperty(channelConfigKey, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT)); //$NON-NLS-1$
+			createProperty(channelConfigKey, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
 		}
 		else {
 			property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
@@ -2512,7 +2512,8 @@ public class DeviceConfiguration {
 			for (int i = 0; i < this.channelGroups.length; i++) {
 				if (this.channelGroups[i] != -1 && this.channelGroups[i] == this.channelGroups[channelConfigNumber - 1]) result.add(i + 1); // 1-based
 			}
-		} else {
+		}
+		else {
 			result.add(channelConfigNumber);
 		}
 		return result;
@@ -2558,6 +2559,31 @@ public class DeviceConfiguration {
 		}
 		log.log(Level.FINER, "ImportBaseDir " + path); //$NON-NLS-1$
 		return path;
-}
+	}
+
+	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
+		try {
+			int index = 0;
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				if (isGPSCoordinates(record)) {
+					int grad = record.realGet(rowIndex) / 1000000;
+					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+					dataTableRow[index + 1] = String.format("%02.6f", grad + minuten / 100.); //$NON-NLS-1$
+				}
+				else {
+					dataTableRow[index + 1] = record.getDecimalFormat().format((record.getOffset() + ((record.realGet(rowIndex) / 1000.0) - record.getReduction()) * record.getFactor()));
+				}
+				++index;
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+		}
+		return dataTableRow;
+	}
 
 }

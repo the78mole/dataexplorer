@@ -264,7 +264,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
+				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8)
+						+ ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
 
 			if (recordSet.isTimeStepConstant())
@@ -290,6 +291,41 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	 */
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// noop
+	}
+
+	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	@Override
+	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
+		if (true)
+			return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
+		else {
+			try {
+				int index = 0;
+				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+					double offset = record.getOffset(); // != 0 if curve has an defined offset
+					double reduction = record.getReduction();
+					double factor = record.getFactor(); // != 1 if a unit translation is required
+					switch (record.getDataType()) {
+					case GPS_LATITUDE:
+					case GPS_LONGITUDE:
+						dataTableRow[index + 1] = String.format("%02.6f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+						break;
+
+					default:
+						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+						break;
+					}
+					++index;
+				}
+			}
+			catch (RuntimeException e) {
+				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			}
+			return dataTableRow;
+		}
 	}
 
 	/**
@@ -445,8 +481,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				if (log.isLoggable(java.util.logging.Level.FINE))
-					log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
+				if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -461,8 +496,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			for (int j = i; j < measurementNames.length; j++) {
 				String[] nameParts = measurementNames[j].split(GDE.STRING_BLANK);
 				if (nameParts.length > 1 && measurementNames[i].split(GDE.STRING_BLANK)[0].equals(nameParts[0]) && i != j && !nameParts[0].equals("GPS")
-						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null
-						&& recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit()) && recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
+						&& this.getMeasruementProperty(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) == null && recordSet.get(i).getUnit().equals(recordSet.get(j).getUnit())
+						&& recordSet.get(j).getDataType() == Record.DataType.DEFAULT) {
 					log.log(Level.FINE, "do synch " + measurementNames[j] + " to " + measurementNames[i]);
 					this.setMeasurementPropertyValue(channelConfigNumber, j, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, i);
 				}
@@ -582,12 +617,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(
-						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
-						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
-						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-						additionalMeasurementOrdinal,
-						findRecordByUnit(activeRecordSet, "m/s"), 	//$NON-NLS-1$
+				exportFileName = new FileHandler().exportFileKMZ(findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE),
+						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), //$NON-NLS-1$
 						findRecordByUnit(activeRecordSet, "km"), //$NON-NLS-1$
 						findRecordByUnit(activeRecordSet, "*"), //$NON-NLS-1$
 						true, isExportTmpDir);
@@ -619,7 +650,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	@Override
 	public boolean isGPSCoordinates(Record record) {
 		//		return record.getDataType().value().startsWith("GPS l");
-		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE ;
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE;
 	}
 
 	/**
@@ -628,15 +659,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	 */
 	public void export2KMZ3D(int type) {
 		RecordSet activeRecordSet = application.getActiveRecordSet();
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3210), 
-				findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
-				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
-				findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-				findRecordByUnit(activeRecordSet, "km/h"), 
-				findRecordByUnit(activeRecordSet, "m/s"), 
-				findRecordByUnit(activeRecordSet, "km"), 
-				-1, 
-				type == DeviceConfiguration.HEIGHT_RELATIVE, 
-				type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3210), findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE),
+				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"),
+				findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 }

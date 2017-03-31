@@ -327,6 +327,43 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	@Override
+	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
+		if (true)
+			return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
+		else {
+			try {
+				int index = 0;
+				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+					double offset = record.getOffset(); // != 0 if curve has an defined offset
+					double reduction = record.getReduction();
+					double factor = record.getFactor(); // != 1 if a unit translation is required
+					switch (record.getDataType()) {
+					case GPS_LATITUDE:
+					case GPS_LONGITUDE:
+						int grad = record.realGet(rowIndex) / 1000000;
+						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+						dataTableRow[index + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
+						break;
+
+					default:
+						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+						break;
+					}
+					++index;
+				}
+			}
+			catch (RuntimeException e) {
+				FutabaAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			}
+			return dataTableRow;
+		}
+	}
+
+	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
@@ -610,15 +647,9 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(
-						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), 
-						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), 
-						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), 
-						additionalMeasurementOrdinal, 
-						findRecordByUnit(activeRecordSet, "m/s"), 
-						findRecordByUnit(activeRecordSet, "km"), 
-						-1, 
-						true, isExportTmpDir);
+				exportFileName = new FileHandler().exportFileKMZ(findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE),
+						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true,
+						isExportTmpDir);
 			}
 		}
 		return exportFileName;
@@ -638,15 +669,15 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		return -1;
 	}
 
-		/**
-		 * @param record
-		 * @return true if if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
-		 */
-		@Override
-		public boolean isGPSCoordinates(Record record) {
-//		return record.getDataType().value().startsWith("GPS l");
-			return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE ;
-		}
+	/**
+	 * @param record
+	 * @return true if if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		//		return record.getDataType().value().startsWith("GPS l");
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE;
+	}
 
 	/**
 	 * exports the actual displayed data set to KML file format

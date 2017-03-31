@@ -527,6 +527,17 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
+	 * get all calculated and formated data points of a given index
+	 * @param index of the data points
+	 * @return formatted values as string array including time
+	 */
+	public String[] getExportRow(int index, boolean isAbsolute) {
+		String[] exportRow = new String[this.size() + 1]; // add time column
+		exportRow[0] = this.getFormatedTime_sec(index, isAbsolute);
+		return this.device.prepareExportRow(this, exportRow, index);
+	}
+
+	/**
 	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
 	 * For devices with none constant time step between measurement points it returns the average value.
 	 * Do not use for calculation, use for logging purpose only.

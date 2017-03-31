@@ -18,6 +18,24 @@
 ****************************************************************************************/
 package gde.device.robbe;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -37,24 +55,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.logging.Logger;
 
 /**
  * Class to read and write comma separated value files
@@ -434,7 +434,7 @@ public class CSVReaderWriter {
 			if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordEntries; i++) {
 				CSVReaderWriter.sb = new StringBuffer();
-				String[] row = recordSet.getDataTableRow(i, true);
+				String[] row = recordSet.getExportRow(i, true);
 
 				// add time entry
 				CSVReaderWriter.sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
