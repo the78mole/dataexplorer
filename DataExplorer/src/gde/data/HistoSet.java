@@ -914,7 +914,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 */
 	public void clearIgnoreHistoLists(Path defaultPath) {
 		Set<Path> exclusionDirectories = new HashSet<>();
-		exclusionDirectories.add(defaultPath);
+		if (defaultPath != null) exclusionDirectories.add(defaultPath);
 		for (HistoVault truss : this.excludedTrusses.values()) {
 			exclusionDirectories.add(truss.getLogFileAsPath().getParent());
 		}

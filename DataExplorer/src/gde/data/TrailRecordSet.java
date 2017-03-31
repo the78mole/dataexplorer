@@ -533,7 +533,7 @@ public class TrailRecordSet extends RecordSet {
 		if (index >= 0) {
 			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
 			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.dataTags.entrySet()) {
-				dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
+				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
 			}
 			return dataTags4Index;
 		}

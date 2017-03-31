@@ -844,9 +844,11 @@ public class DataExplorer extends Composite {
 
 		this.setHistoGraphicsTabItemVisible(this.settings.isHistoActive());
 		this.setHistoTableTabItemVisible(this.settings.isHistoActive());
-		// no rebuild steps as the rebuild will be triggered by the file path analysis
-		this.rebuildStepInvisibleTab = RebuildStep.E_USER_INTERFACE; // file paths will determine which scope of histo data update is appropriate
-		this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // file paths will determine which scope of histo data update is appropriate
+		if (this.settings.isHistoActive()) {
+			// no rebuild steps as the rebuild will be triggered by the file path analysis
+			this.rebuildStepInvisibleTab = RebuildStep.E_USER_INTERFACE; // file paths will determine which scope of histo data update is appropriate
+			this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // file paths will determine which scope of histo data update is appropriate
+		}
 	}
 
 	/**
@@ -2092,7 +2094,7 @@ public class DataExplorer extends Composite {
 	public boolean isHistoGraphicsWindowVisible() {
 		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO);
 	}
-	
+
 	/**
 	 * update the graphicsWindow
 	 */

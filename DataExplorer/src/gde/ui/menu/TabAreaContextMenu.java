@@ -111,6 +111,8 @@ public class TabAreaContextMenu {
 						setAllEnabled(false);
 						TabAreaContextMenu.this.suppressModeItem.setEnabled(true);
 						TabAreaContextMenu.this.curveSelectionItem.setEnabled(true);
+						TabAreaContextMenu.this.hideItem.setEnabled(true);
+						TabAreaContextMenu.this.hideMenuRevokeItem.setEnabled(true);
 						TabAreaContextMenu.this.displayGraphicsHeaderItem.setEnabled(true);
 						TabAreaContextMenu.this.displayGraphicsCommentItem.setEnabled(true);
 						TabAreaContextMenu.this.copyTabItem.setEnabled(true);
@@ -179,7 +181,7 @@ public class TabAreaContextMenu {
 								else if (!validatedImportExtention.isEmpty() && file.getAbsolutePath().endsWith(validatedImportExtention)) {
 									((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).importDeviceData(file.toPath());
 								}
-								TabAreaContextMenu.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL)); 
+								TabAreaContextMenu.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
 							}
 						}
 					});
@@ -254,10 +256,10 @@ public class TabAreaContextMenu {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							TabAreaContextMenu.this.histoSet.clearIgnoreHistoLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
-
-							TabAreaContextMenu.this.settings.setSuppressMode(false);
-							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(false);
+							if (popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()) != null)
+								TabAreaContextMenu.this.histoSet.clearIgnoreHistoLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
+							else
+								TabAreaContextMenu.this.histoSet.clearIgnoreHistoLists(null);
 
 							TabAreaContextMenu.this.application.setupHistoWindows();
 						}

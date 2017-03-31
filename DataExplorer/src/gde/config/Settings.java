@@ -2829,7 +2829,7 @@ public class Settings extends Properties {
 	 * @return the GPS address type (default is the 2nd entry) 
 	 */
 	public GeoCodeGoogle getGpsAddressType() {
-		return GeoCodeGoogle.valueOf(this.getProperty(Settings.GPS_ADDRESS_TYPE, String.valueOf(1)));
+		return GeoCodeGoogle.valueOf(this.getProperty(Settings.GPS_ADDRESS_TYPE, String.valueOf(GeoCodeGoogle.STREET_ADDRESS)));
 	}
 
 	/**
