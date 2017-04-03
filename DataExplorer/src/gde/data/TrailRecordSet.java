@@ -51,11 +51,11 @@ import gde.histocache.DataTypes;
 import gde.histocache.HistoVault;
 import gde.histoinventory.GeoCodes;
 import gde.histoinventory.GpsCluster;
-import gde.histoinventory.GpsCoordinate;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
+import gde.utils.GpsCoordinate;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 

@@ -17,7 +17,7 @@
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
-package gde.histoinventory;
+package gde.utils;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -34,8 +34,8 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	private final static String	$CLASS_NAME		= GpsCoordinate.class.getName();
 	private final static Logger	log						= Logger.getLogger($CLASS_NAME);
 
-	public static double				EARTH_RADIUS	= 6371.000785;											// in km
-	public static double				GPS_ACCURACY	= .01;															// 10 m
+	public static double				EARTH_RADIUS	= 6371.000785;																													// in km
+	public static double				GPS_ACCURACY	= .0078;																																// 7.8 m
 
 	private double							latitude;
 	private double							longitude;
@@ -46,8 +46,8 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	}
 
 	/**
-	 * @param latitude 
-	 * @param longitude
+	 * @param latitude in GPS DD format (e.g. 48.6625593592642)
+	 * @param longitude in GPS DD format (e.g. 9.434632658958435)
 	 */
 	public GpsCoordinate(double latitude, double longitude) {
 		this.latitude = latitude;
@@ -82,22 +82,26 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 		return this.longitude;
 	}
 
-	public String getLatitudeAsString() {
-		return this.format.format(this.latitude);
+	public String getFormattedLatitude() {
+		return String.format(Locale.ENGLISH, "%.7f", this.latitude).trim(); //$NON-NLS-1$
 	}
 
-	public String getLongitudeAsString() {
-		return this.format.format(this.longitude);
+	public String getFormattedLongitude() {
+		return String.format(Locale.ENGLISH, "%.7f", this.longitude).trim(); //$NON-NLS-1$
 	}
 
 	@Override
 	public String toString() {
-		return this.format.format(this.latitude) + GDE.STRING_COMMA + this.format.format(this.longitude); 
+		return String.format(Locale.ENGLISH, "%.7f, %.7f", this.latitude, this.longitude); //$NON-NLS-1$
+	}
+
+	public String toCsvString() {
+		return this.format.format(this.latitude) + GDE.STRING_COMMA + this.format.format(this.longitude);
 	}
 
 	/**
 	 * determine if one GPS coordinate is the same as another.
-	 * the distance must be less than the GPS accuracy (currently 10 m).
+	 * the distance must be less than the GPS accuracy (currently 7.8 m).
 	 * @param o the object to compare to
 	 * @return true if the GPS coordinates do not differ more than the GPS accuracy, false if they are not
 	 */
@@ -119,7 +123,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	}
 
 	/**
-	 * @return the hashcode from the angular representation
+	 * @return the hashcode of the angular representation
 	 */
 	@Override
 	public int hashCode() {

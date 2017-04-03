@@ -18,17 +18,17 @@
 ****************************************************************************************/
 package gde.utils;
 
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.IDevice;
-import gde.log.Level;
-
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
+
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.log.Level;
 
 /**
  * helper class to calculate miscellaneous values based on GPS coordinates
@@ -37,32 +37,6 @@ public class GPSHelper {
 	private static Logger log = Logger.getLogger(GPSHelper.class.getName());
 	final static double rad = Math.PI / 180;
 	
-	public static class LatLong {
-		//GPS coordinate needs to be in degrees
-		double _latitude;
-		double _longitude;
-		
-		public LatLong(final double latitude, final double Longitude) {
-			this._latitude = latitude;
-			this._longitude = Longitude;
-		}
-		public double getLatitude() {
-			return _latitude;
-		}
-		public String getFormattedLatitude() {
-			return String.format(Locale.ENGLISH, "%.7f", _latitude).trim();
-		}
-		public double getLongitude() {
-			return _longitude;
-		}
-		public String getFormattedLongitude() {
-			return String.format(Locale.ENGLISH, "%.7f", _longitude).trim();
-		}
-		@Override
-		public String toString() {
-			return String.format(Locale.ENGLISH, "%.7f, %.7f", _latitude,  _longitude);
-		}
-	}
 	/**
 	 * find the start index where GPS longitude and latitude has coordinate data
 	 * @param recordSet
@@ -496,7 +470,7 @@ public class GPSHelper {
 				lapStartTrip = recordTrip != null ? recordTrip.get(i) : 0;
 				
 				//calculate index delta for 12 sec filter time
-				filterIndexCount = (int) (15); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
+				filterIndexCount = (15); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
 
 			
 				//create the start line between start point and next nearest point.
@@ -511,8 +485,8 @@ public class GPSHelper {
 //        48.66253588583959,9.435037337243557:48.66224158131457,9.435062482953072
 //				48.66253012820547,9.434816054999828:48.6626791621384,9.434885457158089
 				//48.6625593592642,9.434632658958435:48.66223848103202,9.43461287766695
-				final LatLong startPoint = new LatLong(48.6625593592642,9.434632658958435);
-				final LatLong endPoint = new LatLong(48.66223848103202,9.43461287766695);
+				final GpsCoordinate startPoint = new GpsCoordinate(48.6625593592642,9.434632658958435);
+				final GpsCoordinate endPoint = new GpsCoordinate(48.66223848103202,9.43461287766695);
 //				log.log(Level.OFF, "startLine - startPoint = " + startPoint.toString() + " endPoint = " + endPoint);
 				double deltaLatitude = Math.abs(endPoint.getLatitude()-startPoint.getLatitude());
 				double deltaLongitude = Math.abs(endPoint.getLongitude()-startPoint.getLongitude());
@@ -550,8 +524,8 @@ public class GPSHelper {
 				i+=filterIndexCount; //time filter to short lap
 				++i;
 				for (int j = 0; i < recordSize; i++) { // j=0 for disabled start line detection based on nearest passing point else j=1
-					final LatLong lastLatLong = new LatLong(device.translateValue(recordLatitude, recordLatitude.get(i-1)/1000.0), device.translateValue(recordLongitude, recordLongitude.get(i-1)/1000.0));
-					final LatLong latLong = new LatLong(device.translateValue(recordLatitude, recordLatitude.get(i)/1000.0), device.translateValue(recordLongitude, recordLongitude.get(i)/1000.0));
+					final GpsCoordinate lastLatLong = new GpsCoordinate(device.translateValue(recordLatitude, recordLatitude.get(i-1)/1000.0), device.translateValue(recordLongitude, recordLongitude.get(i-1)/1000.0));
+					final GpsCoordinate latLong = new GpsCoordinate(device.translateValue(recordLatitude, recordLatitude.get(i)/1000.0), device.translateValue(recordLongitude, recordLongitude.get(i)/1000.0));
 					final int speedFactor = 1 + recordSpeed.get(i)/ 1000 / 15; 
 					if (isLatitude) {
 						if (startLine.get(lastLatLong.getFormattedLatitude()) != null && startLine.get(latLong.getFormattedLatitude()) != null) { //startLine hit found

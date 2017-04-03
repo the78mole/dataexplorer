@@ -43,6 +43,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.log.Level;
 import gde.utils.FileUtils;
+import gde.utils.GpsCoordinate;
 
 /**
  * @author Thomas Eickert
@@ -140,11 +141,11 @@ public class GeoCodes {
 		long milliTime = System.currentTimeMillis();
 		File geoData = settings.getHistoLocationsDirectory().resolve(gpsCoordinate.toAngularCoordinate()).toFile();
 		FileUtils.checkDirectoryAndCreate(geoData.getParent().toString());
-		try (InputStream inputStream = new URL(Settings.GPS_API_URL + gpsCoordinate.toString()).openStream();
+		try (InputStream inputStream = new URL(Settings.GPS_API_URL + gpsCoordinate.toCsvString()).openStream();
 				ReadableByteChannel readableByteChannel = java.nio.channels.Channels.newChannel(inputStream);
 				FileOutputStream fileOutputStream = new FileOutputStream(geoData)) {
 			fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, 1 << 20); // limit 1 MB
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "http read in " + (System.currentTimeMillis() - milliTime) + " ms!  gpsCoordinate=" + gpsCoordinate.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "http read in " + (System.currentTimeMillis() - milliTime) + " ms!  gpsCoordinate=" + gpsCoordinate.toCsvString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (Exception e1) {
 			log.log(Level.WARNING, "internet connection failed"); //$NON-NLS-1$

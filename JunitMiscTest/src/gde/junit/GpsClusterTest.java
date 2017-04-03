@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import gde.histoinventory.GeoCodes;
 import gde.histoinventory.GpsCluster;
-import gde.histoinventory.GpsCoordinate;
+import gde.utils.GpsCoordinate;
 
 public class GpsClusterTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	private final static String	$CLASS_NAME	= GpsClusterTest.class.getName();
@@ -136,6 +136,6 @@ public class GpsClusterTest extends TestSuperClass { // TODO maybe better to cho
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(chi);
 		location = GeoCodes.getLocation(this.gpsCluster.getCenter());
-		System.out.println("center of S21, chi : " + location + "    " + this.gpsCluster.getCenter().toString());
+		System.out.println("center of S21, chi : " + location + "    " + this.gpsCluster.getCenter().toCsvString());
 	}
 }
