@@ -34,12 +34,14 @@ import gde.ui.DataExplorer;
  * @author Winfried Brügmann
  */
 public class Channels extends HashMap<Integer, Channel> {
-	final static long		serialVersionUID		= 26031957;
-	final static Logger	log									= Logger.getLogger(Channels.class.getName());
+	final static long		serialVersionUID			= 26031957;
+	final static Logger	log										= Logger.getLogger(Channels.class.getName());
 
-	static Channels			channles						= null;
-	int									activeChannelNumber	= 1;																					// default at least one channel must exist
-	String[]						channelNames				= new String[1];
+	final static int		channelNameMinLength	= 3;																					// 'GPS'
+
+	static Channels			channles							= null;
+	int									activeChannelNumber		= 1;																					// default at least one channel must exist
+	String[]						channelNames					= new String[1];
 	final DataExplorer	application;
 
 	/**
@@ -89,7 +91,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	public int getChannelNumber(String channelName) {
 		int searchedNumber = 1;
 
-		if (channelName != null && channelName.length() > 5) {
+		if (channelName != null && channelName.length() >= channelNameMinLength) {
 			// "2 : Outlet", use the first digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_COLON) && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
 				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());
@@ -187,7 +189,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
-			 // this.application.cleanHeaderAndCommentInHistoGraphicsWindow(); is done in setupHistoWindows
+			// this.application.cleanHeaderAndCommentInHistoGraphicsWindow(); is done in setupHistoWindows
 			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
