@@ -21,6 +21,8 @@ HoTTAdapter*
 	- fix start time stamp using last modified of log file
 UT16E multimeter
 	- add support
+S32, latest and greatest JLog
+	- correct RPM factor
 History analysis
 	- add context menu support
 		- graphics template support (no default set of templates get delivered) 
@@ -44,7 +46,6 @@ History analysis
 		* some additional measurements have been stripped off (e.g. file size, CPU time)
 		- fix package loss unit (was per mille)
 		- update DeviceProperties schema to V31 to enable updates regarding history analysis
-	
 	
 Version 3.2.9 - 26 Jan 2017
 +++++ important update Java Runtime Version prerequisite to 1.8 +++++

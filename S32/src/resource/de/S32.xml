@@ -132,7 +132,6 @@
                 <unit>1/min</unit>
                 <active>true</active>
                 <statistics comment="current trigger related" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
-                <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>RPM Motor</name>
@@ -140,7 +139,6 @@
                 <unit>1/min</unit>
                 <active>true</active>
                 <statistics comment="current trigger related" triggerRefOrdinal="6" sigma="false" avg="true" max="true" min="true"/>
-                <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
