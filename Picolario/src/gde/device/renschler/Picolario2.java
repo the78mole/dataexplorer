@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.device.renschler;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.data.Record;
@@ -32,19 +45,6 @@ import gde.utils.CalculationThread;
 import gde.utils.FileUtils;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Picolario2 device main implementation class
@@ -429,7 +429,7 @@ public class Picolario2 extends Picolario {
 	 */
 	public void export2KMZ3D(int type) {
 		//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1252), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1252), 11, 10, 12, 13, 3, -1, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
 	/**
