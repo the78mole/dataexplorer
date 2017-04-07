@@ -2,14 +2,47 @@ Development history / change log, please read from bottom up
 
 
 Version 3.3.0 - xx yyy 2017
-- update DeviceProperties schema to V31 to enable updates regarding history analysis
-- update Copyrights
+OVERVIEW:
++ add UT16E multimeter support
++ enhance MC3000 & Q200 support
++ enhance History analysis to full functional beta version (pls enable in preferences)
+
+DETAILS:
 - fix analog display of synchronized master record
-- add history graphics template support (no default set of templates get delivered) 
+- support UTC time formatting
+- enhance GPS coordinates support (langitude / latitude)
+	- formatting in degrees/minutes or decimal degrees based on unit settings in the device
+	- homogenize the internal GPS coordinates data format
+- keep selected channel after opening an OSD file
+- update Copyrights
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
 UT16E multimeter
 	- add support
+History analysis
+	- add context menu support
+		- graphics template support (no default set of templates get delivered) 
+		- analyze values in detail in the measurement mode (absolute / delta), show measurements table
+		- right click on a source file in the history graph / table and 
+			- open it in the graphics tab for detailed analysis
+			- exclude / reintegrate it in the history analysis (e.g. preflight tests)
+			- delete it permanently (e.g. unintentional recordings)
+	- user interface enhancements
+		- identify the source files via x-axis tool tips showing the filename
+		- show the GPS location an a human readable text in the history table
+		- show source directories in the graphics header tooltip
+		- enhance smart statistics (quantiles, boxplots) and outlier identification
+	- calculate internal resistance values of drive batteries
+		- settings dialog: analysis types > settlements (Auswertungen > Berechnungen)
+		- allows monitoring on a battery cell basis
+		- supports analysis of factors influencing the internal resistance
+	- minor enhancements
+		- support print and screen capturing
+		- integrate files from subdirectories (maximum directory level setting) 
+		* some additional measurements have been stripped off (e.g. file size, CPU time)
+		- fix package loss unit (was per mille)
+		- update DeviceProperties schema to V31 to enable updates regarding history analysis
+	
 	
 Version 3.2.9 - 26 Jan 2017
 +++++ important update Java Runtime Version prerequisite to 1.8 +++++
