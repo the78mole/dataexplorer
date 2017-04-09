@@ -170,9 +170,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					//8=Height, 9=Climb 1, 10=Climb 3
 					//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 					points[12] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
-					points[12] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
+					points[12] = dataBuffer[19] == 1 ? -1 * points[12] : points[12]; // WBrueg was points[1] : points[1];
 					points[13] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
-					points[13] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
+					points[13] = dataBuffer[24] == 1 ? -1 * points[13] : points[13]; // WBrueg was points[2] : points[2];
 					points[8] = (DataParser.parse2Short(dataBuffer, 31) - 500) * 1000;
 					points[9] = (DataParser.parse2Short(dataBuffer, 33) - 30000) * 10;
 					points[10] = ((dataBuffer[35] & 0xFF) - 120) * 1000;
@@ -482,9 +482,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					tmpClimb3 = dataBuffer[30];
 					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > -490 && tmpHeight < 5000 && tmpClimb3 > -50) {
 						points[13] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
-						points[13] = dataBuffer[27] == 1 ? -1 * points[12] : points[13];
+						points[13] = dataBuffer[27] == 1 ? -1 * points[13] : points[13]; // WBrueg was dataBuffer[27] == 1 ? -1 * points[12] : points[13];
 						points[14] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 22);
-						points[14] = dataBuffer[28] == 1 ? -1 * points[13] : points[14];
+						points[14] = dataBuffer[28] == 1 ? -1 * points[14] : points[14]; // WBrueg was dataBuffer[28] == 1 ? -1 * points[13] : points[14];
 						points[9] = tmpHeight * 1000;
 						points[10] = DataParser.parse2Short(dataBuffer, 28) * 10;
 						points[11] = tmpClimb3 * 1000;
