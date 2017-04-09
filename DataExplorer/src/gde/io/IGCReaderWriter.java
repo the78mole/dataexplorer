@@ -18,6 +18,22 @@
 ****************************************************************************************/
 package gde.io;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.Vector;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -36,22 +52,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.GPSHelper;
 import gde.utils.StringHelper;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Vector;
-import java.util.logging.Logger;
 
 /**
  * Class to write IGC conform files
@@ -296,8 +296,8 @@ public class IGCReaderWriter {
 							catch (Exception e) {
 								height = values[3];
 							}
-							values[0] = latitude;
-							values[1] = longitude;
+							values[0] = latitude * 10; // 5 digits after the decimal point only
+							values[1] = longitude * 10; 
 							values[2] = altitude;
 							values[3] = height;
 
@@ -414,7 +414,7 @@ public class IGCReaderWriter {
 				Record recordAlitude = recordSet.get(ordinalAltitude);
 				SimpleDateFormat sdf = new SimpleDateFormat("HHmmss"); //$NON-NLS-1$
 				int offsetHeight = (int) (startAltitude - device.translateValue(recordAlitude, recordAlitude.get(startIndex) / 1000.0));
-				char fixValidity = offsetHeight == 0 ? 'A' : 'V'; //$NON-NLS-1$ //$NON-NLS-2$
+				char fixValidity = offsetHeight == 0 ? 'A' : 'V'; 
 				long lastTimeStamp = -1, timeStamp;
 				long recordSetStartTimeStamp = recordSet.getStartTimeStamp();
 				log.log(Level.TIME, "start time stamp = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", recordSetStartTimeStamp));
