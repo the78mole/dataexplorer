@@ -650,7 +650,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	@Override
 	public boolean isGPSCoordinates(Record record) {
 		//		return record.getDataType().value().startsWith("GPS l");
-		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LATITUDE;
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LONGITUDE;
 	}
 
 	/**
