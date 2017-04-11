@@ -310,7 +310,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
@@ -322,7 +322,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183)  : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(medianRecord.realRealGet(j) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
@@ -338,7 +338,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerRecord.realRealGet(i) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183)  : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
@@ -350,7 +350,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerRecord.realRealGet(j) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? GDE.STRING_COLON : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183)  : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(middleRecord.realRealGet(j) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperRecord.realRealGet(j) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
