@@ -95,7 +95,7 @@ public class GeoCodes {
 			//				geoFile = closestGpsFile;
 			//			}
 			if (FileUtils.checkFileExist(geoFile.getPath()))
-				location = getLocation(geoFile);
+				location = getLocation(geoFile).replace("Unnamed Road, ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			else
 				log.log(Level.WARNING, "geoCode file not found"); //$NON-NLS-1$
 		}
