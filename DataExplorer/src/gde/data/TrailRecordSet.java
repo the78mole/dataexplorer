@@ -844,7 +844,7 @@ public class TrailRecordSet extends RecordSet {
 						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(i)).getParent().getFileName().toString();
 				else if (displayTag == DisplayTag.BASE_PATH)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(i)).getParent().getParent().getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(i)).getParent().toString();
 				else if (displayTag == DisplayTag.CHANNEL_NUMBER)
 					for (int i = 0; i < this.timeStep_ms.size(); i++)
 						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER).get(i);
@@ -870,7 +870,7 @@ public class TrailRecordSet extends RecordSet {
 						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(j)).getParent().getFileName().toString();
 				else if (displayTag == DisplayTag.BASE_PATH)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
-						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(j)).getParent().getParent().getFileName().toString();
+						dataTableRow[i + 2] = Paths.get(this.dataTags.get(DataTag.FILE_PATH).get(j)).getParent().toString();
 				else if (displayTag == DisplayTag.CHANNEL_NUMBER)
 					for (int i = 0, j = this.timeStep_ms.size() - 1; i < this.timeStep_ms.size(); i++, j--)
 						dataTableRow[i + 2] = this.dataTags.get(DataTag.CHANNEL_NUMBER).get(j);
