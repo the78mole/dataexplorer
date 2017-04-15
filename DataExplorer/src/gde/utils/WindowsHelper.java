@@ -101,10 +101,10 @@ public class WindowsHelper {
 			if (portString != null && portString.length() > 1) { //$NON-NLS-1$
 					if (!(isSkipBlootoothDevices && portString.toLowerCase().contains("bluetooth"))) {
 						try {
-							int portNumber = Integer.parseInt(portString.substring(portString.indexOf(WINDOWS_SERIAL_PORT_COM) + 3, portString.lastIndexOf(')')));
+							int portNumber = Integer.parseInt(portString.substring(portString.indexOf('('+WINDOWS_SERIAL_PORT_COM) + 4, portString.lastIndexOf(')')));
 							String[] tmpDesc = portString.split(GDE.STRING_SEMICOLON);
-							String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf(WINDOWS_SERIAL_PORT_COM) - 2);
-							String manufacturer = tmpDesc[0].split(GDE.STRING_BLANK)[0];
+							String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf('('+WINDOWS_SERIAL_PORT_COM) - 1);
+							String manufacturer = tmpDesc[0].split(GDE.STRING_BLANK)[0].replace('.', ' ').trim();
 							if (manufacturer.length() > 1 && !manufacturer.startsWith("(")) { //$NON-NLS-1$
 								if (!portDescription.contains(manufacturer)) {
 									portDescription = manufacturer + GDE.STRING_BLANK + portDescription;

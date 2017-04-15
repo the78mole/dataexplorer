@@ -15,6 +15,8 @@ DETAILS:
 	- homogenize the internal GPS coordinates data format
 - keep selected channel after opening an OSD file
 - update Copyrights
+- add history graphics template support (no default set of templates get delivered) 
+- fix STM virtual serial port enumeration problem (Graupner MC-28)
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
 UT16E multimeter
