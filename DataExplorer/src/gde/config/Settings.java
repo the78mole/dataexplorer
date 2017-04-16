@@ -467,11 +467,9 @@ public class Settings extends Properties {
 	 */
 	public boolean resetHistolocations() {
 		if (FileUtils.checkDirectoryExist(getHistoLocationsDirectory().toString())) {
-			int initialSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
 			FileUtils.deleteDirectory(getHistoLocationsDirectory().toString());
-			int deletedSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
 			Settings.log.log(java.util.logging.Level.CONFIG, "histo geo locations deleted"); //$NON-NLS-1$
-			return initialSize_KiB > deletedSize_KiB;
+			return true;
 		}
 		else
 			return false;
