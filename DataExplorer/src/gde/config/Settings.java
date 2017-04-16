@@ -461,19 +461,21 @@ public class Settings extends Properties {
 		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message);
 		return message;
 	}
-	
+
 	/**
 	 * @return true if files were actually deleted 
 	 */
 	public boolean resetHistolocations() {
-		final String $METHOD_NAME = "resetHistolocations"; //$NON-NLS-1$
-		int initialSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
-		FileUtils.deleteDirectory(getHistoLocationsDirectory().toString());
-		int deletedSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
-		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "histo geo locations deleted"); //$NON-NLS-1$
-		return initialSize_KiB > deletedSize_KiB;
+		if (FileUtils.checkDirectoryExist(getHistoLocationsDirectory().toString())) {
+			int initialSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
+			FileUtils.deleteDirectory(getHistoLocationsDirectory().toString());
+			int deletedSize_KiB = (int) FileUtils.size(getHistoLocationsDirectory()) / 1024;
+			Settings.log.log(java.util.logging.Level.CONFIG, "histo geo locations deleted"); //$NON-NLS-1$
+			return initialSize_KiB > deletedSize_KiB;
+		}
+		else
+			return false;
 	}
-
 
 	/**
 	 * check existence of directory, create if required and update all
