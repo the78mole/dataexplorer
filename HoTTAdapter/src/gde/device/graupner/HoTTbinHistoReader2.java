@@ -437,7 +437,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			}
 			else if (!HoTTbinReader.isTextModusSignaled) {
 				HoTTbinReader.isTextModusSignaled = true;
-				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
+				//				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 			}
 		}
 		if (doFullRead) {
