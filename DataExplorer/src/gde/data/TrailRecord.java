@@ -229,53 +229,26 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 	/**
 	 * query the values for display.
+	 * supports multiple entries for the same x axis position.
 	 * @param timeLine
 	 * @param xDisplayOffset
 	 * @param yDisplayOffset
 	 * @return point time, value; null if the trail record value is null
 	 */
 	public Point[] getDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset) {
-		Point[] points = new Point[timeLine.getScalePositions().size()];
-		int i = 0;
-		Integer value = 0;
-		double offset = super.minDisplayValue * 1 / super.syncMasterFactor;
-		for (Integer xPos : timeLine.getScalePositions().values()) {
-			if ((value = super.realRealGet(i)) != null) {
-				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) (((value / 1000.0) - offset) * super.displayScaleFactorValue));
+		List<Point> points = new ArrayList<>();
+		double displayOffset = super.minDisplayValue * 1 / super.syncMasterFactor;
+		for (int i = 0; i < this.parent.timeStep_ms.size(); i++) {
+			if (super.realRealGet(i) != null) {
+				points.add(new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.parent.timeStep_ms.getTime_ms(i)),
+						yDisplayOffset - (int) (((super.realRealGet(i) / 1000.0) - displayOffset) * super.displayScaleFactorValue)));
 			}
-			i++;
-		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, Arrays.toString(points));
-		return points;
-		// return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset
-		// - Double.valueOf(((this.get(measurementPointIndex) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
-	}
-
-	/**
-	 * query the values for display.
-	 * @param timeLine
-	 * @param xDisplayOffset
-	 * @param yDisplayOffset
-	 * @return point time, value; null if the trail record value is null
-	 */
-	public Point[] getGpsDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset) {
-		Point[] points = new Point[timeLine.getScalePositions().size()];
-		int i = 0;
-		Integer value = 0;
-		double offset = super.minDisplayValue * 1 / super.syncMasterFactor;
-		for (Integer xPos : timeLine.getScalePositions().values()) {
-			if ((value = super.realRealGet(i)) != null) {
-				int grad = value / 1000000;
-				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue));
+			else {
+				points.add(null);
 			}
-			i++;
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
-		return points;
-		// int grad = super.get(measurementPointIndex) / 1000000;
-		// return new Point(xDisplayOffset + Double.valueOf(super.getTime_ms(measurementPointIndex) * super.displayScaleFactorTime).intValue(), yDisplayOffset
-		// - Double.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor))
-		// * this.displayScaleFactorValue).intValue());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, Arrays.toString(points.toArray()));
+		return points.toArray(new Point[0]);
 	}
 
 	public String getHistoTableRowText() {
