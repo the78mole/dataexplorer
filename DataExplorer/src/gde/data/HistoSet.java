@@ -688,8 +688,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
 					for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 						if (this.settings.isSuppressMode()) {
-							if (fileExclusionData == null || !fileExclusionData.getDataFileDir().equals(file.toPath().getParent())) {
-								fileExclusionData = new FileExclusionData(file.toPath().getParent());
+							if (fileExclusionData == null || !fileExclusionData.getDataFileDir().equals(actualFile.toPath().getParent())) {
+								fileExclusionData = new FileExclusionData(actualFile.toPath().getParent());
 								fileExclusionData.load();
 							}
 							if (fileExclusionData.isExcluded(truss.getLogFileAsPath(), truss.getLogRecordsetBaseName())) {
@@ -890,7 +890,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	public String getExcludedTrussesAsText() {
 		Path lastFileDir = null;
 		FileExclusionData fileExclusionData = null;
-		List<String> exclusionTexts = new ArrayList<>();
+		Set<String> exclusionTexts = new HashSet<>();
 		for (HistoVault truss : this.excludedTrusses.values()) {
 			Path fileDir = Paths.get(truss.getLogFilePath()).getParent();
 			if (lastFileDir != fileDir || fileExclusionData == null) {
