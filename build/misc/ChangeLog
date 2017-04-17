@@ -19,6 +19,8 @@ DETAILS:
 - fix STM virtual serial port enumeration problem (Graupner MC-28)
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
+Junsi iCharger seriell
+	- fix problems with received strings which are not a valid status
 UT16E multimeter
 	- add support
 S32, latest and greatest JLog

@@ -30,6 +30,7 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 
 import java.util.logging.Logger;
 
@@ -109,10 +110,16 @@ public class GathererThread extends Thread {
 						processName = "Monitoring";
 						isProgrammExecuting = true;
 					}
-					else {
-						processName = this.device.getProcessName(dataBuffer);
-						isProgrammExecuting = true;
+					else { 
+						try {
+							processName = this.device.getProcessName(dataBuffer);
+							isProgrammExecuting = true;
 						}
+						catch (Exception e) {
+							log.log(Level.WARNING, String .format("Error in getProcessName evaluating '%s'", StringHelper.byte2CharString(dataBuffer, dataBuffer.length)));
+							continue;
+						}
+					}
 					if (GathererThread.log.isLoggable(Level.FINE))
 						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
 				}
@@ -217,6 +224,7 @@ public class GathererThread extends Thread {
 				}
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
+					log.log(Level.SEVERE, e.getMessage(), e);
 					if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
