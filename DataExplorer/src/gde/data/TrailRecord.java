@@ -256,6 +256,33 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
+	 * query the values for display.
+	 * @param timeLine
+	 * @param xDisplayOffset
+	 * @param yDisplayOffset
+	 * @return point time, value; null if the trail record value is null
+	 */
+	public Point[] getGpsDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset) {
+		Point[] points = new Point[timeLine.getScalePositions().size()];
+		int i = 0;
+		Integer value = 0;
+		double offset = super.minDisplayValue * 1 / super.syncMasterFactor;
+		for (Integer xPos : timeLine.getScalePositions().values()) {
+			if ((value = super.realRealGet(i)) != null) {
+				int grad = value / 1000000;
+				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue));
+			}
+			i++;
+		}
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
+		return points;
+		// int grad = super.get(measurementPointIndex) / 1000000;
+		// return new Point(xDisplayOffset + Double.valueOf(super.getTime_ms(measurementPointIndex) * super.displayScaleFactorTime).intValue(), yDisplayOffset
+		// - Double.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor))
+		// * this.displayScaleFactorValue).intValue());
+	}
+
+	/**
 	 * get all calculated and formated data table points.
 	 * @return record name and trail text followed by formatted values as string array
 	 */

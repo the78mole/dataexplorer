@@ -18,6 +18,16 @@
 ****************************************************************************************/
 package gde.io;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -36,15 +46,6 @@ import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
 
 /**
  * Class to provide all file IO relevant functionality
@@ -97,7 +98,7 @@ public class FileHandler {
 				RecordSet activeRecordSet = CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemName(), isRaw);
 				activeDevice.updateVisibilityStatus(activeRecordSet, true);
 				this.application.getActiveChannel().applyTemplate(activeRecordSet.getName(), true);
-				
+
 				//write filename after import to record description
 				activeRecordSet.descriptionAppendFilename(csvFileDialog.getFileName());
 			}
@@ -207,7 +208,7 @@ public class FileHandler {
 			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
 		}
 		if (addRecordSetName && this.application.getActiveChannel() != null && this.application.getActiveChannel().getActiveRecordSet() != null) {
-			fileName = (fileName.endsWith(GDE.STRING_UNDER_BAR) ? fileName : fileName + GDE.STRING_UNDER_BAR) 
+			fileName = (fileName.endsWith(GDE.STRING_UNDER_BAR) ? fileName : fileName + GDE.STRING_UNDER_BAR)
 					+ this.application.getActiveChannel().getActiveRecordSet().getName().replace(") ", GDE.STRING_UNDER_BAR); //$NON-NLS-1$
 		}
 		return fileName;
@@ -252,10 +253,10 @@ public class FileHandler {
 		String devicePath = GDE.FILE_SEPARATOR_UNIX;
 		if (this.application.getActiveDevice() != null) {
 			if (this.application.getActiveDevice().getName().endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200
-				devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length()-4);
+				devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length() - 4);
 			}
 			else
-			 devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName();
+				devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName();
 		}
 		return devicePath;
 	}
@@ -277,6 +278,8 @@ public class FileHandler {
 			String fileDeviceName = osdHeader.get(GDE.DEVICE_NAME);
 			// check and switch device, if required
 			IDevice activeDevice = this.application.getActiveDevice();
+			String previousDeviceName = activeDevice.getName();
+			Integer previousChannelNumber = this.application.getActiveChannelNumber();
 			if (activeDevice == null || !activeDevice.getName().equals(fileDeviceName)) { // new device in file
 				this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
 			}
@@ -318,6 +321,20 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				OsdReaderWriter.read(openFilePath);
+				if (previousChannelNumber != null && previousDeviceName.equals(this.application.getActiveDevice().getName())) {
+					// try to show the recordset which corresponds to the channel selected by the user 
+					for (Entry<String, String> headerEntry : osdHeader.entrySet()) {
+						if (headerEntry.getKey().contains(GDE.RECORD_SET_NAME)) {
+							final String channelNumber = OsdReaderWriter.getRecordSetProperties(headerEntry.getValue()).get(GDE.CHANNEL_CONFIG_NAME).split(GDE.STRING_BLANK_COLON_BLANK)[0];
+							if (Integer.parseInt(channelNumber) == previousChannelNumber) {
+								this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
+								final String recordSetName = OsdReaderWriter.getRecordSetName(headerEntry.getValue());
+								this.application.getActiveChannel().switchRecordSet(recordSetName);
+								break;
+							}
+						}
+					}
+				}
 				this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
 				if (!existAsObjectLinkFile) this.channels.getActiveChannel().setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
 			}
@@ -412,7 +429,7 @@ public class FileHandler {
 
 		// check if the file exists and if the user really wants to delete it
 		File osdFile = new File(filename);
-		if (! FileUtils.checkFileExist(filename) || this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { osdFile.getAbsolutePath() })) == SWT.NO) {
+		if (!FileUtils.checkFileExist(filename) || this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { osdFile.getAbsolutePath() })) == SWT.NO) {
 			return false;
 		}
 
@@ -437,7 +454,7 @@ public class FileHandler {
 		Settings.getInstance().getFileHistory().remove(filename);
 		this.application.updateSubHistoryMenuItem(null);
 		this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-		
+
 		return true;
 	}
 
@@ -638,72 +655,71 @@ public class FileHandler {
 		return kmzFilePath;
 	}
 
-	
-		/**
-		 * handles the export of an GPX file
-		 * @param dialogName
-		 * @param ordinalLongitude
-		 * @param ordinalLatitude
-		 * @param altitudeOrdinal
-		 * @param speedOrdinal
-		 * @param satellitesOrdinal
-		 * @param hdopOrdinal
-		 * @param vdopOrdinal
-		 * @param pdodOrdinal
-		 * @param accelerationXYZ
-		 */
+	/**
+	 * handles the export of an GPX file
+	 * @param dialogName
+	 * @param ordinalLongitude
+	 * @param ordinalLatitude
+	 * @param altitudeOrdinal
+	 * @param speedOrdinal
+	 * @param satellitesOrdinal
+	 * @param hdopOrdinal
+	 * @param vdopOrdinal
+	 * @param pdodOrdinal
+	 * @param accelerationXYZ
+	 */
 		public void exportFileGPX(final String dialogName, 
 				final int latitudeOrdinal, final int longitudeOrdinal, final int altitudeOrdinal, final int speedOrdinal, final int satellitesOrdinal, 
 				final int hdopOrdinal, final int vdopOrdinal, final int pdodOrdinal,
 				final int[] accelerationXYZ) {
-			final Channel activeChannel = this.channels.getActiveChannel();
-			if (activeChannel == null) {
-				this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
-				return;
-			}
-			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet == null) {
-				this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
-				return;
-			}
-	
-			Settings deviceSetting = Settings.getInstance();
-			String devicePath = getDevicePath();
-			String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-			String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
-			fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
-			if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
-				try {
-					String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET)+1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
-					if (fileName!= null && !fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
-						fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
-					}
-				}
-				catch (NumberFormatException e) {
-					// ignore
+		final Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
+			return;
+		}
+		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		if (activeRecordSet == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
+			return;
+		}
+
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = getDevicePath();
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
+			try {
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				if (fileName != null && !fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
+					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
 				}
 			}
-			FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
-			String gpxFilePath = gpxFileDialog.open();
-			if (gpxFilePath != null && gpxFilePath.length() > 4) {
-				if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
-					return;
-				}
-	
-				try {
-					this.application.enableMenuActions(false);
-					this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-					GPXWriter.write(gpxFilePath, activeRecordSet, latitudeOrdinal, longitudeOrdinal, altitudeOrdinal, speedOrdinal, satellitesOrdinal, 
-							hdopOrdinal, vdopOrdinal, pdodOrdinal, accelerationXYZ);
-				}
-				catch (Exception e) {
-					log.log(Level.WARNING, e.getMessage(), e);
-					this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
-				}
-				this.application.enableMenuActions(true);
-				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+			catch (NumberFormatException e) {
+				// ignore
 			}
 		}
+			FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
+		String gpxFilePath = gpxFileDialog.open();
+		if (gpxFilePath != null && gpxFilePath.length() > 4) {
+			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
+				return;
+			}
+
+			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+					GPXWriter.write(gpxFilePath, activeRecordSet, latitudeOrdinal, longitudeOrdinal, altitudeOrdinal, speedOrdinal, satellitesOrdinal, 
+							hdopOrdinal, vdopOrdinal, pdodOrdinal, accelerationXYZ);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+		}
+	}
 
 	/**
 	 * handles the export of an IGC file
@@ -755,14 +771,14 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				
+
 				StringBuffer errorTxt = new StringBuffer();
 				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
 				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
 				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
 				if (0 > activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE)) errorTxt.append(Record.DataType.GPS_LATITUDE.value()).append(GDE.STRING_COMMA);
 				if (errorTxt.length() > 1) {
-					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0051, new String[]{errorTxt.toString()}));
+					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0051, new String[] { errorTxt.toString() }));
 					return;
 				}
 

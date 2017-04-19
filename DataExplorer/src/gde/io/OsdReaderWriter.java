@@ -498,6 +498,14 @@ public class OsdReaderWriter {
 	}
 
 	/**
+	 * @param recordSetProperties
+	 * @return the recordset name extracted form the recordset properties
+	 */
+	public static String getRecordSetName(String recordSetProperties) {
+		return recordSetProperties.substring(0, recordSetProperties.indexOf(GDE.DATA_DELIMITER));
+	}
+
+	/**
 	 * get parsed record set properties containing all data found by OSD_FORMAT_DATA_KEYS
 	 * @param recordSetProperties
 	 * @return hash map with string type data
