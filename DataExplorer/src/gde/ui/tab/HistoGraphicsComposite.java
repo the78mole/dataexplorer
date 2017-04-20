@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -54,6 +55,7 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoSet;
+import gde.data.HistoSet.DirectoryType;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TrailRecord;
@@ -203,13 +205,22 @@ public class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					StringBuilder sb = new StringBuilder();
-					for (Path path : HistoGraphicsComposite.this.histoSet.getValidatedDirectories().values()) {
-						sb.append(GDE.STRING_BLANK + GDE.STRING_PLUS + GDE.STRING_BLANK).append(path.getFileName().toString());
+					final String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
+					final StringBuilder sb = new StringBuilder();
+					String toolTipText = GDE.STRING_EMPTY;
+					for (Entry<DirectoryType, Path> directoryEntry : HistoGraphicsComposite.this.histoSet.getValidatedDirectories().entrySet()) {
+						final String truncatedPath = directoryEntry.getValue().getFileName().toString().length() > 22 ? directoryEntry.getValue().getFileName().toString().substring(0, 22) + ellipsisText
+								: directoryEntry.getValue().getFileName().toString();
+						sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
+						toolTipText += GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
 					}
+					final String levelsText = Settings.getInstance().getSubDirectoryLevelMax() > 0
+							? GDE.STRING_NEW_LINE + "+ " + Settings.getInstance().getSubDirectoryLevelMax() + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT0870) : GDE.STRING_EMPTY; //$NON-NLS-1$ 
 					final String tmpHeaderText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
-					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText))
+					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
 						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeaderText);
+					}
+					if (!toolTipText.isEmpty() ) HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText.substring(1) + levelsText);
 				}
 			});
 		}
@@ -910,7 +921,8 @@ public class HistoGraphicsComposite extends Composite {
 							this.timestampMeasure_ms = timestampMeasureNew_ms;
 							this.xPosMeasure = xPosMeasureNew;
 							this.yPosMeasure = yPosMeasureNew;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINER))
+								log.log(Level.FINER, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
 
 							if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
@@ -1263,7 +1275,7 @@ public class HistoGraphicsComposite extends Composite {
 	 */
 	private void clearOldMeasureLines(TrailRecordSet trailRecordSet, TrailRecord trailRecord) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPosMeasure = " + this.yPosMeasure + " yPosDelta = " + this.yPosDelta ); //$NON-NLS-1$ //$NON-NLS-2$ 
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPosMeasure = " + this.yPosMeasure + " yPosDelta = " + this.yPosDelta); //$NON-NLS-1$ //$NON-NLS-2$ 
 		eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 		// no change don't needs to be calculated, but the calculation limits to bounds
 		this.yPosMeasure = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));

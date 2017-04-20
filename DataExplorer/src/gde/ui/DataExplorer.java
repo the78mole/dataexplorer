@@ -229,7 +229,7 @@ public class DataExplorer extends Composite {
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
 
-	private RebuildStep						rebuildStepInvisibleTab;																																			// collect the strongest rebuild action which was not performed (e.g. tab was not selected) 
+	private RebuildStep						rebuildStepInvisibleTab						= HistoSet.RebuildStep.E_USER_INTERFACE;										// collect the strongest rebuild action which was not performed (e.g. tab was not selected) 
 
 	/**
 	 * main application class constructor
@@ -845,9 +845,7 @@ public class DataExplorer extends Composite {
 		this.setHistoGraphicsTabItemVisible(this.settings.isHistoActive());
 		this.setHistoTableTabItemVisible(this.settings.isHistoActive());
 		if (this.settings.isHistoActive()) {
-			// no rebuild steps as the rebuild will be triggered by the file path analysis
-			this.rebuildStepInvisibleTab = RebuildStep.E_USER_INTERFACE; // file paths will determine which scope of histo data update is appropriate
-			this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, true); // file paths will determine which scope of histo data update is appropriate
+			this.updateHistoTabs(RebuildStep.A_HISTOSET, true);
 		}
 	}
 
@@ -961,12 +959,13 @@ public class DataExplorer extends Composite {
 	public synchronized void updateHistoTable(final boolean forceClean) {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
-				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible())
+				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()) {
 					if (forceClean || !DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !DataExplorer.this.histoTableTabItem.isHeaderTextValid()) {
-					DataExplorer.this.histoTableTabItem.setHeader();
+						DataExplorer.this.histoTableTabItem.setHeader();
+					}
+					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
+					if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getActiveDisplayTags().size());
 				}
-				TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-				if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getActiveDisplayTags().size());
 			}
 		});
 		//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
@@ -2029,7 +2028,7 @@ public class DataExplorer extends Composite {
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 				this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
 				updateHistoGraphicsWindow(true);
-				updateHistoTable(true);
+				updateHistoTable(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
 			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 			setProgress(100, sThreadId);

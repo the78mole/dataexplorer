@@ -88,11 +88,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	private Channel								validatedChannel					= null;
 	private String								validatedImportExtention	= GDE.STRING_EMPTY;
 
-	private enum DirectoryType {
+	public enum DirectoryType {
 		DATA, IMPORT
 	};
 
-	private Map<DirectoryType, Path>	validatedDirectories	= new HashMap<>();
+	private Map<DirectoryType, Path>	validatedDirectories	= new LinkedHashMap<>();
 	/**
 	 * histo files coming from the last directory validation.
 	 * key is lastModified [ms] of the file, the list holds link file paths or file paths for all types of log files.
@@ -466,7 +466,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 								List<HistoVault> vaultsList = this.get(histoVault.getLogStartTimestamp_ms());
 								if (vaultsList == null) this.put(histoVault.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
 								vaultsList.add(histoVault);
-								if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
+								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
 										histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
 								localSizeSum_B += Paths.get(histoVault.getLogFilePath()).toFile().length();
 							}
@@ -494,7 +494,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 							List<HistoVault> vaultsList = this.get(histoVault.getLogStartTimestamp_ms());
 							if (vaultsList == null) this.put(histoVault.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
 							vaultsList.add(histoVault);
-							if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
 									histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
 							localSizeSum_B += Paths.get(histoVault.getLogFilePath()).toFile().length();
 						}
@@ -602,8 +602,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws IOException 
 	 */
 	private boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
-		final int subDirLevelMax = 1;
-
 		IDevice lastDevice = this.validatedDevice;
 		Channel lastChannel = this.validatedChannel;
 		Path lastHistoDataDir = this.validatedDirectories.get(DirectoryType.DATA);
@@ -643,15 +641,15 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			this.excludedTrusses.clear();
 				{
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.DATA).toString());
-				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), subDirLevelMax);
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files found in histoDataDir %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
+				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), this.settings.getSubDirectoryLevelMax());
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files in histoDataDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA).getFileName(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 			}
 			if (this.validatedDirectories.containsKey(DirectoryType.IMPORT)) {
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.IMPORT).toString());
-				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), subDirLevelMax);
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files found in histoImportDir %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT))); //$NON-NLS-1$
+				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), this.settings.getSubDirectoryLevelMax());
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files in histoImportDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT).getFileName(), this.validatedDirectories.get(DirectoryType.IMPORT))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 			}
@@ -762,24 +760,24 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				boolean isValidObject = false;
 				if (this.application.getActiveDevice() != null && !truss.getLogDeviceName().equals(this.application.getActiveDevice().getName())
 						&& !(truss.getLogDeviceName().startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter //$NON-NLS-1$ //$NON-NLS-2$
-					log.log(Level.INFO, String.format("OSD candidate found for wrong device \"%s\" in %s  %s", truss.getLogDeviceName(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.INFO, String.format("OSD candidate found for wrong device '%-11s' in %s  %s", truss.getLogDeviceName(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber())) {
-					log.log(Level.FINE, String.format("OSD candidate for invalid channel    \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE, String.format("OSD candidate for invalid channel    '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
-					log.log(Level.FINE, String.format("OSD candidate out of time range      \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE, String.format("OSD candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (this.application.getActiveObject() != null && !truss.getValidatedObjectKey().isPresent()) {
-					log.log(Level.INFO, String.format("OSD candidate found for empty object \"%s\" in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.INFO, String.format("OSD candidate found for empty object '%-11s' in %s  %s", truss.getLogObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 					isValidObject = this.settings.getFilesWithoutObject();
 				}
 				else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
-					log.log(Level.INFO, String.format("OSD candidate found for wrong object \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.INFO, String.format("OSD candidate found for wrong object '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 					isValidObject = this.settings.getFilesWithOtherObject();
 				}
 				else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
-					log.log(Level.INFO, String.format("OSD candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE, String.format("OSD candidate found for object       '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 					isValidObject = true;
 				}
 				if (isValidObject) {
@@ -793,22 +791,22 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 				else {
 					invalidRecordSetsCount++;
-					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("skip   %s %3.7s    %s %2d %s", truss.getStartTimeStampFormatted(), truss.getVaultDeviceName(), //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("skip   %s %3.7s    %s %2d %s", truss.getStartTimeStampFormatted(), truss.getVaultDeviceName(), //$NON-NLS-1$
 							truss.getLogChannelNumber(), truss.getLogRecordSetOrdinal(), actualFile.toString()));
 				}
 			}
 			else if (!supportedImportExtention.isEmpty() && actualFile.getName().endsWith(supportedImportExtention)) {
 				boolean isValidObject = false;
 				if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
-					log.log(Level.FINE, String.format("BIN candidate out of time range      \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE, String.format("BIN candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
 					log.log(Level.INFO,
-							String.format("BIN candidate found for wrong object \"%s\" in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
+							String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
 					isValidObject = this.settings.getFilesWithOtherObject();
 				}
 				else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
-					log.log(Level.INFO, String.format("BIN candidate found for object       \"%s\" in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE, String.format("BIN candidate found for object       '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 					isValidObject = true;
 				}
 					
@@ -823,6 +821,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 				else {
 					invalidRecordSetsCount++;
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("skip   %s %3.7s    %s %2d %s", truss.getStartTimeStampFormatted(), truss.getVaultDeviceName(), //$NON-NLS-1$
+							truss.getLogChannelNumber(), truss.getLogRecordSetOrdinal(), actualFile.toString()));
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("isValidRecordSet=false  lastModified=%,d  %s", actualFile.lastModified(), actualFile.getAbsolutePath())); //$NON-NLS-1$
 				}
 			}

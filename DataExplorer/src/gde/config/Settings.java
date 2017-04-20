@@ -171,6 +171,7 @@ public class Settings extends Properties {
 	final static String							IS_SUPPRESS_MODE								= "is_suppress_mode";																																							//$NON-NLS-1$
 	final static String							GPS_LOCATION_RADIUS							= "gps_location_radius";																																					//$NON-NLS-1$
 	final static String							GPS_ADDRESS_TYPE								= "gps_address_type";																																							//$NON-NLS-1$
+	final static String							SUBDIRECTORY_LEVEL_MAX					= "subdirectory_level_max";																																				//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -769,6 +770,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUPPRESS_MODE, isSuppressMode())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_LOCATION_RADIUS, getGpsLocationRadius())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_ADDRESS_TYPE, getGpsAddressType())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2842,6 +2844,26 @@ public class Settings extends Properties {
 		}
 		catch (Exception e) {
 			this.setProperty(Settings.GPS_ADDRESS_TYPE, GeoCodeGoogle.values[1].name());
+		}
+	}
+
+	/**
+	 * @return the maximum number of subdirectories which is used for history log selection (default is 0) 
+	 */
+	public int getSubDirectoryLevelMax() {
+		return Integer.valueOf(this.getProperty(Settings.SUBDIRECTORY_LEVEL_MAX, String.valueOf(0)));
+	}
+
+	/**
+	 * @param uintValue the maximum number of subdirectories which is used for history log selection
+	 */
+	public void setSubDirectoryLevelMax(String uintValue) {
+		try {
+			int value = Integer.parseUnsignedInt(uintValue.trim());
+			if (value < 0 || value > 9) value = 0;
+			this.setProperty(Settings.SUBDIRECTORY_LEVEL_MAX, String.valueOf(value));
+		}
+		catch (Exception e) {
 		}
 	}
 
