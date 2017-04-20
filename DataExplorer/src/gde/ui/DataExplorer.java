@@ -2120,6 +2120,9 @@ public class DataExplorer extends Composite {
 					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 						this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 					}
+					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
+						this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+					}
 				}
 			}
 		}
@@ -2138,6 +2141,9 @@ public class DataExplorer extends Composite {
 							DataExplorer.this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
 						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO)) {
+							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+						}
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
 							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
 					}
