@@ -42,8 +42,8 @@ import gde.log.Level;
  * @author Thomas Eickert
  */
 public class Quantile {
-	private final static String			$CLASS_NAME					= Quantile.class.getName();
-	private final static Logger			log									= Logger.getLogger($CLASS_NAME);
+	private final static String			$CLASS_NAME	= Quantile.class.getName();
+	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final List<Integer>			iPopulation;
 	private final List<Double>			dPopulation;
@@ -217,19 +217,20 @@ public class Quantile {
 				if (!excludes.contains(value)) this.iPopulation.add(value);
 			}
 		}
-		this.firstFigure = this.iPopulation.get(0) != null ? this.iPopulation.get(0) : -Double.MAX_VALUE;
-		this.lastFigure = this.iPopulation.get(this.iPopulation.size() - 1) != null ? this.iPopulation.get(this.iPopulation.size() - 1) : -Double.MAX_VALUE;
+		this.firstFigure = this.iPopulation.size() > 0 && this.iPopulation.get(0) != null ? this.iPopulation.get(0) : -Double.MAX_VALUE;
+		this.lastFigure = this.iPopulation.size() > 0 && this.iPopulation.get(this.iPopulation.size() - 1) != null ? this.iPopulation.get(this.iPopulation.size() - 1) : -Double.MAX_VALUE;
 
 		Collections.sort(this.iPopulation);
 
-		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m) 
-		double outlierProbability = ErrorFunction.getOutlierProbability(outlierSigma) / 2.;
-		double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
-		while (this.iPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierBaseRangeFactor)
-			this.iPopulation.remove(0);
-		while (this.iPopulation.get(this.iPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierBaseRangeFactor)
-			this.iPopulation.remove(this.iPopulation.size() - 1);
-
+		if (this.iPopulation.size() > 0) {
+			// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m) 
+			double outlierProbability = ErrorFunction.getOutlierProbability(outlierSigma) / 2.;
+			double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
+			while (this.iPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierBaseRangeFactor)
+				this.iPopulation.remove(0);
+			while (this.iPopulation.get(this.iPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierBaseRangeFactor)
+				this.iPopulation.remove(this.iPopulation.size() - 1);
+		}
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(iPopulation.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.iPopulation.toArray()));
 	}
