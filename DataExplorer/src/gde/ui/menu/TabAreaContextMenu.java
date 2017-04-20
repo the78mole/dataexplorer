@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.HistoSet;
-import gde.data.RecordSet;
 import gde.device.IHistoDevice;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -119,25 +118,67 @@ public class TabAreaContextMenu {
 						TabAreaContextMenu.this.copyPrintImageItem.setEnabled(true);
 					}
 					else {
-						String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
-						String recordSetBaseName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString();
-						RecordSet recordSet = TabAreaContextMenu.this.application.getRecordSetOfVisibleTab();
-						if (recordSet != null && recordSet.size() > 0) {
-							setAllEnabled(true);
-							if (dataFilePath.isEmpty()) {
-								TabAreaContextMenu.this.fileName.setEnabled(false);
-								TabAreaContextMenu.this.openRecordSetItem.setEnabled(false);
-								TabAreaContextMenu.this.deleteFileItem.setEnabled(false);
+						setAllEnabled(true);
+						final String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
+						if (dataFilePath.isEmpty()) {
+							TabAreaContextMenu.this.fileName.setEnabled(false);
+							TabAreaContextMenu.this.openRecordSetItem.setEnabled(false);
+							TabAreaContextMenu.this.deleteFileItem.setEnabled(false);
 
-								TabAreaContextMenu.this.hideMenuRecordSetItem.setEnabled(false);
-								TabAreaContextMenu.this.hideMenuFileItem.setEnabled(false);
-							}
-							else {
-								final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
-								TabAreaContextMenu.this.fileName.setText(">> " + (tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$//$NON-NLS-2$
-										+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", recordSetBaseName) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
-								TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
-							}
+							TabAreaContextMenu.this.hideMenuRecordSetItem.setEnabled(false);
+							TabAreaContextMenu.this.hideMenuFileItem.setEnabled(false);
+						}
+						else {
+							final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
+							TabAreaContextMenu.this.fileName.setText(">> " + (tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$//$NON-NLS-2$
+									+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
+							TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
+						}
+						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
+						TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
+					}
+				}
+				if (type == TabMenuType.HISTOTABLE) {
+					TabAreaContextMenu.this.suppressModeItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.getSelection());
+					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+
+					TabAreaContextMenu.this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
+					TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
+
+					if (popupMenu.getData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString()) == null) { // not within the curve area canvas bounds
+						setAllEnabled(false);
+						TabAreaContextMenu.this.suppressModeItem.setEnabled(true);
+						TabAreaContextMenu.this.hideItem.setEnabled(true);
+						TabAreaContextMenu.this.hideMenuRevokeItem.setEnabled(true);
+						TabAreaContextMenu.this.copyTabItem.setEnabled(true);
+					}
+					else {
+						setAllEnabled(true);
+						TabAreaContextMenu.this.curveSelectionItem.setEnabled(false);
+						TabAreaContextMenu.this.displayGraphicsHeaderItem.setEnabled(false);
+						TabAreaContextMenu.this.displayGraphicsCommentItem.setEnabled(false);
+						TabAreaContextMenu.this.copyPrintImageItem.setEnabled(false);
+						TabAreaContextMenu.this.dateTimeItem.setEnabled(false);
+						TabAreaContextMenu.this.editTableItem.setEnabled(false);
+						TabAreaContextMenu.this.outherAreaColorItem.setEnabled(false);
+						TabAreaContextMenu.this.innerAreaColorItem.setEnabled(false);
+
+						final String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
+						if (dataFilePath.isEmpty()) {
+							TabAreaContextMenu.this.fileName.setEnabled(false);
+							TabAreaContextMenu.this.openRecordSetItem.setEnabled(false);
+							TabAreaContextMenu.this.deleteFileItem.setEnabled(false);
+
+							TabAreaContextMenu.this.hideMenuRecordSetItem.setEnabled(false);
+							TabAreaContextMenu.this.hideMenuFileItem.setEnabled(false);
+						}
+						else {
+							final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
+							TabAreaContextMenu.this.fileName.setText(">> " + (tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$//$NON-NLS-2$
+									+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
+							TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
 						}
 						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
 						TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
@@ -155,7 +196,7 @@ public class TabAreaContextMenu {
 			}
 		});
 		if (!this.isCreated) {
-			if (type == TabMenuType.HISTOGRAPHICS) {
+			if (type == TabMenuType.HISTOGRAPHICS || type == TabMenuType.HISTOTABLE) {
 				{
 					this.fileName = new MenuItem(popupMenu, SWT.None);
 					this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -283,7 +324,7 @@ public class TabAreaContextMenu {
 				}
 			}
 
-			if (type == TabMenuType.GRAPHICS || type == TabMenuType.HISTOGRAPHICS) { // -1 as index mean initialization phase
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.HISTOGRAPHICS || type == TabMenuType.HISTOTABLE) { // -1 as index mean initialization phase
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
 				this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
@@ -331,7 +372,7 @@ public class TabAreaContextMenu {
 				}
 			});
 
-			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type == TabMenuType.HISTOGRAPHICS) {
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type == TabMenuType.HISTOGRAPHICS || type == TabMenuType.HISTOTABLE) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {

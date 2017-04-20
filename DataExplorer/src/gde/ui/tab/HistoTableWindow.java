@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,12 +54,14 @@ import gde.data.Channels;
 import gde.data.HistoSet;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
+import gde.data.TrailRecordSet.DataTag;
 import gde.data.TrailRecordSet.DisplayTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
 import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
@@ -261,6 +264,24 @@ public class HistoTableWindow extends CTabItem {
 				if (HistoTableWindow.this.cursor.getRow() != null) {
 					updateVector(HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()), HistoTableWindow.this.dataTable.getTopIndex());
 				}
+
+				TrailRecordSet trailRecordSet = Channels.getInstance().getActiveChannel() != null ? trailRecordSet = HistoSet.getInstance().getTrailRecordSet() : null;
+				int rowNumber = HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()); // 0-based
+				int columnNumber = HistoTableWindow.this.cursor.getColumn(); // 0-based
+				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "row=" + rowNumber + "  column=" + columnNumber); //$NON-NLS-1$ //$NON-NLS-2$
+				if (HistoTableWindow.this.dataTable.getColumnCount() <= 2 || columnNumber < 2 || trailRecordSet == null || trailRecordSet.isEmpty()) {
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), null);
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+				}
+				else {
+					final Map<DataTag, String> dataTags = trailRecordSet.getDataTags(columnNumber - 2);
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+				}
+				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), HistoSet.getInstance().getExcludedTrussesAsText());
+				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$ 
 			}
 		});
 
