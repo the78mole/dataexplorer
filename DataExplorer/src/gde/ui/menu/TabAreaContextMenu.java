@@ -18,7 +18,9 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
@@ -75,10 +77,10 @@ public class TabAreaContextMenu {
 	MenuItem										setDigitalFontItem;
 	boolean											isCreated		= false;
 
-	private MenuItem						fileName, openRecordSetItem, hideItem;
+	private MenuItem						fileName, openRecordSetItem, deleteFileItem, openFolderItem, hideItem;
 	private Menu								hideMenu;
 	private MenuItem						hideMenuRecordSetItem, hideMenuFileItem, hideMenuRevokeItem;
-	private MenuItem						suppressModeItem, deleteFileItem;
+	private MenuItem						suppressModeItem;
 
 	public enum TabMenuType {
 		GRAPHICS, COMPARE, UTILITY, HISTOGRAPHICS, HISTOTABLE, SIMPLE, TABLE, DIGITAL
@@ -124,11 +126,14 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.fileName.setEnabled(false);
 							TabAreaContextMenu.this.openRecordSetItem.setEnabled(false);
 							TabAreaContextMenu.this.deleteFileItem.setEnabled(false);
+							TabAreaContextMenu.this.openFolderItem.setEnabled(false);
 
 							TabAreaContextMenu.this.hideMenuRecordSetItem.setEnabled(false);
 							TabAreaContextMenu.this.hideMenuFileItem.setEnabled(false);
 						}
 						else {
+							TabAreaContextMenu.this.openFolderItem.setEnabled(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN));
+
 							final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
 							TabAreaContextMenu.this.fileName.setText(">> " + (tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$//$NON-NLS-2$
 									+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -170,11 +175,14 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.fileName.setEnabled(false);
 							TabAreaContextMenu.this.openRecordSetItem.setEnabled(false);
 							TabAreaContextMenu.this.deleteFileItem.setEnabled(false);
+							TabAreaContextMenu.this.openFolderItem.setEnabled(false);
 
 							TabAreaContextMenu.this.hideMenuRecordSetItem.setEnabled(false);
 							TabAreaContextMenu.this.hideMenuFileItem.setEnabled(false);
 						}
 						else {
+							TabAreaContextMenu.this.openFolderItem.setEnabled(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN));
+
 							final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
 							TabAreaContextMenu.this.fileName.setText(">> " + (tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$//$NON-NLS-2$
 									+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -242,6 +250,25 @@ public class TabAreaContextMenu {
 								FileUtils.deleteFile(file.getPath());
 
 								TabAreaContextMenu.this.application.setupHistoWindows();
+							}
+						}
+					});
+				}
+				{
+					this.openFolderItem = new MenuItem(popupMenu, SWT.PUSH);
+					this.openFolderItem.setText(Messages.getString(MessageIds.GDE_MSGT0873));
+					this.openFolderItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0874));
+					this.openFolderItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openFolderItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (Desktop.isDesktopSupported()) {
+								try {
+									Desktop.getDesktop().open(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent().toFile());
+								}
+								catch (IOException e) {
+									DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0065));
+								}
 							}
 						}
 					});
@@ -477,6 +504,7 @@ public class TabAreaContextMenu {
 		if (this.fileName != null) this.fileName.setEnabled(enabled);
 		if (this.openRecordSetItem != null) this.openRecordSetItem.setEnabled(enabled);
 		if (this.deleteFileItem != null) this.deleteFileItem.setEnabled(enabled);
+		if (this.openFolderItem != null) this.openFolderItem.setEnabled(enabled);
 		if (this.hideItem != null) this.hideItem.setEnabled(enabled);
 		if (this.hideMenuRecordSetItem != null) this.hideMenuRecordSetItem.setEnabled(enabled);
 		if (this.hideMenuFileItem != null) this.hideMenuFileItem.setEnabled(enabled);
