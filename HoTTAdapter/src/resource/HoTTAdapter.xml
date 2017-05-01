@@ -112,7 +112,7 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <suppressQuantiles>true</suppressQuantiles>
                 <label>lable_voltage_rx_min</label>
             </Measurement>
             <Settlements/>
@@ -361,6 +361,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+				<suppressQuantiles>true</suppressQuantiles>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -369,6 +370,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+				<suppressQuantiles>true</suppressQuantiles>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -423,7 +425,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+				<suppressQuantiles>true</suppressQuantiles>
                 <label>label_azimuth</label>
             </Measurement>
             <Measurement>
@@ -432,7 +434,7 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <suppressQuantiles>true</suppressQuantiles>
                 <label>label_trip</label>
             </Measurement>
             <Measurement>
