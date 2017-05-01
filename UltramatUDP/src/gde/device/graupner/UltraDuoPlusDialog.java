@@ -1506,7 +1506,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "graphicsDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
 												UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-												int[] points = new int[UltraDuoPlusDialog.this.device.getMeasurementNames(UltraDuoPlusDialog.this.channelSelectionIndex).length];
+												int[] points = new int[UltraDuoPlusDialog.this.device.getNumberOfMeasurements(UltraDuoPlusDialog.this.channelSelectionIndex)];
 												final byte[][] graphicsData = new byte[3][];
 												UltraDuoPlusDialog.this.serialPort.readGraphicsData(graphicsData, UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this);
 

@@ -489,10 +489,29 @@ public interface IDevice {
 	public String[] getMeasurementNames(int channelConfigNumber);
 
 	/**
+	 * @return the sorted measurement names with replaced keys
+	 */
+	public String[] getMeasurementNamesReplacements(int channelConfigNumber);
+
+	/**
 	 * @return the sorted measurement names
 	 */
 	@Deprecated
 	public String[] getMeasurementNames(String channelConfigKey);
+
+	/**
+	 * get name of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementName(int channelConfigNumber, int measurementOrdinal);
+
+	/**
+	 * get replacement name of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementNameReplacement(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * set new name of specified measurement
@@ -576,6 +595,13 @@ public interface IDevice {
 	 */
 	@Deprecated
 	public void setMeasurementSymbol(String channelConfigKey, int measurementOrdinal, String symbol);
+
+	/**
+	 * get replacement name of specified measurement label
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementLabelReplacement(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * get the statistics type of the specified measurement
@@ -738,6 +764,12 @@ public interface IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName();
+
+	/**
+	 * query the state name used as record set name
+	 * @return getRecordSetStateName
+	 */
+	public String getRecordSetStateName(final int stateNumber);
 
 	/**
 	 * load the mapping exist between lov file configuration keys and GDE keys

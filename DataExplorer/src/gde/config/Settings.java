@@ -502,10 +502,10 @@ public class Settings extends Properties {
 				for (String plugin : plugins) {
 					if (existCheck) {
 						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
-							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555);
+							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 					else {
-						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555);
+						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 				}
 			}

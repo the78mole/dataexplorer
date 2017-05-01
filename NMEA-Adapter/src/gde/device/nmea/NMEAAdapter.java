@@ -46,6 +46,7 @@ import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
@@ -367,14 +368,13 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		MeasurementType measurement;
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
 			measurement = this.getMeasurement(channelConfigNumber, i);
 			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+				log.log(Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {

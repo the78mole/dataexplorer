@@ -28,6 +28,7 @@ import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
@@ -1254,13 +1255,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		Record record;
 		MeasurementType measurement;
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
 			measurement = this.getMeasurement(channelConfigNumber, i);
-			if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+			if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {

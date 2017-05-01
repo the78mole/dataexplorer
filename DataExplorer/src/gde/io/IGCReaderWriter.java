@@ -58,10 +58,10 @@ import gde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class IGCReaderWriter {
-	static Logger								log					= Logger.getLogger(IGCReaderWriter.class.getName());
+	static Logger										log						= Logger.getLogger(IGCReaderWriter.class.getName());
 
-	final static DataExplorer		application	= DataExplorer.getInstance();
-	final static Channels				channels		= Channels.getInstance();
+	final static DataExplorer				application		= DataExplorer.getInstance();
+	final static Channels						channels			= Channels.getInstance();
 
 	final public static char[]	igcShortDate			= new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
 			'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
@@ -131,7 +131,7 @@ public class IGCReaderWriter {
 		String date = "000000", time; //16 02 40
 		int hour, minute, second;
 		int latitude, longitude, altitude, height;
-		int values[] = new int[device.getMeasurementNames(1).length-1];
+		int values[] = new int[device.getNumberOfMeasurements(1)-1];
 		File inputFile = new File(filePath);
 		boolean isGsentence = false;
 		String dllID = "XXX";
@@ -226,7 +226,7 @@ public class IGCReaderWriter {
 						}
 
 						try {
-							recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
+							recordSetNameExtend = device.getRecordSetStateName(0); // state name
 							if (recordNameExtend.length() > 0) {
 								recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 							}

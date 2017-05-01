@@ -114,7 +114,7 @@ public class AkkuMonitorParser extends DataParser {
 						this.values[i] = Integer.parseInt(strValue) * 1000; 
 						break;
 					case DATE_TIME:
-						System.out.println(strValue);
+						//System.out.println(strValue);
 						String[] tmpValues = strValue.split(GDE.STRING_COLON);
 						if (tmpValues.length == 2) { //: contained
 							this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S

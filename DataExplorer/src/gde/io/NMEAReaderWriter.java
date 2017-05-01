@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.io;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -35,19 +48,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Vector;
-import java.util.logging.Logger;
-
 /**
  * Class to read and write comma separated value files which simulates serial data 
  * one data line consist of $1;1;0; 14780;  598;  1000;  8838;.....;0002;
@@ -56,15 +56,15 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class NMEAReaderWriter {
-	static Logger							log					= Logger.getLogger(NMEAReaderWriter.class.getName());
+	static Logger										log					= Logger.getLogger(NMEAReaderWriter.class.getName());
 
-	static String							lineSep			= GDE.LINE_SEPARATOR;
-	static DecimalFormat			df3					= new DecimalFormat("0.000");												//$NON-NLS-1$
-	static StringBuffer				sb;
-	static String							tmpSetupString;
+	static String										lineSep			= GDE.LINE_SEPARATOR;
+	static DecimalFormat						df3					= new DecimalFormat("0.000");													//$NON-NLS-1$
+	static StringBuffer							sb;
+	static String										tmpSetupString;
 
-	final static DataExplorer	application	= DataExplorer.getInstance();
-	final static Channels			channels		= Channels.getInstance();
+	final static DataExplorer				application	= DataExplorer.getInstance();
+	final static Channels						channels		= Channels.getInstance();
 
 	/**
 	 * read the selected NMEA file and read/parse
@@ -215,7 +215,7 @@ public class NMEAReaderWriter {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
 
 					try {
-						recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
+						recordSetNameExtend = device.getRecordSetStateName(0); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}

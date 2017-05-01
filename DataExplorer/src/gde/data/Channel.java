@@ -18,6 +18,15 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+
 import gde.GDE;
 import gde.config.GraphicsTemplate;
 import gde.config.Settings;
@@ -29,15 +38,6 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 
 /**
  * Channel class represents on channel (Ausgang 1, Ausgang 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
@@ -80,7 +80,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.parent = Channels.getInstance(this.application);
 		this.number = this.parent.size() + 1;
 		this.channelConfigName = useChannelConfigName;
-		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + useChannelConfigName;
+		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + this.channelConfigName;
 		this.type = channelType;
 		
 		String templateFileName = this.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + this.name.split(GDE.STRING_COLON)[0].trim();
@@ -95,13 +95,14 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param channelType
 	 * @param newRecordSet
 	 */
+	@Deprecated
 	public Channel(String useChannelConfigName, ChannelTypes channelType, RecordSet newRecordSet) {
 		super(1);
 		this.application = DataExplorer.getInstance();
 		this.parent = Channels.getInstance(this.application);
 		this.number = this.parent.size() + 1;
 		this.channelConfigName = useChannelConfigName;
-		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + useChannelConfigName;
+		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + this.channelConfigName;
 		this.type = channelType;
 		this.put(newRecordSet.getName(), newRecordSet);
 

@@ -43,6 +43,7 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
@@ -423,10 +424,8 @@ public class S32 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
 		Record record;
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		//0=Spannung BEC, 1=Strom BEC, 2=Spannung, 3=Strom, 4=Strom intern, 5=Leerlauf, 6=PWM, 7=Drehzahl Uni, 8=Drehzahl, 9=Kapazität, 
 		//10=Temperatur PA, 11=Temperatur BEC, 12=Leistung, 13=Leistung intern, 14=Strom BEC max, 15=Strom Motor max, 
 		//16=ALARM: Kapazität, 17=ALARM: Spannung, 18=ALARM: Temp PA, 19=ALARM: Spg BEC drop, 
@@ -438,7 +437,7 @@ public class S32 extends DeviceConfiguration implements IDevice {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
 			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+				log.log(Level.FINE, record.getName() + " = " + this.getMeasurementNameReplacement(recordSet.getChannelConfigNumber(), i)); //$NON-NLS-1$
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
@@ -570,7 +569,7 @@ public class S32 extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public String getProcessName(byte[] buffer) {
-		return this.getStateProperty(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1]))).getName();
+		return this.getRecordSetStateName(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1])));
 	}
 
 	/**

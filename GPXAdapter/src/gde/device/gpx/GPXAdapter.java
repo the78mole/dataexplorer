@@ -53,10 +53,12 @@ import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -265,7 +267,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		}
 		catch (Exception e) {
 			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
-			GPXAdapter.log.log(java.util.logging.Level.WARNING, msg, e);
+			log.log(Level.WARNING, msg, e);
 			this.application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
 		}
@@ -314,10 +316,10 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		GPXAdapter.log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 
 		for (int i = 0; i < recordDataSize; i++) {
-			GPXAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
@@ -376,7 +378,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			GPXAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -416,7 +418,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		else {
 			newValue = (value - reduction) * factor + offset;
 		}
-		GPXAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -455,7 +457,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		else {
 			newValue = (value - offset) / factor + reduction;
 		}
-		GPXAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -469,28 +471,29 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
 		Record record;
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			if (GPXAdapter.log.isLoggable(java.util.logging.Level.FINE)) GPXAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) 
+				log.log(Level.FINE, record.getName() + " = " + this.getMeasurementNameReplacement(recordSet.getChannelConfigNumber(), i)); //$NON-NLS-1$
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				if (GPXAdapter.log.isLoggable(java.util.logging.Level.FINE))
-					GPXAdapter.log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				if (GPXAdapter.log.isLoggable(java.util.logging.Level.FINE)) GPXAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) 
+					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		if (GPXAdapter.log.isLoggable(java.util.logging.Level.FINER)) GPXAdapter.log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) 
+			log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
@@ -539,7 +542,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 					GPXAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						GPXAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
@@ -548,7 +551,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 								GPXDataReaderWriter.read(selectedImportFile, GPXAdapter.this, recordNameExtend, channelConfigNumber);
 							}
 							catch (Throwable e) {
-								GPXAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+								log.log(Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
@@ -618,7 +621,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					GPXAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -628,7 +631,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					GPXAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -638,7 +641,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					GPXAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
@@ -759,7 +762,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					GPXAdapter.log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();
 				}
 			});

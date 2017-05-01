@@ -84,8 +84,8 @@ public class GathererThread extends Thread {
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 		RecordSet recordSet1 = null, recordSet2 = null;
-		int[] points1 = new int[this.device.getMeasurementNames(this.channelNumber).length];
-		int[] points2 = new int[this.device.getMeasurementNames(this.channelNumber).length];
+		int[] points1 = new int[this.device.getNumberOfMeasurements(this.channelNumber)];
+		int[] points2 = new int[this.device.getNumberOfMeasurements(this.channelNumber)];
 		boolean isProgrammExecuting1 = false, isProgrammExecuting2 = false;
 		long startCycleTime1 = 0, startCycleTime2 = 0;
 		long timeStep1 = 0, timeStep2 = 0;

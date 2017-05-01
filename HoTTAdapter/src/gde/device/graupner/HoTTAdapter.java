@@ -60,6 +60,7 @@ import gde.device.IHistoDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.histocache.HistoVault;
@@ -1093,12 +1094,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		boolean configChanged = this.isChangePropery();
 		Record record;
 
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
 			if (record.isActive() != measurement.isActive()) {

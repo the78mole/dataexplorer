@@ -18,22 +18,6 @@
 ****************************************************************************************/
 package gde.device.gpx;
 
-import gde.GDE;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.MeasurementType;
-import gde.exception.DataInconsitsentException;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.menu.MenuToolBar;
-import gde.utils.StringHelper;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -52,19 +36,35 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import gde.GDE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
+import gde.exception.DataInconsitsentException;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.menu.MenuToolBar;
+import gde.utils.StringHelper;
+
 /**
  * Class to read and write geo points exchange format data 
  * @author Winfried Brügmann
  */
 public class GPXDataReaderWriter {
-	static Logger							log					= Logger.getLogger(GPXDataReaderWriter.class.getName());
+	static Logger										log					= Logger.getLogger(GPXDataReaderWriter.class.getName());
 
-	static String							lineSep			= GDE.LINE_SEPARATOR;
-	static DecimalFormat			df3					= new DecimalFormat("0.000");														//$NON-NLS-1$
-	static StringBuffer				sb;
+	static String										lineSep			= GDE.LINE_SEPARATOR;
+	static DecimalFormat						df3					= new DecimalFormat("0.000");														//$NON-NLS-1$
+	static StringBuffer							sb;
 
-	final static DataExplorer	application	= DataExplorer.getInstance();
-	final static Channels			channels		= Channels.getInstance();
+	final static DataExplorer				application	= DataExplorer.getInstance();
+	final static Channels						channels		= Channels.getInstance();
 
 	/**
 	 * read GPS exchange format track point and extension data
@@ -176,7 +176,7 @@ public class GPXDataReaderWriter {
 			final Map<String, String>	tmpPoints								= new LinkedHashMap<String, String>();
 			final Vector<String>			extensionNames					= new Vector<String>();
 			String										extensionName						= GDE.STRING_EMPTY;
-			int[]											points									= new int[device.getMeasurementNames(activeChannel.getNumber()).length];
+			int[]											points									= new int[device.getNumberOfMeasurements(activeChannel.getNumber())];
 			int												pointsIndex							= 0;
 			RecordSet									activeRecordSet;
 			String 										recordSetDescription 		= GDE.STRING_EMPTY;
@@ -270,7 +270,7 @@ public class GPXDataReaderWriter {
 							Vector<String> vecRecordNames = new Vector<String>();
 							//add the 4 always contained records
 							for (int i = 0; i < 4; i++) {
-								vecRecordNames.add(device.getMeasurementNames(activeChannel.getNumber())[i]);
+								vecRecordNames.add(device.getMeasurementNamesReplacements(activeChannel.getNumber())[i]);
 							}
 							//ad records from extension declaration
 							for (String tmpExtensionName : this.extensionNames) {

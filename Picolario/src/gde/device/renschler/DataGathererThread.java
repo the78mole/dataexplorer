@@ -73,7 +73,7 @@ public class DataGathererThread extends Thread {
 		try {
 			DataGathererThread.log.log(Level.FINE, "entry data gatherer"); //$NON-NLS-1$
 			Channel channel = Channels.getInstance().getActiveChannel();
-			String[] measurements = this.device.getMeasurementNames(channel.getNumber()); // 0=Spannung, 1=Höhe, 2=Steigrate
+			String[] measurements = this.device.getMeasurementNamesReplacements(channel.getNumber()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
 
 			this.dialog.resetDataSetsLabel();

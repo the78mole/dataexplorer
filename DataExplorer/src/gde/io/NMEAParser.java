@@ -325,7 +325,7 @@ public class NMEAParser implements IDataParser {
 			case SETUP1:// setup Multiplex FlightRecorder - time and addresses
 				//$SETUP1;Time;;; A:02;;;;;;; A:09; A:10; A:11;
 				//GPGGA	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
-				for (int i = 4, j = 2; i < this.device.getMeasurementNames(channelConfigNumber).length; i++, j++) {
+				for (int i = 4, j = 2; i < this.device.getNumberOfMeasurements(channelConfigNumber); i++, j++) {
 					if (j < strValues.length && strValues[j].trim().length() > 0) {
 						String name = strValues[j].trim();//$NON-NLS-1$
 						this.device.setMeasurementName(channelConfigNumber, i, StringHelper.transfer(new String(name.getBytes("ISO-8859-1"), "UTF-8")));
@@ -338,7 +338,7 @@ public class NMEAParser implements IDataParser {
 			case SETUP2:// setup Multiplex FlightRecorder
 				//$SETUP2;sec ;;;   °C;;;;;;; km/h;    m;    m;
 				//GPGGA	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
-				for (int i = 4, j = 2; i < this.device.getMeasurementNames(channelConfigNumber).length; i++, j++) {
+				for (int i = 4, j = 2; i < this.device.getNumberOfMeasurements(channelConfigNumber); i++, j++) {
 					if (j < strValues.length &&  strValues[j].trim().length() > 0) {
 						String unit = strValues[j].trim();
 						this.device.setMeasurementUnit(channelConfigNumber, i, StringHelper.transfer(new String(unit.getBytes("ISO-8859-1"), "UTF-8")));
@@ -349,8 +349,8 @@ public class NMEAParser implements IDataParser {
 				}
 				if (log.isLoggable(Level.FINE)) {
 					StringBuilder sb = new StringBuilder();
-					String [] names = this.device.getMeasurementNames(channelConfigNumber);
-					for (int i = 0; i < names.length; i++) {
+					String [] names = this.device.getMeasurementNamesReplacements(channelConfigNumber);
+					for (int i = 0; i < this.device.getNumberOfMeasurements(channelConfigNumber); i++) {
 						sb.append(String.format("\n%s %s", names[i], this.device.getMeasurementUnit(channelConfigNumber, i)));
 					}
 					log.log(Level.OFF, sb.toString());

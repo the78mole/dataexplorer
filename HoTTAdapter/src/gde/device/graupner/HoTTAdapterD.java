@@ -41,6 +41,7 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.io.FileHandler;
@@ -1001,13 +1002,12 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 		boolean configChanged = this.isChangePropery();
 		Record record;
 
-		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
 			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+				log.log(Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);

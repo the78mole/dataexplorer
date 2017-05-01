@@ -78,7 +78,7 @@ public class GPXAdapterDialog extends DeviceDialog {
 		super(parent);
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
-		this.measurementsCount = this.device.getMeasurementNames(1).length;
+		this.measurementsCount = this.device.getNumberOfMeasurements(1);
 	}
 
 	@Override

@@ -265,7 +265,7 @@ public class CSVReaderWriter {
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				String[] tmpRecordNames	=	fileHeader.get(GDE.CSV_DATA_HEADER_MEASUREMENTS).split(GDE.STRING_SEMICOLON);
 				String[] tmpRecordUnits = fileHeader.get(GDE.CSV_DATA_HEADER_UNITS).split(GDE.STRING_SEMICOLON);
-				String[] recordNames = isRaw ? device.getMeasurementNames(activeChannel.getNumber()) : new String[tmpRecordNames.length];
+				String[] recordNames = isRaw ? device.getMeasurementNamesReplacements(activeChannel.getNumber()) : new String[tmpRecordNames.length];
 				String[] recordSymbols = new String[recordNames.length];
 				String[] recordUnits = new String[recordNames.length];
 				for (int i=0, j=0; isRaw ? i < recordNames.length : i < tmpRecordNames.length; i++) {

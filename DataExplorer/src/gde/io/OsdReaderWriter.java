@@ -410,9 +410,17 @@ public class OsdReaderWriter {
 		// check if the file content fits measurements form device properties XML which was used to create the record set
 		for (int i = 0; i < recordKeys.length; ++i) {
 			Record record = recordSet.get(recordKeys[i]);
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]);
-			record.setSerializedProperties(recordsProperties[i]);
-			record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
+			if (record != null) {
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]);
+				record.setSerializedProperties(recordsProperties[i]);
+				record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
+			}
+			else { //possible errors during language keys exchange, check device XML and DeviveXmlResources.properties
+				log.log(Level.WARNING, String.format("After cross checking initial recordSet names with recordsProperties a record with name %s could not be found!", recordKeys[i]));
+				for (int j = 0; j < recordKeys.length; j++) {
+					log.log(Level.WARNING, String.format("%20s - %s", recordKeys[j], recordsProperties[j].subSequence(6, recordsProperties[j].indexOf('|'))));
+				}
+			}
 		}
 		recordSet.setDeserializedProperties(recordSetProperties);
 		recordSet.setSaved(true);

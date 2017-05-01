@@ -62,6 +62,7 @@ import gde.data.RecordSet;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.device.resource.DeviceXmlResource;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -88,6 +89,7 @@ public class DataTableWindow extends CTabItem {
 	final DataExplorer					application;
 	final Channels							channels;
 	final Settings							settings;
+	final DeviceXmlResource			xmlResource								= DeviceXmlResource.getInstance();
 	final CTabFolder						tabFolder;
 	final Menu									popupmenu;
 	final TabAreaContextMenu		contextMenu;
@@ -485,11 +487,10 @@ public class DataTableWindow extends CTabItem {
 			}
 			else {
 				IDevice device = this.application.getActiveDevice();
-				String[] measurements = device.getMeasurementNames(activeChannel.getNumber());
-				for (int i = 0; i < measurements.length; i++) {
+				for (int i = 0; i < device.getNumberOfMeasurements(activeChannel.getNumber()); i++) {
 					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
 					StringBuilder sb = new StringBuilder();
-					sb.append(measurement.getName()).append(GDE.STRING_BLANK).append(GDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+					sb.append(xmlResource.getReplacement(measurement.getName().trim())).append(GDE.STRING_BLANK).append(GDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());

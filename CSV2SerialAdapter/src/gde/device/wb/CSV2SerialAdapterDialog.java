@@ -75,7 +75,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
 		for (int i = 1; i <= this.device.getChannelCount(); i++) {
-			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
+			int actualMeasurementCount = this.device.getNumberOfMeasurements(i);
 			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
 		}
 	}

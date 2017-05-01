@@ -50,6 +50,7 @@ import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.resource.DeviceXmlResource;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -67,6 +68,7 @@ public class DeviceConfiguration {
 	private final static Logger								log												= Logger.getLogger(DeviceConfiguration.class.getName());
 
 	private final Settings										settings;
+	final DeviceXmlResource										xmlResource								= DeviceXmlResource.getInstance();
 
 	// JAXB XML environment
 	private final Unmarshaller								unmarshaller;
@@ -185,7 +187,7 @@ public class DeviceConfiguration {
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
-
+		
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
@@ -212,7 +214,7 @@ public class DeviceConfiguration {
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
-
+		
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
@@ -1265,7 +1267,7 @@ public class DeviceConfiguration {
 	 * @return the channel name
 	 */
 	public String getChannelName(int channelNumber) {
-		return this.deviceProps.getChannels().channel.get(channelNumber - 1).getName();
+		return xmlResource.getReplacement(this.deviceProps.getChannels().channel.get(channelNumber - 1).getName());
 	}
 
 	/**
@@ -1331,7 +1333,13 @@ public class DeviceConfiguration {
 	 * @return the channel measurements by given channel configuration key (name)
 	 */
 	public List<MeasurementType> getChannelMeasuremts(int channelConfigNumber) {
-		return this.getChannel(channelConfigNumber).getMeasurement();
+		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigNumber).getMeasurement();
+		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
+		while (ite.hasNext()) {
+			MeasurementType measurementType = (MeasurementType) ite.next();
+			measurementType.name = xmlResource.getReplacement(measurementType.name);
+		}
+		return tmpMeasurements;
 	}
 
 	/**
@@ -1339,7 +1347,13 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey) {
-		return this.getChannel(channelConfigKey).getMeasurement();
+		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigKey).getMeasurement();
+		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
+		while (ite.hasNext()) {
+			MeasurementType measurementType = (MeasurementType) ite.next();
+			measurementType.name = xmlResource.getReplacement(measurementType.name);
+		}
+		return tmpMeasurements;
 	}
 
 	/**
@@ -1542,6 +1556,24 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * get name of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementName(int channelConfigNumber, int measurementOrdinal) {
+		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getName();
+	}
+
+	/**
+	 * get replacement name of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementNameReplacement(int channelConfigNumber, int measurementOrdinal) {
+		return xmlResource.getReplacement(this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());
+	}
+
+	/**
 	 * set new name of specified measurement
 	 * @param channelConfigNumber
 	 * @param measurementOrdinal
@@ -1662,6 +1694,16 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * get replacement name of specified measurement label
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementLabelReplacement(int channelConfigNumber, int measurementOrdinal) {
+		final String key = this.getMeasurement(channelConfigNumber, measurementOrdinal).getLabel();
+		return key != null ? xmlResource.getReplacement(key) : "";
+	}
+
+	/**
 	 * get the statistics type of the specified measurement
 	 * @param channelConfigNumber
 	 * @param measurementOrdinal
@@ -1737,6 +1779,13 @@ public class DeviceConfiguration {
 	/**
 	 * @return the sorted measurement names
 	 */
+	public String[] getMeasurementNamesReplacements(int channelConfigNumber) {
+		return xmlResource.getReplacements(this.getMeasurementNames(channelConfigNumber));
+	}
+
+	/**
+	 * @return the sorted measurement names
+	 */
 	@Deprecated
 	public String[] getMeasurementNames(String channelConfigKey) {
 		StringBuilder sb = new StringBuilder();
@@ -1747,7 +1796,7 @@ public class DeviceConfiguration {
 				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		return sb.toString().length() > 1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
+		return sb.toString().length() > 1 ? xmlResource.getReplacements(sb.toString().split(GDE.STRING_SEMICOLON)) : new String[0];
 	}
 
 	/**
@@ -2276,8 +2325,17 @@ public class DeviceConfiguration {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + this.getStateType().getProperty().get(0).getName() : Messages.getString(MessageIds.GDE_MSGT0272)
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + xmlResource.getReplacement(this.getStateType().getProperty().get(0).getName()) : Messages.getString(MessageIds.GDE_MSGT0272)
 				: Messages.getString(MessageIds.GDE_MSGT0272);
+	}
+
+	/**
+	 * query the state name used as record set name
+	 * @return getRecordSetStateName
+	 */
+	public String getRecordSetStateName(final int stateNumber) {
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateType().getProperty().get(stateNumber).getName()) : xmlResource.getReplacement("state_data_recording")
+				: xmlResource.getReplacement("state_data_recording");
 	}
 
 	/**

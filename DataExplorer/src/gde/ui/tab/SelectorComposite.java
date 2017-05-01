@@ -28,13 +28,19 @@ import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -61,7 +67,7 @@ public class SelectorComposite extends Composite {
 	final DataExplorer							application							= DataExplorer.getInstance();
 	final Channels									channels								= Channels.getInstance();
 	final SashForm									parent;
-	final GraphicsType												graphicsType;
+	final GraphicsType							graphicsType;
 	final String										headerText;
 	final Menu											popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
@@ -175,6 +181,75 @@ public class SelectorComposite extends Composite {
 					this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
 				}
 			}
+
+			final Listener labelListener = new Listener() {
+				public void handleEvent(Event event) {
+					Label label = (Label) event.widget;
+					Shell shell = label.getShell();
+					switch (event.type) {
+					case SWT.MouseDown:
+						Event e = new Event();
+						e.item = (TableItem) label.getData("_TABLEITEM");
+						// Assuming table is single select, set the selection as if
+						// the mouse down event went through to the table
+						curveSelectorTable.setSelection(new TableItem[] { (TableItem) e.item });
+						curveSelectorTable.notifyListeners(SWT.Selection, e);
+						shell.dispose();
+						curveSelectorTable.setFocus();
+						break;
+					case SWT.MouseExit:
+						shell.dispose();
+						break;
+					}
+				}
+			};
+
+			Listener tableListener = new Listener() {
+				Shell	toolTip		= null;
+				Label	label	= null;
+
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+					case SWT.KeyDown:
+					case SWT.MouseMove: {
+						if (toolTip == null) break;
+						toolTip.dispose();
+						toolTip = null;
+						label = null;
+						break;
+					}
+
+					case SWT.MouseHover: {
+						TableItem item = curveSelectorTable.getItem(new Point(event.x, event.y));
+
+						if (item != null) {
+							if (toolTip != null && !toolTip.isDisposed()) toolTip.dispose();
+							toolTip = new Shell(curveSelectorTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+							FillLayout layout = new FillLayout();
+							layout.marginWidth = 2;
+							toolTip.setLayout(layout);
+							Record record  = application.getActiveRecordSet().get(item.getText());
+							if (record != null && record.getDevice().getMeasurement(record.getParent().getChannelConfigNumber(), record.getOrdinal()).getLabel() != null) {
+								label = new Label(toolTip, SWT.NONE);
+								label.setData("_TABLEITEM", item);
+								label.setText(record.getDevice().getMeasurementLabelReplacement(record.getParent().getChannelConfigNumber(), record.getOrdinal()));
+								label.addListener(SWT.MouseExit, labelListener);
+								label.addListener(SWT.MouseDown, labelListener);
+							}
+							Point size = toolTip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+							Rectangle rect = item.getBounds(0);
+							Point pt = curveSelectorTable.toDisplay(rect.x, rect.y);
+							toolTip.setBounds(pt.x, pt.y, size.x, size.y);
+							toolTip.setVisible(true);
+						}
+					}
+					}
+				}
+			};
+
+			this.curveSelectorTable.addListener(SWT.MouseMove, tableListener);
+			this.curveSelectorTable.addListener(SWT.MouseHover, tableListener);
 		}
 	}
 

@@ -18,6 +18,22 @@
 ****************************************************************************************/
 package gde.device.jeti;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeSet;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import cz.vutbr.fit.gja.proj.utils.TelemetryData;
+import cz.vutbr.fit.gja.proj.utils.TelemetryData.TelemetrySensor;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -35,36 +51,19 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeSet;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import cz.vutbr.fit.gja.proj.utils.TelemetryData;
-import cz.vutbr.fit.gja.proj.utils.TelemetryData.TelemetrySensor;
-
 /**
  * Class to read Jeti sensor data using the TelemetryData class provided by Martin Falticko
  * @author Winfried Brügmann
  */
 public class JetiDataReader {
-	static Logger							log					= Logger.getLogger(CSVSerialDataReaderWriter.class.getName());
+	static Logger										log					= Logger.getLogger(CSVSerialDataReaderWriter.class.getName());
 
-	static String							lineSep			= GDE.LINE_SEPARATOR;
-	static DecimalFormat			df3					= new DecimalFormat("0.000");																	//$NON-NLS-1$
-	static StringBuffer				sb;
+	static String										lineSep			= GDE.LINE_SEPARATOR;
+	static DecimalFormat						df3					= new DecimalFormat("0.000");																	//$NON-NLS-1$
+	static StringBuffer							sb;
 
-	final static DataExplorer	application	= DataExplorer.getInstance();
-	final static Channels			channels		= Channels.getInstance();
+	final static DataExplorer				application	= DataExplorer.getInstance();
+	final static Channels						channels		= Channels.getInstance();
 
 	/**
 	 * read the selected CSV file and parse
@@ -156,7 +155,7 @@ public class JetiDataReader {
 					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
 
 					try {
-						recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
+						recordSetNameExtend = device.getRecordSetStateName(0); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
@@ -168,7 +167,6 @@ public class JetiDataReader {
 					//prepare new record set now
 					recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 
-					//String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
 					//adapt record names and units to current telemetry sensors
 					int index = 0;
 					Vector<String> vecRecordNames = new Vector<String>();
@@ -178,7 +176,7 @@ public class JetiDataReader {
 						if (telemetrySensor.getId() != 0) {
 							boolean isActualgps = false;
 							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-								String newRecordName = dataVar.getName();
+								String newRecordName = dataVar.getName().trim();
 								if (telemetrySensor.getName().startsWith("Rx")) {
 									newRecordName = String.format("%s %s", newRecordName.split(" Rx")[0], telemetrySensor.getName());
 								}
@@ -219,7 +217,7 @@ public class JetiDataReader {
 					for (TelemetrySensor telemetrySensor : recordSetData) {
 						if (telemetrySensor.getId() == 0) {
 							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-								String newRecordName = dataVar.getName();
+								String newRecordName = dataVar.getName().trim();
 								while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
 									newRecordName = newRecordName + "'";
 								}
@@ -262,7 +260,7 @@ public class JetiDataReader {
 
 					index = 0;
 					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE))
-						JetiDataReader.log.log(java.util.logging.Level.FINE, device.getMeasurementNames(activeChannelConfigNumber).length + " - " + recordSet.size());
+						JetiDataReader.log.log(java.util.logging.Level.FINE, device.getNumberOfMeasurements(activeChannelConfigNumber) + " - " + recordSet.size());
 					int[] points = new int[recordNames.length];
 					for (int i = 0; i < numValues; i++) {
 						for (TelemetrySensor telemetrySensor : recordSetData) {

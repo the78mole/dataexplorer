@@ -87,9 +87,9 @@ public class PolaronGathererThread extends Thread {
 		RecordSet recordSet1 = null;
 		RecordSet recordSet2 = null;
 		RecordSet recordSet3 = null;
-		int[] points1 = new int[this.device.getMeasurementNames(1).length];
-		int[] points2 = new int[this.device.getMeasurementNames(2).length];
-		int[] points3 = new int[this.device.getMeasurementNames(3).length];
+		int[] points1 = new int[this.device.getNumberOfMeasurements(1)];
+		int[] points2 = new int[this.device.getNumberOfMeasurements(2)];
+		int[] points3 = new int[this.device.getNumberOfMeasurements(3)];
 		byte[] dataBuffer = null;
 
 		this.isProgrammExecuting1 = false;

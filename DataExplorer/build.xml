@@ -52,6 +52,7 @@
 		<copy todir="${module.output}">
 			<fileset dir="${basedir}/src/" includes="gde/resource/**/*" excludes="**/.cvsignore" />
 			<fileset dir="${basedir}/src/" includes="gde/messages/*.properties" />
+			<fileset dir="${basedir}/src/" includes="gde/device/resource/*.properties" />
 			<fileset dir="${basedir}/src/" includes="help/**/*" excludes="**/.cvsignore" />
 			<fileset dir="${basedir}/src/" includes="resource/*" excludes="**/.cvsignore" />
 			<fileset dir="${basedir}/src/" includes="META-INF/*" excludes="**/.cvsignore" />

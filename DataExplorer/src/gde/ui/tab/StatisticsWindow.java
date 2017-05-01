@@ -1,7 +1,28 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
+****************************************************************************************/
 package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
+
+import gde.log.Level;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,60 +56,61 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.StatisticsType;
-import gde.log.Level;
+import gde.device.resource.DeviceXmlResource;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.TimeLine;
 
 /**
  * class to represent statistics data according configuration in device properties XML file
  */
 public class StatisticsWindow extends CTabItem {
-	final static Logger	log													= Logger.getLogger(StatisticsWindow.class.getName());
+	final static Logger						log						= Logger.getLogger(StatisticsWindow.class.getName());
 
-	static final String	DELIMITER										= "!";																								//$NON-NLS-1$
-	static final String	NO_VALUE										= "    ---    ";																			//$NON-NLS-1$
+	static final String	DELIMITER	= "!"; //$NON-NLS-1$
+	static final String	NO_VALUE	= "    ---    "; //$NON-NLS-1$
 
-	Composite						composite;
-	Composite						filler;
-	Group								descriptionGroup;
-	Text								descriptionTextLabel;
-	CLabel							minLabel;
-	CLabel							maxLabel;
-	CLabel							avgLabel;
-	Table								dataTable;
-	TableColumn					measurementTableColumn;
-	TableColumn					unitTableColumn;
-	TableColumn					sigmaTableColumn;
-	TableColumn					customTableColumn;
-	int									customTableColumnWidth			= 0;
-	CLabel							sigmaLabel;
-	CLabel							extraLabel;
-	TableColumn					avgTableColumn;
-	TableColumn					maxTableColumn;
-	TableColumn					minTableColumn;
-
-	Menu								popupmenu;
-	TabAreaContextMenu	contextMenu;
-	Color								innerAreaBackground;
-	Color								surroundingBackground;
+	Composite											composite;
+	Composite											filler;
+	Group													descriptionGroup;
+	Text													descriptionTextLabel;
+	CLabel												minLabel;
+	CLabel												maxLabel;
+	CLabel												avgLabel;
+	Table													dataTable;
+	TableColumn										measurementTableColumn;
+	TableColumn										unitTableColumn;
+	TableColumn										sigmaTableColumn;
+	TableColumn										customTableColumn;
+	int														customTableColumnWidth = 0;
+	CLabel												sigmaLabel;
+	CLabel												extraLabel;
+	TableColumn										avgTableColumn;
+	TableColumn										maxTableColumn;
+	TableColumn										minTableColumn;
+	
+	Menu													popupmenu;
+	TabAreaContextMenu						contextMenu;
+	Color													innerAreaBackground;
+	Color													surroundingBackground;
 
 	// internal display variables
-	String							descriptionText							= "";																									//$NON-NLS-1$
-	Vector<String>			tabelItemText								= new Vector<String>();
+	String descriptionText = ""; //$NON-NLS-1$
+	Vector<String> tabelItemText = new Vector<String>();
 
-	final boolean				isWindows										= System.getProperty("os.name").startsWith("Windows");
-	final int						extentFactor								= 8;																									// factor to calculate column width
-	RecordSet						oldRecordSet								= null;
-	int									oldNumberDisplayableRecords	= 0;
-	final DataExplorer	application;
-	final Channels			channels;
-	final Settings			settings;
-	final CTabFolder		tabFolder;
+	final boolean									isWindows = System.getProperty("os.name").startsWith("Windows");
+	final int											extentFactor	= 8;																									// factor to calculate column width
+	RecordSet											oldRecordSet	= null;
+	int														oldNumberDisplayableRecords = 0;
+	final DataExplorer						application;
+	final Channels								channels;
+	final Settings								settings;
+	final CTabFolder							tabFolder;
+
+	final DeviceXmlResource				xmlResource		= DeviceXmlResource.getInstance();
 
 	public StatisticsWindow(CTabFolder currentDisplayTab, int style) {
 		super(currentDisplayTab, style);
@@ -97,9 +119,9 @@ public class StatisticsWindow extends CTabItem {
 		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0350));
-
+		
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
 		this.innerAreaBackground = this.settings.getStatisticsInnerAreaBackground();
@@ -112,7 +134,7 @@ public class StatisticsWindow extends CTabItem {
 			this.setControl(this.composite);
 			this.composite.setLayout(null);
 			this.composite.setBackground(this.surroundingBackground);
-			this.composite.setMenu(this.popupmenu);
+			this.composite.setMenu(this.popupmenu);			
 			this.composite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
@@ -122,11 +144,10 @@ public class StatisticsWindow extends CTabItem {
 			this.composite.addControlListener(new ControlListener() {
 				public void controlResized(ControlEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
-					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width - 20, 110);
-					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width - 15, StatisticsWindow.this.descriptionGroup.getClientArea().height - 10);
+					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
+					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
-
 				public void controlMoved(ControlEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
@@ -138,7 +159,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0351));
 				if (!GDE.IS_MAC) this.descriptionGroup.setBackground(this.innerAreaBackground);
-				this.descriptionGroup.setMenu(this.popupmenu);
+				this.descriptionGroup.setMenu(this.popupmenu);			
 				this.descriptionGroup.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
@@ -148,20 +169,20 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
-						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabMenuType.SIMPLE);
+						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
 						if (activeChannel != null) {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null) {
 								String tmpDescriptionText = StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
-										+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
-								if (StatisticsWindow.this.descriptionTextLabel != null && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
+									+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
+								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
 							}
 							else {
 								String tmpDescriptionText = GDE.STRING_EMPTY;
-								if (StatisticsWindow.this.descriptionTextLabel != null && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
+								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
 							}
@@ -176,7 +197,7 @@ public class StatisticsWindow extends CTabItem {
 					if (!GDE.IS_MAC)	this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
 					else							this.descriptionTextLabel.setBounds(5, 3,   this.descriptionGroup.getClientArea().width-10, this.descriptionGroup.getClientArea().height-10);
 					this.descriptionTextLabel.setEditable(false);
-					this.descriptionTextLabel.setMenu(this.popupmenu);
+					this.descriptionTextLabel.setMenu(this.popupmenu);			
 				}
 			}
 			{
@@ -186,7 +207,7 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				this.dataTable.setBackground(this.innerAreaBackground);
-				this.dataTable.setMenu(this.popupmenu);
+				this.dataTable.setMenu(this.popupmenu);			
 				this.dataTable.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
@@ -243,7 +264,7 @@ public class StatisticsWindow extends CTabItem {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * update statistics window display data
 	 */
@@ -256,7 +277,7 @@ public class StatisticsWindow extends CTabItem {
 			if (activeRecordSet != null && !activeRecordSet.isZoomMode() && activeRecordSet.getRecordDataSize(true) > 0 && (forceUpdate || !activeRecordSet.equals(oldRecordSet))) {
 				// cleanup old data table
 				this.dataTable.removeAll();
-
+				
 				this.customTableColumnWidth = 0;
 				try {
 					String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
@@ -293,11 +314,21 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMin()) {
 								if (isTriggerLevel)
-									sb.append(record.getFormattedStatisticsValue( record.getMinValueTriggered() / 1000.0));
-								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
-									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
+									sb.append(formatOutput(df.format(device.translateValue(record, record.getMinValueTriggered() / 1000.0))));
 								else
-									sb.append(NO_VALUE);
+									if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
+										if (device.isGPSCoordinates(record)) {
+											if (record.getUnit().endsWith("'")) {
+												sb.append(String.format("%2d %07.4f", record.getRealMinValue() / 1000000, record.getRealMinValue() % 1000000 / 10000.0));
+											}
+											else {
+												sb.append(String.format("%8.6f", record.getRealMinValue() / 1000000.0));
+											}
+										}
+										else
+											sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
+									else
+										sb.append(NO_VALUE);
 							}
 							else
 								sb.append(NO_VALUE);
@@ -305,20 +336,39 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isAvg())
 								if (isTriggerLevel)
-									sb.append(formatOutput(record.getFormattedStatisticsValue( record.getAvgValueTriggered() / 1000.0)));
+									sb.append(formatOutput(df.format(device.translateValue(record, record.getAvgValueTriggered() / 1000.0))));
 								else
-									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
+									if (device.isGPSCoordinates(record)) {
+										if (record.getUnit().endsWith("'")) {
+											sb.append(String.format("%2d %07.4f", record.getAvgValue() / 1000000, record.getAvgValue() % 1000000 / 10000.0));
+										}
+										else {
+											sb.append(String.format("%8.6f", record.getAvgValue() / 1000000.0));
+										}
+									}
+									else
+										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
 							else
 								sb.append(NO_VALUE);
 							sb.append(DELIMITER);
 
 							if (measurementStatistics.isMax()) {
 								if (isTriggerLevel)
-									sb.append(record.getFormattedStatisticsValue(record.getMaxValueTriggered() / 1000.0));
-								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
-									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
+									sb.append(formatOutput(df.format(device.translateValue(record, record.getMaxValueTriggered() / 1000.0))));
 								else
-									sb.append(NO_VALUE);
+									if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
+										if (device.isGPSCoordinates(record)) {
+											if (record.getUnit().endsWith("'")) {
+												sb.append(String.format("%2d %07.4f", record.getRealMaxValue() / 1000000, record.getRealMaxValue() % 1000000 / 10000.0));
+											}
+											else {
+												sb.append(String.format("%8.6f", record.getRealMaxValue() / 1000000.0));
+											}
+										}
+										else
+											sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
+									else
+										sb.append(NO_VALUE);
 							}
 							else
 								sb.append(NO_VALUE);
@@ -338,14 +388,14 @@ public class StatisticsWindow extends CTabItem {
 
 							// counted trigger events fulfilling the level and time constrains 
 							if (measurementStatistics.isCountByTrigger() != null) {
-								sb.append(measurementStatistics.getCountTriggerText()).append(" = ") //$NON-NLS-1$
-										.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append("; "); //$NON-NLS-1$
+								sb.append(xmlResource.getReplacement(measurementStatistics.getCountTriggerText())).append(" = ") //$NON-NLS-1$
+								.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append("; "); //$NON-NLS-1$
 							}
 
 							// evaluate sum value within trigger range
 							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
-									sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
+									sb.append(xmlResource.getReplacement(measurementStatistics.getSumTriggerText())).append(" = "); //$NON-NLS-1$
 									if (isTriggerLevel)
 										sb.append(String.format("%.1f", device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
 									else {
@@ -358,7 +408,7 @@ public class StatisticsWindow extends CTabItem {
 
 								// append ratio text + ratio value
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-									sb.append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
+									sb.append(xmlResource.getReplacement(measurementStatistics.getRatioText())).append(" = "); //$NON-NLS-1$
 									Record referencedRecord = activeRecordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
 									StatisticsType referencedStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), measurementStatistics.getRatioRefOrdinal());
 
@@ -380,12 +430,13 @@ public class StatisticsWindow extends CTabItem {
 							}
 
 							// append global comment
-							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-
+							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) 
+									sb.append("(").append(xmlResource.getReplacement(measurementStatistics.getComment())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+									
 							// append trigger + comment
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
-								sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : GDE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
+								sb.append("(").append(String.format(xmlResource.getReplacement(measurementStatistics.getTrigger().getComment()), measurementStatistics.getTrigger().getLevel()/1000.0, measurementStatistics.getTrigger().getMinTimeSec())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : GDE.STRING_EMPTY) + xmlResource.getReplacement(xmlResource.getReplacement(measurementStatistics.getSumTriggerTimeText())) + " = " + record.getTimeSumTriggeredRange());
 							}
 
 							GC displayGC = new GC(this.dataTable.getDisplay());
@@ -401,7 +452,7 @@ public class StatisticsWindow extends CTabItem {
 				catch (RuntimeException e) {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
-
+				
 				// set items (rows) of data table
 				TableItem row;
 				if (!this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer between header and table enties only
@@ -415,7 +466,7 @@ public class StatisticsWindow extends CTabItem {
 				}
 				this.oldRecordSet = activeRecordSet;
 			}
-			else if (activeRecordSet == null) {
+			else if (activeRecordSet == null) { 
 				if (oldRecordSet != null && this.tabelItemText.size() > 0) {
 					// cleanup old data table
 					this.dataTable.removeAll();
@@ -459,7 +510,7 @@ public class StatisticsWindow extends CTabItem {
 	 */
 	String formatOutput(String inDecimalString) {
 		String[] tmp = inDecimalString.replace('.', ';').replace(',', ';').split(";"); //$NON-NLS-1$
-		return tmp.length > 1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], ".0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return tmp.length>1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], ".0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -472,6 +523,7 @@ public class StatisticsWindow extends CTabItem {
 		// cleanup old data table
 		this.dataTable.removeAll();
 
+		
 		// set items (rows) of data table
 		TableItem row;
 		if (!this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer between header and table enties only
@@ -494,19 +546,19 @@ public class StatisticsWindow extends CTabItem {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
-		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width - 20, SWT.DEFAULT, true);
+		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "computed size = " + tableSize);
 		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
-		int tableHeight = tableSize.y + 150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height - 150;
+		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
 		tableHeight = tableHeight > 0 ? tableHeight : 0;
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
-		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width - 20, tableHeight);
-
+		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
+		
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
-
+	
 	/**
 	 * create statistics window content as formated string
 	 * 
@@ -537,13 +589,14 @@ public class StatisticsWindow extends CTabItem {
 		//table data
 		for (String tableText : this.tabelItemText) {
 			String[] itemsText = tableText.split(DELIMITER);
-			sb.append(String.format("%-18s %-15s %12s %12s %12s %12s      ", itemsText[0], itemsText[1], itemsText[2], itemsText[3], itemsText[4], itemsText[5]));
-			if (itemsText.length > 6) sb.append(itemsText[6]);
+			sb.append(String.format("%-18s %-15s %12s %12s %12s %12s      ", itemsText[0],itemsText[1],itemsText[2],itemsText[3],itemsText[4],itemsText[5]));
+			if (itemsText.length > 6)
+				sb.append(itemsText[6]);
 			sb.append(GDE.LINE_SEPARATOR);
 		}
 		return sb.toString();
 	}
-
+	
 	/**
 	 * create statistics window content as image
 	 * @return image with content

@@ -40,6 +40,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.TriggerType;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
@@ -173,6 +174,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final DataExplorer								application;																																																																						// pointer to main application
 	final Channels										channels;																																																																								// start point of data hierarchy
 	final IDevice											device;
+	final static DeviceXmlResource		xmlResource											= DeviceXmlResource.getInstance();
+
 
 	/**
 	 * record set data buffers according the size of given names array, where
@@ -245,7 +248,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			}
 			log.log(Level.FINER, "oldRecordNames = " + sb.toString()); //$NON-NLS-1$
 		}
-		String[] newRecordNames = this.device.getMeasurementNames(channelConfigurationNumber);
+		String[] newRecordNames = this.device.getMeasurementNamesReplacements(channelConfigurationNumber);
 		if (log.isLoggable(Level.FINER)) {
 			StringBuilder sb = new StringBuilder();
 			for (String string : newRecordNames) {
@@ -341,7 +344,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		this.channels = recordSet.channels;
 		this.parent = recordSet.parent;
 
-		this.recordNames = recordSet.recordNames.clone(); // copy record names without possible syncableName
+		this.recordNames = xmlResource.getReplacements(recordSet.recordNames.clone()); // copy record names without possible syncableName
 
 		// update child records
 		for (String recordKey : this.recordNames) {
@@ -880,10 +883,11 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-		String[] recordNames = device.getMeasurementNames(channelConfigNumber);
+		String[] recordNames = device.getMeasurementNamesReplacements(channelConfigNumber);
 		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
-			recordNames = device.getMeasurementNames(channelConfigNumber = 1);
+			recordNames = device.getMeasurementNamesReplacements(channelConfigNumber = 1);
 		}
+		
 		String[] recordSymbols = new String[recordNames.length];
 		String[] recordUnits = new String[recordNames.length];
 		for (int i = 0; i < recordNames.length; i++) {
@@ -913,6 +917,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
 			boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		
 		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1714,7 +1719,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
-		for (int i = 0; i < this.device.getMeasurementNames(this.parent.number).length && i < this.size(); ++i) {
+		for (int i = 0; i < this.device.getNumberOfMeasurements(this.parent.number) && i < this.size(); ++i) {
 			if (this.device.getMeasurement(this.parent.number, i).isCalculation()) {
 				this.get(i).resetMinMax();
 			}

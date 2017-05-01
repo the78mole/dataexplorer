@@ -93,7 +93,7 @@ public class CSVReaderWriter {
 			String[] headerDataMeasurements = line.split(GDE.STRING_EMPTY + separator);
 
 			StringBuilder sb = new StringBuilder();
-			String[] measurements = device.getMeasurementNames(application.getActiveChannelNumber());
+			String[] measurements = device.getMeasurementNamesReplacements(application.getActiveChannelNumber());
 			for (int i = 1, j = 0; i < headerDataMeasurements.length; i++) {
 				if (headerDataMeasurements[i].trim().length() > 3) {
 					if (!headerDataMeasurements[i].trim().equals(measurements[j]) && headerDataMeasurements[i].startsWith("MSB")) {

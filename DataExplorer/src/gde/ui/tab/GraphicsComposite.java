@@ -868,6 +868,7 @@ public class GraphicsComposite extends Composite {
 		boolean isDrawScaleInRecordColor = this.settings.isDrawScaleInRecordColor();
 		boolean isDrawNameInRecordColor = this.settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
+		recordSet.syncScaleOfSyncableRecords();
 		recordSet.updateSyncRecordScale();
 		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();

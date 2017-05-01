@@ -1,5 +1,16 @@
 package gde.device.weatronic;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -17,17 +28,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Vector;
-import java.util.logging.Logger;
 
 public class LogReader {
 	final static String								$CLASS_NAME					= LogReader.class.getName();
@@ -432,7 +432,7 @@ public class LogReader {
 				recordSymbols[i] = GDE.STRING_EMPTY; //measurement.getSymbol();
 				recordUnits[i] = measurement.getUnit();
 			}
-			String recordSetNameExtend = LogReader.device.getStateType().getProperty().get(0).getName(); // state name
+			String recordSetNameExtend = LogReader.device.getRecordSetStateName(0); // state name
 			String recordSetName = (LogReader.channels.getActiveChannel().size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 			LogReader.recordSet = RecordSet.createRecordSet(recordSetName, LogReader.device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, LogReader.device.getTimeStep_ms(), true, true, true);
 			LogReader.recordSet.getName(); // cut/correct length of recordSetName
@@ -445,7 +445,7 @@ public class LogReader {
 		}
 
 		private boolean isDuplicatedName(int ordinal, int channelConfigNumber, String name) {
-			String[] measurementNames = LogReader.device.getMeasurementNames(channelConfigNumber);
+			String[] measurementNames = LogReader.device.getMeasurementNamesReplacements(channelConfigNumber);
 			for (int i = 0; i < ordinal; i++) {
 				if (measurementNames[i].equals(name)) 
 					return true;
@@ -509,7 +509,7 @@ public class LogReader {
 			}
 
 			if (WeatronicAdapter.properties.get(name) != null) { //scale_sync_ref_ordinal
-				String[] measurementNames = LogReader.device.getMeasurementNames(channelConfig);
+				String[] measurementNames = LogReader.device.getMeasurementNamesReplacements(channelConfig);
 				int syncOrdinal = -1;
 				String syncName = (String) WeatronicAdapter.properties.get(name);
 				for (int i = 0; i < measurementNames.length; i++) {
@@ -559,7 +559,7 @@ public class LogReader {
 			gdeMeasurement.setOffset(measurement.getOffset());
 
 			if (WeatronicAdapter.properties.get(measurement.getName()) != null) { //scale_sync_ref_ordinal
-				String[] measurementNames = LogReader.device.getMeasurementNames(channelConfig);
+				String[] measurementNames = LogReader.device.getMeasurementNamesReplacements(channelConfig);
 				int syncOrdinal = -1;
 				String syncName = (String) WeatronicAdapter.properties.get(measurement.getName());
 				for (int i = 0; i < measurementNames.length; i++) {

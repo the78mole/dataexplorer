@@ -102,8 +102,8 @@ public class UsbGathererThread extends Thread {
 			final String $METHOD_NAME = "run"; //$NON-NLS-1$
 			RecordSet recordSet1 = null;
 			RecordSet recordSet2 = null;
-			int[] points1 = new int[this.device.getMeasurementNames(1).length];
-			int[] points2 = new int[this.device.getMeasurementNames(2).length];
+			int[] points1 = new int[this.device.getNumberOfMeasurements(1)];
+			int[] points2 = new int[this.device.getNumberOfMeasurements(2)];
 			int lastEnergie1, lastEnergie2;
 
 			this.isProgrammExecuting1 = false;
@@ -142,10 +142,10 @@ public class UsbGathererThread extends Thread {
 						// check if device is ready for data capturing, charge,discharge or pause only
 						if (this.isProgrammExecuting1 || this.isProgrammExecuting2) {
 							lastEnergie1 = points1[5];
-							points1 = new int[this.device.getMeasurementNames(1).length];
+							points1 = new int[this.device.getNumberOfMeasurements(1)];
 							
 							lastEnergie2 = points2[5];
-							points2 = new int[this.device.getMeasurementNames(2).length];
+							points2 = new int[this.device.getNumberOfMeasurements(2)];
 
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
 								points1[5] = lastEnergie1;
@@ -246,7 +246,7 @@ public class UsbGathererThread extends Thread {
 		String batterieType = this.device.getBattrieType(dataBuffer);
 		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE 8=TrickleCurrent 9=Balancing
 		int processModeNumber = dataBuffer[7];
-		String processTypeName = isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2618) : this.device.getStateProperty(processModeNumber).getName();
+		String processTypeName = isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2618) : this.device.getRecordSetStateName(processModeNumber);
 		//STATUS:     0=normal !0=cycle
 		String processStatusName = !isContinuousRecordSet && dataBuffer[9] != 0 ? Messages.getString(MessageIds.GDE_MSGT2610) : GDE.STRING_EMPTY;
 		if (UsbGathererThread.log.isLoggable(Level.FINE)) {

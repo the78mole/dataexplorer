@@ -158,12 +158,12 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 
-		if (UniTrend.log.isLoggable(Level.FINE)) {
+		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 1; i <= 5; i++) {
 				sb.append(String.format("%02x", dataBuffer[i])).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			UniTrend.log.log(Level.FINE, sb.toString());
+			log.log(Level.FINE, sb.toString());
 		}
 		points[0] = Integer.valueOf(String.format("%c%c%c%c%c", dataBuffer[1], dataBuffer[2], dataBuffer[3], dataBuffer[4], dataBuffer[5])).intValue();
 		switch (dataBuffer[6]) {
@@ -300,10 +300,12 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
 			}
 		}
-		UniTrend.log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
 
 		for (int i = 0; i < recordDataSize; i++) {
-			UniTrend.log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize);
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize);
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 
@@ -330,52 +332,9 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			UniTrend.log.log(Level.SEVERE, e.getMessage(), e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
-	}
-
-	/**
-	 * get digit from display
-	 * @param select
-	 * @return digit value
-	 */
-	public int getDigit(int select) {
-		int digit = 0;
-		switch (select) {
-		case 0x7d:
-			digit = 0;
-			break;
-		case 0x05:
-			digit = 1;
-			break;
-		case 0x5b:
-			digit = 2;
-			break;
-		case 0x1f:
-			digit = 3;
-			break;
-		case 0x27:
-			digit = 4;
-			break;
-		case 0x3e:
-			digit = 5;
-			break;
-		case 0x7e:
-			digit = 6;
-			break;
-		case 0x15:
-			digit = 7;
-			break;
-		case 0x7f:
-			digit = 8;
-			break;
-		case 0x3f:
-			digit = 9;
-			break;
-		}
-
-		return digit;
 	}
 
 	/**
@@ -393,11 +352,11 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 	 * @return measurement unit as string
 	 */
 	public HashMap<String, String> getMeasurementInfo(byte[] buffer, HashMap<String, String> measurementInfo) {
-		if (UniTrend.log.isLoggable(Level.FINE)) {
-			UniTrend.log.log(Level.FINE, "buffer : " + StringHelper.byte2Hex4CharString(buffer, buffer.length));
-			UniTrend.log.log(Level.FINE, "Schalterstellung (Byte[6]): " + buffer[6]);
-			UniTrend.log.log(Level.FINE, "Bereich          (Byte[0]): " + buffer[0]);
-			UniTrend.log.log(Level.FINE, "Kopplung        (Byte[10]): " + buffer[10]);
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "buffer : " + StringHelper.byte2Hex4CharString(buffer, buffer.length));
+			log.log(Level.FINE, "Schalterstellung (Byte[6]): " + buffer[6]);
+			log.log(Level.FINE, "Bereich          (Byte[0]): " + buffer[0]);
+			log.log(Level.FINE, "Kopplung        (Byte[10]): " + buffer[10]);
 		}
 		String unit = ""; //$NON-NLS-1$
 		switch (buffer[6]) {
@@ -516,7 +475,7 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 			measurementInfo.put(UniTrend.INPUT_SYMBOL, typeSymbol.split(" ")[1]); //$NON-NLS-1$
 		}
 		catch (Exception e) {
-			UniTrend.log.log(Level.WARNING, e.getMessage());
+			log.log(Level.WARNING, e.getMessage());
 		}
 
 		return measurementInfo;
@@ -550,7 +509,7 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		// 0=Spannung oder Strom oder ..
 		double newValue = value; // no factor, offset, reduction or other supported
-		if (UniTrend.log.isLoggable(Level.FINER)) UniTrend.log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -563,7 +522,7 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		// 0=Spannung oder Strom oder ..
 		double newValue = value; // no factor, offset, reduction or other supported
-		if (UniTrend.log.isLoggable(Level.FINER)) UniTrend.log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -588,7 +547,7 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		UniTrend.log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
+		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -634,18 +593,18 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 							}
 						}
 						catch (RuntimeException e) {
-							UniTrend.log.log(Level.WARNING, e.getMessage(), e);
+							log.log(Level.WARNING, e.getMessage(), e);
 						}
 						if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 					}
 				}
 				catch (SerialPortException e) {
-					UniTrend.log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(),
 							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 				}
 				catch (ApplicationConfigurationException e) {
-					UniTrend.log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}

@@ -107,10 +107,10 @@ public class Q200GathererThread extends Thread {
 			RecordSet recordSet2 = null;
 			RecordSet recordSet3 = null;
 			RecordSet recordSet4 = null;
-			int[] points1 = new int[this.device.getMeasurementNames(1).length];
-			int[] points2 = new int[this.device.getMeasurementNames(2).length];
-			int[] points3 = new int[this.device.getMeasurementNames(3).length];
-			int[] points4 = new int[this.device.getMeasurementNames(4).length];
+			int[] points1 = new int[this.device.getNumberOfMeasurements(1)];
+			int[] points2 = new int[this.device.getNumberOfMeasurements(2)];
+			int[] points3 = new int[this.device.getNumberOfMeasurements(3)];
+			int[] points4 = new int[this.device.getNumberOfMeasurements(4)];
 			int lastEnergie1, lastEnergie2, lastEnergie3, lastEnergie4;
 
 			this.isProgrammExecuting1 = false;
@@ -195,16 +195,16 @@ public class Q200GathererThread extends Thread {
 					// check if device is ready for data capturing, discharge or charge allowed only
 					if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3 || this.isProgrammExecuting4) {
 						lastEnergie1 = points1[4];
-						points1 = new int[this.device.getMeasurementNames(1).length];
+						points1 = new int[this.device.getNumberOfMeasurements(1)];
 						
 						lastEnergie2 = points2[4];
-						points2 = new int[this.device.getMeasurementNames(2).length];
+						points2 = new int[this.device.getNumberOfMeasurements(2)];
 						
 						lastEnergie3 = points3[4];
-						points3 = new int[this.device.getMeasurementNames(3).length];
+						points3 = new int[this.device.getNumberOfMeasurements(3)];
 						
 						lastEnergie4 = points4[4];
-						points4 = new int[this.device.getMeasurementNames(4).length];
+						points4 = new int[this.device.getNumberOfMeasurements(4)];
 
 
 						if (this.isProgrammExecuting1 && channelBuffer1 != null && dataBuffer1 != null) { // checks for processes active includes check state change waiting to discharge to charge

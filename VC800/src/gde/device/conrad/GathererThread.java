@@ -95,7 +95,7 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 
 		RecordSet recordSet = null;
-		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
+		int[] points = new int[this.device.getNumberOfMeasurements(this.channelNumber)];
 		final HashMap<String, String>	configData = this.dialog.getConfigData();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;

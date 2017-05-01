@@ -103,7 +103,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 		this.settings = Settings.getInstance();
 		this.measurementsCount = 30;
 //		for (int i = 1; i <= this.device.getChannelCount(); i++) {
-//			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
+//			int actualMeasurementCount = this.device.getNumberOfMeasurements(i);
 //			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
 //		}
 		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_V4.ordinal(); 
@@ -938,7 +938,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
 				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 				int activeChannelNumber = this.application.getActiveChannelNumber();
-				if (activeChannelNumber == 6 && this.device.getMeasurementNames(activeChannelNumber).length > 72  && this.device.getMeasurementPropertyValue(activeChannelNumber, 74, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
+				if (activeChannelNumber == 6 && this.device.getNumberOfMeasurements(activeChannelNumber) > 72  && this.device.getMeasurementPropertyValue(activeChannelNumber, 74, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
 					this.filterStartTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 73, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
 					this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 74, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 					this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
