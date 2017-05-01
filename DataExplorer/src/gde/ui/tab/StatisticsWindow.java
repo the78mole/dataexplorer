@@ -20,9 +20,6 @@ package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-
-import gde.log.Level;
-
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -57,11 +54,13 @@ import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.StatisticsType;
 import gde.device.resource.DeviceXmlResource;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
+import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.TimeLine;
 
 /**
@@ -169,7 +168,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
-						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabMenuType.SIMPLE);
 						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
 						if (activeChannel != null) {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -302,7 +301,6 @@ public class StatisticsWindow extends CTabItem {
 					for (String recordName : displayableRecords) {
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "updating record = " + recordName);
 						Record record = activeRecordSet.get(recordName);
-						DecimalFormat df = record.getDecimalFormat();
 						IDevice device = activeRecordSet.getDevice();
 						StatisticsType measurementStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), activeRecordSet.get(recordName).getOrdinal());
 						if (measurementStatistics != null) {
@@ -314,21 +312,11 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMin()) {
 								if (isTriggerLevel)
-									sb.append(formatOutput(df.format(device.translateValue(record, record.getMinValueTriggered() / 1000.0))));
+									sb.append(record.getFormattedStatisticsValue( record.getMinValueTriggered() / 1000.0));
+								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
+									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
-									if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
-										if (device.isGPSCoordinates(record)) {
-											if (record.getUnit().endsWith("'")) {
-												sb.append(String.format("%2d %07.4f", record.getRealMinValue() / 1000000, record.getRealMinValue() % 1000000 / 10000.0));
-											}
-											else {
-												sb.append(String.format("%8.6f", record.getRealMinValue() / 1000000.0));
-											}
-										}
-										else
-											sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
-									else
-										sb.append(NO_VALUE);
+									sb.append(NO_VALUE);
 							}
 							else
 								sb.append(NO_VALUE);
@@ -336,37 +324,18 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isAvg())
 								if (isTriggerLevel)
-									sb.append(formatOutput(df.format(device.translateValue(record, record.getAvgValueTriggered() / 1000.0))));
+									sb.append(formatOutput(record.getFormattedStatisticsValue( record.getAvgValueTriggered() / 1000.0)));
 								else
-									if (device.isGPSCoordinates(record)) {
-										if (record.getUnit().endsWith("'")) {
-											sb.append(String.format("%2d %07.4f", record.getAvgValue() / 1000000, record.getAvgValue() % 1000000 / 10000.0));
-										}
-										else {
-											sb.append(String.format("%8.6f", record.getAvgValue() / 1000000.0));
-										}
-									}
+									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
 									else
-										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
-							else
 								sb.append(NO_VALUE);
 							sb.append(DELIMITER);
 
 							if (measurementStatistics.isMax()) {
 								if (isTriggerLevel)
-									sb.append(formatOutput(df.format(device.translateValue(record, record.getMaxValueTriggered() / 1000.0))));
-								else
-									if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
-										if (device.isGPSCoordinates(record)) {
-											if (record.getUnit().endsWith("'")) {
-												sb.append(String.format("%2d %07.4f", record.getRealMaxValue() / 1000000, record.getRealMaxValue() % 1000000 / 10000.0));
-											}
-											else {
-												sb.append(String.format("%8.6f", record.getRealMaxValue() / 1000000.0));
-											}
-										}
-										else
-											sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
+									sb.append(record.getFormattedStatisticsValue(record.getMaxValueTriggered() / 1000.0));
+								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
+									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
 									else
 										sb.append(NO_VALUE);
 							}
