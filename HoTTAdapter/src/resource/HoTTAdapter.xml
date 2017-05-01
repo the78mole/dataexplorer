@@ -112,7 +112,7 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-                <suppressQuantiles>true</suppressQuantiles>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
                 <label>lable_voltage_rx_min</label>
             </Measurement>
             <Settlements/>
@@ -361,7 +361,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<suppressQuantiles>true</suppressQuantiles>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -370,7 +369,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<suppressQuantiles>true</suppressQuantiles>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -425,7 +423,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<suppressQuantiles>true</suppressQuantiles>
                 <label>label_azimuth</label>
             </Measurement>
             <Measurement>
@@ -434,7 +431,7 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <suppressQuantiles>true</suppressQuantiles>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
                 <label>label_trip</label>
             </Measurement>
             <Measurement>
@@ -812,7 +809,7 @@
                     </evaluation>
                 </Settlement>
                 <Settlement settlementId="9">
-                    <name>capacity pro Höhenmeter</name>
+                    <name>Kapazität pro Höhenmeter</name>
                     <symbol>vh</symbol>
                     <unit>mAh/m</unit>
                     <active>true</active>
