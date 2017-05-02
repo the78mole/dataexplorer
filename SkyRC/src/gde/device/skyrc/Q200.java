@@ -391,7 +391,7 @@ public class Q200 extends MC3000 implements IDevice {
 		}
 		points[5] = dataBuffer[13] * 1000;
 		points[6] = dataBuffer[14] * 1000;
-		points[7] = DataParser.parse2Short(dataBuffer[16], dataBuffer[15]) * (dataBuffer[0] <= 3 ? 1000 : 100); //Ni battery type 1/10 of Li????
+		points[7] = DataParser.parse2Short(dataBuffer[16], dataBuffer[15]) * 100;
 		
 		if (dataBuffer[0] <= 3) { // exclude Ni PB batteries
 			//9=CellVoltage1....14=CellVoltage6
