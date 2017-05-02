@@ -451,7 +451,7 @@ public class HistoGraphicsComposite extends Composite {
 				log.log(Level.FINE, "record=" + actualRecord.getName() + "  isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
 			if (actualRecord.isScaleVisible())
-				HistoCurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
+				HistoCurveUtils.drawHistoScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(trailRecordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());

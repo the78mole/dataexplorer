@@ -38,6 +38,7 @@ import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
 import gde.device.StatisticsType;
 import gde.device.TrailTypes;
+import gde.device.resource.DeviceXmlResource;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
@@ -60,7 +61,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	private final TrailRecordSet	parentTrail;
 	private final MeasurementType	measurementType;																				// measurement / settlement / scoregroup are options
 	private final SettlementType	settlementType;																					// measurement / settlement / scoregroup are options
-	private final ScoreGroupType	scoregroupType;																					// measurement / settlement / scoregroup are options
+	private final ScoreGroupType	scoreGroupType;																					// measurement / settlement / scoregroup are options
 	private int										trailTextSelectedIndex	= -1;														// user selection from applicable trails, is saved in the graphics template
 	private List<String>					applicableTrailsTexts;																	// the user may select one of these entries
 	private List<Integer>					applicableTrailsOrdinals;																// maps all applicable trails in order to convert the user selection into a valid trail
@@ -68,6 +69,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	private double								factor									= Double.MIN_VALUE;
 	private double								offset									= Double.MIN_VALUE;
 	private double								reduction								= Double.MIN_VALUE;
+
+	final DeviceXmlResource				xmlResource		= DeviceXmlResource.getInstance();
 
 	/**
 	 * creates a vector for a measurementType to hold data points.
@@ -83,7 +86,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		super.parent = parentTrail;
 		this.measurementType = measurementType;
 		this.settlementType = null;
-		this.scoregroupType = null;
+		this.scoreGroupType = null;
 	}
 
 	/**
@@ -100,7 +103,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		super.parent = parentTrail;
 		this.measurementType = null;
 		this.settlementType = settlementType;
-		this.scoregroupType = null;
+		this.scoreGroupType = null;
 	}
 
 	/**
@@ -118,7 +121,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		super.parent = parentTrail;
 		this.measurementType = null;
 		this.settlementType = null;
-		this.scoregroupType = scoregroupType;
+		this.scoreGroupType = scoregroupType;
 	}
 
 	@Override
@@ -174,7 +177,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				super.add(histoVault.getMeasurementPoint(this.ordinal, this.getTrailOrdinal()));
 			else if (this.isSettlement())
 				super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
-			else if (this.isScoregroup()) {
+			else if (this.isScoreGroup()) {
 				if (log.isLoggable(Level.FINEST))
 					log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
 				super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
@@ -193,7 +196,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.getTrailOrdinal());
 				else if (this.isSettlement())
 					point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(), trailRecord.getTrailOrdinal());
-				else if (this.isScoregroup()) {
+				else if (this.isScoreGroup()) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
 					point = histoVault.getScorePoint(this.getTrailOrdinal());
 				}
@@ -252,7 +255,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	public String getHistoTableRowText() {
-		return this.getUnit().length() > 0 ? (this.getName() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET).intern() : this.getName().intern();
+		return this.getUnit().length() > 0 ? (this.getNameReplacement() + GDE.STRING_BLANK_LEFT_BRACKET + this.getUnit() + GDE.STRING_RIGHT_BRACKET).intern() : this.getNameReplacement().intern();
 	}
 
 	/**
@@ -463,19 +466,19 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					this.applicableTrailsOrdinals.add(i);
 					if (TrailTypes.values[i].isTriggered()) {
 						if (TrailTypes.values[i].equals(TrailTypes.REAL_COUNT_TRIGGERED)) {
-							this.applicableTrailsTexts.add(getStatistics().getCountTriggerText().intern());
+							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getCountTriggerText()));
 						}
 						else if (TrailTypes.values[i].equals(TrailTypes.REAL_SUM_TRIGGERED)) {
-							this.applicableTrailsTexts.add(getStatistics().getSumTriggerText().intern());
+							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getSumTriggerText()));
 						}
 						else if (TrailTypes.values[i].equals(TrailTypes.REAL_TIME_SUM_TRIGGERED)) {
-							this.applicableTrailsTexts.add(getStatistics().getSumTriggerTimeText().intern());
+							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getSumTriggerTimeText()));
 						}
 						else if (TrailTypes.values[i].equals(TrailTypes.REAL_AVG_RATIO_TRIGGERED)) {
-							this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
+							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getRatioText()));
 						}
 						else if (TrailTypes.values[i].equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
-							this.applicableTrailsTexts.add(getStatistics().getRatioText().intern());
+							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getRatioText()));
 						}
 						else
 							throw new UnsupportedOperationException("TrailTypes.isTriggered"); //$NON-NLS-1$
@@ -559,16 +562,16 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, super.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
 		}
-		else if (this.scoregroupType != null) {
+		else if (this.scoreGroupType != null) {
 			applicablePrimitiveTrails = new boolean[0]; // not required
 
 			// build applicable trail type lists for display purposes
 			this.applicableTrailsOrdinals = new ArrayList<Integer>();
 			this.applicableTrailsTexts = new ArrayList<String>();
-			if (this.scoregroupType != null) {
-				for (int i = 0; i < this.scoregroupType.getScore().size(); i++) {
-					this.applicableTrailsOrdinals.add(this.scoregroupType.getScore().get(i).getLabel().ordinal());
-					this.applicableTrailsTexts.add(this.scoregroupType.getScore().get(i).getValue().intern());
+			if (this.scoreGroupType != null) {
+				for (int i = 0; i < this.scoreGroupType.getScore().size(); i++) {
+					this.applicableTrailsOrdinals.add(this.scoreGroupType.getScore().get(i).getLabel().ordinal());
+					this.applicableTrailsTexts.add(getDeviceXmlReplacement(this.scoreGroupType.getScore().get(i).getValue()));
 				}
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.getName() + " score "); //$NON-NLS-1$
 			}
@@ -618,8 +621,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailTypes.getDisplaySequence(), this.settlementType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailTypes.ordinal());
 					}
-					else if (this.scoregroupType != null) {
-						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailTypes.getDisplaySequence(), this.scoregroupType, this.parentTrail, this.size()); //$NON-NLS-1$
+					else if (this.scoreGroupType != null) {
+						this.trailRecordSuite[i] = new TrailRecord(this.device, this.ordinal, "suite" + trailTypes.getDisplaySequence(), this.scoreGroupType, this.parentTrail, this.size()); //$NON-NLS-1$
 						this.trailRecordSuite[i].setApplicableTrailTypes(trailTypes.ordinal());
 					}
 					else {
@@ -639,19 +642,19 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	public boolean isTrailSuite() {
-		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isSuite() : false;
+		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isSuite() : false;
 	}
 
 	public boolean isRangePlotSuite() {
-		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isRangePlot() : false;
+		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isRangePlot() : false;
 	}
 
 	public boolean isBoxPlotSuite() {
-		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isBoxPlot() : false;
+		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isBoxPlot() : false;
 	}
 
 	public boolean isSuiteForSummation() {
-		return this.scoregroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isForSummation() : false;
+		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isForSummation() : false;
 	}
 
 	public boolean isMeasurement() {
@@ -662,8 +665,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.settlementType != null;
 	}
 
-	public boolean isScoregroup() {
-		return this.scoregroupType != null;
+	public boolean isScoreGroup() {
+		return this.scoreGroupType != null;
 	}
 
 	public MeasurementType getMeasurement() {
@@ -675,7 +678,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	public ScoreGroupType getScoregroup() {
-		return this.scoregroupType;
+		return this.scoreGroupType;
 	}
 
 	public StatisticsType getStatistics() {
@@ -687,7 +690,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @return
 	 */
 	public void setMostApplicableTrailTextOrdinal() {
-		if (this.scoregroupType != null) {
+		if (this.scoreGroupType != null) {
 			setTrailTextSelectedIndex(0);
 		}
 		else {
@@ -709,8 +712,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			PropertyType property = this.getProperty(IDevice.FACTOR);
 			if (property != null)
 				this.factor = Double.valueOf(property.getValue());
-			else if (this.scoregroupType != null)
-				this.factor = this.scoregroupType.getFactor();
+			else if (this.scoreGroupType != null)
+				this.factor = this.scoreGroupType.getFactor();
 			else if (this.settlementType != null)
 				this.factor = this.settlementType.getFactor();
 			else if (this.measurementType != null) {
@@ -734,8 +737,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			PropertyType property = this.getProperty(IDevice.OFFSET);
 			if (property != null)
 				this.offset = Double.valueOf(property.getValue());
-			else if (this.scoregroupType != null)
-				this.offset = this.scoregroupType.getOffset();
+			else if (this.scoreGroupType != null)
+				this.offset = this.scoreGroupType.getOffset();
 			else if (this.settlementType != null)
 				this.offset = this.settlementType.getOffset();
 			else if (this.measurementType != null)
@@ -758,8 +761,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			PropertyType property = this.getProperty(IDevice.REDUCTION);
 			if (property != null)
 				this.reduction = Double.valueOf(property.getValue());
-			else if (this.scoregroupType != null)
-				this.reduction = this.scoregroupType.getReduction();
+			else if (this.scoreGroupType != null)
+				this.reduction = this.scoreGroupType.getReduction();
 			else if (this.settlementType != null)
 				this.reduction = this.settlementType.getReduction();
 			else if (this.measurementType != null)
@@ -785,7 +788,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			final double translatedMinValue = this.device.translateValue(this, this.minValue / 1000.);
 			final double delta = translatedMaxValue - translatedMinValue;
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, translatedMaxValue, delta)); //$NON-NLS-1$
-			if (Math.abs(translatedMaxValue) <= 100 && Math.abs(translatedMinValue) <= 100) {
+			if (Math.abs(translatedMaxValue) < 100 && Math.abs(translatedMinValue) < 100) {
 				if (delta < 0.1)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
 				else if (delta <= 1)
@@ -831,11 +834,16 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.trailRecordSuite;
 	}
 
+	public String getNameReplacement() {
+		return getDeviceXmlReplacement(this.name);
+	}
+
 	/**
-	 * @return the value of the label property from the device channel entry.
+	 * @return the localized value of the label property from the device channel entry or an empty string.
 	 */
 	public String getLabel() {
-		return this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoregroupType.getLabel();
+		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoreGroupType.getLabel();
+		return getDeviceXmlReplacement(label);
 	}
 
 	/**
@@ -863,7 +871,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 */
 	@Override // reason are the histo display settings which hide records
 	public boolean isScaleVisible() {
-		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoregroup() && this.settings.isDisplayScores());
+		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoreGroup() && this.settings.isDisplayScores());
 		return isValidDisplayRecord && super.isScaleVisible();
 	}
 
@@ -1160,6 +1168,14 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; //sec
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param replacementKey
+	 * @return the replacement name of the specified key or an empty string if there is no key entry
+	 */
+	private String getDeviceXmlReplacement(String replacementKey) {
+		return replacementKey != null ? this.xmlResource.getReplacement(replacementKey) : GDE.STRING_EMPTY;
 	}
 
 }

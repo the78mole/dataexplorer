@@ -104,7 +104,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						CurveSelectorContextMenu.log.log(java.util.logging.Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
+							CurveSelectorContextMenu.this.recordNameKey = (String) popupmenu.getData(DataExplorer.RECORD_NAME);
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.COMPARE);
 							CurveSelectorContextMenu.this.isTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.UTIL);

@@ -1359,7 +1359,7 @@ public class DeviceConfiguration {
 		List<MeasurementType> cpMeasurements = new ArrayList<MeasurementType>();
 		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
 		while (ite.hasNext()) {
-			MeasurementType measurementType = (MeasurementType) ite.next().clone();
+			MeasurementType measurementType = ite.next().clone();
 			measurementType.name = xmlResource.getReplacement(measurementType.name);
 			cpMeasurements.add(measurementType);
 		}
@@ -2336,7 +2336,7 @@ public class DeviceConfiguration {
 	 */
 	public String getRecordSetStemName() {
 		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " +this.getStateType().getProperty().get(0).getName() 
-				: ") state_data_recording" : ") state_data_recording";
+				: Messages.getString(MessageIds.GDE_MSGT0272)	: Messages.getString(MessageIds.GDE_MSGT0272);
 	}
 
 	/**
