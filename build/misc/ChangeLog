@@ -6,6 +6,7 @@ OVERVIEW:
 + add UT16E multimeter support
 + enhance MC3000 & Q200 support
 + enhance History analysis to full functional beta version (pls enable in preferences)
++ fix device XML migration problem with devices using USB
 
 DETAILS:
 - fix analog display of synchronized master record

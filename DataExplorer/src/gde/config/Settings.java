@@ -393,7 +393,7 @@ public class Settings extends Properties {
 										DeviceConfiguration newConfig = actualConfigurations.get(oldConfig.getName());
 										if (oldConfig.isUsed() && newConfig != null) {
 											newConfig.setUsed(true);
-											if (oldConfig.getPort().length() > 1) newConfig.setPort(oldConfig.getPort());
+											if (oldConfig.getPort().length() > 1 && !oldConfig.getPort().startsWith("USB")) newConfig.setPort(oldConfig.getPort());
 											if (oldConfig.getDataBlockPreferredDataLocation().length() > 1) newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
 											if (oldConfig.getLastChannelNumber() != 0) newConfig.setLastChannelNumber(oldConfig.getLastChannelNumber());
 
