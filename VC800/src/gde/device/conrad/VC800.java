@@ -227,11 +227,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			int index = 0;
-			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				dataTableRow[index + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
-				++index;
-			}
+			dataTableRow[1] = recordSet.get(0).getDecimalFormat().format(recordSet.get(0).realGet(rowIndex) / 1000.0);
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

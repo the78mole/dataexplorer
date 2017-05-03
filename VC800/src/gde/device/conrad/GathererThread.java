@@ -147,6 +147,7 @@ public class GathererThread extends Thread {
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
+						recordSet.updateVisibleAndDisplayableRecordsForTable();
 						measurementCount = 0;
 						old_unit = m_unit;
 					}
