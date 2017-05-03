@@ -1334,12 +1334,14 @@ public class DeviceConfiguration {
 	 */
 	public List<MeasurementType> getChannelMeasuremts(int channelConfigNumber) {
 		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigNumber).getMeasurement();
+		List<MeasurementType> cpMeasurements = new ArrayList<MeasurementType>();
 		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
 		while (ite.hasNext()) {
-			MeasurementType measurementType = (MeasurementType) ite.next();
+			MeasurementType measurementType = (MeasurementType) ite.next().clone();
 			measurementType.name = xmlResource.getReplacement(measurementType.name);
+			cpMeasurements.add(measurementType);
 		}
-		return tmpMeasurements;
+		return cpMeasurements;
 	}
 
 	/**
@@ -1348,12 +1350,14 @@ public class DeviceConfiguration {
 	@Deprecated
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey) {
 		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigKey).getMeasurement();
+		List<MeasurementType> cpMeasurements = new ArrayList<MeasurementType>();
 		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
 		while (ite.hasNext()) {
-			MeasurementType measurementType = (MeasurementType) ite.next();
+			MeasurementType measurementType = (MeasurementType) ite.next().clone();
 			measurementType.name = xmlResource.getReplacement(measurementType.name);
+			cpMeasurements.add(measurementType);
 		}
-		return tmpMeasurements;
+		return cpMeasurements;
 	}
 
 	/**
