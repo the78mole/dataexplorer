@@ -13,7 +13,6 @@ DETAILS:
 - support UTC time formatting
 - enhance GPS coordinates support (langitude / latitude)
 	- formatting in degrees/minutes or decimal degrees based on unit settings in the device
-	- homogenize the internal GPS coordinates data format
 - keep selected channel after opening an OSD file
 - update Copyrights
 - add history graphics template support (no default set of templates get delivered) 
@@ -46,12 +45,10 @@ History analysis
 		- enhance smart statistics (quantiles, boxplots) and outlier identification
 	- calculate internal resistance values of drive batteries
 		- settings dialog: analysis types > settlements (Auswertungen > Berechnungen)
-		- allows monitoring on a battery cell basis
-		- supports analysis of factors influencing the internal resistance
 	- minor enhancements
 		- support print and screen capturing
 		- integrate files from subdirectories (maximum directory level setting) 
-		* some additional measurements have been stripped off (e.g. file size, CPU time)
+		- some additional measurements have been stripped off (e.g. file size, CPU time)
 		- fix package loss unit (was per mille)
 		- update DeviceProperties schema to V31 to enable updates regarding history analysis
 	
