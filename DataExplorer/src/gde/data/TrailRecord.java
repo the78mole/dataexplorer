@@ -266,11 +266,41 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		Point[] points = new Point[timeLine.getScalePositions().size()];
 		int i = 0;
 		Integer value = 0;
-		double offset = super.minDisplayValue * 1 / super.syncMasterFactor;
+		final double tmpOffset = super.minDisplayValue * 1 / super.syncMasterFactor; // minDisplayValue is GPS DD format * 1000
 		for (Integer xPos : timeLine.getScalePositions().values()) {
 			if ((value = super.realRealGet(i)) != null) {
-				int grad = value / 1000000;
-				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((((grad + ((super.realRealGet(i) / 1000000.0 - grad) / 0.60)) * 1000.0) - offset) * super.displayScaleFactorValue));
+				final double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
+				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((decimalDegreeValue * 1000. - tmpOffset) * super.displayScaleFactorValue));
+			}
+			i++;
+		}
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
+		return points;
+		// int grad = super.get(measurementPointIndex) / 1000000;
+		// return new Point(xDisplayOffset + Double.valueOf(super.getTime_ms(measurementPointIndex) * super.displayScaleFactorTime).intValue(), yDisplayOffset
+		// - Double.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor))
+		// * this.displayScaleFactorValue).intValue());
+	}
+
+	/**
+	 * as suite records are not synchronized we need a separate method for them.
+	 * is based on DMM record values.
+	 * @param timeLine
+	 * @param xDisplayOffset
+	 * @param yDisplayOffset
+	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
+	 * @return point time, value; null if the trail record value is null
+	 */
+	public Point[] getSuiteGpsDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset,  int drawAreaHeight) {
+		Point[] points = new Point[timeLine.getScalePositions().size()];
+		int i = 0;
+		Integer value = 0;
+		final double tmpOffset = super.minScaleValue; // in decimal degrees
+		final double tmpDisplayScaleFactor = (drawAreaHeight * 1.) / (this.maxScaleValue - this.minScaleValue);
+		for (Integer xPos : timeLine.getScalePositions().values()) {
+			if ((value = super.realRealGet(i)) != null) {
+				final double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
+				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((decimalDegreeValue - tmpOffset) * tmpDisplayScaleFactor));
 			}
 			i++;
 		}

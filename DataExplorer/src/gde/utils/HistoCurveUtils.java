@@ -86,70 +86,22 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 		// get the number of data points size to be drawn
 		int displayableSize = record.size();
 
-		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
 		double displayableTime_ms = record.getDrawTimeWidth_ms();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
-		int xScaleFactor; // x-axis scaling not supported
-		if (false) {
-			// calculate xScale for curves with much to many data points, it makes no sense to draw all the small lines on the same part of the screen
-			xScaleFactor = (int) (displayableSize / (width * 2.2));
-			xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1; // check for curves with less points than draw area width
-			while (displayableSize % xScaleFactor > 3 && xScaleFactor > 1) {
-				--xScaleFactor;
-			}
-			// xScaleFactor+=2;
-			// calculate scale factor to fit time into draw bounds display pixel based
-			double xTimeFactor = width / displayableTime_ms; // * (xScaleFactor - 0.44);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
-			record.setDisplayScaleFactorTime(xTimeFactor);
-			record.setDisplayScaleFactorValue(height);
-		}
-		else {
-			xScaleFactor = 1;
-			record.setDisplayScaleFactorTime(1);
-			record.setDisplayScaleFactorValue(height);
-		}
+		record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
+		record.setDisplayScaleFactorValue(height);
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
 
-		Point oldPoint1 = null;
-		if (false) {
-			// do NOT draw the first point with possible interpolated values if it does not match a measurement point at time value
-			try {
-				// calculate start point of the curve, which is the first oldPoint
-				// oldPoint = record.getParent().isScopeMode() ? record.getDisplayPoint(0, x0, y0) : record.getDisplayEndPoint(0, x0);
-				int xPosNewestPoint = timeLine.getScalePositions().firstEntry().getValue(); // is the leftmost point only if the scale is not reversed (reversed is standard)
-				oldPoint1 = record.getDisplayEndPoint(xPosNewestPoint);
-				if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(oldPoint1.toString());
-			}
-			catch (RuntimeException e) {
-				log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
-			}
-		}
-
 		Point[] points = null;
-		List<Point[]> suitePoints = new ArrayList<>();
-		Point[] oldSuitePoints = new Point[3];
-		int boxWidth = 0; // boxplot only
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		if (record.getParent().isCompareSet()) {// todo not supported // compare set might contain records with different size
-			throw new UnsupportedOperationException();
-		}
-		else if (record.getDevice().isGPSCoordinates(record)) {
+		if (record.getDevice().isGPSCoordinates(record))
 			points = record.getGpsDisplayPoints(timeLine, x0, y0);
-		}
-		else if (record.getTrailRecordSuite().length > 1) {
-			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
-				points = trailRecord.getDisplayPoints(timeLine, x0, y0);
-				suitePoints.add(points);
-			}
-			boxWidth = timeLine.getDensity().getScaledBoxWidth();
-		}
-		else {
+		else
 			points = record.getDisplayPoints(timeLine, x0, y0);
-		}
+
 		Point newPoint, oldPoint = null;
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
@@ -189,7 +141,6 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 		int displayableSize = masterRecord.size();
 		double displayableTime_ms = masterRecord.getDrawTimeWidth_ms();
 
-		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + masterRecord.getAverageTimeStep_ms()); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 		{
@@ -202,12 +153,19 @@ public class HistoCurveUtils extends CurveUtils { // todo merging with CurveUtil
 
 		List<Point[]> suitePoints = new ArrayList<>(); // display point cache: one row for each record of the suite
 		int boxWidth = 0; // boxplot only
-		if (record.getParent().isCompareSet()) {// todo not supported // compare set might contain records with different size
-			throw new UnsupportedOperationException();
-		}
-		else if (record.getDevice().isGPSCoordinates(record)) { // todo GPS not supported
-			// points = record.getGpsDisplayPoints(timeLine, x0, y0);
-			throw new UnsupportedOperationException();
+		if (record.getDevice().isGPSCoordinates(record)) { // todo GPS not supported
+			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
+				// this was done in drawScale for the record
+				trailRecord.setMinScaleValue(record.getMinScaleValue());
+				trailRecord.setMaxScaleValue(record.getMaxScaleValue());
+				trailRecord.setMinDisplayValue(record.getMinDisplayValue());
+				trailRecord.setMaxDisplayValue(record.getMaxDisplayValue());
+				// this was done here for the record
+				trailRecord.setDisplayScaleFactorTime(1);
+				trailRecord.setDisplayScaleFactorValue(height); // for getSuiteGpsDisplayPoints
+				suitePoints.add(trailRecord.getSuiteGpsDisplayPoints(timeLine, x0, y0, height));
+			}
+			boxWidth = timeLine.getDensity().getScaledBoxWidth();
 		}
 		else if (record.getTrailRecordSuite().length > 1) {
 			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
