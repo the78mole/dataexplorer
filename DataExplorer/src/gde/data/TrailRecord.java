@@ -781,11 +781,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
 		case -1:
-			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue / 1000));
-			final double minValueAbs = this.device.translateValue(this, Math.abs(this.minValue / 1000));
-			final double delta = this.device.translateValue(this, this.maxValue / 1000) - this.device.translateValue(this, this.minValue / 1000);
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, maxValueAbs, delta)); //$NON-NLS-1$
-			if (maxValueAbs <= 100 && minValueAbs <= 100) {
+			final double translatedMaxValue = this.device.translateValue(this, this.maxValue / 1000.);
+			final double translatedMinValue = this.device.translateValue(this, this.minValue / 1000.);
+			final double delta = translatedMaxValue - translatedMinValue;
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, translatedMaxValue, delta)); //$NON-NLS-1$
+			if (Math.abs(translatedMaxValue) <= 100 && Math.abs(translatedMinValue) <= 100) {
 				if (delta < 0.1)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
 				else if (delta <= 1)
@@ -793,7 +793,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				else
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 			}
-			else if (maxValueAbs < 500 && minValueAbs < 500) {
+			else if (Math.abs(translatedMaxValue) < 500 && Math.abs(translatedMinValue) < 500) {
 				if (delta <= 0.1)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else if (delta <= 1)

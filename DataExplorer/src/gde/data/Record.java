@@ -1212,8 +1212,8 @@ public class Record extends Vector<Integer> {
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
 		case -1:
-			final double delta = this.maxScaleValue - this.minScaleValue == 0 ? this.device.translateValue(this, (this.maxValue - this.minValue) / 1000) : this.maxScaleValue - this.minScaleValue;
-			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue / 1000));
+			final double delta = this.maxScaleValue - this.minScaleValue == 0 ? this.device.translateValue(this, (this.maxValue - this.minValue) / 1000.0) : this.maxScaleValue - this.minScaleValue;
+			final double maxValueAbs = this.device.translateValue(this, Math.abs(this.maxValue / 1000.0));
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, maxValueAbs, delta));
 			if (maxValueAbs < 100) {
 				if (delta < 0.1)
