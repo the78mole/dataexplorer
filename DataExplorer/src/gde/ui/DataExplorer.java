@@ -964,7 +964,10 @@ public class DataExplorer extends Composite {
 						DataExplorer.this.histoTableTabItem.setHeader();
 					}
 					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-					if (trailRecordSet != null) DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + trailRecordSet.getActiveDisplayTags().size());
+					if (trailRecordSet != null) {
+						final int tagSize = DataExplorer.this.settings.isDisplayScores() ?  trailRecordSet.getActiveDisplayTags().size() : 0;
+						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + tagSize);
+					}
 				}
 			}
 		});
