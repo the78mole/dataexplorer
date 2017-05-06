@@ -35,8 +35,6 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.ChannelPropertyType;
-import gde.device.ChannelPropertyTypes;
 import gde.device.ChannelType;
 import gde.device.IDevice;
 import gde.device.TransitionClassTypes;
@@ -57,7 +55,6 @@ public class HistoTransitions {
 	final static Logger															log					= Logger.getLogger($CLASS_NAME);
 
 	private final DataExplorer											application	= DataExplorer.getInstance();
-	private final Settings													settings		= Settings.getInstance();
 	private final IDevice														device			= this.application.getActiveDevice();
 
 	private final RecordSet													recordSet;
@@ -93,12 +90,12 @@ public class HistoTransitions {
 	}
 
 	/**
+	 * @author Thomas Eickert
 	 * provides the extremum value of the deque for reference purposes and the information if the deque has sufficient elements for the deque time period.
 	 * ensures the maximum deque time period by removing elements from the front of the deque.
 	 * expects elements to be added in chronological order.
 	 * Does not support null measurement values.
 	 * Resizable array implementation of the Deque interface.
-	 * @author Thomas Eickert
 	 */
 	private class SettlementDeque extends ArrayDeque<Double> {
 
@@ -131,61 +128,41 @@ public class HistoTransitions {
 			clear();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the decque.
-		 * 
-		 * @see java.util.ArrayDeque#add(java.lang.Object)
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // does not add the timestamp value
 		public boolean add(Double translatedValue) {
 			throw new UnsupportedOperationException();
 		}
 
 		public void addFirst(double translatedValue, long timeStamp_100ns) {
-			this.addFirst(translatedValue);
+			super.addFirst(translatedValue);
+			this.extremeValue = this.isMinimumExtremum ? Math.min(this.extremeValue, translatedValue) : Math.max(this.extremeValue, translatedValue);
+			this.sortedValues = null;
 			this.timeStampDeque.addFirst(timeStamp_100ns);
 			ensureTimePeriod();
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the deque.
 		 * 
-		 * @see java.util.ArrayDeque#addFirst(java.lang.Object)
+		 * @see java.util.ArrayDeque#addLast(java.lang.Object)
+		 * 
 		 */
-		public void addFirst(double translatedValue) {
-			super.addFirst(translatedValue);
+		public void addLast(double translatedValue, long timeStamp_100ns) {
+			super.addLast(translatedValue);
 			this.extremeValue = this.isMinimumExtremum ? Math.min(this.extremeValue, translatedValue) : Math.max(this.extremeValue, translatedValue);
 			this.sortedValues = null;
-		}
-
-		public void addLast(double translatedValue, long timeStamp_100ns) {
-			this.addLast(translatedValue);
 			this.timeStampDeque.addLast(timeStamp_100ns);
 			ensureTimePeriod();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the decque.
-		 * 
-		 * @see java.util.ArrayDeque#addLast(java.lang.Object)
-		 */
-		@Override
+		@Override 	
+		@Deprecated // does not add the timestamp value
 		public void addLast(Double translatedValue) {
-			super.addLast(translatedValue);
-			this.extremeValue = this.isMinimumExtremum ? Math.min(this.extremeValue, translatedValue) : Math.max(this.extremeValue, translatedValue);
-			this.sortedValues = null;
+			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#clear()
-		 */
-		@Override
+		@Override 	// reInitializes the deque properties
 		public void clear() {
 			super.clear();
 			this.timeStampDeque.clear();
@@ -203,60 +180,58 @@ public class HistoTransitions {
 			this.startIndex = newStartIndex;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#clone()
+		/**
+		 * Refreshes all properties.
+		 * Use this method after removing elements from this deque. 
 		 */
+		public void reInitialize(int removedCount) {
+			if (this.isEmpty())
+				clear();
+			else {
+				this.startIndex -= removedCount;
+				this.isExhausted = false;
+				this.sortedValues = null;
+				if (this.isMinimumExtremum) {
+					this.extremeValue = Double.MAX_VALUE;
+					for (Iterator<Double> iterator = this.iterator(); iterator.hasNext();) {
+						this.extremeValue = Math.min(this.extremeValue, iterator.next().doubleValue());
+					}
+				}
+				else {
+					this.extremeValue = -Double.MAX_VALUE;
+					for (Iterator<Double> iterator = this.iterator(); iterator.hasNext();) {
+						this.extremeValue = Math.max(this.extremeValue, iterator.next().doubleValue());
+					}
+				}
+			}
+		}
+
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public SettlementDeque clone() {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the decque.
-		 * 
-		 * @see java.util.ArrayDeque#offer(java.lang.Object)
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public boolean offer(Double translatedValue) {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the decque.
-		 * 
-		 * @see java.util.ArrayDeque#offerFirst(java.lang.Object)
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public boolean offerFirst(Double translatedValue) {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the decque.
-		 * 
-		 * @see java.util.ArrayDeque#offerLast(java.lang.Object)
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public boolean offerLast(Double translatedValue) {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#poll()
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public Double poll() {
 			throw new UnsupportedOperationException();
 		}
@@ -266,6 +241,7 @@ public class HistoTransitions {
 		 * 
 		 * @see java.util.ArrayDeque#pollFirst()
 		 */
+		@Override 	// reInitializes the deque properties
 		public Double pollFirst() {
 			Double removedItem = super.pollFirst();
 			this.timeStampDeque.pollFirst();
@@ -280,6 +256,7 @@ public class HistoTransitions {
 		 * 
 		 * @see java.util.ArrayDeque#pollLast()
 		 */
+		@Override 	// reInitializes the deque properties
 		public Double pollLast() {
 			Double removedItem = super.pollLast();
 			this.timeStampDeque.pollLast();
@@ -289,64 +266,40 @@ public class HistoTransitions {
 			return removedItem;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * ensures the maximum deque time period by removing elements from the front of the decque.
-		 * 
-		 * @see java.util.ArrayDeque#push(java.lang.Object)
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public void push(Double translatedValue) {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#pop()
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public Double pop() {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#remove()
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public Double remove() {
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#removeFirst()
-		 */
 		@Override
-		@Deprecated
+		@Deprecated // would require reInitializing the deque properties
 		public Double removeFirst() {
 			// use pollFirst()
 			throw new UnsupportedOperationException();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.util.ArrayDeque#removeLast()
-		 */
+		@Override
+		@Deprecated // would require reInitializing the deque properties
 		public Double removeLast() {
 			// use pollLast()
 			throw new UnsupportedOperationException();
 		}
 
 		/**
-		 * moves all deque entries and leaves an cleared deque.
+		 * Moves all deque entries and leaves an cleared deque.
 		 * @param settlementDeque
 		 */
 		public void addLastByMoving(SettlementDeque settlementDeque) {
@@ -354,13 +307,12 @@ public class HistoTransitions {
 			for (Iterator<Double> iterator = settlementDeque.iterator(); iterator.hasNext();) {
 				this.addLast(iterator.next(), iteratorTimeStamp.next());
 			}
-			ensureTimePeriod();
 			settlementDeque.clear();
 		}
 
 		/**
-		 * moves entries until the deque time period is exceeded.
-		 * leaves a reduced settlementDeque.
+		 * Moves entries until the deque time period is exceeded.
+		 * Leaves a reduced settlementDeque.
 		 * @param settlementDeque
 		 * @return the number of deque entries moved
 		 */
@@ -369,13 +321,13 @@ public class HistoTransitions {
 			Iterator<Long> iteratorTimeStamp = settlementDeque.timeStampDeque.iterator();
 			for (Iterator<Double> iterator = settlementDeque.iterator(); iterator.hasNext();) {
 				if (this.isStuffed()) break;
-				
+
 				addLast(iterator.next(), iteratorTimeStamp.next());
 				iterator.remove();
 				iteratorTimeStamp.remove();
 				movedCount++;
 			}
-			if (settlementDeque.isEmpty()) settlementDeque.clear();
+			if (movedCount > 0) settlementDeque.reInitialize(movedCount);
 			return movedCount;
 		}
 

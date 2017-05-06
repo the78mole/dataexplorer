@@ -995,7 +995,7 @@ public class HistoSettlement extends Vector<Integer> {
 
 	public Quantile getQuantile() {
 		if (this.quantile == null) {
-			this.quantile = new Quantile(this, EnumSet.of(Fixings.IS_SAMPLE, Fixings.REMOVE_NULLS, Fixings.REMOVE_TYPEMAXMIN), 9, 9);
+			this.quantile = new Quantile(this, EnumSet.of(Fixings.IS_SAMPLE, Fixings.REMOVE_NULLS, Fixings.REMOVE_MAXMIN), 9, 9);
 		}
 		return this.quantile;
 	}

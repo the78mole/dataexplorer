@@ -58,7 +58,7 @@ public class Quantile {
 	private Double									sigmaFigure;
 
 	public enum Fixings {
-		REMOVE_NULLS, REMOVE_ZEROS, REMOVE_TYPEMAXMIN, IS_SAMPLE
+		REMOVE_NULLS, REMOVE_ZEROS, REMOVE_MAXMIN, IS_SAMPLE
 	};
 
 	/**
@@ -206,7 +206,7 @@ public class Quantile {
 		List<Integer> excludes = new ArrayList<Integer>();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) excludes.add(null);
 		if (fixings.contains(Fixings.REMOVE_ZEROS)) excludes.add(0);
-		if (fixings.contains(Fixings.REMOVE_TYPEMAXMIN)) {
+		if (fixings.contains(Fixings.REMOVE_MAXMIN)) {
 			excludes.add(Integer.MIN_VALUE);
 			excludes.add(Integer.MAX_VALUE);
 		}
@@ -254,7 +254,7 @@ public class Quantile {
 		List<Double> excludes = new ArrayList<Double>();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) excludes.add(null);
 		if (fixings.contains(Fixings.REMOVE_ZEROS)) excludes.add(0.);
-		if (fixings.contains(Fixings.REMOVE_TYPEMAXMIN)) {
+		if (fixings.contains(Fixings.REMOVE_MAXMIN)) {
 			excludes.add(-Double.MAX_VALUE);
 			excludes.add(Double.MAX_VALUE);
 		}
@@ -297,7 +297,7 @@ public class Quantile {
 		Stream<Integer> stream = iPopulation.parallelStream();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) stream = stream.filter(Objects::nonNull);
 		if (fixings.contains(Fixings.REMOVE_ZEROS)) stream = stream.filter(x -> x != 0);
-		if (fixings.contains(Fixings.REMOVE_TYPEMAXMIN)) {
+		if (fixings.contains(Fixings.REMOVE_MAXMIN)) {
 			Integer[] excludes = { Integer.MIN_VALUE, Integer.MAX_VALUE };
 			stream = stream.filter(x -> Arrays.asList(excludes).contains(x));
 		}
@@ -323,7 +323,7 @@ public class Quantile {
 		Stream<Double> stream = dPopulation.parallelStream();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) stream = stream.filter(Objects::nonNull);
 		if (fixings.contains(Fixings.REMOVE_ZEROS)) stream = stream.filter(x -> x != 0);
-		if (fixings.contains(Fixings.REMOVE_TYPEMAXMIN)) {
+		if (fixings.contains(Fixings.REMOVE_MAXMIN)) {
 			Double[] excludes = { -Double.MAX_VALUE, Double.MAX_VALUE };
 			stream = stream.filter(x -> Arrays.asList(excludes).contains(x));
 		}
