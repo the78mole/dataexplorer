@@ -8,6 +8,7 @@
 package gde.device;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -101,26 +102,26 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class ChannelType {
 
 	@XmlElement(name = "Measurement", required = true)
-	protected List<MeasurementType>												measurement;
+	protected List<MeasurementType>										measurement;
 	@XmlElement(name = "Settlements")
 	@XmlJavaTypeAdapter(SettlementsAdapter.class)
-	protected LinkedHashMap<Integer, SettlementType>			settlements;
+	protected LinkedHashMap<Integer, SettlementType>	settlements;
 	@XmlElement(name = "ReferenceGroups")
 	@XmlJavaTypeAdapter(ReferenceGroupsAdapter.class)
-	protected LinkedHashMap<Integer, ReferenceGroupType>	referenceGroups;
+	protected HashMap<Integer, ReferenceGroupType>		referenceGroups;
 	@XmlElement(name = "TransitionGroups")
 	@XmlJavaTypeAdapter(TransitionGroupsAdapter.class)
-	protected LinkedHashMap<Integer, TransitionGroupType>	transitionGroups;
+	protected HashMap<Integer, TransitionGroupType>		transitionGroups;
 	@XmlElement(name = "Transitions")
 	@XmlJavaTypeAdapter(TransitionsAdapter.class)
-	protected LinkedHashMap<Integer, TransitionType>			transitions;
+	protected HashMap<Integer, TransitionType>				transitions;
 	@XmlElement(name = "ScoreGroups")
 	@XmlJavaTypeAdapter(ScoreGroupsAdapter.class)
-	protected LinkedHashMap<Integer, ScoreGroupType>			scoreGroups;
+	protected LinkedHashMap<Integer, ScoreGroupType>	scoreGroups;
 	@XmlAttribute(required = true)
-	protected String																			name;
+	protected String																	name;
 	@XmlAttribute(required = true)
-	protected ChannelTypes																type;
+	protected ChannelTypes														type;
 
 	/**
 	 * Gets the value of the measurement property.
@@ -186,9 +187,9 @@ public class ChannelType {
 	   *     {@link ReferenceGroupsType }
 	 * 
 	 */
-	public LinkedHashMap<Integer, ReferenceGroupType> getReferenceGroups() {
+	public HashMap<Integer, ReferenceGroupType> getReferenceGroups() {
 		if (this.referenceGroups == null) {
-			this.referenceGroups = new LinkedHashMap<Integer, ReferenceGroupType>();
+			this.referenceGroups = new HashMap<Integer, ReferenceGroupType>();
 		}
 		return referenceGroups;
 	}
@@ -201,7 +202,7 @@ public class ChannelType {
 	   *     {@link ReferenceGroupsType }
 	 * 
 	 */
-	public void setReferenceGroups(LinkedHashMap<Integer, ReferenceGroupType> value) {
+	public void setReferenceGroups(HashMap<Integer, ReferenceGroupType> value) {
 		this.referenceGroups = value;
 	}
 
@@ -213,9 +214,9 @@ public class ChannelType {
 	   *     {@link TransitionGroupsType }
 	 * 
 	   */
-	public LinkedHashMap<Integer, TransitionGroupType> getTransitionGroups() {
+	public HashMap<Integer, TransitionGroupType> getTransitionGroups() {
 		if (this.transitionGroups == null) {
-			this.transitionGroups = new LinkedHashMap<Integer, TransitionGroupType>();
+			this.transitionGroups = new HashMap<Integer, TransitionGroupType>();
 		}
 		return transitionGroups;
 	}
@@ -228,7 +229,7 @@ public class ChannelType {
 	 *     {@link TransitionGroupsType }
 	* 
 	*/
-	public void setTransitionGroups(LinkedHashMap<Integer, TransitionGroupType> value) {
+	public void setTransitionGroups(HashMap<Integer, TransitionGroupType> value) {
 		this.transitionGroups = value;
 	}
 
@@ -240,9 +241,9 @@ public class ChannelType {
 	   *     {@link TransitionsType2 }
 	 * 
 	 */
-	public LinkedHashMap<Integer, TransitionType> getTransitions() {
+	public HashMap<Integer, TransitionType> getTransitions() {
 		if (this.transitions == null) {
-			this.transitions = new LinkedHashMap<Integer, TransitionType>();
+			this.transitions = new HashMap<Integer, TransitionType>();
 		}
 		return transitions;
 	}
@@ -255,7 +256,7 @@ public class ChannelType {
 	   *     {@link TransitionsType2 }
 	 * 
 	 */
-	public void setTransitions(LinkedHashMap<Integer, TransitionType> value) {
+	public void setTransitions(HashMap<Integer, TransitionType> value) {
 		this.transitions = value;
 	}
 
@@ -639,7 +640,7 @@ public class ChannelType {
 	}
 
 	/**
-	* leverages the xml marshalling to key value pairs.
+	 * leverages the xml marshalling to sorted key value pairs by using LinkedHashMap.
 	 */
 	public static class SettlementsAdapter extends XmlAdapter<ChannelType.Settlements, LinkedHashMap<Integer, SettlementType>> {
 
@@ -662,13 +663,13 @@ public class ChannelType {
 	}
 
 	/**
-	* leverages the xml marshalling to key value pairs.
+	 * leverages the xml marshalling to key value pairs.
 	 */
-	public static class ReferenceGroupsAdapter extends XmlAdapter<ChannelType.ReferenceGroups, LinkedHashMap<Integer, ReferenceGroupType>> {
+	public static class ReferenceGroupsAdapter extends XmlAdapter<ChannelType.ReferenceGroups, HashMap<Integer, ReferenceGroupType>> {
 
 		@Override
-		public LinkedHashMap<Integer, ReferenceGroupType> unmarshal(ChannelType.ReferenceGroups values) {
-			LinkedHashMap<Integer, ReferenceGroupType> map = new LinkedHashMap<Integer, ReferenceGroupType>();
+		public HashMap<Integer, ReferenceGroupType> unmarshal(ChannelType.ReferenceGroups values) {
+			HashMap<Integer, ReferenceGroupType> map = new HashMap<Integer, ReferenceGroupType>();
 			if (values != null) {
 				for (ReferenceGroupType value : values.referenceGroup)
 					map.put(value.referenceGroupId, value);
@@ -677,7 +678,7 @@ public class ChannelType {
 		}
 
 		@Override
-		public ChannelType.ReferenceGroups marshal(LinkedHashMap<Integer, ReferenceGroupType> map) {
+		public ChannelType.ReferenceGroups marshal(HashMap<Integer, ReferenceGroupType> map) {
 			ChannelType.ReferenceGroups aList = new ChannelType.ReferenceGroups();
 			aList.referenceGroup = map == null ? new ArrayList<ReferenceGroupType>() : new ArrayList<ReferenceGroupType>(map.values());
 			return aList;
@@ -685,13 +686,13 @@ public class ChannelType {
 	}
 
 	/**
-	* leverages the xml marshalling to key value pairs.
-	*/
-	public static class TransitionGroupsAdapter extends XmlAdapter<ChannelType.TransitionGroups, LinkedHashMap<Integer, TransitionGroupType>> {
+	 * leverages the xml marshalling to key value pairs.
+	 */
+	public static class TransitionGroupsAdapter extends XmlAdapter<ChannelType.TransitionGroups, HashMap<Integer, TransitionGroupType>> {
 
 		@Override
-		public LinkedHashMap<Integer, TransitionGroupType> unmarshal(ChannelType.TransitionGroups values) {
-			LinkedHashMap<Integer, TransitionGroupType> map = new LinkedHashMap<Integer, TransitionGroupType>();
+		public HashMap<Integer, TransitionGroupType> unmarshal(ChannelType.TransitionGroups values) {
+			HashMap<Integer, TransitionGroupType> map = new HashMap<Integer, TransitionGroupType>();
 			if (values != null) {
 				for (TransitionGroupType value : values.transitionGroup)
 					map.put(value.transitionGroupId, value);
@@ -700,7 +701,7 @@ public class ChannelType {
 		}
 
 		@Override
-		public ChannelType.TransitionGroups marshal(LinkedHashMap<Integer, TransitionGroupType> map) {
+		public ChannelType.TransitionGroups marshal(HashMap<Integer, TransitionGroupType> map) {
 			ChannelType.TransitionGroups aList = new ChannelType.TransitionGroups();
 			aList.transitionGroup = map == null ? new ArrayList<TransitionGroupType>() : new ArrayList<TransitionGroupType>(map.values());
 			return aList;
@@ -708,13 +709,13 @@ public class ChannelType {
 	}
 
 	/**
-	* leverages the xml marshalling to key value pairs.
+	 * leverages the xml marshalling to key value pairs.
 	 */
-	public static class TransitionsAdapter extends XmlAdapter<ChannelType.Transitions, LinkedHashMap<Integer, TransitionType>> {
+	public static class TransitionsAdapter extends XmlAdapter<ChannelType.Transitions, HashMap<Integer, TransitionType>> {
 
 		@Override
-		public LinkedHashMap<Integer, TransitionType> unmarshal(ChannelType.Transitions values) {
-			LinkedHashMap<Integer, TransitionType> map = new LinkedHashMap<Integer, TransitionType>();
+		public HashMap<Integer, TransitionType> unmarshal(ChannelType.Transitions values) {
+			HashMap<Integer, TransitionType> map = new HashMap<Integer, TransitionType>();
 			if (values != null) {
 				for (TransitionType value : values.transition)
 					map.put(value.transitionId, value);
@@ -723,7 +724,7 @@ public class ChannelType {
 		}
 
 		@Override
-		public ChannelType.Transitions marshal(LinkedHashMap<Integer, TransitionType> map) {
+		public ChannelType.Transitions marshal(HashMap<Integer, TransitionType> map) {
 			ChannelType.Transitions aList = new ChannelType.Transitions();
 			aList.transition = map == null ? new ArrayList<TransitionType>() : new ArrayList<TransitionType>(map.values());
 			return aList;
@@ -732,7 +733,7 @@ public class ChannelType {
 	}
 
 	/**
-	* leverages the xml marshalling to key value pairs.
+	 * leverages the xml marshalling to sorted key value pairs by using LinkedHashMap.
 	 */
 	public static class ScoreGroupsAdapter extends XmlAdapter<ChannelType.ScoreGroups, LinkedHashMap<Integer, ScoreGroupType>> {
 

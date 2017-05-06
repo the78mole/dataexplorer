@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
@@ -1412,6 +1413,7 @@ public class HistoVault {
 	}
 
 	/**
+	* leverages the xml marshalling to sorted key value pairs due to TreeMap conversion.
 	* leverages the xml marshalling to key value pairs.
 	*/
 	public static class CompartmentsTypeAdapter extends XmlAdapter<CompartmentsType, HashMap<Integer, CompartmentType>> {
@@ -1429,7 +1431,7 @@ public class HistoVault {
 		@Override
 		public CompartmentsType marshal(HashMap<Integer, CompartmentType> map) {
 			CompartmentsType aList = new CompartmentsType();
-			aList.compartment = map == null ? new ArrayList<CompartmentType>() : new ArrayList<CompartmentType>(map.values());
+			aList.compartment = map == null ? new ArrayList<CompartmentType>() : new ArrayList<CompartmentType>(new TreeMap<>(map).values());
 			return aList;
 		}
 	}
