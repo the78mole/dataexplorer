@@ -74,21 +74,17 @@ public class HistoSettlement extends Vector<Integer> {
 	 * outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0
 	 */
 	public final static double		outlierRangeFactorDefault	= 2.;
-	
-	private final static int			initialRecordCapacity			= 111;
+
+	private final static int			initialRecordCapacity			= 22;
 
 	private final IDevice					device										= DataExplorer.getInstance().getActiveDevice();
 	private final Settings				settings									= Settings.getInstance();
 
-	private final TimeSteps				timeStep_ms								= null;																					// timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
 	private final SettlementType	settlement;
-	// device measurement configuration and used to find specific properties
 
 	private final RecordSet				parent;
 	private final int							logChannelNumber;
 	String												name;																																			// measurement name Höhe
-	String												unit;																																			// unit [m]
-	String												symbol;																																		// symbol h
 
 	List<PropertyType>						properties								= new ArrayList<PropertyType>();								// offset, factor, reduction, ...
 	private int										transitionCounter					= 0;
@@ -138,8 +134,7 @@ public class HistoSettlement extends Vector<Integer> {
 		 */
 		public Double getRawAverage(int fromIndex, int toIndex) {
 			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
-					: HistoSettlement.outlierSigmaDefault;
+			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 					: HistoSettlement.outlierRangeFactorDefault;
@@ -277,10 +272,9 @@ public class HistoSettlement extends Vector<Integer> {
 
 	/**
 	 * creates a vector to hold data points.
-	 * @param newDevice
 	 * @param newSettlement
 	 * @param parent
-	 * @param initialCapacity
+	 * @param logChannelNumber
 	 */
 	public HistoSettlement(SettlementType newSettlement, RecordSet parent, int logChannelNumber) {
 		super(initialRecordCapacity);
@@ -556,27 +550,33 @@ public class HistoSettlement extends Vector<Integer> {
 			final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 					: HistoSettlement.outlierRangeFactorDefault;
-			Quantile quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
-			referenceExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
-			values = new ArrayList<Double>();
-			// one additional time step before and after in order to cope with potential measurement latencies
-			for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
-				Double aggregatedValue = recordGroup.getReal(j);
-				if (aggregatedValue != null) values.add(aggregatedValue);
-			}
-			quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
-			thresholdExtremum = quantile.getQuantile(isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
-			if (transition.recoveryStartIndex > 0) {
+			{
+				Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+				referenceExtremum = tmpQuantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
 				values = new ArrayList<Double>();
-				for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
+				// one additional time step before and after in order to cope with potential measurement latencies
+				for (int j = transition.thresholdStartIndex - 1; j < transition.thresholdEndIndex + 1 + 1; j++) {
 					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				quantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
-				recoveryExtremum = quantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
+			}
+			{
+				Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
+			}
+			{
+				if (transition.recoveryStartIndex > 0) {
+					values = new ArrayList<Double>();
+					for (int j = transition.recoveryStartIndex; j < transition.recoveryEndIndex + 1; j++) {
+						Double aggregatedValue = recordGroup.getReal(j);
+						if (aggregatedValue != null) values.add(aggregatedValue);
+					}
+					Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+					recoveryExtremum = tmpQuantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
+				}
 			}
 		}
 		else {
@@ -624,7 +624,7 @@ public class HistoSettlement extends Vector<Integer> {
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record  
-		addNullableRaw(reverseTranslatedResult, (long) this.parent.getTime_ms(transition.thresholdStartIndex) * 10);
+		add(reverseTranslatedResult);
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
 					, reverseTranslatedResult, transitionFigure.getFigureType()));
@@ -689,7 +689,7 @@ public class HistoSettlement extends Vector<Integer> {
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record  
-		addNullableRaw(reverseTranslatedResult, (long) this.parent.getTime_ms(transition.thresholdStartIndex) * 10);
+		add(reverseTranslatedResult);
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
 					, reverseTranslatedResult, transitionAmount.getAmountType()));
@@ -742,31 +742,11 @@ public class HistoSettlement extends Vector<Integer> {
 				throw new UnsupportedOperationException();
 			}
 			// add to settlement record  
-			addNullableRaw(reverseTranslatedResult, (long) this.parent.getTime_ms(transition.thresholdStartIndex) * 10);
+			add(reverseTranslatedResult);
 			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
 						, reverseTranslatedResult, calculus.getCalculusType()));
 		}
-	}
-
-	/**
-	 * add a data point to the settlement data, checks for minimum and maximum to define display range
-	 * @param point
-	 * @param time_100ns in 0.1 ms (divide by 10 to get ms)
-	 */
-	private synchronized boolean addNullableRaw(Integer point, long time_100ns) {
-		if (this.timeStep_ms != null) this.timeStep_ms.addRaw(time_100ns);
-		return this.add(point);
-	}
-
-	/**
-	 * add a data point to the record data, checks for minimum and maximum to define display range
-	 * @param point
-	 */
-	@Override
-	@Deprecated // use elaborated add methods for settlements 
-	public synchronized boolean add(Integer point) {
-		return super.add(point);
 	}
 
 	@Override
@@ -987,22 +967,9 @@ public class HistoSettlement extends Vector<Integer> {
 	 * @return double of device dependent value
 	 */
 	private double translateValue(double value) {
-		double factor = this.getFactor(); // != 1 if a unit translation is required
-		double offset = this.getOffset(); // != 0 if a unit translation is required
-		double reduction = this.getReduction(); // != 0 if a unit translation is required
-		double newValue = 0.;
+		double newValue =  (value - this.getReduction()) * this.getFactor() + this.getOffset();
 
-		//		if (this.getParent().getChannelConfigNumber() == 3 && (this.ordinal == 1 || this.ordinal == 2)) { // 1=GPS-longitude 2=GPS-latitude
-		//			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		//			int grad = ((int) (value / 1000));
-		//			double minuten = (value - (grad * 1000.0)) / 10.0;
-		//			newValue = grad + minuten / 60.0;
-		//		}
-		//		else {
-		newValue = (value - reduction) * factor + offset;
-
-		// if (log.isLoggable(Level.FINER))
-		log.log(Level.FINER, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -1012,18 +979,7 @@ public class HistoSettlement extends Vector<Integer> {
 	 * @return double of settlement dependent value
 	 */
 	public double reverseTranslateValue(double value) { // todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
-		double factor = this.getFactor(); // != 1 if a unit translation is required
-		double offset = this.getOffset(); // != 0 if a unit translation is required
-		double reduction = this.getReduction(); // != 0 if a unit translation is required
-		double newValue = 0.;
-
-		// if (this.getParent().getChannelConfigNumber() == 3 && (this.getOrdinal() == 1 || this.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude )
-		// // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		// int grad = (int) value;
-		// double minuten = (value - grad * 1.0) * 60.0;
-		// newValue = (grad + minuten / 100.0) * 1000.0;
-		// } else {
-		newValue = (value - offset) / factor + reduction;
+		double newValue = (value - this.getOffset()) / this.getFactor() + this.getReduction();
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;

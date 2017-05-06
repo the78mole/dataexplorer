@@ -196,7 +196,9 @@ public class Quantile {
 	 * @param outlierBasePopulation sigma limit for identifying measurement outliers
 	 */
 	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings, double outlierSigma, double outlierBaseRangeFactor) {
-		if (iPopulation.isEmpty()) throw new UnsupportedOperationException();
+		if (iPopulation.isEmpty()) {
+			throw new UnsupportedOperationException();
+		}
 		this.dPopulation = null;
 		this.fixings = fixings;
 		ArrayList<Integer> fullList = new ArrayList<>(iPopulation);
@@ -242,7 +244,9 @@ public class Quantile {
 	 * @param outlierSigma sigma limit for identifying measurement outliers
 	 */
 	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings, double outlierSigma, double outlierBaseRangeFactor) {
-		if (dPopulation.isEmpty()) throw new UnsupportedOperationException();
+		if (dPopulation.isEmpty()) {
+			throw new UnsupportedOperationException();
+		}
 		this.iPopulation = null;
 		this.fixings = fixings;
 		ArrayList<Double> fullList = new ArrayList<>(dPopulation);
