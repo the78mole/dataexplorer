@@ -98,6 +98,7 @@ import gde.data.TrailRecordSet;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.device.resource.DeviceXmlResource;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -412,11 +413,10 @@ public class DataExplorer extends Composite {
 				this.taskBarItem = taskBar.getItem(GDE.shell) != null ? taskBar.getItem(GDE.shell) : taskBar.getItem(null);
 			}
 
-			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isHistoCacheTemplateUpdated() || this.settings.isDevicePropertiesReplaced()) {
+			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isHistoCacheTemplateUpdated()) {
 				StringBuilder sb = new StringBuilder();
 				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0016)).append(GDE.STRING_NEW_LINE);
 				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0017)).append(GDE.STRING_NEW_LINE);
-				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.GDE_MSGI0028)).append(GDE.STRING_NEW_LINE);
 				application.openMessageDialog(GDE.shell, sb.toString());
 				if (this.settings.isHistoCacheTemplateUpdated()) // shut up in this case
 					sb.append(Messages.getString(MessageIds.GDE_MSGI0068)).append(GDE.STRING_NEW_LINE);
@@ -3517,5 +3517,13 @@ public class DataExplorer extends Composite {
 				}.start();
 			}
 		}
+	}
+	
+	/**
+	 * reload all resource which are language related
+	 */
+	public void reloadLanguageRelatedResources() {
+		Messages.reloadResources();
+		DeviceXmlResource.reloadResources();
 	}
 }

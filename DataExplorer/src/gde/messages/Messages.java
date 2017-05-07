@@ -144,4 +144,12 @@ public class Messages {
 			return '?';
 		}
 	}
+	
+	/**
+	 * enable reloading resources after a language switch
+	 */
+	public static void reloadResources() {
+		mainResourceBundle		= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());
+		deviceResourceBundle	= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());
+	}
 }

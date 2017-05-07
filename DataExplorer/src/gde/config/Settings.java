@@ -256,7 +256,7 @@ public class Settings extends Properties {
 	BufferedWriter									writer;																																																														// to write the application settings
 
 	boolean													isDevicePropertiesUpdated				= false;
-	boolean													isDevicePropertiesReplaced			= false;
+	//boolean													isDevicePropertiesReplaced			= false;
 	boolean													isGraphicsTemplateUpdated				= false;
 	boolean													isHistocacheTemplateUpdated			= false;
 
@@ -352,11 +352,11 @@ public class Settings extends Properties {
 		devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 		if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
 			FileUtils.extract(this.getClass(), Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
-			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true);
+			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true, true);
 			this.isDevicePropertiesUpdated = true;
 		}
 		else { // execute every time application starts to enable update from added plug-in
-			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true);
+			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true, true);
 		}
 
 		this.readMeasurementDiplayProperties();
@@ -364,12 +364,12 @@ public class Settings extends Properties {
 		this.xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, local switch comes with the same XSD
 
 		// locale settings has been changed, replacement of device property files required
-		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
-			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false);
-			this.isDevicePropertiesReplaced = true;
+		if (this.getLocaleChanged()) {
+			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false, false);
+			//this.isDevicePropertiesReplaced = true;
 		}
 
-		if (this.isDevicePropertiesReplaced || this.isDevicePropertiesUpdated) { //check if previous devices exist and migrate device usage, default import directory, ....
+		if (this.isDevicePropertiesUpdated) { //check if previous devices exist and migrate device usage, default import directory, ....
 			this.migrationThread = new Thread("migration") {
 				@Override
 				public void run() {
@@ -480,35 +480,37 @@ public class Settings extends Properties {
 	 * check existence of directory, create if required and update all
 	 * @param devicePropertiesTargetpath
 	 */
-	private void updateDeviceProperties(String devicePropertiesTargetpath, boolean existCheck) {
+	private void updateDeviceProperties(String devicePropertiesTargetpath, boolean existCheck, boolean replaceDeviceXmlFiles) {
 		final String $METHOD_NAME = "updateDeviceProperties"; //$NON-NLS-1$
 		final String lang = this.getLocale().getLanguage().contains("de") || this.getLocale().getLanguage().contains("en") ? this.getLocale().getLanguage() : "en";
 
-		String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
-		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
-		String[] files = new File(deviceJarBasePath).list();
-		for (String jarFileName : files) {
-			if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) continue;
-			JarFile jarFile = null;
-			String[] plugins = new String[0];
-			try {
-				jarFile = new JarFile(deviceJarBasePath + GDE.FILE_SEPARATOR_UNIX + jarFileName);
-				plugins = FileUtils.getDeviceJarServicesNames(jarFile);
-			}
-			catch (Throwable e) {
-				Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-			}
-			if (jarFile != null) {
-				for (String plugin : plugins) {
-					if (existCheck) {
-						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
+		if (replaceDeviceXmlFiles) {
+			String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
+			Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
+			String[] files = new File(deviceJarBasePath).list();
+			for (String jarFileName : files) {
+				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) continue;
+				JarFile jarFile = null;
+				String[] plugins = new String[0];
+				try {
+					jarFile = new JarFile(deviceJarBasePath + GDE.FILE_SEPARATOR_UNIX + jarFileName);
+					plugins = FileUtils.getDeviceJarServicesNames(jarFile);
+				}
+				catch (Throwable e) {
+					Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				}
+				if (jarFile != null) {
+					for (String plugin : plugins) {
+						if (existCheck) {
+							if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
+								FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+						}
+						else {
 							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
-					}
-					else {
-						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+						}
 					}
 				}
-			}
+			} 
 		}
 		File path = new File(this.getApplHomePath() + "/Mapping/"); //$NON-NLS-1$
 		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
@@ -1752,13 +1754,6 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the isDevicePropertiesReplaced
-	 */
-	public boolean isDevicePropertiesReplaced() {
-		return this.isDevicePropertiesReplaced;
-	}
-
-	/**
 	 * query value if desktop shortcut needs to be created
 	 */
 	public boolean isDesktopShortcutCreated() {
@@ -1766,7 +1761,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * query value if DataExplorer application is registerd to operating system
+	 * query value if DataExplorer application is registered to operating system
 	 */
 	public boolean isApplicationRegistered() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_APPL_REGISTERED, "false")); //$NON-NLS-1$

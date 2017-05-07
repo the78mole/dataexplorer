@@ -2177,6 +2177,7 @@ public class SettingsDialog extends Dialog {
 					// check for changed local
 					if (SettingsDialog.this.isLocaleLanguageChanged) {
 						SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT0304));
+						//SettingsDialog.this.application.reloadLanguageRelatedResources(); //this may cause several exceptions while a text compare is used
 					}
 				}
 			});

@@ -123,103 +123,12 @@ public class DeviceXmlResource {
 		}
 		return replacements;
 	}
-	
-//if (this.timeBase != null) {
-//	String newKey = null;
-//	try {
-//		newKey = this.deviceXmlResources.getString(this.timeBase.name);
-//		
-//		if (newKey != null)
-//			this.timeBase.name = newKey;
-//	}
-//	catch (Exception e) {
-//		if (log.isLoggable(Level.FINE)) log.log(Level.WARNING, this.xmlFile + " check for missing TimeBase key = " + this.timeBase.name);
-//	}
-//}
-//
-//if (this.state != null) {
-//	for (PropertyType p : this.state.getProperty()) {
-//		String newKey = null;
-//		try {
-//			newKey = this.deviceXmlResources.getString(p.name);
-//			
-//			if (p.name != null) {
-//				//System.out.print(p.name);
-//				p.name = newKey;
-//				//System.out.println( " -> " + p.name);
-//			}
-//		}
-//		catch (Exception e) {
-//			if (log.isLoggable(Level.FINE)) log.log(Level.WARNING, this.xmlFile + " check for missing State key = " + p.name);
-//		}
-//	}
-//}
-//
-//if (this.deviceProps.channels != null) {
-//	//channel outlet or configuration names 
-//	for (ChannelType c : this.deviceProps.channels.getChannel()) {
-//		if (c.name != null) {
-//			System.out.print(c.name);
-//
-//			String[] tmpChannelName = c.name.split(" |_");
-//			StringBuilder sb = new StringBuilder();
-//			if (tmpChannelName.length >= 2) sb.append(tmpChannelName[0]).append('_').append(tmpChannelName[1]);
-//
-//			try {
-//				StringBuilder newChannelName = new StringBuilder(this.deviceXmlResources.getString(sb.toString()));
-//				if (tmpChannelName.length > 2) newChannelName.append(' ').append(tmpChannelName[2]);
-//
-//				c.name = newChannelName.toString();
-//				System.out.println(" -> " + c.name);
-//			}
-//			catch (Exception e) {
-//				System.out.println();
-//				log.log(Level.WARNING, this.xmlFile + " check for missing Channel key = " + c.name);
-//			}
-//		}
-//
-//		//measurement name
-//		for (MeasurementType m : c.getMeasurement()) {
-//			if (m.name != null) {
-//				System.out.print(m.name);
-//
-//				String[] tmpMeasurementName = m.name.split(" ");
-//				StringBuilder sb = new StringBuilder();
-//				if (tmpMeasurementName.length >= 1)
-//					sb.append(tmpMeasurementName[0]);
-//
-//				try {
-//					StringBuilder newMeasurementName = new StringBuilder(this.deviceXmlResources.getString(sb.toString()));
-//					if (tmpMeasurementName.length > 1) newMeasurementName.append(' ').append(tmpMeasurementName[1]);
-//
-//					m.name = newMeasurementName.toString();
-//					System.out.println(" -> " + m.name);
-//				}
-//				catch (Exception e) {
-//					System.out.println();
-//					log.log(Level.WARNING, this.xmlFile + " check for missing Measurement key = " + m.name);
-//				}
-//			}
-//			if (m.label != null) {
-//				System.out.print(m.label);
-//
-//				String[] tmpLabelName = m.label.split(" ");
-//
-//				try {
-//					StringBuilder newLabelName = new StringBuilder(this.deviceXmlResources.getString(tmpLabelName[0]));
-//					if (tmpLabelName.length > 1) newLabelName.append(' ').append(tmpLabelName[1]);
-//
-//					m.label = newLabelName.toString();
-//					System.out.println(" -> " + m.label);
-//				}
-//				catch (Exception e) {
-//					System.out.println();
-//					log.log(Level.WARNING, this.xmlFile + " check for missing Label key = " + m.label);
-//				}
-//			}					
-//		}
-//	}
-//}
 
+	/**
+	 * enable reloading resources after a language switch
+	 */
+	public static void reloadResources() {
+		deviceXmlResources = PropertyResourceBundle.getBundle("gde.device.resource.devicexmlresources", Settings.getInstance().getLocale());
+	}
 
 }
