@@ -78,7 +78,7 @@ public class GPXDataReaderWriter {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		Channel activeChannel = null;
 		int lineNumber = 0;
-		String recordSetNameExtend = device.getRecordSetStemName();
+		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		RecordSet channelRecordSet = null;
 		MenuToolBar menuToolBar = GPXDataReaderWriter.application.getMenuToolBar();
 		if (menuToolBar != null) {
@@ -115,6 +115,7 @@ public class GPXDataReaderWriter {
 					Channels.getInstance().switchChannel(activeChannel.getName());
 					activeChannel.switchRecordSet(recordSetName);
 					device.updateVisibilityStatus(channelRecordSet, true);
+					channelRecordSet.updateVisibleAndDisplayableRecordsForTable();
 
 					menuToolBar.updateChannelSelector();
 					menuToolBar.updateRecordSetSelectCombo();

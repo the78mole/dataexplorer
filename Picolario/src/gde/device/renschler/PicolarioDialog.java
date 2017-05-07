@@ -217,15 +217,15 @@ public class PicolarioDialog extends DeviceDialog {
 
 				if (this.device.getChannelCount() > 0) {
 					this.configTabItem1 = new CTabItem(this.configTabFolder, SWT.NONE);
-					this.configTabItem1.setText(this.device.getChannelName(1));
-					this.configTab1 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelName(1));
+					this.configTabItem1.setText(this.device.getChannelNameReplacement(1));
+					this.configTab1 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelNameReplacement(1));
 					this.configTabItem1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.configTabItem1.setControl(this.configTab1);
 				}
 				if (this.device.getChannelCount() > 1) {
 					this.configTabItem2 = new CTabItem(this.configTabFolder, SWT.NONE);
-					this.configTabItem2.setText(this.device.getChannelName(2));
-					this.configTab2 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelName(2));
+					this.configTabItem2.setText(this.device.getChannelNameReplacement(2));
+					this.configTab2 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelNameReplacement(2));
 					this.configTabItem2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.configTabItem2.setControl(this.configTab2);
 				}

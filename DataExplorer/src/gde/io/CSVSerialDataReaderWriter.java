@@ -152,7 +152,7 @@ public class CSVSerialDataReaderWriter {
 
 				Vector<String> stateNames = new Vector<String>(device.getStateType().getProperty().size());
 				for (int i = 0; i < device.getStateType().getProperty().size(); i++) {
-					stateNames.add(device.getRecordSetStateName(i));
+					stateNames.add(device.getRecordSetStateNameReplacement(i));
 				}
 						
 				while ((line = reader.readLine()) != null) {

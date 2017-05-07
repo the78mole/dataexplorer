@@ -74,7 +74,7 @@ public class WeatronicAdapterDialogTabItem extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
-		this.setText(this.device.getChannelName(this.channelConfigNumber));
+		this.setText(this.device.getChannelNameReplacement(this.channelConfigNumber));
 
 		create();
 	}
@@ -113,8 +113,8 @@ public class WeatronicAdapterDialogTabItem extends CTabItem {
 				filler.setLayoutData(fillerLData);
 			}
 			{
-				for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
+				for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).size(); i++) {
+					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i),
 							this.device, 1));
 				}
 			}
@@ -122,14 +122,14 @@ public class WeatronicAdapterDialogTabItem extends CTabItem {
 				@Override
 				public void controlResized(ControlEvent evt) {
 					WeatronicAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt);
-					int height = 35 + WeatronicAdapterDialogTabItem.this.device.getChannelMeasuremts(WeatronicAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
+					int height = 35 + WeatronicAdapterDialogTabItem.this.device.getChannelMeasuremtsReplacedNames(WeatronicAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					WeatronicAdapterDialogTabItem.this.mainTabComposite.setSize(WeatronicAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 
 				@Override
 				public void controlMoved(ControlEvent evt) {
 					WeatronicAdapterDialogTabItem.log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt);
-					int height = 35 + WeatronicAdapterDialogTabItem.this.device.getChannelMeasuremts(WeatronicAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
+					int height = 35 + WeatronicAdapterDialogTabItem.this.device.getChannelMeasuremtsReplacedNames(WeatronicAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					WeatronicAdapterDialogTabItem.this.mainTabComposite.setSize(WeatronicAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 			});

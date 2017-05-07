@@ -95,15 +95,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1222), Messages.getString(MessageIds.GDE_MSGT1221));
 	}
-	
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	@Override
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1220);
-	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and GDE keys

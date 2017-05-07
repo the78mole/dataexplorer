@@ -81,7 +81,7 @@ public class GathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
-		this.recordSetKey = GDE.STRING_BLANK + this.device.getRecordSetStateName(this.stateNumber);
+		this.recordSetKey = GDE.STRING_BLANK + this.device.getRecordSetStateNameReplacement(this.stateNumber);
 		this.parser = new DataParser(this.device.getDataBlockTimeUnitFactor(), this.device.getDataBlockLeader(), this.device.getDataBlockSeparator().value(), this.device.getDataBlockCheckSumType(), this.device.getDataBlockSize(InputTypes.FILE_IO)); //$NON-NLS-1$  //$NON-NLS-2$
 
 		if (!this.serialPort.isConnected()) {
@@ -134,7 +134,7 @@ public class GathererThread extends Thread {
 	
 						PropertyType stateProperty = this.device.getStateProperty(this.stateNumber);
 						if (stateProperty != null) 
-							processName = this.device.getRecordSetStateName(this.stateNumber);
+							processName = this.device.getRecordSetStateNameReplacement(this.stateNumber);
 						else 
 							throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGW1702, new Object[] {this.stateNumber}));
 						

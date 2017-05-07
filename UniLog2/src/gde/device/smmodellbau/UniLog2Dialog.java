@@ -468,7 +468,7 @@ public class UniLog2Dialog extends DeviceDialog {
 	private void createVisualizationTabItem(final int channelNumber) {
 		CTabItem visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 		visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2509) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber)); //);
+		visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2509) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelNameReplacement(channelNumber)); //);
 
 		Composite visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
 		FormLayout visualizationMainCompositeLayout = new FormLayout();

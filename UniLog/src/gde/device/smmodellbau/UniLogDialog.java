@@ -923,29 +923,29 @@ public class UniLogDialog extends DeviceDialog {
 					{ // begin measurement configuration tabs
 						if (this.device.getChannelCount() > 0) {
 							this.configTabItem1 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
-							this.configTabItem1.setText(this.device.getChannelName(1));
-							this.configTab1 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(1));
+							this.configTabItem1.setText(this.device.getChannelNameReplacement(1));
+							this.configTab1 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelNameReplacement(1));
 							this.configTabItem1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.configTabItem1.setControl(this.configTab1);
 						}
 						if (this.device.getChannelCount() > 1) {
 							this.configTabItem2 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
-							this.configTabItem2.setText(this.device.getChannelName(2));
-							this.configTab2 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(2));
+							this.configTabItem2.setText(this.device.getChannelNameReplacement(2));
+							this.configTab2 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelNameReplacement(2));
 							this.configTabItem2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.configTabItem2.setControl(this.configTab2);
 						}
 						if (this.device.getChannelCount() > 2) {
 							this.configTabItem3 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
-							this.configTabItem3.setText(this.device.getChannelName(3));
-							this.configTab3 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(3));
+							this.configTabItem3.setText(this.device.getChannelNameReplacement(3));
+							this.configTab3 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelNameReplacement(3));
 							this.configTabItem3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.configTabItem3.setControl(this.configTab3);
 						}
 						if (this.device.getChannelCount() > 3) {
 							this.configTabItem4 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
-							this.configTabItem4.setText(this.device.getChannelName(4));
-							this.configTab4 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(4));
+							this.configTabItem4.setText(this.device.getChannelNameReplacement(4));
+							this.configTab4 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelNameReplacement(4));
 							this.configTabItem4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.configTabItem4.setControl(this.configTab4);
 						}
@@ -1055,7 +1055,7 @@ public class UniLogDialog extends DeviceDialog {
 										int index = UniLogDialog.this.application.getActiveChannelNumber() - 1;
 										UniLogDialog.this.configurationNames = new String[UniLogDialog.this.device.getChannelCount()];
 										for (int i = 0; i < UniLogDialog.this.configurationNames.length; i++) {
-											UniLogDialog.this.configurationNames[i] = " " + UniLogDialog.this.device.getChannelName(i + 1); //$NON-NLS-1$
+											UniLogDialog.this.configurationNames[i] = " " + UniLogDialog.this.device.getChannelNameReplacement(i + 1); //$NON-NLS-1$
 										}
 										UniLogDialog.this.useConfigCombo.setItems(UniLogDialog.this.configurationNames);
 										UniLogDialog.this.useConfigCombo.select(index);

@@ -61,7 +61,7 @@ public class LiPoWatchDataGatherer extends Thread {
 		this.serialPort = useSerialPort;
 		this.dialog = useDevice.getDialog();
 		this.channelNumber = 1; //$NON-NLS-1$
-		this.configKey = this.device.getChannelName(this.channelNumber);
+		this.configKey = this.device.getChannelNameReplacement(this.channelNumber);
 }
 
 	/**

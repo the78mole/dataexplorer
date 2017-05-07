@@ -2336,7 +2336,10 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public int getRecordOrdinalOfType(Record.DataType dataType) {
 		for (Record record : this.values()) {
-			if (record.dataType == dataType) return record.ordinal;
+			if (record.dataType == dataType) {
+				if (record.hasReasonableData())
+					return record.ordinal;
+			}
 		}
 		return -1;
 	}

@@ -582,7 +582,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								RecordSet activeRecordSet = CSVReaderWriter.read(FutabaAdapter.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, FutabaAdapter.this.getRecordSetStemName());
+								RecordSet activeRecordSet = CSVReaderWriter.read(FutabaAdapter.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, FutabaAdapter.this.getRecordSetStemNameReplacement());
 								FutabaAdapter.this.updateVisibilityStatus(activeRecordSet, true);
 								activeRecordSet.descriptionAppendFilename(selectedImportFile);
 							}

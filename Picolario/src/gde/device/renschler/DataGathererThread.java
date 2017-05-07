@@ -59,7 +59,7 @@ public class DataGathererThread extends Thread {
 		this.serialPort = currentSerialPort;
 		this.dialog = (PicolarioDialog) currentDevice.getDialog();
 		this.datagramNumbers = useDatagramNumbers;
-		this.configKey = currentDevice.getChannelName(1);
+		this.configKey = currentDevice.getChannelNameReplacement(1);
 	}
 
 	/**

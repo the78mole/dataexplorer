@@ -1123,7 +1123,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 				log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
 
-				Channel newChannel = new Channel(activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
+				Channel newChannel = new Channel(activeDevice.getChannelNameReplacement(i), activeDevice.getChannelTypes(i));
 				newChannel.setObjectKey(this.application.getObjectKey());
 				// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 				channels.put(Integer.valueOf(i), newChannel);

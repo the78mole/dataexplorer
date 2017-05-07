@@ -78,7 +78,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = 1; 
 		this.channel = this.channels.get(this.channelNumber);
-		this.configKey = this.device.getChannelName(this.channelNumber);
+		this.configKey = this.device.getChannelNameReplacement(this.channelNumber);
 
 		this.calcValues.put(LiPoWatch.A1_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 11)); // 11 = A1
 		this.calcValues.put(LiPoWatch.A1_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 11));

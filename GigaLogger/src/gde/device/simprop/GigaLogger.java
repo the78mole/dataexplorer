@@ -490,7 +490,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								RecordSet activeRecordSet = CSVReaderWriter.read(GigaLogger.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, GigaLogger.this.getRecordSetStemName());
+								RecordSet activeRecordSet = CSVReaderWriter.read(GigaLogger.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, GigaLogger.this.getRecordSetStemNameReplacement());
 								GigaLogger.this.updateVisibilityStatus(activeRecordSet, true);
 								activeRecordSet.descriptionAppendFilename(tmpFileName);
 							}

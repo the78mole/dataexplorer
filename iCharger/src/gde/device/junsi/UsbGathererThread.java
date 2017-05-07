@@ -246,7 +246,7 @@ public class UsbGathererThread extends Thread {
 		String batterieType = this.device.getBattrieType(dataBuffer);
 		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE 8=TrickleCurrent 9=Balancing
 		int processModeNumber = dataBuffer[7];
-		String processTypeName = isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2618) : this.device.getRecordSetStateName(processModeNumber);
+		String processTypeName = isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2618) : this.device.getRecordSetStateNameReplacement(processModeNumber);
 		//STATUS:     0=normal !0=cycle
 		String processStatusName = !isContinuousRecordSet && dataBuffer[9] != 0 ? Messages.getString(MessageIds.GDE_MSGT2610) : GDE.STRING_EMPTY;
 		if (UsbGathererThread.log.isLoggable(Level.FINE)) {

@@ -1374,10 +1374,10 @@ public class DataExplorer extends Composite {
 		String[] channelNames = new String[device.getChannelCount()];
 		// buildup new structure - set up the channels
 		for (int i = 1; i <= device.getChannelCount(); i++) {
-			Channel newChannel = new Channel(device.getChannelName(i), device.getChannelTypes(i));
+			Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
 			// newChannel.setObjectKey(this.application.getObjectKey()); now in  application.selectObjectKey
 			this.channels.put(Integer.valueOf(i), newChannel);
-			channelNames[i - 1] = i + " : " + device.getChannelName(i);
+			channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
 		}
 		this.channels.setChannelNames(channelNames);
 

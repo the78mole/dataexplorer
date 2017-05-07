@@ -132,7 +132,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			//check if recordSet initialized, transmitter and receiver data always present, but not in the same data rate and signals
 			channel = HoTTbinReader.channels.get(channelNumber);
 			channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-			recordSetName = recordSetNumber + device.getRecordSetStemName() + recordSetNameExtend;
+			recordSetName = recordSetNumber + device.getRecordSetStemNameReplacement() + recordSetNameExtend;
 			HoTTbinReaderD.recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 			channel.put(recordSetName, HoTTbinReaderD.recordSet);
 			tmpRecordSet = channel.get(recordSetName);
@@ -476,7 +476,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			//receiver data are always contained
 			channel = HoTTbinReader.channels.get(channelNumber);
 			channel.setFileDescription(HoTTbinReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey() : date);
-			recordSetName = recordSetNumber + device.getRecordSetStemName() + recordSetNameExtend;
+			recordSetName = recordSetNumber + device.getRecordSetStemNameReplacement() + recordSetNameExtend;
 			HoTTbinReaderD.recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 			channel.put(recordSetName, HoTTbinReaderD.recordSet);
 			tmpRecordSet = channel.get(recordSetName);

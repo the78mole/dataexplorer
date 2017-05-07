@@ -176,7 +176,7 @@ public class LogViewReader {
 		int channelNumber = device.recordSetNumberFollowChannel() ? new Integer(header.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
 		ChannelTypes channelType = device.getChannelTypes(channelNumber);
 		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(GDE.CHANNEL_CONFIG_NAME);
-		String channelConfigName = device.getChannelName(channelNumber);
+		String channelConfigName = device.getChannelNameReplacement(channelNumber);
 		log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + GDE.CHANNEL_CONFIG_TYPE + channelType + "; " + GDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		header.put(GDE.CHANNEL_CONFIG_TYPE, channelType.name());
 		header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);

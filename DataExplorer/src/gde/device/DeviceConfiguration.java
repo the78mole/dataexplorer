@@ -1266,7 +1266,7 @@ public class DeviceConfiguration {
 	/**
 	 * @return the channel name
 	 */
-	public String getChannelName(int channelNumber) {
+	public String getChannelNameReplacement(int channelNumber) {
 		return xmlResource.getReplacement(this.deviceProps.getChannels().channel.get(channelNumber - 1).getName());
 	}
 
@@ -1333,15 +1333,7 @@ public class DeviceConfiguration {
 	 * @return the channel measurements by given channel configuration key (name)
 	 */
 	public List<MeasurementType> getChannelMeasuremts(int channelConfigNumber) {
-		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigNumber).getMeasurement();
-		List<MeasurementType> cpMeasurements = new ArrayList<MeasurementType>();
-		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
-		while (ite.hasNext()) {
-			MeasurementType measurementType = (MeasurementType) ite.next().clone();
-			measurementType.name = xmlResource.getReplacement(measurementType.name);
-			cpMeasurements.add(measurementType);
-		}
-		return cpMeasurements;
+		return this.getChannel(channelConfigNumber).getMeasurement();
 	}
 
 	/**
@@ -1349,7 +1341,14 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey) {
-		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigKey).getMeasurement();
+		return this.getChannel(channelConfigKey).getMeasurement();
+	}
+
+	/**
+	 * @return the channel measurements by given channel configuration key (name)
+	 */
+	public List<MeasurementType> getChannelMeasuremtsReplacedNames(int channelConfigNumber) {
+		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigNumber).getMeasurement();
 		List<MeasurementType> cpMeasurements = new ArrayList<MeasurementType>();
 		Iterator<MeasurementType> ite = tmpMeasurements.iterator();
 		while (ite.hasNext()) {
@@ -2329,8 +2328,17 @@ public class DeviceConfiguration {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + xmlResource.getReplacement(this.getStateType().getProperty().get(0).getName()) : Messages.getString(MessageIds.GDE_MSGT0272)
-				: Messages.getString(MessageIds.GDE_MSGT0272);
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " +this.getStateType().getProperty().get(0).getName() 
+				: ") state_data_recording" : ") state_data_recording";
+	}
+
+	/**
+	 * query the default stem used as record set replaced name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemNameReplacement() {
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + xmlResource.getReplacement(this.getStateType().getProperty().get(0).getName()) 
+			: Messages.getString(MessageIds.GDE_MSGT0272)	: Messages.getString(MessageIds.GDE_MSGT0272);
 	}
 
 	/**
@@ -2338,8 +2346,17 @@ public class DeviceConfiguration {
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateName(final int stateNumber) {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateType().getProperty().get(stateNumber).getName()) : xmlResource.getReplacement("state_data_recording")
-				: xmlResource.getReplacement("state_data_recording");
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? this.getStateType().getProperty().get(stateNumber).getName() 
+				: "state_data_recording" : "state_data_recording";
+	}
+
+	/**
+	 * query the state name used as record set name
+	 * @return getRecordSetStateName
+	 */
+	public String getRecordSetStateNameReplacement(final int stateNumber) {
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateType().getProperty().get(stateNumber).getName()) 
+				: xmlResource.getReplacement("state_data_recording") : xmlResource.getReplacement("state_data_recording");
 	}
 
 	/**

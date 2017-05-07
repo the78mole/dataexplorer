@@ -28,7 +28,6 @@ import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.PropertyType;
-import gde.device.smmodellbau.lipowatch.MessageIds;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -100,15 +99,6 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-	}
-
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	@Override
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1601);
 	}
 
 	/**

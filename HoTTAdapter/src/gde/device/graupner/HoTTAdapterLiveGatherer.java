@@ -181,7 +181,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 
 		this.channel = this.application.getActiveChannel();
 		String recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + "live" + GDE.STRING_RIGHT_BRACKET;
-		String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
+		String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemNameReplacement();
 
 		//receiver is always - might be empty in slave modus
 		this.channel = this.channels.get(1);

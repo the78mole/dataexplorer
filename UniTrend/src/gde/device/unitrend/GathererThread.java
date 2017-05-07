@@ -78,7 +78,7 @@ public class GathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
-		this.recordSetKey = this.device.getRecordSetStemName();
+		this.recordSetKey = this.device.getRecordSetStemNameReplacement();
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();

@@ -164,25 +164,25 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				///////////////////////////////////////////////////				
 				if (this.numberChannels > 0) {
 					this.channel1Tab = new AkkuMasterChannelTab(this,
-							(" 1 " + this.device.getChannelName(1)), AkkuMasterC4SerialPort.channel_1, AkkuMasterC4Dialog.this.serialPort, this.channels.get(1), aCapacity, aCellCount, //$NON-NLS-1$
+							(" 1 " + this.device.getChannelNameReplacement(1)), AkkuMasterC4SerialPort.channel_1, AkkuMasterC4Dialog.this.serialPort, this.channels.get(1), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 					this.channel1Tab.addChannelTab(this.tabFolder);
 				}
 				if (this.numberChannels > 1) {
 					this.channel2Tab = new AkkuMasterChannelTab(this,
-							(" 2 " + this.device.getChannelName(2)), AkkuMasterC4SerialPort.channel_2, AkkuMasterC4Dialog.this.serialPort, this.channels.get(2), aCapacity, aCellCount, //$NON-NLS-1$
+							(" 2 " + this.device.getChannelNameReplacement(2)), AkkuMasterC4SerialPort.channel_2, AkkuMasterC4Dialog.this.serialPort, this.channels.get(2), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 					this.channel2Tab.addChannelTab(this.tabFolder);
 				}
 				if (this.numberChannels > 2) {
 					this.channel3Tab = new AkkuMasterChannelTab(this,
-							(" 3 " + this.device.getChannelName(3)), AkkuMasterC4SerialPort.channel_3, AkkuMasterC4Dialog.this.serialPort, this.channels.get(3), aCapacity, aCellCount, //$NON-NLS-1$
+							(" 3 " + this.device.getChannelNameReplacement(3)), AkkuMasterC4SerialPort.channel_3, AkkuMasterC4Dialog.this.serialPort, this.channels.get(3), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 					this.channel3Tab.addChannelTab(this.tabFolder);
 				}
 				if (this.numberChannels > 3) {
 					this.channel4Tab = new AkkuMasterChannelTab(this,
-							(" 4 " + this.device.getChannelName(4)), AkkuMasterC4SerialPort.channel_4, AkkuMasterC4Dialog.this.serialPort, this.channels.get(4), aCapacity, aCellCount, //$NON-NLS-1$
+							(" 4 " + this.device.getChannelNameReplacement(4)), AkkuMasterC4SerialPort.channel_4, AkkuMasterC4Dialog.this.serialPort, this.channels.get(4), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 					this.channel4Tab.addChannelTab(this.tabFolder);
 				}

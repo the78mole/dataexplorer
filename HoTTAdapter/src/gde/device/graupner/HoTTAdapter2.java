@@ -1105,7 +1105,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	@Override
 	public void resetMeasurements() {
 		for (int i = 1; i <= this.getChannelCount(); i++) {
-			List<MeasurementType> measurement = this.getChannelMeasuremts(i);
+			List<MeasurementType> measurement = this.getChannelMeasuremtsReplacedNames(i);
 			for (MeasurementType measurementType : measurement) {
 				measurementType.setActive(true);
 			}
@@ -1176,7 +1176,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			if (fileRecord.contains("_isActive=true") || fileRecord.contains("_name=Ch ")) ++noneCalculationRecords;
 		}
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
-			List<MeasurementType> measurements = this.getChannelMeasuremts(recordSet.getChannelConfigNumber());
+			List<MeasurementType> measurements = this.getChannelMeasuremtsReplacedNames(recordSet.getChannelConfigNumber());
 			switch (fileRecordsProperties.length) {
 			case 44: //Android HoTTAdapter3
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
@@ -1252,7 +1252,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		}
 		else if ((recordKeys.length - noneCalculationRecords) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
 			//load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
-			List<MeasurementType> measurements = this.getChannelMeasuremts(recordSet.getChannelConfigNumber());
+			List<MeasurementType> measurements = this.getChannelMeasuremtsReplacedNames(recordSet.getChannelConfigNumber());
 			switch (noneCalculationRecords) {
 			case 44: //Android HoTTAdapter3
 				for (int i = 0; i < recordKeys.length; i++) {

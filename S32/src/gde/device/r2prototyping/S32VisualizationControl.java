@@ -100,7 +100,7 @@ public class S32VisualizationControl extends Composite {
 	}
 	
 	void updateMeasurements() {
-		for (MeasurementType tmpMeasurement : this.device.getChannelMeasuremts(this.channelConfigNumber)) {
+		for (MeasurementType tmpMeasurement : this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber)) {
 			System.out.println(tmpMeasurement.getUnit());
 		}		
 	}
@@ -130,7 +130,7 @@ public class S32VisualizationControl extends Composite {
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) { // display actual only the native 31 measurements of JLog2
 				//allow all measurement names, symbols and units to be correctable
 				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
-						this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));
+						this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));
 			}
 		}
 	}

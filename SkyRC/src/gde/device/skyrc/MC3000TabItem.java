@@ -76,7 +76,7 @@ public class MC3000TabItem extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
-		this.setText(this.device.getChannelName(this.channelConfigNumber));
+		this.setText(this.device.getChannelNameReplacement(this.channelConfigNumber));
 
 		create();
 	}
@@ -103,8 +103,8 @@ public class MC3000TabItem extends CTabItem {
 		}
 		{
 			//measurements
-			for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, i==10?2:1));
+			for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).size(); i++) {
+				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, i==10?2:1));
 			}
 		}
 	}

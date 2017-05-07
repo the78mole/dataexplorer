@@ -75,7 +75,7 @@ public class HoTTAdapterDialogTabItem extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
-		this.setText(this.device.getChannelName(this.channelConfigNumber));
+		this.setText(this.device.getChannelNameReplacement(this.channelConfigNumber));
 
 		create();
 	}
@@ -119,21 +119,21 @@ public class HoTTAdapterDialogTabItem extends CTabItem {
 				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Revolution, 21=Height, 22=Climb 1, 23=Climb 3, 24=Voltage 1, 25=Voltage 2, 26=Temperature 1, 27=Temperature 2 
 				//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
+				for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).size(); i++) {
+					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i),
 							this.device, 1));
 				}
 			}
 			this.scolledComposite.addControlListener(new ControlListener() {
 				public void controlResized(ControlEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt);
-					int height = 35 + HoTTAdapterDialogTabItem.this.device.getChannelMeasuremts(HoTTAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
+					int height = 35 + HoTTAdapterDialogTabItem.this.device.getChannelMeasuremtsReplacedNames(HoTTAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					HoTTAdapterDialogTabItem.this.mainTabComposite.setSize(HoTTAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 
 				public void controlMoved(ControlEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt);
-					int height = 35 + HoTTAdapterDialogTabItem.this.device.getChannelMeasuremts(HoTTAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
+					int height = 35 + HoTTAdapterDialogTabItem.this.device.getChannelMeasuremtsReplacedNames(HoTTAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					HoTTAdapterDialogTabItem.this.mainTabComposite.setSize(HoTTAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 			});

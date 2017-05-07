@@ -324,6 +324,7 @@ public class OsdReaderWriter {
 					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
 					data_in.readFully(buffer);
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
+					recordSet.updateVisibleAndDisplayableRecordsForTable();
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (new Date().getTime() - startTime)));
 				}
 				// display the first record set data while reading the rest of the data
@@ -772,6 +773,7 @@ public class OsdReaderWriter {
 				random_in.readFully(buffer);
 	    }
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
+			recordSet.updateVisibleAndDisplayableRecordsForTable();
 			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (FileNotFoundException e) {

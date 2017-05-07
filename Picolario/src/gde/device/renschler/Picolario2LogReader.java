@@ -68,7 +68,7 @@ public class Picolario2LogReader {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		Channel activeChannel = null;
 		int lineNumber = 0;
-		String recordSetNameExtend = device.getRecordSetStemName();
+		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		RecordSet recordSet = null;
 		DataInputStream data_in = null;
 		int[] points = new int[device.getNumberOfMeasurements(1)];

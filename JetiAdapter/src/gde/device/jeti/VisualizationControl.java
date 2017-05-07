@@ -111,7 +111,7 @@ public class VisualizationControl extends Composite {
 			
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
 				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
-						this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
+						this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
 			}
 		}
 	}

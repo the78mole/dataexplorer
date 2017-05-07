@@ -125,10 +125,10 @@ public class GathererThread extends Thread {
 					dataBuffer = this.serialPort.getData();
 
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(this.device.getRecordSetStemName())) { //$NON-NLS-1$
+					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(this.device.getRecordSetStemNameReplacement())) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
 						// record set does not exist or is outdated, build a new name and create
-						this.recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName(); //$NON-NLS-1$ 
+						this.recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemNameReplacement(); //$NON-NLS-1$ 
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), this.channel.getNumber(), true, false, true));
 						this.channel.applyTemplateBasics(this.recordSetKey);
 						log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$

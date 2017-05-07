@@ -113,7 +113,7 @@ public class VisualizationControl extends Composite {
 			
 			RecordSet activeRecordSet = this.application.getActiveChannel().getActiveRecordSet();
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
-				MeasurementType recordMeasurement = this.device.getChannelMeasuremts(this.channelConfigNumber).get(i);
+				MeasurementType recordMeasurement = this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i);
 				if (activeRecordSet != null)
 					recordMeasurement.setUnit(activeRecordSet.get(i).getUnit());
 				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, recordMeasurement,

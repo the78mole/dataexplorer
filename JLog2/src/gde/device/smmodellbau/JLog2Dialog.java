@@ -403,7 +403,7 @@ public class JLog2Dialog extends DeviceDialog {
 	private void createVisualizationTabItem(int channelNumber, int numMeasurements) {
 		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
-		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2809) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber));
+		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2809) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelNameReplacement(channelNumber));
 
 		this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
 		FormLayout visualizationMainCompositeLayout = new FormLayout();

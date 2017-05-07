@@ -154,7 +154,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 
 		this.channel = this.application.getActiveChannel();
 		String recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + "live" + GDE.STRING_RIGHT_BRACKET;
-		String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName() + recordSetNameExtend;
+		String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemNameReplacement() + recordSetNameExtend;
 
 		this.dialog.selectTab(this.device.getLastChannelNumber());
 		this.channel = this.channels.get(this.device.getLastChannelNumber());

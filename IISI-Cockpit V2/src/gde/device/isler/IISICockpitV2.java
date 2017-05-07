@@ -553,7 +553,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								RecordSet activeRecordSet = CSVReaderWriter.read(IISICockpitV2.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, IISICockpitV2.this.getRecordSetStemName());
+								RecordSet activeRecordSet = CSVReaderWriter.read(IISICockpitV2.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, IISICockpitV2.this.getRecordSetStemNameReplacement());
 								IISICockpitV2.this.updateVisibilityStatus(activeRecordSet, true);
 								activeRecordSet.descriptionAppendFilename(tmpFileName);
 							}

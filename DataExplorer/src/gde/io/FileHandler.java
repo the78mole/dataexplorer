@@ -480,7 +480,7 @@ public class FileHandler {
 			int channelNumber = this.application.getActiveDevice().recordSetNumberFollowChannel() ? new Integer(lovHeader.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
 			IDevice activeDevice = this.application.getActiveDevice();
 			String channelType = activeDevice.getChannelTypes(channelNumber).name();
-			String channelConfigName = activeDevice.getChannelName(channelNumber);
+			String channelConfigName = activeDevice.getChannelNameReplacement(channelNumber);
 			FileHandler.log.log(Level.FINE,
 					"channelConfigName = " + channelConfigName + " (" + GDE.CHANNEL_CONFIG_TYPE + channelType + "; " + GDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Channel channel = this.channels.get(channelNumber);

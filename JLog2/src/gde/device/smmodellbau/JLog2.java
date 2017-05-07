@@ -594,7 +594,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public String getProcessName(byte[] buffer) {
-		return this.getRecordSetStateName(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1])));
+		return this.getRecordSetStateNameReplacement(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1])));
 	}
 	
 	String getConfigurationFileDirecotry() {

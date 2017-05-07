@@ -215,7 +215,7 @@ public class NMEAReaderWriter {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
 
 					try {
-						recordSetNameExtend = device.getRecordSetStateName(0); // state name
+						recordSetNameExtend = device.getRecordSetStateNameReplacement(0); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}

@@ -278,9 +278,9 @@ public class KMZWriter {
 			if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setProgress(progressCycle, sThreadId);
 			final Record recordLongitude = recordSet.get(ordinalLongitude);
 			final Record recordLatitude = recordSet.get(ordinalLatitude);
-			final Record recordHeight = ordinalHeight < 0 ? null : recordSet.get(ordinalHeight);
-			final Record recordMeasurement = ordinalMeasurement < 0 ? null : recordSet.get(ordinalMeasurement);
-			final Record recordSlope = ordinalSlope < 0 ? null : recordSet.get(ordinalSlope);
+			final Record recordHeight = ordinalHeight < 0 ? null : recordSet.get(ordinalHeight).hasReasonableData() ? recordSet.get(ordinalHeight) : null;
+			final Record recordMeasurement = ordinalMeasurement < 0 ? null : recordSet.get(ordinalMeasurement).hasReasonableData() ? recordSet.get(ordinalMeasurement) : null;
+			final Record recordSlope = ordinalSlope < 0 ? null : recordSet.get(ordinalSlope).hasReasonableData() ? recordSet.get(ordinalSlope) : null;
 			final String measurementName = recordMeasurement != null ? recordMeasurement.getName() : GDE.STRING_EMPTY;
 			final String measurementUnit = recordMeasurement != null ? recordMeasurement.getUnit() : GDE.STRING_EMPTY;
 			
@@ -297,7 +297,7 @@ public class KMZWriter {
 			else { //device oriented
 				Integer activeChannelNumber = application.getActiveChannelNumber();
 				Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
-				if(activeChannelNumber != null && measurementOrdinal != null) {
+				if(activeChannelNumber != null && measurementOrdinal != null && measurementOrdinal >= 0) {
 					PropertyType property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value());
 					if (property != null) {
 						try {
@@ -517,7 +517,7 @@ public class KMZWriter {
 				timeStamp = recordSet.getTime(i) / 10 + recordSetStartTimeStamp;
 				if ((timeStamp - lastTimeStamp) >= 500 || lastTimeStamp == -1) {// write a point all ~1000 ms
 					int velocity = recordMeasurement == null ? 0 : (int) device.translateValue(recordMeasurement, recordMeasurement.get(i) / 1000.0);
-					if (!((velocity < measurementLowerLimit && velocityRange == 0) || (velocity >= measurementLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
+					if (recordMeasurement != null && !((velocity < measurementLowerLimit && velocityRange == 0) || (velocity >= measurementLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
 						velocityRange = switchColor(zipWriter, recordMeasurement, velocity, measurementLowerLimit, velocityUpperLimit, velocityColors, velocityRange, altitudeMode, isExtrude, randomColor);
 	
 						//re-write last coordinates

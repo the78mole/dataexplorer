@@ -403,7 +403,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public String getProcessName(byte[] buffer) throws Exception {
-		return this.getRecordSetStateName(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1])));
+		return this.getRecordSetStateNameReplacement(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1])));
 	}
 	
 	/**

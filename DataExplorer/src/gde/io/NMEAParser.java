@@ -365,7 +365,7 @@ public class NMEAParser implements IDataParser {
 		catch (Exception e) {
 			if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
 				if (!missingImpleWarned.contains(strValues[0].substring(1))) {
-					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implemented!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					missingImpleWarned.add(strValues[0].substring(1));
 				}
 			}

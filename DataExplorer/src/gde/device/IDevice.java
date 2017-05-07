@@ -405,7 +405,7 @@ public interface IDevice {
 	 * @param channelNumber
 	 * @return the channel name
 	 */
-	public String getChannelName(int channelNumber);
+	public String getChannelNameReplacement(int channelNumber);
 
 	/**
 	 * @param channelName - size should not exceed 15 char length - this is the key to get access
@@ -429,6 +429,11 @@ public interface IDevice {
 	 */
 	@Deprecated
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey);
+
+	/**
+	 * @return the channel measurements by given channel configuration number with replaced names
+	 */
+	public List<MeasurementType> getChannelMeasuremtsReplacedNames(int channelConfigNumber);
 
 	/**
 	 * get the properties from a channel/configuration and record key name 
@@ -766,10 +771,23 @@ public interface IDevice {
 	public String getRecordSetStemName();
 
 	/**
+	 * query the default stem used as record set replaced name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemNameReplacement();
+
+
+	/**
 	 * query the state name used as record set name
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateName(final int stateNumber);
+
+	/**
+	 * query the replaced state name used as record set name
+	 * @return getRecordSetStateName
+	 */
+	public String getRecordSetStateNameReplacement(final int stateNumber);
 
 	/**
 	 * load the mapping exist between lov file configuration keys and GDE keys
