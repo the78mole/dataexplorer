@@ -125,7 +125,7 @@ public class IGCReaderWriter {
 		Channel activeChannel = null;
 		int lineNumber = 1;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
-		String recordSetNameExtend = device.getRecordSetStemName();
+		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		long timeStamp = -1, actualTimeStamp = -1, startTimeStamp = -1;
 		StringBuilder header = new StringBuilder();
 		String date = "000000", time; //16 02 40

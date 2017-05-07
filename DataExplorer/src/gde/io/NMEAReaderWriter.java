@@ -89,7 +89,7 @@ public class NMEAReaderWriter {
 		Channel activeChannel = null;
 		int lineNumber = 1;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
-		String recordSetNameExtend = device.getRecordSetStemName();
+		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		long timeStamp = -1;
 		int lastProgress = 0;
 		File inputFile = new File(filePath);
@@ -266,6 +266,7 @@ public class NMEAReaderWriter {
 				activeChannel.applyTemplate(recordSetName, true);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+				activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
 				if (NMEAReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 
 				reader.close();

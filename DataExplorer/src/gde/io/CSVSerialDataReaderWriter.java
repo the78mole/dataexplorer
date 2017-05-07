@@ -92,7 +92,7 @@ public class CSVSerialDataReaderWriter {
 		boolean isOutdated = false;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
-		String recordSetNameExtend = device.getRecordSetStemName();
+		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		RecordSet channelRecordSet = null;
 		int lastRecordSetNumberOffset = 0;
 		Vector<RecordSet> createdRecordSets = new Vector<RecordSet>(1);

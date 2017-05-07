@@ -95,7 +95,7 @@ public class FileHandler {
 
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				RecordSet activeRecordSet = CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemName(), isRaw);
+				RecordSet activeRecordSet = CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemNameReplacement(), isRaw);
 				activeDevice.updateVisibilityStatus(activeRecordSet, true);
 				this.application.getActiveChannel().applyTemplate(activeRecordSet.getName(), true);
 

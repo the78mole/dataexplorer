@@ -99,7 +99,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 			// iterate over telegram entries to build the record set
 			for (Vector<byte[]> telegrams : dataCollection) {
-				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
+				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemNameReplacement();
 				
 				// check analog modus and update channel/configuration
 				//this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);

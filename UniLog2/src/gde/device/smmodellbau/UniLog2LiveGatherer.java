@@ -111,7 +111,7 @@ public class UniLog2LiveGatherer extends Thread {
 		this.channels.switchChannel(this.channel.getName());
 
 		// prepare timed data gatherer thread
-		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
+		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemNameReplacement();
 
 		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false, true));
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$

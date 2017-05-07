@@ -88,7 +88,7 @@ public class JetiDataReader {
 		boolean isOutdated = false;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
-		String recordSetNameExtend = device.getRecordSetStemName();
+		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		double time_ms = 0, timeStep_ms = 0;
 
 		try {
@@ -312,6 +312,7 @@ public class JetiDataReader {
 							new String[]{activeChannel.get(recordSetName).getRecordSetDescription(), data.getModelName(), 
 							String.format(Locale.getDefault(), "min=%.3f sec; max=%.3f sec; avg=%.3f sec; sigma=%.3f sec", data.getMinTimeStep()/1000.0, data.getMaxTimeStep()/1000.0, data.getAvgTimeStep()/1000.0, data.getSigmaTimeStep()/1000.0)}));
 					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+					activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
 					if (JetiDataReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 				}
 			}

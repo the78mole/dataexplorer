@@ -172,6 +172,7 @@ public class GathererThread extends Thread {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
 						this.application.getMenuToolBar().updateRecordSetSelectCombo();
+						this.channel.get(this.recordSetKey).updateVisibleAndDisplayableRecordsForTable();
 						measurementCount = 0;
 						startCycleTime = 0;
 					}
