@@ -1266,6 +1266,13 @@ public class DeviceConfiguration {
 	/**
 	 * @return the channel name
 	 */
+	public String getChannelName(int channelNumber) {
+		return this.deviceProps.getChannels().channel.get(channelNumber - 1).getName();
+	}
+
+	/**
+	 * @return the channel replacement name
+	 */
 	public String getChannelNameReplacement(int channelNumber) {
 		return xmlResource.getReplacement(this.deviceProps.getChannels().channel.get(channelNumber - 1).getName());
 	}

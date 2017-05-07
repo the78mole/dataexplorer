@@ -402,8 +402,12 @@ public interface IDevice {
 	public int getChannelCount();
 
 	/**
-	 * @param channelNumber
 	 * @return the channel name
+	 */
+	public String getChannelName(int channelNumber);
+
+	/**
+	 * @return the channel replacement name
 	 */
 	public String getChannelNameReplacement(int channelNumber);
 
