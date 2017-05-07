@@ -21,17 +21,19 @@ package gde.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.OsdReaderWriter;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -41,14 +43,15 @@ import gde.ui.DataExplorer;
  * @author Winfried Brügmann
  */
 public class ObjectKeyScanner extends Thread {
-	final private static Logger											log					= Logger.getLogger(ObjectKeyScanner.class.getName());
+	final private static Logger	log								= Logger.getLogger(ObjectKeyScanner.class.getName());
 
-	final private Settings settings;
-	final String deviceOriented;
-	String objectKey = GDE.STRING_EMPTY;
-	boolean searchForKeys = false;
-	final Vector<String> objectKeys;
-	
+	final private Settings			settings;
+	final String								deviceOriented;
+	String											objectKey					= GDE.STRING_EMPTY;
+	boolean											searchForKeys			= false;
+	boolean											addToExistentKeys	= false;
+	final Vector<String>				objectKeys;
+
 	/**
 	 * constructor to create a object key scanner, 
 	 * starting this as thread all the sub files of the given data path are scanned for object key references 
@@ -96,7 +99,7 @@ public class ObjectKeyScanner extends Thread {
 			if (this.objectKey.length() > 1) { // use exact defined object key
 				//check directory and cleanup if already exist 
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
-				
+
 				// check if object key known (settings)
 				String[] objectList = this.settings.getObjectList();
 				boolean isKnown = true;
@@ -109,7 +112,7 @@ public class ObjectKeyScanner extends Thread {
 				if (!isKnown && !this.objectKeys.contains(this.objectKey)) {
 					this.objectKeys.add(this.objectKey);
 				}
-				
+
 				//scan all data files for object key
 				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
 				for (File file : files) {
@@ -141,7 +144,7 @@ public class ObjectKeyScanner extends Thread {
 				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				this.objectKeys.clear();
-				HashMap<String,Vector<File>> objectFilesMap = new HashMap<String,Vector<File>>();
+				HashMap<String, Vector<File>> objectFilesMap = new HashMap<String, Vector<File>>();
 				int fileCounter = 0;
 				if (this.searchForKeys) {
 					log.log(Level.FINE, "this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
@@ -201,7 +204,15 @@ public class ObjectKeyScanner extends Thread {
 							}
 						}
 					}
-					DataExplorer.getInstance().setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());
+					if (this.addToExistentKeys) {
+						HashSet<String> objectListClone = new HashSet<String>(Arrays.asList(Settings.getInstance().getObjectList()));
+						if (objectListClone.addAll(this.objectKeys)) {
+							DataExplorer.getInstance().setObjectList(objectListClone.toArray(new String[0]), this.settings.getActiveObject());
+							log.log(Level.FINE, "object list updated: ", objectListClone); //$NON-NLS-1$
+						}
+					}
+					else
+						DataExplorer.getInstance().setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());
 				}
 			}
 		}
@@ -225,17 +236,24 @@ public class ObjectKeyScanner extends Thread {
 	}
 
 	/**
+	 * @param enable adding the results to the existing keys
+	 */
+	public void setAddToExistentKeys(boolean enable) {
+		this.addToExistentKeys = enable;
+	}
+
+	/**
 	 * @return object key list found during scan
 	 */
 	public String[] getObjectList() {
 		return this.objectKeys.toArray(new String[0]);
 	}
-	
+
 	/**
 	 * deletes all file links under standard data directory
 	 * this is the reverse operation of the run() method creating such file links
 	 */
-	public static void cleanFileLinks() {	
+	public static void cleanFileLinks() {
 		try {
 			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			for (File file : files) {

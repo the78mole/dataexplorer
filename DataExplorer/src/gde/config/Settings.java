@@ -870,24 +870,45 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * scan the sub-directories in the data and import file paths.
+	 * Scan the sub-directories in the data file and import file paths.
 	 * @return all sub-directories which neither represent devices nor objects
 	 */
-	public Set<String> getObjectKeyCandidates() {
+	public List<String> getObjectKeyCandidates() {
 		Set<String> result = new HashSet<String>();
-		TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-		Path tmpImportDirPath = DataExplorer.getInstance().getActiveDevice() != null ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir() : null;
 		ArrayList<Path> dirPaths = new ArrayList<Path>();
-		dirPaths.add(Paths.get(getDataFilePath()));
-		if (getSearchImportPath() && tmpImportDirPath != null) dirPaths.add(tmpImportDirPath);
+		{
+			final String dataFilePath = getDataFilePath();
+			if (dataFilePath != null && !dataFilePath.trim().isEmpty() && !dataFilePath.equals(GDE.FILE_SEPARATOR_UNIX)) {
+				dirPaths.add(Paths.get(dataFilePath));
+				log.log(Level.FINE, "data path ", dataFilePath); //$NON-NLS-1$
+			}
+		}
+		{
+			String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation();
+			if (getSearchImportPath() && tmpImportDirPath != null && !tmpImportDirPath.trim().isEmpty() && !tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX)) {
+				Path path = Paths.get(tmpImportDirPath);
+				// ignore object if path ends with a valid object
+				String directoryName = path.getFileName().toString();
+				if (Settings.getInstance().getValidatedObjectKey(directoryName).isPresent())
+					path = path.getParent();
+				else {
+					// ignore device if path ends with a valid device
+					String directoryName2 = path.getFileName().toString();
+					if (DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent())
+						path = path.getParent();
+					else
+						// the directory is supposed to be a new object
+						path = path.getParent();
+					;
+				}
+				log.log(Level.FINE, "ImportBaseDir ", path); //$NON-NLS-1$
+				dirPaths.add(path);
+			}
+		}
+		final List<String> actualObjects = Arrays.asList(getObjectList());
+		final TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
 		for (Path dirPath : dirPaths) {
 			if (!(dirPath == null || dirPath.toString().isEmpty())) {
-				// ignore object if path ends with a valid object
-				String directoryName = dirPath.getFileName().toString();
-				dirPath = getValidatedObjectKey(directoryName).isPresent() ? dirPath.getParent() : dirPath;
-				// ignore device if path ends with a valid device
-				String directoryName2 = dirPath.getFileName().toString();
-				dirPath = actualConfigurations.keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? dirPath.getParent() : dirPath;
 				List<File> directories = new ArrayList<File>();
 				try {
 					directories = FileUtils.getDirectories(dirPath.toFile());
@@ -895,7 +916,6 @@ public class Settings extends Properties {
 				catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
-				List<String> actualObjects = Arrays.asList(getObjectList());
 				for (File file : directories) {
 					if (!actualConfigurations.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
 						result.add(file.getName());
@@ -903,7 +923,8 @@ public class Settings extends Properties {
 				}
 			}
 		}
-		return result;
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "object candidates=", result); //$NON-NLS-1$
+		return new ArrayList<String>(result);
 	}
 
 	/**

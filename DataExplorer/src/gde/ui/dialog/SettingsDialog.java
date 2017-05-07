@@ -22,9 +22,10 @@ package gde.ui.dialog;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -1563,8 +1564,7 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "blankChargeDischargeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setReduceChargeDischarge(SettingsDialog.this.blankChargeDischargeButton.getSelection());
 										if (SettingsDialog.this.settings.isContinuousRecordSet() && SettingsDialog.this.settings.isReduceChargeDischarge()
-												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("MC3000")
-												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("Q200")) {
+												&& SettingsDialog.this.application.getActiveDevice().getName().startsWith("MC3000") && SettingsDialog.this.application.getActiveDevice().getName().startsWith("Q200")) {
 											// continuous recording without breaks like pauses or termination phase may lead in combination record sets to
 											// time gaps which can not be realized, so charger specific implementation take place here
 											SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0059));
@@ -1786,7 +1786,6 @@ public class SettingsDialog extends Dialog {
 									}
 								}
 								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837, new Object[] { toolTipExtension }));
-								this.cleanObjectReferecesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0221, new Object[] { this.settings.getDataFilePath() }));
 								RowData createObjectsFromDirectoriesButtonLData = new RowData();
 								createObjectsFromDirectoriesButtonLData.width = 180;
 								createObjectsFromDirectoriesButtonLData.height = 30;
@@ -1794,22 +1793,48 @@ public class SettingsDialog extends Dialog {
 								this.createObjectsFromDirectoriesButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "createObjectsFromDirectoriesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										Set<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
+										SettingsDialog.log.log(Level.FINEST, "createObjectsFromDirectoriesButton.widgetSelected, event=", evt); //$NON-NLS-1$
+										// find directories which might represent object keys 
+										List<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
 										if (objectCandidates.size() > 0) {
+											Collections.sort(objectCandidates);
 											String message = Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() });
 											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(message)) {
-												List<String> objectListClone = new ArrayList<String>(Arrays.asList(SettingsDialog.this.settings.getObjectList()));
+												// build a new object list consisting from existing objects and new objects
+												Set<String> objectListClone = new HashSet<String>(Arrays.asList(SettingsDialog.this.settings.getObjectList()));
 												objectListClone.remove(0); // device oriented / gerätebezogen
 												if (objectListClone.addAll(objectCandidates)) {
+													// ensure that all objects owns a directory
 													for (String tmpObjectKey : objectCandidates) {
 														Path objectKeyDirPath = Paths.get(SettingsDialog.this.settings.getDataFilePath()).resolve(tmpObjectKey);
 														FileUtils.checkDirectoryAndCreate(objectKeyDirPath.toString());
 													}
-													SettingsDialog.this.settings.setObjectList(objectListClone.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
-													SettingsDialog.this.application.setObjectList(SettingsDialog.this.settings.getObjectList(), SettingsDialog.this.settings.getActiveObject());
-													log.log(Level.FINE, "object list updated and directories created for object keys : " + objectCandidates.toString()); //$NON-NLS-1$
+													// replace the applications object list
+													SettingsDialog.this.application.setObjectList(objectListClone.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
+													log.log(Level.FINE, "object list updated and directories created for object keys : ", objectCandidates); //$NON-NLS-1$
 												}
+												// scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list  
+												final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
+												objLnkSearch.setSearchForKeys(true);
+												objLnkSearch.setAddToExistentKeys(true);
+												objLnkSearch.start();
+												new Thread() {
+													@Override
+													public void run() {
+														while (objLnkSearch.isAlive()) {
+															try {
+																Thread.sleep(1000);
+															}
+															catch (InterruptedException e) {
+																// ignore
+															}
+														}
+														if (getParent().isDisposed())
+															SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0071));
+														else
+															SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.GDE_MSGI0071));
+													}
+												}.start();
 											}
 										}
 										else {
