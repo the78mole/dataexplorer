@@ -2418,8 +2418,8 @@ public class DataExplorer extends Composite {
 	 */
 	public void clearMeasurementModes() {
 		if (isRecordSetVisible(GraphicsType.HISTO)) {
-			// use setMeasurementActive
-			throw new UnsupportedOperationException();
+			this.histoSet.getTrailRecordSet().clearMeasurementModes();
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
