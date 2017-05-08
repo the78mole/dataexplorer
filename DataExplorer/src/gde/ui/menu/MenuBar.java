@@ -1220,10 +1220,10 @@ public class MenuBar {
 	 */
 	public void cleanup() {
 		//cleanup exportMenu for device specific entries
-		for (int i = this.exportMenu.getItemCount() - 1; !this.exportMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0732)); i--) {
+		for (int i = this.exportMenu.getItemCount() - 1; this.exportMenu.getItemCount() > 3; i--) {
 			this.exportMenu.getItem(i).dispose();
 		}
-		for (int i = this.importMenu.getItemCount() - 1; !this.importMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
+		for (int i = this.importMenu.getItemCount() - 1; this.importMenu.getItemCount() > 2; i--) {
 			this.importMenu.getItem(i).dispose();
 		}
 	}
