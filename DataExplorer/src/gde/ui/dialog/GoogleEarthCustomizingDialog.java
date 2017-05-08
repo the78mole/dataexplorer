@@ -136,7 +136,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();			
-			dialogShell.setSize(350, 236);
+			dialogShell.setSize(360, 255);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
 	      public void handleEvent(Event event) {
 	        switch (event.detail) {
@@ -158,25 +158,23 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			});
 			{
 				valueSelectorComposite = new Composite(dialogShell, SWT.NONE);
-				RowLayout compositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
-				valueSelectorComposite.setLayout(compositeLayout);
 				FormData colorCompositeLData = new FormData();
-				colorCompositeLData.bottom =  new FormAttachment(240, 1000, 0);
-				colorCompositeLData.left =  new FormAttachment(0, 1000, 5);
 				colorCompositeLData.top =  new FormAttachment(0, 1000, 0);
-				colorCompositeLData.width = 340;
-				colorCompositeLData.height = 51;
+				colorCompositeLData.left =  new FormAttachment(0, 1000, 5);
 				colorCompositeLData.right =  new FormAttachment(1000, 1000, -5);
+				colorCompositeLData.height = 55;
 				valueSelectorComposite.setLayoutData(colorCompositeLData);
+				RowLayout compositeLayout = new RowLayout(SWT.VERTICAL);
+				valueSelectorComposite.setLayout(compositeLayout);
 				{
 					valueSelectionLabel = new Label(valueSelectorComposite, SWT.NONE);
-					RowData valueSelectionLabelLData = new RowData();
+					RowData valueSelectionLabelLData = new RowData(185, 18);
 					valueSelectionLabel.setLayoutData(valueSelectionLabelLData);
-					valueSelectionLabel.setText("Messwert Konfiguration");
+					valueSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT0875));
 				}
 				{
-					RowData valueSelectionComboLData = new RowData();
 					valueSelectionCombo = new Combo(valueSelectorComposite, SWT.NONE);
+					RowData valueSelectionComboLData = new RowData(155, 18);
 					valueSelectionCombo.setLayoutData(valueSelectionComboLData);
 					valueSelectionCombo.setItems(application.getActiveRecordSet().getRecordNames());
 					valueSelectionCombo.select(device.getGPS2KMZMeasurementOrdinal());
