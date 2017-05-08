@@ -168,13 +168,13 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				valueSelectorComposite.setLayout(compositeLayout);
 				{
 					valueSelectionLabel = new Label(valueSelectorComposite, SWT.NONE);
-					RowData valueSelectionLabelLData = new RowData(185, 18);
+					RowData valueSelectionLabelLData = new RowData(GDE.IS_LINUX ? 200 : 185, 18);
 					valueSelectionLabel.setLayoutData(valueSelectionLabelLData);
 					valueSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT0875));
 				}
 				{
 					valueSelectionCombo = new Combo(valueSelectorComposite, SWT.NONE);
-					RowData valueSelectionComboLData = new RowData(155, 18);
+					RowData valueSelectionComboLData = new RowData(GDE.IS_WINDOWS ? 155 : 170, GDE.IS_MAC ? 26 : 18);
 					valueSelectionCombo.setLayoutData(valueSelectionComboLData);
 					valueSelectionCombo.setItems(application.getActiveRecordSet().getRecordNames());
 					valueSelectionCombo.select(device.getGPS2KMZMeasurementOrdinal());
@@ -189,7 +189,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				}
 				{
 					extrudeButton = new Button(valueSelectorComposite, SWT.CHECK | SWT.LEFT);
-					RowData isExtrudeButtonLData = new RowData();
+					RowData isExtrudeButtonLData = new RowData(150, 18);
 					extrudeButton.setLayoutData(isExtrudeButtonLData);
 					extrudeButton.setText(Messages.getString(MessageIds.GDE_MSGT0734));
 					extrudeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0735));
@@ -203,7 +203,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				}
 				{
 					randomColorButton = new Button(valueSelectorComposite, SWT.CHECK | SWT.LEFT);
-					RowData randomColorButtonLData = new RowData();
+					RowData randomColorButtonLData = new RowData(150, 18);
 					randomColorButton.setLayoutData(randomColorButtonLData);
 					randomColorButton.setText(Messages.getString(MessageIds.GDE_MSGT0736));
 					randomColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0737));
