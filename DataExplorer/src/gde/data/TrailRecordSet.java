@@ -47,7 +47,6 @@ import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.exception.DataInconsitsentException;
-import gde.histocache.DataTypes;
 import gde.histocache.HistoVault;
 import gde.histoinventory.GeoCodes;
 import gde.histoinventory.GpsCluster;
@@ -236,8 +235,9 @@ public class TrailRecordSet extends RecordSet {
 
 		// setting all data in this create procedure and the synchronized keyword makes this method thread safe 
 		newTrailRecordSet.defineTrailTypes();
-		newTrailRecordSet.setPoints();
-		newTrailRecordSet.setDataTags();
+		newTrailRecordSet.addHistoVaults();
+		newTrailRecordSet.setGpsLocationsTags();
+		newTrailRecordSet.syncScaleOfSyncableRecords();
 
 		return newTrailRecordSet;
 	}
@@ -282,8 +282,9 @@ public class TrailRecordSet extends RecordSet {
 	 */
 	public synchronized void refillRecordSet() {
 		this.cleanup();
-		this.setPoints();
-		this.setDataTags();
+		this.addHistoVaults();
+		this.setGpsLocationsTags();
+		this.syncScaleOfSyncableRecords();
 	}
 
 	/**
@@ -291,6 +292,7 @@ public class TrailRecordSet extends RecordSet {
 	 * keeps initial capacities.
 	 * does not clear any fields in the recordSet, the records or in timeStep. 
 	 */
+	@Override
 	public void cleanup() {
 		super.timeStep_ms.clear();
 		for (String recordName : super.getRecordNames()) {
@@ -364,26 +366,6 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * set time steps for the trail recordset and the data points for all displayable trail records.
-	 * every record takes the selected trail type / score data from the history vault and populates its data. 
-	 */
-	public synchronized void setPoints() {
-		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
-			for (HistoVault histoVault : entry.getValue()) {
-				int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
-				this.durations_mm.add(duration_mm);
-				this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getLogStartTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
-				this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10);
-				for (String recordName : this.getRecordNames()) {
-					((TrailRecord) this.get(recordName)).add(histoVault);
-				}
-			}
-		}
-		syncScaleOfSyncableRecords();
-	}
-
-	/**
 	 * query the size of record set child record 
 	 * - normal record set will return the size of the data vector of first active in recordNames
 	 * - zoomed set will return size of zoomOffset + zoomWith
@@ -413,6 +395,34 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
+	 * set time steps for the trail recordset and the data points for all displayable trail records.
+	 * every record takes the selected trail type / score data from the history vault and populates its data. 
+	 */
+	private void addHistoVaults() {
+		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
+			for (HistoVault histoVault : entry.getValue()) {
+				{ // add values 
+					int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
+					this.durations_mm.add(duration_mm);
+					this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d  -- entry.key %,d", histoVault.getLogStartTimestamp_ms(), entry.getKey())); //$NON-NLS-1$
+					this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10);
+					for (String recordName : this.getRecordNames()) {
+						((TrailRecord) this.get(recordName)).add(histoVault);
+					}
+				}
+				{ // add data Tags
+					this.dataFilePath.add(histoVault.getLogFilePath().intern());
+					this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
+					this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
+					this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
+					this.dataRecordSetOrdinals.add(String.valueOf(histoVault.getLogRecordSetOrdinal()).intern());
+				}
+			}
+		}
+	}
+
+	/**
 	 * set the data points for one single trail record.
 	 * the record takes the selected trail type / score data from the trail record vault and populates its data. 
 	 * @param recordOrdinal
@@ -435,53 +445,43 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * sets tagging information for the trail entries.
+	 * adds GPS location tagging information based on the latitude / longitude median.
 	 * supports asynchronous geocode fetches from the internet.
 	 */
-	public synchronized void setDataTags() {
-		GpsCluster gpsCluster = new GpsCluster();
-		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
-			for (HistoVault histoVault : entry.getValue()) {
-				this.dataFilePath.add(histoVault.getLogFilePath().intern());
-				this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
-				this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
-				this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
-				this.dataRecordSetOrdinals.add(String.valueOf(histoVault.getLogRecordSetOrdinal()).intern());
-
-				// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
-				Double latitude = null;
-				Double longitude = null;
-				for (String recordName : this.getRecordNames()) {
-					if (recordName.toLowerCase().contains("breitengr") || recordName.toLowerCase().contains("latitud")) { //$NON-NLS-1$
-						latitude = histoVault.getMeasurementPoint(DataTypes.GPS_LATITUDE, TrailTypes.Q2).map(c -> {
-							TrailRecord record = (TrailRecord) this.get(recordName);
-							return record.device.translateValue(record, c / 1000.);
-						}).orElse(null);
-					}
-					if (recordName.toLowerCase().contains("längengr") || recordName.toLowerCase().contains("longitud")) { //$NON-NLS-1$
-						longitude = histoVault.getMeasurementPoint(DataTypes.GPS_LONGITUDE, TrailTypes.Q2).map(c -> {
-							TrailRecord record = (TrailRecord) this.get(recordName);
-							return record.device.translateValue(record, c / 1000.);
-						}).orElse(null);
-					}
-				}
-
-				if (latitude != null && longitude != null) {
-					GpsCoordinate gpsCoordinate = new GpsCoordinate(latitude, longitude);
-					gpsCluster.add(gpsCoordinate);
-				}
-				else
-					gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
-			}
+	private void setGpsLocationsTags() {
+		// locate the GPS coordinates records
+		TrailRecord latitudeRecord = null, longitudeRecord = null;
+		for (int i = 0; i < this.getRecordNames().length; i++) { // todo fill HistoVault's DataType and access via DataType without hard coded measurement names
+			if (this.getRecordNames()[i].toLowerCase().contains("latitud")) //$NON-NLS-1$
+				latitudeRecord = (TrailRecord) this.get(this.getRecordNames()[i]);
+			else if (this.getRecordNames()[i].toLowerCase().contains("longitud")) //$NON-NLS-1$
+				longitudeRecord = (TrailRecord) this.get(this.getRecordNames()[i]);
+			if (latitudeRecord != null && longitudeRecord != null) break;
 		}
-		// populate the GPS locations list for subsequently filling the histo table
-		if (gpsCluster.parallelStream().filter(Objects::nonNull).count() > 0) {
-			Thread gpsLocationsThread = new Thread((Runnable) () -> setGpsLocationTags(gpsCluster, this.dataGpsLocations), "setGpsLocationTags"); //$NON-NLS-1$
-			try {
-				gpsLocationsThread.start();
+
+		GpsCluster gpsCluster = new GpsCluster();
+		if (latitudeRecord != null && longitudeRecord != null) {
+			// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
+			for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
+				for (HistoVault histoVault : entry.getValue()) {
+					Integer latitudePoint = histoVault.getMeasurementPoint(latitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
+					Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
+
+					if (latitudePoint != null && longitudePoint != null)
+						gpsCluster.add(new GpsCoordinate(this.device.translateValue(latitudeRecord, latitudePoint / 1000.), this.device.translateValue(longitudeRecord, longitudePoint / 1000.)));
+					else
+						gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
+				}
 			}
-			catch (RuntimeException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
+			// populate the GPS locations list for subsequently filling the histo table
+			if (gpsCluster.parallelStream().filter(Objects::nonNull).count() > 0) {
+				Thread gpsLocationsThread = new Thread((Runnable) () -> setGpsLocationTags(gpsCluster, this.dataGpsLocations), "setGpsLocationTags"); //$NON-NLS-1$
+				try {
+					gpsLocationsThread.start();
+				}
+				catch (RuntimeException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -492,7 +492,7 @@ public class TrailRecordSet extends RecordSet {
 	 * @param gpsCluster holds the GPS coordinates and the assignment to clusters; null coordinates are allowed
 	 * @param dataGpsLocations is an empty list or GPS location strings for all vaults in the correct sequence
 	 */
-	public synchronized void setGpsLocationTags(GpsCluster gpsCluster, List<String> dataGpsLocations) {
+	private synchronized void setGpsLocationTags(GpsCluster gpsCluster, List<String> dataGpsLocations) {
 		long nanoTime = System.nanoTime();
 		gpsCluster.setClusters();
 		if (gpsCluster.size() > 0) {
@@ -681,7 +681,7 @@ public class TrailRecordSet extends RecordSet {
 	//	}
 
 	public HistoGraphicsTemplate getTemplate() {
-		return template;
+		return this.template;
 	}
 
 	/**

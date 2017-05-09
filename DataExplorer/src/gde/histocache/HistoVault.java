@@ -1068,7 +1068,7 @@ public class HistoVault {
 						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.getLogFilePath())); //$NON-NLS-1$
 					}
 					else if (!record.hasReasonableData()) {
-						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.getLogFilePath())); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.getLogFilePath())); //$NON-NLS-1$
 					}
 					else {
 						StatisticsType measurementStatistics = measurementType.getStatistics();
@@ -1300,17 +1300,6 @@ public class HistoVault {
 		else {
 			return null;
 		}
-	}
-
-	/**
-	 * @param dataType 
-	 * @param trailType
-	 * @return the value of the first measurement tagged with the specified data type or null in case of unavailable measurement or trail
-	 */
-	public Optional<Integer> getMeasurementPoint(DataTypes dataType, TrailTypes trailType) { // todo DataType
-		return this.getMeasurements().values().stream().filter(c -> c.text.toLowerCase().startsWith("breitengr") && dataType == DataTypes.GPS_LATITUDE  //
-				|| c.text.toLowerCase().startsWith("längengr") && dataType == DataTypes.GPS_LONGITUDE).findFirst().map(c -> c.getTrails().get(trailType.ordinal())).map(p -> p.getValue());
-//		return this.getMeasurements().values().stream().filter(c -> c.dataType == dataType).findFirst().map(d -> d.getTrails().get(trailType.ordinal())).map(v -> v.getValue());
 	}
 
 	/**
