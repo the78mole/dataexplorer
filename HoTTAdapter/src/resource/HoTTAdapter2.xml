@@ -713,105 +713,105 @@
             <Transitions/>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
-                    <name>Dauer</name>
+                    <name>duration</name>
                     <symbol></symbol>
                     <unit>h</unit>
                     <active>true</active>
-                    <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
                     <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
                     <property name="histo_top_placement" value="true" type="Boolean"/>
-                    <label>Zeitdauer der Log-Aufzeichnung</label>
+                    <label>scorelabel_duration</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="1">
-                    <name>Zeitschritte</name>
+                    <name>time_interval</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="2">
-                    <name>Zählerwerte</name>
+                    <name>measurement_number</name>
                     <symbol></symbol>
                     <unit>Tsd</unit>
-                    <active>true</active>
-                    <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
-                    <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
-                    <score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
-                    <score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
-                    <label>Anzahl von Messwerten</label>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="3">
-                    <name>Paketverlustdauer</name>
+                    <name>lost_packages_timespan</name>
                     <symbol></symbol>
                     <unit>ms</unit>
                     <active>true</active>
-                    <score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals (Rx->Tx)</label>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="4">
-                    <name>Paketverluste</name>
+                    <name>lost_packages_number</name>
                     <symbol></symbol>
                     <unit>%</unit>
                     <active>true</active>
-                    <score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages"/>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
                     <property name="factor" value="0.1" type="Double"/>
-                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung (Rx->Tx)</label>
+                    <label>scorelabel_lost_packages_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="5">
-                    <name>Sensoren</name>
+                    <name>sensor_number</name>
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="Anzahl" type="String"/>
-                    <score label="sensorVario" value="Vario" type="String"/>
-                    <score label="sensorGps" value="GPS" type="String"/>
-                    <score label="sensorGam" value="GAM" type="String"/>
-                    <score label="sensorEam" value="EAM" type="String"/>
-                    <score label="sensorEsc" value="ESC" type="String"/>
-                    <label>Vorhandensein von Sensoren</label>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
-                    <name>Versionen</name>
+                    <name>software_version</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logDataVersion" value="Gerät" type="String"/>
-                    <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
-                    <score label="logFileVersion" value="Log-Datei" type="String"/>
-                    <label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="7">
-                    <name>Datenmenge</name>
+                    <name>file_size</name>
                     <symbol></symbol>
                     <unit>kiB</unit>
-                    <active>true</active>
-                    <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
-                    <score label="logFileBytes" value="Dateigröße" type="String"/>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
                     <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
-                    <label>Größe der Log-Aufzeichnung</label>
+                    <label>scorelabel_file_size</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="8">
-                    <name>Datensätze</name>
+                    <name>recordset_number</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logFileRecordSets" value="Anzahl" type="String"/>
-                    <label>Anzahl an Log-Aufzeichnungen</label>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="9">
-                    <name>Laufzeiten</name>
+                    <name>elapsed_time</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
-                    <label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
                 </Scoregroup>
             </ScoreGroups>
         </Channel>
@@ -1489,105 +1489,105 @@
             <Transitions/>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
-                    <name>Dauer</name>
+                    <name>duration</name>
                     <symbol></symbol>
                     <unit>h</unit>
                     <active>true</active>
-                    <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
                     <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
                     <property name="histo_top_placement" value="true" type="Boolean"/>
-                    <label>Zeitdauer der Log-Aufzeichnung</label>
+                    <label>scorelabel_duration</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="1">
-                    <name>Zeitschritte</name>
+                    <name>time_interval</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="2">
-                    <name>Zählerwerte</name>
+                    <name>measurement_number</name>
                     <symbol></symbol>
                     <unit>Tsd</unit>
-                    <active>true</active>
-                    <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
-                    <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
-                    <score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
-                    <score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
-                    <label>Anzahl von Messwerten</label>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="3">
-                    <name>Paketverlustdauer</name>
+                    <name>lost_packages_timespan</name>
                     <symbol></symbol>
                     <unit>ms</unit>
                     <active>true</active>
-                    <score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="4">
-                    <name>Paketverluste</name>
+                    <name>lost_packages_number</name>
                     <symbol></symbol>
                     <unit>%</unit>
                     <active>true</active>
-                    <score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages"/>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
                     <property name="factor" value="0.1" type="Double"/>
-                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+                    <label>scorelabel_lost_packages_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="5">
-                    <name>Sensoren</name>
+                    <name>sensor_number</name>
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="Anzahl" type="String"/>
-                    <score label="sensorVario" value="Vario" type="String"/>
-                    <score label="sensorGps" value="GPS" type="String"/>
-                    <score label="sensorGam" value="GAM" type="String"/>
-                    <score label="sensorEam" value="EAM" type="String"/>
-                    <score label="sensorEsc" value="ESC" type="String"/>
-                    <label>Vorhandensein von Sensoren</label>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
-                    <name>Versionen</name>
+                    <name>software_version</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logDataVersion" value="Gerät" type="String"/>
-                    <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
-                    <score label="logFileVersion" value="Log-Datei" type="String"/>
-                    <label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="7">
-                    <name>Datenmenge</name>
+                    <name>file_size</name>
                     <symbol></symbol>
                     <unit>kiB</unit>
-                    <active>true</active>
-                    <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
-                    <score label="logFileBytes" value="Dateigröße" type="String"/>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
                     <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
-                    <label>Größe der Log-Aufzeichnung</label>
+                    <label>scorelabel_file_size</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="8">
-                    <name>Datensätze</name>
+                    <name>recordset_number</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logFileRecordSets" value="Anzahl" type="String"/>
-                    <label>Anzahl an Log-Aufzeichnungen</label>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="9">
-                    <name>Laufzeiten</name>
+                    <name>elapsed_time</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
-                    <label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
                 </Scoregroup>
             </ScoreGroups>
         </Channel>
@@ -2265,105 +2265,105 @@
             <Transitions/>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
-                    <name>Dauer</name>
+                    <name>duration</name>
                     <symbol></symbol>
                     <unit>h</unit>
                     <active>true</active>
-                    <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
                     <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
                     <property name="histo_top_placement" value="true" type="Boolean"/>
-                    <label>Zeitdauer der Log-Aufzeichnung</label>
+                    <label>scorelabel_duration</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="1">
-                    <name>Zeitschritte</name>
+                    <name>time_interval</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="2">
-                    <name>Zählerwerte</name>
+                    <name>measurement_number</name>
                     <symbol></symbol>
                     <unit>Tsd</unit>
-                    <active>true</active>
-                    <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
-                    <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
-                    <score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
-                    <score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
-                    <label>Anzahl von Messwerten</label>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="3">
-                    <name>Paketverlustdauer</name>
+                    <name>lost_packages_timespan</name>
                     <symbol></symbol>
                     <unit>ms</unit>
                     <active>true</active>
-                    <score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="4">
-                    <name>Paketverluste</name>
+                    <name>lost_packages_number</name>
                     <symbol></symbol>
                     <unit>%</unit>
                     <active>true</active>
-                    <score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages"/>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
                     <property name="factor" value="0.1" type="Double"/>
-                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+                    <label>scorelabel_lost_packages_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="5">
-                    <name>Sensoren</name>
+                    <name>sensor_number</name>
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="Anzahl" type="String"/>
-                    <score label="sensorVario" value="Vario" type="String"/>
-                    <score label="sensorGps" value="GPS" type="String"/>
-                    <score label="sensorGam" value="GAM" type="String"/>
-                    <score label="sensorEam" value="EAM" type="String"/>
-                    <score label="sensorEsc" value="ESC" type="String"/>
-                    <label>Vorhandensein von Sensoren</label>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
-                    <name>Versionen</name>
+                    <name>software_version</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logDataVersion" value="Gerät" type="String"/>
-                    <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
-                    <score label="logFileVersion" value="Log-Datei" type="String"/>
-                    <label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="7">
-                    <name>Datenmenge</name>
+                    <name>file_size</name>
                     <symbol></symbol>
                     <unit>kiB</unit>
-                    <active>true</active>
-                    <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
-                    <score label="logFileBytes" value="Dateigröße" type="String"/>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
                     <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
-                    <label>Größe der Log-Aufzeichnung</label>
+                    <label>scorelabel_file_size</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="8">
-                    <name>Datensätze</name>
+                    <name>recordset_number</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logFileRecordSets" value="Anzahl" type="String"/>
-                    <label>Anzahl an Log-Aufzeichnungen</label>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="9">
-                    <name>Laufzeiten</name>
+                    <name>elapsed_time</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
-                    <label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
                 </Scoregroup>
             </ScoreGroups>
         </Channel>
@@ -3802,105 +3802,105 @@
             <Transitions/>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
-                    <name>Dauer</name>
+                    <name>duration</name>
                     <symbol></symbol>
                     <unit>h</unit>
                     <active>true</active>
-                    <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
                     <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
                     <property name="histo_top_placement" value="true" type="Boolean"/>
-                    <label>Zeitdauer der Log-Aufzeichnung</label>
+                    <label>scorelabel_duration</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="1">
-                    <name>Zeitschritte</name>
+                    <name>time_interval</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="2">
-                    <name>Zählerwerte</name>
+                    <name>measurement_number</name>
                     <symbol></symbol>
                     <unit>Tsd</unit>
-                    <active>true</active>
-                    <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
-                    <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
-                    <score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
-                    <score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
-                    <label>Anzahl von Messwerten</label>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="3">
-                    <name>Paketverlustdauer</name>
+                    <name>lost_packages_timespan</name>
                     <symbol></symbol>
                     <unit>ms</unit>
                     <active>true</active>
-                    <score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="4">
-                    <name>Paketverluste</name>
+                    <name>lost_packages_number</name>
                     <symbol></symbol>
                     <unit>%</unit>
                     <active>true</active>
-                    <score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages"/>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
                     <property name="factor" value="0.1" type="Double"/>
-                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+                    <label>scorelabel_lost_packages_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="5">
-                    <name>Sensoren</name>
+                    <name>sensor_number</name>
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="Anzahl" type="String"/>
-                    <score label="sensorVario" value="Vario" type="String"/>
-                    <score label="sensorGps" value="GPS" type="String"/>
-                    <score label="sensorGam" value="GAM" type="String"/>
-                    <score label="sensorEam" value="EAM" type="String"/>
-                    <score label="sensorEsc" value="ESC" type="String"/>
-                    <label>Vorhandensein von Sensoren</label>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
-                    <name>Versionen</name>
+                    <name>software_version</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logDataVersion" value="Gerät" type="String"/>
-                    <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
-                    <score label="logFileVersion" value="Log-Datei" type="String"/>
-                    <label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="7">
-                    <name>Datenmenge</name>
+                    <name>file_size</name>
                     <symbol></symbol>
                     <unit>kiB</unit>
-                    <active>true</active>
-                    <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
-                    <score label="logFileBytes" value="Dateigröße" type="String"/>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
                     <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
-                    <label>Größe der Log-Aufzeichnung</label>
+                    <label>scorelabel_file_size</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="8">
-                    <name>Datensätze</name>
+                    <name>recordset_number</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logFileRecordSets" value="Anzahl" type="String"/>
-                    <label>Anzahl an Log-Aufzeichnungen</label>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="9">
-                    <name>Laufzeiten</name>
+                    <name>elapsed_time</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
-                    <label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
                 </Scoregroup>
             </ScoreGroups>
         </Channel>
@@ -4549,105 +4549,105 @@
             <Transitions/>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
-                    <name>Dauer</name>
+                    <name>duration</name>
                     <symbol></symbol>
                     <unit>h</unit>
                     <active>true</active>
-                    <score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer"/>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
                     <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
                     <property name="histo_top_placement" value="true" type="Boolean"/>
-                    <label>Zeitdauer der Log-Aufzeichnung</label>
+                    <label>scorelabel_duration</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="1">
-                    <name>Zeitschritte</name>
+                    <name>time_interval</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="2">
-                    <name>Zählerwerte</name>
+                    <name>measurement_number</name>
                     <symbol></symbol>
                     <unit>Tsd</unit>
-                    <active>true</active>
-                    <score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte"/>
-                    <score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe"/>
-                    <score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete"/>
-                    <score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete"/>
-                    <label>Anzahl von Messwerten</label>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="3">
-                    <name>Paketverlustdauer</name>
+                    <name>lost_packages_timespan</name>
                     <symbol></symbol>
                     <unit>ms</unit>
                     <active>true</active>
-                    <score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert"/>
-                    <score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum"/>
-                    <score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum"/>
-                    <score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung"/>
-                    <label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="4">
-                    <name>Paketverluste</name>
+                    <name>lost_packages_number</name>
                     <symbol></symbol>
                     <unit>%</unit>
                     <active>true</active>
-                    <score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages"/>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
                     <property name="factor" value="0.1" type="Double"/>
-                    <label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
+                    <label>scorelabel_lost_packages_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="5">
-                    <name>Sensoren</name>
+                    <name>sensor_number</name>
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="Anzahl" type="String"/>
-                    <score label="sensorVario" value="Vario" type="String"/>
-                    <score label="sensorGps" value="GPS" type="String"/>
-                    <score label="sensorGam" value="GAM" type="String"/>
-                    <score label="sensorEam" value="EAM" type="String"/>
-                    <score label="sensorEsc" value="ESC" type="String"/>
-                    <label>Vorhandensein von Sensoren</label>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
-                    <name>Versionen</name>
+                    <name>software_version</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logDataVersion" value="Gerät" type="String"/>
-                    <score label="logDataExplorerVersion" value="DataExplorer" type="String"/>
-                    <score label="logFileVersion" value="Log-Datei" type="String"/>
-                    <label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="7">
-                    <name>Datenmenge</name>
+                    <name>file_size</name>
                     <symbol></symbol>
                     <unit>kiB</unit>
-                    <active>true</active>
-                    <score label="logRecordSetBytes" value="Datensatzgröße" type="String"/>
-                    <score label="logFileBytes" value="Dateigröße" type="String"/>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
                     <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
-                    <label>Größe der Log-Aufzeichnung</label>
+                    <label>scorelabel_file_size</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="8">
-                    <name>Datensätze</name>
+                    <name>recordset_number</name>
                     <symbol></symbol>
                     <unit></unit>
-                    <active>true</active>
-                    <score label="logFileRecordSets" value="Anzahl" type="String"/>
-                    <label>Anzahl an Log-Aufzeichnungen</label>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="9">
-                    <name>Laufzeiten</name>
+                    <name>elapsed_time</name>
                     <symbol></symbol>
                     <unit>ms</unit>
-                    <active>true</active>
-                    <score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String"/>
-                    <label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
                 </Scoregroup>
             </ScoreGroups>
         </Channel>

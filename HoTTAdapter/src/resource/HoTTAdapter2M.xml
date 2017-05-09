@@ -44,7 +44,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-				<label>label_rx_tx_ploss</label>
+                <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -52,7 +52,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_rxsq</label>
+                <label>label_rxsq</label>
             </Measurement>
             <Measurement>
                 <name>Strength</name>
@@ -60,7 +60,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_strenght</label>
+                <label>label_strenght</label>
             </Measurement>
             <Measurement>
                 <name>VPack</name>
@@ -68,7 +68,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_vpack</label>
+                <label>label_vpack</label>
             </Measurement>
             <Measurement>
                 <name>Tx</name>
@@ -76,7 +76,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_tx</label>
+                <label>label_tx</label>
             </Measurement>
             <Measurement>
                 <name>Rx</name>
@@ -85,7 +85,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="scale_sync_ref_ordinal" value="4" type="Integer" />
-				<label>label_rx</label>
+                <label>label_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx</name>
@@ -94,7 +94,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage_rx</label>
+                <label>label_voltage_rx</label>
             </Measurement>
             <Measurement>
                 <name>temperature_rx</name>
@@ -102,7 +102,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_rx</label>
+                <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
@@ -112,8 +112,8 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>lable_voltage_rx_min</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>lable_voltage_rx_min</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -121,7 +121,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_altitude</label>
+                <label>label_altitude</label>
             </Measurement>
             <Measurement>
                 <name>climb 1</name>
@@ -129,7 +129,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_climb_1</label>
+                <label>label_climb_1</label>
             </Measurement>
             <Measurement>
                 <name>climb 3</name>
@@ -138,7 +138,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_3</label>
+                <label>label_climb_3</label>
             </Measurement>
             <Measurement>
                 <name>climb 10</name>
@@ -147,7 +147,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_10</label>
+                <label>label_climb_10</label>
             </Measurement>
             <Measurement>
                 <name>latitude</name>
@@ -156,7 +156,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -165,7 +164,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -173,7 +171,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_velocity</label>
+                <label>label_velocity</label>
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -181,7 +179,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_distance_start</label>
+                <label>label_distance_start</label>
             </Measurement>
             <Measurement>
                 <name>azimuth</name>
@@ -190,8 +188,8 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_azimuth</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_azimuth</label>
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -199,8 +197,8 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_trip</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_trip</label>
             </Measurement>
             <Measurement>
                 <name>voltage G</name>
@@ -209,7 +207,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage GAM</label>
+                <label>label_voltage GAM</label>
             </Measurement>
             <Measurement>
                 <name>current G</name>
@@ -218,7 +216,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_current GAM</label>
+                <label>label_current GAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity G</name>
@@ -227,7 +225,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_capacity GAM</label>
+                <label>label_capacity GAM</label>
             </Measurement>
             <Measurement>
                 <name>power G</name>
@@ -236,7 +234,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
-				<label>label_power GAM</label>
+                <label>label_power GAM</label>
             </Measurement>
             <Measurement>
                 <name>balance G</name>
@@ -245,7 +243,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<label>label_balance GAM</label>
+                <label>label_balance GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G1</name>
@@ -254,7 +252,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 1 GAM</label>
+                <label>label_cell_voltage 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G2</name>
@@ -264,7 +262,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 2 GAM</label>
+                <label>label_cell_voltage 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G3</name>
@@ -274,7 +272,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 3 GAM</label>
+                <label>label_cell_voltage 3 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G4</name>
@@ -284,7 +282,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 4 GAM</label>
+                <label>label_cell_voltage 4 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G5</name>
@@ -294,7 +292,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 5 GAM</label>
+                <label>label_cell_voltage 5 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G6</name>
@@ -304,7 +302,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 6 GAM</label>
+                <label>label_cell_voltage 6 GAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute G</name>
@@ -313,7 +311,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_rpm GAM</label>
+                <label>label_rpm GAM</label>
             </Measurement>
             <Measurement>
                 <name>fuel</name>
@@ -321,7 +319,7 @@
                 <unit>ml</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_fuel GAM</label>
+                <label>label_fuel GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS1</name>
@@ -329,7 +327,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_voltage_sensor 1 GAM</label>
+                <label>label_voltage_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS2</name>
@@ -338,7 +336,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 GAM</label>
+                <label>label_voltage_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G1</name>
@@ -347,7 +345,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 GAM</label>
+                <label>label_temperature_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G2</name>
@@ -356,7 +354,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 GAM</label>
+                <label>label_temperature_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage E</name>
@@ -366,7 +364,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage EAM</label>
+                <label>label_voltage EAM</label>
             </Measurement>
             <Measurement>
                 <name>current E</name>
@@ -376,7 +374,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current EAM</label>
+                <label>label_current EAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity E</name>
@@ -386,7 +384,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity EAM</label>
+                <label>label_capacity EAM</label>
             </Measurement>
             <Measurement>
                 <name>power E</name>
@@ -396,7 +394,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power EAM</label>
+                <label>label_power EAM</label>
             </Measurement>
             <Measurement>
                 <name>balance E</name>
@@ -406,7 +404,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="23" type="Integer" />
-				<label>label_balance EAM</label>
+                <label>label_balance EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E1</name>
@@ -416,7 +414,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer" />
-				<label>label_cell_voltage 1 EAM</label>
+                <label>label_cell_voltage 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E2</name>
@@ -426,7 +424,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 2 EAM</label>
+                <label>label_cell_voltage 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E3</name>
@@ -436,7 +434,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 3 EAM</label>
+                <label>label_cell_voltage 3 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E4</name>
@@ -446,7 +444,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 4 EAM</label>
+                <label>label_cell_voltage 4 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E5</name>
@@ -456,7 +454,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 5 EAM</label>
+                <label>label_cell_voltage 5 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E6</name>
@@ -466,7 +464,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 6 EAM</label>
+                <label>label_cell_voltage 6 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E7</name>
@@ -476,7 +474,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 7 EAM</label>
+                <label>label_cell_voltage 7 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E8</name>
@@ -486,7 +484,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 8 EAM</label>
+                <label>label_cell_voltage 8 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E9</name>
@@ -496,7 +494,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 9 EAM</label>
+                <label>label_cell_voltage 9 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E10</name>
@@ -506,7 +504,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 10 EAM</label>
+                <label>label_cell_voltage 10 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E11</name>
@@ -516,7 +514,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 11 EAM</label>
+                <label>label_cell_voltage 11 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E12</name>
@@ -526,7 +524,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 12 EAM</label>
+                <label>label_cell_voltage 12 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E13</name>
@@ -536,7 +534,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 13 EAM</label>
+                <label>label_cell_voltage 13 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E14</name>
@@ -546,7 +544,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 14 EAM</label>
+                <label>label_cell_voltage 14 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES1</name>
@@ -555,7 +553,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 1 EAM</label>
+                <label>label_voltage_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES2</name>
@@ -564,7 +562,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 EAM</label>
+                <label>label_voltage_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E1</name>
@@ -573,7 +571,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 EAM</label>
+                <label>label_temperature_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E2</name>
@@ -582,7 +580,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 2 EAM</label>
+                <label>label_temperature_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute E</name>
@@ -592,7 +590,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm EAM</label>
+                <label>label_rpm EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage M</name>
@@ -602,7 +600,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage ESC</label>
+                <label>label_voltage ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M</name>
@@ -612,7 +610,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current ESC</label>
+                <label>label_current ESC</label>
             </Measurement>
             <Measurement>
                 <name>capacity M</name>
@@ -622,7 +620,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity ESC</label>
+                <label>label_capacity ESC</label>
             </Measurement>
             <Measurement>
                 <name>power M</name>
@@ -632,7 +630,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power ESC</label>
+                <label>label_power ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M</name>
@@ -642,7 +640,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm ESC</label>
+                <label>label_rpm ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1</name>
@@ -650,7 +648,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_fet ESC</label>
+                <label>label_temperature_fet ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2</name>
@@ -659,7 +657,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_ext ESC</label>
+                <label>label_temperature_ext ESC</label>
             </Measurement>
             <Measurement>
                 <name>voltage M_min</name>
@@ -668,8 +666,8 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_voltage_bat_min ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_voltage_bat_min ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M_max</name>
@@ -678,8 +676,8 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_current_bat_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_current_bat_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>
@@ -688,8 +686,8 @@
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_rpm_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_rpm_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1_max</name>
@@ -697,8 +695,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_temperature_fet_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_fet_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2_max</name>
@@ -706,112 +704,116 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
- 				<label>label_temperature_ext_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_ext_max ESC</label>
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
             <ScoreGroups>
-				<Scoregroup scoregroupId="0">
-					<name>Dauer</name>
-					<symbol></symbol>
-					<unit>h</unit>
-					<active>true</active>
-					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-					<property name="histo_top_placement" value="true" type="Boolean" />
-					<label>Zeitdauer der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="1">
-					<name>Zeitschritte</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="2">
-					<name>Zählerwerte</name>
-					<symbol></symbol>
-					<unit>Tsd</unit>
-					<active>true</active>
-					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-					<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
-					<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
-					<label>Anzahl von Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="3">
-					<name>Paketverlustdauer</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="4">
-					<name>Paketverluste</name>
-					<symbol></symbol>
-					<unit>‰</unit>
-					<active>true</active>
-					<score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages" />
-					<property name="factor" value="0.1" type="Double" />
-					<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="5">
-					<name>Sensoren</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="sensors" value="Anzahl" type="String" />
-					<score label="sensorVario" value="Vario" type="String" />
-					<score label="sensorGps" value="GPS" type="String" />
-					<score label="sensorGam" value="GAM" type="String" />
-					<score label="sensorEam" value="EAM" type="String" />
-					<score label="sensorEsc" value="ESC" type="String" />
-					<label>Vorhandensein von Sensoren</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="6">
-					<name>Versionen</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logDataVersion" value="Gerät" type="String" />
-					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-					<score label="logFileVersion" value="Log-Datei" type="String" />
-					<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="7">
-					<name>Datenmenge</name>
-					<symbol></symbol>
-					<unit>kiB</unit>
-					<active>true</active>
-					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-					<score label="logFileBytes" value="Dateigröße" type="String" />
-					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-					<label>Größe der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="8">
-					<name>Datensätze</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logFileRecordSets" value="Anzahl" type="String" />
-					<label>Anzahl an Log-Aufzeichnungen</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="9">
-					<name>Laufzeiten</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-					<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
-				</Scoregroup>
-			</ScoreGroups>
+                <Scoregroup scoregroupId="0">
+                    <name>duration</name>
+                    <symbol></symbol>
+                    <unit>h</unit>
+                    <active>true</active>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
+                    <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                    <property name="histo_top_placement" value="true" type="Boolean"/>
+                    <label>scorelabel_duration</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="1">
+                    <name>time_interval</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="2">
+                    <name>measurement_number</name>
+                    <symbol></symbol>
+                    <unit>Tsd</unit>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="3">
+                    <name>lost_packages_timespan</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>true</active>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="4">
+                    <name>lost_packages_number</name>
+                    <symbol></symbol>
+                    <unit>%</unit>
+                    <active>true</active>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
+                    <property name="factor" value="0.1" type="Double"/>
+                    <label>scorelabel_lost_packages_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="5">
+                    <name>sensor_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>true</active>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="6">
+                    <name>software_version</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="7">
+                    <name>file_size</name>
+                    <symbol></symbol>
+                    <unit>kiB</unit>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
+                    <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+                    <label>scorelabel_file_size</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="8">
+                    <name>recordset_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="9">
+                    <name>elapsed_time</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
+                </Scoregroup>
+            </ScoreGroups>
         </Channel>
         <Channel name="GAM" type="TYPE_CONFIG">
             <Measurement>
@@ -819,7 +821,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-				<label>label_rx_tx_ploss</label>
+                <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -827,7 +829,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_rxsq</label>
+                <label>label_rxsq</label>
             </Measurement>
             <Measurement>
                 <name>Strength</name>
@@ -835,7 +837,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_strenght</label>
+                <label>label_strenght</label>
             </Measurement>
             <Measurement>
                 <name>VPack</name>
@@ -843,7 +845,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_vpack</label>
+                <label>label_vpack</label>
             </Measurement>
             <Measurement>
                 <name>Tx</name>
@@ -851,7 +853,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_tx</label>
+                <label>label_tx</label>
             </Measurement>
             <Measurement>
                 <name>Rx</name>
@@ -860,7 +862,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="scale_sync_ref_ordinal" value="4" type="Integer" />
-				<label>label_rx</label>
+                <label>label_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx</name>
@@ -869,7 +871,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage_rx</label>
+                <label>label_voltage_rx</label>
             </Measurement>
             <Measurement>
                 <name>temperature_rx</name>
@@ -877,7 +879,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_rx</label>
+                <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
@@ -886,8 +888,8 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>lable_voltage_rx_min</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>lable_voltage_rx_min</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -895,7 +897,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="19" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="21" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
- 				<label>label_altitude</label>
+                <label>label_altitude</label>
             </Measurement>
             <Measurement>
                 <name>climb 1</name>
@@ -903,7 +905,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_climb_1</label>
+                <label>label_climb_1</label>
             </Measurement>
             <Measurement>
                 <name>climb 3</name>
@@ -912,7 +914,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_3</label>
+                <label>label_climb_3</label>
             </Measurement>
             <Measurement>
                 <name>climb 10</name>
@@ -921,7 +923,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
- 				<label>label_climb_10</label>
+                <label>label_climb_10</label>
             </Measurement>
             <Measurement>
                 <name>latitude</name>
@@ -930,7 +932,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -939,7 +940,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -947,7 +947,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_velocity</label>
+                <label>label_velocity</label>
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -955,7 +955,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_distance_start</label>
+                <label>label_distance_start</label>
             </Measurement>
             <Measurement>
                 <name>azimuth</name>
@@ -964,7 +964,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -972,7 +972,7 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>voltage G</name>
@@ -981,7 +981,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage GAM</label>
+                <label>label_voltage GAM</label>
             </Measurement>
             <Measurement>
                 <name>current G</name>
@@ -992,7 +992,7 @@
                     <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_climb_def"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_current GAM</label>
+                <label>label_current GAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity G</name>
@@ -1001,7 +1001,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_capacity GAM</label>
+                <label>label_capacity GAM</label>
             </Measurement>
             <Measurement>
                 <name>power G</name>
@@ -1010,7 +1010,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
-				<label>label_power GAM</label>
+                <label>label_power GAM</label>
             </Measurement>
             <Measurement>
                 <name>balance G</name>
@@ -1019,7 +1019,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<label>label_balance GAM</label>
+                <label>label_balance GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G1</name>
@@ -1028,7 +1028,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 1 GAM</label>
+                <label>label_cell_voltage 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G2</name>
@@ -1038,7 +1038,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 2 GAM</label>
+                <label>label_cell_voltage 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G3</name>
@@ -1048,7 +1048,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 3 GAM</label>
+                <label>label_cell_voltage 3 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G4</name>
@@ -1058,7 +1058,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 14 GAM</label>
+                <label>label_cell_voltage 14 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G5</name>
@@ -1068,7 +1068,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 5 GAM</label>
+                <label>label_cell_voltage 5 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G6</name>
@@ -1078,7 +1078,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 6 GAM</label>
+                <label>label_cell_voltage 6 GAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute G</name>
@@ -1087,7 +1087,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_rpm GAM</label>
+                <label>label_rpm GAM</label>
             </Measurement>
             <Measurement>
                 <name>fuel</name>
@@ -1095,7 +1095,7 @@
                 <unit>ml</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_fuel</label>
+                <label>label_fuel</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS1</name>
@@ -1103,7 +1103,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_voltage_sensor 1 GAM</label>
+                <label>label_voltage_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS2</name>
@@ -1112,7 +1112,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 GAM</label>
+                <label>label_voltage_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G1</name>
@@ -1121,7 +1121,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 GAM</label>
+                <label>label_temperature_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G2</name>
@@ -1130,7 +1130,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
- 				<label>label_temperature_sensor 2 GAM</label>
+                <label>label_temperature_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage E</name>
@@ -1140,7 +1140,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage EAM</label>
+                <label>label_voltage EAM</label>
             </Measurement>
             <Measurement>
                 <name>current E</name>
@@ -1150,7 +1150,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current EAM</label>
+                <label>label_current EAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity E</name>
@@ -1160,7 +1160,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity EAM</label>
+                <label>label_capacity EAM</label>
             </Measurement>
             <Measurement>
                 <name>power E</name>
@@ -1170,7 +1170,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power EAM</label>
+                <label>label_power EAM</label>
             </Measurement>
             <Measurement>
                 <name>balance E</name>
@@ -1180,7 +1180,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="23" type="Integer" />
-				<label>label_balance EAM</label>
+                <label>label_balance EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E1</name>
@@ -1190,7 +1190,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer" />
-				<label>label_cell_voltage 1 EAM</label>
+                <label>label_cell_voltage 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E2</name>
@@ -1200,7 +1200,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 2 EAM</label>
+                <label>label_cell_voltage 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E3</name>
@@ -1210,7 +1210,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 3 EAM</label>
+                <label>label_cell_voltage 3 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E4</name>
@@ -1220,7 +1220,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 4 EAM</label>
+                <label>label_cell_voltage 4 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E5</name>
@@ -1230,7 +1230,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 5 EAM</label>
+                <label>label_cell_voltage 5 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E6</name>
@@ -1240,7 +1240,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 6 EAM</label>
+                <label>label_cell_voltage 6 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E7</name>
@@ -1250,7 +1250,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 7 EAM</label>
+                <label>label_cell_voltage 7 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E8</name>
@@ -1260,7 +1260,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 8 EAM</label>
+                <label>label_cell_voltage 8 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E9</name>
@@ -1270,7 +1270,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 9 EAM</label>
+                <label>label_cell_voltage 9 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E10</name>
@@ -1280,7 +1280,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 10 EAM</label>
+                <label>label_cell_voltage 10 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E11</name>
@@ -1290,7 +1290,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 11 EAM</label>
+                <label>label_cell_voltage 11 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E12</name>
@@ -1300,7 +1300,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 12 EAM</label>
+                <label>label_cell_voltage 12 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E13</name>
@@ -1310,7 +1310,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 13 EAM</label>
+                <label>label_cell_voltage 13 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E14</name>
@@ -1320,7 +1320,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 14 EAM</label>
+                <label>label_cell_voltage 14 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES1</name>
@@ -1329,7 +1329,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 1 EAM</label>
+                <label>label_voltage_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES2</name>
@@ -1338,7 +1338,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 EAM</label>
+                <label>label_voltage_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E1</name>
@@ -1347,7 +1347,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 EAM</label>
+                <label>label_temperature_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E2</name>
@@ -1356,7 +1356,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 2 EAM</label>
+                <label>label_temperature_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute E</name>
@@ -1366,7 +1366,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm EAM</label>
+                <label>label_rpm EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage M</name>
@@ -1376,7 +1376,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage ESC</label>
+                <label>label_voltage ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M</name>
@@ -1386,7 +1386,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current ESC</label>
+                <label>label_current ESC</label>
             </Measurement>
             <Measurement>
                 <name>capacity M</name>
@@ -1396,7 +1396,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity ESC</label>
+                <label>label_capacity ESC</label>
             </Measurement>
             <Measurement>
                 <name>power M</name>
@@ -1406,7 +1406,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power ESC</label>
+                <label>label_power ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M</name>
@@ -1416,7 +1416,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm ESC</label>
+                <label>label_rpm ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1</name>
@@ -1424,7 +1424,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_fet ESC</label>
+                <label>label_temperature_fet ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2</name>
@@ -1433,7 +1433,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_ext ESC</label>
+                <label>label_temperature_ext ESC</label>
             </Measurement>
             <Measurement>
                 <name>voltage M_min</name>
@@ -1442,8 +1442,8 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_voltage_bat_min ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_voltage_bat_min ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M_max</name>
@@ -1452,8 +1452,8 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_current_bat_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_current_bat_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>
@@ -1462,8 +1462,8 @@
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_rpm_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_rpm_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1_max</name>
@@ -1471,8 +1471,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_temperature_fet_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_fet_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2_max</name>
@@ -1480,112 +1480,116 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
- 				<label>label_temperature_ext_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_ext_max ESC</label>
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
             <ScoreGroups>
-				<Scoregroup scoregroupId="0">
-					<name>Dauer</name>
-					<symbol></symbol>
-					<unit>h</unit>
-					<active>true</active>
-					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-					<property name="histo_top_placement" value="true" type="Boolean" />
-					<label>Zeitdauer der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="1">
-					<name>Zeitschritte</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="2">
-					<name>Zählerwerte</name>
-					<symbol></symbol>
-					<unit>Tsd</unit>
-					<active>true</active>
-					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-					<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
-					<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
-					<label>Anzahl von Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="3">
-					<name>Paketverlustdauer</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="4">
-					<name>Paketverluste</name>
-					<symbol></symbol>
-					<unit>‰</unit>
-					<active>true</active>
-					<score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages" />
-					<property name="factor" value="0.1" type="Double" />
-					<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="5">
-					<name>Sensoren</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="sensors" value="Anzahl" type="String" />
-					<score label="sensorVario" value="Vario" type="String" />
-					<score label="sensorGps" value="GPS" type="String" />
-					<score label="sensorGam" value="GAM" type="String" />
-					<score label="sensorEam" value="EAM" type="String" />
-					<score label="sensorEsc" value="ESC" type="String" />
-					<label>Vorhandensein von Sensoren</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="6">
-					<name>Versionen</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logDataVersion" value="Gerät" type="String" />
-					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-					<score label="logFileVersion" value="Log-Datei" type="String" />
-					<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="7">
-					<name>Datenmenge</name>
-					<symbol></symbol>
-					<unit>kiB</unit>
-					<active>true</active>
-					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-					<score label="logFileBytes" value="Dateigröße" type="String" />
-					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-					<label>Größe der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="8">
-					<name>Datensätze</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logFileRecordSets" value="Anzahl" type="String" />
-					<label>Anzahl an Log-Aufzeichnungen</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="9">
-					<name>Laufzeiten</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-					<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
-				</Scoregroup>
-			</ScoreGroups>
+                <Scoregroup scoregroupId="0">
+                    <name>duration</name>
+                    <symbol></symbol>
+                    <unit>h</unit>
+                    <active>true</active>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
+                    <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                    <property name="histo_top_placement" value="true" type="Boolean"/>
+                    <label>scorelabel_duration</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="1">
+                    <name>time_interval</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="2">
+                    <name>measurement_number</name>
+                    <symbol></symbol>
+                    <unit>Tsd</unit>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="3">
+                    <name>lost_packages_timespan</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>true</active>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="4">
+                    <name>lost_packages_number</name>
+                    <symbol></symbol>
+                    <unit>%</unit>
+                    <active>true</active>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
+                    <property name="factor" value="0.1" type="Double"/>
+                    <label>scorelabel_lost_packages_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="5">
+                    <name>sensor_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>true</active>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="6">
+                    <name>software_version</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="7">
+                    <name>file_size</name>
+                    <symbol></symbol>
+                    <unit>kiB</unit>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
+                    <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+                    <label>scorelabel_file_size</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="8">
+                    <name>recordset_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="9">
+                    <name>elapsed_time</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
+                </Scoregroup>
+            </ScoreGroups>
         </Channel>
         <Channel name="EAM" type="TYPE_CONFIG">
             <Measurement>
@@ -1593,7 +1597,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
- 				<label>label_rx_tx_ploss</label>
+                <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -1601,7 +1605,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_rxsq</label>
+                <label>label_rxsq</label>
             </Measurement>
             <Measurement>
                 <name>Strength</name>
@@ -1609,7 +1613,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_strenght</label>
+                <label>label_strenght</label>
             </Measurement>
             <Measurement>
                 <name>VPack</name>
@@ -1617,7 +1621,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_vpack</label>
+                <label>label_vpack</label>
             </Measurement>
             <Measurement>
                 <name>Tx</name>
@@ -1625,7 +1629,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_tx</label>
+                <label>label_tx</label>
             </Measurement>
             <Measurement>
                 <name>Rx</name>
@@ -1634,7 +1638,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="scale_sync_ref_ordinal" value="4" type="Integer" />
-				<label>label_rx</label>
+                <label>label_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx</name>
@@ -1643,7 +1647,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage_rx</label>
+                <label>label_voltage_rx</label>
             </Measurement>
             <Measurement>
                 <name>temperature_rx</name>
@@ -1651,7 +1655,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_rx</label>
+                <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
@@ -1660,8 +1664,8 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>lable_voltage_rx_min</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>lable_voltage_rx_min</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -1669,7 +1673,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="37" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="39" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
- 				<label>label_altitude</label>
+                <label>label_altitude</label>
             </Measurement>
             <Measurement>
                 <name>climb 1</name>
@@ -1677,7 +1681,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_climb_1</label>
+                <label>label_climb_1</label>
             </Measurement>
             <Measurement>
                 <name>climb 3</name>
@@ -1686,7 +1690,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_3</label>
+                <label>label_climb_3</label>
             </Measurement>
             <Measurement>
                 <name>climb 10</name>
@@ -1695,7 +1699,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_10</label>
+                <label>label_climb_10</label>
             </Measurement>
             <Measurement>
                 <name>latitude</name>
@@ -1704,7 +1708,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -1713,7 +1716,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -1721,7 +1723,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_velocity</label>
+                <label>label_velocity</label>
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -1729,7 +1731,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_distance_start</label>
+                <label>label_distance_start</label>
             </Measurement>
             <Measurement>
                 <name>azimuth</name>
@@ -1738,7 +1740,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -1746,7 +1748,7 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>voltage G</name>
@@ -1755,7 +1757,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage GAM</label>
+                <label>label_voltage GAM</label>
             </Measurement>
             <Measurement>
                 <name>current G</name>
@@ -1764,7 +1766,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_current GAM</label>
+                <label>label_current GAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity G</name>
@@ -1773,7 +1775,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_capacity GAM</label>
+                <label>label_capacity GAM</label>
             </Measurement>
             <Measurement>
                 <name>power G</name>
@@ -1782,7 +1784,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
-				<label>label_power GAM</label>
+                <label>label_power GAM</label>
             </Measurement>
             <Measurement>
                 <name>balance G</name>
@@ -1791,7 +1793,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<label>label_balance GAM</label>
+                <label>label_balance GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G1</name>
@@ -1800,7 +1802,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 1 GAM</label>
+                <label>label_cell_voltage 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G2</name>
@@ -1810,7 +1812,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 2 GAM</label>
+                <label>label_cell_voltage 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G3</name>
@@ -1820,7 +1822,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 3 GAM</label>
+                <label>label_cell_voltage 3 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G4</name>
@@ -1830,7 +1832,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 4 GAM</label>
+                <label>label_cell_voltage 4 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G5</name>
@@ -1840,7 +1842,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 5 GAM</label>
+                <label>label_cell_voltage 5 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G6</name>
@@ -1850,7 +1852,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 6 GAM</label>
+                <label>label_cell_voltage 6 GAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute G</name>
@@ -1859,7 +1861,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_rpm GAM</label>
+                <label>label_rpm GAM</label>
             </Measurement>
             <Measurement>
                 <name>fuel</name>
@@ -1867,7 +1869,7 @@
                 <unit>ml</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_fuel</label>
+                <label>label_fuel</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS1</name>
@@ -1875,7 +1877,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_voltage_sensor 1 GAM</label>
+                <label>label_voltage_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS2</name>
@@ -1884,7 +1886,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 GAM</label>
+                <label>label_voltage_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G1</name>
@@ -1893,7 +1895,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 GAM</label>
+                <label>label_temperature_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G2</name>
@@ -1902,7 +1904,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 2 GAM</label>
+                <label>label_temperature_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage E</name>
@@ -1912,7 +1914,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage EAM</label>
+                <label>label_voltage EAM</label>
             </Measurement>
             <Measurement>
                 <name>current E</name>
@@ -1924,7 +1926,7 @@
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current EAM</label>
+                <label>label_current EAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity E</name>
@@ -1934,7 +1936,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity EAM</label>
+                <label>label_capacity EAM</label>
             </Measurement>
             <Measurement>
                 <name>power E</name>
@@ -1944,7 +1946,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power EAM</label>
+                <label>label_power EAM</label>
             </Measurement>
             <Measurement>
                 <name>balance E</name>
@@ -1954,7 +1956,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="23" type="Integer" />
-				<label>label_balance EAM</label>
+                <label>label_balance EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E1</name>
@@ -1964,7 +1966,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer" />
-				<label>label_cell_voltage 1 EAM</label>
+                <label>label_cell_voltage 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E2</name>
@@ -1974,7 +1976,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 2 EAM</label>
+                <label>label_cell_voltage 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E3</name>
@@ -1984,7 +1986,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 3 EAM</label>
+                <label>label_cell_voltage 3 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E4</name>
@@ -1994,7 +1996,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 4 EAM</label>
+                <label>label_cell_voltage 4 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E5</name>
@@ -2004,7 +2006,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 5 EAM</label>
+                <label>label_cell_voltage 5 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E6</name>
@@ -2014,7 +2016,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 6 EAM</label>
+                <label>label_cell_voltage 6 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E7</name>
@@ -2024,7 +2026,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 7 EAM</label>
+                <label>label_cell_voltage 7 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E8</name>
@@ -2034,7 +2036,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 8 EAM</label>
+                <label>label_cell_voltage 8 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E9</name>
@@ -2044,7 +2046,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 9 EAM</label>
+                <label>label_cell_voltage 9 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E10</name>
@@ -2054,7 +2056,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
- 				<label>label_cell_voltage 10 EAM</label>
+                <label>label_cell_voltage 10 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E11</name>
@@ -2064,7 +2066,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 11 EAM</label>
+                <label>label_cell_voltage 11 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E12</name>
@@ -2074,7 +2076,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 12 EAM</label>
+                <label>label_cell_voltage 12 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E13</name>
@@ -2084,7 +2086,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 13 EAM</label>
+                <label>label_cell_voltage 13 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E14</name>
@@ -2094,7 +2096,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 14 EAM</label>
+                <label>label_cell_voltage 14 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES1</name>
@@ -2103,7 +2105,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 1 EAM</label>
+                <label>label_voltage_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES2</name>
@@ -2112,7 +2114,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 EAM</label>
+                <label>label_voltage_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E1</name>
@@ -2121,7 +2123,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 EAM</label>
+                <label>label_temperature_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E2</name>
@@ -2130,7 +2132,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 2 EAM</label>
+                <label>label_temperature_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute E</name>
@@ -2140,7 +2142,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm EAM</label>
+                <label>label_rpm EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage M</name>
@@ -2150,7 +2152,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage ESC</label>
+                <label>label_voltage ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M</name>
@@ -2160,7 +2162,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current ESC</label>
+                <label>label_current ESC</label>
             </Measurement>
             <Measurement>
                 <name>capacity M</name>
@@ -2170,7 +2172,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity ESC</label>
+                <label>label_capacity ESC</label>
             </Measurement>
             <Measurement>
                 <name>power M</name>
@@ -2180,7 +2182,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
- 				<label>label_power ESC</label>
+                <label>label_power ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M</name>
@@ -2190,7 +2192,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
- 				<label>label_rpm ESC</label>
+                <label>label_rpm ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1</name>
@@ -2198,7 +2200,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
- 				<label>label_temperature_fet ESC</label>
+                <label>label_temperature_fet ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2</name>
@@ -2207,7 +2209,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
- 				<label>label_temperature_ext ESC</label>
+                <label>label_temperature_ext ESC</label>
             </Measurement>
             <Measurement>
                 <name>voltage M_min</name>
@@ -2216,8 +2218,8 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_voltage_bat_min ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_voltage_bat_min ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M_max</name>
@@ -2226,8 +2228,8 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_current_bat_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_current_bat_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>
@@ -2236,8 +2238,8 @@
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_rpm_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_rpm_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1_max</name>
@@ -2245,8 +2247,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_temperature_fet_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_fet_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2_max</name>
@@ -2254,112 +2256,116 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_temperature_ext_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_ext_max ESC</label>
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
             <ScoreGroups>
-				<Scoregroup scoregroupId="0">
-					<name>Dauer</name>
-					<symbol></symbol>
-					<unit>h</unit>
-					<active>true</active>
-					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-					<property name="histo_top_placement" value="true" type="Boolean" />
-					<label>Zeitdauer der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="1">
-					<name>Zeitschritte</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="2">
-					<name>Zählerwerte</name>
-					<symbol></symbol>
-					<unit>Tsd</unit>
-					<active>true</active>
-					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-					<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
-					<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
-					<label>Anzahl von Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="3">
-					<name>Paketverlustdauer</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="4">
-					<name>Paketverluste</name>
-					<symbol></symbol>
-					<unit>‰</unit>
-					<active>true</active>
-					<score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages" />
-					<property name="factor" value="0.1" type="Double" />
-					<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="5">
-					<name>Sensoren</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="sensors" value="Anzahl" type="String" />
-					<score label="sensorVario" value="Vario" type="String" />
-					<score label="sensorGps" value="GPS" type="String" />
-					<score label="sensorGam" value="GAM" type="String" />
-					<score label="sensorEam" value="EAM" type="String" />
-					<score label="sensorEsc" value="ESC" type="String" />
-					<label>Vorhandensein von Sensoren</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="6">
-					<name>Versionen</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logDataVersion" value="Gerät" type="String" />
-					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-					<score label="logFileVersion" value="Log-Datei" type="String" />
-					<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="7">
-					<name>Datenmenge</name>
-					<symbol></symbol>
-					<unit>kiB</unit>
-					<active>true</active>
-					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-					<score label="logFileBytes" value="Dateigröße" type="String" />
-					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-					<label>Größe der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="8">
-					<name>Datensätze</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logFileRecordSets" value="Anzahl" type="String" />
-					<label>Anzahl an Log-Aufzeichnungen</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="9">
-					<name>Laufzeiten</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-					<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
-				</Scoregroup>
-			</ScoreGroups>
+                <Scoregroup scoregroupId="0">
+                    <name>duration</name>
+                    <symbol></symbol>
+                    <unit>h</unit>
+                    <active>true</active>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
+                    <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                    <property name="histo_top_placement" value="true" type="Boolean"/>
+                    <label>scorelabel_duration</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="1">
+                    <name>time_interval</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="2">
+                    <name>measurement_number</name>
+                    <symbol></symbol>
+                    <unit>Tsd</unit>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="3">
+                    <name>lost_packages_timespan</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>true</active>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="4">
+                    <name>lost_packages_number</name>
+                    <symbol></symbol>
+                    <unit>%</unit>
+                    <active>true</active>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
+                    <property name="factor" value="0.1" type="Double"/>
+                    <label>scorelabel_lost_packages_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="5">
+                    <name>sensor_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>true</active>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="6">
+                    <name>software_version</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="7">
+                    <name>file_size</name>
+                    <symbol></symbol>
+                    <unit>kiB</unit>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
+                    <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+                    <label>scorelabel_file_size</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="8">
+                    <name>recordset_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="9">
+                    <name>elapsed_time</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
+                </Scoregroup>
+            </ScoreGroups>
         </Channel>
         <Channel name="type_channels" type="TYPE_CONFIG">
             <Measurement>
@@ -2426,7 +2432,7 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -2497,6 +2503,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
+                <label>label_azimuth</label>
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -3078,7 +3085,7 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>current M_max</name>
@@ -3087,7 +3094,7 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>
@@ -3096,7 +3103,7 @@
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>temperature M_1_max</name>
@@ -3104,7 +3111,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>temperature M_2_max</name>
@@ -3112,8 +3119,13 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
+            <ScoreGroups/>
         </Channel>
         <Channel name="ESC" type="TYPE_CONFIG">
             <Measurement>
@@ -3121,7 +3133,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-				<label>label_rx_tx_ploss</label>
+                <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -3129,7 +3141,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_rxsq</label>
+                <label>label_rxsq</label>
             </Measurement>
             <Measurement>
                 <name>Strength</name>
@@ -3137,7 +3149,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_strenght</label>
+                <label>label_strenght</label>
             </Measurement>
             <Measurement>
                 <name>VPack</name>
@@ -3145,7 +3157,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_vpack</label>
+                <label>label_vpack</label>
             </Measurement>
             <Measurement>
                 <name>Tx</name>
@@ -3153,7 +3165,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-				<label>label_tx</label>
+                <label>label_tx</label>
             </Measurement>
             <Measurement>
                 <name>Rx</name>
@@ -3162,7 +3174,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="scale_sync_ref_ordinal" value="4" type="Integer" />
- 				<label>label_rx</label>
+                <label>label_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx</name>
@@ -3171,7 +3183,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
- 				<label>label_voltage_rx</label>
+                <label>label_voltage_rx</label>
             </Measurement>
             <Measurement>
                 <name>temperature_rx</name>
@@ -3179,7 +3191,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_rx</label>
+                <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
@@ -3188,16 +3200,16 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>lable_voltage_rx_min</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>lable_voltage_rx_min</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" ratioRefOrdinal="62" sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="61" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
-				<label>label_altitude</label>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="61" sumTriggerText="text_trigger_motor_sum" ratioRefOrdinal="62" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
+                <label>label_altitude</label>
             </Measurement>
             <Measurement>
                 <name>climb 1</name>
@@ -3205,8 +3217,8 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_climb_1</label>
-           </Measurement>
+                <label>label_climb_1</label>
+            </Measurement>
             <Measurement>
                 <name>climb 3</name>
                 <symbol>vh</symbol>
@@ -3214,7 +3226,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_3</label>
+                <label>label_climb_3</label>
             </Measurement>
             <Measurement>
                 <name>climb 10</name>
@@ -3223,7 +3235,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="10" type="Integer" />
-				<label>label_climb_10</label>
+                <label>label_climb_10</label>
             </Measurement>
             <Measurement>
                 <name>latitude</name>
@@ -3232,7 +3244,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -3241,7 +3252,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -3249,7 +3259,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -3257,7 +3267,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_distance_start</label>
+                <label>label_distance_start</label>
             </Measurement>
             <Measurement>
                 <name>azimuth</name>
@@ -3266,7 +3276,8 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_azimuth</label>
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -3274,7 +3285,7 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>voltage G</name>
@@ -3283,7 +3294,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_voltage GAM</label>
+                <label>label_voltage GAM</label>
             </Measurement>
             <Measurement>
                 <name>current G</name>
@@ -3292,7 +3303,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<label>label_current GAM</label>
+                <label>label_current GAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity G</name>
@@ -3301,7 +3312,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_capacity GAM</label>
+                <label>label_capacity GAM</label>
             </Measurement>
             <Measurement>
                 <name>power G</name>
@@ -3310,7 +3321,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
-				<label>label_power GAM</label>
+                <label>label_power GAM</label>
             </Measurement>
             <Measurement>
                 <name>balance G</name>
@@ -3319,7 +3330,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-				<label>label_balance GAM</label>
+                <label>label_balance GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G1</name>
@@ -3328,7 +3339,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-				<label>label_cell_voltage 1 GAM</label>
+                <label>label_cell_voltage 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G2</name>
@@ -3338,7 +3349,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 2 GAM</label>
+                <label>label_cell_voltage 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G3</name>
@@ -3348,7 +3359,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 3 GAM</label>
+                <label>label_cell_voltage 3 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G4</name>
@@ -3358,7 +3369,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 4 GAM</label>
+                <label>label_cell_voltage 4 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G5</name>
@@ -3368,7 +3379,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 5 GAM</label>
+                <label>label_cell_voltage 5 GAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage G6</name>
@@ -3378,7 +3389,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 6 GAM</label>
+                <label>label_cell_voltage 6 GAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute G</name>
@@ -3387,7 +3398,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-				<label>label_rpm GAM</label>
+                <label>label_rpm GAM</label>
             </Measurement>
             <Measurement>
                 <name>fuel</name>
@@ -3395,7 +3406,7 @@
                 <unit>ml</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-				<label>label_fuel</label>
+                <label>label_fuel</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS1</name>
@@ -3403,7 +3414,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_voltage_sensor 1 GAM</label>
+                <label>label_voltage_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage GS2</name>
@@ -3412,7 +3423,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 GAM</label>
+                <label>label_voltage_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G1</name>
@@ -3421,7 +3432,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 GAM</label>
+                <label>label_temperature_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature G2</name>
@@ -3430,7 +3441,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 2 GAM</label>
+                <label>label_temperature_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage E</name>
@@ -3440,7 +3451,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="59" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage EAM</label>
+                <label>label_voltage EAM</label>
             </Measurement>
             <Measurement>
                 <name>current E</name>
@@ -3450,7 +3461,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="59" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current EAM</label>
+                <label>label_current EAM</label>
             </Measurement>
             <Measurement>
                 <name>capacity E</name>
@@ -3460,7 +3471,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
- 				<label>label_capacity EAM</label>
+                <label>label_capacity EAM</label>
             </Measurement>
             <Measurement>
                 <name>power E</name>
@@ -3470,7 +3481,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power EAM</label>
+                <label>label_power EAM</label>
             </Measurement>
             <Measurement>
                 <name>balance E</name>
@@ -3480,7 +3491,7 @@
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="23" type="Integer" />
-				<label>label_balance EAM</label>
+                <label>label_balance EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E1</name>
@@ -3490,7 +3501,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer" />
-				<label>label_cell_voltage 1 EAM</label>
+                <label>label_cell_voltage 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E2</name>
@@ -3500,7 +3511,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 2 EAM</label>
+                <label>label_cell_voltage 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E3</name>
@@ -3510,7 +3521,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 3 EAM</label>
+                <label>label_cell_voltage 3 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E4</name>
@@ -3520,7 +3531,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 4 EAM</label>
+                <label>label_cell_voltage 4 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E5</name>
@@ -3530,7 +3541,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 5 EAM</label>
+                <label>label_cell_voltage 5 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E6</name>
@@ -3540,7 +3551,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 6 EAM</label>
+                <label>label_cell_voltage 6 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E7</name>
@@ -3550,7 +3561,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 7 EAM</label>
+                <label>label_cell_voltage 7 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E8</name>
@@ -3560,7 +3571,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 8 EAM</label>
+                <label>label_cell_voltage 8 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E9</name>
@@ -3570,7 +3581,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 9 EAM</label>
+                <label>label_cell_voltage 9 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E10</name>
@@ -3580,7 +3591,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 10 EAM</label>
+                <label>label_cell_voltage 10 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E11</name>
@@ -3590,7 +3601,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 11 EAM</label>
+                <label>label_cell_voltage 11 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E12</name>
@@ -3600,7 +3611,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 12 EAM</label>
+                <label>label_cell_voltage 12 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E13</name>
@@ -3610,7 +3621,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 13 EAM</label>
+                <label>label_cell_voltage 13 EAM</label>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E14</name>
@@ -3620,7 +3631,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
-				<label>label_cell_voltage 14 EAM</label>
+                <label>label_cell_voltage 14 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES1</name>
@@ -3629,7 +3640,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 1 EAM</label>
+                <label>label_voltage_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage ES2</name>
@@ -3638,7 +3649,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
-				<label>label_voltage_sensor 2 EAM</label>
+                <label>label_voltage_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E1</name>
@@ -3647,7 +3658,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_sensor 1 EAM</label>
+                <label>label_temperature_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>temperature E2</name>
@@ -3656,7 +3667,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
- 				<label>label_temperature_sensor 1 EAM</label>
+                <label>label_temperature_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute E</name>
@@ -3666,7 +3677,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm EAM</label>
+                <label>label_rpm EAM</label>
             </Measurement>
             <Measurement>
                 <name>voltage M</name>
@@ -3676,7 +3687,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
-				<label>label_voltage ESC</label>
+                <label>label_voltage ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M</name>
@@ -3688,7 +3699,7 @@
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<label>label_current ESC</label>
+                <label>label_current ESC</label>
             </Measurement>
             <Measurement>
                 <name>capacity M</name>
@@ -3698,7 +3709,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
-				<label>label_capacity ESC</label>
+                <label>label_capacity ESC</label>
             </Measurement>
             <Measurement>
                 <name>power M</name>
@@ -3708,7 +3719,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
-				<label>label_power ESC</label>
+                <label>label_power ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M</name>
@@ -3718,7 +3729,7 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<label>label_rpm ESC</label>
+                <label>label_rpm ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1</name>
@@ -3726,7 +3737,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-				<label>label_temperature_fet ESC</label>
+                <label>label_temperature_fet ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2</name>
@@ -3735,7 +3746,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<label>label_temperature_ext ESC</label>
+                <label>label_temperature_ext ESC</label>
             </Measurement>
             <Measurement>
                 <name>voltage M_min</name>
@@ -3744,8 +3755,8 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_voltage_bat_min ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_voltage_bat_min ESC</label>
             </Measurement>
             <Measurement>
                 <name>current M_max</name>
@@ -3754,8 +3765,8 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_current_bat_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_current_bat_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>
@@ -3764,8 +3775,8 @@
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_rpm_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_rpm_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_1_max</name>
@@ -3773,8 +3784,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_temperature_fet_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_fet_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>temperature M_2_max</name>
@@ -3782,112 +3793,116 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
-				<label>label_temperature_fet_max ESC</label>
+                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <label>label_temperature_fet_max ESC</label>
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
             <ScoreGroups>
-				<Scoregroup scoregroupId="0">
-					<name>Dauer</name>
-					<symbol></symbol>
-					<unit>h</unit>
-					<active>true</active>
-					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-					<property name="histo_top_placement" value="true" type="Boolean" />
-					<label>Zeitdauer der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="1">
-					<name>Zeitschritte</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="2">
-					<name>Zählerwerte</name>
-					<symbol></symbol>
-					<unit>Tsd</unit>
-					<active>true</active>
-					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-					<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
-					<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
-					<label>Anzahl von Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="3">
-					<name>Paketverlustdauer</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="4">
-					<name>Paketverluste</name>
-					<symbol></symbol>
-					<unit>‰</unit>
-					<active>true</active>
-					<score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages" />
-					<property name="factor" value="0.1" type="Double" />
-					<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="5">
-					<name>Sensoren</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="sensors" value="Anzahl" type="String" />
-					<score label="sensorVario" value="Vario" type="String" />
-					<score label="sensorGps" value="GPS" type="String" />
-					<score label="sensorGam" value="GAM" type="String" />
-					<score label="sensorEam" value="EAM" type="String" />
-					<score label="sensorEsc" value="ESC" type="String" />
-					<label>Vorhandensein von Sensoren</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="6">
-					<name>Versionen</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logDataVersion" value="Gerät" type="String" />
-					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-					<score label="logFileVersion" value="Log-Datei" type="String" />
-					<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="7">
-					<name>Datenmenge</name>
-					<symbol></symbol>
-					<unit>kiB</unit>
-					<active>true</active>
-					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-					<score label="logFileBytes" value="Dateigröße" type="String" />
-					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-					<label>Größe der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="8">
-					<name>Datensätze</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logFileRecordSets" value="Anzahl" type="String" />
-					<label>Anzahl an Log-Aufzeichnungen</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="9">
-					<name>Laufzeiten</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-					<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
-				</Scoregroup>
-			</ScoreGroups>
+                <Scoregroup scoregroupId="0">
+                    <name>duration</name>
+                    <symbol></symbol>
+                    <unit>h</unit>
+                    <active>true</active>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
+                    <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                    <property name="histo_top_placement" value="true" type="Boolean"/>
+                    <label>scorelabel_duration</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="1">
+                    <name>time_interval</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="2">
+                    <name>measurement_number</name>
+                    <symbol></symbol>
+                    <unit>Tsd</unit>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="3">
+                    <name>lost_packages_timespan</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>true</active>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="4">
+                    <name>lost_packages_number</name>
+                    <symbol></symbol>
+                    <unit>%</unit>
+                    <active>true</active>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
+                    <property name="factor" value="0.1" type="Double"/>
+                    <label>scorelabel_lost_packages_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="5">
+                    <name>sensor_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>true</active>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="6">
+                    <name>software_version</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="7">
+                    <name>file_size</name>
+                    <symbol></symbol>
+                    <unit>kiB</unit>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
+                    <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+                    <label>scorelabel_file_size</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="8">
+                    <name>recordset_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="9">
+                    <name>elapsed_time</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
+                </Scoregroup>
+            </ScoreGroups>
         </Channel>
         <Channel name="type_lap_time" type="TYPE_CONFIG">
             <Measurement>
@@ -3954,7 +3969,7 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -4023,6 +4038,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
+                <label>label_azimuth</label>
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -4396,7 +4412,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
             </Measurement>
@@ -4449,7 +4465,7 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>current M_max</name>
@@ -4458,7 +4474,7 @@
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>
@@ -4467,25 +4483,23 @@
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>temperature M_1_max</name>
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
-                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>temperature M_2_max</name>
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
-				<trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>Rxl</name>
@@ -4529,112 +4543,118 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="74" type="Integer" />
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
             <ScoreGroups>
-				<Scoregroup scoregroupId="0">
-					<name>Dauer</name>
-					<symbol></symbol>
-					<unit>h</unit>
-					<active>true</active>
-					<score label="duration_mm" value="Gesamt" type="String" description="Zeitdauer" />
-					<property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten" />
-					<property name="histo_top_placement" value="true" type="Boolean" />
-					<label>Zeitdauer der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="1">
-					<name>Zeitschritte</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="averageTimeStep_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="minimumTimeStep_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="maximumTimeStep_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="sigmaTimeStep_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitabstand zwischen den ausgewerteten Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="2">
-					<name>Zählerwerte</name>
-					<symbol></symbol>
-					<unit>Tsd</unit>
-					<active>true</active>
-					<score label="totalReadings" value="Anzahl gelesene Werte" type="String" description="Anzahl gelesene Werte" />
-					<score label="sampledReadings" value="Anzahl Stichprobe" type="String" description="Anzahl Stichprobe" />
-					<score label="totalPackages" value="Anzahl Pakete" type="String" description="Anzahl Pakete" />
-					<score label="lostPackages" value="Verlorene Pakete" type="String" description="Verlorene Pakete" />
-					<label>Anzahl von Messwerten</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="3">
-					<name>Paketverlustdauer</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="lostPackagesAvg_ms" value="Mittel" type="String" description="Mittelwert" />
-					<score label="lostPackagesMin_ms" value="Minimum" type="String" description="Minimum" />
-					<score label="lostPackagesMax_ms" value="Maximum" type="String" description="Maximum" />
-					<score label="lostPackagesSigma_ms" value="Standardabweichung" type="String" description="Standardabweichung" />
-					<label>Zeitraum ohne Empfang von Datenpaketen des Rückkanals</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="4">
-					<name>Paketverluste</name>
-					<symbol></symbol>
-					<unit>‰</unit>
-					<active>true</active>
-					<score label="lostPackagesPerMille" value="Paketverlustquote" type="String" description="lostPackages / totalPackages" />
-					<property name="factor" value="0.1" type="Double" />
-					<label>Anteil verlorener Pakete des Rückkanals für die gesamte Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="5">
-					<name>Sensoren</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="sensors" value="Anzahl" type="String" />
-					<score label="sensorVario" value="Vario" type="String" />
-					<score label="sensorGps" value="GPS" type="String" />
-					<score label="sensorGam" value="GAM" type="String" />
-					<score label="sensorEam" value="EAM" type="String" />
-					<score label="sensorEsc" value="ESC" type="String" />
-					<label>Vorhandensein von Sensoren</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="6">
-					<name>Versionen</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logDataVersion" value="Gerät" type="String" />
-					<score label="logDataExplorerVersion" value="DataExplorer" type="String" />
-					<score label="logFileVersion" value="Log-Datei" type="String" />
-					<label>Programmversionen der Aufzeichnungs- und Auswertesoftware</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="7">
-					<name>Datenmenge</name>
-					<symbol></symbol>
-					<unit>kiB</unit>
-					<active>true</active>
-					<score label="logRecordSetBytes" value="Datensatzgröße" type="String" />
-					<score label="logFileBytes" value="Dateigröße" type="String" />
-					<property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024" />
-					<label>Größe der Log-Aufzeichnung</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="8">
-					<name>Datensätze</name>
-					<symbol></symbol>
-					<unit></unit>
-					<active>true</active>
-					<score label="logFileRecordSets" value="Anzahl" type="String" />
-					<label>Anzahl an Log-Aufzeichnungen</label>
-				</Scoregroup>
-				<Scoregroup scoregroupId="9">
-					<name>Laufzeiten</name>
-					<symbol></symbol>
-					<unit>ms</unit>
-					<active>true</active>
-					<score label="elapsedHistoRecordSet_ms" value="Datensatz lesen" type="String" />
-					<label>Rechnerlaufzeit bei das Lesen und Auswerten der Log-Aufzeichnung</label>
-				</Scoregroup>
-			</ScoreGroups>
+                <Scoregroup scoregroupId="0">
+                    <name>duration</name>
+                    <symbol></symbol>
+                    <unit>h</unit>
+                    <active>true</active>
+                    <score label="duration_mm" value="scorevalue_total" type="String" description="Zeitdauer"/>
+                    <property name="factor" value="0.01666667" type="Double" description="interne Darstellung in Minuten"/>
+                    <property name="histo_top_placement" value="true" type="Boolean"/>
+                    <label>scorelabel_duration</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="1">
+                    <name>time_interval</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="averageTimeStep_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="minimumTimeStep_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="maximumTimeStep_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="sigmaTimeStep_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_time_interval</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="2">
+                    <name>measurement_number</name>
+                    <symbol></symbol>
+                    <unit>Tsd</unit>
+                    <active>false</active>
+                    <score label="totalReadings" value="scorevalue_readings_count" type="String" description="Anzahl gelesene Werte"/>
+                    <score label="sampledReadings" value="scorevalue_samples_count" type="String" description="Anzahl Stichprobe"/>
+                    <score label="totalPackages" value="scorevalue_packages_count" type="String" description="Anzahl Pakete"/>
+                    <score label="lostPackages" value="scorevalue_lost_packages_count" type="String" description="Verlorene Pakete"/>
+                    <label>scorelabel_measurement_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="3">
+                    <name>lost_packages_timespan</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>true</active>
+                    <score label="lostPackagesAvg_ms" value="scorevalue_average" type="String" description="Mittelwert"/>
+                    <score label="lostPackagesMin_ms" value="scorevalue_minimum" type="String" description="Minimum"/>
+                    <score label="lostPackagesMax_ms" value="scorevalue_maximum" type="String" description="Maximum"/>
+                    <score label="lostPackagesSigma_ms" value="scorevalue_standard_deviation" type="String" description="Standardabweichung"/>
+                    <label>scorelabel_lost_packages_timespan</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="4">
+                    <name>lost_packages_number</name>
+                    <symbol></symbol>
+                    <unit>%</unit>
+                    <active>true</active>
+                    <score label="lostPackagesPerMille" value="scorevalue_lost_packages_ratio" type="String" description="lostPackages / totalPackages"/>
+                    <property name="factor" value="0.1" type="Double"/>
+                    <label>scorelabel_lost_packages_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="5">
+                    <name>sensor_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>true</active>
+                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorVario" value="scorevalue_vario" type="String"/>
+                    <score label="sensorGps" value="scorevalue_gps" type="String"/>
+                    <score label="sensorGam" value="scorevalue_gam" type="String"/>
+                    <score label="sensorEam" value="scorevalue_eam" type="String"/>
+                    <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <label>scorelabel_sensor_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="6">
+                    <name>software_version</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logDataVersion" value="scorevalue_device" type="String"/>
+                    <score label="logDataExplorerVersion" value="scorevalue_data_explorer" type="String"/>
+                    <score label="logFileVersion" value="scorevalue_log_file" type="String"/>
+                    <label>scorelabel_software_version</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="7">
+                    <name>file_size</name>
+                    <symbol></symbol>
+                    <unit>kiB</unit>
+                    <active>false</active>
+                    <score label="logRecordSetBytes" value="scorevalue_recordset_size" type="String"/>
+                    <score label="logFileBytes" value="scorevalue_file_size" type="String"/>
+                    <property name="factor" value="0.9765625" type="Double" description="kiB conversion factor = 1000 / 1024"/>
+                    <label>scorelabel_file_size</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="8">
+                    <name>recordset_number</name>
+                    <symbol></symbol>
+                    <unit></unit>
+                    <active>false</active>
+                    <score label="logFileRecordSets" value="scorevalue_count" type="String"/>
+                    <label>scorelabel_recordset_number</label>
+                </Scoregroup>
+                <Scoregroup scoregroupId="9">
+                    <name>elapsed_time</name>
+                    <symbol></symbol>
+                    <unit>ms</unit>
+                    <active>false</active>
+                    <score label="elapsedHistoRecordSet_ms" value="scorevalue_load_recordset" type="String"/>
+                    <label>scorelabel_elapsed_time</label>
+                </Scoregroup>
+            </ScoreGroups>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
         <property name="text_mode" value="true" type="Boolean"/>
+        <property name="outlier_sigma" value="3.29" type="Double" description="3.29 sigma allows 0.1% outliers, i.e. we allow 1 lower and 1 upper outlier for a population of 2000 measurements"/>
+        <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0"/>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>
