@@ -288,7 +288,7 @@ public class TabAreaContextMenu {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							TabAreaContextMenu.this.histoSet.setIgnoreHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()),
+							TabAreaContextMenu.this.histoSet.setExcludeHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()),
 									popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString());
 
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
@@ -306,7 +306,7 @@ public class TabAreaContextMenu {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							TabAreaContextMenu.this.histoSet.setIgnoreHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()), GDE.STRING_EMPTY);
+							TabAreaContextMenu.this.histoSet.setExcludeHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()), GDE.STRING_EMPTY);
 
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
@@ -325,9 +325,9 @@ public class TabAreaContextMenu {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()) != null)
-								TabAreaContextMenu.this.histoSet.clearIgnoreHistoLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
+								TabAreaContextMenu.this.histoSet.clearExcludeHistoLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
 							else
-								TabAreaContextMenu.this.histoSet.clearIgnoreHistoLists(null);
+								TabAreaContextMenu.this.histoSet.clearExcludeHistoLists(null);
 
 							TabAreaContextMenu.this.application.setupHistoWindows();
 						}

@@ -112,7 +112,7 @@ public class HistoGraphicsComposite extends Composite {
 	int													headerGap						= 0;
 	int													commentHeight				= 0;
 	int													commentGap					= 0;
-	String											graphicsHeaderText, recordSetCommentText;
+	String											graphicsHeaderText;
 	Point												oldSize							= new Point(0, 0);								// composite size - control resized
 
 	HashMap<String, Integer>		leftSideScales			= new HashMap<String, Integer>();
@@ -220,7 +220,7 @@ public class HistoGraphicsComposite extends Composite {
 					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
 						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeaderText);
 					}
-					if (!toolTipText.isEmpty() ) HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText.substring(1) + levelsText);
+					if (!toolTipText.isEmpty()) HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText.substring(1) + levelsText);
 				}
 			});
 		}
@@ -275,7 +275,7 @@ public class HistoGraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT | SWT.READ_ONLY);
-			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.recordSetComment.setBackground(this.surroundingBackground);
 			this.recordSetComment.setMenu(this.popupmenu);
 			this.recordSetComment.addPaintListener(new PaintListener() {
@@ -320,6 +320,8 @@ public class HistoGraphicsComposite extends Composite {
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
+
+			setRecordSetCommentStandard();
 
 			if (trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE, true);
@@ -549,6 +551,15 @@ public class HistoGraphicsComposite extends Composite {
 		this.recordSetComment.notifyListeners(SWT.FocusOut, new Event());
 	}
 
+	public void setRecordSetCommentStandard() {
+		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.recordSetComment.setText(Messages.getString(MessageIds.GDE_MSGI0064,
+				new Object[] { String.format("%,d", this.histoSet.getDirectoryFilesCount()), String.format("%,d", this.histoSet.getSelectedFilesCount()), //
+						String.format("%,d", this.histoSet.getTotalTrussesCount()), String.format("%,d", this.histoSet.getUnsuppressedTrussesCount()), //
+						String.format("%,d", this.histoSet.getMatchingTrussesCount()), String.format("%,d", this.histoSet.getAvailableTrussesCount()), //
+						String.format("%.2f", this.histoSet.getElapsedTime_ms() / 1000.) }));
+	}
+
 	/**
 	 * draw the start pointer for measurement modes.
 	 * select only valid timestamps on the x axis.
@@ -573,10 +584,10 @@ public class HistoGraphicsComposite extends Composite {
 		if (trailRecordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
 			this.timestampMeasure_ms = isRefresh ? this.timestampMeasure_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "timestampMeasure_ms=" + this.timestampMeasure_ms + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timestampMeasure_ms=" + this.timestampMeasure_ms + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
 			int yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
 			if (yPosMeasureNew == Integer.MIN_VALUE) {
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
 				for (int i = 0; i < trailRecord.size(); i++) {
 					this.timestampMeasure_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
 					if ((yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms))) > Integer.MIN_VALUE) break;
@@ -604,7 +615,7 @@ public class HistoGraphicsComposite extends Composite {
 			this.timestampMeasure_ms = isRefresh ? this.timestampMeasure_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
 			int yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
 			if (yPosMeasureNew == Integer.MIN_VALUE) {
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
 				for (int i = 0; i < trailRecord.size(); i++) {
 					this.timestampMeasure_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
 					if ((yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms))) > Integer.MIN_VALUE) break;
@@ -617,7 +628,7 @@ public class HistoGraphicsComposite extends Composite {
 			this.timestampDelta_ms = isRefresh ? this.timestampDelta_ms : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 3 * 2);
 			int yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampDelta_ms));
 			if (yPosDeltaNew == Integer.MIN_VALUE) {
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampDelta_ms=%d search first non-null value", this.timestampDelta_ms)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampDelta_ms=%d search first non-null value", this.timestampDelta_ms)); //$NON-NLS-1$
 				for (int i = trailRecord.size() - 1; i >= 0; i--) {
 					this.timestampDelta_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
 					if ((yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampDelta_ms))) > Integer.MIN_VALUE) break;
@@ -625,7 +636,7 @@ public class HistoGraphicsComposite extends Composite {
 			}
 			this.xPosDelta = this.timeLine.getXPosTimestamp(this.timestampDelta_ms);
 			this.yPosDelta = yPosDeltaNew;
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", this.timestampDelta_ms, this.xPosDelta, this.yPosDelta)); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", this.timestampDelta_ms, this.xPosDelta, this.yPosDelta)); //$NON-NLS-1$
 
 			if (yPosMeasureNew > Integer.MIN_VALUE && yPosDeltaNew > Integer.MIN_VALUE) {
 				drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
@@ -793,13 +804,8 @@ public class HistoGraphicsComposite extends Composite {
 				cleanConnectingLineObsoleteRectangle();
 			}
 			if (isGCset) this.canvasGC.dispose();
-			if (this.recordSetCommentText != null) {
-				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-				this.recordSetComment.setText(this.recordSetCommentText);
-			}
-			else {
-				this.recordSetComment.setText(GDE.STRING_EMPTY);
-			}
+
+			setRecordSetCommentStandard();
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
 		catch (RuntimeException e) {
@@ -1139,8 +1145,6 @@ public class HistoGraphicsComposite extends Composite {
 			HistoGraphicsComposite.this.recordSetComment.setText(GDE.STRING_EMPTY);
 			HistoGraphicsComposite.this.graphicsHeader.setText(GDE.STRING_EMPTY);
 			HistoGraphicsComposite.this.graphicsHeaderText = null;
-			HistoGraphicsComposite.this.recordSetCommentText = null;
-			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 			updateCaptions();
 		}
 	}
@@ -1237,7 +1241,6 @@ public class HistoGraphicsComposite extends Composite {
 		Properties displayProps = this.settings.getMeasurementDisplayProperties();
 		TrailRecordSet trailRecordSet = getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
-			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
 
 			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799))); //$NON-NLS-1$ 
@@ -1263,10 +1266,12 @@ public class HistoGraphicsComposite extends Composite {
 				TrailRecord record = (TrailRecord) records.get(i);
 				sb.append(GDE.STRING_OR).append(String.format("%.10s", StringHelper.center(record.getFormattedMeasureValue(index), 10))); //$NON-NLS-1$
 			}
+			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			return sb.append(GDE.STRING_OR).toString();
 		}
-		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-		return this.recordSetCommentText != null ? this.recordSetCommentText : GDE.STRING_EMPTY;
+		else {
+			return GDE.STRING_EMPTY;
+		}
 	}
 
 	/**

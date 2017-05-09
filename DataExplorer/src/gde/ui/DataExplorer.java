@@ -2036,7 +2036,7 @@ public class DataExplorer extends Composite {
 			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 			setProgress(100, sThreadId);
 			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
-				if (this.histoSet.getValidTrusses().isEmpty()) {
+				if (this.histoSet.getUnsuppressedTrusses().isEmpty()) {
 					StringBuilder sb = new StringBuilder();
 					for (Path path : this.histoSet.getValidatedDirectories().values()) {
 						sb.append(path.toString()).append(GDE.STRING_NEW_LINE);
