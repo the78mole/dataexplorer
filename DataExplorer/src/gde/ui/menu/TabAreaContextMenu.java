@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.menu;
@@ -63,7 +63,7 @@ public class TabAreaContextMenu {
 
 	MenuItem										curveSelectionItem;
 	MenuItem										displayGraphicsHeaderItem;
-	MenuItem										displayGraphicsCommentItem;
+	MenuItem										displayGraphicsCommentItem, displayGraphicsCurveSurvey;
 	MenuItem										separatorView;
 	MenuItem										copyTabItem;
 	MenuItem										copyPrintImageItem;
@@ -92,18 +92,21 @@ public class TabAreaContextMenu {
 
 	public void createMenu(Menu popupMenu, TabMenuType type) {
 		popupMenu.addMenuListener(new MenuListener() {
+			@Override
 			public void menuShown(MenuEvent e) {
 				TabAreaContextMenu.log.log(Level.FINEST, "menuShown action " + e); //$NON-NLS-1$
 				if (type == TabMenuType.GRAPHICS) {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsCurveSurvey.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.getSelection());
 				}
 				if (type == TabMenuType.HISTOGRAPHICS) {
 					TabAreaContextMenu.this.suppressModeItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.getSelection());
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsCurveSurvey.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.getSelection());
 
 					TabAreaContextMenu.this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
 					TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
@@ -116,6 +119,7 @@ public class TabAreaContextMenu {
 						TabAreaContextMenu.this.hideMenuRevokeItem.setEnabled(true);
 						TabAreaContextMenu.this.displayGraphicsHeaderItem.setEnabled(true);
 						TabAreaContextMenu.this.displayGraphicsCommentItem.setEnabled(true);
+						TabAreaContextMenu.this.displayGraphicsCurveSurvey.setEnabled(true);
 						TabAreaContextMenu.this.copyTabItem.setEnabled(true);
 						TabAreaContextMenu.this.copyPrintImageItem.setEnabled(true);
 					}
@@ -148,6 +152,7 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsCurveSurvey.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.getSelection());
 
 					TabAreaContextMenu.this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
 					TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
@@ -164,6 +169,7 @@ public class TabAreaContextMenu {
 						TabAreaContextMenu.this.curveSelectionItem.setEnabled(false);
 						TabAreaContextMenu.this.displayGraphicsHeaderItem.setEnabled(false);
 						TabAreaContextMenu.this.displayGraphicsCommentItem.setEnabled(false);
+						TabAreaContextMenu.this.displayGraphicsCurveSurvey.setEnabled(false);
 						TabAreaContextMenu.this.copyPrintImageItem.setEnabled(false);
 						TabAreaContextMenu.this.dateTimeItem.setEnabled(false);
 						TabAreaContextMenu.this.editTableItem.setEnabled(false);
@@ -199,6 +205,7 @@ public class TabAreaContextMenu {
 				popupMenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.toString(), null);
 			}
 
+			@Override
 			public void menuHidden(MenuEvent e) {
 				//ignore
 			}
@@ -355,6 +362,7 @@ public class TabAreaContextMenu {
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
 				this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
 						boolean selection = TabAreaContextMenu.this.curveSelectionItem.getSelection();
@@ -365,6 +373,7 @@ public class TabAreaContextMenu {
 				this.displayGraphicsHeaderItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.displayGraphicsHeaderItem.setText(Messages.getString(MessageIds.GDE_MSGT0041));
 				this.displayGraphicsHeaderItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsHeaderItem action performed! " + e); //$NON-NLS-1$
 						boolean selection = TabAreaContextMenu.this.displayGraphicsHeaderItem.getSelection();
@@ -376,12 +385,28 @@ public class TabAreaContextMenu {
 				});
 				this.displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.displayGraphicsCommentItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
+				this.displayGraphicsCommentItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
 				this.displayGraphicsCommentItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsCommentItem action performed! " + e); //$NON-NLS-1$
 						boolean selection = TabAreaContextMenu.this.displayGraphicsCommentItem.getSelection();
 						TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.setSelection(selection);
 						TabAreaContextMenu.this.application.enableRecordSetComment(selection);
+						TabAreaContextMenu.this.application.updateHistoTabs(false, false);
+						;
+					}
+				});
+				this.displayGraphicsCurveSurvey = new MenuItem(popupMenu, SWT.CHECK);
+				this.displayGraphicsCurveSurvey.setText(Messages.getString(MessageIds.GDE_MSGT0876));
+				this.displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
+				this.displayGraphicsCurveSurvey.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "displayGraphicsCurveSurvey action performed! " + e); //$NON-NLS-1$
+						boolean selection = TabAreaContextMenu.this.displayGraphicsCurveSurvey.getSelection();
+						TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.setSelection(selection);
+						TabAreaContextMenu.this.application.enableCurveSurvey(selection);
 						TabAreaContextMenu.this.application.updateHistoTabs(false, false);
 						;
 					}
@@ -393,6 +418,7 @@ public class TabAreaContextMenu {
 			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0, Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
 			this.copyTabItem.addListener(SWT.Selection, new Listener() {
 
+				@Override
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
 					TabAreaContextMenu.this.application.copyTabContentAsImage();
@@ -403,6 +429,7 @@ public class TabAreaContextMenu {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
 						TabAreaContextMenu.this.application.copyGraphicsPrintImage();
@@ -417,6 +444,7 @@ public class TabAreaContextMenu {
 				this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
 				this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
 						RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
@@ -428,6 +456,7 @@ public class TabAreaContextMenu {
 				this.innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.innerAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0463));
 				this.innerAreaColorItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
 						RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
@@ -442,6 +471,7 @@ public class TabAreaContextMenu {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "borderColorItem action performed! " + e); //$NON-NLS-1$
 						RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
@@ -457,6 +487,7 @@ public class TabAreaContextMenu {
 				this.dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
 				this.dateTimeItem.setSelection(Settings.getInstance().isTimeFormatAbsolute());
 				this.dateTimeItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
 						TabAreaContextMenu.this.application.setAbsoluteDateTime(TabAreaContextMenu.this.dateTimeItem.getSelection());
@@ -466,6 +497,7 @@ public class TabAreaContextMenu {
 				this.editTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0731));
 				this.editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
 				this.editTableItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.OFF, "editTableItem action performed! " + e); //$NON-NLS-1$
 						Settings.getInstance().setDataTableEditable(TabAreaContextMenu.this.editTableItem.getSelection());
@@ -475,6 +507,7 @@ public class TabAreaContextMenu {
 				this.partialTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0704));
 				this.partialTableItem.setSelection(Settings.getInstance().isPartialDataTable());
 				this.partialTableItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
 						Settings.getInstance().setPartialDataTable(TabAreaContextMenu.this.partialTableItem.getSelection());
@@ -488,6 +521,7 @@ public class TabAreaContextMenu {
 				this.setDigitalFontItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.setDigitalFontItem.setText(Messages.getString(MessageIds.GDE_MSGT0726));
 				this.setDigitalFontItem.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "setDigitalFontItem action performed! " + e); //$NON-NLS-1$
 						int selectedFontSize = TabAreaContextMenu.this.application.openFontSizeDialog();
@@ -514,6 +548,7 @@ public class TabAreaContextMenu {
 		if (this.curveSelectionItem != null) this.curveSelectionItem.setEnabled(enabled);
 		if (this.displayGraphicsHeaderItem != null) this.displayGraphicsHeaderItem.setEnabled(enabled);
 		if (this.displayGraphicsCommentItem != null) this.displayGraphicsCommentItem.setEnabled(enabled);
+		if (this.displayGraphicsCurveSurvey != null) this.displayGraphicsCurveSurvey.setEnabled(enabled);
 		if (this.separatorView != null) this.separatorView.setEnabled(enabled);
 		if (this.copyTabItem != null) this.copyTabItem.setEnabled(enabled);
 		if (this.copyPrintImageItem != null) this.copyPrintImageItem.setEnabled(enabled);

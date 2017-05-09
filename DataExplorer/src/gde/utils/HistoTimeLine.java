@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     					2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -95,12 +95,12 @@ public class HistoTimeLine {
 	private TreeMap<Long, Double>					relativeTimeScale;																							// maps histoset timestamps to x-axis with range 0 to 1
 	private Density												density;																												// degree of population on the x -axis
 	private final TreeMap<Long, Integer>	scalePositions			= new TreeMap<>(Collections.reverseOrder());
-	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms	= null;																			// access timestamps by x axis position (naturalOrder)
+	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms= new TreeMap<Integer, List<Long>>();				// access timestamps by x axis position (naturalOrder)
 
 	/**
-	 * takes the timeline width and calculates the x-axis pixel positions for the histo timestamp values. 
+	 * takes the timeline width and calculates the x-axis pixel positions for the histo timestamp values.
 	 * @param newTrailRecordSet any recordset object (no trail recordset required)
-	 * @param newWidth  number of pixels for the timescale length including left/right margins for boxplots 
+	 * @param newWidth  number of pixels for the timescale length including left/right margins for boxplots
 	 * @param newLeftmostTimeStamp  in modes zoom, pan, scope
 	 * @param newRightmostTimeStamp  in modes zoom, pan, scope
 	 */
@@ -189,7 +189,7 @@ public class HistoTimeLine {
 			else
 				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
 		}
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$ 
+		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$
 		return timeFormat;
 	}
 
@@ -201,28 +201,23 @@ public class HistoTimeLine {
 	}
 
 	/**
-	 * takes the timeline width and calculates the pixel positions of the timestamp values. 
+	 * takes the timeline width and calculates the pixel positions of the timestamp values.
 	 * left and right margins are left free for boxplots.
-	 * in case of few timestamps the left and right margins will be increased. 
+	 * in case of few timestamps the left and right margins will be increased.
 	 */
 	public void setScalePositions() {
 		this.scalePositions.clear();
+		this.scaleTimeStamps_ms.clear();
 		int leftMargin;
 		int rightMargin;
 		if (this.settings.isXAxisLogarithmicDistance() || this.density == Density.LOW || this.relativeTimeScale.size() <= 2) {
 			// bigger margins present the data in a more harmonic manner
 			int remainingWidthPerItem = (this.width - this.density.boxWidth) / this.relativeTimeScale.size();
-			if (remainingWidthPerItem > 2 * Density.LOW.boxWidth) {
+			if (remainingWidthPerItem > 2 * Density.LOW.boxWidth)
 				// in case of few items: placing the items according to the average distance is more harmonic than using the double box size
 				leftMargin = rightMargin = this.width / (this.relativeTimeScale.size() + 1);
-			}
 			else
 				leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
-			// else {
-			// // the first and last timescale items are placed at the margins without trying to set them proportionally according their timestamps
-			// leftMargin = rightMargin = Math.max((this.boxWidths[this.density] + this.boxWidthAmplitude), this.width
-			// - 2 * this.boxWidths[TimeLine.DENSITY_LOW] * (this.relativeTimeScale.size() + 1)) / 2; // minimum distance equal to 2*boxWidth assumed
-			// }
 		}
 		else {
 			leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
@@ -334,8 +329,8 @@ public class HistoTimeLine {
 	}
 
 	/**
-	 * calculates a density indicator based on the current width and the boxplot element scaled sizes without width amplitude settings. 
-	 * Does not take elements which have a distance less than one pixel and will be thus positioned at the same place. 
+	 * calculates a density indicator based on the current width and the boxplot element scaled sizes without width amplitude settings.
+	 * Does not take elements which have a distance less than one pixel and will be thus positioned at the same place.
 	 */
 	private void defineDensity() {
 		List<Double> relativeDistances = new ArrayList<>();
@@ -401,7 +396,8 @@ public class HistoTimeLine {
 	 * @return the timestamp position in the drawing area (relative to x0 which is the left position of the drawing canvas)
 	 */
 	public int getXPosTimestamp(long timestamp_ms) {
-		return this.scalePositions.get(timestamp_ms);
+		if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "scalePositionsSize=" + this.scalePositions.size() + "  timestamp_ms=  ", timestamp_ms); //$NON-NLS-1$
+		return  this.scalePositions.get(timestamp_ms);
 	}
 
 	/**
@@ -412,17 +408,23 @@ public class HistoTimeLine {
 		final int xPosTolerance = 20;
 		Long timeStamp_ms = null;
 
-		if (this.scaleTimeStamps_ms == null) setScaleTimeStamps_ms();
+		if (this.scaleTimeStamps_ms.isEmpty()) setScaleTimeStamps_ms();
 
 		final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
-		if (xPos == lowerEntry.getKey())
+		if (lowerEntry != null && xPos == lowerEntry.getKey())
 			timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
 		else {
 			Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
-			if (xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2)
-				timeStamp_ms = xPos < lowerEntry.getKey() + xPosTolerance ? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) : null; // far away on the right 
+			if (ceilingEntry == null && lowerEntry == null)
+				throw new UnsupportedOperationException("an empty scale is not allowed");
+			else if (ceilingEntry == null)
+				timeStamp_ms = lowerEntry.getValue().get(lowerEntry.getValue().size() - 1);
+			else if (lowerEntry == null)
+				timeStamp_ms = ceilingEntry.getValue().get(0);
+			else if (xPos > lowerEntry.getKey() + xPosTolerance && xPos < ceilingEntry.getKey() - xPosTolerance)
+				timeStamp_ms = null; // midst in the distance but too far away
 			else
-				timeStamp_ms = xPos > ceilingEntry.getKey() - xPosTolerance ? ceilingEntry.getValue().get(0) : null;  // far away on the left
+				timeStamp_ms = lowerEntry != null && xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 ? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) : ceilingEntry.getValue().get(0);
 		}
 		return timeStamp_ms;
 	}
@@ -434,27 +436,32 @@ public class HistoTimeLine {
 	public long getAdjacentTimestamp(int xPos) {
 		long timeStamp_ms;
 
-		if (this.scaleTimeStamps_ms == null) setScaleTimeStamps_ms();
+		if (this.scaleTimeStamps_ms.isEmpty()) setScaleTimeStamps_ms();
 
 		final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
-		if (xPos == lowerEntry.getKey())
+		if (lowerEntry != null && xPos == lowerEntry.getKey())
 			timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
 		else {
 			final Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
-			timeStamp_ms = xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 ? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) : ceilingEntry.getValue().get(0);
+			if (ceilingEntry == null && lowerEntry == null)
+				throw new UnsupportedOperationException(" an empty scale is not allowed");
+			else if (ceilingEntry == null)
+				timeStamp_ms = lowerEntry.getValue().get(lowerEntry.getValue().size() - 1);
+			else
+				timeStamp_ms = lowerEntry != null && xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 ? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) : ceilingEntry.getValue().get(0);
 		}
 		return timeStamp_ms;
 	}
 
 	/**
-	 * Creates the map for optimized access to timestamps by x axis position. 
+	 * Creates the map for optimized access to timestamps by x axis position.
 	 * Is optimized for naturally ordered x positions and timestamps ordered based on the user's x axis order setting.
 	 */
 	private void setScaleTimeStamps_ms() {
-		this.scaleTimeStamps_ms = new TreeMap<Integer, List<Long>>(); // natural order
+		this.scaleTimeStamps_ms.clear();
 		if (this.settings.isXAxisReversed()) {
 			Entry<Integer, List<Long>> previous = null;
-			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
+			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed
 				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
 				if (previous == null || entry.getValue() != previous.getKey()) {
 					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
@@ -465,7 +472,7 @@ public class HistoTimeLine {
 		}
 		else {
 			Entry<Integer, List<Long>> previous = null;
-			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
+			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed
 				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
 				if (previous == null || entry.getValue() != previous.getKey()) {
 					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());

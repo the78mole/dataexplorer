@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.menu;
@@ -73,53 +73,53 @@ public class MenuBar {
 
 	private final Settings			settings		= Settings.getInstance();
 
-	MenuItem						fileMenuItem;
-	Menu								fileMenu;
-	MenuItem						openFileMenuItem;
-	MenuItem						historyFileMenuItem;
-	MenuItem						toolBoxDeviceMenuItem, portMenuItem;
-	MenuItem						aboutMenuItem;
-	MenuItem						contentsMenuItem, webCheckMenuItem;
-	Menu								helpMenu;
-	MenuItem						helpMenuItem;
-	MenuItem						recordCommentMenuItem, graphicsHeaderMenuItem, prevTabConfigItem, nextTabConfigItem;
-	MenuItem						curveSelectionMenuItem, prevChannelConfigItem, nextChannelConfigItem, prevRecordSetItem, nextRecordSetItem;
-	Menu								viewMenu;
-	MenuItem						viewMenuItem;
-	MenuItem						suppressModeItem;
-	Menu								graphicsMenu;
-	MenuItem						graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
-	MenuItem						csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
-	MenuItem						nextDeviceMenuItem;
-	MenuItem						prevDeviceMenuItem;
-	MenuItem						selectDeviceMenuItem;
-	Menu								deviceMenu;
-	MenuItem						deviceMenuItem;
-	MenuItem						copyTabContentAsImageMenuItem, copyGraphicsPrintImageMenuItem;
-	MenuItem						activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
-	Menu								editMenu;
-	MenuItem						editMenuItem;
-	MenuItem						printMenuItem, startTimeMenuItem;
-	MenuItem						exitMenuItem;
-	MenuItem						preferencesFileMenuItem;
-	MenuItem						devicePropertyFileEditMenuItem;
-	Menu								exportMenu;
-	MenuItem						exportFileMenuItem;
-	MenuItem						csvImportMenuItem1, csvImportMenuItem2;
-	Menu								importMenu;
-	MenuItem						importFileMenuItem;
-	Menu								fileHistoryMenu;
-	MenuItem						saveAsFileMenuItem;
-	MenuItem						saveFileMenuItem;
-	MenuItem						newFileMenuItem;
-	MenuItem						deleteFileMenuItem;
+	MenuItem										fileMenuItem;
+	Menu												fileMenu;
+	MenuItem										openFileMenuItem;
+	MenuItem										historyFileMenuItem;
+	MenuItem										toolBoxDeviceMenuItem, portMenuItem;
+	MenuItem										aboutMenuItem;
+	MenuItem										contentsMenuItem, webCheckMenuItem;
+	Menu												helpMenu;
+	MenuItem										helpMenuItem;
+	MenuItem										recordCommentMenuItem, graphicsCurveSurveyMenuItem, graphicsHeaderMenuItem, prevTabConfigItem, nextTabConfigItem;
+	MenuItem										curveSelectionMenuItem, prevChannelConfigItem, nextChannelConfigItem, prevRecordSetItem, nextRecordSetItem;
+	Menu												viewMenu;
+	MenuItem										viewMenuItem;
+	MenuItem										suppressModeItem;
+	Menu												graphicsMenu;
+	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	MenuItem										csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
+	MenuItem										nextDeviceMenuItem;
+	MenuItem										prevDeviceMenuItem;
+	MenuItem										selectDeviceMenuItem;
+	Menu												deviceMenu;
+	MenuItem										deviceMenuItem;
+	MenuItem										copyTabContentAsImageMenuItem, copyGraphicsPrintImageMenuItem;
+	MenuItem										activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
+	Menu												editMenu;
+	MenuItem										editMenuItem;
+	MenuItem										printMenuItem, startTimeMenuItem;
+	MenuItem										exitMenuItem;
+	MenuItem										preferencesFileMenuItem;
+	MenuItem										devicePropertyFileEditMenuItem;
+	Menu												exportMenu;
+	MenuItem										exportFileMenuItem;
+	MenuItem										csvImportMenuItem1, csvImportMenuItem2;
+	Menu												importMenu;
+	MenuItem										importFileMenuItem;
+	Menu												fileHistoryMenu;
+	MenuItem										saveAsFileMenuItem;
+	MenuItem										saveFileMenuItem;
+	MenuItem										newFileMenuItem;
+	MenuItem										deleteFileMenuItem;
 
-	int									iconSet	= DeviceCommPort.ICON_SET_OPEN_CLOSE;
+	int													iconSet			= DeviceCommPort.ICON_SET_OPEN_CLOSE;
 
-	final Menu					parent;
-	final DataExplorer						application;
-	final Channels			channels;
-	final FileHandler		fileHandler;
+	final Menu									parent;
+	final DataExplorer					application;
+	final Channels							channels;
+	final FileHandler						fileHandler;
 
 	public MenuBar(DataExplorer currentApplication, Menu menuParent) {
 		this.application = currentApplication;
@@ -129,13 +129,14 @@ public class MenuBar {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void create() {
 		{
 			this.fileMenuItem = new MenuItem(this.parent, SWT.CASCADE);
 			this.fileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0001));
 			this.fileMenuItem.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "fileMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
@@ -144,6 +145,7 @@ public class MenuBar {
 			{
 				this.fileMenu = new Menu(this.fileMenuItem);
 				this.fileMenu.addMenuListener(new MenuListener() {
+					@Override
 					public void menuShown(MenuEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
 						MenuBar.this.updateSubHistoryMenuItem(GDE.STRING_EMPTY);
@@ -161,6 +163,7 @@ public class MenuBar {
 
 					}
 
+					@Override
 					public void menuHidden(MenuEvent evt) {
 						log.log(Level.FINEST, "fileMenu.menuHidden " + evt); //$NON-NLS-1$
 					}
@@ -389,15 +392,17 @@ public class MenuBar {
 			this.editMenuItem = new MenuItem(this.parent, SWT.CASCADE);
 			this.editMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0022));
 			this.editMenuItem.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ 
+					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$
 				}
 			});
 			{
 				this.editMenu = new Menu(this.editMenuItem);
 				this.editMenuItem.setMenu(this.editMenu);
 				this.editMenu.addMenuListener(new MenuListener() {
+					@Override
 					public void menuShown(MenuEvent e) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "editMenu.menuShown, event=" + e); //$NON-NLS-1$
 						Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -412,6 +417,7 @@ public class MenuBar {
 						MenuBar.this.copyGraphicsPrintImageMenuItem.setEnabled((isRecordSetRelatedCopyable && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);
 					}
 
+					@Override
 					public void menuHidden(MenuEvent e) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "editMenu.menuHidden, event=" + e); //$NON-NLS-1$
 					}
@@ -486,9 +492,10 @@ public class MenuBar {
 			this.deviceMenuItem = new MenuItem(this.parent, SWT.CASCADE);
 			this.deviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0028));
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ 
+					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -635,9 +642,10 @@ public class MenuBar {
 			this.graphicsMenuItem = new MenuItem(this.parent, SWT.CASCADE);
 			this.graphicsMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0033));
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ 
+					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -654,7 +662,7 @@ public class MenuBar {
 								HistoSet.getInstance().getTrailRecordSet().saveTemplate();
 							}
 							else {
-								MenuBar.this.channels.getActiveChannel().saveTemplate();								
+								MenuBar.this.channels.getActiveChannel().saveTemplate();
 							}
 						}
 					});
@@ -697,8 +705,8 @@ public class MenuBar {
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
 							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
 								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
-								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
-										.getGraphicsTemplatePath(), template.getDefaultFileName());
+								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
+										Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 								fileDialog.open();
 								String templateFileName = fileDialog.getFileName();
 								if (templateFileName != null && templateFileName.length() > 4 && !templateFileName.equals(template.getDefaultFileName())) {
@@ -711,8 +719,8 @@ public class MenuBar {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									GraphicsTemplate template = activeChannel.getTemplate();
-									FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
-											.getGraphicsTemplatePath(), template.getDefaultFileName());
+									FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
+											Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 									fileDialog.open();
 									String templateFileName = fileDialog.getFileName();
 									if (templateFileName != null && templateFileName.length() > 4 && !templateFileName.equals(template.getDefaultFileName())) {
@@ -732,8 +740,8 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
-									.getGraphicsTemplatePath(), null, SWT.SINGLE);
+							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
+									Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
 							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
 								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
 								template.setHistoFileName(fileDialog.getFileName());
@@ -761,6 +769,7 @@ public class MenuBar {
 			this.viewMenuItem = new MenuItem(this.parent, SWT.CASCADE);
 			this.viewMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0039));
 			this.viewMenuItem.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
@@ -817,6 +826,7 @@ public class MenuBar {
 				{
 					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
 					this.recordCommentMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
+					this.recordCommentMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
 					this.recordCommentMenuItem.setSelection(false);
 					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -829,6 +839,26 @@ public class MenuBar {
 							else {
 								MenuBar.this.application.enableRecordSetComment(false);
 								MenuBar.this.application.updateDisplayTab();
+							}
+						}
+					});
+				}
+				{
+					this.graphicsCurveSurveyMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
+					this.graphicsCurveSurveyMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0876));
+					this.graphicsCurveSurveyMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
+					this.graphicsCurveSurveyMenuItem.setSelection(false);
+					this.graphicsCurveSurveyMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicsCurveSurvey.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MenuBar.this.graphicsCurveSurveyMenuItem.getSelection()) {
+								MenuBar.this.application.enableCurveSurvey(true);
+								MenuBar.this.application.updateHistoGraphicsWindow();
+							}
+							else {
+								MenuBar.this.application.enableCurveSurvey(false);
+								MenuBar.this.application.updateHistoGraphicsWindow();
 							}
 						}
 					});
@@ -983,13 +1013,13 @@ public class MenuBar {
 
 		Menu systemMenu = GDE.display.getSystemMenu();
 		if (systemMenu != null) {
-			/* remove comment for further logging 
+			/* remove comment for further logging
 			systemMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuHidden(MenuEvent e) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "App menu closed"); //$NON-NLS-1$
 				}
-			
+
 				@Override
 				public void menuShown(MenuEvent e) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "App menu opened"); //$NON-NLS-1$
@@ -1168,7 +1198,7 @@ public class MenuBar {
 	}
 
 	/**
-	 * set selection of record comment window 
+	 * set selection of record comment window
 	 * @param selected
 	 */
 	public void setRecordCommentMenuItemSelection(boolean selected) {
@@ -1176,7 +1206,15 @@ public class MenuBar {
 	}
 
 	/**
-	 * set selection of record comment window 
+	 * set histo graphics CurveSurvey display
+	 * @param selected
+	 */
+	public void setCurveSurveyMenuItemSelection(boolean selected) {
+		this.graphicsCurveSurveyMenuItem.setSelection(selected);
+	}
+
+	/**
+	 * set selection of record comment window
 	 * @param selected
 	 */
 	public void setGraphicsHeaderMenuItemSelection(boolean selected) {
@@ -1230,7 +1268,7 @@ public class MenuBar {
 
 	/**
 	 * enable pan button in zoomed mode
-	 * @param enable 
+	 * @param enable
 	 */
 	public void enablePanButton(boolean enable) {
 		this.panGraphicMenuItem.setEnabled(enable);
@@ -1254,6 +1292,7 @@ public class MenuBar {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					boolean isAdditionalExportItem = false;
 					for (MenuItem menuItem : MenuBar.this.exportMenu.getItems()) {

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     							2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -169,6 +169,7 @@ public class Settings extends Properties {
 	final static String							IS_DISPLAY_TAGS									= "is_display_tags";																																							//$NON-NLS-1$
 	final static String							IS_DATA_SETTINGS_AT_HOME_PATH		= "is_data_settings_at_home_path";																																//$NON-NLS-1$
 	final static String							IS_SUPPRESS_MODE								= "is_suppress_mode";																																							//$NON-NLS-1$
+	final static String							IS_CURVE_SURVEY									= "is_curve_survey";																																							//$NON-NLS-1$
 	final static String							GPS_LOCATION_RADIUS							= "gps_location_radius";																																					//$NON-NLS-1$
 	final static String							GPS_ADDRESS_TYPE								= "gps_address_type";																																							//$NON-NLS-1$
 	final static String							SUBDIRECTORY_LEVEL_MAX					= "subdirectory_level_max";																																				//$NON-NLS-1$
@@ -336,7 +337,7 @@ public class Settings extends Properties {
 					Settings.this.marshaller = Settings.this.jc.createMarshaller();
 					Settings.this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
 					Settings.this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
-					Settings.log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$		
+					Settings.log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (Exception e) {
 					Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
@@ -464,7 +465,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return true if files were actually deleted 
+	 * @return true if files were actually deleted
 	 */
 	public boolean resetHistolocations() {
 		if (FileUtils.checkDirectoryExist(getHistoLocationsDirectory().toString())) {
@@ -516,7 +517,7 @@ public class Settings extends Properties {
 		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
 		if (existCheck) {
 			if (!FileUtils.checkFileExist(propertyFilePath))
-				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ 
+				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$
 		}
 		else {
 			if (FileUtils.checkFileExist(propertyFilePath)) {
@@ -528,7 +529,7 @@ public class Settings extends Properties {
 					//ignore
 				}
 			}
-			FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ 
+			FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$
 		}
 	}
 
@@ -700,8 +701,8 @@ public class Settings extends Properties {
 			}
 
 			this.writer.write(String.format("%s\n", Settings.APPL_BLOCK)); // [Programmeinstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FILE_PATH, getDataFilePath())); //$NON-NLS-1$ 
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_IMAGE_FILE_PATH, getObjectImageFilePath())); //$NON-NLS-1$ 
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FILE_PATH, getDataFilePath())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_IMAGE_FILE_PATH, getObjectImageFilePath())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_DATA_FILE_NAME_LEADER, getUsageDateAsFileNameLeader())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_OBJECT_KEY_IN_FILE_NAME, getUsageObjectKeyInFileName())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WRITE_TMP_FILES, getUsageWritingTmpFiles())); //$NON-NLS-1$
@@ -770,6 +771,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_TAGS, isDisplayTags())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_SETTINGS_AT_HOME_PATH, isDataSettingsAtHomePath())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUPPRESS_MODE, isSuppressMode())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CURVE_SURVEY, isCurveSurvey())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_LOCATION_RADIUS, getGpsLocationRadius())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_ADDRESS_TYPE, getGpsAddressType())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
@@ -995,8 +997,8 @@ public class Settings extends Properties {
 
 		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < activeObjectList.length; ++i) {
-			sb.append(activeObjectList[i]).append(GDE.STRING_SEMICOLON);
+		for (String element : activeObjectList) {
+			sb.append(element).append(GDE.STRING_SEMICOLON);
 		}
 		this.setProperty(Settings.OBJECT_LIST, sb.toString());
 		this.setProperty(Settings.ACTIVE_OBJECT, newObjectKey);
@@ -1434,7 +1436,7 @@ public class Settings extends Properties {
 	 * @param newGridDashStyle {drawn, blank}
 	 */
 	public void setGridDaschStyle(int[] newGridDashStyle) {
-		this.setProperty(Settings.GRID_DASH_STYLE, GDE.STRING_EMPTY + newGridDashStyle[0] + ", " + newGridDashStyle[1]); //$NON-NLS-1$ 
+		this.setProperty(Settings.GRID_DASH_STYLE, GDE.STRING_EMPTY + newGridDashStyle[0] + ", " + newGridDashStyle[1]); //$NON-NLS-1$
 	}
 
 	/**
@@ -1709,7 +1711,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * query the time format is set to absolute 
+	 * query the time format is set to absolute
 	 * @return used time format as string
 	 */
 	public boolean isTimeFormatAbsolute() {
@@ -2430,7 +2432,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return boolean true if the history labels should be visible if the current device supports the history 
+	 * @return boolean true if the history labels should be visible if the current device supports the history
 	 */
 	public boolean isHistoActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_HISTO_ACTIVE, "false")); //$NON-NLS-1$
@@ -2452,14 +2454,14 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return three boxplot graphics sizes as localized texts 
+	 * @return three boxplot graphics sizes as localized texts
 	 */
 	public String[] getBoxplotScaleNomenclatures() {
 		return Messages.getString(MessageIds.GDE_MSGT0802).split(GDE.STRING_COMMA);
 	}
 
 	/**
-	 * set the boxplot size for the history 
+	 * set the boxplot size for the history
 	 * @param scaleNomenclature
 	 */
 	public void setBoxplotScale(String scaleNomenclature) {
@@ -2481,14 +2483,14 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return four boxplot size adaptation levels as localized texts ranging from none to large. the adaptation is based on the log duration. 
+	 * @return four boxplot size adaptation levels as localized texts ranging from none to large. the adaptation is based on the log duration.
 	 */
 	public String[] getBoxplotSizeAdaptationNomenclatures() {
 		return Messages.getString(MessageIds.GDE_MSGT0803).split(GDE.STRING_COMMA);
 	}
 
 	/**
-	 * set the boxplot size adaptation level for the history 
+	 * set the boxplot size adaptation level for the history
 	 * @param scaleNomenclature
 	 */
 	public void setBoxplotSizeAdaptation(String scaleNomenclature) {
@@ -2517,7 +2519,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set the extent of logarithmic spreading of the x axis distances between trails 
+	 * set the extent of logarithmic spreading of the x axis distances between trails
 	 * @param gradeText
 	 */
 	public void setXAxisSpreadGrade(String gradeText) {
@@ -2569,49 +2571,49 @@ public class Settings extends Properties {
 	}
 
 	/**
-	* @param isActive true if files from the device import directory are read for the history 
+	* @param isActive true if files from the device import directory are read for the history
 	*/
 	public void setSearchImportPath(boolean isActive) {
 		this.setProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(isActive));
 	}
 
 	/**
-	 * @return true if files from the device import directory are read for the history 
+	 * @return true if files from the device import directory are read for the history
 	 */
 	public boolean getSearchImportPath() {
 		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(true)));
 	}
 
 	/**
-	 * @param isActive true if import files from the data directory are read for the history 
+	 * @param isActive true if import files from the data directory are read for the history
 	 */
 	public void setSearchDataPathImports(boolean isActive) {
 		this.setProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(isActive));
 	}
 
 	/**
-	 * @return true if import files from the data directory are read for the history 
+	 * @return true if import files from the data directory are read for the history
 	 */
 	public boolean getSearchDataPathImports() {
 		return Boolean.valueOf(this.getProperty(Settings.SEARCH_DATAPATH_IMPORTS, String.valueOf(true)));
 	}
 
 	/**
-	 * @param isActive true if channels with identical measurements are selected for the history 
+	 * @param isActive true if channels with identical measurements are selected for the history
 	 */
 	public void setChannelMix(boolean isActive) {
 		this.setProperty(Settings.IS_CHANNEL_MIX, String.valueOf(isActive));
 	}
 
 	/**
-	 * @return true true if channels with identical measurements are selected for the history 
+	 * @return true true if channels with identical measurements are selected for the history
 	 */
 	public boolean isChannelMix() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_CHANNEL_MIX, "true")); //$NON-NLS-1$
 	}
 
 	/**
-	 * @return sampling timespan values in seconds with seven values ranging from 0.001 to 10.0 based on the current locale 
+	 * @return sampling timespan values in seconds with seven values ranging from 0.001 to 10.0 based on the current locale
 	 */
 	public String[] getSamplingTimespanValues() {
 		double[] values_ss = { 10., 5., 1., .5, .1, .05, .001 };
@@ -2623,7 +2625,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set the sampling time which defines the timespan for one single sample value for the history 
+	 * set the sampling time which defines the timespan for one single sample value for the history
 	 * @param valueText
 	 */
 	public void setSamplingTimespan_ms(String valueText) {
@@ -2631,7 +2633,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * repairs the properties file setting if it holds an invalid index value. 
+	 * repairs the properties file setting if it holds an invalid index value.
 	 * @return the sampling time which defines the timespan for one single sample value for the history (default is 1 sec)
 	 */
 	public int getSamplingTimespan_ms() {
@@ -2654,7 +2656,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param value true if the history should select files in the object directory which do not hold the object key internally 
+	 * @param value true if the history should select files in the object directory which do not hold the object key internally
 	 */
 	public void setFilesWithoutObject(boolean value) {
 		this.setProperty(Settings.FILES_WITHOUT_OBJECT, String.valueOf(value));
@@ -2668,7 +2670,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param value true if the history should select files in the object directory which hold a different object key internally 
+	 * @param value true if the history should select files in the object directory which hold a different object key internally
 	 */
 	public void setFilesWithOtherObject(boolean value) {
 		this.setProperty(Settings.FILES_WITH_OTHER_OBJECT, String.valueOf(value));
@@ -2682,7 +2684,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the maximum number of full calendar months which is used for history log selection (default is 12) 
+	 * @return the maximum number of full calendar months which is used for history log selection (default is 12)
 	 */
 	public int getRetrospectMonths() {
 		return Integer.valueOf(this.getProperty(Settings.RETROSPECT_MONTHS, String.valueOf(12)));
@@ -2745,7 +2747,7 @@ public class Settings extends Properties {
 
 	/**
 	 * small values select peaks with a smaller amplitude. values close to 1 only select peaks with an amplitude close to the min-max distance.
-	 * @param doubleValue is the factor for the calculation of the minimum absolute transition level required for firing the trigger 
+	 * @param doubleValue is the factor for the calculation of the minimum absolute transition level required for firing the trigger
 	 */
 	public void setAbsoluteTransitionLevel(String doubleValue) {
 		try {
@@ -2842,6 +2844,20 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * @param isCurveSurvey true extended curve delta measuring display
+	 */
+	public void setCurveSurvey(boolean isCurveSurvey) {
+		this.setProperty(Settings.IS_CURVE_SURVEY, String.valueOf(isCurveSurvey));
+	}
+
+	/**
+	 * @return true for extended curve delta measuring display
+	 */
+	public boolean isCurveSurvey() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_CURVE_SURVEY, "false")); //$NON-NLS-1$
+	}
+
+	/**
 	 * @return the radius in km for GPS coordinates assignment to the same cluster (default 0.5 km)
 	 */
 	public double getGpsLocationRadius() {
@@ -2856,7 +2872,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the GPS address type (default is the 2nd entry) 
+	 * @return the GPS address type (default is the 2nd entry)
 	 */
 	public GeoCodeGoogle getGpsAddressType() {
 		return GeoCodeGoogle.valueOf(this.getProperty(Settings.GPS_ADDRESS_TYPE, String.valueOf(GeoCodeGoogle.STREET_ADDRESS)));
@@ -2876,7 +2892,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the maximum number of subdirectories which is used for history log selection (default is 0) 
+	 * @return the maximum number of subdirectories which is used for history log selection (default is 0)
 	 */
 	public int getSubDirectoryLevelMax() {
 		return Integer.valueOf(this.getProperty(Settings.SUBDIRECTORY_LEVEL_MAX, String.valueOf(0)));

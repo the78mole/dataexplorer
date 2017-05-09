@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
@@ -72,7 +72,7 @@ public class TrailRecordSet extends RecordSet {
 	private final static int									initialRecordCapacity		= 111;
 
 	private final HistoGraphicsTemplate				template;																																// graphics template holds view configuration
-	private final int[]												linkedOrdinals;																													// allows getting a trail record by ordinal without iterating the linked hashmap  
+	private final int[]												linkedOrdinals;																													// allows getting a trail record by ordinal without iterating the linked hashmap
 
 	private final List<Integer>								durations_mm						= new ArrayList<Integer>(initialRecordCapacity);
 	private double														averageDuration_mm			= 0;
@@ -103,9 +103,9 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * holds trail records for measurements, settlements and scores.
-	 * @param useDevice the instance of the device 
+	 * @param useDevice the instance of the device
 	 * @param channelNumber the channel number to be used
-	 * @param recordNames 
+	 * @param recordNames
 	 */
 	public TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames) {
 		super(useDevice, channelNumber, "Trail", recordNames, -1, true, true); //$NON-NLS-1$
@@ -150,8 +150,8 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * create a trail record set containing records according the channel configuration which is loaded from device properties file.
-	 * the trail records' display sequence (= LinkedHashMap sequence) supports pinning score / settlement records at the top based on device xml settings. 
-	 * @param device the instance of the device 
+	 * the trail records' display sequence (= LinkedHashMap sequence) supports pinning score / settlement records at the top based on device xml settings.
+	 * @param device the instance of the device
 	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
@@ -210,7 +210,7 @@ public class TrailRecordSet extends RecordSet {
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				myIndex++; // 
+				myIndex++; //
 			}
 		}
 		{// display section 4: take remaining scores
@@ -223,7 +223,7 @@ public class TrailRecordSet extends RecordSet {
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added scoregroup record for " + scoreGroup.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				myIndex++; // 
+				myIndex++; //
 			}
 		}
 		newTrailRecordSet.syncScaleOfSyncableRecords();
@@ -234,7 +234,7 @@ public class TrailRecordSet extends RecordSet {
 			newTrailRecordSet.linkedOrdinals[i] = recordNameList.indexOf(iterator.next().getKey());
 		}
 
-		// setting all data in this create procedure and the synchronized keyword makes this method thread safe 
+		// setting all data in this create procedure and the synchronized keyword makes this method thread safe
 		newTrailRecordSet.defineTrailTypes();
 		newTrailRecordSet.addHistoVaults();
 		newTrailRecordSet.setGpsLocationsTags();
@@ -247,7 +247,7 @@ public class TrailRecordSet extends RecordSet {
 	 * method to create a record set with given name "1) Laden" containing records according the device channle/configuration
 	 * which are loaded from device properties file
 	 * @param recordSetName the name of the record set
-	 * @param device the instance of the device 
+	 * @param device the instance of the device
 	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
@@ -262,12 +262,12 @@ public class TrailRecordSet extends RecordSet {
 	 * method to create a record set with given name "1) Laden" containing records according the given record names, symbols and units
 	 * active status as well as statistics and properties are used from device properties
 	 * @param recordSetName the name of the record set
-	 * @param device the instance of the device 
+	 * @param device the instance of the device
 	 * @param channelConfigNumber (name of the outlet or configuration)
 	 * @param recordNames array of names to be used for created records
 	 * @param recordSymbols array of symbols to be used for created records
 	 * @param recordUnits array of units to be used for created records
-	 * @param timeStep_ms 
+	 * @param timeStep_ms
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
@@ -291,7 +291,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * clears the data points in all records and in the time steps.
 	 * keeps initial capacities.
-	 * does not clear any fields in the recordSet, the records or in timeStep. 
+	 * does not clear any fields in the recordSet, the records or in timeStep.
 	 */
 	@Override
 	public void cleanup() {
@@ -313,7 +313,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Deprecated
 	@Override
@@ -325,7 +325,7 @@ public class TrailRecordSet extends RecordSet {
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
 	 * @param time_ms
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Deprecated
 	@Override
@@ -336,7 +336,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * method to add a series of points to none calculation records (records active or inactive)
 	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Deprecated
 	@Override
@@ -348,7 +348,7 @@ public class TrailRecordSet extends RecordSet {
 	 * method to add a series of points to none calculation records (records active or inactive)
 	 * @param points as int[], where the length must fit records.size()
 	 * @param time_ms
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Deprecated
 	@Override
@@ -367,7 +367,7 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * query the size of record set child record 
+	 * query the size of record set child record
 	 * - normal record set will return the size of the data vector of first active in recordNames
 	 * - zoomed set will return size of zoomOffset + zoomWith
 	 * @param isReal false return the size of zoomOffset + zoomWith
@@ -397,12 +397,12 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * set time steps for the trail recordset and the data points for all displayable trail records.
-	 * every record takes the selected trail type / score data from the history vault and populates its data. 
+	 * every record takes the selected trail type / score data from the history vault and populates its data.
 	 */
 	private void addHistoVaults() {
 		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
-				{ // add values 
+				{ // add values
 					int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
 					this.durations_mm.add(duration_mm);
 					this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
@@ -425,7 +425,7 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * set the data points for one single trail record.
-	 * the record takes the selected trail type / score data from the trail record vault and populates its data. 
+	 * the record takes the selected trail type / score data from the trail record vault and populates its data.
 	 * @param recordOrdinal
 	 */
 	public synchronized void setPoints(int recordOrdinal) {
@@ -518,7 +518,7 @@ public class TrailRecordSet extends RecordSet {
 
 	/**
 	 * @param timestamp_ms
-	 * @return the position of the timestep which is the closest to the timestamp 
+	 * @return the position of the timestep which is the closest to the timestamp
 	 */
 	public int getIndex(long timestamp_ms) {
 		return this.timeStep_ms.getBestIndex(timestamp_ms, Comparator.reverseOrder());
@@ -541,12 +541,12 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * inform displayable trail records about the trail types which are allowed, set trail selection list and current trailType / score. 
+	 * inform displayable trail records about the trail types which are allowed, set trail selection list and current trailType / score.
 	 */
 	public void defineTrailTypes() {
 		String[] trailRecordNames = this.getRecordNames();
-		for (int j = 0; j < trailRecordNames.length; j++) {
-			TrailRecord trailRecord = ((TrailRecord) this.get(trailRecordNames[j]));
+		for (String trailRecordName : trailRecordNames) {
+			TrailRecord trailRecord = ((TrailRecord) this.get(trailRecordName));
 			trailRecord.setApplicableTrailTypes();
 			applyTemplateTrailData(trailRecord.getOrdinal());
 		}
@@ -732,7 +732,7 @@ public class TrailRecordSet extends RecordSet {
 	/**
 	 * method to get the sorted record names as array for display purpose
 	 * sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
-	 * @return all measurement records and settlement / score records based on display settings 
+	 * @return all measurement records and settlement / score records based on display settings
 	 */
 	@Override // reasons: 1. Harmonize display records collections  2. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
 	public Record[] getRecordsSortedForDisplay() {
@@ -797,7 +797,7 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @return the tags which have been filled 
+	 * @return the tags which have been filled
 	 */
 	public EnumSet<DisplayTag> getActiveDisplayTags() {
 		EnumSet<DisplayTag> activeDisplayTags = EnumSet.allOf(DisplayTag.class);
@@ -807,8 +807,8 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * get all tags for all recordsets / vaults. 
-	 * please note that the GPS location tags are filled in asynchronously. 
+	 * get all tags for all recordsets / vaults.
+	 * please note that the GPS location tags are filled in asynchronously.
 	 * @param displayTag
 	 * @return empty record name and display tag description as a trail text replacement followed by the tag values
 	 */
@@ -898,7 +898,7 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @return the column headers starting with the first data column 
+	 * @return the column headers starting with the first data column
 	 */
 	public String[] getTableHeaderRow() {
 		String[] headerRow = new String[this.timeStep_ms.size()];

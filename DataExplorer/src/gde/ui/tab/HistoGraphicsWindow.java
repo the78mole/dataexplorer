@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2016,2017 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.tab;
@@ -81,7 +81,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * query if this component is visible 
+	 * query if this component is visible
 	 * @return true if graphics window is visible
 	 */
 	public boolean isVisible() {
@@ -99,6 +99,7 @@ public class HistoGraphicsWindow extends CTabItem {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					HistoGraphicsWindow.this.graphicsComposite.doRedrawGraphics();
 					HistoGraphicsWindow.this.graphicsComposite.updateCaptions();
@@ -117,6 +118,7 @@ public class HistoGraphicsWindow extends CTabItem {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					HistoGraphicsWindow.this.graphicsComposite.updateCaptions();
 				}
@@ -125,7 +127,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * method to update the curves displayed in the curve selector panel 
+	 * method to update the curves displayed in the curve selector panel
 	 */
 	public void updateCurveSelectorTable() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
@@ -133,6 +135,7 @@ public class HistoGraphicsWindow extends CTabItem {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					HistoGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
@@ -185,7 +188,7 @@ public class HistoGraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * @return true if selector is enabled 
+	 * @return true if selector is enabled
 	 */
 	public boolean isCurveSelectorEnabled() {
 		return this.isCurveSelectorEnabled;

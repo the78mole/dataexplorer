@@ -13,7 +13,7 @@
 
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
@@ -71,7 +71,7 @@ import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
 /**
- * supports the selection of histo vaults and provides a trail recordset based on the vaults. 
+ * supports the selection of histo vaults and provides a trail recordset based on the vaults.
  * sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
  * @author Thomas Eickert
  */
@@ -104,12 +104,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	};
 
 	private Map<DirectoryType, Path>	validatedDirectories	= new LinkedHashMap<>();
-	/**
-	 * histo files coming from the last directory validation.
-	 * key is lastModified [ms] of the file, the list holds link file paths or file paths for all types of log files.
-	 */
-	private Map<Long, Set<Path>>			histoFilePaths				= new TreeMap<Long, Set<Path>>(Collections.reverseOrder());	// todo HashMap is sufficient (no sort required)
-	private long											fileSizeSum_B					= 0;																												// size of all the histo files which have been read to build the histo recordsets 
+	private long											fileSizeSum_B					= 0;																												// size of all the histo files which have been read to build the histo recordsets
 	private TrailRecordSet						trailRecordSet				= null;																											// histo data transformed in a recordset format
 	private Map<String, HistoVault>		unsuppressedTrusses		= new HashMap<>();
 	private Map<String, HistoVault>		suppressedTrusses			= new HashMap<>();
@@ -128,7 +123,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		*/
 		B_HISTOVAULTS(4),
 		/**
-		* true starts building the trail recordset from the histo vaults 
+		* true starts building the trail recordset from the histo vaults
 		*/
 		C_TRAILRECORDSET(3),
 		/**
@@ -182,7 +177,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	}
 
 	/**
-	 * re- initializes the singleton. 
+	 * re- initializes the singleton.
 	 */
 	public synchronized void initialize() {
 		this.clear();
@@ -208,7 +203,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
 	}
 
-	/* 
+	/*
 	 * clears trails for refill but keeps the trail recordset.
 	 * @see java.util.TreeMap#clear()
 	 */
@@ -262,15 +257,15 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	/**
 	 * determine histo files, build a recordset based job list and read from the log file or the cache for each job.
 	 * populate the trail recordset.
-	 * disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user or the device, channel or object was modified. 
+	 * disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user or the device, channel or object was modified.
 	 * @param rebuildStep
 	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
 	 * @return true if the HistoSet was rebuilt
-	 * @throws DataTypeException 
-	 * @throws DataInconsitsentException 
-	 * @throws NotSupportedFileFormatException 
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 * @throws DataTypeException
+	 * @throws DataInconsitsentException
+	 * @throws NotSupportedFileFormatException
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
 	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi)
 			throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
@@ -365,7 +360,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 										TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
 										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
 
-						// step: identify duplicate vaults (origin is duplicated log files with the same contents) 
+						// step: identify duplicate vaults (origin is duplicated log files with the same contents)
 						if (isUniqueHistoTimeStamp)
 							for (List<HistoVault> vaults : this.values().parallelStream().filter(l -> l.size() > 1).collect(Collectors.toList())) {
 								Set<Integer> channelNumbers = new HashSet<>();
@@ -419,12 +414,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	/**
 	 * read file and populate vault from the histo recordset.
 	 * put the vault into the histoset map.
-	 * @param filePath is the actual file path, not the path to the link file 
+	 * @param filePath is the actual file path, not the path to the link file
 	 * @param trusses
 	 * @throws DataTypeException for the bin file reader only
-	 * @throws DataInconsitsentException 
-	 * @throws NotSupportedFileFormatException 
-	 * @throws IOException 	
+	 * @throws DataInconsitsentException
+	 * @throws NotSupportedFileFormatException
+	 * @throws IOException
 	 * @return the vaults extracted from the file based on the input trusses
 	 */
 	private List<HistoVault> loadVaultsFromFile(Path filePath, Map<String, HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
@@ -461,7 +456,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	/**
 	 * put cached vaults into the histoSet map and reduce the trussJobs map.
 	 * @param trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
-	 * @return total length (bytes) of the original log files of those vaults which were put into the histoset 
+	 * @return total length (bytes) of the original log files of those vaults which were put into the histoset
 	 * @throws IOException during opening or traversing the zip file
 	 */
 	private synchronized long loadVaultsFromCache(Map<Path, Map<String, HistoVault>> trussJobs) throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
@@ -528,7 +523,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * get the zip file name from the history vault class and add all histoset vaults to this file.
 	 * source http://stackoverflow.com/a/17504151
 	 * @return cache file bytes length
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private long storeVaultsInCache(List<HistoVault> newVaults) throws IOException {
 		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
@@ -538,7 +533,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			env.put("create", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) { //$NON-NLS-1$
 				for (HistoVault histoVault : newVaults) {
-					// name the file inside the zip file 
+					// name the file inside the zip file
 					Path filePath = zipFileSystem.getPath(histoVault.getVaultFileName().toString());
 					if (!FileUtils.checkFileExist(filePath.toString())) {
 						//					if (!filePath.toFile().exists()) {
@@ -589,8 +584,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * determine file paths from an input directory and an import directory which fit to the objectKey, the device, the channel and the file extensions.
 	 * @param rebuildStep defines which steps during histo data collection are skipped
 	 * @return true if the list of file paths has already been valid
-	 * @throws NotSupportedFileFormatException 
-	 * @throws IOException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws IOException
 	 */
 	private boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
 		IDevice lastDevice = this.validatedDevice;
@@ -628,7 +623,6 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
 
 		if (isFullChange) {
-			this.histoFilePaths.clear();
 			this.unsuppressedTrusses.clear();
 			this.suppressedTrusses.clear();
 			{
@@ -659,9 +653,9 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 
 	/**
 	 * use ignore lists to determine the vaults which are required for the data access.
-	 * @param deviceConfigurations 
-	 * @throws IOException 
-	 * @throws NotSupportedFileFormatException 
+	 * @param deviceConfigurations
+	 * @throws IOException
+	 * @throws NotSupportedFileFormatException
 	*/
 	private void addTrusses(List<File> files, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
@@ -739,10 +733,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * determine the vaults which are required for the data access.
 	 * selects osd file candidates for the active device and the active channel; select as well for objectKey and start timestamp.
 	 * selects bin file candidates for object key based on the parent directory name and last modified.
-	 * @param deviceConfigurations 
+	 * @param deviceConfigurations
 	 * @return trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
-	 * @throws IOException 
-	 * @throws NotSupportedFileFormatException 
+	 * @throws IOException
+	 * @throws NotSupportedFileFormatException
 	*/
 	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
@@ -804,7 +798,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					log.log(Level.FINE, String.format("BIN candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
-					log.log(Level.INFO, String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
+					log.log(Level.INFO, String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$
 					isValidObject = this.settings.getFilesWithOtherObject();
 				}
 				else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
@@ -923,7 +917,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		}
 		for (Path ignorePath : exclusionDirectories) {
 			new FileExclusionData(ignorePath).delete();
-			log.log(Level.FINE, "deleted : ", ignorePath); //$NON-NLS-1$	
+			log.log(Level.FINE, "deleted : ", ignorePath); //$NON-NLS-1$
 		}
 	}
 

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     					2017 Thomas Eickert
 ****************************************************************************************/
@@ -221,6 +221,7 @@ public class DataExplorer extends Composite {
 
 	boolean												isCurveSelectorEnabled						= true;																											// always enabled during startup - there is no setting. So true is mandatory.
 	boolean												isRecordCommentVisible						= false;
+	boolean												isCurveSurveyVisible						= false;
 	boolean												isGraphicsHeaderVisible						= false;
 	boolean												isObjectWindowVisible							= false;
 
@@ -231,7 +232,7 @@ public class DataExplorer extends Composite {
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
 
-	private RebuildStep						rebuildStepInvisibleTab						= HistoSet.RebuildStep.E_USER_INTERFACE;										// collect the strongest rebuild action which was not performed (e.g. tab was not selected) 
+	private RebuildStep						rebuildStepInvisibleTab						= HistoSet.RebuildStep.E_USER_INTERFACE;										// collect the strongest rebuild action which was not performed (e.g. tab was not selected)
 
 	/**
 	 * main application class constructor
@@ -424,6 +425,7 @@ public class DataExplorer extends Composite {
 			}
 
 			GDE.shell.addControlListener(new ControlListener() {
+				@Override
 				public void controlResized(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
@@ -432,6 +434,7 @@ public class DataExplorer extends Composite {
 					}
 				}
 
+				@Override
 				public void controlMoved(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!GDE.shell.getMaximized()) DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
@@ -441,6 +444,7 @@ public class DataExplorer extends Composite {
 			GDE.shell.open();
 
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.postInitGUI(inputFilePath);
 
@@ -462,6 +466,7 @@ public class DataExplorer extends Composite {
 
 			if (!this.settings.isUpdateChecked()) {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						check4update();
 					}
@@ -538,6 +543,7 @@ public class DataExplorer extends Composite {
 
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init listener"); //$NON-NLS-1$
 			GDE.shell.addListener(SWT.Close, new Listener() {
+				@Override
 				public void handleEvent(Event evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$
 
@@ -546,6 +552,7 @@ public class DataExplorer extends Composite {
 				}
 			});
 			this.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$ //$NON-NLS-2$
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getSize().toString()); //$NON-NLS-1$
@@ -577,7 +584,7 @@ public class DataExplorer extends Composite {
 						DataExplorer.application.getDeviceDialog().forceDispose();
 					}
 
-					// query the item definition to save it for restore option 
+					// query the item definition to save it for restore option
 					DataExplorer.this.order = DataExplorer.this.menuCoolBar.getItemOrder();
 					DataExplorer.this.wrapIndices = DataExplorer.this.menuCoolBar.getWrapIndices();
 					if (DataExplorer.this.wrapIndices.length > 0) {
@@ -620,6 +627,7 @@ public class DataExplorer extends Composite {
 				}
 			});
 			this.displayTab.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER) && DataExplorer.this.displayTab.getSelectionIndex() >= 0)
 						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
@@ -674,7 +682,7 @@ public class DataExplorer extends Composite {
 					if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
 						DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
 					}
-					
+
 					if (tabSelectionIndex == 0) {
 						DataExplorer.this.menuToolBar.enableScopePointsCombo(true);
 						DataExplorer.this.enableZoomMenuButtons(true);
@@ -766,12 +774,14 @@ public class DataExplorer extends Composite {
 
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init help listener"); //$NON-NLS-1$
 			this.menuCoolBar.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
 					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 			this.menu.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
 					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
@@ -783,6 +793,11 @@ public class DataExplorer extends Composite {
 			if (this.isRecordCommentVisible) {
 				this.menuBar.setRecordCommentMenuItemSelection(this.isRecordCommentVisible);
 				this.enableRecordSetComment(this.isRecordCommentVisible);
+			}
+			this.isCurveSurveyVisible = this.settings.isCurveSurvey();
+			if (this.isCurveSurveyVisible) {
+				this.menuBar.setCurveSurveyMenuItemSelection(this.isCurveSurveyVisible);
+				this.enableCurveSurvey(this.isCurveSurveyVisible);
 			}
 			this.isGraphicsHeaderVisible = this.settings.isGraphicsHeaderVisible();
 			if (this.isGraphicsHeaderVisible) {
@@ -866,6 +881,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.statisticsTabItem.updateStatisticsData(true);
 					}
@@ -885,6 +901,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.statisticsTabItem.updateStatisticsData(forceUpdate);
 					}
@@ -927,6 +944,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						if (forceClean) {
 							//DataExplorer.this.dataTableTabItem.setAbsoluteDateTime(false);
@@ -948,6 +966,7 @@ public class DataExplorer extends Composite {
 				}
 				else {
 					GDE.display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							if (DataExplorer.this.dataTableTabItem != null) {
 								//DataExplorer.this.dataTableTabItem.setHeader();
@@ -965,6 +984,7 @@ public class DataExplorer extends Composite {
 	 */
 	public synchronized void updateHistoTable(final boolean forceClean) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()) {
 					if (forceClean || !DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !DataExplorer.this.histoTableTabItem.isHeaderTextValid()) {
@@ -987,6 +1007,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						if (DataExplorer.this.histoTableTabItem != null) {
 							DataExplorer.this.histoTableTabItem.cleanTable();
@@ -1007,6 +1028,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.digitalTabItem.update(true);
 					}
@@ -1025,6 +1047,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.digitalTabItem.updateChilds();
 					}
@@ -1043,6 +1066,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.analogTabItem.update(true);
 					}
@@ -1061,6 +1085,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.analogTabItem.updateChilds();
 					}
@@ -1087,6 +1112,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.cellVoltageTabItem.getCellVoltageMainComposite().redraw();
 					}
@@ -1105,6 +1131,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.cellVoltageTabItem.updateChilds();
 					}
@@ -1123,6 +1150,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.cellVoltageTabItem.updateVoltageLimitsSelection();
 					}
@@ -1141,6 +1169,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.fileCommentTabItem.update();
 					}
@@ -1159,6 +1188,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.objectDescriptionTabItem.update();
 					}
@@ -1176,6 +1206,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.graphicsTabItem.clearHeaderAndComment();
 				}
@@ -1193,6 +1224,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.statusBar.setMessage(message, swtColor);
 				}
@@ -1207,6 +1239,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						DataExplorer.this.statusBar.setMessage(message);
 					}
@@ -1243,6 +1276,7 @@ public class DataExplorer extends Composite {
 				}
 				else {
 					GDE.display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							DataExplorer.this.statusBar.setProgress(percentage);
 							if (DataExplorer.this.taskBarItem != null) {
@@ -1264,6 +1298,7 @@ public class DataExplorer extends Composite {
 
 	private void resetProgressBar() {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				//Thread.sleep(5);
 				DataExplorer.this.statusBar.setProgress(0);
@@ -1281,6 +1316,7 @@ public class DataExplorer extends Composite {
 		}
 		else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.progessPercentage = DataExplorer.this.statusBar.getProgressPercentage();
 				}
@@ -1295,6 +1331,7 @@ public class DataExplorer extends Composite {
 		if (isRxOn[0]) {
 			isRxOn[0] = false;
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.statusBar.setSerialTxOn();
 					isRxOn[0] = true;
@@ -1309,6 +1346,7 @@ public class DataExplorer extends Composite {
 		if (isRxOff[0]) {
 			isRxOff[0] = false;
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.statusBar.setSerialTxOff();
 					isRxOff[0] = true;
@@ -1323,6 +1361,7 @@ public class DataExplorer extends Composite {
 		if (doneRxOn[0]) {
 			doneRxOn[0] = false;
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.statusBar.setSerialRxOn();
 					doneRxOn[0] = true;
@@ -1337,6 +1376,7 @@ public class DataExplorer extends Composite {
 		if (doneRxOff[0]) {
 			doneRxOff[0] = false;
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.statusBar.setSerialRxOff();
 					doneRxOff[0] = true;
@@ -1352,6 +1392,7 @@ public class DataExplorer extends Composite {
 	public void openDeviceDialog() {
 		if (DataExplorer.this.getDeviceDialog() != null) {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.getDeviceDialog().open();
 				}
@@ -1457,6 +1498,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					GDE.shell.setText(headerText);
 				}
@@ -1472,6 +1514,7 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						updateTitleBar(DataExplorer.this.getObjectKey(), actualDevice.getName(), actualDevice.getPort());
 					}
@@ -1489,6 +1532,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.syncExec(new Runnable() {
+				@Override
 				public void run() {
 					MessageBox messageDialog = new MessageBox(GDE.shell, SWT.OK | SWT.ICON_WARNING);
 					messageDialog.setText(GDE.NAME_LONG);
@@ -1509,6 +1553,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.syncExec(new Runnable() {
+				@Override
 				public void run() {
 					// parent might be disposed ??
 					Shell useParent = (parent != null && !parent.isDisposed()) ? parent : GDE.shell;
@@ -1523,6 +1568,7 @@ public class DataExplorer extends Composite {
 
 	public void openMessageDialogAsync(final String message) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageBox messageDialog = new MessageBox(GDE.shell, SWT.OK | SWT.ICON_WARNING);
 				messageDialog.setText(GDE.NAME_LONG);
@@ -1535,6 +1581,7 @@ public class DataExplorer extends Composite {
 	public void openMessageDialogAsync(Shell parent, final String message) {
 		final Shell useParent = (parent != null && !parent.isDisposed()) ? parent : GDE.shell;
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING | SWT.MODELESS);
 				messageDialog.setText(GDE.NAME_LONG);
@@ -1577,6 +1624,7 @@ public class DataExplorer extends Composite {
 	public int openYesNoMessageDialogSync(final String message) {
 		this.openYesNoMessageDialogAsyncValue = -1;
 		GDE.display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageBox yesNoMessageDialog = new MessageBox(GDE.shell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 				yesNoMessageDialog.setText(GDE.NAME_LONG);
@@ -1655,6 +1703,7 @@ public class DataExplorer extends Composite {
 					else {
 						final int selectionIndex = searchSelectionIndex;
 						GDE.display.asyncExec(new Runnable() {
+							@Override
 							public void run() {
 								DataExplorer.this.menuToolBar.selectObjectKey(selectionIndex);
 								DataExplorer.this.channels.getActiveChannel().setObjectKey(newObjectKey);
@@ -1668,7 +1717,7 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * check if some the object data needs to be saved 
+	 * check if some the object data needs to be saved
 	 */
 	public void checkSaveObjectData() {
 		if (this.objectDescriptionTabItem != null) this.objectDescriptionTabItem.checkSaveObjectData();
@@ -1692,6 +1741,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.menuToolBar.setObjectList(newObjectKeyList, newObjectKey);
 				}
@@ -1718,7 +1768,7 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * enable/disable some menu action (buttons) to avoid exceptions 
+	 * enable/disable some menu action (buttons) to avoid exceptions
 	 * sample: while loading file content, disable device switch or record set deletion
 	 */
 	public void enableMenuActions(final boolean enabled) {
@@ -1731,6 +1781,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.menuToolBar.enableDeviceSwitchButtons(enabled);
 					DataExplorer.this.menuBar.enableDeviceSwitchButtons(enabled);
@@ -1954,6 +2005,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.updateGraphicsWindow(redrawCurveSelector);
 					DataExplorer.this.updateStatisticsData(true);
@@ -1985,12 +2037,12 @@ public class DataExplorer extends Composite {
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
 		DataExplorer.this.histoSet.getTrailRecordSet().setPoints(recordOrdinal);
 		DataExplorer.this.updateHistoTabs(RebuildStep.F_FILE_CHECK, isWithUi); // ET rebuilds the graphics only if new files have been found
-		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found 
+		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found
 	}
 
 	/**
 	 * update the histo tabs if visible.
-	 * @param readFromFiles if true then reload from files; if false then use histo vault data 
+	 * @param readFromFiles if true then reload from files; if false then use histo vault data
 	 */
 	public void updateHistoTabs(boolean readFromFiles, boolean rebuildTrails) {
 		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
@@ -2089,6 +2141,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!DataExplorer.this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
@@ -2138,6 +2191,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!DataExplorer.this.graphicsTabItem.isActiveCurveSelectorContextMenu()) {
 						int tabSelectionIndex = DataExplorer.this.displayTab.getSelectionIndex();
@@ -2179,6 +2233,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.graphicsTabItem.updateCurveSelectorTable();
 					if (DataExplorer.this.compareTabItem != null && !DataExplorer.this.compareTabItem.isDisposed()) DataExplorer.this.compareTabItem.updateCurveSelectorTable();
@@ -2308,6 +2363,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.graphicsTabItem.setModeState(GraphicsMode.RESET);
 				}
@@ -2325,6 +2381,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.histoGraphicsTabItem.clearHeaderAndComment();
 					DataExplorer.this.histoGraphicsTabItem.getGraphicsComposite().setModeState(HistoGraphicsMode.RESET);
@@ -2455,7 +2512,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
-			if (!enabled) this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			this.histoSet.getTrailRecordSet().setMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
@@ -2495,9 +2552,9 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, recordKey);
+		if (log.isLoggable(Level.FINE )) log.log(Level.FINE, recordKey);
 		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
-			if (!enabled) this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			this.histoSet.getTrailRecordSet().setDeltaMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
@@ -2555,6 +2612,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.application.getParent().setCursor(newCursor);
 				}
@@ -2581,6 +2639,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					DataExplorer.this.menuBar.setPortConnected(isOpenStatus);
 					DataExplorer.this.menuToolBar.setPortConnected(isOpenStatus);
@@ -2598,8 +2657,8 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * open the dialog and displays content of given HTML file 
-	 * @param deviceName 
+	 * open the dialog and displays content of given HTML file
+	 * @param deviceName
 	 * @param fileName the help HTML file
 	 */
 	public void openHelpDialog(String deviceName, String fileName) {
@@ -2621,8 +2680,8 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * open the dialog and displays content of given HTML file 
-	 * @param deviceName 
+	 * open the dialog and displays content of given HTML file
+	 * @param deviceName
 	 * @param fileName the help HTML file
 	 */
 	public void openHelpDialog(String deviceName, String fileName, boolean extractBase) {
@@ -2644,7 +2703,7 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * open the dialog and displays content of given HTML file 
+	 * open the dialog and displays content of given HTML file
 	 * @param stringURL of the help HTML file
 	 */
 	public void openWebBrowser(String stringURL) {
@@ -2680,6 +2739,16 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * enable extended curve delta measuring display
+	 */
+	public void enableCurveSurvey(boolean enabled) {
+		// not supported in the standard graphics tab        this.graphicsTabItem.enableRecordSetComment(enabled);
+		//		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.enableCurveSurvey(enabled);
+		this.settings.setCurveSurvey(enabled);
+		this.isCurveSurveyVisible = enabled;
+	}
+
+	/**
 	 * @return the statusBar
 	 */
 	public StatusBar getStatusBar() {
@@ -2702,6 +2771,7 @@ public class DataExplorer extends Composite {
 		}
 		else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (DataExplorer.this.fileCommentTabItem != null && DataExplorer.this.fileCommentTabItem.isFileCommentChanged()) DataExplorer.this.fileCommentTabItem.setFileComment();
 				}
@@ -2725,6 +2795,7 @@ public class DataExplorer extends Composite {
 		}
 		else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (DataExplorer.this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) DataExplorer.this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
 				}
@@ -2880,7 +2951,7 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void copyGraphicsPrintImage() {
 		Image graphicsImage = this.getGraphicsPrintImage();
@@ -3094,6 +3165,7 @@ public class DataExplorer extends Composite {
 				//restore window settings
 				this.setCurveSelectorEnabled(this.isCurveSelectorEnabled);
 				this.enableRecordSetComment(this.isRecordCommentVisible);
+				this.enableCurveSurvey(this.isCurveSurveyVisible);
 				this.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			}
 		}
@@ -3287,6 +3359,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void resetShellIcon() {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				GDE.shell.setImage(SWTResourceManager.getImage(GDE.IS_MAC ? "gde/resource/DataExplorer_MAC.png" : "gde/resource/DataExplorer.png")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -3433,7 +3506,7 @@ public class DataExplorer extends Composite {
 			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052)
-			//				+ Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN) 
+			//				+ Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN)
 			//				? new String[] {
 			//					"1)  Korrektur der initialen Messwert-Synchronisation\n",
 			//					"2)  Korrektur vom Junsi iCharger 206, 208, 306, 3010 konstanten Zeitschritt auf 2 Sekunden\n",
@@ -3468,7 +3541,7 @@ public class DataExplorer extends Composite {
 			//					"13) UniLog2 - fix missing parsing of M-Link data\n",
 			//					"14) UniLog2 - fix configuration of symbol and unit for M-Link measurements\n",
 			//					"15) add Junsi iCharger 4010 Duo support (read log from SD storage)\n",
-			//					"16) add port enumeration ttyACM* Linux CDC ACM devices\n" 
+			//					"16) add port enumeration ttyACM* Linux CDC ACM devices\n"
 			//			})
 			);
 			if (SWT.YES == messageDialog.open()) {
@@ -3492,6 +3565,7 @@ public class DataExplorer extends Composite {
 							if (!new File(targetFilePath).exists()) FileUtils.downloadFile(new URL(downloadUrl + filename), targetFilePath);
 
 							GDE.display.syncExec(new Runnable() {
+								@Override
 								public void run() {
 									if (GDE.IS_LINUX) {
 										URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();

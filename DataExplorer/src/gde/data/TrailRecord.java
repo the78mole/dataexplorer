@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
@@ -22,9 +22,14 @@ package gde.data;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -41,6 +46,8 @@ import gde.device.resource.DeviceXmlResource;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
+import gde.utils.Quantile;
+import gde.utils.Quantile.Fixings;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
@@ -55,21 +62,230 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	private final static long			serialVersionUID				= 110124007964748556L;
 	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
 
-	public final static String		TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";					// reference to the selected trail //$NON-NLS-1$
+	public final static String		TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
 	private final TrailRecordSet	parentTrail;
-	private final MeasurementType	measurementType;																				// measurement / settlement / scoregroup are options
-	private final SettlementType	settlementType;																					// measurement / settlement / scoregroup are options
-	private final ScoreGroupType	scoreGroupType;																					// measurement / settlement / scoregroup are options
-	private int										trailTextSelectedIndex	= -1;														// user selection from applicable trails, is saved in the graphics template
-	private List<String>					applicableTrailsTexts;																	// the user may select one of these entries
-	private List<Integer>					applicableTrailsOrdinals;																// maps all applicable trails in order to convert the user selection into a valid trail
-	private TrailRecord[]					trailRecordSuite;																				// holds data points in case of trail suites
+	private final MeasurementType	measurementType;																					// measurement / settlement / scoregroup are options
+	private final SettlementType	settlementType;																						// measurement / settlement / scoregroup are options
+	private final ScoreGroupType	scoreGroupType;																						// measurement / settlement / scoregroup are options
+	private int										trailTextSelectedIndex	= -1;															// user selection from applicable trails, is saved in the graphics template
+	private List<String>					applicableTrailsTexts;																		// the user may select one of these entries
+	private List<Integer>					applicableTrailsOrdinals;																	// maps all applicable trails in order to convert the user selection into a valid trail
+	private TrailRecord[]					trailRecordSuite;																					// holds data points in case of trail suites
 	private double								factor									= Double.MIN_VALUE;
 	private double								offset									= Double.MIN_VALUE;
 	private double								reduction								= Double.MIN_VALUE;
 
-	final DeviceXmlResource				xmlResource		= DeviceXmlResource.getInstance();
+	final DeviceXmlResource				xmlResource							= DeviceXmlResource.getInstance();
+	private LinearRegression			linearRegression				= null;
+	private Quantile							quantile								= null;
+
+	/**
+	 *  Performs a simple linear regression on an set of <em>n</em> data points (<em>y<sub>i</sub></em>, <em>x<sub>i</sub></em>).
+	 *  That is, it fits a straight line <em>y</em> = &alpha; + &beta; <em>x</em>, (where <em>y</em> is the response variable, <em>x</em> is the predictor variable,
+	 *  &alpha; is the <em>y-intercept</em>, and &beta; is the <em>slope</em>) that minimizes the sum of squared residuals of the linear regression model.
+	 *  It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope and <em>y</em>-intercept.
+	 *  Source: http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html
+	 *  @author Robert Sedgewick
+	 *  @author Kevin Wayne
+	 *  @author Thomas Eickert
+	 */
+	public class LinearRegression { // todo harmonize with /DataExplorer/src/gde/utils/LinearRegression.java
+		private final int						n;																			// size with y nulls stripped off
+		private final List<Double>	xx		= new ArrayList<>();							// original values with y(!) nulls stripped off
+		private final List<Double>	yy		= new ArrayList<>();							// original values with y nulls stripped off
+
+		private double							xbar	= 0.0, ybar = 0.0;								// averages
+		private double							xxbar	= 0.0, yybar = 0.0, xybar = 0.0;	// (co-)variance times n
+		private double							rss		= 0.0;														// residual sum of squares
+		private double							ssr		= 0.0;														// regression sum of squares
+
+		/**
+		  * Performs a linear regression on the data points {@code (y[i], x[i])}.
+		  * @param  x the values of the predictor variable
+		  * @param  y the corresponding values of the response variable
+		  * @throws IllegalArgumentException if the lengths of the two arrays are not equal or if n<=2
+		  */
+		public LinearRegression(double[] x, double[] y) {
+			this(DoubleStream.of(x).boxed().collect(Collectors.toList()), DoubleStream.of(y).boxed().collect(Collectors.toList()));
+		}
+
+		/**
+		  * Performs a linear regression on the data points {@code (y[i], x[i])}.
+		  * Removes  {@code (y[i], x[i])} if {@code y[i]} is null.
+		  * @param  x the values of the predictor variable
+		  * @param  y the corresponding values of the response variable (may contain nulls)
+		  * @throws IllegalArgumentException if the length of non-null elements is less than 2  or if the length is not equal
+		  */
+		public LinearRegression(List<Double> x, List<Double> y) {
+			if (x.size() != y.size()) {
+				throw new IllegalArgumentException("collection lengths are not equal");
+			}
+
+			// first pass: eliminate y nulls
+			double sumx = 0.0, sumy = 0.0; // , sumx2 = 0.0;
+			for (int i = 0; i < x.size(); i++) {
+				if (y.get(i) != null) {
+					this.xx.add(x.get(i));
+					this.yy.add(y.get(i));
+					sumx += x.get(i);
+					// sumx2 += x.get(i) * x.get(i);
+					sumy += y.get(i);
+				}
+			}
+			this.n = this.xx.size();
+			if (this.n >= 1) {
+				this.xbar = sumx / this.n;
+				this.ybar = sumy / this.n;
+
+				// second pass: covariances
+				for (int i = 0; i < this.n; i++) {
+					this.xxbar += (this.xx.get(i) - this.xbar) * (this.xx.get(i) - this.xbar);
+					this.yybar += (this.yy.get(i) - this.ybar) * (this.yy.get(i) - this.ybar);
+					this.xybar += (this.xx.get(i) - this.xbar) * (this.yy.get(i) - this.ybar);
+				}
+
+				if (this.n >= 2) {
+					// third pass: error estimation
+					for (int i = 0; i < this.n; i++) {
+						double fit = getResponse(this.xx.get(i));
+						this.rss += (fit - this.yy.get(i)) * (fit - this.yy.get(i));
+						this.ssr += (fit - this.ybar) * (fit - this.ybar);
+					}
+				}
+			}
+		}
+
+		/**
+		* @return the <em>y</em>-intercept &alpha; of the best-fit line <em>y = &alpha; + &beta; x</em>
+		*/
+		public double getIntercept() {
+			return this.ybar - getSlope() * this.xbar;
+		}
+
+		/**
+		* @return the slope &beta; of the best-fit line <em>y</em> = &alpha; + &beta; <em>x</em>
+		*/
+		public double getSlope() {
+			if (this.n < 2)
+				return 0;
+			else
+				return this.xybar / this.xxbar;
+		}
+
+		/**
+		 * @return the coefficient of determination <em>R</em><sup>2</sup>,
+		 *         which is a real number between 0 and 1
+		 */
+		public double getR2() {
+			if (this.n < 2)
+				return 0;
+			else
+				return this.ssr / this.yybar;
+		}
+
+		/**
+		* @return the standard error of the estimate for the intercept
+		*/
+		public double getInterceptStdErr() {
+			if (this.n <= 2)
+				return 0;
+			else {
+				double svar = this.rss / (this.n - 2);
+				double svar1 = svar / this.xxbar;
+				return Math.sqrt(svar / this.n + this.xbar * this.xbar * svar1);
+			}
+		}
+
+		/**
+		* @return the standard error of the estimate for the slope
+		*/
+		public double getSlopeStdErr() {
+			if (this.n <= 2)
+				return 0;
+			else {
+				double svar = this.rss / (this.n - 2);
+				return Math.sqrt(svar / this.xxbar);
+			}
+		}
+
+		/**
+		* @param  xValue the predictor variable
+		* @return the expected response {@code y} given the value of the predictor variable {@code x} or 0 if no non-null values exist
+		*/
+		public double getResponse(double xValue) {
+			if (this.n < 1)
+				return 0;
+			else
+				return getSlope() * xValue + getIntercept();
+		}
+
+		/**
+		 * @return the first value {@code x} or 0 if no non-null values exist
+		 */
+		public double getFirstPredictor() {
+			if (this.n < 1)
+				return 0;
+			else
+				return this.xx.get(0);
+		}
+
+		/**
+		* @return the delta of the {@code x} bounds values or 0 if no non-null values exist
+		*/
+		public double getPredictorDelta() {
+			if (this.n < 1)
+				return 0;
+			else
+				return this.xx.get(this.xx.size() - 1) - this.xx.get(0);
+		}
+
+		/**
+		* @return the delta of the {@code y} bounds values or 0 if no non-null values exist
+		*/
+		public double getDelta() {
+			if (this.n < 1)
+				return 0;
+			else
+				return this.yy.get(this.yy.size() - 1) - this.yy.get(0);
+		}
+
+		/**
+		* @return the average of the y values
+		*/
+		public double getAvg() {
+			if (this.n < 1)
+				return 0;
+			else
+				return this.ybar;
+		}
+
+		/**
+		* @return the standard deviation of the y values
+		*/
+		public double getSigma() {
+			if (this.n < 2)
+				return 0;
+			else
+				return Math.sqrt(this.yybar / (this.n - 1));
+		}
+
+		public int getRealSize() {
+			return this.n;
+		}
+
+		/**
+		* @return a string representation of the simple linear regression model,  including the best-fit line and the coefficient of determination  <em>R</em><sup>2</sup>
+		*/
+		@Override
+		public String toString() {
+			StringBuilder s = new StringBuilder();
+			s.append(String.format("%.4f n + %.4f", getSlope(), getIntercept()));
+			s.append("  (R^2 = " + String.format("%.3f", getR2()) + ")");
+			return s.toString();
+		}
+
+	}
 
 	/**
 	 * creates a vector for a measurementType to hold data points.
@@ -188,8 +404,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			int minVal = Integer.MAX_VALUE, maxVal = Integer.MIN_VALUE; // min/max depends on all values of the suite
 			int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
 			boolean summationSign = false; // false means subtract, true means add
-			for (int i = 0; i < this.trailRecordSuite.length; i++) {
-				TrailRecord trailRecord = this.trailRecordSuite[i];
+			for (TrailRecord trailRecord : this.trailRecordSuite) {
 				Integer point;
 				if (this.isMeasurement())
 					point = histoVault.getMeasurementPoint(trailRecord.ordinal, trailRecord.getTrailOrdinal());
@@ -239,11 +454,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 */
 	public Point[] getDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset) {
 		List<Point> points = new ArrayList<>();
-		double displayOffset = super.minDisplayValue * 1 / super.syncMasterFactor;
+		double tmpOffset = super.minDisplayValue * 1 / super.syncMasterFactor;
 		for (int i = 0; i < this.parent.timeStep_ms.size(); i++) {
 			if (super.realRealGet(i) != null) {
 				points.add(new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.parent.timeStep_ms.getTime_ms(i)),
-						yDisplayOffset - (int) (((super.realRealGet(i) / 1000.0) - displayOffset) * super.displayScaleFactorValue)));
+						yDisplayOffset - (int) (((super.realRealGet(i) / 1000.0) - tmpOffset) * super.displayScaleFactorValue)));
 			}
 			else {
 				points.add(null);
@@ -293,7 +508,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
 	 * @return point time, value; null if the trail record value is null
 	 */
-	public Point[] getSuiteGpsDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset,  int drawAreaHeight) {
+	public Point[] getSuiteGpsDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset, int drawAreaHeight) {
 		Point[] points = new Point[timeLine.getScalePositions().size()];
 		int i = 0;
 		Integer value = 0;
@@ -354,7 +569,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? Character.toString((char) 183)  : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(medianRecord.realRealGet(j) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
@@ -370,7 +585,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(i) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerRecord.realRealGet(i) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? Character.toString((char) 183)  : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
@@ -382,7 +597,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					if (masterRecord.realRealGet(j) != null) {
 						StringBuilder sb = new StringBuilder();
 						sb.append(lowerRecord.realRealGet(j) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? Character.toString((char) 183)  : GDE.STRING_BLANK_COLON_BLANK;
+						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
 						sb.append(delimiter).append(middleRecord.realRealGet(j) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						sb.append(delimiter).append(upperRecord.realRealGet(j) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
@@ -444,7 +659,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			if (!hideAllTrails)
 				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 
-			// set visible and reset hidden trails based on device settlement settings 
+			// set visible and reset hidden trails based on device settlement settings
 			this.measurementType.getTrailDisplay().ifPresent(x -> x.getExposed().stream().filter(y -> !y.getTrail().isSuite()).forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = true));
 			this.measurementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().stream().filter(y -> !y.getTrail().isSuite()).forEach(y -> applicablePrimitiveTrails[y.getTrail().ordinal()] = false));
 
@@ -517,13 +732,13 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					throw new UnsupportedOperationException("TransitionAmount not implemented"); //$NON-NLS-1$
 			}
 
-			// set visible non-suite trails based on device settlement settings 
+			// set visible non-suite trails based on device settlement settings
 			this.settlementType.getTrailDisplay()
 					.ifPresent(x -> x.getExposed().stream().map(z -> z.getTrail()) //
 							.filter(o -> !o.isSuite()) //
 							.forEach(y -> applicablePrimitiveTrails[y.ordinal()] = true));
 
-			// reset hidden non-suite trails based on device settlement settings 
+			// reset hidden non-suite trails based on device settlement settings
 			this.settlementType.getTrailDisplay().ifPresent(x -> x.getDisclosed().stream().map(z -> z.getTrail()).filter(o -> !o.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = false));
 
 			// set at least one trail if no trail is applicable
@@ -585,7 +800,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
-	 * @return display text for the trail (may have been modified due to special texts for triggers)  
+	 * @return display text for the trail (may have been modified due to special texts for triggers)
 	 */
 	public String getTrailText() {
 		return this.applicableTrailsTexts.size() == 0 ? GDE.STRING_EMPTY : this.applicableTrailsTexts.get(this.trailTextSelectedIndex);
@@ -600,8 +815,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
-	 * builds the suite of trail records if the selection has changed. 
-	 * @param value position / index of the trail type in the current list of applicable trails 
+	 * builds the suite of trail records if the selection has changed.
+	 * @param value position / index of the trail type in the current list of applicable trails
 	 */
 	public void setTrailTextSelectedIndex(int value) {
 		if (this.trailTextSelectedIndex != value) {
@@ -685,7 +900,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
-	 * select the most prioritized trail from the applicable trails. 
+	 * select the most prioritized trail from the applicable trails.
 	 * @return
 	 */
 	public void setMostApplicableTrailTextOrdinal() {
@@ -784,37 +999,37 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		switch (newNumberFormat) {
 		case -1:
 			if (Math.abs(this.maxScaleValue) < 10 && Math.abs(this.minScaleValue) < 10) {
-				if (this.maxScaleValue - this.minScaleValue <= 0.02)
+				if (this.maxScaleValue - this.minScaleValue < 0.01)
+					this.df.applyPattern("0.0000"); //$NON-NLS-1$
+				else if (this.maxScaleValue - this.minScaleValue < 0.1)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
-				else if (this.maxScaleValue - this.minScaleValue <= 0.2)
-					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else
-					this.df.applyPattern("0.0"); //$NON-NLS-1$
+					this.df.applyPattern("0.00"); //$NON-NLS-1$
 			}
 			else if (Math.abs(this.maxScaleValue) < 100 && Math.abs(this.minScaleValue) < 100) {
-				if (this.maxScaleValue - this.minScaleValue <= 0.2)
+				if (this.maxScaleValue - this.minScaleValue < 0.1)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
-				else if (this.maxScaleValue - this.minScaleValue <= 2)
+				else if (this.maxScaleValue - this.minScaleValue < 1.)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 			}
-			else if (Math.abs(this.maxScaleValue) < 500 && Math.abs(this.minScaleValue) < 500) {
-				if (this.maxScaleValue - this.minScaleValue <= 0.2)
+			else if (Math.abs(this.maxScaleValue) < 1000 && Math.abs(this.minScaleValue) < 1000) {
+				if (this.maxScaleValue - this.minScaleValue < 1.)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
-				else if (this.maxScaleValue - this.minScaleValue <= 2)
+				else if (this.maxScaleValue - this.minScaleValue < 10.)
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
 			}
 			else if (Math.abs(this.maxScaleValue) < 10000 && Math.abs(this.minScaleValue) < 10000) {
-				if (this.maxScaleValue - this.minScaleValue <= 0.2)
+				if (this.maxScaleValue - this.minScaleValue < 10.)
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
 			}
 			else {
-					this.df.applyPattern("0"); //$NON-NLS-1$
+				this.df.applyPattern("0"); //$NON-NLS-1$
 			}
 			break;
 		case 0:
@@ -882,14 +1097,19 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
-	 * get the delta of the vertical display points
-	 * supports suites and null values.
-	 * @param index1 is the position of the left value in the record collection 
-	 * @param index2 is the position of the right value in the record collection 
-	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
+	 * Builds value lists from the points within the bounds.
+	 * The list is ordered from timeStamp1 to timeStamp2.
+	 * @param timeStamp1_ms is the time of the delta measurement start value
+	 * @param timeStamp2_ms is the time of the delta measurement end value
 	 */
-	public String getFormattedDeltaStatisticsValue(int index1, int index2) {
+	public void setBounds(long timeStamp1_ms, long timeStamp2_ms) {
+		this.linearRegression = null;
+		this.quantile = null;
+
 		final TrailRecord trailRecord;
+		final List<Double> boundedTimeStamps_ms = new ArrayList<>();
+		final List<Double> boundedValues = new ArrayList<>();
+
 		if (!this.isTrailSuite())
 			trailRecord = this.getTrailRecordSuite()[0];
 		else if (this.isBoxPlotSuite())
@@ -899,20 +1119,100 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		else
 			throw new UnsupportedOperationException();
 
-		if (trailRecord.realRealGet(index1) != null && trailRecord.realRealGet(index2) != null) {
-			final double translatedDelta = trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index2) / 1000.)
-					- trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index1) / 1000.);
-			return trailRecord.getFormattedScaleValue(translatedDelta);
+		final int measureIndex = this.parentTrail.getIndex(timeStamp1_ms);
+		final int deltaIndex = this.parentTrail.getIndex(timeStamp2_ms);
+		boundedTimeStamps_ms.clear();
+		boundedValues.clear();
+		if (measureIndex < deltaIndex) {
+			for (int i = measureIndex; i < deltaIndex + 1; i++) {
+				if (trailRecord.realRealGet(i) != null) {
+					boundedTimeStamps_ms.add(this.parent.timeStep_ms.getTime_ms(i));
+					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(i) / 1000.));
+				}
+			}
 		}
-		else
-			return GDE.STRING_STAR;
+		else {
+			for (int i = measureIndex; i > deltaIndex - 1; i--) {
+				if (trailRecord.realRealGet(i) != null) {
+					boundedTimeStamps_ms.add(this.parent.timeStep_ms.getTime_ms(i));
+					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(i) / 1000.));
+				}
+			}
+		}
+
+		if (!boundedTimeStamps_ms.isEmpty()) {
+			this.linearRegression = new LinearRegression(boundedTimeStamps_ms, boundedValues);
+			this.quantile = new Quantile(boundedValues, EnumSet.of(Fixings.IS_SAMPLE), 99., 99.);
+			if (log.isLoggable(Level.FINER)) {
+				Date date = new Date(boundedTimeStamps_ms.get(0).longValue());
+				log.log(Level.FINER, String.format("regressionSize=%d regressionRealSize=%d starts at %tF %tR", boundedValues.size(), this.linearRegression.getRealSize(), date, date));
+			}
+		}
 	}
 
 	/**
-	 * supports suites and null values.
+	 * @return the formatted translated average of all bounds values
+	 */
+	public String getFormattedBoundsAvg() {
+		return this.getFormattedScaleValue(this.linearRegression.getAvg());
+	}
+
+	/**
+	 * @return the formatted translated difference between the left and right bounds values
+	 */
+	public String getFormattedBoundsDelta() {
+		return this.getFormattedScaleValue(0. - this.linearRegression.getDelta());
+	}
+
+	/**
+	 * @return the formatted translated regression slope of the bounds values based on months
+	 */
+	@Deprecated
+	public String getFormattedBoundsDeltaSlope() {
+		final long endTimeStamp_ms = (long) this.linearRegression.getFirstPredictor(); // inverse sorted order
+		final long startTimeStamp_ms = (long) (this.linearRegression.getFirstPredictor() + this.linearRegression.getPredictorDelta());
+		Calendar startCalendar = new GregorianCalendar();
+		startCalendar.setTimeInMillis(startTimeStamp_ms);
+		Calendar endCalendar = new GregorianCalendar();
+		endCalendar.setTimeInMillis(endTimeStamp_ms);
+
+		// determine number of full calendar months
+		int month1 = startCalendar.get(Calendar.YEAR) * 12 + startCalendar.get(Calendar.MONTH);
+		int month2 = endCalendar.get(Calendar.YEAR) * 12 + endCalendar.get(Calendar.MONTH);
+		int monthDelta = month2 - month1;
+
+		// determine the number of months with decimal places
+		double fractionalMonthsDelta;
+		{
+			// calculate the number of days in a year's sliding window
+			final int d2m = 24 * 60; // days to minutes factor
+			int minute1 = startCalendar.get(Calendar.DAY_OF_YEAR) * d2m + startCalendar.get(Calendar.HOUR_OF_DAY) * 60 + startCalendar.get(Calendar.MINUTE);
+			int minute2 = endCalendar.get(Calendar.DAY_OF_YEAR) * d2m + endCalendar.get(Calendar.HOUR_OF_DAY) * 60 + endCalendar.get(Calendar.MINUTE);
+			int minuteDelta = startCalendar.getActualMaximum(Calendar.DAY_OF_YEAR) == 366 ? (366 * d2m + minute2 - minute1 + d2m) % (366 * d2m) : (365 * d2m + minute2 - minute1) % (365 * d2m);
+			// transform the number of days into number of months
+			int y2m = endCalendar.getActualMaximum(Calendar.DAY_OF_YEAR) == 366 ? d2m * 366 : d2m * 365; // year to minutes factor
+			fractionalMonthsDelta = endCalendar.getActualMaximum(Calendar.DAY_OF_YEAR) == 366 ? minuteDelta / (y2m / 12.) : minuteDelta / (y2m / 12.);
+		}
+		if (monthDelta > 12) fractionalMonthsDelta = monthDelta - 12 + fractionalMonthsDelta;
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("%tF %tR %tF %tR delta=%f months=%f", startCalendar.getTime(), startCalendar.getTime(), endCalendar.getTime(), //$NON-NLS-1$
+				endCalendar.getTime(), this.linearRegression.getDelta(), fractionalMonthsDelta));
+
+		return this.getFormattedScaleValue(-this.linearRegression.getDelta() / fractionalMonthsDelta);
+	}
+
+	/**
+	 * @return the formatted translated regression slope of the bounds values based on months
+	 */
+	public String getFormattedBoundsSlope() {
+		return this.getFormattedScaleValue(this.linearRegression.getSlope() * GDE.ONE_HOUR_MS * 24 * 365 / 12);
+	}
+
+	/**
+	 * Supports suites and null values.
 	 * @param index
 	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
 	 */
+	@Override
 	public String getFormattedMeasureValue(int index) {
 		final TrailRecord trailRecord;
 		if (!this.isTrailSuite())
@@ -978,29 +1278,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
-	 * query data value (not translated in device units) from a display position point 
-	 * @param index
-	 * @return displays yPos in pixel
-	 */
-	@Deprecated
-	public int getVerticalDisplayPointPos(int index) {
-		final TrailRecord masterRecord = this.getTrailRecordSuite()[0]; // the master record is always available and is in case of a single suite identical with this record
-		if (!this.isTrailSuite()) {
-			return (int) (this.parent.drawAreaBounds.height - (((masterRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
-		}
-		else if (this.isBoxPlotSuite()) {
-			final TrailRecord medianRecord = this.getTrailRecordSuite()[2];
-			return (int) (this.parent.drawAreaBounds.height - (((medianRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
-		}
-		else if (isRangePlotSuite()) {
-			final TrailRecord middleRecord = this.getTrailRecordSuite()[0];
-			return (int) (this.parent.drawAreaBounds.height - (((middleRecord.realRealGet(index) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue));
-		}
-		else
-			throw new UnsupportedOperationException();
-	}
-
-	/**
 	 * supports suites and null values.
 	 * @param index
 	 * @return yPos in pixel (with top@0 and bottom@drawAreaBounds.height) or Integer.MIN_VALUE if the index value is null
@@ -1018,19 +1295,46 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 		int verticalDisplayPos = Integer.MIN_VALUE;
 		if (this.device.isGPSCoordinates(this)) {
-			// multiply by 1000 due to special logic in setminDisplayValue
-			if (trailRecord.realRealGet(index) != null) verticalDisplayPos = (int) (trailRecord.parent.drawAreaBounds.height
-					- ((trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(index) / 1000.0) * 1000. - (trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor))
-							* trailRecord.displayScaleFactorValue));
+			if (trailRecord.realRealGet(index) != null) {
+				double decimalDegreeValue = trailRecord.realRealGet(index) / 1000000 + trailRecord.realRealGet(index) % 1000000 / 600000.;
+				verticalDisplayPos = trailRecord.parent.drawAreaBounds.height
+						- (int) ((decimalDegreeValue * 1000. - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
+			}
 		}
-		else if (trailRecord.realRealGet(index) != null) verticalDisplayPos = (int) (trailRecord.parent.drawAreaBounds.height
-				- (((trailRecord.realRealGet(index) / 1000.0) - (trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor)) * trailRecord.displayScaleFactorValue));
+		else if (trailRecord.realRealGet(index) != null) verticalDisplayPos = trailRecord.parent.drawAreaBounds.height
+				- (int) ((trailRecord.realRealGet(index) / 1000.0 - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
 
 		return verticalDisplayPos;
 	}
 
+	public int getVerticalDisplayPos(double translatedValue) {
+		int verticalDisplayPos = Integer.MIN_VALUE;
+
+		final TrailRecord trailRecord;
+		if (!this.isTrailSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
+		else if (this.isBoxPlotSuite())
+			trailRecord = this.getTrailRecordSuite()[2];
+		else if (isRangePlotSuite())
+			trailRecord = this.getTrailRecordSuite()[0];
+		else
+			throw new UnsupportedOperationException();
+
+		int point = (int) (this.device.reverseTranslateValue(this, translatedValue) * 1000.);
+		if (this.device.isGPSCoordinates(this)) {
+			double decimalDegreeValue = point / 1000000 + point % 1000000 / 600000.;
+			verticalDisplayPos = trailRecord.parent.drawAreaBounds.height
+					- (int) ((decimalDegreeValue * 1000. - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
+		}
+		else {
+			verticalDisplayPos = trailRecord.parent.drawAreaBounds.height - (int) ((point / 1000.0 - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
+		}
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("translatedValue=%f reverseTranslatedPoint=%d yPos=%d", translatedValue, point, verticalDisplayPos)); //$NON-NLS-1$
+		return verticalDisplayPos;
+	}
+
 	/**
-	 * query data value (not translated in device units) from a display position point 
+	 * query data value (not translated in device units) from a display position point
 	 * @param xPos
 	 * @return displays yPos in pixel
 	 */
@@ -1082,9 +1386,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", (long) tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 
 			//check yPos out of range, the graph might not visible within this area
-			//		if(pointPosY > this.parent.drawAreaBounds.height) 
+			//		if(pointPosY > this.parent.drawAreaBounds.height)
 			//			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
-			//		if(pointPosY < 0) 
+			//		if(pointPosY < 0)
 			//			log.log(Level.WARNING, "pointPosY < 0");
 		}
 		catch (RuntimeException e) {
@@ -1108,8 +1412,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		//if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 		//	Record syncRecord = this.parent.get(this.ordinal);
 		//		displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
-		//}	
-		//else 
+		//}
+		//else
 		if (this.parent.isZoomMode)
 			displayPointValue = this.df.format(this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height));
 		else
@@ -1181,6 +1485,46 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 */
 	private String getDeviceXmlReplacement(String replacementKey) {
 		return replacementKey != null ? this.xmlResource.getReplacement(replacementKey) : GDE.STRING_EMPTY;
+	}
+
+	public double getBoundedAvgValue() {
+		return this.linearRegression.getAvg();
+	}
+
+	public double getBoundedSlopeValue(long timeStamp_ms) {
+		return this.linearRegression.getResponse(timeStamp_ms);
+	}
+
+	public double getBoundedQuartile0Value() {
+		return this.quantile.getQuartile0();
+	}
+
+	public double getBoundedQuartile1Value() {
+		return this.quantile.getQuartile1();
+	}
+
+	public double getBoundedQuartile2Value() {
+		return this.quantile.getQuartile2();
+	}
+
+	public double getBoundedQuartile3Value() {
+		return this.quantile.getQuartile3();
+	}
+
+	public double getBoundedQuartile4Value() {
+		return this.quantile.getQuartile4();
+	}
+
+	public double getBoundedLowerWhiskerValue() {
+		return this.quantile.getQuantileLowerWhisker();
+	}
+
+	public double getBoundedUpperWhiskerValue() {
+		return this.quantile.getQuantileUpperWhisker();
+	}
+
+	public boolean isValidBounds() {
+		return this.linearRegression != null;
 	}
 
 }
