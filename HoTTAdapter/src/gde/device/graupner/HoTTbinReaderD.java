@@ -379,6 +379,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				if (!isInitialSwitched) {
 					HoTTbinReader.channels.switchChannel(channel.getName());
 					channel.switchRecordSet(recordSetName);
+					isInitialSwitched = true;
 				}
 				else {
 					device.makeInActiveDisplayable(HoTTbinReaderD.recordSet);
@@ -730,6 +731,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				if (!isInitialSwitched) {
 					HoTTbinReader.channels.switchChannel(channel.getName());
 					channel.switchRecordSet(recordSetName);
+					isInitialSwitched = true;
 				}
 				else {
 					device.makeInActiveDisplayable(HoTTbinReaderD.recordSet);

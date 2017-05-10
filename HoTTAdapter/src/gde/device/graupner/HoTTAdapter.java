@@ -128,10 +128,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		RECEIVER("Receiver", 1), //$NON-NLS-1$
 		VARIO("Vario", 2), //$NON-NLS-1$
 		GPS("GPS", 3), //$NON-NLS-1$
-		GAM("General-Air", 4), //$NON-NLS-1$
-		EAM("Electric-Air", 5), //$NON-NLS-1$
+		GAM("GAM", 4), //$NON-NLS-1$
+		EAM("EAM", 5), //$NON-NLS-1$
 		CHANNEL("Channel", 6), //$NON-NLS-1$
-		ESC("MotorDriver", 7); //$NON-NLS-1$
+		ESC("ESC", 7); //$NON-NLS-1$
 		private final String				value;
 		private final int						channelNumber;
 		public static final Sensor	values[]	= values();	// use this to avoid cloning if calling values()
@@ -1207,6 +1207,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			public void run() {
 				try {
 					HoTTAdapter.this.application.setPortConnected(true);
+					boolean isInitialSwitched = false;
+
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
@@ -1223,6 +1225,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
 								HoTTbinReader.read(selectedImportFile); // , HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								if (!isInitialSwitched) {
+									Channel receiverChannel = HoTTAdapter.this.channels.get(1);
+									HoTTbinReader.channels.switchChannel(receiverChannel.getName());
+									isInitialSwitched = true;
+								}
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
@@ -1249,6 +1256,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			public void run() {
 				try {
 					HoTTAdapter.this.application.setPortConnected(true);
+					
 					if (filePath.getFileName().toString().length() > MIN_FILENAME_LENGTH) {
 						Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
 						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;

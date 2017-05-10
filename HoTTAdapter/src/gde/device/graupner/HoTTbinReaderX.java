@@ -136,7 +136,6 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		boolean isInitialSwitched = false;
 		//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 		//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
 		//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
@@ -390,12 +389,6 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			HoTTbinReaderX.logx.logp(Level.TIME, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
-				HoTTbinReaderX.application.setProgress(100, sThreadId);
-				if (!isInitialSwitched) {
-					HoTTbinReaderX.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-
 				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 					device.makeInActiveDisplayable(recordSet);
 					device.updateVisibilityStatus(recordSet, true);

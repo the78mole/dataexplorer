@@ -321,7 +321,6 @@ public class HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		boolean isInitialSwitched = false;
 		HoTTbinReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
@@ -726,12 +725,6 @@ public class HoTTbinReader {
 					+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
 
 			if (menuToolBar != null) {
-				HoTTbinReader.application.setProgress(100, sThreadId);
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-
 				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 					device.makeInActiveDisplayable(recordSet);
 
@@ -811,7 +804,6 @@ public class HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		boolean isInitialSwitched = false;
 		HoTTbinReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
@@ -1184,12 +1176,6 @@ public class HoTTbinReader {
 					+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
 
 			if (menuToolBar != null) {
-				HoTTbinReader.application.setProgress(99, sThreadId);
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-
 				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 					device.makeInActiveDisplayable(recordSet);
 					device.updateVisibilityStatus(recordSet, true);

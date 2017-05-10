@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.swt.widgets.FileDialog;
 
 import gde.GDE;
+import gde.data.Channel;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.graupner.hott.MessageIds;
@@ -53,6 +54,8 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 			public void run() {
 				try {
 					HoTTAdapterX.this.application.setPortConnected(true);
+					boolean isInitialSwitched = false;
+
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
@@ -69,6 +72,11 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
 								HoTTbinReaderX.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								if (!isInitialSwitched) {
+									Channel receiverChannel = HoTTAdapterX.this.channels.get(1);
+									HoTTbinReader.channels.switchChannel(receiverChannel.getName());
+									isInitialSwitched = true;
+								}
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {

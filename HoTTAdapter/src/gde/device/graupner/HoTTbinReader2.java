@@ -83,7 +83,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		Channel channel = null;
 		int channelNumber = device.getLastChannelNumber();
 		device.getMeasurementFactor(channelNumber, 12);
-		boolean isInitialSwitched = false;
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
 		HoTTbinReader2.recordSet = null;
@@ -359,13 +358,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 			if (menuToolBar != null) {
 				HoTTbinReader.application.setProgress(99, sThreadId);
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-				else {
-					device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
-				}
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
 
 				//write filename after import to record description
@@ -407,7 +399,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isGeneralData = false;
 		boolean isElectricData = false;
 		boolean isMotorDriverData = false;
-		boolean isInitialSwitched = false;
 		HoTTbinReader2.recordSet = null;
 		HoTTbinReader2.isJustMigrated = false;
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
@@ -710,13 +701,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 			if (menuToolBar != null) {
 				HoTTbinReader.application.setProgress(99, sThreadId);
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-				else {
-					device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
-				}
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
 
 				//write filename after import to record description
