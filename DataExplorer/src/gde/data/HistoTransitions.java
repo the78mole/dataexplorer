@@ -106,6 +106,7 @@ public class HistoTransitions {
 		private boolean						isMinimumExtremum;
 		private long							timePeriod_100ns;
 		private double						extremeValue;
+		@Deprecated
 		private boolean						isExhausted;
 		private int								startIndex;
 
@@ -156,13 +157,13 @@ public class HistoTransitions {
 			ensureTimePeriod();
 		}
 
-		@Override 	
+		@Override
 		@Deprecated // does not add the timestamp value
 		public void addLast(Double translatedValue) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override 	// reInitializes the deque properties
+		@Override // reInitializes the deque properties
 		public void clear() {
 			super.clear();
 			this.timeStampDeque.clear();
@@ -241,7 +242,7 @@ public class HistoTransitions {
 		 * 
 		 * @see java.util.ArrayDeque#pollFirst()
 		 */
-		@Override 	// reInitializes the deque properties
+		@Override // reInitializes the deque properties
 		public Double pollFirst() {
 			Double removedItem = super.pollFirst();
 			this.timeStampDeque.pollFirst();
@@ -256,7 +257,7 @@ public class HistoTransitions {
 		 * 
 		 * @see java.util.ArrayDeque#pollLast()
 		 */
-		@Override 	// reInitializes the deque properties
+		@Override // reInitializes the deque properties
 		public Double pollLast() {
 			Double removedItem = super.pollLast();
 			this.timeStampDeque.pollLast();
@@ -318,11 +319,12 @@ public class HistoTransitions {
 		 */
 		public int tryAddLastByMoving(SettlementDeque settlementDeque) {
 			int movedCount = 0;
-			Iterator<Long> iteratorTimeStamp = settlementDeque.timeStampDeque.iterator();
-			for (Iterator<Double> iterator = settlementDeque.iterator(); iterator.hasNext();) {
-				if (this.isStuffed()) break;
+			Iterator<Double> iterator = settlementDeque.iterator();
+			for (Iterator<Long> iteratorTimeStamp = settlementDeque.timeStampDeque.iterator(); iterator.hasNext();) {
+				final long nextTimeStamp_100ns = iteratorTimeStamp.next();
+				if (!this.isAddableInTimePeriod(nextTimeStamp_100ns)) break;
 
-				addLast(iterator.next(), iteratorTimeStamp.next());
+				addLast(iterator.next(), nextTimeStamp_100ns);
 				iterator.remove();
 				iteratorTimeStamp.remove();
 				movedCount++;
@@ -334,8 +336,17 @@ public class HistoTransitions {
 		/**
 		 * @return true if the next add will be most likely beyond the current time window position. however, a smaller timestep than the last one may fit.
 		 */
+		@Deprecated
 		public boolean isStuffed() {
 			return this.isExhausted || getDuration_ms() >= this.timePeriod_100ns;
+		}
+
+		/**
+		 * @param timeStamp_100ns
+		 * @return true if the timestamp will fit in the deque without exceeding the deque's time period.
+		 */
+		public boolean isAddableInTimePeriod(long timeStamp_100ns) {
+			return !this.timeStampDeque.isEmpty() ? timeStamp_100ns - this.timeStampDeque.peekFirst() <= this.timePeriod_100ns : true;
 		}
 
 		private void ensureTimePeriod() {
@@ -478,6 +489,7 @@ public class HistoTransitions {
 		/**
 		 * @return true if the last add provoked dropping at least one element from the front of the deque.
 		 */
+		@Deprecated
 		public boolean isExhausted() {
 			return this.isExhausted;
 		}
@@ -659,9 +671,12 @@ public class HistoTransitions {
 		if (descriptionCutPoint < 0) descriptionCutPoint = 11;
 		log.log(Level.FINEST, transitionType.getTransitionId() + "  " + transitionRecord.parent.name + " " + " " + transitionRecord.parent.description.substring(0, descriptionCutPoint) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ String.format(" %s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
+		int samplingTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
 		if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
 				if (transitionRecord.realRealGet(i) == null) break;
+				if (log.isLoggable(Level.FINER) && i > 0 && samplingTimespan_ms * 2 <= (long) (transitionRecord.getTime_ms(i) - transitionRecord.getTime_ms(i - 1)) )
+					log.log(Level.FINER, String.format("timestamps with distance >= 2 * samplingPeriod: %,d %,d", (int) transitionRecord.getTime_ms(i), (int) transitionRecord.getTime_ms(i - 1)));
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
 				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.realRealGet(i));
 				switch (this.triggerState) {
@@ -669,7 +684,8 @@ public class HistoTransitions {
 					this.previousTriggerState = this.triggerState;
 					boolean isThresholdLevel = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
 					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold 
-					if (isThresholdLevel && this.referenceDeque.isStuffed() && !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
+					if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns)
+							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
@@ -691,7 +707,7 @@ public class HistoTransitions {
 						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
 						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
 					}
-					else if (this.thresholdDeque.isStuffed()) {
+					else if (!this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns)) {
 						this.triggerState = TriggerState.WAITING;
 						log.log(Level.FINER, " isThresholdTimeExceeded ", this); //$NON-NLS-1$
 						this.referenceDeque.addLastByMoving(this.thresholdDeque);
@@ -705,7 +721,7 @@ public class HistoTransitions {
 				case RECOVERING:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentRecovery = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
-					if (this.recoveryDeque.isStuffed()) {
+					if (!this.recoveryDeque.isAddableInTimePeriod(timeStamp_100ns)) {
 						// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue) //
 								&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue(), translatedRecoveryValue) //
@@ -783,7 +799,8 @@ public class HistoTransitions {
 					this.previousTriggerState = this.triggerState;
 					boolean isThresholdLevel = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
 					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold 
-					if (isThresholdLevel && this.referenceDeque.isStuffed() && !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
+					if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns)
+							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
@@ -796,7 +813,7 @@ public class HistoTransitions {
 				case TRIGGERED:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentTrigger = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					boolean isInThresholdTime = !this.thresholdDeque.isStuffed(); // no tryAdd because 
+					boolean isInThresholdTime = this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns);
 					boolean isRecovered = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
 					if (!isInThresholdTime && isRecovered) {
 						// check if only a minimum of the threshold values actually passed the recovery level (in order to tolerate a minimum of jitters)
@@ -832,7 +849,7 @@ public class HistoTransitions {
 				case RECOVERING:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentRecovery = isBeyondRecoveryLevel(transitionType, translatedValue, translatedRecoveryValue);
-					if (this.recoveryDeque.isStuffed()) {
+					if (!this.recoveryDeque.isAddableInTimePeriod(timeStamp_100ns)) {
 						// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue) //
 								&& !isBeyondRecoveryLevel(transitionType, this.thresholdDeque.getSecurityValue(), translatedRecoveryValue) //
@@ -902,7 +919,8 @@ public class HistoTransitions {
 					this.previousTriggerState = this.triggerState;
 					boolean isThresholdLevel = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
 					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold 
-					if (isThresholdLevel && this.referenceDeque.isStuffed() && !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
+					if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns)
+							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 						this.triggerState = TriggerState.TRIGGERED;
 						this.thresholdDeque.initialize(i);
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
@@ -915,7 +933,7 @@ public class HistoTransitions {
 				case TRIGGERED:
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentTrigger = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					if (this.thresholdDeque.isStuffed()) {
+					if (!this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns)) {
 						// final check if the majority of the reference values did not pass the threshold and if the majority of the threshold values passed the threshold 
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 							this.triggerState = TriggerState.WAITING;

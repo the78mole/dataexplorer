@@ -1149,7 +1149,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void focusLost(FocusEvent e) {
 										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
-											SettingsDialog.this.application.updateHistoTabs(true, false);
+											SettingsDialog.this.application.setupHistoWindows();
 										}
 									}
 

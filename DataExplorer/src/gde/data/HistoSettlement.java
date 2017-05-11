@@ -338,14 +338,15 @@ public class HistoSettlement extends Vector<Integer> {
 		// determine the direction of the peak or pulse or jump
 		final boolean isPositiveDirection;
 		// extend the threshold by one additional time step before and after in order to cope with potential measurement latencies
-		final int extendIndex = 1;
-		final double referenceAvg = recordGroup.getRawAverage(transition.referenceStartIndex, transition.referenceEndIndex + 1 - extendIndex);
-		final double thresholdAvg = recordGroup.getRawAverage(transition.thresholdStartIndex - extendIndex, transition.thresholdEndIndex + 1 + extendIndex);
+		final int extendLeftIndex = transition.referenceSize > 1 ? 1 : 0;
+		final int extendRightIndex = transition.recoverySize > 1 ? 1 : 0;
+		final double referenceAvg = recordGroup.getRawAverage(transition.referenceStartIndex, transition.referenceEndIndex + 1 - extendLeftIndex);
+		final double thresholdAvg = recordGroup.getRawAverage(transition.thresholdStartIndex - extendLeftIndex, transition.thresholdEndIndex + 1 + extendRightIndex);
 		if (transition.isSlope()) {
 			isPositiveDirection = (referenceAvg < thresholdAvg) ^ (recordGroup.getPropertyFactor() < 0.);
 		}
 		else {
-			final double recoveryAvg = recordGroup.getRawAverage(transition.recoveryStartIndex + extendIndex, transition.recoveryEndIndex + 1);
+			final double recoveryAvg = recordGroup.getRawAverage(transition.recoveryStartIndex + extendRightIndex, transition.recoveryEndIndex + 1);
 			isPositiveDirection = (referenceAvg + recoveryAvg < 2. * thresholdAvg) ^ (recordGroup.getPropertyFactor() < 0.);
 		}
 
@@ -637,7 +638,7 @@ public class HistoSettlement extends Vector<Integer> {
 	 */
 	private void addAmount(Transition transition) {
 		TransitionAmountType transitionAmount = this.settlement.getEvaluation().getTransitionAmount();
-		log.log(Level.OFF, GDE.STRING_GREATER, transitionAmount);
+		log.log(Level.FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = this.parent.get(this.parent.recordNames[transitionAmount.getRefOrdinal()]);
 		log.log(Level.FINE, record.getName() + " values   " + record.subList(transition.referenceStartIndex, transition.thresholdEndIndex + 1)); //$NON-NLS-1$
 		final int reverseTranslatedResult;

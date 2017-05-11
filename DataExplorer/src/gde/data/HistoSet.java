@@ -407,7 +407,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (isWithUi) this.application.setProgress(98, sThreadId);
 				}
 			}
-			this.elapsedTime_ms = (int) (System.nanoTime() - startNanoTime + 500000) / 1000000;
+			this.elapsedTime_ms = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000000);
 			if (log.isLoggable(Level.FINE)) log.log(Level.TIME, "time = " + StringHelper.getFormatedTime("mm:ss:SSS", this.elapsedTime_ms)); //$NON-NLS-1$ //$NON-NLS-2$
 			return isRebuilt;
 		}
@@ -634,6 +634,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			{
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.DATA).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), this.settings.getSubDirectoryLevelMax());
+				this.directoryFilesCount = files.size();
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO,
 						String.format("%04d files in histoDataDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA).getFileName(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
 
@@ -642,6 +643,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			if (this.validatedDirectories.containsKey(DirectoryType.IMPORT)) {
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.IMPORT).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), this.settings.getSubDirectoryLevelMax());
+				this.directoryFilesCount += files.size();
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files in histoImportDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT).getFileName(), //$NON-NLS-1$
 						this.validatedDirectories.get(DirectoryType.IMPORT)));
 
@@ -954,7 +956,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		if (this.settings.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
 			ArrayList<Path> dataPaths = new ArrayList<Path>();
 			dataPaths.add(Paths.get(this.settings.getDataFilePath()));
-			FileExclusionData.deleteIgnoreDirectory(dataPaths);
+			FileExclusionData.deleteExclusionsDirectory(dataPaths);
 
 			this.settings.setDataSettingsAtHomePath(isDataSettingsAtHomePath);
 		}

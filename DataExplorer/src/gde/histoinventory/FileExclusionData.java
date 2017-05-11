@@ -44,7 +44,7 @@ import gde.utils.FileUtils;
 /**
  * supports excluding files from history analysis.
  * is based on property files for each data directory.
- * stores the ignore file in the user directory if the data directory is not accessible for writing.
+ * stores the exclusions property files in the user directory if the data directory is not accessible for writing.
  * @author Thomas Eickert
  */
 public class FileExclusionData extends Properties {
@@ -72,19 +72,19 @@ public class FileExclusionData extends Properties {
 	}
 
 	/**
-	 * deletes all ignore files from the user directory and the data directories
+	 * deletes all exclusions property files from the user directory and the data directories
 	 * @param dataDirectories
 	 */
-	public static void deleteIgnoreDirectory(List<Path> dataDirectories) {
+	public static void deleteExclusionsDirectory(List<Path> dataDirectories) {
 		FileUtils.deleteDirectory(exclusionsDir.toString());
 		for (Path dataPath : dataDirectories) {
 			try {
-				for (File file : FileUtils.getFileListing(dataPath.toFile(), 77, Settings.HISTO_EXCLUSIONS_FILE_NAME)) {
+				for (File file : FileUtils.getFileListing(dataPath.toFile(), Integer.MAX_VALUE, Settings.HISTO_EXCLUSIONS_FILE_NAME)) {
 					FileUtils.deleteFile(file.getPath());
 				}
 			}
 			catch (FileNotFoundException e) {
-				log.log(Level.OFF, e.getMessage(), e);
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 	}

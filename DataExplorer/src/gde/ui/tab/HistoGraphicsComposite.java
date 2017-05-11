@@ -314,14 +314,14 @@ public class HistoGraphicsComposite extends Composite {
 		// get gc for other drawing operations
 		this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
 
+		setRecordSetCommentStandard();
+
 		TrailRecordSet trailRecordSet = getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
 			drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
-
-			setRecordSetCommentStandard();
 
 			if (trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE, true);
