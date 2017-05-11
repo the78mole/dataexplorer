@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -784,30 +783,37 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
 		case -1:
-			final double translatedMaxValue = this.device.translateValue(this, this.maxValue / 1000.);
-			final double translatedMinValue = this.device.translateValue(this, this.minValue / 1000.);
-			final double delta = translatedMaxValue - translatedMinValue;
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.getDefault(), "%s: %.0f - %.1f", this.name, translatedMaxValue, delta)); //$NON-NLS-1$
-			if (Math.abs(translatedMaxValue) < 100 && Math.abs(translatedMinValue) < 100) {
-				if (delta < 0.1)
+			if (Math.abs(this.maxScaleValue) < 10 && Math.abs(this.minScaleValue) < 10) {
+				if (this.maxScaleValue - this.minScaleValue <= 0.02)
 					this.df.applyPattern("0.000"); //$NON-NLS-1$
-				else if (delta <= 1)
+				else if (this.maxScaleValue - this.minScaleValue <= 0.2)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 			}
-			else if (Math.abs(translatedMaxValue) < 500 && Math.abs(translatedMinValue) < 500) {
-				if (delta <= 0.1)
+			else if (Math.abs(this.maxScaleValue) < 100 && Math.abs(this.minScaleValue) < 100) {
+				if (this.maxScaleValue - this.minScaleValue <= 0.2)
+					this.df.applyPattern("0.000"); //$NON-NLS-1$
+				else if (this.maxScaleValue - this.minScaleValue <= 2)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
-				else if (delta <= 1)
+				else
+					this.df.applyPattern("0.0"); //$NON-NLS-1$
+			}
+			else if (Math.abs(this.maxScaleValue) < 500 && Math.abs(this.minScaleValue) < 500) {
+				if (this.maxScaleValue - this.minScaleValue <= 0.2)
+					this.df.applyPattern("0.00"); //$NON-NLS-1$
+				else if (this.maxScaleValue - this.minScaleValue <= 2)
+					this.df.applyPattern("0.0"); //$NON-NLS-1$
+				else
+					this.df.applyPattern("0"); //$NON-NLS-1$
+			}
+			else if (Math.abs(this.maxScaleValue) < 10000 && Math.abs(this.minScaleValue) < 10000) {
+				if (this.maxScaleValue - this.minScaleValue <= 0.2)
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
 			}
 			else {
-				if (delta <= 5)
-					this.df.applyPattern("0.0"); //$NON-NLS-1$
-				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
 			}
 			break;

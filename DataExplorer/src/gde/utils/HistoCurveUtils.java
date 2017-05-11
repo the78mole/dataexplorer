@@ -21,6 +21,7 @@ package gde.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -30,7 +31,6 @@ import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.Record;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
 import gde.device.IDevice;
@@ -60,11 +60,11 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 	 * @param width
 	 * @param height
 	 * @param scaleWidthSpace
-	 * @param isDrawScalesInRecordColor
+	 * @param isDrawScaleInRecordColor
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawHistoScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor,
+	public static void drawHistoScale(TrailRecord record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor,
 			boolean isDrawNumbersInRecordColor) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		int numberTicks = 10, miniticks = 5;
@@ -87,11 +87,17 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 			yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 			yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			if (device != null) { // adapt to device specific range
-				yMinValueDisplay = device.translateValue(record, yMinValue);
-				yMaxValueDisplay = device.translateValue(record, yMaxValue);
+				if (!record.isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
+					; // in case of an empty record leave the values unchanged
+				else {
+					yMinValueDisplay = device.translateValue(record, yMinValue);
+					yMaxValueDisplay = device.translateValue(record, yMaxValue);
+				}
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (device != null && (Math.abs(yMaxValue - yMinValue) < .0001)) { // equal value disturbs the scaling algorithm
 				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
@@ -105,6 +111,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 				yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 				yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (record.isStartpointZero()) {
 				// check if the main part of the curve is on positive side
@@ -117,6 +124,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 					yMaxValue = yMaxValueDisplay - record.getOffset();
 				}
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		record.setMinScaleValue(yMinValueDisplay);
