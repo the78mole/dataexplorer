@@ -64,7 +64,7 @@ public class HistoSelectorComposite extends Composite {
 	private final static String			$CLASS_NAME							= HistoSelectorComposite.class.getName();
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
-	private final static int				textExtentFactor				= 8;
+	private final static int				textExtentFactor				= 6;
 
 	private final DataExplorer			application							= DataExplorer.getInstance();
 	private final HistoSet					histoSet								= HistoSet.getInstance();
@@ -235,7 +235,7 @@ public class HistoSelectorComposite extends Composite {
 				TrailRecord record = (TrailRecord) recordSet.getDisplayRecords().get(i);
 				textSize = record.getName().length() * textExtentFactor;
 				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
-				textSize2 = (record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10)) * (textExtentFactor - 2);
+				textSize2 = (int) (record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10) * textExtentFactor * 15 / 20.);
 				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
 				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 				if (record.isDisplayable()) {
