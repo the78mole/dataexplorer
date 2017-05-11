@@ -155,7 +155,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="100.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -163,7 +163,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="25.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -188,7 +188,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
                 <label>label_azimuth</label>
             </Measurement>
             <Measurement>
@@ -896,7 +895,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="19" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="21" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="20" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="21" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>
@@ -931,7 +930,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="100.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -939,7 +938,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="25.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -964,7 +963,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -1137,7 +1135,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <label>label_voltage EAM</label>
@@ -1147,7 +1145,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
                 <label>label_current EAM</label>
@@ -1157,7 +1155,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
                 <label>label_capacity EAM</label>
@@ -1167,7 +1165,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
                 <label>label_power EAM</label>
@@ -1363,7 +1361,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
                 <label>label_rpm EAM</label>
@@ -1707,7 +1705,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="100.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -1715,7 +1713,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="25.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -1740,7 +1738,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -1755,7 +1752,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage GAM</label>
             </Measurement>
@@ -1764,7 +1761,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_current GAM</label>
             </Measurement>
@@ -1773,7 +1770,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity GAM</label>
             </Measurement>
@@ -1782,7 +1779,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power GAM</label>
             </Measurement>
@@ -1859,7 +1856,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm GAM</label>
             </Measurement>
@@ -2139,7 +2136,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
                 <label>label_rpm EAM</label>
@@ -2439,17 +2436,15 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="10" sumTriggerText="text_trigger_motor_sum"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>climb 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count">
-                    <trigger level="1500" isGreater="true" minTimeSec="10" comment="comment_trigger_climb_def"/>
-                </statistics>
-            </Measurement>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+             </Measurement>
             <Measurement>
                 <name>climb 3</name>
                 <symbol>vh</symbol>
@@ -2472,7 +2467,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="100.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -2480,7 +2475,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="25.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -2859,7 +2854,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
             </Measurement>
@@ -3243,7 +3238,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="100.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -3251,7 +3246,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="25.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -3259,7 +3254,6 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -3276,7 +3270,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
                 <label>label_azimuth</label>
             </Measurement>
             <Measurement>
@@ -3292,7 +3285,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage GAM</label>
             </Measurement>
@@ -3301,7 +3294,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_current GAM</label>
             </Measurement>
@@ -3310,7 +3303,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity GAM</label>
             </Measurement>
@@ -3319,7 +3312,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power GAM</label>
             </Measurement>
@@ -3396,7 +3389,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm GAM</label>
             </Measurement>
@@ -3448,7 +3441,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="59" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
                 <label>label_voltage EAM</label>
@@ -3458,7 +3451,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="59" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
                 <label>label_current EAM</label>
@@ -3468,7 +3461,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
                 <label>label_capacity EAM</label>
@@ -3478,7 +3471,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
                 <label>label_power EAM</label>
@@ -3674,7 +3667,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
                 <label>label_rpm EAM</label>
@@ -4007,7 +4000,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="100.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="100.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
@@ -4015,7 +4008,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="filter_factor" value="25.0" type="Double" description="Filterfaktor - höherer Wert, stärkerer Filter"/>
+                <property name="filter_factor" value="25.0" type="Double" description="Filter factor - increase value more powerfull filter"/>
             </Measurement>
             <Measurement>
                 <name>velocity</name>
@@ -4052,7 +4045,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -4060,7 +4053,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -4076,7 +4069,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -4191,7 +4184,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="59" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
             </Measurement>
@@ -4200,7 +4193,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="59" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="20" type="Integer" />
             </Measurement>
@@ -4209,7 +4202,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
             </Measurement>
@@ -4218,7 +4211,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
             </Measurement>
@@ -4394,7 +4387,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
             </Measurement>
@@ -4403,7 +4396,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
             </Measurement>
@@ -4421,7 +4414,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
             </Measurement>
@@ -4430,7 +4423,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="22" type="Integer" />
             </Measurement>
@@ -4439,7 +4432,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
             </Measurement>
