@@ -24,26 +24,26 @@ import java.util.logging.Logger;
 import gde.utils.ObjectKeyScanner;
 
 public class TestObjectKeyScanner extends TestSuperClass {
-	Logger	logger = Logger.getLogger("gde.utils.ObjectKeyScanner");
+	Logger logger = Logger.getLogger("gde.utils.ObjectKeyScanner");
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();		
-    this.logger.setLevel(Level.FINER);
-    this.logger.setUseParentHandlers(true);
-    
-    this.setDataPath();
-    //System.out.println("this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
+		super.setUp();
+		this.logger.setLevel(Level.FINER);
+		this.logger.setUseParentHandlers(true);
+
+		this.setDataPath();
+		//System.out.println("this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
 	}
-	
+
 	public final void testFindAllObjectKeysAndCreateLinks() {
-		ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
-		objLnkSearch.setSearchForKeys(true);
+		ObjectKeyScanner objLnkSearch = new ObjectKeyScanner(false);
+		//		objLnkSearch.setSearchForKeys();
 		objLnkSearch.start();
-		while(objLnkSearch.isAlive()) {
+		while (objLnkSearch.isAlive()) {
 			try {
 				Thread.sleep(1000);
 			}
@@ -52,11 +52,11 @@ public class TestObjectKeyScanner extends TestSuperClass {
 			}
 		}
 	}
-	
+
 	public final void testCreateLinksForObjectKey() {
 		ObjectKeyScanner objLnkCrt = new ObjectKeyScanner("ASW-27");
 		objLnkCrt.start();
-		while(objLnkCrt.isAlive()) {
+		while (objLnkCrt.isAlive()) {
 			try {
 				Thread.sleep(1000);
 			}

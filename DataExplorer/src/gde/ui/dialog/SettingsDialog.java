@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -1725,26 +1724,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "scanObjectKeysButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
-										objLnkSearch.setSearchForKeys(true);
-										objLnkSearch.start();
-										new Thread() {
-											@Override
-											public void run() {
-												while (objLnkSearch.isAlive()) {
-													try {
-														Thread.sleep(1000);
-													}
-													catch (InterruptedException e) {
-														// ignore
-													}
-												}
-												if (getParent().isDisposed())
-													SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0034));
-												else
-													SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.GDE_MSGI0034));
-											}
-										}.start();
+										rebuildObjectKeysAsync();
 									}
 								});
 							}
@@ -1798,11 +1778,9 @@ public class SettingsDialog extends Dialog {
 										List<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
 										if (objectCandidates.size() > 0) {
 											Collections.sort(objectCandidates);
-											String message = Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() });
-											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(message)) {
+											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() }))) {
 												// build a new object list consisting from existing objects and new objects
-												Set<String> objectListClone = new HashSet<String>(Arrays.asList(SettingsDialog.this.settings.getObjectList()));
-												objectListClone.remove(0); // device oriented / gerätebezogen
+												Set<String> objectListClone = SettingsDialog.this.settings.getRealObjectKeys();
 												if (objectListClone.addAll(objectCandidates)) {
 													// ensure that all objects owns a directory
 													for (String tmpObjectKey : objectCandidates) {
@@ -1813,34 +1791,14 @@ public class SettingsDialog extends Dialog {
 													SettingsDialog.this.application.setObjectList(objectListClone.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
 													log.log(Level.FINE, "object list updated and directories created for object keys : ", objectCandidates); //$NON-NLS-1$
 												}
-												// scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list  
-												final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
-												objLnkSearch.setSearchForKeys(true);
-												objLnkSearch.setAddToExistentKeys(true);
-												objLnkSearch.start();
-												new Thread() {
-													@Override
-													public void run() {
-														while (objLnkSearch.isAlive()) {
-															try {
-																Thread.sleep(1000);
-															}
-															catch (InterruptedException e) {
-																// ignore
-															}
-														}
-														if (getParent().isDisposed())
-															SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0071));
-														else
-															SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.GDE_MSGI0071));
-													}
-												}.start();
+												rebuildObjectKeysAsync();
 											}
 										}
 										else {
 											SettingsDialog.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0070));
 										}
 									}
+
 								});
 							}
 						}
@@ -2481,4 +2439,45 @@ public class SettingsDialog extends Dialog {
 			}
 		}
 	}
+
+	/**
+	 * Scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list.
+	 * Identify object keys with empty directories or without directories and query the user for deletion.  
+	 */
+	private void rebuildObjectKeysAsync() {
+		// scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list  
+		final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner(true);
+		objLnkSearch.start();
+		new Thread() {
+			@Override
+			public void run() {
+				while (objLnkSearch.isAlive()) {
+					try {
+						Thread.sleep(1000);
+					}
+					catch (InterruptedException e) {
+						// ignore
+					}
+				}
+				if (objLnkSearch.getObsoleteObjectKeys() != null && !objLnkSearch.getObsoleteObjectKeys().isEmpty()) {
+					Collections.sort(objLnkSearch.getObsoleteObjectKeys());
+					String message = Messages.getString(MessageIds.GDE_MSGI0063, new Object[] { objLnkSearch.getObsoleteObjectKeys() });
+					if (SWT.YES == SettingsDialog.this.application.openYesNoMessageDialogSync(message)) {
+						Set<String> realObjectKeys= Settings.getInstance().getRealObjectKeys();
+						for (String tmpObjectKey : objLnkSearch.getObsoleteObjectKeys()) {
+							Path objectKeyDirPath = Paths.get(SettingsDialog.this.settings.getDataFilePath()).resolve(tmpObjectKey);
+							FileUtils.deleteDirectory(objectKeyDirPath.toString());
+							realObjectKeys.remove(objectKeyDirPath.getFileName().toString());
+						}
+						SettingsDialog.this.application.setObjectList(realObjectKeys.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
+					}
+				}
+				else if (getParent().isDisposed()) 
+					SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0034));
+				else
+					SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.GDE_MSGI0034));
+			}
+		}.start();
+	}
+
 }

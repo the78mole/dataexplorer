@@ -503,14 +503,14 @@ public class Settings extends Properties {
 					for (String plugin : plugins) {
 						if (existCheck) {
 							if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
-								FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+								FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
 						}
 						else {
-							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
 						}
 					}
 				}
-			} 
+			}
 		}
 		File path = new File(this.getApplHomePath() + "/Mapping/"); //$NON-NLS-1$
 		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
@@ -871,7 +871,7 @@ public class Settings extends Properties {
 
 	/**
 	 * Scan the sub-directories in the data file and import file paths.
-	 * @return all sub-directories which neither represent devices nor objects
+	 * @return all non-empty sub-directories which neither represent devices nor objects
 	 */
 	public List<String> getObjectKeyCandidates() {
 		Set<String> result = new HashSet<String>();
@@ -905,21 +905,22 @@ public class Settings extends Properties {
 				dirPaths.add(path);
 			}
 		}
-		final List<String> actualObjects = Arrays.asList(getObjectList());
+		final Set<String> actualObjects = getRealObjectKeys();
 		final TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
 		for (Path dirPath : dirPaths) {
 			if (!(dirPath == null || dirPath.toString().isEmpty())) {
-				List<File> directories = new ArrayList<File>();
 				try {
-					directories = FileUtils.getDirectories(dirPath.toFile());
+					final File filePath = dirPath.toFile();
+					for (File file : FileUtils.getDirectories(filePath)) {
+						if (!actualConfigurations.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
+							if (!FileUtils.getFileListing(file, Integer.MAX_VALUE).isEmpty()) {
+								result.add(file.getName());
+							}
+						}
+					}
 				}
 				catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				for (File file : directories) {
-					if (!actualConfigurations.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
-						result.add(file.getName());
-					}
+					log.log(Level.WARNING, e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -934,6 +935,17 @@ public class Settings extends Properties {
 	public Optional<String> getValidatedObjectKey(String objectKeyCandidate) {
 		String key = objectKeyCandidate.trim();
 		return Arrays.stream(getObjectList()).filter(s -> s.equalsIgnoreCase(key)).findFirst();
+	}
+
+	/**
+	 * @return the cloned object keys without the deviceoriented entry
+	 */
+	public Set<String> getRealObjectKeys() {
+		String[] objectKeys = this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200)).split(GDE.STRING_SEMICOLON);
+		Set<String> objectList = new HashSet<>(Arrays.asList(objectKeys));
+		String deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
+		objectList.remove(deviceOriented);
+		return objectList;
 	}
 
 	public String getObjectListAsString() {
