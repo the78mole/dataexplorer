@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -211,7 +212,7 @@ public class ObjectKeyScanner extends Thread {
 					final String deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 					Set<String> newObjectList = Settings.getInstance().getRealObjectKeys();
 					newObjectList.remove(deviceOriented);
-					if (newObjectList.addAll(this.objectKeys)) {
+					if (newObjectList.addAll(this.objectKeys) || !newObjectList.equals(new HashSet<>(this.objectKeys))) {
 						DataExplorer.getInstance().setObjectList(newObjectList.toArray(new String[0]), this.settings.getActiveObject());
 						log.log(Level.FINE, "object list updated: ", newObjectList); //$NON-NLS-1$
 					}
