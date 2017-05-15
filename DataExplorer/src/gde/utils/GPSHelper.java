@@ -235,7 +235,6 @@ public class GPSHelper {
 			Record recordLatitude = recordSet.get(recordOrdinalLatitude);
 			Record recordLongitude = recordSet.get(recordOrdinalLongitude);
 			Record recordAlitude = recordSet.get(recordOrdinalAltitude);
-			Record recordDistance = recordSet.get(recordOrdinalDistance);
 			int recordSize = recordLatitude.realSize();
 
 			if (recordSize >= 3 && recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData()) {
@@ -247,7 +246,7 @@ public class GPSHelper {
 				int indexGPS = 0;
 				int i = 0;
 				for (; i < recordSize; ++i) {
-					if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+					if (recordLatitude.get(i) != 0 || recordLongitude.get(i) != 0) {
 						indexGPS = i;
 						++i;
 						break;
@@ -264,52 +263,55 @@ public class GPSHelper {
 				double phi_A_rad = phi_start_rad;
 				double lambda_A = lambda_start;
 				
-				int indexMovement = 0;
-				
 				for (; i < recordSize; ++i) {
-					double phi_B_rad = device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0) * rad;
-					double lambda_B = device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0);
+					if (recordLatitude.get(i) != 0 || recordLongitude.get(i) != 0) {
+						double phi_B_rad = device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0) * rad;
+						double lambda_B = device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0);
 
-					double prod_start = (Math.sin(phi_start_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_start_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_start) * rad));
-					prod_start = prod_start > 1.0 ? 1.0 : prod_start < -1.0 ? -1.0 : prod_start;
+						double prod_start = (Math.sin(phi_start_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_start_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_start) * rad));
+						prod_start = prod_start > 1.0 ? 1.0 : prod_start < -1.0 ? -1.0 : prod_start;
 
-					double zeta_start_rad = Math.acos(prod_start);
-					zeta_start_rad = zeta_start_rad <= 0.0 ? 0.0 : zeta_start_rad >= Math.PI ? Math.PI : zeta_start_rad;
-					double zeta_start = zeta_start_rad / rad;
+						double zeta_start_rad = Math.acos(prod_start);
+						zeta_start_rad = zeta_start_rad <= 0.0 ? 0.0 : zeta_start_rad >= Math.PI ? Math.PI : zeta_start_rad;
+						double zeta_start = zeta_start_rad / rad;
 
-					double prod = (Math.sin(phi_A_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_A_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_A) * rad));
-					prod = prod > 1.0 ? 1.0 : prod < -1.0 ? -1.0 : prod;
+						double prod = (Math.sin(phi_A_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_A_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_A) * rad));
+						prod = prod > 1.0 ? 1.0 : prod < -1.0 ? -1.0 : prod;
 
-					double zeta_rad = Math.acos(prod);
-					zeta_rad = zeta_rad <= 0.0 ? 0.0 : zeta_rad >= Math.PI ? Math.PI : zeta_rad;
-					double zeta = zeta_rad / rad;
+						double zeta_rad = Math.acos(prod);
+						zeta_rad = zeta_rad <= 0.0 ? 0.0 : zeta_rad >= Math.PI ? Math.PI : zeta_rad;
+						double zeta = zeta_rad / rad;
 
-					double powDeltaHeight = Math.pow((recordAlitude.get(i - 1) - recordAlitude.get(i)) / 1000.0, 2);
-					double powOrthodrome = Math.pow((zeta * (40041000.0 / 360.0)), 2);
-					double deltaTrip = Math.sqrt(powOrthodrome + powDeltaHeight);
-					recordTripLength.add((int) (lastTripLength + deltaTrip));//[km}];
+						double powDeltaHeight = Math.pow((recordAlitude.get(i - 1) - recordAlitude.get(i)) / 1000.0, 2);
+						double powOrthodrome = Math.pow((zeta * (40041000.0 / 360.0)), 2);
+						double deltaTrip = Math.sqrt(powOrthodrome + powDeltaHeight);
+						recordTripLength.add((int) (lastTripLength + deltaTrip));//[km}];
 
-					powDeltaHeight = Math.pow((recordAlitude.get(i) - startAltitude) / 1000.0, 2); // alternatively the relative altitude could be used here
-					powOrthodrome = Math.pow(((zeta_start * 40041000 / 360)), 2);
+						//powDeltaHeight = Math.pow((recordAlitude.get(i) - startAltitude) / 1000.0, 2); // alternatively the relative altitude could be used here
+						//powOrthodrome = Math.pow(((zeta_start * 40041000 / 360)), 2);
 
-					double prod_alpha_start = zeta_start <= 0.0 ? -1.0 : zeta_start >= Math.PI ? Math.PI : (Math.sin(phi_B_rad) - (Math.sin(phi_start_rad) * Math.cos(zeta_start_rad)))
-							/ (Math.cos(phi_start_rad) * Math.sin(zeta_start_rad));
-					double alpha_start = Math.acos(prod_alpha_start < -1.0 ? -1.0 : prod_alpha_start > 1.0 ? 1.0 : prod_alpha_start) / rad;
-					alpha_start = startLongitude > recordLongitude.get(i) ? 360.0 - alpha_start : alpha_start;
+						double prod_alpha_start = zeta_start <= 0.0 ? -1.0
+								: zeta_start >= Math.PI ? Math.PI : (Math.sin(phi_B_rad) - (Math.sin(phi_start_rad) * Math.cos(zeta_start_rad))) / (Math.cos(phi_start_rad) * Math.sin(zeta_start_rad));
+						double alpha_start = Math.acos(prod_alpha_start < -1.0 ? -1.0 : prod_alpha_start > 1.0 ? 1.0 : prod_alpha_start) / rad;
+						alpha_start = startLongitude > recordLongitude.get(i) ? 360.0 - alpha_start : alpha_start;
 
-					double prod_alpha = zeta_rad <= 0.0 ? -1.0 : zeta_rad >= Math.PI ? Math.PI : (Math.sin(phi_B_rad) - (Math.sin(phi_A_rad) * Math.cos(zeta_rad))) / (Math.cos(phi_A_rad) * Math.sin(zeta_rad));
-					double alpha = Math.acos(prod_alpha < -1.0 ? -1.0 : prod_alpha > 1.0 ? 1.0 : prod_alpha) / rad;
-					alpha = lastLongitude > recordLongitude.get(i) ? 360.0 - alpha : alpha;
+						double prod_alpha = zeta_rad <= 0.0 ? -1.0
+								: zeta_rad >= Math.PI ? Math.PI : (Math.sin(phi_B_rad) - (Math.sin(phi_A_rad) * Math.cos(zeta_rad))) / (Math.cos(phi_A_rad) * Math.sin(zeta_rad));
+						double alpha = Math.acos(prod_alpha < -1.0 ? -1.0 : prod_alpha > 1.0 ? 1.0 : prod_alpha) / rad;
+						alpha = lastLongitude > recordLongitude.get(i) ? 360.0 - alpha : alpha;
 
-					lastLongitude = recordLongitude.get(i);
+						lastLongitude = recordLongitude.get(i);
 
-					phi_A_rad = phi_B_rad;
-					lambda_A = lambda_B;
+						phi_A_rad = phi_B_rad;
+						lambda_A = lambda_B;
 
-					lastTripLength = lastTripLength + deltaTrip;
-					
-					if (indexMovement == 0 && recordDistance.get(i) > 1500) 
-						indexMovement = i;
+						lastTripLength = lastTripLength + deltaTrip;
+					} 
+					else {
+						if (log.isLoggable(Level.FINE)) 
+							log.log(Level.FINE, String.format("%d - %s", i, recordSet.getName(), recordLatitude, recordLongitude));					
+						recordTripLength.add((int)lastTripLength); // keep previous point
+					}
 				}
 				for (int j = recordTripLength.realSize(); j < recordSize; j++) {
 					recordTripLength.add(recordTripLength.get(recordTripLength.realSize()-1));
