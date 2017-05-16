@@ -103,7 +103,8 @@ public class GathererThread extends Thread {
 		String m_unit = "", old_unit = ""; //$NON-NLS-1$ //$NON-NLS-2$
 
 		this.isCollectDataStopped = false;
-		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE))
+			log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 		this.application.setStatusMessage(""); //$NON-NLS-1$
 
 		try {
@@ -121,7 +122,8 @@ public class GathererThread extends Thread {
 				this.device.getMeasurementInfo(dataBuffer, configData);
 				m_unit = configData.get(UniTrend.INPUT_UNIT);
 				String processName = this.device.getMode(dataBuffer);
-				GathererThread.log.log(Level.FINE, "unit = " + m_unit + " mode = " + processName); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, "unit = " + m_unit + " mode = " + processName); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (m_unit.length() > 0) {
 					// check if a record set matching for re-use is available and prepare a new if required
@@ -132,7 +134,8 @@ public class GathererThread extends Thread {
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), this.channel.getNumber(), true, false, true));
 						this.channel.applyTemplateBasics(this.recordSetKey);
-						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE))
+							log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setAllDisplayable();
@@ -162,13 +165,14 @@ public class GathererThread extends Thread {
 							recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
 
 							delayTime = lastTimeStamp == 0 ? 0 : (tmpCycleTime - startCycleTime) - (measurementCount++ * this.cycleTime_ms);
-							GathererThread.log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME,
+							if (log.isLoggable(Level.TIME))
+								log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME,
 									"deltaTime = " + (lastTimeStamp == 0 ? 0 : ((tmpCycleTime - startCycleTime) / (measurementCount - 1))) + ", delayTime = " + delayTime);
 							lastTimeStamp = tmpCycleTime - delayTime;
 						}
 					}
 					else {
-						recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
+							recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
 					}
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -198,7 +202,8 @@ public class GathererThread extends Thread {
 			}
 		}
 		configData.clear();
-		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE))
+			log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
 	/**

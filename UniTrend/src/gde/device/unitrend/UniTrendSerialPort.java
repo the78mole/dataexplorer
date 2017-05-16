@@ -6,10 +6,13 @@ import java.util.logging.Logger;
 import gde.comm.DeviceCommPort;
 import gde.device.IDevice;
 import gde.device.InputTypes;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * Sample serial port implementation, used as template for new device implementations
@@ -57,34 +60,65 @@ public class UniTrendSerialPort extends DeviceCommPort {
 			}
 
 			answer = this.read(answer, 5000);
-			if (UniTrendSerialPort.log.isLoggable(java.util.logging.Level.FINER)) UniTrendSerialPort.log.log(java.util.logging.Level.FINER, StringHelper.byte2Hex4CharString(answer, answer.length));
+			if (log.isLoggable(Level.FINER)) 
+				log.log(Level.FINER, StringHelper.byte2Hex4CharString(answer, answer.length));
 			// synchronize received data to begin of sent data
 			while ((answer[this.dataLength - 1] & 0xFF) != this.endByte && (answer[this.dataLength - 2] & 0xFF) != this.endByte_1) {
 				this.isInSync = false;
+				log.log(Level.WARNING, "Answer needs synchronization, does not end with CRLF");
+				log.log(Level.WARNING, StringHelper.byte2Hex4CharString(answer, answer.length));
+
 				for (int i = 1; i < answer.length; i++) {
 					if ((answer[i] & 0xFF) == this.endByte && (answer[i - 1] & 0xFF) == this.endByte_1) {
+						log.log(Level.WARNING, String.format("CRLF found at position %d", i));
 						System.arraycopy(answer, i + 1, data, 0, this.dataLength - 1 - i);
 						answer = new byte[i + 1];
 						answer = this.read(answer, 3000);
+						log.log(Level.WARNING, "Reading missing bytes to get in sync");
+						log.log(Level.WARNING, StringHelper.byte2Hex4CharString(answer, answer.length));
 						System.arraycopy(answer, 0, data, this.dataLength - 1 - i, i + 1);
 						this.isInSync = true;
-						UniTrendSerialPort.log.logp(java.util.logging.Level.FINE, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						log.logp(Level.WARNING, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
-				if (this.isInSync) break;
-				answer = new byte[this.dataLength];
-				answer = this.read(answer, 3000);
-				if (UniTrendSerialPort.log.isLoggable(java.util.logging.Level.FINER)) UniTrendSerialPort.log.log(java.util.logging.Level.FINER, StringHelper.byte2Hex4CharString(answer, answer.length));
+				//check special case 0A 31.....30 0D || 00 31.....30 0D
+				if ((answer[0] & 0xFF) == this.endByte || (answer[answer.length - 1] & 0xFF) == this.endByte_1) { 
+					log.log(Level.WARNING, "LF found at position 0");
+					System.arraycopy(answer, 1, data, 0, this.dataLength - 2);
+					answer = new byte[1];
+					answer = this.read(answer, 3000);
+					log.log(Level.WARNING, "Reading missing byte to get in sync");
+					log.log(Level.WARNING, StringHelper.byte2Hex4CharString(answer, answer.length));
+					data[this.dataLength - 1] = answer[0];
+					this.isInSync = true;
+					log.logp(Level.WARNING, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+					log.log(Level.WARNING, StringHelper.byte2Hex4CharString(data, data.length));
+				}
+				
+				if (this.isInSync)  {
+					//read fresh data again
+					answer = new byte[this.dataLength];
+					answer = this.read(answer, 3000);
+					if (log.isLoggable(Level.FINER)) 
+						log.log(java.util.logging.Level.FINER, StringHelper.byte2Hex4CharString(answer, answer.length));
+					break;
+				}
+//				else {
+//					this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { "SerialPortException", "synchronization" }));
+//					throw new SerialPortException("Check serial port, data can not get in sync!");
+//				}
 			}
 			if ((answer[this.dataLength - 1] & 0xFF) != this.endByte && (answer[this.dataLength - 2] & 0xFF) != this.endByte_1) {
-				UniTrendSerialPort.log.logp(java.util.logging.Level.WARNING, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> data end does not match, number of errors = " + this.getXferErrors());
+				log.logp(Level.WARNING, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> data end does not match, number of errors = " + this.getXferErrors());
 				this.addXferError();
 				if (this.getXferErrors() > 0 && this.getXferErrors() % UniTrendSerialPort.xferErrorLimit == 0) {
-					UniTrendSerialPort.log.logp(java.util.logging.Level.WARNING, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME,
+					log.logp(Level.WARNING, UniTrendSerialPort.$CLASS_NAME, $METHOD_NAME,
 							"Number of tranfer error exceed the acceptable limit! number errors = " + this.getXferErrors());
 					this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { "SerialPortException", this.getXferErrors() }));
+					throw new SerialPortException(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { "SerialPortException", this.getXferErrors() }));
 				}
+				WaitTimer.delay(1000);
 				data = getData();
 			}
 			else {
@@ -92,7 +126,7 @@ public class UniTrendSerialPort extends DeviceCommPort {
 			}
 		}
 		catch (Exception e) {
-			if (!(e instanceof TimeOutException)) UniTrendSerialPort.log.log(java.util.logging.Level.SEVERE, e.getMessage());
+			if (!(e instanceof TimeOutException)) log.log(Level.SEVERE, e.getMessage());
 			throw e;
 		}
 		finally {
