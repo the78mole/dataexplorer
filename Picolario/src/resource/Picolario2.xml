@@ -129,7 +129,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="text_trigger_motor_sum" comment="comment_trigger_current" ratioRefOrdinal="6" ratioText="text_trigger_ratio"/>
+                <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="text_trigger_motor_sum" comment="comment_trigger_current" ratioRefOrdinal="6" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <property name="do_subtract_first" value="true" type="Boolean" description="subtract first measurement value from all successors"/>
             </Measurement>
             <Measurement>

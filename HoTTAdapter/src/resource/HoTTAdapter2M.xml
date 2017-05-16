@@ -895,7 +895,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="20" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="21" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="20" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="21" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>
@@ -1670,7 +1670,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="37" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="39" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="37" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="39" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>
@@ -3203,7 +3203,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="61" sumTriggerText="text_trigger_motor_sum" ratioRefOrdinal="62" ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="61" sumTriggerText="text_trigger_motor_sum" ratioRefOrdinal="62" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>

@@ -331,7 +331,7 @@
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
-	            <statistics ratioText="text_trigger_ratio" ratioRefOrdinal="3" sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+	            <statistics ratioText="text_trigger_ratio_capacity_per_height" ratioRefOrdinal="3" sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
                 <property description="subtract first measurement value from all successors" type="Boolean" value="true" name="do_subtract_first"/>
 	        </Measurement>
 	        <Measurement>
@@ -444,7 +444,7 @@
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
-	            <statistics ratioText="text_trigger_ratio" ratioRefOrdinal="4" sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+	            <statistics ratioText="text_trigger_ratio_capacity_per_height" ratioRefOrdinal="4" sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
                 <property description="subtract first measurement value from all successors" type="Boolean" value="true" name="do_subtract_first"/>
 	        </Measurement>
 	        <Measurement>
