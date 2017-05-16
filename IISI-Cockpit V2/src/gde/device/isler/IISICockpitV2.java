@@ -264,8 +264,7 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8)
-						+ ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
+				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
 
 			if (recordSet.isTimeStepConstant())
@@ -337,16 +336,16 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
 				switch (record.getDataType()) {
 				case GPS_LATITUDE:
 				case GPS_LONGITUDE:
-					dataTableRow[index + 1] = String.format("%02.6f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 					break;
 
 				default:
+					double offset = record.getOffset(); // != 0 if curve has an defined offset
+					double reduction = record.getReduction();
+					double factor = record.getFactor(); // != 1 if a unit translation is required
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 					break;
 				}
@@ -481,7 +480,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
+				if (log.isLoggable(java.util.logging.Level.FINE))
+					log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -617,8 +617,12 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE),
-						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), //$NON-NLS-1$
+				exportFileName = new FileHandler().exportFileKMZ(
+						findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE),
+						findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE),
+						findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE),
+						additionalMeasurementOrdinal,
+						findRecordByUnit(activeRecordSet, "m/s"), //$NON-NLS-1$
 						findRecordByUnit(activeRecordSet, "km"), //$NON-NLS-1$
 						findRecordByUnit(activeRecordSet, "*"), //$NON-NLS-1$
 						true, isExportTmpDir);
@@ -629,7 +633,8 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 
 	private int findRecordByType(RecordSet recordSet, Record.DataType dataType) {
 		for (Record record : recordSet.values()) {
-			if (record.getDataType().equals(dataType)) return record.getOrdinal();
+			if (record.getDataType().equals(dataType))
+				return record.getOrdinal();
 		}
 		return -1;
 	}
@@ -659,8 +664,15 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	 */
 	public void export2KMZ3D(int type) {
 		RecordSet activeRecordSet = application.getActiveRecordSet();
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3210), findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE),
-				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"),
-				findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3210),
+				findRecordByType(activeRecordSet, Record.DataType.GPS_LONGITUDE),
+				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE),
+				findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE),
+				findRecordByUnit(activeRecordSet, "km/h"),
+				findRecordByUnit(activeRecordSet, "m/s"),
+				findRecordByUnit(activeRecordSet, "km"),
+				-1,
+				type == DeviceConfiguration.HEIGHT_RELATIVE,
+				type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 }

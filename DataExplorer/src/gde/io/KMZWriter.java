@@ -380,9 +380,11 @@ public class KMZWriter {
 						// longitude, latitude, heading, tilt, range, lineColor, lineWidth, extrude
 						positionLongitude = device.translateValue(recordLongitude, recordLongitude.realGet(i) / 1000.0);
 						positionLatitude = device.translateValue(recordLongitude, recordLatitude.realGet(i) / 1000.0);
-						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(), recordSet.getRecordSetDescription()							.replace("<", "min")
-								.replace("<", "min")
-								.replace(">", "max"), 
+						String recordSetDescription = recordSet.getRecordSetDescription();
+						recordSetDescription = recordSetDescription.contains(GDE.STRING_NEW_LINE) ? recordSetDescription.split(GDE.STRING_NEW_LINE)[0] : recordSetDescription;
+						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(),
+								recordSetDescription,
+								//recordSet.getRecordSetDescription().replace("<", "min").replace(">", "max"), 
 								dateString, new SimpleDateFormat("HH:mm:ss").format(date), 
 								dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)),
 								positionLongitude, positionLatitude, -50, 70, 1000).getBytes());
