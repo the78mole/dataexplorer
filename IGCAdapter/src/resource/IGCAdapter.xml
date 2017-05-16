@@ -32,13 +32,13 @@
 			<Measurement>
 				<name>latitude</name>
 				<symbol>B</symbol>
-				<unit>°</unit>
+				<unit>° '</unit>
 				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>longitude</name>
 				<symbol>L</symbol>
-				<unit>°</unit>
+				<unit>° '</unit>
 				<active>true</active>
 			</Measurement>
 			<Measurement>

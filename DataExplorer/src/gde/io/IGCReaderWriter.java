@@ -296,8 +296,8 @@ public class IGCReaderWriter {
 							catch (Exception e) {
 								height = values[3];
 							}
-							values[0] = latitude * 10; // 5 digits after the decimal point only
-							values[1] = longitude * 10; 
+							values[0] = latitude; // 5 digits after the decimal point only
+							values[1] = longitude; 
 							values[2] = altitude;
 							values[3] = height;
 
