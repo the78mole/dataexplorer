@@ -976,11 +976,11 @@ public class Settings extends Properties {
 		if (startsWithDeviceOriented) {
 			String[] tmpObjectKeys = new String[activeObjectList.length - 1];
 			System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
-			Arrays.sort(tmpObjectKeys, this.comparator);
+			Arrays.sort(tmpObjectKeys, String.CASE_INSENSITIVE_ORDER);
 			System.arraycopy(tmpObjectKeys, 0, activeObjectList, 1, activeObjectList.length - 1);
 		}
 		else {
-			Arrays.sort(activeObjectList, this.comparator);
+			Arrays.sort(activeObjectList, String.CASE_INSENSITIVE_ORDER);
 			String[] tmpObjectKeys = new String[activeObjectList.length + 1];
 			tmpObjectKeys[0] = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 			System.arraycopy(activeObjectList, 0, tmpObjectKeys, 1, activeObjectList.length);

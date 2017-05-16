@@ -1777,7 +1777,7 @@ public class SettingsDialog extends Dialog {
 										// find directories which might represent object keys 
 										List<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
 										if (objectCandidates.size() > 0) {
-											Collections.sort(objectCandidates);
+											Collections.sort(objectCandidates, String.CASE_INSENSITIVE_ORDER);
 											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() }))) {
 												// build a new object list consisting from existing objects and new objects
 												Set<String> objectListClone = SettingsDialog.this.settings.getRealObjectKeys();
@@ -2460,7 +2460,7 @@ public class SettingsDialog extends Dialog {
 					}
 				}
 				if (objLnkSearch.getObsoleteObjectKeys() != null && !objLnkSearch.getObsoleteObjectKeys().isEmpty()) {
-					Collections.sort(objLnkSearch.getObsoleteObjectKeys());
+					Collections.sort(objLnkSearch.getObsoleteObjectKeys(), String.CASE_INSENSITIVE_ORDER);
 					String message = Messages.getString(MessageIds.GDE_MSGI0063, new Object[] { objLnkSearch.getObsoleteObjectKeys() });
 					if (SWT.YES == SettingsDialog.this.application.openYesNoMessageDialogSync(message)) {
 						Set<String> realObjectKeys= Settings.getInstance().getRealObjectKeys();

@@ -72,7 +72,7 @@ public class HistoTableWindow extends CTabItem {
 	private final static String	$CLASS_NAME				= HistoTableWindow.class.getName();
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	private final static int		textExtentFactor	= 7;
+	private final static int		textExtentFactor	= 6;
 
 	private final HistoSet			histoSet					= HistoSet.getInstance();
 
@@ -449,12 +449,12 @@ public class HistoTableWindow extends CTabItem {
 
 		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0749);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.recordsColumn.setWidth(recordTitle.length() * textExtentFactor * 18 / 10);
+		this.recordsColumn.setWidth((int) (recordTitle.length() * textExtentFactor * 15 / 10.));
 		this.recordsColumn.setText(recordTitle);
 
 		String curveTypeHeader = Messages.getString(MessageIds.GDE_MSGT0828);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.LEFT);
-		this.recordsColumn.setWidth(curveTypeHeader.length() * textExtentFactor * 18 / 10);
+		this.recordsColumn.setWidth((int) (curveTypeHeader.length() * textExtentFactor * 15 / 10.));
 		this.recordsColumn.setText(curveTypeHeader);
 
 		// set the data columns of the new header line
@@ -464,7 +464,7 @@ public class HistoTableWindow extends CTabItem {
 			if (tableHeaderRow.length > 0) {
 				for (String headerString : tableHeaderRow) {
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-					column.setWidth(headerString.length() * textExtentFactor * 9 / 10);
+					column.setWidth((int) (headerString.length() * textExtentFactor * 21 / 20.));
 					column.setText(headerString.intern());
 				}
 			}
