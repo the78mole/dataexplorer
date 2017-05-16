@@ -701,6 +701,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 			if (menuToolBar != null) {
 				HoTTbinReader.application.setProgress(99, sThreadId);
+				device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
 
 				//write filename after import to record description

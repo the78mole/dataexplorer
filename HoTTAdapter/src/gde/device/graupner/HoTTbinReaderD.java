@@ -86,7 +86,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		Channel channel = null;
 		int channelNumber = device.getLastChannelNumber();
 		device.getMeasurementFactor(channelNumber, 12);
-		boolean isInitialSwitched = false;
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
 		HoTTbinReaderD.isGpsStartTimeSet = false;
@@ -376,14 +375,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 
 			if (menuToolBar != null) {
 				HoTTbinReader.application.setProgress(99, sThreadId);
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-					isInitialSwitched = true;
-				}
-				else {
-					device.makeInActiveDisplayable(HoTTbinReaderD.recordSet);
-				}
+				device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
 				device.updateVisibilityStatus(HoTTbinReaderD.recordSet, true);
 
 				//write filename after import to record description

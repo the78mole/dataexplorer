@@ -1255,6 +1255,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			@Override
 			public void run() {
 				try {
+					boolean isInitialSwitched = false;
 					HoTTAdapter.this.application.setPortConnected(true);
 					
 					if (filePath.getFileName().toString().length() > MIN_FILENAME_LENGTH) {
@@ -1273,10 +1274,30 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								HoTTbinReader.read(filePath.toString());
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterX.class))
 								HoTTbinReaderX.read(filePath.toString());
-							else if (HoTTAdapter.this.getClass().equals(HoTTViewer.class))
-								HoTTbinReader.read(filePath.toString());
 							else
 								throw new UnsupportedOperationException();
+
+							if (!isInitialSwitched) {
+								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class) 
+										|| HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
+									Channel receiverChannel = HoTTAdapter.this.channels.get(1);
+									HoTTbinReader.channels.switchChannel(receiverChannel.getName());									
+								}
+								else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
+									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
+									HoTTbinReader2.channels.switchChannel(activeChannel.getName());
+									activeChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
+								}
+								else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class)) {
+									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
+									HoTTbinReader.channels.switchChannel(activeChannel.getName());
+									activeChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
+								}
+								else
+									throw new UnsupportedOperationException();
+								isInitialSwitched = true;
+							}
+
 							WaitTimer.delay(500);
 						}
 						catch (Exception e) {
