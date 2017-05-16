@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2016,2017 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.tab;
@@ -142,9 +142,10 @@ public class HistoSelectorComposite extends Composite {
 						for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
 							if (tableItem.getChecked()) {
 								// avoid phantom measurements with invisible curves
-								if (HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(tableItem.getText())) {
-									HistoSelectorComposite.this.contextMenu.setMeasurement(tableItem.getText(), false);
-									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(tableItem.getText(), false);
+								final TrailRecord activeRecord = getTableItemRecord(tableItem);
+								if (HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(activeRecord.getName())) {
+									HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
+									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(activeRecord.getName(), false);
 								}
 								toggleRecordSelection(tableItem, false, false);
 							}
@@ -158,7 +159,7 @@ public class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found 
+					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found
 					HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 				}
 			});
@@ -183,11 +184,12 @@ public class HistoSelectorComposite extends Composite {
 					if (evt != null && evt.item != null) {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
-						if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
+						if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
+						final TrailRecord activeRecord = getTableItemRecord(eventItem);
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE)
-								&& HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(eventItem.getText())) {
-							HistoSelectorComposite.this.contextMenu.setMeasurement(eventItem.getText(), false);
-							HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(eventItem.getText(), false);
+								&& HistoSelectorComposite.this.histoSet.getTrailRecordSet().getRecordKeyMeasurement().equals(activeRecord.getName())) {
+							HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
+							HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(activeRecord.getName(), false);
 						}
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
@@ -252,6 +254,7 @@ public class HistoSelectorComposite extends Composite {
 					selectorCombos[i].setText(record.getTrailText());
 					selectorCombos[i].setToolTipText(!record.getLabel().isEmpty() ? record.getLabel() : Messages.getString(MessageIds.GDE_MSGT0748));
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent event) {
 							Combo combo = (Combo) event.getSource();
 							record.setTrailTextSelectedIndex(combo.getSelectionIndex());
@@ -311,7 +314,7 @@ public class HistoSelectorComposite extends Composite {
 	}
 
 	public void setRecordSelection(TrailRecord activeRecord, boolean isVisible) {
-		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()).filter(c -> c.getText().equals(activeRecord.getName())).findFirst().orElseThrow(UnsupportedOperationException::new);
+		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()).filter(c -> ((String) c.getData(DataExplorer.RECORD_NAME)).equals(activeRecord.getName())).findFirst().orElseThrow(UnsupportedOperationException::new);
 		tableItem.setChecked(isVisible);
 		if (activeRecord != null) setRecordSelection(activeRecord, isVisible, tableItem);
 	}
@@ -339,21 +342,28 @@ public class HistoSelectorComposite extends Composite {
 	/**
 	 * toggles selection state of a record
 	 * @param item table were selection need toggle state
-	 * @param isTableSelection 
+	 * @param isTableSelection
 	 * @param forceVisible
 	 * @return true if the state was actually changed
 	 */
 	private boolean toggleRecordSelection(TableItem item, boolean isTableSelection, boolean forceVisible) {
 		boolean isToggled = false;
-		String recordName = (String) item.getData(DataExplorer.RECORD_NAME);
+		TrailRecord activeRecord = getTableItemRecord(item);
 		if (!isTableSelection || item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
 			isToggled = true;
-			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selection state changed = " + recordName); //$NON-NLS-1$
+			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selection state changed = " + activeRecord.getName()); //$NON-NLS-1$
 			// get newest timestamp and newest recordSet within this entry (both collections are in descending order)
-			TrailRecord activeRecord = (TrailRecord) this.histoSet.getTrailRecordSet().getRecord(recordName);
 			if (activeRecord != null) setRecordSelection(activeRecord, isTableSelection && item.getChecked() || forceVisible, item);
 		}
-		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "isVisible= " + this.histoSet.getTrailRecordSet().getRecord(recordName).isVisible()); //$NON-NLS-1$
+		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "isVisible= " + activeRecord.isVisible()); //$NON-NLS-1$
 		return isToggled;
+	}
+
+	/**
+	 * @param item
+	 * @return the record of the record represented by the table item
+	 */
+	private TrailRecord getTableItemRecord(TableItem item) {
+		return (TrailRecord) this.histoSet.getTrailRecordSet().getRecord((String) item.getData(DataExplorer.RECORD_NAME));
 	}
 }
