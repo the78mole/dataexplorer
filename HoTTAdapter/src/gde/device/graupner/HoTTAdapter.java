@@ -1280,8 +1280,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							if (!isInitialSwitched) {
 								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class) 
 										|| HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
-									Channel receiverChannel = HoTTAdapter.this.channels.get(1);
-									HoTTbinReader.channels.switchChannel(receiverChannel.getName());									
+									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
+									HoTTbinReader.channels.switchChannel(activeChannel.getName());									
 								}
 								else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
 									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
