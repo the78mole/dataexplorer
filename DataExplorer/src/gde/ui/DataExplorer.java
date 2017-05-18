@@ -203,6 +203,7 @@ public class DataExplorer extends Composite {
 	StatusBar											statusBar;
 	int														progessPercentage									= 0;
 	boolean												isDeviceDialogModal;
+	int														tabSelectedIndex;																																						// use for identifying the last selected tab
 
 	SettingsDialog								settingsDialog;
 	HelpInfoDialog								helpDialog;
@@ -665,9 +666,15 @@ public class DataExplorer extends Composite {
 			this.displayTab.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "addSelectionListener, event=" + evt); //$NON-NLS-1$
 					CTabFolder tabFolder = (CTabFolder) evt.widget;
+					int tabPreviousIndex = DataExplorer.this.tabSelectedIndex;
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
+					DataExplorer.this.tabSelectedIndex = tabFolder.getSelectionIndex();
+					if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
+					if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
+						DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
+					}
+					
 					if (tabSelectionIndex == 0) {
 						DataExplorer.this.menuToolBar.enableScopePointsCombo(true);
 						DataExplorer.this.enableZoomMenuButtons(true);
@@ -965,7 +972,7 @@ public class DataExplorer extends Composite {
 					}
 					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
 					if (trailRecordSet != null) {
-						final int tagSize = DataExplorer.this.settings.isDisplayScores() ?  trailRecordSet.getActiveDisplayTags().size() : 0;
+						final int tagSize = DataExplorer.this.settings.isDisplayScores() ? trailRecordSet.getActiveDisplayTags().size() : 0;
 						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + tagSize);
 					}
 				}
@@ -3518,7 +3525,7 @@ public class DataExplorer extends Composite {
 			}
 		}
 	}
-	
+
 	/**
 	 * reload all resource which are language related
 	 */

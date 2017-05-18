@@ -766,7 +766,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					log.log(Level.INFO, String.format("OSD candidate found for wrong device '%-11s' in %s  %s", truss.getLogDeviceName(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber())) {
-					log.log(Level.FINE, String.format("OSD candidate for invalid channel    '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE, String.format("OSD candidate for invalid channel  %d '%-11s' in %s  %s", truss.getLogChannelNumber(), truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 					log.log(Level.FINE, String.format("OSD candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
@@ -804,8 +804,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					log.log(Level.FINE, String.format("BIN candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
-					log.log(Level.INFO,
-							String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
+					log.log(Level.INFO, String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$ 
 					isValidObject = this.settings.getFilesWithOtherObject();
 				}
 				else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
@@ -830,7 +829,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 			}
 		}
-		this.matchingTrussesCount = trusses4Paths.size();
+		this.matchingTrussesCount = this.unsuppressedTrusses.size() - invalidRecordSetsCount;
 		log.log(Level.INFO, String.format("%04d trusses taken --- %04d checked trusses --- %04d invalid trusses", trusses4Paths.size(), this.unsuppressedTrusses.size(), invalidRecordSetsCount)); //$NON-NLS-1$
 		return trusses4Paths;
 
