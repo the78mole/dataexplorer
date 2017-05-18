@@ -870,6 +870,21 @@ public interface IDevice {
 	public double reverseTranslateValue(Record record, double value);
 
 	/**
+	 * This function can be over written by a device and measurement specific algorithm.
+	 * @return the translated value for a value which represents a difference
+	 */
+	public default double translateDeltaValue(Record record, double value) {
+		double newValue = 0;
+		if (isGPSCoordinates(record)) {
+			newValue = value / 1000.0;
+		}
+		else {
+			newValue = value * record.getFactor();
+		}
+		return newValue;
+	}
+
+	/**
 	 * function to calculate values for inactive record which need to be calculated
 	 * at least an update of the graphics window should be included at the end of this method
 	 */

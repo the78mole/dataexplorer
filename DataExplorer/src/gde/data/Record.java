@@ -2351,7 +2351,7 @@ public class Record extends Vector<Integer> {
 							if (point < min) min = point;
 						}
 					}
-					sum += this.device.translateValue(this, (max - min));
+					sum += max - min;
 				}
 			}
 			return sum;

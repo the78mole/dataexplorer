@@ -1118,28 +1118,42 @@ public class HistoVault {
 								entryPoints.addPoint(TrailTypes.REAL_SD, record.getSigmaValue());
 							}
 							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1)
-									entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, record.getSumTriggeredRange());
-								else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-									entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal()));
+								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
+									if (isTriggerLevel) {
+										int deltaValue = record.getSumTriggeredRange();
+										double translatedValue = this.device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction / offset
+										entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, (int) (this.device.reverseTranslateValue(record, translatedValue) * 1000.));
+									}
+									else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+										int deltaValue = record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal());
+										double translatedValue = this.device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction / offset
+										entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, (int) (this.device.reverseTranslateValue(record, translatedValue) * 1000.));
+									}
 								}
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 									Record referencedRecord = recordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
 									StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.getLogChannelNumber(), measurementStatistics.getRatioRefOrdinal());
-									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax()))
-										// todo trigger ratio is multiplied by 1000 (per mille)
-										if (referencedStatistics.isAvg())
-										entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED, (int) Math.round(referencedRecord.getAvgValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
-										else if (referencedStatistics.isMax()) //
-											entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED,
-													(int) Math.round(referencedRecord.getMaxValue() * 1000.0 / record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal())));
+									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
+										if (referencedStatistics.isAvg()) {
+											double ratio = this.device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.)
+													/ this.device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
+											entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, (int) (this.device.reverseTranslateValue(record, ratio) * 1000.)); // multiply by 1000 -> all ratios are internally stored multiplied by thousand
+										}
+										else if (referencedStatistics.isMax()) {
+											double ratio = this.device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.)
+													/ this.device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
+											entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, (int) (this.device.reverseTranslateValue(record, ratio) * 1000.)); // multiply by 1000 -> all ratios are internally stored multiplied by thousand
+										}
+									}
 								}
 							}
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
-								entryPoints.addPoint(TrailTypes.REAL_TIME_SUM_TRIGGERED, record.getTimeSumTriggeredRange_ms());
+								int timeSum_ms = record.getTimeSumTriggeredRange_ms();
+								entryPoints.addPoint(TrailTypes.REAL_TIME_SUM_TRIGGERED, (int) this.device.reverseTranslateValue(record, timeSum_ms)); // do not multiply by 1000 -> results in seconds  
 							}
 							if (measurementStatistics.isCountByTrigger() != null) {
-								entryPoints.addPoint(TrailTypes.REAL_COUNT_TRIGGERED, record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0);
+								int countValue = record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0;
+								entryPoints.addPoint(TrailTypes.REAL_COUNT_TRIGGERED, (int) (this.device.reverseTranslateValue(record, countValue) * 1000.)); // multiply by 1000 -> all counters are internally stored multiplied by thousand
 							}
 						}
 						if (record.realSize() != 0) {

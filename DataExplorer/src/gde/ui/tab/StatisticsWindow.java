@@ -67,49 +67,49 @@ import gde.utils.TimeLine;
  * class to represent statistics data according configuration in device properties XML file
  */
 public class StatisticsWindow extends CTabItem {
-	final static Logger						log						= Logger.getLogger(StatisticsWindow.class.getName());
+	final static Logger			log													= Logger.getLogger(StatisticsWindow.class.getName());
 
-	static final String	DELIMITER	= "!"; //$NON-NLS-1$
-	static final String	NO_VALUE	= "    ---    "; //$NON-NLS-1$
+	static final String			DELIMITER										= "!";																								//$NON-NLS-1$
+	static final String			NO_VALUE										= "    ---    ";																			//$NON-NLS-1$
 
-	Composite											composite;
-	Composite											filler;
-	Group													descriptionGroup;
-	Text													descriptionTextLabel;
-	CLabel												minLabel;
-	CLabel												maxLabel;
-	CLabel												avgLabel;
-	Table													dataTable;
-	TableColumn										measurementTableColumn;
-	TableColumn										unitTableColumn;
-	TableColumn										sigmaTableColumn;
-	TableColumn										customTableColumn;
-	int														customTableColumnWidth = 0;
-	CLabel												sigmaLabel;
-	CLabel												extraLabel;
-	TableColumn										avgTableColumn;
-	TableColumn										maxTableColumn;
-	TableColumn										minTableColumn;
-	
-	Menu													popupmenu;
-	TabAreaContextMenu						contextMenu;
-	Color													innerAreaBackground;
-	Color													surroundingBackground;
+	Composite								composite;
+	Composite								filler;
+	Group										descriptionGroup;
+	Text										descriptionTextLabel;
+	CLabel									minLabel;
+	CLabel									maxLabel;
+	CLabel									avgLabel;
+	Table										dataTable;
+	TableColumn							measurementTableColumn;
+	TableColumn							unitTableColumn;
+	TableColumn							sigmaTableColumn;
+	TableColumn							customTableColumn;
+	int											customTableColumnWidth			= 0;
+	CLabel									sigmaLabel;
+	CLabel									extraLabel;
+	TableColumn							avgTableColumn;
+	TableColumn							maxTableColumn;
+	TableColumn							minTableColumn;
+
+	Menu										popupmenu;
+	TabAreaContextMenu			contextMenu;
+	Color										innerAreaBackground;
+	Color										surroundingBackground;
 
 	// internal display variables
-	String descriptionText = ""; //$NON-NLS-1$
-	Vector<String> tabelItemText = new Vector<String>();
+	String									descriptionText							= "";																									//$NON-NLS-1$
+	Vector<String>					tabelItemText								= new Vector<String>();
 
-	final boolean									isWindows = System.getProperty("os.name").startsWith("Windows");
-	final int											extentFactor	= 8;																									// factor to calculate column width
-	RecordSet											oldRecordSet	= null;
-	int														oldNumberDisplayableRecords = 0;
-	final DataExplorer						application;
-	final Channels								channels;
-	final Settings								settings;
-	final CTabFolder							tabFolder;
+	final boolean						isWindows										= System.getProperty("os.name").startsWith("Windows");
+	final int								extentFactor								= 8;																									// factor to calculate column width
+	RecordSet								oldRecordSet								= null;
+	int											oldNumberDisplayableRecords	= 0;
+	final DataExplorer			application;
+	final Channels					channels;
+	final Settings					settings;
+	final CTabFolder				tabFolder;
 
-	final DeviceXmlResource				xmlResource		= DeviceXmlResource.getInstance();
+	final DeviceXmlResource	xmlResource									= DeviceXmlResource.getInstance();
 
 	public StatisticsWindow(CTabFolder currentDisplayTab, int style) {
 		super(currentDisplayTab, style);
@@ -118,9 +118,9 @@ public class StatisticsWindow extends CTabItem {
 		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0350));
-		
+
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
 		this.innerAreaBackground = this.settings.getStatisticsInnerAreaBackground();
@@ -133,7 +133,7 @@ public class StatisticsWindow extends CTabItem {
 			this.setControl(this.composite);
 			this.composite.setLayout(null);
 			this.composite.setBackground(this.surroundingBackground);
-			this.composite.setMenu(this.popupmenu);			
+			this.composite.setMenu(this.popupmenu);
 			this.composite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
@@ -143,10 +143,11 @@ public class StatisticsWindow extends CTabItem {
 			this.composite.addControlListener(new ControlListener() {
 				public void controlResized(ControlEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
-					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
-					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
+					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width - 20, 110);
+					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width - 15, StatisticsWindow.this.descriptionGroup.getClientArea().height - 10);
 					adaptTableSize();
 				}
+
 				public void controlMoved(ControlEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
@@ -158,7 +159,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0351));
 				if (!GDE.IS_MAC) this.descriptionGroup.setBackground(this.innerAreaBackground);
-				this.descriptionGroup.setMenu(this.popupmenu);			
+				this.descriptionGroup.setMenu(this.popupmenu);
 				this.descriptionGroup.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
@@ -174,14 +175,14 @@ public class StatisticsWindow extends CTabItem {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null) {
 								String tmpDescriptionText = StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
-									+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
-								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
+										+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
+								if (StatisticsWindow.this.descriptionTextLabel != null && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
 							}
 							else {
 								String tmpDescriptionText = GDE.STRING_EMPTY;
-								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
+								if (StatisticsWindow.this.descriptionTextLabel != null && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
 							}
@@ -196,7 +197,7 @@ public class StatisticsWindow extends CTabItem {
 					if (!GDE.IS_MAC)	this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
 					else							this.descriptionTextLabel.setBounds(5, 3,   this.descriptionGroup.getClientArea().width-10, this.descriptionGroup.getClientArea().height-10);
 					this.descriptionTextLabel.setEditable(false);
-					this.descriptionTextLabel.setMenu(this.popupmenu);			
+					this.descriptionTextLabel.setMenu(this.popupmenu);
 				}
 			}
 			{
@@ -206,7 +207,7 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				this.dataTable.setBackground(this.innerAreaBackground);
-				this.dataTable.setMenu(this.popupmenu);			
+				this.dataTable.setMenu(this.popupmenu);
 				this.dataTable.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
@@ -263,7 +264,7 @@ public class StatisticsWindow extends CTabItem {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * update statistics window display data
 	 */
@@ -276,7 +277,7 @@ public class StatisticsWindow extends CTabItem {
 			if (activeRecordSet != null && !activeRecordSet.isZoomMode() && activeRecordSet.getRecordDataSize(true) > 0 && (forceUpdate || !activeRecordSet.equals(oldRecordSet))) {
 				// cleanup old data table
 				this.dataTable.removeAll();
-				
+
 				this.customTableColumnWidth = 0;
 				try {
 					String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
@@ -312,7 +313,7 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMin()) {
 								if (isTriggerLevel)
-									sb.append(record.getFormattedStatisticsValue( record.getMinValueTriggered() / 1000.0));
+									sb.append(record.getFormattedStatisticsValue(record.getMinValueTriggered() / 1000.0));
 								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
@@ -324,10 +325,10 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isAvg())
 								if (isTriggerLevel)
-									sb.append(formatOutput(record.getFormattedStatisticsValue( record.getAvgValueTriggered() / 1000.0)));
+									sb.append(formatOutput(record.getFormattedStatisticsValue(record.getAvgValueTriggered() / 1000.0)));
 								else
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
-									else
+							else
 								sb.append(NO_VALUE);
 							sb.append(DELIMITER);
 
@@ -336,8 +337,8 @@ public class StatisticsWindow extends CTabItem {
 									sb.append(record.getFormattedStatisticsValue(record.getMaxValueTriggered() / 1000.0));
 								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
-									else
-										sb.append(NO_VALUE);
+								else
+									sb.append(NO_VALUE);
 							}
 							else
 								sb.append(NO_VALUE);
@@ -358,7 +359,7 @@ public class StatisticsWindow extends CTabItem {
 							// counted trigger events fulfilling the level and time constrains 
 							if (measurementStatistics.isCountByTrigger() != null) {
 								sb.append(xmlResource.getReplacement(measurementStatistics.getCountTriggerText())).append(" = ") //$NON-NLS-1$
-								.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append("; "); //$NON-NLS-1$
+										.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append("; "); //$NON-NLS-1$
 							}
 
 							// evaluate sum value within trigger range
@@ -366,10 +367,10 @@ public class StatisticsWindow extends CTabItem {
 								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
 									sb.append(xmlResource.getReplacement(measurementStatistics.getSumTriggerText())).append(" = "); //$NON-NLS-1$
 									if (isTriggerLevel)
-										sb.append(String.format("%.1f", device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
+										sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSumTriggeredRange() / 1000.)));
 									else {
 										if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-											sb.append(String.format("%.1f", record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
+											sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.)));
 											sb.append(" [").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 									}
@@ -384,13 +385,13 @@ public class StatisticsWindow extends CTabItem {
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
 										if (referencedStatistics.isAvg()) {
 											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)
-													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+													/ device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 										else if (referencedStatistics.isMax()) {
 											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)
-													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+													/ device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
@@ -399,9 +400,9 @@ public class StatisticsWindow extends CTabItem {
 							}
 
 							// append global comment
-							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) 
-									sb.append("(").append(xmlResource.getReplacement(measurementStatistics.getComment())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-									
+							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1)
+								sb.append("(").append(xmlResource.getReplacement(measurementStatistics.getComment())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+
 							// append trigger + comment
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
 								sb.append("(").append(String.format(xmlResource.getReplacement(measurementStatistics.getTrigger().getComment()), measurementStatistics.getTrigger().getLevel()/1000.0, measurementStatistics.getTrigger().getMinTimeSec())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
@@ -421,7 +422,7 @@ public class StatisticsWindow extends CTabItem {
 				catch (RuntimeException e) {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
-				
+
 				// set items (rows) of data table
 				TableItem row;
 				if (!this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer between header and table enties only
@@ -435,7 +436,7 @@ public class StatisticsWindow extends CTabItem {
 				}
 				this.oldRecordSet = activeRecordSet;
 			}
-			else if (activeRecordSet == null) { 
+			else if (activeRecordSet == null) {
 				if (oldRecordSet != null && this.tabelItemText.size() > 0) {
 					// cleanup old data table
 					this.dataTable.removeAll();
@@ -479,7 +480,7 @@ public class StatisticsWindow extends CTabItem {
 	 */
 	String formatOutput(String inDecimalString) {
 		String[] tmp = inDecimalString.replace('.', ';').replace(',', ';').split(";"); //$NON-NLS-1$
-		return tmp.length>1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], ".0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return tmp.length > 1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], ".0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -492,7 +493,6 @@ public class StatisticsWindow extends CTabItem {
 		// cleanup old data table
 		this.dataTable.removeAll();
 
-		
 		// set items (rows) of data table
 		TableItem row;
 		if (!this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer between header and table enties only
@@ -515,19 +515,19 @@ public class StatisticsWindow extends CTabItem {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
-		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
+		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width - 20, SWT.DEFAULT, true);
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "computed size = " + tableSize);
 		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
-		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
+		int tableHeight = tableSize.y + 150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height - 150;
 		tableHeight = tableHeight > 0 ? tableHeight : 0;
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
-		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
-		
+		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width - 20, tableHeight);
+
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
-	
+
 	/**
 	 * create statistics window content as formated string
 	 * 
@@ -565,7 +565,7 @@ public class StatisticsWindow extends CTabItem {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * create statistics window content as image
 	 * @return image with content
