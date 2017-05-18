@@ -40,7 +40,6 @@ import gde.exception.DataTypeException;
 import gde.histocache.HistoVault;
 import gde.io.DataParser;
 import gde.log.Level;
-import gde.messages.Messages;
 import gde.utils.StringHelper;
 
 /**
@@ -437,7 +436,6 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			}
 			else if (!HoTTbinReader.isTextModusSignaled) {
 				HoTTbinReader.isTextModusSignaled = true;
-				//				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 			}
 		}
 		if (doFullRead) {
@@ -775,7 +773,6 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			}
 			else if (!HoTTbinReader.isTextModusSignaled) {
 				HoTTbinReader.isTextModusSignaled = true;
-				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 			}
 		}
 		if (doFullRead) {
