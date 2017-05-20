@@ -437,7 +437,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 							&& measurementStatistics.getSumTriggerTimeText().length() > 1);
 					applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
 				}
-				// todo applicablePrimitiveTrails[TrailTypes.REAL_SUM.ordinal()] = false; // in settlements only
+				// applicablePrimitiveTrails[TrailTypes.REAL_SUM.ordinal()] = false; // in settlements only
 			}
 
 			// set non-suite trail types : triggered values like count/sum are not supported
@@ -1035,7 +1035,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @return displays yPos in pixel
 	 */
 	@Override
-	@Deprecated // todo
 	public int getVerticalDisplayPointValue(int xPos) {
 		int pointPosY = 0;
 

@@ -22,6 +22,7 @@ package gde.data;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -516,15 +517,11 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * @param timestamp_ms is a time stamp from the timestep range
-	 * @return the position of the timestep which is smaller or equal to the timestamp or -1 if not found 
+	 * @param timestamp_ms
+	 * @return the position of the timestep which is the closest to the timestamp 
 	 */
 	public int getIndex(long timestamp_ms) {
-		for (int i = 0; i < this.timeStep_ms.size(); i++) {
-			long tmpTimestep_ms = this.timeStep_ms.get(i) / 10;
-			if (tmpTimestep_ms <= timestamp_ms) return i;
-		}
-		return -1;
+		return this.timeStep_ms.getBestIndex(timestamp_ms, Comparator.reverseOrder());
 	}
 
 	/**

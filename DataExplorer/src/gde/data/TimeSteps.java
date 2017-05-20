@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -32,12 +34,12 @@ import gde.utils.LocalizedDateTime.DurationPattern;
  * @author Winfried Brügmann
  */
 public class TimeSteps extends Vector<Long> {
-	final static String	$CLASS_NAME				= RecordSet.class.getName();
-	final static long		serialVersionUID	= 26031957;
-	final static Logger	log								= Logger.getLogger(RecordSet.class.getName());
+	final static String												$CLASS_NAME				= RecordSet.class.getName();
+	final static long													serialVersionUID	= 26031957;
+	final static Logger												log								= Logger.getLogger(RecordSet.class.getName());
 
-	final boolean				isConstant;																											// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
-	long								startTimeStamp_ms	= 0;
+	final boolean															isConstant;																											// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
+	long																			startTimeStamp_ms	= 0;
 
 	/**
 	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
@@ -155,7 +157,7 @@ public class TimeSteps extends Vector<Long> {
 	 * @return the absolute time at the index position as 25 char formated string
 	 */
 	public String getFormattedTime(DateTimePattern formatPattern, int index) {
-		return String.format("%25s", LocalizedDateTime.getFormatedTime(formatPattern,  this.startTimeStamp_ms + (long) getTime_ms(index))); //$NON-NLS-1$
+		return String.format("%25s", LocalizedDateTime.getFormatedTime(formatPattern, this.startTimeStamp_ms + (long) getTime_ms(index))); //$NON-NLS-1$
 	}
 
 	/**
@@ -343,10 +345,44 @@ public class TimeSteps extends Vector<Long> {
 				for (; index < elementCount; index++) {
 					if (value <= this.get(index)) break;
 				}
+				// WBrueg the algorithm sometimes finds the next index (index+1)
+				// this might be better: if (index + 1 <= this.elementCount && value <= (this.get(index) + this.get(index - 1)) / 2) index = index - 1;
+				// ~ O(n/2) complexity compared to getBestIndex O(log n) which makes a difference of some ms elapsed time on ET's machine (this.size = 78808).
 				if (index + 1 <= this.elementCount - 1 && value > (this.get(index + 1) + this.get(index)) / 2) index = index + 1;
 			}
 		}
 		//log.log(Level.INFO, "index=" + index);
+		return index;
+	}
+
+	/**
+	 * @param time_ms
+	 * @param comparator reflects the sort order of the timesteps, e.g. Comparator.naturalOrder(),  Comparator.reverseOrder()
+	 * @return the index closest to the given time or 0 if the list is empty
+	 */
+	public synchronized int getBestIndex(double time_ms, Comparator<Long> comparator) {
+		int index = 0;
+		if (!this.isEmpty()) {
+			if (this.isConstant) {
+				if (time_ms > 0) {
+					double position = time_ms / (this.get(0) / 10.0);
+					index = (int) (position + 0.5);
+				}
+			}
+			else {
+				// determine index 
+				long value_ms = (long) (time_ms * 10.0);
+				int result = Collections.binarySearch(this, value_ms, comparator);
+				if (result >= 0)
+					index = result;
+				else {
+					index = Math.abs(result + 2);
+					// the index is now the lower bound and we want the next index if the value is beyond the mid of the distance to the next value
+					if (index < size() - 1 && comparator.compare(value_ms, (this.get(index + 1) + this.get(index)) / 2) > 0) index++;
+				}
+			}
+		}
+		// log.log(Level.INFO, "index=" + index);
 		return index;
 	}
 

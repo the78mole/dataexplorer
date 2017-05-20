@@ -590,7 +590,8 @@ public class HistoGraphicsComposite extends Composite {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
 				for (int i = 0; i < trailRecord.size(); i++) {
 					this.timestampMeasure_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
-					if ((yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms))) > Integer.MIN_VALUE) break;
+					yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
+					if (yPosMeasureNew > Integer.MIN_VALUE) break;
 				}
 			}
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
@@ -618,7 +619,8 @@ public class HistoGraphicsComposite extends Composite {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d search first non-null value", this.timestampMeasure_ms)); //$NON-NLS-1$
 				for (int i = 0; i < trailRecord.size(); i++) {
 					this.timestampMeasure_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
-					if ((yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms))) > Integer.MIN_VALUE) break;
+					yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampMeasure_ms));
+					if (yPosMeasureNew > Integer.MIN_VALUE) break;
 				}
 			}
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(this.timestampMeasure_ms);
@@ -631,7 +633,8 @@ public class HistoGraphicsComposite extends Composite {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampDelta_ms=%d search first non-null value", this.timestampDelta_ms)); //$NON-NLS-1$
 				for (int i = trailRecord.size() - 1; i >= 0; i--) {
 					this.timestampDelta_ms = trailRecordSet.getDisplayTimeStamp_ms(i);
-					if ((yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampDelta_ms))) > Integer.MIN_VALUE) break;
+					yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(this.timestampDelta_ms));
+					if (yPosDeltaNew > Integer.MIN_VALUE) break;
 				}
 			}
 			this.xPosDelta = this.timeLine.getXPosTimestamp(this.timestampDelta_ms);
@@ -1294,22 +1297,6 @@ public class HistoGraphicsComposite extends Composite {
 
 			cleanConnectingLineObsoleteRectangle();
 		}
-	}
-
-	/**
-	 * @return the index of the trail recordset item at the time of the last mouse up action or -1 in case there was no nearby item on the screen
-	 */
-	public int getMouseUpRecordSetIndex() {
-		TrailRecordSet trailRecordSet = getTrailRecordSet();
-		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0 && this.canvasImage != null) {
-			final Long timestamp_ms = this.timeLine.getSnappedTimestamp(this.xUp);
-			if (timestamp_ms == null)
-				return -1;
-			else
-				return trailRecordSet.getIndex(this.timestampMeasure_ms);
-		}
-		else
-			return -1;
 	}
 
 }
