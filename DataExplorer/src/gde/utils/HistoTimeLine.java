@@ -89,12 +89,13 @@ public class HistoTimeLine {
 		}
 	}
 
-	private TrailRecordSet					trailRecordSet;																							// this class does not utilize any specific trail recordset methods
-	private int											width;																											// number of pixels for the timescale length (includes left/right margins and the histo chart region)
-	private long										leftmostTimeStamp, rightmostTimeStamp;											// define the corners of the histo chart region
-	private TreeMap<Long, Double>		relativeTimeScale;																					// maps histoset timestamps to x-axis with range 0 to 1
-	private Density									density;																										// degree of population on the x -axis
-	private TreeMap<Long, Integer>	scalePositions	= new TreeMap<>(Collections.reverseOrder());
+	private TrailRecordSet								trailRecordSet;																									// this class does not utilize any specific trail recordset methods
+	private int														width;																													// number of pixels for the timescale length (includes left/right margins and the histo chart region)
+	private long													leftmostTimeStamp, rightmostTimeStamp;													// define the corners of the histo chart region
+	private TreeMap<Long, Double>					relativeTimeScale;																							// maps histoset timestamps to x-axis with range 0 to 1
+	private Density												density;																												// degree of population on the x -axis
+	private final TreeMap<Long, Integer>	scalePositions			= new TreeMap<>(Collections.reverseOrder());
+	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms	= null;																			// access timestamps by x axis position (naturalOrder)
 
 	/**
 	 * takes the timeline width and calculates the x-axis pixel positions for the histo timestamp values. 
@@ -409,56 +410,21 @@ public class HistoTimeLine {
 	 */
 	public Long getSnappedTimestamp(int xPos) {
 		final int xPosTolerance = 20;
-		if (this.settings.isXAxisReversed()) {
-			Entry<Long, Integer> previous = null;
-			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
-				if (previous != null && xPos < previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
-					if (xPos < previous.getValue() + xPosTolerance)
-						return previous.getKey();
-					else
-						return null; // far away on the right 
-				}
-				else if (xPos <= entry.getValue()) { // on the left 
-					if (xPos <= entry.getValue() - xPosTolerance)
-						return null; // far away on the left
-					else
-						return entry.getKey();
-				}
-				else {
-					previous = entry;
-				}
-			}
-			if (previous != null && xPos < previous.getValue() + xPosTolerance)
-				return previous.getKey();
-			else
-				return null; // far away on the right 
-		}
+		Long timeStamp_ms = null;
+
+		if (this.scaleTimeStamps_ms == null) setScaleTimeStamps_ms();
+
+		final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
+		if (xPos == lowerEntry.getKey())
+			timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
 		else {
-			Entry<Long, Integer> previous = null;
-			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
-				if (previous != null && xPos > previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
-					if (xPos > previous.getValue() - xPosTolerance)
-						return previous.getKey();
-					else
-						return null; // far away on the left 
-				}
-				else if (xPos >= entry.getValue()) {
-					if (xPos >= entry.getValue() + xPosTolerance)
-						return null; // far away on the right
-					else
-						return entry.getKey();
-				}
-				else {
-					previous = entry;
-				}
-			}
-			if (xPos > previous.getValue() - xPosTolerance)
-				return previous.getKey();
+			Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
+			if (xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2)
+				timeStamp_ms = xPos < lowerEntry.getKey() + xPosTolerance ? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) : null; // far away on the right 
 			else
-				return null; // far away on the left 
+				timeStamp_ms = xPos > ceilingEntry.getKey() - xPosTolerance ? ceilingEntry.getValue().get(0) : null;  // far away on the left
 		}
+		return timeStamp_ms;
 	}
 
 	/**
@@ -466,37 +432,47 @@ public class HistoTimeLine {
 	 * @return the time stamp of the trail recordset which is the closest one to xPos
 	 */
 	public long getAdjacentTimestamp(int xPos) {
+		long timeStamp_ms;
+
+		if (this.scaleTimeStamps_ms == null) setScaleTimeStamps_ms();
+
+		final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
+		if (xPos == lowerEntry.getKey())
+			timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
+		else {
+			final Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
+			timeStamp_ms = xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 ? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) : ceilingEntry.getValue().get(0);
+		}
+		return timeStamp_ms;
+	}
+
+	/**
+	 * Creates the map for optimized access to timestamps by x axis position. 
+	 * Is optimized for naturally ordered x positions and timestamps ordered based on the user's x axis order setting.
+	 */
+	private void setScaleTimeStamps_ms() {
+		this.scaleTimeStamps_ms = new TreeMap<Integer, List<Long>>(); // natural order
 		if (this.settings.isXAxisReversed()) {
-			Entry<Long, Integer> previous = null;
+			Entry<Integer, List<Long>> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
-				if (previous != null && xPos < previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
-					return previous.getKey();
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
+				if (previous == null || entry.getValue() != previous.getKey()) {
+					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
+					previous = this.scaleTimeStamps_ms.lastEntry();
 				}
-				else if (xPos <= entry.getValue()) { // on the left 
-					return entry.getKey();
-				}
-				else {
-					previous = entry;
-				}
+				previous.getValue().add(entry.getKey()); // results in a reverse timeStamp order (decreasing timestamps)
 			}
-			return previous.getKey();
 		}
 		else {
-			Entry<Long, Integer> previous = null;
+			Entry<Integer, List<Long>> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed 
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", xPos, entry.getValue())); //$NON-NLS-1$
-				if (previous != null && xPos > previous.getValue() + (entry.getValue() - previous.getValue()) / 2) {
-					return previous.getKey();
+				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
+				if (previous == null || entry.getValue() != previous.getKey()) {
+					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
+					previous = this.scaleTimeStamps_ms.firstEntry(); // due to decreasing x axis positions in the scalePositions map
 				}
-				else if (xPos >= entry.getValue()) {
-					return entry.getKey();
-				}
-				else {
-					previous = entry;
-				}
+				previous.getValue().add(0, entry.getKey()); // results in a natural timeStamp order
 			}
-			return previous.getKey();
 		}
 	}
 
