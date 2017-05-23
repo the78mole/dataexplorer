@@ -38,6 +38,8 @@ public class ConvertContextMenu {
 	final static Logger						log	= Logger.getLogger(ConvertContextMenu.class.getName());
 	
 	MenuItem											convert2mc32;
+	MenuItem											convert2mc28;
+	MenuItem											convert2mc26;
 	MenuItem											convert2mc20;
 	MenuItem											convert2mx20;
 	MenuItem											convert2mc16;
@@ -53,15 +55,28 @@ public class ConvertContextMenu {
 				switch (transmiterCode) {
 				case MC_32:
 					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc28.setEnabled(true);
+					ConvertContextMenu.this.convert2mc26.setEnabled(true);
+					ConvertContextMenu.this.convert2mx20.setEnabled(true);
+					ConvertContextMenu.this.convert2mc16.setEnabled(true);
+					ConvertContextMenu.this.convert2mx16.setEnabled(false);
+					ConvertContextMenu.this.convert2mx12.setEnabled(false);
+					break;
+				case MC_28:
+					ConvertContextMenu.this.convert2mc32.setEnabled(true);
+					ConvertContextMenu.this.convert2mc28.setEnabled(false);
+					ConvertContextMenu.this.convert2mc26.setEnabled(true);
 					ConvertContextMenu.this.convert2mc20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx20.setEnabled(true);
 					ConvertContextMenu.this.convert2mc16.setEnabled(true);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
 					ConvertContextMenu.this.convert2mx12.setEnabled(false);
 					break;
-				case MC_20:
+				case MC_26:
 					ConvertContextMenu.this.convert2mc32.setEnabled(true);
-					ConvertContextMenu.this.convert2mc20.setEnabled(false);
+					ConvertContextMenu.this.convert2mc28.setEnabled(true);
+					ConvertContextMenu.this.convert2mc26.setEnabled(false);
+					ConvertContextMenu.this.convert2mc20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx20.setEnabled(true);
 					ConvertContextMenu.this.convert2mc16.setEnabled(true);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
@@ -69,6 +84,8 @@ public class ConvertContextMenu {
 					break;
 				case MX_20:
 					ConvertContextMenu.this.convert2mc32.setEnabled(true);
+					ConvertContextMenu.this.convert2mc28.setEnabled(true);
+					ConvertContextMenu.this.convert2mc26.setEnabled(true);
 					ConvertContextMenu.this.convert2mc20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx20.setEnabled(false);
 					ConvertContextMenu.this.convert2mc16.setEnabled(true);
@@ -77,6 +94,8 @@ public class ConvertContextMenu {
 					break;
 				case MC_16:
 					ConvertContextMenu.this.convert2mc32.setEnabled(true);
+					ConvertContextMenu.this.convert2mc28.setEnabled(true);
+					ConvertContextMenu.this.convert2mc26.setEnabled(true);
 					ConvertContextMenu.this.convert2mc20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx20.setEnabled(true);
 					ConvertContextMenu.this.convert2mc16.setEnabled(false);
@@ -85,6 +104,8 @@ public class ConvertContextMenu {
 					break;
 				case MX_16:
 					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc28.setEnabled(false);
+					ConvertContextMenu.this.convert2mc26.setEnabled(false);
 					ConvertContextMenu.this.convert2mc20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx20.setEnabled(false);
 					ConvertContextMenu.this.convert2mc16.setEnabled(false);
@@ -93,6 +114,8 @@ public class ConvertContextMenu {
 					break;
 				case MX_12:
 					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc28.setEnabled(false);
+					ConvertContextMenu.this.convert2mc26.setEnabled(false);
 					ConvertContextMenu.this.convert2mc20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx20.setEnabled(false);
 					ConvertContextMenu.this.convert2mc16.setEnabled(false);
@@ -101,6 +124,8 @@ public class ConvertContextMenu {
 					break;
 				default:
 					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc28.setEnabled(false);
+					ConvertContextMenu.this.convert2mc26.setEnabled(false);
 					ConvertContextMenu.this.convert2mc20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
@@ -120,6 +145,22 @@ public class ConvertContextMenu {
 				public void handleEvent(Event e) {
 					ConvertContextMenu.log.log(Level.FINEST, "convert2mc32 action performed! " + e); //$NON-NLS-1$
 					Transmitter.convert2target(sourceFilePath, Transmitter.MC_32);
+				}
+			});
+			this.convert2mc28 = new MenuItem(popupMenu, SWT.NONE);
+			this.convert2mc28.setText("-> " + Transmitter.MC_28);
+			this.convert2mc28.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					ConvertContextMenu.log.log(Level.FINEST, "convert2mc28 action performed! " + e); //$NON-NLS-1$
+					Transmitter.convert2target(sourceFilePath, Transmitter.MC_28);
+				}
+			});
+			this.convert2mc26 = new MenuItem(popupMenu, SWT.NONE);
+			this.convert2mc26.setText("-> " + Transmitter.MC_26);
+			this.convert2mc26.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					ConvertContextMenu.log.log(Level.FINEST, "convert2mc26 action performed! " + e); //$NON-NLS-1$
+					Transmitter.convert2target(sourceFilePath, Transmitter.MC_26);
 				}
 			});
 			this.convert2mc20 = new MenuItem(popupMenu, SWT.NONE);

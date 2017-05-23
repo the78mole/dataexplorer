@@ -7,6 +7,7 @@ OVERVIEW:
 + enhance MC3000 & Q200 support
 + enhance VC820 & VC840 support
 + enhance History analysis to full functional beta version (pls enable in preferences)
++ add MDL converter functionality for MC-28/MC-26 from/to MC-32,MC-20,MX-20,MC-16
 
 DETAILS:
 - fix analog display of synchronized master record
