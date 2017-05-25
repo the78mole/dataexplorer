@@ -213,7 +213,8 @@ public class SelectorComposite extends Composite {
 					case SWT.Dispose:
 					case SWT.KeyDown:
 					case SWT.MouseMove: {
-						if (toolTip == null) break;
+						if (toolTip == null) 
+							break;
 						toolTip.dispose();
 						toolTip = null;
 						label = null;
@@ -225,23 +226,23 @@ public class SelectorComposite extends Composite {
 
 						if (item != null) {
 							if (toolTip != null && !toolTip.isDisposed()) toolTip.dispose();
-							toolTip = new Shell(curveSelectorTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
-							FillLayout layout = new FillLayout();
-							layout.marginWidth = 2;
-							toolTip.setLayout(layout);
 							Record record  = application.getActiveRecordSet().get(item.getText());
 							if (record != null && record.getDevice().getMeasurement(record.getParent().getChannelConfigNumber(), record.getOrdinal()).getLabel() != null) {
+								toolTip = new Shell(curveSelectorTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+								FillLayout layout = new FillLayout();
+								layout.marginWidth = 2;
+								toolTip.setLayout(layout);
 								label = new Label(toolTip, SWT.NONE);
 								label.setData("_TABLEITEM", item);
 								label.setText(record.getDevice().getMeasurementLabelReplacement(record.getParent().getChannelConfigNumber(), record.getOrdinal()));
 								label.addListener(SWT.MouseExit, labelListener);
 								label.addListener(SWT.MouseDown, labelListener);
+								Point size = toolTip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+								Rectangle rect = item.getBounds(0);
+								Point pt = curveSelectorTable.toDisplay(rect.x, rect.y);
+								toolTip.setBounds(pt.x, pt.y, size.x, size.y);
+								toolTip.setVisible(true);
 							}
-							Point size = toolTip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-							Rectangle rect = item.getBounds(0);
-							Point pt = curveSelectorTable.toDisplay(rect.x, rect.y);
-							toolTip.setBounds(pt.x, pt.y, size.x, size.y);
-							toolTip.setVisible(true);
 						}
 					}
 					}
