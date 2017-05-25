@@ -173,6 +173,8 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		int activeChannelNumber = device.channels.getActiveChannelNumber(); 
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
+		boolean isFilterEnabledPre = HoTTAdapter.isFilterEnabled;
+		HoTTAdapter.isFilterEnabled = true;
 		HoTTbinReader2.recordSet = tmpRecordSet;
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
@@ -493,6 +495,8 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		else {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead));
 		}
+
+		HoTTAdapter.isFilterEnabled = isFilterEnabledPre; //reset filter value to user set
 		return histoRandomSample;
 	}
 
@@ -517,6 +521,8 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		boolean isGAMData = false;
 		boolean isEAMData = false;
 		boolean isESCData = false;
+		boolean isFilterEnabledPre = HoTTAdapter.isFilterEnabled;
+		HoTTAdapter.isFilterEnabled = true;
 		HoTTbinReader2.isJustMigrated = false;
 		HoTTbinHistoReader2.recordSet = tmpRecordSet;
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
@@ -826,6 +832,8 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		else {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead));
 		}
+
+		HoTTAdapter.isFilterEnabled = isFilterEnabledPre; //reset filter value to user set
 		return histoRandomSample;
 	}
 
