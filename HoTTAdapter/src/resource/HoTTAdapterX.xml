@@ -63,6 +63,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
                 <name>Tx</name>

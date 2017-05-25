@@ -76,6 +76,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_tx</label>
             </Measurement>
             <Measurement>
