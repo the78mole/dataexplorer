@@ -2036,7 +2036,8 @@ public class DataExplorer extends Composite {
 			isRebuilt = this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
-				this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
+				if (this.histoSet.getTrailRecordSet() != null)
+					this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
 				updateHistoGraphicsWindow(true);
 				updateHistoTable(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
