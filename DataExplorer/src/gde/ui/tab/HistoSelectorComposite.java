@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.TableItem;
 
 import gde.GDE;
 import gde.data.HistoSet;
-import gde.data.HistoSet.RebuildStep;
 import gde.data.TrailRecord;
 import gde.data.TrailRecordSet;
 import gde.messages.MessageIds;
@@ -159,7 +158,7 @@ public class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found
+					//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found
 					HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 				}
 			});
@@ -194,7 +193,7 @@ public class HistoSelectorComposite extends Composite {
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
 						if (toggleRecordSelection(eventItem, true, false)) {
-							HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true);
+							//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true);
 							HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 						}
 					}
