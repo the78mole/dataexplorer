@@ -201,6 +201,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTAdapter.reverseChannelPackageLossCounter.clear();
 		HoTTbinHistoReader.lostPackages.clear();
 		HoTTbinHistoReader.countLostPackages = 0;
+		boolean isFilterEnabledPre = HoTTAdapter.isFilterEnabled;
+		HoTTAdapter.isFilterEnabled = true;
 		HoTTbinHistoReader.isJustParsed = false;
 		int countPackageLoss = 0;
 		HistoRandomSample histoRandomSample = null;
@@ -585,6 +587,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		else {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead)); //$NON-NLS-1$
 		}
+
+		HoTTAdapter.isFilterEnabled = isFilterEnabledPre; //reset filter value to user set
 		return histoRandomSample;
 	}
 
@@ -628,6 +632,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTAdapter.reverseChannelPackageLossCounter.clear();
 		HoTTbinHistoReader.lostPackages.clear();
 		HoTTbinHistoReader.countLostPackages = 0;
+		boolean isFilterEnabledPre = HoTTAdapter.isFilterEnabled;
+		HoTTAdapter.isFilterEnabled = true;
 		HoTTbinHistoReader.isJustParsed = false;
 		HoTTbinHistoReader.isTextModusSignaled = false;
 		// HoTTbinHistoReader.oldProtocolCount = 0;
@@ -966,6 +972,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		else {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("doFullRead=%b > ends", doFullRead)); //$NON-NLS-1$
 		}
+
+		HoTTAdapter.isFilterEnabled = isFilterEnabledPre; //reset filter value to user set
 		return histoRandomSample;
 	}
 
