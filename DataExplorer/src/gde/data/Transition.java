@@ -13,7 +13,7 @@
 
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
@@ -51,9 +51,9 @@ public class Transition {
 	/**
 	 * @param startIndex is the position where the search started after the previous transition
 	 * @param referenceSize
-	 * @param recoveryStartIndex 
+	 * @param recoveryStartIndex
 	 * @param thresholdSize
-	 * @param recoveryStartIndex is less than zero in case of missing recovery phase 
+	 * @param recoveryStartIndex is less than zero in case of missing recovery phase
 	 * @param recoverySize
 	 * @param transitionRecord
 	 * @param transitionType
@@ -112,8 +112,8 @@ public class Transition {
 		sb.append("threshold=").append(getFormatedDuration(this.thresholdStartIndex)).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
 		sb.append("thresholdStartIndex/size=").append(this.thresholdStartIndex).append(GDE.STRING_OR).append(this.thresholdSize).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
 		sb.append("isPeak=").append(isPeak()).append(GDE.STRING_COMMA_BLANK).append("isSlope=").append(isSlope()).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("referenceStartIndex/size=").append(this.startIndex).append(GDE.STRING_OR).append(this.referenceSize).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("reference=").append(getFormatedDuration(this.startIndex)); //$NON-NLS-1$
+		sb.append("referenceStartIndex/size=").append(this.referenceStartIndex).append(GDE.STRING_OR).append(this.referenceSize).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append("reference=").append(getFormatedDuration(this.referenceStartIndex)); //$NON-NLS-1$
 		if (this.recoveryStartIndex > 0) {
 			sb.append(GDE.STRING_COMMA_BLANK);
 			sb.append("recovery=").append(getFormatedDuration(this.recoveryStartIndex)).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$

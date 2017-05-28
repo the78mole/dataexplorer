@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
@@ -93,7 +93,7 @@ public class HistoSettlement extends Vector<Integer> {
 	/**
 	 * @author Thomas Eickert
 	 * performs the aggregation of translated record values.
-	 * The aggregation is based on the reference rule. 
+	 * The aggregation is based on the reference rule.
 	 * null support was not tested up to now.
 	 */
 	private class RecordGroup {
@@ -130,7 +130,7 @@ public class HistoSettlement extends Vector<Integer> {
 		/**
 		 * @param fromIndex
 		 * @param toIndex
-		 * @return the average of the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive 
+		 * @return the average of the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive
 		 */
 		public Double getRawAverage(int fromIndex, int toIndex) {
 			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
@@ -183,12 +183,12 @@ public class HistoSettlement extends Vector<Integer> {
 			Double result = 0.;
 			for (int i = 0; i < this.records.length; i++) {
 				Record record = this.records[i];
-				if (record.realRealGet(index) == null) {
+				if (record.elementAt(index) == null) {
 					result = null;
 					break;
 				}
 				else {
-					final double translatedValue = HistoSettlement.this.device.translateValue(record, record.realRealGet(index));
+					final double translatedValue = HistoSettlement.this.device.translateValue(record, record.elementAt(index));
 					result = calculateAggregate(result, i, translatedValue);
 				}
 			}
@@ -253,7 +253,7 @@ public class HistoSettlement extends Vector<Integer> {
 		/**
 		 * @param fromIndex
 		 * @param toIndex
-		 * @return the portion of the aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.) 
+		 * @return the portion of the aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
 		 */
 		public Vector<Double> getSubGrouped(int fromIndex, int toIndex) {
 			int recordSize = toIndex - fromIndex;
@@ -325,7 +325,7 @@ public class HistoSettlement extends Vector<Integer> {
 
 	/**
 	 * walks through the measurement record and calculates the difference between the threshold level value and the base level value (reference or recovery).
-	 * skips null measurement values. 
+	 * skips null measurement values.
 	 * @param recordGroup holds the measurement points
 	 * @param leveling rule for determining the level value from the device configuration
 	 * @param transition holds the transition properties which are used to access the measurement data
@@ -604,7 +604,7 @@ public class HistoSettlement extends Vector<Integer> {
 
 	/**
 	 * figure out the result value and add result value.
-	 * the timeSum and timeStep value has the unit seconds with 3 decimal places. 
+	 * the timeSum and timeStep value has the unit seconds with 3 decimal places.
 	 * @param transition
 	 */
 	private void addFigure(Transition transition) {
@@ -624,7 +624,7 @@ public class HistoSettlement extends Vector<Integer> {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
 		}
-		// add to settlement record  
+		// add to settlement record
 		add(reverseTranslatedResult);
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
@@ -645,23 +645,23 @@ public class HistoSettlement extends Vector<Integer> {
 		if (transitionAmount.getAmountType() == AmountTypes.MIN) {
 			double min = Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j < transition.thresholdEndIndex + 1; j++)
-				if (record.realRealGet(j) != null)
-					min = Math.min(min, transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.realRealGet(j))) : this.device.translateValue(record, record.realRealGet(j)));
+				if (record.elementAt(j) != null)
+					min = Math.min(min, transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.elementAt(j))) : this.device.translateValue(record, record.elementAt(j)));
 			reverseTranslatedResult = (int) reverseTranslateValue(min);
 		}
 		else if (transitionAmount.getAmountType() == AmountTypes.MAX) {
 			double max = transitionAmount.isUnsigned() ? 0. : -Double.MAX_VALUE;
 			for (int j = transition.thresholdStartIndex; j < transition.thresholdEndIndex + 1; j++)
-				if (record.realRealGet(j) != null)
-					max = Math.max(max, transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.realRealGet(j))) : this.device.translateValue(record, record.realRealGet(j)));
+				if (record.elementAt(j) != null)
+					max = Math.max(max, transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.elementAt(j))) : this.device.translateValue(record, record.elementAt(j)));
 			reverseTranslatedResult = (int) reverseTranslateValue(max);
 		}
 		else if (transitionAmount.getAmountType() == AmountTypes.AVG) {
 			double avg = 0., value = 0.;
 			int skipCount = 0;
 			for (int j = transition.thresholdStartIndex; j < transition.thresholdEndIndex + 1; j++)
-				if (record.realRealGet(j) != null) {
-					value = transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.realRealGet(j))) : this.device.translateValue(record, record.realRealGet(j));
+				if (record.elementAt(j) != null) {
+					value = transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.elementAt(j))) : this.device.translateValue(record, record.elementAt(j));
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.thresholdStartIndex - skipCount + 1);
 				}
@@ -674,8 +674,8 @@ public class HistoSettlement extends Vector<Integer> {
 			double avg = 0., q = 0., value = 0.;
 			int skipCount = 0;
 			for (int j = transition.thresholdStartIndex; j < transition.thresholdEndIndex + 1; j++)
-				if (record.realRealGet(j) != null) {
-					value = transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.realRealGet(j))) : this.device.translateValue(record, record.realRealGet(j));
+				if (record.elementAt(j) != null) {
+					value = transitionAmount.isUnsigned() ? Math.abs(this.device.translateValue(record, record.elementAt(j))) : this.device.translateValue(record, record.elementAt(j));
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.thresholdStartIndex - skipCount + 1);
 					q += deltaAvg * (value - avg);
@@ -689,7 +689,7 @@ public class HistoSettlement extends Vector<Integer> {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
 		}
-		// add to settlement record  
+		// add to settlement record
 		add(reverseTranslatedResult);
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
@@ -699,7 +699,7 @@ public class HistoSettlement extends Vector<Integer> {
 	/**
 	 * walk forward from the time step when the trigger has fired and collect the extremum values for the calculation.
 	 * add single result value.
-	 * the result value is multiplied by 1000. 
+	 * the result value is multiplied by 1000.
 	 * @param transition
 	 */
 	private void addCalculus(Transition transition) {
@@ -742,7 +742,7 @@ public class HistoSettlement extends Vector<Integer> {
 				reverseTranslatedResult = 0;
 				throw new UnsupportedOperationException();
 			}
-			// add to settlement record  
+			// add to settlement record
 			add(reverseTranslatedResult);
 			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.getName(), (int) this.parent.getTime_ms(transition.thresholdEndIndex + 1) //$NON-NLS-1$
@@ -751,7 +751,7 @@ public class HistoSettlement extends Vector<Integer> {
 	}
 
 	@Override
-	@Deprecated // use elaborated add methods for settlements 
+	@Deprecated // use elaborated add methods for settlements
 	public synchronized Integer set(int index, Integer point) {
 		return super.set(index, point);
 	}
@@ -864,7 +864,7 @@ public class HistoSettlement extends Vector<Integer> {
 
 	/**
 	 * time calculation needs always the real size of the record
-	 * @return real vector size 
+	 * @return real vector size
 	 */
 	public int realSize() {
 		return super.size();

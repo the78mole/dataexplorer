@@ -13,7 +13,7 @@
 
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.data;
@@ -52,7 +52,7 @@ import gde.utils.StringHelper;
  */
 public class HistoTransitions {
 	final static String															$CLASS_NAME	= HistoTransitions.class.getName();
-	final static Logger															log					= Logger.getLogger($CLASS_NAME);
+	final static Logger													 		log					= Logger.getLogger($CLASS_NAME);
 
 	private final DataExplorer											application	= DataExplorer.getInstance();
 	private final IDevice														device			= this.application.getActiveDevice();
@@ -75,7 +75,7 @@ public class HistoTransitions {
 
 	private enum TriggerState {
 		/**
-		 * check measurements until the reference duration is satisfied and the measurement value goes beyond the trigger threshold  
+		 * check measurements until the reference duration is satisfied and the measurement value goes beyond the trigger threshold
 		 */
 		WAITING,
 		/**
@@ -84,7 +84,7 @@ public class HistoTransitions {
 		 */
 		TRIGGERED,
 		/**
-		 * check measurements until the recovery duration is satisfied and the measurement value stays within the recovery threshold  
+		 * check measurements until the recovery duration is satisfied and the measurement value stays within the recovery threshold
 		 */
 		RECOVERING;
 	}
@@ -116,7 +116,7 @@ public class HistoTransitions {
 		/**
 		 * be sure to call initialize before using the deque.
 		 * @param numElements
-		 * @param isMinimumExtremum true if the extreme value shall determine the minimum of all values since initialize / clear 
+		 * @param isMinimumExtremum true if the extreme value shall determine the minimum of all values since initialize / clear
 		 * @param timePeriod_100ns
 		 * @param startIndex is the source record index at the initialize call
 		 */
@@ -145,9 +145,9 @@ public class HistoTransitions {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.util.ArrayDeque#addLast(java.lang.Object)
-		 * 
+		 *
 		 */
 		public void addLast(double translatedValue, long timeStamp_100ns) {
 			super.addLast(translatedValue);
@@ -183,7 +183,7 @@ public class HistoTransitions {
 
 		/**
 		 * Refreshes all properties.
-		 * Use this method after removing elements from this deque. 
+		 * Use this method after removing elements from this deque.
 		 */
 		public void reInitialize(int removedCount) {
 			if (this.isEmpty())
@@ -194,14 +194,14 @@ public class HistoTransitions {
 				this.sortedValues = null;
 				if (this.isMinimumExtremum) {
 					this.extremeValue = Double.MAX_VALUE;
-					for (Iterator<Double> iterator = this.iterator(); iterator.hasNext();) {
-						this.extremeValue = Math.min(this.extremeValue, iterator.next().doubleValue());
+					for (Double value : this) {
+						this.extremeValue = Math.min(this.extremeValue, value.doubleValue());
 					}
 				}
 				else {
 					this.extremeValue = -Double.MAX_VALUE;
-					for (Iterator<Double> iterator = this.iterator(); iterator.hasNext();) {
-						this.extremeValue = Math.max(this.extremeValue, iterator.next().doubleValue());
+					for (Double value : this) {
+						this.extremeValue = Math.max(this.extremeValue, value.doubleValue());
 					}
 				}
 			}
@@ -239,7 +239,7 @@ public class HistoTransitions {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.util.ArrayDeque#pollFirst()
 		 */
 		@Override // reInitializes the deque properties
@@ -254,7 +254,7 @@ public class HistoTransitions {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.util.ArrayDeque#pollLast()
 		 */
 		@Override // reInitializes the deque properties
@@ -300,13 +300,13 @@ public class HistoTransitions {
 		}
 
 		/**
-		 * Moves all deque entries and leaves an cleared deque.
+		 * Moves all deque entries and leaves a cleared deque.
 		 * @param settlementDeque
 		 */
 		public void addLastByMoving(SettlementDeque settlementDeque) {
 			Iterator<Long> iteratorTimeStamp = settlementDeque.timeStampDeque.iterator();
-			for (Iterator<Double> iterator = settlementDeque.iterator(); iterator.hasNext();) {
-				this.addLast(iterator.next(), iteratorTimeStamp.next());
+			for (Double value : settlementDeque) {
+				this.addLast(value, iteratorTimeStamp.next());
 			}
 			settlementDeque.clear();
 		}
@@ -400,7 +400,7 @@ public class HistoTransitions {
 
 		/**
 		 * please note: requires a sort over the full deque size.
-		 * @return NaN for empty deque or a leveled extremum value for comparisons, i.e. a more stable value than the extremum value  
+		 * @return NaN for empty deque or a leveled extremum value for comparisons, i.e. a more stable value than the extremum value
 		 */
 		public double getBenchmarkValue() {
 			if (Settings.getInstance().getMinmaxQuantileDistance() == 0.) {
@@ -414,7 +414,7 @@ public class HistoTransitions {
 
 		/**
 		 * please note: requires a sort over the full deque size.
-		 * @return NaN for empty deque or a leveled value for security comparisons which shall ensure that the majority of the values did NOT pass a comparison level  
+		 * @return NaN for empty deque or a leveled value for security comparisons which shall ensure that the majority of the values did NOT pass a comparison level
 		 */
 		public double getSecurityValue() {
 			if (this.isEmpty()) {
@@ -526,12 +526,12 @@ public class HistoTransitions {
 				this.transitionCount += transitionsFromRecord.size();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d  transitionCount=%d", transitionType.getTransitionId(), this.transitionCount)); //$NON-NLS-1$
 
-				// assign the transitions to all transition groups which have a mapping to this transition type 
+				// assign the transitions to all transition groups which have a mapping to this transition type
 				Iterable<TransitionGroupType> iterable = channelType.getTransitionGroups().values().stream()
 						.filter(group -> group.getTransitionMapping().stream().anyMatch(mapping -> mapping.getTransitionId() == transitionType.getTransitionId()))::iterator;
 				for (TransitionGroupType transitionGroupType : iterable) {
 					if (!this.transitionContainer.containsKey(transitionGroupType.getTransitionGroupId())) {
-						// build the container 
+						// build the container
 						TreeMap<Long, Transition> groupTransitions = new TreeMap<Long, Transition>();
 						this.transitionContainer.put(transitionGroupType.getTransitionGroupId(), groupTransitions);
 					}
@@ -674,16 +674,16 @@ public class HistoTransitions {
 		int samplingTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
 		if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
-				if (transitionRecord.realRealGet(i) == null) break;
+				if (transitionRecord.elementAt(i) == null) break;
 				if (log.isLoggable(Level.FINER) && i > 0 && samplingTimespan_ms * 2 <= (long) (transitionRecord.getTime_ms(i) - transitionRecord.getTime_ms(i - 1)) )
 					log.log(Level.FINER, String.format("timestamps with distance >= 2 * samplingPeriod: %,d %,d", (int) transitionRecord.getTime_ms(i), (int) transitionRecord.getTime_ms(i - 1)));
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
-				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.realRealGet(i));
+				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.elementAt(i));
 				switch (this.triggerState) {
 				case WAITING:
 					this.previousTriggerState = this.triggerState;
 					boolean isThresholdLevel = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold 
+					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold
 					if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns)
 							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 						this.triggerState = TriggerState.TRIGGERED;
@@ -764,7 +764,7 @@ public class HistoTransitions {
 							this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 						}
 						else {
-							// now the threshold time is exceeded and the current value does not fit in the recovery phase 
+							// now the threshold time is exceeded and the current value does not fit in the recovery phase
 							this.triggerState = TriggerState.WAITING;
 							this.referenceDeque.addLastByMoving(this.thresholdDeque);
 							this.referenceDeque.addLastByMoving(this.recoveryDeque);
@@ -791,14 +791,14 @@ public class HistoTransitions {
 
 		else if (transitionType.getClassType() == TransitionClassTypes.PULSE) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
-				if (transitionRecord.realRealGet(i) == null) break;
+				if (transitionRecord.elementAt(i) == null) break;
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
-				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.realRealGet(i));
+				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.elementAt(i));
 				switch (this.triggerState) {
 				case WAITING:
 					this.previousTriggerState = this.triggerState;
 					boolean isThresholdLevel = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold 
+					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold
 					if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns)
 							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 						this.triggerState = TriggerState.TRIGGERED;
@@ -911,14 +911,14 @@ public class HistoTransitions {
 
 		else if (transitionType.getClassType() == TransitionClassTypes.SLOPE) {
 			for (int i = 0; i < transitionRecord.size(); i++) {
-				if (transitionRecord.realRealGet(i) == null) break;
+				if (transitionRecord.elementAt(i) == null) break;
 				long timeStamp_100ns = (long) (transitionRecord.getTime_ms(i) * 10.);
-				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.realRealGet(i));
+				double translatedValue = this.device.translateValue(transitionRecord, transitionRecord.elementAt(i));
 				switch (this.triggerState) {
 				case WAITING:
 					this.previousTriggerState = this.triggerState;
 					boolean isThresholdLevel = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
-					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold 
+					// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold
 					if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns)
 							&& !isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 						this.triggerState = TriggerState.TRIGGERED;
@@ -934,7 +934,7 @@ public class HistoTransitions {
 					this.previousTriggerState = this.triggerState;
 					boolean isPersistentTrigger = isBeyondThresholdLevel(absoluteDelta, transitionType, translatedValue, translatedThresholdValue);
 					if (!this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns)) {
-						// final check if the majority of the reference values did not pass the threshold and if the majority of the threshold values passed the threshold 
+						// final check if the majority of the reference values did not pass the threshold and if the majority of the threshold values passed the threshold
 						if (!isBeyondThresholdLevel(absoluteDelta, transitionType, this.referenceDeque.getSecurityValue(), translatedThresholdValue)) {
 							this.triggerState = TriggerState.WAITING;
 							log.log(Level.FINE, Integer.toString(transitionType.getTransitionId()), this);

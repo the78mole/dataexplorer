@@ -369,6 +369,37 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		throw new UnsupportedOperationException();
 	}
 
+	@Deprecated
+	@Override
+	public synchronized boolean add(Integer point) {
+		throw new UnsupportedOperationException(" " + point); //$NON-NLS-1$
+	}
+
+	/**
+	 * Add a data point to the record and set minimum and maximum.
+	 * @param point
+	 */
+	@Override
+	public synchronized void addElement(Integer point) {
+		if (point == null) {
+			if (this.isEmpty()) {
+				this.minValue = Integer.MAX_VALUE;
+				this.maxValue = Integer.MIN_VALUE;
+			}
+		}
+		else {
+			if (this.isEmpty())
+				this.minValue = this.maxValue = point;
+			else {
+				if (point > this.maxValue) this.maxValue = point;
+				if (point < this.minValue) this.minValue = point;
+			}
+		}
+		super.addElement(point);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " adding point = " + point); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 	@Override
 	@Deprecated
 	public synchronized Integer set(int index, Integer point) {
@@ -384,24 +415,30 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		if (this.applicableTrailsOrdinals.size() != this.applicableTrailsTexts.size()) {
 			throw new UnsupportedOperationException(String.format("%,3d %,3d %,3d", this.applicableTrailsOrdinals.size(), TrailTypes.getPrimitives().size(), this.applicableTrailsTexts.size())); //$NON-NLS-1$
 		}
-		if (this.trailRecordSuite == null) { // ???
-			super.add(null);
+
+		if (this.trailRecordSuite == null) {
+			super.addElement(null);
 		}
 		else if (!this.isTrailSuite()) {
+			Integer point;
 			if (this.isMeasurement())
-				super.add(histoVault.getMeasurementPoint(this.ordinal, this.getTrailOrdinal()));
+				point = histoVault.getMeasurementPoint(this.ordinal, this.getTrailOrdinal());
 			else if (this.isSettlement())
-				super.add(histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.getTrailOrdinal()));
+				point = histoVault.getSettlementPoint(this.settlementType.getSettlementId(), this.getTrailOrdinal());
 			else if (this.isScoreGroup()) {
 				if (log.isLoggable(Level.FINEST))
 					log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", this.getName(), this.getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
-				super.add(histoVault.getScorePoint(this.getTrailOrdinal()));
+				point = histoVault.getScorePoint(this.getTrailOrdinal());
 			}
 			else
 				throw new UnsupportedOperationException("length == 1"); //$NON-NLS-1$
+
+			this.addElement(point);
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s %d", getName(), this.getTrailOrdinal(), histoVault.getLogFilePath(), point)); //$NON-NLS-1$
 		}
 		else {
 			int minVal = Integer.MAX_VALUE, maxVal = Integer.MIN_VALUE; // min/max depends on all values of the suite
+
 			int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
 			boolean summationSign = false; // false means subtract, true means add
 			for (TrailRecord trailRecord : this.trailRecordSuite) {
@@ -411,13 +448,12 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				else if (this.isSettlement())
 					point = histoVault.getSettlementPoint(trailRecord.settlementType.getSettlementId(), trailRecord.getTrailOrdinal());
 				else if (this.isScoreGroup()) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath())); //$NON-NLS-1$
 					point = histoVault.getScorePoint(this.getTrailOrdinal());
 				}
 				else
 					throw new UnsupportedOperationException("length > 1"); //$NON-NLS-1$
 
-				if (point != null) { // trailRecord.getMinValue() is zero if trailRecord.size() == 0 or only nulls have been added
+				if (point != null) {
 					if (trailRecord.isSuiteForSummation()) {
 						point = summationSign ? masterPoint + 2 * point : masterPoint - 2 * point;
 						summationSign = !summationSign; // toggle the add / subtract mode
@@ -426,22 +462,20 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
 						summationSign = false;
 					}
-					trailRecord.add(point);
+					trailRecord.addElement(point);
 					minVal = Math.min(minVal, trailRecord.getRealMinValue());
 					maxVal = Math.max(maxVal, trailRecord.getRealMaxValue());
 				}
 				else {
-					trailRecord.add(point);
+					trailRecord.addElement(point);
 				}
-				log.log(Level.FINEST, trailRecord.getName() + " trail ", trailRecord); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST))
+					log.log(Level.FINEST, String.format(" %s trail %3d  %s %s %d minVal=%d maxVal=%d", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath(), point, minVal, maxVal)); //$NON-NLS-1$
 			}
-			if (minVal != Integer.MAX_VALUE && maxVal != Integer.MIN_VALUE) {
-				this.setMinMax(minVal, maxVal);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + minVal + "," + maxVal); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+
+			setMinMax(Math.min(minVal, getRealMinValue()), Math.max(maxVal, getRealMaxValue()));
 		}
 		log.log(Level.FINEST, this.getName() + " trail ", this); //$NON-NLS-1$
-
 	}
 
 	/**
@@ -456,9 +490,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		List<Point> points = new ArrayList<>();
 		double tmpOffset = super.minDisplayValue * 1 / super.syncMasterFactor;
 		for (int i = 0; i < this.parent.timeStep_ms.size(); i++) {
-			if (super.realRealGet(i) != null) {
+			if (super.elementAt(i) != null) {
 				points.add(new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.parent.timeStep_ms.getTime_ms(i)),
-						yDisplayOffset - (int) (((super.realRealGet(i) / 1000.0) - tmpOffset) * super.displayScaleFactorValue)));
+						yDisplayOffset - (int) (((super.elementAt(i) / 1000.0) - tmpOffset) * super.displayScaleFactorValue)));
 			}
 			else {
 				points.add(null);
@@ -485,7 +519,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		Integer value = 0;
 		final double tmpOffset = super.minDisplayValue * 1 / super.syncMasterFactor; // minDisplayValue is GPS DD format * 1000
 		for (Integer xPos : timeLine.getScalePositions().values()) {
-			if ((value = super.realRealGet(i)) != null) {
+			if ((value = super.elementAt(i)) != null) {
 				final double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
 				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((decimalDegreeValue * 1000. - tmpOffset) * super.displayScaleFactorValue));
 			}
@@ -515,7 +549,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		final double tmpOffset = super.minScaleValue; // in decimal degrees
 		final double tmpDisplayScaleFactor = (drawAreaHeight * 1.) / (this.maxScaleValue - this.minScaleValue);
 		for (Integer xPos : timeLine.getScalePositions().values()) {
-			if ((value = super.realRealGet(i)) != null) {
+			if ((value = super.elementAt(i)) != null) {
 				final double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
 				points[i] = new Point(xDisplayOffset + xPos, yDisplayOffset - (int) ((decimalDegreeValue - tmpOffset) * tmpDisplayScaleFactor));
 			}
@@ -541,11 +575,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		if (!this.isTrailSuite()) {
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++)
-					dataTableRow[i + 2] = masterRecord.realRealGet(i) != null ? masterRecord.getFormattedTableValue(i) : GDE.STRING_STAR;
+					dataTableRow[i + 2] = masterRecord.elementAt(i) != null ? masterRecord.getFormattedTableValue(i) : GDE.STRING_STAR;
 			}
 			else {
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-					dataTableRow[i + 2] = masterRecord.realRealGet(j) != null ? masterRecord.getFormattedTableValue(j) : GDE.STRING_STAR;
+					dataTableRow[i + 2] = masterRecord.elementAt(j) != null ? masterRecord.getFormattedTableValue(j) : GDE.STRING_STAR;
 			}
 		}
 		else if (this.isBoxPlotSuite()) {
@@ -554,24 +588,24 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			final TrailRecord upperWhiskerRecord = this.getTrailRecordSuite()[6];
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++) {
-					if (masterRecord.realRealGet(i) != null) {
+					if (masterRecord.elementAt(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerWhiskerRecord.realRealGet(i) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(lowerWhiskerRecord.elementAt(i) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(medianRecord.realRealGet(i) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
-						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(i) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(medianRecord.elementAt(i) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperWhiskerRecord.elementAt(i) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
 			}
 			else {
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-					if (masterRecord.realRealGet(j) != null) {
+					if (masterRecord.elementAt(j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(lowerWhiskerRecord.elementAt(j) != null ? String.format("%.8s", lowerWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(medianRecord.realRealGet(j) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
-						sb.append(delimiter).append(upperWhiskerRecord.realRealGet(j) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(medianRecord.elementAt(j) != null ? String.format("%.8s", medianRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperWhiskerRecord.elementAt(j) != null ? String.format("%.8s", upperWhiskerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -582,24 +616,24 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 			final TrailRecord upperRecord = this.getTrailRecordSuite()[2];
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < masterRecord.size(); i++) {
-					if (masterRecord.realRealGet(i) != null) {
+					if (masterRecord.elementAt(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerRecord.realRealGet(i) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(lowerRecord.elementAt(i) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(middleRecord.realRealGet(i) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
-						sb.append(delimiter).append(upperRecord.realRealGet(i) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(middleRecord.elementAt(i) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperRecord.elementAt(i) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(i)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
 			}
 			else {
 				for (int i = 0, j = masterRecord.size() - 1; i < masterRecord.size(); i++, j--)
-					if (masterRecord.realRealGet(j) != null) {
+					if (masterRecord.elementAt(j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(lowerRecord.realRealGet(j) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(lowerRecord.elementAt(j) != null ? String.format("%.8s", lowerRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(middleRecord.realRealGet(j) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
-						sb.append(delimiter).append(upperRecord.realRealGet(j) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(middleRecord.elementAt(j) != null ? String.format("%.8s", middleRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
+						sb.append(delimiter).append(upperRecord.elementAt(j) != null ? String.format("%.8s", upperRecord.getFormattedTableValue(j)) : GDE.STRING_STAR); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -1125,17 +1159,17 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		boundedValues.clear();
 		if (measureIndex < deltaIndex) {
 			for (int i = measureIndex; i < deltaIndex + 1; i++) {
-				if (trailRecord.realRealGet(i) != null) {
+				if (trailRecord.elementAt(i) != null) {
 					boundedTimeStamps_ms.add(this.parent.timeStep_ms.getTime_ms(i));
-					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(i) / 1000.));
+					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.elementAt(i) / 1000.));
 				}
 			}
 		}
 		else {
 			for (int i = measureIndex; i > deltaIndex - 1; i--) {
-				if (trailRecord.realRealGet(i) != null) {
+				if (trailRecord.elementAt(i) != null) {
 					boundedTimeStamps_ms.add(this.parent.timeStep_ms.getTime_ms(i));
-					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.realRealGet(i) / 1000.));
+					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.elementAt(i) / 1000.));
 				}
 			}
 		}
@@ -1224,7 +1258,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		else
 			throw new UnsupportedOperationException();
 
-		if (trailRecord.realRealGet(index) != null) {
+		if (trailRecord.elementAt(index) != null) {
 			return trailRecord.getFormattedTableValue(index);
 		}
 		else
@@ -1295,14 +1329,14 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 		int verticalDisplayPos = Integer.MIN_VALUE;
 		if (this.device.isGPSCoordinates(this)) {
-			if (trailRecord.realRealGet(index) != null) {
-				double decimalDegreeValue = trailRecord.realRealGet(index) / 1000000 + trailRecord.realRealGet(index) % 1000000 / 600000.;
+			if (trailRecord.elementAt(index) != null) {
+				double decimalDegreeValue = trailRecord.elementAt(index) / 1000000 + trailRecord.elementAt(index) % 1000000 / 600000.;
 				verticalDisplayPos = trailRecord.parent.drawAreaBounds.height
 						- (int) ((decimalDegreeValue * 1000. - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
 			}
 		}
-		else if (trailRecord.realRealGet(index) != null) verticalDisplayPos = trailRecord.parent.drawAreaBounds.height
-				- (int) ((trailRecord.realRealGet(index) / 1000.0 - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
+		else if (trailRecord.elementAt(index) != null) verticalDisplayPos = trailRecord.parent.drawAreaBounds.height
+				- (int) ((trailRecord.elementAt(index) / 1000.0 - trailRecord.minDisplayValue * 1 / trailRecord.syncMasterFactor) * trailRecord.displayScaleFactorValue);
 
 		return verticalDisplayPos;
 	}

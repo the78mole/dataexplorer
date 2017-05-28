@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.data;
@@ -66,14 +66,14 @@ public class Record extends Vector<Integer> {
 	String											keyName;
 	TimeSteps										timeStep_ms				= null;																			// timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
 	IDevice											device;
-	int													ordinal;																											// ordinal is referencing the source position of the record relative to the initial 
+	int													ordinal;																											// ordinal is referencing the source position of the record relative to the initial
 	// device measurement configuration and used to find specific properties
 
 	RecordSet										parent;
 	String											name;																													// measurement name Höhe
 	String											unit;																													// unit [m]
 	String											symbol;																												// symbol h
-	String											description				= GDE.STRING_BLANK;													// only set if copied into compare set 
+	String											description				= GDE.STRING_BLANK;													// only set if copied into compare set
 	boolean											isActive;
 	boolean											isDisplayable;
 	boolean											isVisible					= true;
@@ -153,7 +153,7 @@ public class Record extends Vector<Integer> {
 	int														syncMaxValue							= 0;																																																																		// max value of the curve if synced
 	int														syncMinValue							= 0;																																																																		// min value of the curve if synced
 
-	// scope view 
+	// scope view
 	int														scopeMin									= 0;																																																																		// min value of the curve within scope display area
 	int														scopeMax									= 0;																																																																		// max value of the curve within scope display area
 
@@ -165,7 +165,7 @@ public class Record extends Vector<Integer> {
 	int														avgValueTriggered					= Integer.MIN_VALUE;																																																										// avarage value (avg = sum(xi)/n)
 	int														sigmaValueTriggered				= Integer.MIN_VALUE;																																																										// sigma value of data, according a set trigger level if any
 
-	double												drawLimit_ms							= Integer.MAX_VALUE;																																																										// above this limit the record will not be drawn (compareSet with different records) 
+	double												drawLimit_ms							= Integer.MAX_VALUE;																																																										// above this limit the record will not be drawn (compareSet with different records)
 	double												zoomTimeOffset						= 0;																																																																		// time where the zoom area begins
 	int														zoomOffset								= 0;																																																																		// number of measurements point until zoom area begins approximation only
 	double												drawTimeWidth							= 0;																																																																		// all or zoomed area time width
@@ -345,7 +345,7 @@ public class Record extends Vector<Integer> {
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
-		this.device = record.device; // reference to device	
+		this.device = record.device; // reference to device
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class Record extends Vector<Integer> {
 	public Record clone(String newName) {
 		Record newRecord = new Record(this);
 		newRecord.name = newName;
-		if (newRecord.parent.timeStep_ms != null) { //record.clone() have copied timeSteps where the parent record set 
+		if (newRecord.parent.timeStep_ms != null) { //record.clone() have copied timeSteps where the parent record set
 			newRecord.timeStep_ms = null; // route to parent timeSteps
 		}
 		return newRecord;
@@ -550,69 +550,66 @@ public class Record extends Vector<Integer> {
 	@Override
 	public synchronized boolean add(Integer point) {
 		final String $METHOD_NAME = "add"; //$NON-NLS-1$
-		// ET: histoRecords support null values
-		if (point != null) {
-			if (super.size() == 0) {
-				this.minValue = this.maxValue = point;
-			}
-			else {
-				if (point > this.maxValue)
-					this.maxValue = point;
-				else if (point < this.minValue) this.minValue = point;
-			}
-			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
-			if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (super.size() == 0) {
+			this.minValue = this.maxValue = point;
+		}
+		else {
+			if (point > this.maxValue)
+				this.maxValue = point;
+			else if (point < this.minValue) this.minValue = point;
+		}
+		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
-			switch (this.device.getCurrentSmoothIndex()) {
-			case 1:
-				//add shadow data points to detect current drops to nearly zero
-				if (this.isCurrentRecord && super.size() > 5) {
-					int index = super.size();
-					//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
-					if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
-						if (this.dropStartIndex == 0) {
-							this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
-							this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
-						}
-						this.dropEndIndex = index + ((index - this.dropStartIndex) + 1);
+		switch (this.device.getCurrentSmoothIndex()) {
+		case 1:
+			//add shadow data points to detect current drops to nearly zero
+			if (this.isCurrentRecord && super.size() > 5) {
+				int index = super.size();
+				//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
+					if (this.dropStartIndex == 0) {
+						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
 					}
-					else { // normal data point
-						if (index >= this.dropEndIndex && this.dropStartIndex != 0) {
-							this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, this.dropEndIndex });
-							this.dropStartIndex = 0;
-						}
+					this.dropEndIndex = index + ((index - this.dropStartIndex) + 1);
+				}
+				else { // normal data point
+					if (index >= this.dropEndIndex && this.dropStartIndex != 0) {
+						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, this.dropEndIndex });
+						this.dropStartIndex = 0;
 					}
 				}
-				break;
-			case 2:
-				//add shadow data points to detect current drops to nearly zero
-				if (this.isCurrentRecord && super.size() > 5) {
-					int index = super.size();
-					//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
-					if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
-						if (this.dropStartIndex == 0) {
-							this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
-						}
-						else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
-							this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
-							this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement					
-							this.dropIndexWritten = true;
-						}
-						this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
-					}
-					else { // normal data point
-						if (index > this.dropEndIndex && this.dropStartIndex != 0) {
-							this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, this.dropEndIndex });
-							this.dropStartIndex = 0;
-							this.dropIndexWritten = true;
-						}
-						else if (this.dropStartIndex != 0) {
-							this.dropIndexWritten = false;
-						}
-					}
-				}
-				break;
 			}
+			break;
+		case 2:
+			//add shadow data points to detect current drops to nearly zero
+			if (this.isCurrentRecord && super.size() > 5) {
+				int index = super.size();
+				//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
+					if (this.dropStartIndex == 0) {
+						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+					}
+					else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
+						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
+						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+						this.dropIndexWritten = true;
+					}
+					this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
+				}
+				else { // normal data point
+					if (index > this.dropEndIndex && this.dropStartIndex != 0) {
+						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, this.dropEndIndex });
+						this.dropStartIndex = 0;
+						this.dropIndexWritten = true;
+					}
+					else if (this.dropStartIndex != 0) {
+						this.dropIndexWritten = false;
+					}
+				}
+			}
+			break;
 		}
 		return super.add(point);
 	}
@@ -620,19 +617,16 @@ public class Record extends Vector<Integer> {
 	@Override
 	public synchronized Integer set(int index, Integer point) {
 		final String $METHOD_NAME = "set"; //$NON-NLS-1$
-		// ET: histoRecord support null values
-		if (point != null) {
-			if (super.size() == 0) {
-				this.minValue = this.maxValue = point;
-			}
-			else {
-				if (point > this.maxValue)
-					this.maxValue = point;
-				else if (point < this.minValue) this.minValue = point;
-			}
-			if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
-			if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (super.size() == 0) {
+			this.minValue = this.maxValue = point;
 		}
+		else {
+			if (point > this.maxValue)
+				this.maxValue = point;
+			else if (point < this.minValue) this.minValue = point;
+		}
+		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		return super.set(index, point);
 	}
 
@@ -935,7 +929,7 @@ public class Record extends Vector<Integer> {
 					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 			}
 			if (this.triggerRanges != null) {
-				// evaluate trigger ranges to meet minTimeSec requirement 
+				// evaluate trigger ranges to meet minTimeSec requirement
 				for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
 					if ((this.getTime_ms(range.out) - this.getTime_ms(range.in)) < this.getMinTriggerTimeSec() * 1000) this.triggerRanges.remove(range);
 				}
@@ -1014,7 +1008,7 @@ public class Record extends Vector<Integer> {
 
 	/**
 	 * time calculation needs always the real size of the record
-	 * @return real vector size 
+	 * @return real vector size
 	 */
 	public int realSize() {
 		return super.size();
@@ -1079,10 +1073,6 @@ public class Record extends Vector<Integer> {
 			return returnValue;
 		}
 		return 0;
-	}
-
-	public Integer realRealGet(int index) {
-		return super.get(index);
 	}
 
 	/**
@@ -1317,7 +1307,7 @@ public class Record extends Vector<Integer> {
 		return this.parent.isZoomMode ? this.minZoomScaleValue : this.minScaleValue;
 	}
 
-	/** 
+	/**
 	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of this record (set)
 	 * @return time stamp of the date and time when the record starts
 	 */
@@ -1325,7 +1315,7 @@ public class Record extends Vector<Integer> {
 		return this.timeStep_ms == null ? this.parent.timeStep_ms.getStartTimeStamp() : this.timeStep_ms.getStartTimeStamp();
 	}
 
-	/** 
+	/**
 	 * query time step time in mills seconds at index
 	 * @return time step in msec
 	 */
@@ -1341,7 +1331,7 @@ public class Record extends Vector<Integer> {
 			return this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index) : this.timeStep_ms.getTime_ms(index);
 	}
 
-	/** 
+	/**
 	 * query time step time in mills seconds at index
 	 * @return time step in msec
 	 */
@@ -1349,7 +1339,7 @@ public class Record extends Vector<Integer> {
 		return this.timeStep_ms == null ? this.parent.timeStep_ms.lastElement() / 10.0 : this.timeStep_ms.lastElement() / 10.0;
 	}
 
-	/** 
+	/**
 	 * query time step in mills seconds, this property is hold local to be independent (compare window)
 	 * @return time step in msec
 	 */
@@ -1374,11 +1364,11 @@ public class Record extends Vector<Integer> {
 
 	/**
 	 * Find the indexes in this time vector where the given time value is placed
-	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
+	 * In case of the given time in in between two available measurement points both bounding indexes are returned,
 	 * only in case where the given time matches an existing entry both indexes are equal.
 	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
 	 * @param time_ms
-	 * @return two index values around the given time 
+	 * @return two index values around the given time
 	 */
 	public int[] findBoundingIndexes(double time_ms) {
 		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
@@ -1507,7 +1497,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * method to query time and value for display at a given index. 
+	 * method to query time and value for display at a given index.
 	 * does not support null measurement values.
 	 * @param measurementPointIndex (differs from index if display width != measurement size)
 	 * @param xDisplayOffset
@@ -1521,7 +1511,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * method to query time and value for display at a given index. 
+	 * method to query time and value for display at a given index.
 	 * does not support null measurement values.
 	 * @param measurementPointIndex (differs from index if display width != measurement size)
 	 * @param xDisplayOffset
@@ -1542,12 +1532,12 @@ public class Record extends Vector<Integer> {
 	public String getFormattedMeasureValue(int index) {
 		if (this.device.isGPSCoordinates(this)) {
 			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
-				return this.realRealGet(index) != null ? StringHelper.getFormatedWithMinutes("%2d %04.1f", this.device.translateValue(this, this.realRealGet(index) / 1000.)).trim() : GDE.STRING_STAR; //$NON-NLS-1$
+				return this.elementAt(index) != null ? StringHelper.getFormatedWithMinutes("%2d %04.1f", this.device.translateValue(this, this.elementAt(index) / 1000.)).trim() : GDE.STRING_STAR; //$NON-NLS-1$
 			else
-				return this.realRealGet(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+				return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
 		}
 		else
-			return this.realRealGet(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.realRealGet(index) / 1000.)) : GDE.STRING_STAR;
+			return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
 	}
 
 	/**
@@ -1608,7 +1598,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * method to query x,y position of a display at a given horizontal display index 
+	 * method to query x,y position of a display at a given horizontal display index
 	 * @param xPos
 	 * @return point time, value
 	 */
@@ -1645,7 +1635,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * query data value (not translated in device units) from a display position point 
+	 * query data value (not translated in device units) from a display position point
 	 * @param xPos
 	 * @return displays yPos in pixel
 	 */
@@ -1697,9 +1687,9 @@ public class Record extends Vector<Integer> {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 
 			//check yPos out of range, the graph might not visible within this area
-			//		if(pointPosY > this.parent.drawAreaBounds.height) 
+			//		if(pointPosY > this.parent.drawAreaBounds.height)
 			//			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
-			//		if(pointPosY < 0) 
+			//		if(pointPosY < 0)
 			//			log.log(Level.WARNING, "pointPosY < 0");
 		}
 		catch (RuntimeException e) {
@@ -1721,8 +1711,8 @@ public class Record extends Vector<Integer> {
 		//if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 		//	Record syncRecord = this.parent.get(this.ordinal);
 		//		displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
-		//}	
-		//else 
+		//}
+		//else
 		if (this.parent.isZoomMode)
 			displayPointValue = this.df.format(Double.valueOf(this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height)));
 		else
@@ -1969,6 +1959,7 @@ public class Record extends Vector<Integer> {
 	 * set new the min-max-values after external re-calculation
 	 */
 	public void setMinMax(int newMin, int newMax) {
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + newMin + "," + newMax); //$NON-NLS-1$ //$NON-NLS-2$
 		this.maxValue = newMax;
 		this.minValue = newMin;
 	}
@@ -2009,7 +2000,7 @@ public class Record extends Vector<Integer> {
 			sb.append(property.getName()).append(GDE.STRING_UNDER_BAR).append(property.getType()).append(GDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
 		if (this.statistics != null) sb.append(this.statistics.toString()).append(DELIMITER);
-		//formatting 
+		//formatting
 		sb.append(DEFINED_MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
 		sb.append(DEFINED_MIN_VALUE).append(GDE.STRING_EQUAL).append(this.minScaleValue).append(DELIMITER);
 		sb.append(IS_POSITION_LEFT).append(GDE.STRING_EQUAL).append(this.isPositionLeft).append(DELIMITER);
