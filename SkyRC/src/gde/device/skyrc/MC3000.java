@@ -1168,7 +1168,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3624), Messages.getString(MessageIds.GDE_MSGT3624) };
 		this.BATTERY_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3640), Messages.getString(MessageIds.GDE_MSGT3641), Messages.getString(MessageIds.GDE_MSGT3642),
 				Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3645), Messages.getString(MessageIds.GDE_MSGT3646),
-				Messages.getString(MessageIds.GDE_MSGT3647) };
+				Messages.getString(MessageIds.GDE_MSGT3647), Messages.getString(MessageIds.GDE_MSGT3686) };
 
 		this.application = DataExplorer.getInstance();
 		this.settings = Settings.getInstance();
@@ -1197,7 +1197,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3624), Messages.getString(MessageIds.GDE_MSGT3624) };
 		this.BATTERY_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3640), Messages.getString(MessageIds.GDE_MSGT3641), Messages.getString(MessageIds.GDE_MSGT3642),
 				Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3645), Messages.getString(MessageIds.GDE_MSGT3646),
-				Messages.getString(MessageIds.GDE_MSGT3647) };
+				Messages.getString(MessageIds.GDE_MSGT3647), Messages.getString(MessageIds.GDE_MSGT3686) };
 
 		this.application = DataExplorer.getInstance();
 		this.settings = Settings.getInstance();
