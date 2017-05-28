@@ -65,7 +65,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	protected String[]		USAGE_MODE_ZN;
 	protected String[]		USAGE_MODE_PB;
 	protected String[]		BATTERY_TYPE;
-	final static String[]	cellTypeNames				= { "LiIon", "LiFe", "LiIo4.35", "NiMH", "NiCd", "NiZn", "Eneloop", "RAM" };
+	final static String[]	cellTypeNames				= { "LiIon", "LiFe", "LiIo4.35", "NiMH", "NiCd", "NiZn", "Eneloop", "RAM", "LTO" };
 	final static String[]	cycleModeNames			= { "C>D", "C>D>C", "D>C", "D>C>D" };
 	final static String[]	operationModeLi			= { "Charge", "Refresh", "Storage", "Discharge", "Cycle" };
 	final static String[]	operationModeNi			= { "Charge", "Refresh", "Break_in", "Discharge", "Cycle" };
@@ -362,7 +362,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
 			//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 			//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
-			if ((((this.batteryType <= 4 || this.batteryType == 6) && this.operationMode != 3) //!discharge Li -> Ni + Eneloop
+			if ((((this.batteryType <= 4 || this.batteryType == 6 || this.batteryType == 8) && this.operationMode != 3) //!discharge Li -> Ni + Eneloop
 					|| ((this.batteryType == 5 || this.batteryType == 7) && this.operationMode != 2)) //!discharge NiZn, RAM
 					&& this.getChargeCurrent() != 0) {
 				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fA", Messages.getString(MessageIds.GDE_MSGT3661), this.getChargeCurrent() / 1000.0)).append(GDE.LINE_SEPARATOR);
@@ -378,7 +378,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3662))).append(GDE.LINE_SEPARATOR);
 			}
 			//C.RESTING:
-			if (((this.batteryType <= 4 || this.batteryType == 6) && this.operationMode != 3) //!discharge Li -> Ni + Eneloop
+			if (((this.batteryType <= 4 || this.batteryType == 6 || this.batteryType == 8) && this.operationMode != 3) //!discharge Li -> Ni + Eneloop
 					|| ((this.batteryType == 5 || this.batteryType == 7) && this.operationMode != 2)) { //!discharge NiZn, RAM
 				sb.append(String.format(Locale.ENGLISH, "%-14s %dmin", Messages.getString(MessageIds.GDE_MSGT3663), this.chargeRestingTime & 0xFF)).append(GDE.LINE_SEPARATOR);
 			}
@@ -398,12 +398,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			//CYCLE COUNT://CYCLE MODE:
 			appendCycleCountCycleMode(sb, isToolTip);
 			//TARGET VOLT:
-			//battery type:  0:LiIon 1:LiFe 2:LiHV 3:NiMH 4:NiCd 5:NiZn 6:Eneloop 7:RAM
+			//battery type:  0:LiIon 1:LiFe 2:LiHV 3:NiMH 4:NiCd 5:NiZn 6:Eneloop 7:RAM 8:LiTo
 			//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
 			//Mode Ni battery:		0=CHARGE 1=REFRESH 2=BREAK_IN  3=DISCHARGE 4=CYCLE
 			//Mode Zn battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
 			//Mode RAM battery:		0=CHARGE 1=REFRESH 2=DISCHARGE 3=CYCLE
-			if ((this.batteryType <= 2 && this.operationMode != 3) //!discharge Li
+			if (((this.batteryType <= 2 || this.batteryType == 8) && this.operationMode != 3) //!discharge Li
 					|| ((this.batteryType == 3 || this.batteryType == 4 || this.batteryType == 6) && (this.operationMode != 2 && this.operationMode != 3))//!break_in !discharge Ni + Eneloop
 					|| ((this.batteryType == 5 || this.batteryType == 7) && this.operationMode != 2)) { //!discharge NiZn, RAM
 				sb.append(String.format(Locale.ENGLISH, "%-14s %4.2fV", Messages.getString(MessageIds.GDE_MSGT3667), this.getChargeEndVoltage() / 1000.0)).append(GDE.LINE_SEPARATOR);
@@ -420,7 +420,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			//D.REDUCE:
 			appendDischargeReductionCurrent(sb, isToolTip);
 			//CUT VOLT:
-			if (this.operationMode == 0 || (this.operationMode == 2 && this.batteryType < 3)) {// charge or Li storage
+			if (this.operationMode == 0 || (this.operationMode == 2 && (this.batteryType < 3 || this.batteryType == 8))) {// charge or Li storage
 				if (!isToolTip) sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3671))).append(GDE.LINE_SEPARATOR);
 			}
 			else {
@@ -540,6 +540,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 3://NiMH
 			case 4://NiCd
 			case 6://Eneloop
+			case 8://LiTo
 				switch (this.operationMode) {
 				case 2://storage, break_in 
 				case 3://discharge
@@ -580,6 +581,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 2://LiHV
 			case 5://NiZn
 			case 7://RAM
+			case 8://LiTo
 				//Li batteries use termination current as end detection
 				break;
 
@@ -633,6 +635,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 0://LiIon
 			case 1://LiFe
 			case 2://LiHV
+			case 8://LiTo
 				switch (this.operationMode) {
 				case 3://discharge
 					if (!isToolTip)
@@ -684,6 +687,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 0://LiIon
 			case 1://LiFe
 			case 2://LiHV
+			case 8://LiTo
 				switch (this.operationMode) {
 				case 1://refresh
 					sb.append(String.format(Locale.ENGLISH, "%-14s %d", Messages.getString(MessageIds.GDE_MSGT3665), 1)).append(GDE.LINE_SEPARATOR);
@@ -759,6 +763,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 2://LiHV
 			case 5://NiZn
 			case 7://RAM
+			case 8://LiTo
 				//Capacity
 				if (getCapacity() == 0)
 					sb.append(String.format(Locale.ENGLISH, "%-14s OFF", Messages.getString(MessageIds.GDE_MSGT3660))).append(GDE.LINE_SEPARATOR);
@@ -826,6 +831,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 3: //NiMH
 			case 4: //NiCd
 			case 6: //Eneloop
+			case 8: //LiTo
 				switch (this.operationMode) {
 				case 0: //CHARGE
 					sb.append(String.format(Locale.ENGLISH, "%4.2fA", this.getChargeCurrent() / 1000.0));
@@ -857,6 +863,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					case 0: //LiIo
 					case 1: //LiFe
 					case 2: //LiHV
+					case 8: //LiTo
 						sb.append(String.format(Locale.ENGLISH, "%3.2fV", this.getChargeEndVoltage() / 1000.0));
 						break;
 					case 3: //NiMH
@@ -915,6 +922,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			case 0://LiIon
 			case 1://LiFe
 			case 2://LiHV
+			case 8://LiTo
 				//Capacity
 				//Mode LI battery： 		0=CHARGE 1=REFRESH 2=STORAGE   3=DISCHARGE 4=CYCLE
 				sb.append(MC3000.operationModeLi[this.operationMode]);
