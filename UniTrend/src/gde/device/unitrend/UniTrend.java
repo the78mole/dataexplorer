@@ -214,6 +214,7 @@ public class UniTrend extends DeviceConfiguration implements IDevice {
 		case 53: //resistance - pieps
 			break;
 		case 49: //resistance - diode
+			points[0] /= 10;
 			break;
 		case 54: //capacity
 			switch (dataBuffer[0]) {
