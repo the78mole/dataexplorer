@@ -463,8 +463,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						summationSign = false;
 					}
 					trailRecord.addElement(point);
-					minVal = Math.min(minVal, trailRecord.getRealMinValue());
-					maxVal = Math.max(maxVal, trailRecord.getRealMaxValue());
+					minVal = Math.min(minVal, point);
+					maxVal = Math.max(maxVal, point);
 				}
 				else {
 					trailRecord.addElement(point);

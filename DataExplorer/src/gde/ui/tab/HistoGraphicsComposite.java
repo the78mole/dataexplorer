@@ -762,8 +762,8 @@ public class HistoGraphicsComposite extends Composite {
 					}
 				}
 				else if (measureRecordKey != null && (trailRecordSet.isMeasurementMode(measureRecordKey) || trailRecordSet.isDeltaMeasurementMode(measureRecordKey))) {
-					if (this.curveSurvey.getxPosMeasure() + 1 >= evt.x && this.curveSurvey.getxPosMeasure() - 1 <= evt.x
-							|| this.curveSurvey.getxPosDelta() + 1 >= evt.x && this.curveSurvey.getxPosDelta() - 1 <= evt.x) { // snap mouse pointer
+					if (evt.x > 0 && this.curveSurvey.getxPosMeasure() > 0 && this.curveSurvey.getxPosMeasure() + 1 >= evt.x && this.curveSurvey.getxPosMeasure() - 1 <= evt.x
+							|| evt.x > 0 && this.curveSurvey.getxPosDelta() > 0 && this.curveSurvey.getxPosDelta() + 1 >= evt.x && this.curveSurvey.getxPosDelta() - 1 <= evt.x) { // snap mouse pointer
 						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
 					}
 					else {
