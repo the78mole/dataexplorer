@@ -603,6 +603,8 @@ public class NMEAParser implements IDataParser {
 			//this.values[6]  = VDOP (vertical dilution of precision)
 			//this.values[7]  = velocity;
 			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("lat %9.6f, long %9.6f, alt %d, sats %d", latitude/1000000., longitude/1000000., altitudeAbs/10000, numSatelites/1000));
 		}
 	}
 
@@ -1604,4 +1606,16 @@ public class NMEAParser implements IDataParser {
 		//to be implemented by extending DataParser
 	}
 
+	public boolean isSupportedSentence(final String sentenceSignature) {
+		boolean isSupported = false;
+		try {
+			NMEA.valueOf(sentenceSignature);
+			isSupported = true;
+		}
+		catch(Throwable t) {
+			//ignore
+		}
+		return isSupported;
+	}
+	
 }

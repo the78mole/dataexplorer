@@ -150,13 +150,16 @@ public class NMEAReaderWriter {
 				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name())
-						|| !line.startsWith(device.getDataBlockLeader())) {
+						|| !line.startsWith(device.getDataBlockLeader()) || !data.isSupportedSentence(line.substring(1, 6))) {
 					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
 							|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 							|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name()))) {
 						Vector<String> setupLine = new Vector<String>();
 						setupLine.add(line);
 						data.parse(setupLine, lineNumber);
+					}
+					else if (line != null && !data.isSupportedSentence(line.substring(1, 6))) {
+						log.log(Level.WARNING, filePath + " line number " + lineNumber + " does not starts with supported NMEA sentence" + line.substring(1, 6) + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 					else {
 						log.log(Level.WARNING, filePath + " line number " + lineNumber + " does not starts with " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
