@@ -34,7 +34,9 @@ VC820, VC840
 History analysis
 	- add context menu support
 		- graphics template support (no default set of templates get delivered) 
-		- analyze values in detail in the measurement mode (absolute / delta), show measurements table
+		- analyze values in detail in the measurement mode (absolute / delta)
+		  - measurements table
+		  - delta measurements with linear regression and boxplot
 		- right click on a source file in the history graph / table and 
 			- open it in the graphics tab for detailed analysis
 			- exclude / reintegrate it in the history analysis (e.g. preflight tests)
@@ -44,8 +46,6 @@ History analysis
 		- show the GPS location an a human readable text in the history table
 		- show source directories in the graphics header tooltip
 		- enhance smart statistics (quantiles, boxplots) and outlier identification
-	- calculate internal resistance values of drive batteries
-		- settings dialog: analysis types > settlements (Auswertungen > Berechnungen)
 	- minor enhancements
 		- support print and screen capturing
 		- integrate files from subdirectories (maximum directory level setting) 
