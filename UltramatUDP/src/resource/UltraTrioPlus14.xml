@@ -280,6 +280,15 @@
 				</ReferenceGroup>
 			</ReferenceGroups>
 			<TransitionGroups>
+                <TransitionGroup transitionGroupId="0">
+                    <TransitionMapping transitionId="0" comment="for test only">
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="3">
+                    <TransitionMapping transitionId="3" comment="for test only">
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="6">
+                    <TransitionMapping transitionId="6" comment="for test only">
+                </TransitionGroup>
 				<TransitionGroup transitionGroupId="100" comment="R_i transitions based on current values">
 					<TransitionMapping transitionId="0" />
 					<TransitionMapping transitionId="3" />
@@ -288,16 +297,16 @@
 			</TransitionGroups>
 			<Transitions>
 				<Transition transitionId="0" refOrdinal="1" classType="peak" valueType="deltaFactor"
-					thresholdValue="-0.4" recoveryValue="-0.1" referenceTimeMsec="5000" thresholdTimeMsec="7000"
+					thresholdValue="-0.5" recoveryValue="-0.1" referenceTimeMsec="5000" thresholdTimeMsec="7000"
 					recoveryTimeMsec="5000" peakMinimumTimeMsec="2000"
-					comment="Stromeinbruch auf wenigstens ein Zehntel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 7 Sekunden" />
+					comment="Stromeinbruch auf wenigstens die Hälfte mit Wiederanstieg auf mindestens 90%; Dauer höchstens 7 Sekunden" />
 				<Transition transitionId="3" refOrdinal="1" classType="pulse" valueType="deltaFactor"
-					thresholdValue="-0.4" recoveryValue="-0.2" referenceTimeMsec="5000" thresholdTimeMsec="3000"
+					thresholdValue="-0.5" recoveryValue="-0.1" referenceTimeMsec="5000" thresholdTimeMsec="3000"
 					recoveryTimeMsec="5000"
-					comment="Stromeinbruch auf wenigstens ein Zehntel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 3 Sekunden" />
+					comment="Stromeinbruch auf wenigstens die Hälfte mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 3 Sekunden" />
 				<Transition transitionId="6" refOrdinal="1" classType="slope" valueType="deltaFactor"
-					thresholdValue="-0.2" referenceTimeMsec="5000" thresholdTimeMsec="3000"
-					comment="Stromeinbruch auf wenigstens ein Zehntel; Einbruchdauer mindestens 3 Sekunden" />
+					thresholdValue="-0.5" referenceTimeMsec="5000" thresholdTimeMsec="3000"
+					comment="Stromeinbruch auf wenigstens die Hälfte; Einbruchdauer mindestens 3 Sekunden" />
 			</Transitions>
 			<ScoreGroups>
 				<Scoregroup scoregroupId="0">
