@@ -13,17 +13,20 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.data;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,6 +42,7 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.device.TransitionGroupType;
 import gde.device.TriggerType;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
@@ -81,7 +85,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	boolean														isFromFile											= false;																																																								//indicates that this record set was created by loading data from file
 	boolean														isRecalculation									= true;																																																									//indicates record is modified and need re-calculation
 	int																fileDataSize										= 0;																																																										//number of integer values per record
-	int																fileDataBytes										= 0;																																																										//number of bytes containing all records data 
+	int																fileDataBytes										= 0;																																																										//number of bytes containing all records data
 	long															fileDataPointer									= 0;																																																										//file pointer where the data of this record begins
 	boolean														hasDisplayableData							= false;
 	int																xScaleStep											= 0;																																																										// steps in x direction to draw the curves, normally 1
@@ -96,7 +100,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	//for compare set x min/max and y max (time) might be different
 	boolean														isCompareSet										= false;
 	boolean														isUtilitySet										= false;
-	double														maxTime													= 0.0;																																																									//compare set -> each record will have its own timeSteps_ms, 
+	double														maxTime													= 0.0;																																																									//compare set -> each record will have its own timeSteps_ms,
 	//so the biggest record in view point of time will define the time scale
 	double														maxValue												= Integer.MIN_VALUE;
 	double														minValue												= Integer.MAX_VALUE;																																																		//min max value
@@ -154,7 +158,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	int																horizontalGridRecordOrdinal			= -1;																																																										// recordNames[horizontalGridRecord]
 
 	int[]															voltageLimits										= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
-	public static final String				VOLTAGE_LIMITS									= "RecordSet_voltageLimits";																																														// each main tickmark //$NON-NLS-1$		
+	public static final String				VOLTAGE_LIMITS									= "RecordSet_voltageLimits";																																														// each main tickmark //$NON-NLS-1$
 
 	//	boolean												isSyncRecordSelected					= false;
 	//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
@@ -175,13 +179,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final Channels										channels;																																																																								// start point of data hierarchy
 	final IDevice											device;
 	final static DeviceXmlResource		xmlResource											= DeviceXmlResource.getInstance();
-
+	private HistoTransitions					histoTransitions;
+	private TreeMap<Long, Transition>	transitions;
 
 	/**
 	 * record set data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
 	 * @param channelNumber the channel number to be used
-	 * @param newName for the records like "1) Laden" 
+	 * @param newName for the records like "1) Laden"
 	 * @param measurementNames array of the device supported measurement names
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
@@ -203,12 +208,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * special record set data buffers according the size of given names array, where
-	 * the name is the key to access the data buffer used to hold compare able records (compare set) 
+	 * the name is the key to access the data buffer used to hold compare able records (compare set)
 	 * @param useDevice the device
 	 * @param newChannelName the channel name or configuration name
-	 * @param newName for the records like "1) Laden" 
+	 * @param newName for the records like "1) Laden"
 	 * @param newTimeStep_ms time in msec of device measures points
-	 * @param graphicsType 
+	 * @param graphicsType
 	 */
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, GraphicsType graphicsType) {
 		super();
@@ -225,7 +230,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * copy constructor - used to copy a record set to another channel/configuration, 
+	 * copy constructor - used to copy a record set to another channel/configuration,
 	 * where the configuration coming from the device properties file
 	 * @param recordSet
 	 * @param channelConfigurationNumber
@@ -279,7 +284,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
 			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
 
-			//copy record properties if -> record properties available == name equal 
+			//copy record properties if -> record properties available == name equal
 			if (recordSet.get(this.recordNames[i]) != null)
 				tmpRecord.setProperties(recordSet.get(this.recordNames[i]).getProperties());
 			else
@@ -323,14 +328,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * clone method used to move record sets to other configuration or channel
-	 * @param channelConfiguationNumber 
+	 * @param channelConfiguationNumber
 	 */
 	public RecordSet clone(int channelConfiguationNumber) {
 		return new RecordSet(this, channelConfiguationNumber);
 	}
 
 	/**
-	 * copy constructor - used to copy a record set during graphics cut mode. 
+	 * copy constructor - used to copy a record set during graphics cut mode.
 	 * @param recordSet
 	 * @param dataIndex
 	 * @param isFromBegin
@@ -422,7 +427,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * check all records of this record set are displayable
-	 * @return true/false	
+	 * @return true/false
 	 */
 	public boolean checkAllRecordsDisplayable() {
 		int displayableRecordEntries = 0;
@@ -449,7 +454,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
@@ -459,8 +464,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
-				for (int i = 0; i < points.length; i++) {
-					sb.append(points[i]).append(GDE.STRING_BLANK);
+				for (int point : points) {
+					sb.append(point).append(GDE.STRING_BLANK);
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
@@ -475,7 +480,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
 	 * @param time_ms
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addPoints(int[] points, double time_ms) throws DataInconsitsentException {
 		this.timeStep_ms.add(time_ms);
@@ -485,7 +490,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * method to add a series of points to none calculation records (records active or inactive)
 	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addNoneCalculationRecordsPoints"; //$NON-NLS-1$
@@ -495,8 +500,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
-				for (int i = 0; i < points.length; i++) {
-					sb.append(points[i]).append(GDE.STRING_BLANK);
+				for (int point : points) {
+					sb.append(point).append(GDE.STRING_BLANK);
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
@@ -511,22 +516,48 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * method to add a series of points to none calculation records (records active or inactive)
 	 * @param points as int[], where the length must fit records.size()
 	 * @param time_ms
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
 		this.timeStep_ms.add(time_ms);
 		this.addNoneCalculationRecordsPoints(points);
 	}
 
+	public HistoTransitions getHistoTransitions() {
+		if (this.histoTransitions == null) {
+			this.histoTransitions = new HistoTransitions(this);
+			this.histoTransitions.add4Channel(this.channels.getActiveChannelNumber());
+		}
+		return this.histoTransitions;
+	}
+
 	/**
-	 * get all calculated and formated data table points of a given index
+	 * get all calculated and formated data table points of a given index.
+	 * Add transition columns and list the valid transition ID in the transition timestamp rows.
 	 * @param index of the data points
+	 * @param isAbsolute false shows timesteps starting with zero
 	 * @return formatted values as string array including time
 	 */
 	public String[] getDataTableRow(int index, boolean isAbsolute) {
 		String[] dataTableRow = new String[this.size() + 1]; // add time column
 		dataTableRow[0] = this.getFormatedTime_sec(index, isAbsolute);
-		return this.device.prepareDataTableRow(this, dataTableRow, index);
+		this.device.prepareDataTableRow(this, dataTableRow, index);
+
+		if (this.settings.isDataTableTransitions()) {
+			HashMap<Integer, TransitionGroupType> transitionGroups = this.device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
+			dataTableRow = Arrays.copyOf(dataTableRow, this.size() + 1 + transitionGroups.size());
+
+			int i = this.size() + 1;
+			for (Entry<Integer, TransitionGroupType> transitionsGroupsEntry : transitionGroups.entrySet()) {
+				TreeMap<Long, Transition> transitions2 = this.getHistoTransitions().getTransitions(transitionsGroupsEntry.getKey());
+				Transition transition = transitions2.get((long) this.getTime_ms(index));
+				if (transition != null) {
+					dataTableRow[i] = Integer.toString(transition.transitionType.getTransitionId());
+				}
+				i++;
+			}
+		}
+		return dataTableRow;
 	}
 
 	/**
@@ -587,7 +618,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * @param index
 	 * @param isAbsolute true forces the formatting to "yyyy-mm-dd HH:mm:ss.SSS"
-	 * @return the timeSteps_ms formatted relative (e.g. "mm:ss.SSS") or absolute 
+	 * @return the timeSteps_ms formatted relative (e.g. "mm:ss.SSS") or absolute
 	 */
 	public String getFormatedTime_sec(int index, boolean isAbsolute) {
 		if (isAbsolute) {
@@ -637,7 +668,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * method to get the sorted record names as array, use it for logging or debugging purpose only
 	 * sorted according list in the device configuration (XML) file
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getRecordNames() {
 		return this.recordNames.clone();
@@ -703,7 +734,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * method to add an new record name 
+	 * method to add an new record name
 	 */
 	public void addRecordName(String newRecordName) {
 		String[] newRecordNames = new String[this.recordNames.length + 1];
@@ -713,7 +744,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * method to remove a record name 
+	 * method to remove a record name
 	 */
 	void removeRecordName(String deleteRecordName) {
 		Vector<String> newRecordNames = new Vector<String>();
@@ -741,7 +772,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * method to get the sorted record active names which are visible as string array
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getDisplayableAndVisibleRecordNames() {
 		Vector<String> displayableAndVisibleRecords = new Vector<String>();
@@ -753,7 +784,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * method to get the sorted record active names which are visible as string array
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getVisibleRecordNames() {
 		Vector<String> visibleRecords = new Vector<String>();
@@ -789,7 +820,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * method to get the sorted record displayable names as string array
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getDisplayableRecordNames() {
 		Vector<String> displayableRecords = new Vector<String>();
@@ -801,7 +832,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * method to get the sorted record active names as string array
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getActiveRecordNames() {
 		Vector<String> activeRecords = new Vector<String>();
@@ -815,7 +846,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * method to get the sorted active or in active record names as string array
 	 *  - records which does not have inactive or active flag are calculated from active or inactive
 	 *  - all records not calculated may have the active status and must be stored
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getNoneCalculationRecordNames() {
 		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
@@ -823,7 +854,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 *	clear the record set compare view 
+	 *	clear the record set compare view
 	 */
 	@Override
 	public void clear() {
@@ -840,7 +871,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * clears the data points in all records and in timeStep.
 	 * reduce initial capacity to zero.
-	 * does not clear any fields in the recordSet, in the records or in timeStep. 
+	 * does not clear any fields in the recordSet, in the records or in timeStep.
 	 */
 	public void cleanup() {
 		//		this.histoSettlements.clear();
@@ -873,7 +904,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * method to create a record set with given name "1) Laden" containing records according the device channel/configuration
 	 * which are loaded from device properties file
 	 * @param recordSetName the name of the record set
-	 * @param device the instance of the device 
+	 * @param device the instance of the device
 	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
@@ -887,7 +918,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
 			recordNames = device.getMeasurementNamesReplacements(channelConfigNumber = 1);
 		}
-		
+
 		String[] recordSymbols = new String[recordNames.length];
 		String[] recordUnits = new String[recordNames.length];
 		for (int i = 0; i < recordNames.length; i++) {
@@ -903,12 +934,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * method to create a record set with given name "1) Laden" containing records according the given record names, symbols and units.
 	 * active status as well as statistics and properties are used from device properties.
 	 * @param recordSetName the name of the record set
-	 * @param device the instance of the device 
+	 * @param device the instance of the device
 	 * @param channelConfigNumber (name of the outlet or configuration)
 	 * @param recordNames array of names to be used for created records
 	 * @param recordSymbols array of symbols to be used for created records
 	 * @param recordUnits array of units to be used for created records
-	 * @param timeStep_ms 
+	 * @param timeStep_ms
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
@@ -917,7 +948,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
 			boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-		
+
 		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -951,8 +982,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	static void printRecordNames(String methodName, String[] recordNames) {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < recordNames.length; ++i) {
-			sb.append(recordNames[i]).append(GDE.STRING_MESSAGE_CONCAT);
+		for (String recordName : recordNames) {
+			sb.append(recordName).append(GDE.STRING_MESSAGE_CONCAT);
 		}
 		sb.delete(sb.length() - 3, sb.length());
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, methodName, sb.toString());
@@ -1054,7 +1085,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * Set the time step in msec for record sets of devices with constant time step with a positive value.
 	 * A negative value signals none-constant time steps for this record set.
-	 * This method has to be called BEFORE adding data points and will set the time step if called the first time only, 
+	 * This method has to be called BEFORE adding data points and will set the time step if called the first time only,
 	 * if timeStep_ms needs to be changed for some reason use setNewTimeStep_ms
 	 * @param newTimeStep_ms the timeStep_ms to set
 	 */
@@ -1146,6 +1177,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 		// start a low prio tread to load other record set data
 		Thread dataLoadThread = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				CalculationThread ct = RecordSet.this.device.getCalculationThread();
 				try {
@@ -1195,7 +1227,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @return the isFromFile, this flag indicates to call the make allInActiveDisplayable 
+	 * @return the isFromFile, this flag indicates to call the make allInActiveDisplayable
 	 * - the handling might be different if data captured directly from device
 	 */
 	public boolean isFromFile() {
@@ -1203,7 +1235,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * query the size of record set child record 
+	 * query the size of record set child record
 	 * - normal record set will return the size of the data vector of first active in recordNames
 	 * - zoomed set will return size of zoomOffset + zoomWith
 	 * @return the size of data point to calculate the time unit
@@ -1433,7 +1465,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param newDisplayZoomBounds - where the start point offset is x,y and the area is width, height
 	 */
 	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
-		// iterate children 
+		// iterate children
 		for (Record record : this.values()) {
 			record.setZoomBounds(newDisplayZoomBounds);
 		}
@@ -1667,7 +1699,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * get the record name to decide for horizontal grid lines 
+	 * get the record name to decide for horizontal grid lines
 	 * @return the horizontalGridRecord
 	 */
 	@Deprecated
@@ -1911,7 +1943,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * synchronize scales according device properties 
+	 * synchronize scales according device properties
 	 */
 	public void syncScaleOfSyncableRecords() {
 		this.scaleSyncedRecords.clear(); //	= new HashMap<Integer,Vector<Record>>(1);
@@ -1957,7 +1989,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * check if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method 
+	 * check if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
 	 * @param syncMasterRecordOrdinal
 	 * @param tmpRecord
 	 * @return
@@ -2025,13 +2057,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 					syncRecord.syncMaxValue = tmpSyncMax;
 				}
 			}
-			
+
 			if (isAffected && log.isLoggable(Level.FINE)) log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	/**
-	 * synchronize scale properties of master and slave scale synchronized records 
+	 * synchronize scale properties of master and slave scale synchronized records
 	 */
 	public void syncMasterSlaveRecords(Record syncInputRecord, int type) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
@@ -2101,7 +2133,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * query if one of the syncable records is switched visible
-	 * @param syncMasterOrdinal the record name of the sync master record 
+	 * @param syncMasterOrdinal the record name of the sync master record
 	 * @return true if one of the syncable records is visible
 	 */
 	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
@@ -2160,7 +2192,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @return the fileDataBytes, number of bytes containing all records data 
+	 * @return the fileDataBytes, number of bytes containing all records data
 	 */
 	public int getFileDataBytesSize() {
 		return this.fileDataBytes;
@@ -2238,7 +2270,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @param enable the isScopeMode 
+	 * @param enable the isScopeMode
 	 */
 	public void setScopeMode(boolean enable) {
 		this.isScopeMode = enable;
@@ -2269,14 +2301,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * query boolean value to enable curve smoothing due to current drop 
+	 * query boolean value to enable curve smoothing due to current drop
 	 */
 	public boolean isSmoothAtCurrentDrop() {
 		return this.isSmoothAtCurrentDrop;
 	}
 
 	/**
-	 * set boolean value to enable curve smoothing due to current drop 
+	 * set boolean value to enable curve smoothing due to current drop
 	 * @param enable
 	 */
 	public void setSmoothAtCurrentDrop(boolean enable) {
@@ -2337,8 +2369,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public int getRecordOrdinalOfType(Record.DataType dataType) {
 		for (Record record : this.values()) {
 			if (record.dataType == dataType) {
-				if (record.hasReasonableData())
-					return record.ordinal;
+				if (record.hasReasonableData()) return record.ordinal;
 			}
 		}
 		return -1;
@@ -2346,13 +2377,13 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * find the first occurrence of given unit samples and return the record ordinal
-	 * @param units string array of unit 
+	 * @param units string array of unit
 	 * @return record ordinal or -1 if not found
 	 */
 	public int findRecordOrdinalByUnit(String[] units) {
 		for (Record record : this.values()) {
-			for (int i = 0; i < units.length; i++) {
-				if (record.getUnit().toLowerCase().contains(units[i].toLowerCase()) && record.hasReasonableData()) return record.getOrdinal();
+			for (String unit : units) {
+				if (record.getUnit().toLowerCase().contains(unit.toLowerCase()) && record.hasReasonableData()) return record.getOrdinal();
 			}
 		}
 		return -1;
@@ -2360,15 +2391,15 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	/**
 	 * find the first occurrence of given unit samples and return the record ordinal if the value range is within the given boundaries
-	 * @param units string array of unit 
+	 * @param units string array of unit
 	 * @param minBoundaryValue lower value boundary
 	 * @param maxBoundaryValue upper value boundary
 	 * @return record ordinal or -1 if not found
 	 */
 	public int findRecordOrdinalByUnit(String[] units, int minBoundaryValue, int maxBoundaryValue) {
 		for (Record record : this.values()) {
-			if (record.getMinValue() / 1000 >= minBoundaryValue && record.getMaxValue() / 1000 <= maxBoundaryValue) for (int i = 0; i < units.length; i++) {
-				if (record.getUnit().toLowerCase().contains(units[i].toLowerCase()) && record.hasReasonableData()) return record.getOrdinal();
+			if (record.getMinValue() / 1000 >= minBoundaryValue && record.getMaxValue() / 1000 <= maxBoundaryValue) for (String unit : units) {
+				if (record.getUnit().toLowerCase().contains(unit.toLowerCase()) && record.hasReasonableData()) return record.getOrdinal();
 			}
 		}
 		return -1;

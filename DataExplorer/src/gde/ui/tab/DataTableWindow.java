@@ -13,11 +13,13 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -62,6 +64,7 @@ import gde.data.RecordSet;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.device.TransitionGroupType;
 import gde.device.resource.DeviceXmlResource;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -145,13 +148,14 @@ public class DataTableWindow extends CTabItem {
 						@Override
 						public void modifyText(ModifyEvent me) {
 							Text modifyText = (Text) editor.getEditor();
-								editor.getItem().setText(DataTableWindow.this.cursor.getColumn(), modifyText.getText());
+							editor.getItem().setText(DataTableWindow.this.cursor.getColumn(), modifyText.getText());
 						}
 					});
 					text.addVerifyListener(new VerifyListener() {
-						
+
+						@Override
 						public void verifyText(VerifyEvent ve) {
-							ve.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, text.getText());					
+							ve.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, text.getText());
 						}
 					});
 					text.addFocusListener(new FocusListener() {
@@ -159,10 +163,10 @@ public class DataTableWindow extends CTabItem {
 						public void focusLost(FocusEvent fe) {
 							//System.out.println("focus lost");
 							DataTableWindow.this.settings.setDataTableEditable(false);
-							if (!setEditedRecordPoint(row, column)) 
-								DataTableWindow.this.cursor.getRow().setText(column, origText);
+							if (!setEditedRecordPoint(row, column)) DataTableWindow.this.cursor.getRow().setText(column, origText);
 							text.dispose();
 						}
+
 						@Override
 						public void focusGained(FocusEvent arg0) {
 							//System.out.println("focus gained");
@@ -174,14 +178,14 @@ public class DataTableWindow extends CTabItem {
 						public void keyReleased(KeyEvent ke) {
 							//System.out.println("key released");
 						}
+
 						@Override
 						public void keyPressed(KeyEvent ke) {
 							//System.out.println("key pressed");
 							if (ke.character == SWT.CR) {
 								row.setText(column, ((Text) editor.getEditor()).getText());
 								DataTableWindow.this.settings.setDataTableEditable(false);
-								if (!setEditedRecordPoint(row, column)) 
-									DataTableWindow.this.cursor.getRow().setText(column, origText);
+								if (!setEditedRecordPoint(row, column)) DataTableWindow.this.cursor.getRow().setText(column, origText);
 								text.dispose();
 							}
 							// close the text editor when the user hits "ESC"
@@ -274,16 +278,16 @@ public class DataTableWindow extends CTabItem {
 			 * the TableCursor has already internally processed the home/end keyevent
 			 * and changed the row/column, see:
 			 * http://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html
-			 * 
+			 *
 			 * Therefore, we need a Vector that stores the last cell positions, so we can
 			 * access the position before the current position.
-			 * 
+			 *
 			 * @param col
 			 */
 			private void workaroundTableCursor(int col) {
 				/* Get the second element from the vector.
 				 * This represents the row that was active before the keyevent
-				 * fired and the TableCursor automatically changed the row. 
+				 * fired and the TableCursor automatically changed the row.
 				*/
 				int row = DataTableWindow.this.rowVector.get(0);
 				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting selection to row: " + row));
@@ -292,8 +296,7 @@ public class DataTableWindow extends CTabItem {
 				/* As the TableCursor automatically changes the rows and we go back, the item that was on top of the list changes.
 				 * We fix that here to get the original item at the top of the list again.
 				 */
-				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER))
-					DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
 				DataTableWindow.this.dataTable.setTopIndex(DataTableWindow.this.topindexVector.get(0));
 
 				/* Workaround: When Home or End is pressed, the cursor is misplaced in such way,
@@ -364,12 +367,12 @@ public class DataTableWindow extends CTabItem {
 			}
 		});
 		this.dataTable.addKeyListener(new KeyListener() {
-			int	selectionFlowIndex	= 0;
+			int selectionFlowIndex = 0;
 
 			private void workaroundTableCursor(int col) {
 				/* Get the second element from the vector.
 				 * This represents the row that was active before the keyevent
-				 * fired and the TableCursor automatically changed the row. 
+				 * fired and the TableCursor automatically changed the row.
 				*/
 				int row = DataTableWindow.this.rowVector.get(DataTableWindow.this.rowVector.size() - 1);
 				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting selection to row: " + row));
@@ -378,8 +381,7 @@ public class DataTableWindow extends CTabItem {
 				/* As the TableCursor automatically changes the rows and we go back, the item that was on top of the list changes.
 				 * We fix that here to get the original item at the top of the list again.
 				 */
-				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER))
-					DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
+				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINER)) DataTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + DataTableWindow.this.topindexVector.get(0)));
 				DataTableWindow.this.dataTable.setTopIndex(DataTableWindow.this.topindexVector.get(DataTableWindow.this.topindexVector.size() - 1));
 
 				DataTableWindow.this.cursor.setVisible(true);
@@ -484,6 +486,18 @@ public class DataTableWindow extends CTabItem {
 						column.setText(sb.toString());
 					}
 				}
+				if (this.settings.isDataTableTransitions()) {
+					IDevice device = this.application.getActiveDevice();
+					HashMap<Integer, TransitionGroupType> transitionGroups = device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
+					for (Entry<Integer, TransitionGroupType> transitionGroupEntry : transitionGroups.entrySet()) {
+						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+						column.setWidth(6 * extentFactor);
+						if (transitionGroupEntry.getValue().getComment() != null)
+							column.setText(String.format("TG%d: %-22s", transitionGroupEntry.getKey(), transitionGroupEntry.getValue().getComment()));
+						else
+							column.setText(String.format("TG%d", transitionGroupEntry.getKey()));
+					}
+				}
 			}
 			else {
 				IDevice device = this.application.getActiveDevice();
@@ -561,7 +575,7 @@ public class DataTableWindow extends CTabItem {
 		String recordName = DataTableWindow.this.dataTable.getColumn(column).getText();
 		recordName = recordName.substring(0, recordName.lastIndexOf(GDE.STRING_BLANK));
 		Record editRecord = DataTableWindow.this.application.getActiveRecordSet().getRecord(recordName);
-		if (editRecord != null  && StringHelper.verifyTypedInput(DataTypes.DOUBLE, row.getText(column))) {
+		if (editRecord != null && StringHelper.verifyTypedInput(DataTypes.DOUBLE, row.getText(column))) {
 			editRecord.set(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), (int) (Double.valueOf(row.getText(column).replace(',', '.')) * 1000));
 			return true;
 		}

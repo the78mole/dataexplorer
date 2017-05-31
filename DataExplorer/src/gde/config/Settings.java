@@ -173,6 +173,7 @@ public class Settings extends Properties {
 	final static String							GPS_LOCATION_RADIUS							= "gps_location_radius";																																					//$NON-NLS-1$
 	final static String							GPS_ADDRESS_TYPE								= "gps_address_type";																																							//$NON-NLS-1$
 	final static String							SUBDIRECTORY_LEVEL_MAX					= "subdirectory_level_max";																																				//$NON-NLS-1$
+	final static String							IS_DATA_TABLE_TRANSITIONS					= "is_data_table_transitions";																																				//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -775,6 +776,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_LOCATION_RADIUS, getGpsLocationRadius())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_ADDRESS_TYPE, getGpsAddressType())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_TABLE_TRANSITIONS, isDataTableTransitions())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2909,6 +2911,20 @@ public class Settings extends Properties {
 		}
 		catch (Exception e) {
 		}
+	}
+
+	/**
+	 * @param isCurveSurvey true extended curve delta measuring display
+	 */
+	public void setDataTableTransitions(boolean enabled) {
+		this.setProperty(Settings.IS_DATA_TABLE_TRANSITIONS, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true for extended curve delta measuring display
+	 */
+	public boolean isDataTableTransitions() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_TABLE_TRANSITIONS, "false")); //$NON-NLS-1$
 	}
 
 }
