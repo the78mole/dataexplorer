@@ -29,7 +29,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -48,6 +47,8 @@ import gde.log.Level;
 import gde.utils.HistoTimeLine;
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
+import gde.utils.SingleResponseRegression;
+import gde.utils.SingleResponseRegression.RegressionType;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
@@ -58,234 +59,27 @@ import gde.utils.TimeLine;
  * @author Thomas Eickert
  */
 public class TrailRecord extends Record { // todo maybe a better option is to create a common base class for Record and TrailRecord.
-	private final static String		$CLASS_NAME							= TrailRecord.class.getName();
-	private final static long			serialVersionUID				= 110124007964748556L;
-	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
+	private final static String				$CLASS_NAME							= TrailRecord.class.getName();
+	private final static long					serialVersionUID				= 110124007964748556L;
+	private final static Logger				log											= Logger.getLogger($CLASS_NAME);
 
-	public final static String		TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
+	public final static String				TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
-	private final TrailRecordSet	parentTrail;
-	private final MeasurementType	measurementType;																					// measurement / settlement / scoregroup are options
-	private final SettlementType	settlementType;																						// measurement / settlement / scoregroup are options
-	private final ScoreGroupType	scoreGroupType;																						// measurement / settlement / scoregroup are options
-	private int										trailTextSelectedIndex	= -1;															// user selection from applicable trails, is saved in the graphics template
-	private List<String>					applicableTrailsTexts;																		// the user may select one of these entries
-	private List<Integer>					applicableTrailsOrdinals;																	// maps all applicable trails in order to convert the user selection into a valid trail
-	private TrailRecord[]					trailRecordSuite;																					// holds data points in case of trail suites
-	private double								factor									= Double.MIN_VALUE;
-	private double								offset									= Double.MIN_VALUE;
-	private double								reduction								= Double.MIN_VALUE;
+	private final TrailRecordSet			parentTrail;
+	private final MeasurementType			measurementType;																					// measurement / settlement / scoregroup are options
+	private final SettlementType			settlementType;																						// measurement / settlement / scoregroup are options
+	private final ScoreGroupType			scoreGroupType;																						// measurement / settlement / scoregroup are options
+	private int												trailTextSelectedIndex	= -1;															// user selection from applicable trails, is saved in the graphics template
+	private List<String>							applicableTrailsTexts;																		// the user may select one of these entries
+	private List<Integer>							applicableTrailsOrdinals;																	// maps all applicable trails in order to convert the user selection into a valid trail
+	private TrailRecord[]							trailRecordSuite;																					// holds data points in case of trail suites
+	private double										factor									= Double.MIN_VALUE;
+	private double										offset									= Double.MIN_VALUE;
+	private double										reduction								= Double.MIN_VALUE;
 
-	final DeviceXmlResource				xmlResource							= DeviceXmlResource.getInstance();
-	private LinearRegression			linearRegression				= null;
-	private Quantile							quantile								= null;
-
-	/**
-	 *  Performs a simple linear regression on an set of <em>n</em> data points (<em>y<sub>i</sub></em>, <em>x<sub>i</sub></em>).
-	 *  That is, it fits a straight line <em>y</em> = &alpha; + &beta; <em>x</em>, (where <em>y</em> is the response variable, <em>x</em> is the predictor variable,
-	 *  &alpha; is the <em>y-intercept</em>, and &beta; is the <em>slope</em>) that minimizes the sum of squared residuals of the linear regression model.
-	 *  It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope and <em>y</em>-intercept.
-	 *  Source: http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html
-	 *  @author Robert Sedgewick
-	 *  @author Kevin Wayne
-	 *  @author Thomas Eickert
-	 */
-	public class LinearRegression { // todo harmonize with /DataExplorer/src/gde/utils/LinearRegression.java
-		private final int						n;																			// size with y nulls stripped off
-		private final List<Double>	xx		= new ArrayList<>();							// original values with y(!) nulls stripped off
-		private final List<Double>	yy		= new ArrayList<>();							// original values with y nulls stripped off
-
-		private double							xbar	= 0.0, ybar = 0.0;								// averages
-		private double							xxbar	= 0.0, yybar = 0.0, xybar = 0.0;	// (co-)variance times n
-		private double							rss		= 0.0;														// residual sum of squares
-		private double							ssr		= 0.0;														// regression sum of squares
-
-		/**
-		  * Performs a linear regression on the data points {@code (y[i], x[i])}.
-		  * @param  x the values of the predictor variable
-		  * @param  y the corresponding values of the response variable
-		  * @throws IllegalArgumentException if the lengths of the two arrays are not equal or if n<=2
-		  */
-		public LinearRegression(double[] x, double[] y) {
-			this(DoubleStream.of(x).boxed().collect(Collectors.toList()), DoubleStream.of(y).boxed().collect(Collectors.toList()));
-		}
-
-		/**
-		  * Performs a linear regression on the data points {@code (y[i], x[i])}.
-		  * Removes  {@code (y[i], x[i])} if {@code y[i]} is null.
-		  * @param  x the values of the predictor variable
-		  * @param  y the corresponding values of the response variable (may contain nulls)
-		  * @throws IllegalArgumentException if the length of non-null elements is less than 2  or if the length is not equal
-		  */
-		public LinearRegression(List<Double> x, List<Double> y) {
-			if (x.size() != y.size()) {
-				throw new IllegalArgumentException("collection lengths are not equal");
-			}
-
-			// first pass: eliminate y nulls
-			double sumx = 0.0, sumy = 0.0; // , sumx2 = 0.0;
-			for (int i = 0; i < x.size(); i++) {
-				if (y.get(i) != null) {
-					this.xx.add(x.get(i));
-					this.yy.add(y.get(i));
-					sumx += x.get(i);
-					// sumx2 += x.get(i) * x.get(i);
-					sumy += y.get(i);
-				}
-			}
-			this.n = this.xx.size();
-			if (this.n >= 1) {
-				this.xbar = sumx / this.n;
-				this.ybar = sumy / this.n;
-
-				// second pass: covariances
-				for (int i = 0; i < this.n; i++) {
-					this.xxbar += (this.xx.get(i) - this.xbar) * (this.xx.get(i) - this.xbar);
-					this.yybar += (this.yy.get(i) - this.ybar) * (this.yy.get(i) - this.ybar);
-					this.xybar += (this.xx.get(i) - this.xbar) * (this.yy.get(i) - this.ybar);
-				}
-
-				if (this.n >= 2) {
-					// third pass: error estimation
-					for (int i = 0; i < this.n; i++) {
-						double fit = getResponse(this.xx.get(i));
-						this.rss += (fit - this.yy.get(i)) * (fit - this.yy.get(i));
-						this.ssr += (fit - this.ybar) * (fit - this.ybar);
-					}
-				}
-			}
-		}
-
-		/**
-		* @return the <em>y</em>-intercept &alpha; of the best-fit line <em>y = &alpha; + &beta; x</em>
-		*/
-		public double getIntercept() {
-			return this.ybar - getSlope() * this.xbar;
-		}
-
-		/**
-		* @return the slope &beta; of the best-fit line <em>y</em> = &alpha; + &beta; <em>x</em>
-		*/
-		public double getSlope() {
-			if (this.n < 2)
-				return 0;
-			else
-				return this.xybar / this.xxbar;
-		}
-
-		/**
-		 * @return the coefficient of determination <em>R</em><sup>2</sup>,
-		 *         which is a real number between 0 and 1
-		 */
-		public double getR2() {
-			if (this.n < 2)
-				return 0;
-			else
-				return this.ssr / this.yybar;
-		}
-
-		/**
-		* @return the standard error of the estimate for the intercept
-		*/
-		public double getInterceptStdErr() {
-			if (this.n <= 2)
-				return 0;
-			else {
-				double svar = this.rss / (this.n - 2);
-				double svar1 = svar / this.xxbar;
-				return Math.sqrt(svar / this.n + this.xbar * this.xbar * svar1);
-			}
-		}
-
-		/**
-		* @return the standard error of the estimate for the slope
-		*/
-		public double getSlopeStdErr() {
-			if (this.n <= 2)
-				return 0;
-			else {
-				double svar = this.rss / (this.n - 2);
-				return Math.sqrt(svar / this.xxbar);
-			}
-		}
-
-		/**
-		* @param  xValue the predictor variable
-		* @return the expected response {@code y} given the value of the predictor variable {@code x} or 0 if no non-null values exist
-		*/
-		public double getResponse(double xValue) {
-			if (this.n < 1)
-				return 0;
-			else
-				return getSlope() * xValue + getIntercept();
-		}
-
-		/**
-		 * @return the first value {@code x} or 0 if no non-null values exist
-		 */
-		public double getFirstPredictor() {
-			if (this.n < 1)
-				return 0;
-			else
-				return this.xx.get(0);
-		}
-
-		/**
-		* @return the delta of the {@code x} bounds values or 0 if no non-null values exist
-		*/
-		public double getPredictorDelta() {
-			if (this.n < 1)
-				return 0;
-			else
-				return this.xx.get(this.xx.size() - 1) - this.xx.get(0);
-		}
-
-		/**
-		* @return the delta of the {@code y} bounds values or 0 if no non-null values exist
-		*/
-		public double getDelta() {
-			if (this.n < 1)
-				return 0;
-			else
-				return this.yy.get(this.yy.size() - 1) - this.yy.get(0);
-		}
-
-		/**
-		* @return the average of the y values
-		*/
-		public double getAvg() {
-			if (this.n < 1)
-				return 0;
-			else
-				return this.ybar;
-		}
-
-		/**
-		* @return the standard deviation of the y values
-		*/
-		public double getSigma() {
-			if (this.n < 2)
-				return 0;
-			else
-				return Math.sqrt(this.yybar / (this.n - 1));
-		}
-
-		public int getRealSize() {
-			return this.n;
-		}
-
-		/**
-		* @return a string representation of the simple linear regression model,  including the best-fit line and the coefficient of determination  <em>R</em><sup>2</sup>
-		*/
-		@Override
-		public String toString() {
-			StringBuilder s = new StringBuilder();
-			s.append(String.format("%.4f n + %.4f", getSlope(), getIntercept()));
-			s.append("  (R^2 = " + String.format("%.3f", getR2()) + ")");
-			return s.toString();
-		}
-
-	}
+	final DeviceXmlResource						xmlResource							= DeviceXmlResource.getInstance();
+	private SingleResponseRegression	regression							= null;
+	private Quantile									quantile								= null;
 
 	/**
 	 * creates a vector for a measurementType to hold data points.
@@ -1137,7 +931,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @param timeStamp2_ms is the time of the delta measurement end value
 	 */
 	public void setBounds(long timeStamp1_ms, long timeStamp2_ms) {
-		this.linearRegression = null;
+		this.regression = null;
 		this.quantile = null;
 
 		final TrailRecord trailRecord;
@@ -1175,11 +969,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 
 		if (!boundedTimeStamps_ms.isEmpty()) {
-			this.linearRegression = new LinearRegression(boundedTimeStamps_ms, boundedValues);
+			this.regression = new SingleResponseRegression(boundedTimeStamps_ms, boundedValues, RegressionType.LINEAR);
 			this.quantile = new Quantile(boundedValues, EnumSet.of(Fixings.IS_SAMPLE), 99., 99.);
 			if (log.isLoggable(Level.FINER)) {
 				Date date = new Date(boundedTimeStamps_ms.get(0).longValue());
-				log.log(Level.FINER, String.format("regressionSize=%d regressionRealSize=%d starts at %tF %tR", boundedValues.size(), this.linearRegression.getRealSize(), date, date));
+				log.log(Level.FINER, String.format("regressionSize=%d regressionRealSize=%d starts at %tF %tR", boundedValues.size(), this.regression.getRealSize(), date, date));
 			}
 		}
 	}
@@ -1188,14 +982,14 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @return the formatted translated average of all bounds values
 	 */
 	public String getFormattedBoundsAvg() {
-		return this.getFormattedScaleValue(this.linearRegression.getAvg());
+		return this.getFormattedScaleValue(this.regression.getAvg());
 	}
 
 	/**
 	 * @return the formatted translated difference between the left and right bounds values
 	 */
 	public String getFormattedBoundsDelta() {
-		return this.getFormattedScaleValue(0. - this.linearRegression.getDelta());
+		return this.getFormattedScaleValue(0. - this.regression.getDelta());
 	}
 
 	/**
@@ -1203,8 +997,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 */
 	@Deprecated
 	public String getFormattedBoundsDeltaSlope() {
-		final long endTimeStamp_ms = (long) this.linearRegression.getFirstPredictor(); // inverse sorted order
-		final long startTimeStamp_ms = (long) (this.linearRegression.getFirstPredictor() + this.linearRegression.getPredictorDelta());
+		final long endTimeStamp_ms = (long) this.regression.getFirstRegressor(); // inverse sorted order
+		final long startTimeStamp_ms = (long) (this.regression.getFirstRegressor() + this.regression.getRegressorDelta());
 		Calendar startCalendar = new GregorianCalendar();
 		startCalendar.setTimeInMillis(startTimeStamp_ms);
 		Calendar endCalendar = new GregorianCalendar();
@@ -1229,16 +1023,16 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 		if (monthDelta > 12) fractionalMonthsDelta = monthDelta - 12 + fractionalMonthsDelta;
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("%tF %tR %tF %tR delta=%f months=%f", startCalendar.getTime(), startCalendar.getTime(), endCalendar.getTime(), //$NON-NLS-1$
-				endCalendar.getTime(), this.linearRegression.getDelta(), fractionalMonthsDelta));
+				endCalendar.getTime(), this.regression.getDelta(), fractionalMonthsDelta));
 
-		return this.getFormattedScaleValue(-this.linearRegression.getDelta() / fractionalMonthsDelta);
+		return this.getFormattedScaleValue(-this.regression.getDelta() / fractionalMonthsDelta);
 	}
 
 	/**
 	 * @return the formatted translated regression slope of the bounds values based on months
 	 */
 	public String getFormattedBoundsSlope() {
-		return this.getFormattedScaleValue(this.linearRegression.getSlope() * GDE.ONE_HOUR_MS * 24 * 365 / 12);
+		return this.getFormattedScaleValue(this.regression.getSlope() * GDE.ONE_HOUR_MS * 24 * 365 / 12);
 	}
 
 	/**
@@ -1522,11 +1316,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	public double getBoundedAvgValue() {
-		return this.linearRegression.getAvg();
+		return this.regression.getAvg();
 	}
 
 	public double getBoundedSlopeValue(long timeStamp_ms) {
-		return this.linearRegression.getResponse(timeStamp_ms);
+		return this.regression.getResponse(timeStamp_ms);
 	}
 
 	public double getBoundedQuartile0Value() {
@@ -1558,7 +1352,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	public boolean isValidBounds() {
-		return this.linearRegression != null;
+		return this.regression != null;
 	}
 
 }

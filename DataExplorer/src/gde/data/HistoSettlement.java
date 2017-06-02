@@ -44,7 +44,6 @@ import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.ReferenceGroupType;
 import gde.device.ReferenceRuleTypes;
-import gde.device.SettlementMappingType;
 import gde.device.SettlementType;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
@@ -53,6 +52,8 @@ import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
+import gde.utils.SingleResponseRegression;
+import gde.utils.SingleResponseRegression.RegressionType;
 
 /**
  * holds settlement points of a line or curve calculated from measurements.
@@ -110,9 +111,7 @@ public class HistoSettlement extends Vector<Integer> {
 				this.records[i] = HistoSettlement.this.parent.get(HistoSettlement.this.parent.recordNames[measurementMappingType.getMeasurementOrdinal()]);
 				i++;
 			}
-			for (SettlementMappingType settlementMappingType : referenceGroupType.getSettlementMapping()) {
-				throw new UnsupportedOperationException();
-			}
+			if (!referenceGroupType.getSettlementMapping().isEmpty()) throw new UnsupportedOperationException("settlements based on settlements not supported");
 		}
 
 		/**
@@ -130,23 +129,15 @@ public class HistoSettlement extends Vector<Integer> {
 		/**
 		 * @param fromIndex
 		 * @param toIndex
-		 * @return the average of the portion of the un-translated values between fromIndex, inclusive, and toIndex, exclusive
+		 * @return the average of the portion of the translated values between fromIndex, inclusive, and toIndex, exclusive
 		 */
-		public Double getRawAverage(int fromIndex, int toIndex) {
+		public Double getAverage(int fromIndex, int toIndex) {
 			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 					: HistoSettlement.outlierRangeFactorDefault;
 			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor).getAvgFigure();
-		}
-
-		public double getPropertyFactor() {
-			double factor = this.records[0].getFactor();
-			for (Record record : this.records) {
-				if (factor != record.getFactor()) throw new UnsupportedOperationException();
-			}
-			return factor;
 		}
 
 		/**
@@ -248,13 +239,23 @@ public class HistoSettlement extends Vector<Integer> {
 		 * @param toIndex
 		 * @return the portion of the aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
 		 */
-		public Vector<Double> getSubGrouped(int fromIndex, int toIndex) {
+		public List<Double> getSubGrouped(int fromIndex, int toIndex) {
 			int recordSize = toIndex - fromIndex;
-			Vector<Double> result = new Vector<Double>(recordSize);
+			List<Double> result = new ArrayList<Double>(recordSize);
 			for (int i = fromIndex; i < toIndex; i++) {
 				result.add(getReal(i));
 			}
 			log.log(Level.FINER, getComment(), result);
+			return result;
+		}
+
+		public List<Double> getSubTimeSteps_ms(int fromIndex, int toIndex) {
+			int recordSize = toIndex - fromIndex;
+			List<Double> result = new ArrayList<Double>(recordSize);
+			for (int i = fromIndex; i < toIndex; i++) {
+				result.add(HistoSettlement.this.parent.timeStep_ms.getTime_ms(i));
+			}
+			log.log(Level.FINER, "", result);
 			return result;
 		}
 
@@ -328,20 +329,22 @@ public class HistoSettlement extends Vector<Integer> {
 		double deltaValue = 0.;
 		TransitionCalculusType transitionCalculus = this.settlement.getEvaluation().getTransitionCalculus();
 
-		// determine the direction of the peak or pulse or jump
+		// determine the direction of the peak or pulse or slope
 		final boolean isPositiveDirection;
-		{// extend the threshold by one additional time step before and after in order to cope with potential measurement latencies
-			final int extendLeftIndex = transition.referenceSize > 1 ? 1 : 0;
-			final int extendRightIndex = transition.recoverySize > 1 ? 1 : 0;
-			final double referenceAvg = recordGroup.getRawAverage(transition.referenceStartIndex, transition.referenceEndIndex + 1 - extendLeftIndex);
-			final double thresholdAvg = recordGroup.getRawAverage(transition.thresholdStartIndex - extendLeftIndex, transition.thresholdEndIndex + 1 + extendRightIndex);
+		{
 			if (transition.isSlope()) {
-				isPositiveDirection = (referenceAvg < thresholdAvg) ^ (recordGroup.getPropertyFactor() < 0.);
+				int fromIndex = transition.referenceStartIndex;
+				int toIndex = transition.thresholdEndIndex + 1;
+				SingleResponseRegression regression = new SingleResponseRegression(recordGroup.getSubTimeSteps_ms(fromIndex, toIndex), recordGroup.getSubGrouped(fromIndex, toIndex), RegressionType.LINEAR);
+				isPositiveDirection = regression.getSlope() > 0;
 			}
 			else {
-				final double recoveryAvg = recordGroup.getRawAverage(transition.recoveryStartIndex + extendRightIndex, transition.recoveryEndIndex + 1);
-				isPositiveDirection = (referenceAvg + recoveryAvg < 2. * thresholdAvg) ^ (recordGroup.getPropertyFactor() < 0.);
+				int fromIndex = transition.referenceStartIndex;
+				int toIndex = transition.recoveryEndIndex + 1;
+				SingleResponseRegression regression = new SingleResponseRegression(recordGroup.getSubTimeSteps_ms(fromIndex, toIndex), recordGroup.getSubGrouped(fromIndex, toIndex), RegressionType.QUADRATIC);
+				isPositiveDirection = regression.getGamma() < 0;
 			}
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "direction: ", isPositiveDirection);
 		}
 
 		double referenceExtremum = 0.;
@@ -712,7 +715,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RELATIVE_DELTA_PERCENT) {
 				final double relativeDeltaValue = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition) / (recordGroup.getRealMax() - recordGroup.getRealMin());
-				reverseTranslatedResult = (int) ( calculus.isUnsigned() ? Math.abs(relativeDeltaValue)  * 1000. * 100. : relativeDeltaValue * 1000. * 100.); // all internal values are multiplied by 1000
+				reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(relativeDeltaValue) * 1000. * 100. : relativeDeltaValue * 1000. * 100.); // all internal values are multiplied by 1000
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
