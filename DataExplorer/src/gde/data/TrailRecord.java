@@ -969,7 +969,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		}
 
 		if (!boundedTimeStamps_ms.isEmpty()) {
-			this.regression = new SingleResponseRegression(boundedTimeStamps_ms, boundedValues, RegressionType.LINEAR);
+			this.regression = new SingleResponseRegression(boundedTimeStamps_ms, boundedValues, RegressionType.QUADRATIC);
 			this.quantile = new Quantile(boundedValues, EnumSet.of(Fixings.IS_SAMPLE), 99., 99.);
 			if (log.isLoggable(Level.FINER)) {
 				Date date = new Date(boundedTimeStamps_ms.get(0).longValue());
@@ -1355,4 +1355,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.regression != null;
 	}
 
+	public double[] getBoundedParabolaCoefficients() {
+		return new double[] { this.regression.getAlpha(), this.regression.getBeta(), this.regression.getGamma() };
+	}
+
+	public double getBoundedParabolaValue(long timeStamp_ms) {
+		return this.regression.getResponse(timeStamp_ms);
+	}
+
+	public boolean isBoundedParabola() {
+		return this.regression.getGamma() != 0.;
+	}
 }

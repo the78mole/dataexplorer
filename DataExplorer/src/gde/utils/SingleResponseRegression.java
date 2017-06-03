@@ -19,6 +19,8 @@
 package gde.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -56,8 +58,16 @@ public class SingleResponseRegression { // todo harmonize with /DataExplorer/src
 	  * @param  type
 	  * @throws IllegalArgumentException if the lengths of the two arrays are not equal or if n<=2
 	  */
-	public SingleResponseRegression(double[] x, double[] y, RegressionType type) {
+	public SingleResponseRegression(double[] x, double[] y, RegressionType type) { // todo copy the full constructor without null check for better performance
 		this(DoubleStream.of(x).boxed().collect(Collectors.toList()), DoubleStream.of(y).boxed().collect(Collectors.toList()), type);
+	}
+
+	public SingleResponseRegression(int[] x, int[] y, RegressionType type) {
+		this(Arrays.stream(x).mapToDouble(i -> i).boxed().collect(Collectors.toList()), Arrays.stream(y).mapToDouble(i -> i).boxed().collect(Collectors.toList()), type);
+	}
+
+	public SingleResponseRegression(Collection<Integer> x, List<Integer> y, RegressionType type) { // todo copy the full constructor for better performance
+		this(x.stream().mapToDouble(i -> i).boxed().collect(Collectors.toList()), y.stream().mapToDouble(i -> i).boxed().collect(Collectors.toList()), type);
 	}
 
 	/**

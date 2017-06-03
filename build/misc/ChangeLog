@@ -36,7 +36,7 @@ History analysis
 		- graphics template support (no default set of templates get delivered) 
 		- analyze values in detail in the measurement mode (absolute / delta)
 		  - measurements table
-		  - delta measurements with linear regression and boxplot
+		  - delta measurements with regression and boxplot
 		- right click on a source file in the history graph / table and 
 			- open it in the graphics tab for detailed analysis
 			- exclude / reintegrate it in the history analysis (e.g. preflight tests)

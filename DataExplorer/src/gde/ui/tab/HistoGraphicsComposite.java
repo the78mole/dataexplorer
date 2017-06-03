@@ -564,7 +564,7 @@ public class HistoGraphicsComposite extends Composite {
 		this.canvasGC.setForeground(trailRecord.getColor());
 
 		if (this.curveSurvey == null) {
-			this.curveSurvey = new CurveSurvey(this.canvasGC, trailRecord);
+			this.curveSurvey = new CurveSurvey(this.canvasGC, trailRecord, this.timeLine);
 		}
 		else {
 			this.curveSurvey.setCanvasGC(this.canvasGC);
@@ -575,7 +575,7 @@ public class HistoGraphicsComposite extends Composite {
 			long timestampMeasureNew_ms = isRefresh ? this.curveSurvey.getTimestampMeasure_ms() : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timestampMeasure_ms=" + timestampMeasureNew_ms + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
 
-			this.curveSurvey.setPosMeasure(this.curveAreaBounds, this.timeLine, timestampMeasureNew_ms);
+			this.curveSurvey.setPosMeasure(this.curveAreaBounds, timestampMeasureNew_ms);
 
 			String statusMessage = this.curveSurvey.drawMeasurementGraphics();
 			this.application.setStatusMessage(statusMessage);
@@ -586,11 +586,11 @@ public class HistoGraphicsComposite extends Composite {
 			long timestampMeasureNew_ms = isRefresh ? this.curveSurvey.getTimestampMeasure_ms() : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timestampMeasure_ms=" + timestampMeasureNew_ms + " isRefresh=" + isRefresh); //$NON-NLS-1$ //$NON-NLS-2$
 
-			this.curveSurvey.setPosMeasure(this.curveAreaBounds, this.timeLine, timestampMeasureNew_ms);
+			this.curveSurvey.setPosMeasure(this.curveAreaBounds, timestampMeasureNew_ms);
 
 			long timestampDeltaNew_ms = isRefresh ? this.curveSurvey.getTimestampDelta_ms() : this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 3 * 2);
 
-			this.curveSurvey.setPosDelta(this.curveAreaBounds, this.timeLine, timestampDeltaNew_ms);
+			this.curveSurvey.setPosDelta(this.curveAreaBounds, timestampDeltaNew_ms);
 
 			String statusMessage = this.curveSurvey.drawDeltaMeasurementGraphics();
 			this.application.setStatusMessage(statusMessage);
@@ -723,12 +723,12 @@ public class HistoGraphicsComposite extends Composite {
 							this.curveSurvey.clearOldMeasureLines(this.canvasImage);
 
 							if (trailRecordSet.isMeasurementMode(measureRecordKey)) {
-								this.curveSurvey.setPosMeasure(this.curveAreaBounds, this.timeLine, timestampMeasureNew_ms);
+								this.curveSurvey.setPosMeasure(this.curveAreaBounds, timestampMeasureNew_ms);
 								String statusMessage = this.curveSurvey.drawMeasurementGraphics();
 								this.application.setStatusMessage(statusMessage);
 							}
 							else if (trailRecordSet.isDeltaMeasurementMode(measureRecordKey)) {
-								this.curveSurvey.setPosMeasure(this.curveAreaBounds, this.timeLine, timestampMeasureNew_ms);
+								this.curveSurvey.setPosMeasure(this.curveAreaBounds, timestampMeasureNew_ms);
 								String statusMessage = this.curveSurvey.drawDeltaMeasurementGraphics();
 								this.application.setStatusMessage(statusMessage);
 							}
@@ -752,7 +752,7 @@ public class HistoGraphicsComposite extends Composite {
 						if (timestampDeltaNew_ms != this.curveSurvey.getTimestampDelta_ms() || yPosDeltaNew != this.curveSurvey.getyPosDelta()) {
 							this.curveSurvey.clearOldMeasureLines(this.canvasImage);
 
-							this.curveSurvey.setPosDelta(this.curveAreaBounds, this.timeLine, timestampDeltaNew_ms);
+							this.curveSurvey.setPosDelta(this.curveAreaBounds, timestampDeltaNew_ms);
 							String statusMessage = this.curveSurvey.drawDeltaMeasurementGraphics();
 							this.application.setStatusMessage(statusMessage);
 
