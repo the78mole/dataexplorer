@@ -28,10 +28,10 @@ import java.util.stream.DoubleStream;
 /**
  *  It fits a straight line <em>y</em> = &alpha; + &beta; <em>x</em>, (where <em>y</em> is the response variable, <em>x</em> is the independent variable,
  *  &alpha; is the <em>y-intercept</em>, and &beta; is the <em>slope</em>).
- *  It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope.</br>
- *  Also supports quadratic regression of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>.</br>
- *  Algorithm: http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html</br>
- * 	Quadratic regression: http://www.stksachs.uni-leipzig.de/tl_files/media/pdf/lehrbuecher/informatik/Regressionsanalyse.pdf
+ *  It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope.<br>
+ *  Also supports quadratic regression of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>.<br>
+ * @see <a href="http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html">Basic algorithm</a>
+ * @see <a href="http://www.stksachs.uni-leipzig.de/tl_files/media/pdf/lehrbuecher/informatik/Regressionsanalyse.pdf">Quadratic regression</a>
  */
 public class SingleResponseRegression { // todo harmonize with /DataExplorer/src/gde/utils/LinearRegression.java
 

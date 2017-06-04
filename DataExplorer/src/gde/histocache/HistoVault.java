@@ -1003,9 +1003,9 @@ public class HistoVault {
 	}
 
 	/**
-	 * source: http://www.sha1-online.com/sha1-java/
 	 * @param input
 	 * @return the SHA-1 hash value rendered as a hexadecimal number, 40 digits long
+	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	private static String sha1(String input) {
 		byte[] hashBytes = null;
@@ -1023,10 +1023,10 @@ public class HistoVault {
 	}
 
 	/**
-	 * source: http://www.sha1-online.com/sha1-java/
 	 * @param file
 	 * @return the file's full data SHA1 checksum
 	 * @throws IOException
+	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	private static String sha1(File file) throws IOException {
 		MessageDigest sha1Digest = null;
@@ -1162,13 +1162,13 @@ public class HistoVault {
 
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-							final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
+							final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
 									: HistoSettlement.outlierSigmaDefault;
 							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+							final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 									: HistoSettlement.outlierRangeFactorDefault;
 							// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
-							Quantile quantile = new Quantile(record.getTranslatedValues(), isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+							Quantile quantile = new Quantile(record.getTranslatedValues(), isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
 							entryPoints.addPoint(TrailTypes.AVG, (int) (this.device.reverseTranslateValue(record, quantile.getAvgFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.MAX, (int) (this.device.reverseTranslateValue(record, quantile.getMaxFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.MIN, (int) (this.device.reverseTranslateValue(record, quantile.getMinFigure()) * 1000.));
@@ -1187,7 +1187,7 @@ public class HistoVault {
 							entryPoints.addPoint(TrailTypes.LAST, (int) (this.device.reverseTranslateValue(record, quantile.getLastFigure()) * 1000.));
 							// trigger trail types sum are not supported for measurements
 							entryPoints.addPoint(TrailTypes.SUM, (int) (0 * 1000.));
-							entryPoints.addPoint(TrailTypes.COUNT, (int) (this.device.reverseTranslateValue(record, quantile.getSizeFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.COUNT, (int) (this.device.reverseTranslateValue(record, quantile.getSize()) * 1000.));
 						}
 						log.log(Level.FINER, record.getName() + " data ", entryPoints); //$NON-NLS-1$
 					}
@@ -1239,12 +1239,12 @@ public class HistoVault {
 							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 
 							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-							final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
+							final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
 									: HistoSettlement.outlierSigmaDefault;
 							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-							final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+							final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 									: HistoSettlement.outlierRangeFactorDefault;
-							Quantile quantile = new Quantile(histoSettlement.getTranslatedValues(), isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+							Quantile quantile = new Quantile(histoSettlement.getTranslatedValues(), isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
 
 							entryPoints.addPoint(TrailTypes.REAL_AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.REAL_MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getMaxFigure()) * 1000.));
@@ -1253,7 +1253,7 @@ public class HistoVault {
 							entryPoints.addPoint(TrailTypes.REAL_FIRST, (int) (histoSettlement.reverseTranslateValue(quantile.getFirstFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.REAL_LAST, (int) (histoSettlement.reverseTranslateValue(quantile.getLastFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.REAL_SUM, (int) (histoSettlement.reverseTranslateValue(quantile.getSumFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.REAL_COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSizeFigure() * 1000) * 1000.));
+							entryPoints.addPoint(TrailTypes.REAL_COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSize() * 1000) * 1000.));
 
 							entryPoints.addPoint(TrailTypes.AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getMaxFigure()) * 1000.));
@@ -1272,7 +1272,7 @@ public class HistoVault {
 							entryPoints.addPoint(TrailTypes.FIRST, (int) (histoSettlement.reverseTranslateValue(quantile.getFirstFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.LAST, (int) (histoSettlement.reverseTranslateValue(quantile.getLastFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.SUM, (int) (histoSettlement.reverseTranslateValue(quantile.getSumFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSizeFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSize()) * 1000.));
 						}
 						log.log(Level.FINER, histoSettlement.getName() + " data ", this.getSettlements()); //$NON-NLS-1$
 					}

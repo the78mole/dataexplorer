@@ -1320,32 +1320,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.regression.getResponse(timeStamp_ms);
 	}
 
-	public double getBoundedQuartile0Value() {
-		return this.quantile.getQuartile0();
-	}
-
-	public double getBoundedQuartile1Value() {
-		return this.quantile.getQuartile1();
-	}
-
-	public double getBoundedQuartile2Value() {
-		return this.quantile.getQuartile2();
-	}
-
-	public double getBoundedQuartile3Value() {
-		return this.quantile.getQuartile3();
-	}
-
-	public double getBoundedQuartile4Value() {
-		return this.quantile.getQuartile4();
-	}
-
-	public double getBoundedLowerWhiskerValue() {
-		return this.quantile.getQuantileLowerWhisker();
-	}
-
-	public double getBoundedUpperWhiskerValue() {
-		return this.quantile.getQuantileUpperWhisker();
+	public double[] getBoundedBoxplotValues() {
+		return this.quantile.getTukeyBoxPlot();
 	}
 
 	public boolean isValidBounds() {

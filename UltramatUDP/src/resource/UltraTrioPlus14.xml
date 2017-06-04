@@ -636,7 +636,7 @@
 			</ScoreGroups>
 		</Channel>
 		<property name="outlier_sigma" value="3" type="Integer" description="3600 measurements per hour do not allow a higher value, i.e. we allow 1 lower and 1 upper outlier for a log with 13 minutes" />
-        <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0"/>
+        <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the tolerance interval extended by a factor of 2.0"/>
 	</Channels>
 	<Desktop>
 		<property name="table_tab" value="true" />

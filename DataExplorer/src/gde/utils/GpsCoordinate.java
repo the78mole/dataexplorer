@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
@@ -131,7 +131,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	}
 
 	/**
-	 * @param yourCoordinate 
+	 * @param yourCoordinate
 	 * @return as negative, 0, or positive if the this object is less than, equal to, or greater than yourCoordinate
 	 */
 	@Override
@@ -145,10 +145,9 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	/**
 	 * based on the haversine formula.
 	 * particularly well-conditioned for numerical computation even at small distances.
-	 * http://www.movable-type.co.uk/scripts/latlong.html 
-	 * http://wikivisually.com/lang-de/wiki/Gro%C3%9Fkreis
 	 * @param yourCoordinate
 	 * @return the great circle distance in km
+	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Latitude / longitude formulae</a>
 	 */
 	public double getDistance(GpsCoordinate yourCoordinate) {
 		double phi1 = Math.toRadians(this.latitude);

@@ -13,20 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.exception.ApplicationConfigurationException;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.dialog.edit.DevicePropertiesEditor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -76,6 +66,16 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.dialog.edit.DevicePropertiesEditor;
+
 /**
  * Utility class with helpers around file and directory handling
  * @author Winfried Brügmann
@@ -108,7 +108,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * copy all files from source directory to target directory 
+	 * copy all files from source directory to target directory
 	 * @param srcDir
 	 * @param tgtDir
 	 * @throws IOException
@@ -151,7 +151,7 @@ public class FileUtils {
 	/**
 	 * check existence of a directory and file version and create if not exist, backup if version does not match
 	 * @param directory
-	 * @param versionFileName string qualifier "_V01" checks for file *_V01.* 
+	 * @param versionFileName string qualifier "_V01" checks for file *_V01.*
 	 * @return true false if directory needs to be created
 	 */
 	public static boolean checkDirectoryAndCreate(String directory, String versionFileName) {
@@ -176,7 +176,7 @@ public class FileUtils {
 							}
 						}
 					}
-					//check if a directory ending with the actual version already exist to re-use if legacy GDE was started before and a newer version has renamed 
+					//check if a directory ending with the actual version already exist to re-use if legacy GDE was started before and a newer version has renamed
 					File versionDir = new File(directory + "_V" + version); //$NON-NLS-1$
 					if (versionDir.exists()) {
 						if (!versionDir.renameTo(new File(directory))) {
@@ -509,7 +509,7 @@ public class FileUtils {
 	 * get the input stream of a file from a given jar archive
 	 * @param jarFile
 	 * @param jarInternalFilePath
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static InputStream getFileInputStream(JarFile jarFile, String jarInternalFilePath) throws IOException {
 		// normalize input file path
@@ -634,7 +634,7 @@ public class FileUtils {
 		while (enties.hasMoreElements()) {
 			JarEntry jarEntry = enties.nextElement();
 			String entryName = jarEntry.getName();
-			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(GDE.STRING_DOT) && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$ 
+			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(GDE.STRING_DOT) && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$
 				ZipEntry ze = jarFile.getEntry(entryName);
 				FileUtils.checkDirectoryAndCreate(targetDirectory + entryName.substring(0, entryName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 				try {
@@ -847,7 +847,7 @@ public class FileUtils {
 	public static String findDeviceProjectDirectoryPath(DeviceConfiguration deviceConfig) throws MalformedURLException, URISyntaxException, ApplicationConfigurationException, ClassNotFoundException {
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName // full qualified
-				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ 
+				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
 		if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -873,7 +873,7 @@ public class FileUtils {
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		IDevice newInst = null;
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName // full qualified
-				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ 
+				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
 		if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class<?> c = loader.loadClass(className);
@@ -1024,7 +1024,7 @@ public class FileUtils {
 					FileUtils.log.log(Level.SEVERE, "Internal Error - permission not usable (" + unixPermissions + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "chmod 755 " + fileName);
-				Runtime.getRuntime().exec(new String[] { "chmod", unixPermissions, fullQualifiedFilePath }).waitFor(); //$NON-NLS-1$ 
+				Runtime.getRuntime().exec(new String[] { "chmod", unixPermissions, fullQualifiedFilePath }).waitFor(); //$NON-NLS-1$
 			}
 			catch (Throwable e) {
 				//ignore
@@ -1033,7 +1033,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * find out the base path where the application Jars are located  
+	 * find out the base path where the application Jars are located
 	 * @return operating depending path where the device plug-in jar are located
 	 */
 	public static String getJarBasePath() {
@@ -1045,7 +1045,7 @@ public class FileUtils {
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" //$NON-NLS-1$ //$NON-NLS-2$
-					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$ 
+					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$
 					+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + GDE.FILE_SEPARATOR_UNIX;
 		}
 		else { // started outside java -jar *.jar
@@ -1058,7 +1058,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * find out the base path where the device plug-in jar are located 
+	 * find out the base path where the device plug-in jar are located
 	 * @return operating depending path where the device plug-in jar are located
 	 */
 	public static String getDevicePluginJarBasePath() {
@@ -1075,8 +1075,8 @@ public class FileUtils {
 				//jarPath = basePath + "build" + GDE.FILE_SEPARATOR_UNIX + "target" + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" //$NON-NLS-1$ //$NON-NLS-2$
-						+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$ 
-						+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + "/devices"; //$NON-NLS-1$ 
+						+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$
+						+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + "/devices"; //$NON-NLS-1$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -1102,7 +1102,7 @@ public class FileUtils {
 
 	/**
 	 * get the names of the exported device services
-	 * @param jarFile 
+	 * @param jarFile
 	 * @throws IOException
 	 */
 	public static String[] getDeviceJarServicesNames(JarFile jarFile) throws IOException {
@@ -1122,7 +1122,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * check the java executable version 
+	 * check the java executable version
 	 * @param javaFullQualifiedExecutablePath /usr/lib/jvm/java-sun/java
 	 * @param expectedVersionString 1.6
 	 * @return true if the expected version is lower or equal the version found by executing the given java executable
@@ -1196,7 +1196,7 @@ public class FileUtils {
 			if (start < versionStringLength) minor = Integer.parseInt(version.substring(start, index));
 		}
 		catch (NumberFormatException e) {
-			//ignore			
+			//ignore
 		}
 		start = ++index;
 		while (index < versionStringLength && Character.isDigit(version.charAt(index)))
@@ -1248,7 +1248,7 @@ public class FileUtils {
 	/**
 	  * @param rootDirectory
 	  * @return unsorted list of directories without sub-level directories
-	  * @throws FileNotFoundException if the param is not a directory 
+	  * @throws FileNotFoundException if the param is not a directory
 	  */
 	public static List<File> getDirectories(File rootDirectory) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
@@ -1410,7 +1410,7 @@ public class FileUtils {
 		//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
 		//			}
 		//		}
-		//		if (GDE.IS_WINDOWS) 
+		//		if (GDE.IS_WINDOWS)
 		//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "Register*.exe", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		//		else if (GDE.IS_LINUX)
 		//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "*register.sh", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -1651,11 +1651,11 @@ public class FileUtils {
 		}
 	}
 
-	/** 
+	/**
 	 * Attempts to calculate the size of a file or directory.
-	 * <p> Since the operation is non-atomic, the returned value may be inaccurate. 
+	 * <p> Since the operation is non-atomic, the returned value may be inaccurate.
 	 * However, this method is quick and does its best.
-	 * http://stackoverflow.com/a/19877372
+	 * @see <a href="http://stackoverflow.com/a/19877372">Code example</a>
 	 */
 	public static long size(Path path) {
 		final AtomicLong size = new AtomicLong(0);

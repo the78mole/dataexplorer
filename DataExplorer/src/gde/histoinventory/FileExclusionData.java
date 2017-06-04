@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
@@ -88,7 +88,7 @@ public class FileExclusionData extends Properties {
 			}
 		}
 	}
-	
+
 	@Override
 	public synchronized Object setProperty(String dataFileName, String recordsetBaseName) {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
@@ -125,7 +125,7 @@ public class FileExclusionData extends Properties {
 
 	/**
 	 * @param key is the data file name of the vault / truss
-	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname') 
+	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname')
 	 */
 	public String getFormattedProperty(String key) {
 		return getProperty(key).isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + getProperty(key);
@@ -133,7 +133,7 @@ public class FileExclusionData extends Properties {
 
 	/**
 	 * @param dataFilePath is the full data file path of the vault / truss
-	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname') 
+	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname')
 	 */
 	public String getFormattedProperty(Path dataFilePath) {
 		String dataFileName = dataFilePath.getFileName().toString();
@@ -239,9 +239,9 @@ public class FileExclusionData extends Properties {
 	}
 
 	/**
-	 * source: http://www.sha1-online.com/sha1-java/
 	 * @param input
 	 * @return the SHA-1 hash value rendered as a hexadecimal number, 40 digits long
+	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	private String sha1(String input) {
 		byte[] hashBytes = null;
@@ -252,8 +252,8 @@ public class FileExclusionData extends Properties {
 			e.printStackTrace();
 		}
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < hashBytes.length; i++) {
-			sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16).substring(1));
+		for (byte hashByte : hashBytes) {
+			sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
 		}
 		return sb.toString();
 	}

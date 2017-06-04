@@ -40,6 +40,7 @@ import gde.ui.SWTResourceManager;
 import gde.utils.HistoTimeLine;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.Quantile;
 import gde.utils.SingleResponseRegression;
 import gde.utils.SingleResponseRegression.RegressionType;
 
@@ -244,33 +245,35 @@ public class CurveSurvey {
 		{
 			int xPosMidBounds = (this.xPosDelta + this.xPosMeasure) / 2;
 			int halfBoxWidth = getBoxWidth() / 2;
-			int yPosQuartile1 = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedQuartile1Value());
+			double[] values = this.trailRecord.getBoundedBoxplotValues();
+
+			int yPosQuartile1 = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE1.ordinal()]);
 			drawHorizontalLine(yPosQuartile1, xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
-			drawHorizontalLine(this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedQuartile2Value()), xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
-			int yPosQuartile3 = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedQuartile3Value());
+			drawHorizontalLine(this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE2.ordinal()]), xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
+			int yPosQuartile3 = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE3.ordinal()]);
 			drawHorizontalLine(yPosQuartile3, xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds - halfBoxWidth, yPosQuartile3, yPosQuartile1 - yPosQuartile3, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds + halfBoxWidth, yPosQuartile3, yPosQuartile1 - yPosQuartile3, LineMark.BOXPLOT);
 
 			// Connecting lines define the bounds rectangle transverse area
-			int yPosLowerWhisker = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedLowerWhiskerValue());
+			int yPosLowerWhisker = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.LOWER_WHISKER.ordinal()]);
 			drawConnectingLine(xPosMidBounds - halfBoxWidth / 2, yPosLowerWhisker, xPosMidBounds + halfBoxWidth / 2, yPosLowerWhisker, LineMark.BOXPLOT);
 			// drawHorizontalLine(yPosLowerWhisker, xPosMidBounds - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds, yPosQuartile1, yPosLowerWhisker - yPosQuartile1, LineMark.BOXPLOT);
 
-			int yPosUpperWhisker = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedUpperWhiskerValue());
+			int yPosUpperWhisker = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.UPPER_WHISKER.ordinal()]);
 			drawConnectingLine(xPosMidBounds - halfBoxWidth / 2, yPosUpperWhisker, xPosMidBounds + halfBoxWidth / 2, yPosUpperWhisker, LineMark.BOXPLOT);
 			// drawHorizontalLine(yPosUpperWhisker, xPosMidBounds - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds, yPosUpperWhisker, yPosQuartile3 - yPosUpperWhisker, LineMark.BOXPLOT);
 
-			int yPosLowerOutlier = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedQuartile0Value());
-			if (yPosLowerOutlier != yPosLowerWhisker) drawOutlier(xPosMidBounds, yPosLowerOutlier, halfBoxWidth / 4, LineMark.BOXPLOT);
+			if (values[Quantile.BoxplotItems.QUARTILE0.ordinal()] != values[Quantile.BoxplotItems.LOWER_WHISKER.ordinal()])
+				drawOutlier(xPosMidBounds, this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE0.ordinal()]), halfBoxWidth / 4, LineMark.BOXPLOT);
 
-			int yPosUpperOutlier = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedQuartile4Value());
-			if (yPosUpperOutlier != yPosUpperWhisker) drawOutlier(xPosMidBounds, yPosUpperOutlier, halfBoxWidth / 4, LineMark.BOXPLOT);
+			if (values[Quantile.BoxplotItems.QUARTILE4.ordinal()] != values[Quantile.BoxplotItems.UPPER_WHISKER.ordinal()])
+				drawOutlier(xPosMidBounds, this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE4.ordinal()]), halfBoxWidth / 4, LineMark.BOXPLOT);
 
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("LW=%d Q1=%d Q2=%d Q3=%d UW=%d ", yPosLowerWhisker, yPosQuartile1, //$NON-NLS-1$
-					this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedQuartile2Value()), yPosQuartile3, yPosUpperWhisker));
+					this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE2.ordinal()]), yPosQuartile3, yPosUpperWhisker));
 		}
 	}
 

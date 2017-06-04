@@ -72,7 +72,8 @@ public class HistoSettlement extends Vector<Integer> {
 	 */
 	public final static double		outlierSigmaDefault				= 3.;
 	/**
-	 * outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0
+	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
+	 * Outliers are identified only if they lie beyond this limit.
 	 */
 	public final static double		outlierRangeFactorDefault	= 2.;
 
@@ -133,11 +134,11 @@ public class HistoSettlement extends Vector<Integer> {
 		 */
 		public Double getAverage(int fromIndex, int toIndex) {
 			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
+			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 					: HistoSettlement.outlierRangeFactorDefault;
-			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor).getAvgFigure();
+			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor).getAvgFigure();
 		}
 
 		/**
@@ -544,12 +545,12 @@ public class HistoSettlement extends Vector<Integer> {
 				if (aggregatedValue != null) values.add(aggregatedValue);
 			}
 			final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double outlierSigma = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
+			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
 			final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-			final double outlierRangeFaktor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 					: HistoSettlement.outlierRangeFactorDefault;
 			{
-				Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+				Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
 				referenceExtremum = tmpQuantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
 				values = new ArrayList<Double>();
@@ -560,7 +561,7 @@ public class HistoSettlement extends Vector<Integer> {
 				}
 			}
 			{
-				Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+				Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
 				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
 			}
@@ -571,7 +572,7 @@ public class HistoSettlement extends Vector<Integer> {
 						Double aggregatedValue = recordGroup.getReal(j);
 						if (aggregatedValue != null) values.add(aggregatedValue);
 					}
-					Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), outlierSigma, outlierRangeFaktor);
+					Quantile tmpQuantile = new Quantile(values, EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
 					recoveryExtremum = tmpQuantile.getQuantile(!isPositiveDirection ? 1. - this.settings.getMinmaxQuantileDistance() : this.settings.getMinmaxQuantileDistance());
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
 				}
