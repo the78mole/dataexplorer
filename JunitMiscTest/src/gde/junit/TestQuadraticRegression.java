@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.junit;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,10 +31,10 @@ import gde.utils.SingleResponseRegression.RegressionType;
 public class TestQuadraticRegression extends TestSuperClass {
 	static Logger								log					= Logger.getLogger(TestQuadraticRegression.class.getName());
 
-	private static final double	DELTA													= 1e-8;
+	private static final double	DELTA				= 1e-8;
 
-	private final double				xPoints[]		= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-	private final double				yPoints[]		= { 11757, 11757, 11539, 11529, 11521, 11515,								//
+	private final int						xPoints[]		= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+	private final int						yPoints[]		= { 11757, 11757, 11539, 11529, 11521, 11515,								//
 			11609, 11715, 11724, 11733, 11744, 11755, 11757 };
 
 	private final double				x1Points[]	= { 1, 2, 3, 4, 5, 6, 7 };
@@ -42,7 +44,6 @@ public class TestQuadraticRegression extends TestSuperClass {
 	private final double				beta1				= 0.23642857;
 	private final double				alpha1			= -0.03285714;
 	private final double				r2Coeff1		= 0.99870690;
-
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -55,53 +56,44 @@ public class TestQuadraticRegression extends TestSuperClass {
 	}
 
 	public void testRoundUpAlgorithmWithDeltaval() {
-		List<Double> x = new ArrayList<>();
-		List<Double> y = new ArrayList<>();
-
+		List<Point> points = new ArrayList<>();
 		for (int i = 0; i < yPoints.length; i++) {
-			x.add(xPoints[i]);
-			y.add(yPoints[i]);
+			points.add(new Point(xPoints[i], yPoints[i]));
 		}
 
-		SingleResponseRegression singlePredictorRegression = new SingleResponseRegression(x, y, RegressionType.QUADRATIC);
+		SingleResponseRegression singlePredictorRegression = new SingleResponseRegression(points, RegressionType.QUADRATIC);
 		log.log(Level.OFF, "result for concave : ", singlePredictorRegression);
 		log.log(Level.OFF, "determination : ", singlePredictorRegression.getR2());
 
-		x.clear();
-		y.clear();
+		points.clear();
 		for (int i = 0; i < yPoints.length; i++) {
-			x.add(xPoints[i]);
-			y.add(-yPoints[i]);
+			points.add(new Point(xPoints[i], -yPoints[i]));
 		}
-		singlePredictorRegression = new SingleResponseRegression(x, y, RegressionType.QUADRATIC);
+		singlePredictorRegression = new SingleResponseRegression(points, RegressionType.QUADRATIC);
 		log.log(Level.OFF, "result for convex : ", singlePredictorRegression);
 		log.log(Level.OFF, "determination : ", singlePredictorRegression.getR2());
 
-		x.clear();
-		y.clear();
+		points.clear();
 		for (int i = 0; i < yPoints.length; i++) {
-			x.add(xPoints[i]);
-			y.add(xPoints[i]);
+			points.add(new Point(xPoints[i], xPoints[i]));
 		}
-		singlePredictorRegression = new SingleResponseRegression(x, y, RegressionType.QUADRATIC);
+		singlePredictorRegression = new SingleResponseRegression(points, RegressionType.QUADRATIC);
 		log.log(Level.OFF, "result for linear : ", singlePredictorRegression);
 		log.log(Level.OFF, "determination : ", singlePredictorRegression.getR2());
 	}
 
 	public void testRoundUpAutoAlgorithmWithDeltaval() {
-		List<Double> x = new ArrayList<>();
-		List<Double> y = new ArrayList<>();
+		List<Point2D.Double> points = new ArrayList<>();
 		for (int i = 0; i < y1Points.length; i++) {
-			x.add(x1Points[i]);
-			y.add(y1Points[i]);
+			points.add(new Point2D.Double(x1Points[i], y1Points[i]));
 		}
 
-		SingleResponseRegression singlePredictorRegression = new SingleResponseRegression(x, y, RegressionType.QUADRATIC);
+		SingleResponseRegression singlePredictorRegression = new SingleResponseRegression(points, RegressionType.QUADRATIC);
 		log.log(Level.OFF, "result : ", singlePredictorRegression);
-		assertEquals("alpha=" + singlePredictorRegression.getAlpha(), singlePredictorRegression.getAlpha(), alpha1, DELTA);
-		assertEquals("beta=" + singlePredictorRegression.getBeta(), singlePredictorRegression.getBeta(), beta1, DELTA);
-		assertEquals("gamma=" + singlePredictorRegression.getGamma(), singlePredictorRegression.getGamma(), gamma1, DELTA);
-		assertEquals("R2=" + singlePredictorRegression.getR2(), singlePredictorRegression.getR2(), r2Coeff1, DELTA);
+		assertEquals("alpha ", singlePredictorRegression.getAlpha(), alpha1, DELTA);
+		assertEquals("beta ", singlePredictorRegression.getBeta(), beta1, DELTA);
+		assertEquals("gamma ", singlePredictorRegression.getGamma(), gamma1, DELTA);
+		assertEquals("R2 ", singlePredictorRegression.getR2(), r2Coeff1, DELTA);
 	}
 
 }

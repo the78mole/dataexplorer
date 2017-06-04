@@ -18,12 +18,11 @@
 ****************************************************************************************/
 package gde.utils;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 /**
  *  It fits a straight line <em>y</em> = &alpha; + &beta; <em>x</em>, (where <em>y</em> is the response variable, <em>x</em> is the independent variable,
@@ -52,72 +51,77 @@ public class SingleResponseRegression { // todo harmonize with /DataExplorer/src
 	private double							ssr		= 0.0;														// regression (explained) sum of squares
 
 	/**
-	  * Performs a linear regression on the data points <em>y<sub>i</sub></em>, <em>x<sub>i</sub></em>.
-	  * @param  x the values of the independent variable
-	  * @param  y the corresponding values of the response variable
-	  * @param  type
-	  * @throws IllegalArgumentException if the lengths of the two arrays are not equal or if n<=2
-	  */
-	public SingleResponseRegression(double[] x, double[] y, RegressionType type) { // todo copy the full constructor without null check for better performance
-		this(DoubleStream.of(x).boxed().collect(Collectors.toList()), DoubleStream.of(y).boxed().collect(Collectors.toList()), type);
-	}
-
-	public SingleResponseRegression(int[] x, int[] y, RegressionType type) {
-		this(Arrays.stream(x).mapToDouble(i -> i).boxed().collect(Collectors.toList()), Arrays.stream(y).mapToDouble(i -> i).boxed().collect(Collectors.toList()), type);
-	}
-
-	public SingleResponseRegression(Collection<Integer> x, List<Integer> y, RegressionType type) { // todo copy the full constructor for better performance
-		this(x.stream().mapToDouble(i -> i).boxed().collect(Collectors.toList()), y.stream().mapToDouble(i -> i).boxed().collect(Collectors.toList()), type);
-	}
-
-	/**
-	  * Performs a regression analysis on the data points <em>y<sub>i</sub></em>, <em>x<sub>i</sub></em>.
-	  * Removes  {@code (y[i], x[i])} if {@code y[i]} is null.
-	  * @param  x the values of the independent variable
-	  * @param  y the corresponding values of the response variable (may contain nulls)
-	  * @param  type
-	  * @throws IllegalArgumentException if the length of non-null elements is less than 2  or if the length is not equal
-	  */
-	public SingleResponseRegression(List<Double> x, List<Double> y, RegressionType type) {
-		if (x.size() != y.size()) {
-			throw new IllegalArgumentException("collection lengths are not equal");
-		}
-
-		// first pass: eliminate y nulls
+	 * @param points with <em>x<sub>i</sub></em> (independent variable) and <em>y<sub>i</sub></em> (response variable)
+	 * @param type
+	 */
+	public SingleResponseRegression(Collection<Point> points, RegressionType type) {
 		double sumx = 0.0, sumy = 0.0, sumz = 0.0;
-		List<Double> z = new ArrayList<>();
-		for (int i = 0; i < x.size(); i++) {
-			if (y.get(i) != null) {
+		// first pass: uniform lists
+		for (Point point : points) {
+			this.xx.add(point.getX());
+			this.yy.add(point.getY());
+			sumx += point.getX();
+			sumy += point.getY();
 
-				this.xx.add(x.get(i));
-				this.yy.add(y.get(i));
-				sumx += x.get(i);
-				sumy += y.get(i);
-
-				// build quadratic transformation into third parameter
-				if (type == RegressionType.QUADRATIC) {
-					z.add(x.get(i) * x.get(i));
-					this.zz.add(z.get(i));
-					sumz += z.get(i);
-				}
-
+			// build quadratic transformation into third parameter
+			if (type == RegressionType.QUADRATIC) {
+				this.zz.add(point.getX() * point.getX());
+				sumz += point.getX() * point.getX();
 			}
 		}
+		// second pass: averages
 		this.n = this.xx.size();
 		if (this.n >= 1) {
 			this.xbar = sumx / this.n;
 			this.ybar = sumy / this.n;
+			this.zbar = sumz / this.n;
+		}
 
-			// second pass: covariances
+		setCovariances();
+	}
+
+	/**
+	 * @param points with <em>x<sub>i</sub></em> (independent variable) and <em>y<sub>i</sub></em> (response variable)
+	 * @param type
+	 */
+	public SingleResponseRegression(List<Point2D.Double> points, RegressionType type) {
+		double sumx = 0.0, sumy = 0.0, sumz = 0.0;
+		// first pass: uniform lists
+		for (Point2D.Double point : points) {
+			this.xx.add(point.getX());
+			this.yy.add(point.getY());
+			sumx += point.getX();
+			sumy += point.getY();
+
+			// build quadratic transformation into third parameter
+			if (type == RegressionType.QUADRATIC) {
+				this.zz.add(point.getX() * point.getX());
+				sumz += point.getX() * point.getX();
+			}
+		}
+		// second pass: averages
+		this.n = this.xx.size();
+		if (this.n >= 1) {
+			this.xbar = sumx / this.n;
+			this.ybar = sumy / this.n;
+			this.zbar = sumz / this.n;
+		}
+
+		setCovariances();
+	}
+
+	/**
+	 * third pass: covariances
+	 */
+	private void setCovariances() {
+		if (this.n >= 1) {
 			for (int i = 0; i < this.n; i++) {
 				this.xxbar += (this.xx.get(i) - this.xbar) * (this.xx.get(i) - this.xbar);
 				this.yybar += (this.yy.get(i) - this.ybar) * (this.yy.get(i) - this.ybar);
 				this.xybar += (this.xx.get(i) - this.xbar) * (this.yy.get(i) - this.ybar);
 			}
 
-			if (type == RegressionType.QUADRATIC) {
-				this.zbar = sumz / this.n;
-				// second pass extension: covariances for squares
+			if (!this.zz.isEmpty()) {
 				for (int i = 0; i < this.n; i++) {
 					this.zzbar += (this.zz.get(i) - this.zbar) * (this.zz.get(i) - this.zbar);
 					this.zxbar += (this.zz.get(i) - this.zbar) * (this.xx.get(i) - this.xbar);
@@ -128,7 +132,7 @@ public class SingleResponseRegression { // todo harmonize with /DataExplorer/src
 	}
 
 	/**
-	 * third pass: error estimation
+	 * forth pass: error estimation
 	 */
 	private void setErrorSums() {
 		if (this.n >= 2) {

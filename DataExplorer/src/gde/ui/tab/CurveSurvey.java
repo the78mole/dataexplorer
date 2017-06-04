@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -227,20 +229,26 @@ public class CurveSurvey {
 	 * @param trailRecord
 	 */
 	private void drawCurveSurvey() {
-		{
-			//			int yBoundedAvg = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedAvgValue());
-			//			drawHorizontalLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure, LineMark.AVG_LINE);
-			//			drawConnectingLine(this.xPosMeasure, yBoundedAvg, this.xPosDelta, yBoundedAvg, LineMark.AVG_LINE);
-			//
-			//			int yRegressionPosMeasure = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedSlopeValue(this.timestampMeasure_ms));
-			//			int yRegressionPosDelta = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedSlopeValue(this.timestampDelta_ms));
-			//			drawConnectingLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta, LineMark.SLOPE_LINE);
+		if (!this.trailRecord.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
+			int yBoundedAvg = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedAvgValue());
+			drawHorizontalLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure, LineMark.AVG_LINE);
+			drawConnectingLine(this.xPosMeasure, yBoundedAvg, this.xPosDelta, yBoundedAvg, LineMark.AVG_LINE);
 
-			if (this.trailRecord.isBoundedParabola()) {
-				NavigableMap<Long, Integer> boundedXpos = this.xPosMeasure < this.xPosDelta ? this.timeLine.getScalePositions().subMap(this.timestampMeasure_ms, true, this.timestampDelta_ms, true)
-						: this.timeLine.getScalePositions().subMap(this.timestampDelta_ms, true, this.timestampMeasure_ms, true);
-				drawRegressionParabolaLine(boundedXpos, LineMark.PARABOLA_LINE);
+			int yRegressionPosMeasure = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedSlopeValue(this.timestampMeasure_ms));
+			int yRegressionPosDelta = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedSlopeValue(this.timestampDelta_ms));
+			drawConnectingLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta, LineMark.SLOPE_LINE);
+		}
+		else {
+			NavigableMap<Long, Integer> boundedXpos = this.xPosMeasure < this.xPosDelta ? this.timeLine.getScalePositions().subMap(this.timestampMeasure_ms, true, this.timestampDelta_ms, true)
+					: this.timeLine.getScalePositions().subMap(this.timestampDelta_ms, true, this.timestampMeasure_ms, true);
+
+			List<Point> points = new ArrayList<>(boundedXpos.size());
+			for (Entry<Long, Integer> entry : boundedXpos.entrySet()) {
+				points.add(new Point(entry.getValue(), this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(entry.getKey()))));
 			}
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "values " + Arrays.toString(points.toArray(new Point2D.Double[0])));
+
+			drawRegressionParabolaLine(points, LineMark.PARABOLA_LINE);
 		}
 		{
 			int xPosMidBounds = (this.xPosDelta + this.xPosMeasure) / 2;
@@ -277,14 +285,12 @@ public class CurveSurvey {
 		}
 	}
 
-	private void drawRegressionParabolaLine(NavigableMap<Long, Integer> boundedXpos, LineMark lineMark) {
-		List<Integer> yPos = new ArrayList<>(boundedXpos.size());
-		for (Entry<Long, Integer> entry : boundedXpos.entrySet()) {
-			yPos.add(this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(entry.getKey())));
-		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xpos " + Arrays.toString(boundedXpos.values().toArray(new Integer[0])));
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "ypos " + Arrays.toString(yPos.toArray(new Integer[0])));
-
+	/**
+	 * Draw a parabola based on bounded trailrecord values as defined relative to curve draw area, where there is an offset from left and an offset from top.
+	 * @param points is a list of the display points approximated by the parabola (one point per log timestamp)
+	 * @param lineMark
+	 */
+	private void drawRegressionParabolaLine(List<Point> points, LineMark lineMark) {
 		// set the erase area max/min values
 		double[] boundedParabolaCoefficients = this.trailRecord.getBoundedParabolaCoefficients();
 		double extremumTimeStamp_ms = boundedParabolaCoefficients[1] / boundedParabolaCoefficients[2] / -2.;
@@ -300,7 +306,8 @@ public class CurveSurvey {
 		this.yUpperTransversePos = Math.min(this.yUpperTransversePos, Math.min(yPos1, yPos2));
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yUpperTransversePos=" + this.yUpperTransversePos + " yLowerTransversePos=" + this.yLowerTransversePos); //$NON-NLS-1$ //$NON-NLS-2$
 
-		SingleResponseRegression singleResponseRegression = new SingleResponseRegression(boundedXpos.values(), yPos, RegressionType.QUADRATIC);
+		// determine the display points for all x axis pixels within the bounded survey range
+		SingleResponseRegression singleResponseRegression = new SingleResponseRegression(points, RegressionType.QUADRATIC);
 
 		int xPosStart = Math.min(this.xPosDelta, this.xPosMeasure);
 		int[] pointArray = new int[Math.abs(this.xPosDelta - this.xPosMeasure) * 2];
@@ -322,7 +329,7 @@ public class CurveSurvey {
 	 * @param posFromTop1
 	 * @param posFromLeft1
 	 * @param radius
-	 * @param defaultColor in case of a null color in the lineMark
+	 * @param lineMark
 	 */
 	private void drawOutlier(int posFromLeft1, int posFromTop1, int radius, LineMark lineMark) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "posFromLeft1=" + posFromLeft1 + " posFromTop1=" + posFromTop1); //$NON-NLS-1$ //$NON-NLS-2$

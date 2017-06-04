@@ -19,12 +19,12 @@
 
 package gde.data;
 
+import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
@@ -46,7 +46,6 @@ import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
 import gde.utils.Quantile;
-import gde.utils.Quantile.Fixings;
 import gde.utils.SingleResponseRegression;
 import gde.utils.SingleResponseRegression.RegressionType;
 import gde.utils.StringHelper;
@@ -922,6 +921,23 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
+	 * @param fromIndex
+	 * @param toIndex
+	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
+	 */
+	public List<Point2D.Double> getSubPoints(int fromIndex, int toIndex) {
+		int recordSize = toIndex - fromIndex;
+		List<Point2D.Double> result = new ArrayList<>(recordSize);
+		for (int i = fromIndex; i < toIndex; i++) {
+			if (this.elementAt(i) != null) {
+				result.add(new Point2D.Double(this.parent.timeStep_ms.getTime_ms(i), this.device.translateValue(this, this.elementAt(i) / 1000.)));
+			}
+		}
+		log.log(Level.FINER, "", Arrays.toString(result.toArray()));
+		return result;
+	}
+
+	/**
 	 * Builds value lists from the points within the bounds.
 	 * The list is ordered from timeStamp1 to timeStamp2.
 	 * @param timeStamp1_ms is the time of the delta measurement start value
@@ -932,9 +948,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		this.quantile = null;
 
 		final TrailRecord trailRecord;
-		final List<Double> boundedTimeStamps_ms = new ArrayList<>();
-		final List<Double> boundedValues = new ArrayList<>();
-
 		if (!this.isTrailSuite())
 			trailRecord = this.getTrailRecordSuite()[0];
 		else if (this.isBoxPlotSuite())
@@ -946,31 +959,17 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 		final int measureIndex = this.parentTrail.getIndex(timeStamp1_ms);
 		final int deltaIndex = this.parentTrail.getIndex(timeStamp2_ms);
-		boundedTimeStamps_ms.clear();
-		boundedValues.clear();
-		if (measureIndex < deltaIndex) {
-			for (int i = measureIndex; i < deltaIndex + 1; i++) {
-				if (trailRecord.elementAt(i) != null) {
-					boundedTimeStamps_ms.add(this.parent.timeStep_ms.getTime_ms(i));
-					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.elementAt(i) / 1000.));
-				}
-			}
-		}
-		else {
-			for (int i = measureIndex; i > deltaIndex - 1; i--) {
-				if (trailRecord.elementAt(i) != null) {
-					boundedTimeStamps_ms.add(this.parent.timeStep_ms.getTime_ms(i));
-					boundedValues.add(trailRecord.device.translateValue(trailRecord, trailRecord.elementAt(i) / 1000.));
-				}
-			}
-		}
+		final List<Point2D.Double> subPoints = trailRecord.getSubPoints(Math.min(measureIndex, deltaIndex), Math.max(measureIndex, deltaIndex) + 1);
 
-		if (!boundedTimeStamps_ms.isEmpty()) {
-			this.regression = new SingleResponseRegression(boundedTimeStamps_ms, boundedValues, RegressionType.QUADRATIC);
-			this.quantile = new Quantile(boundedValues, EnumSet.of(Fixings.IS_SAMPLE), 99., 99.);
+		if (!subPoints.isEmpty()) {
+			this.quantile = new Quantile(subPoints, 99., 99.); // take all points for display
+
+			Quantile tmpQuantile = new Quantile(subPoints, Quantile.boxplotSigmaFactor, Quantile.boxplotOutlierFactor); // regression without Tukey outliers
+			subPoints.removeAll(tmpQuantile.getOutliers());
+			this.regression = new SingleResponseRegression(subPoints, RegressionType.QUADRATIC);
 			if (log.isLoggable(Level.FINER)) {
-				Date date = new Date(boundedTimeStamps_ms.get(0).longValue());
-				log.log(Level.FINER, String.format("regressionSize=%d regressionRealSize=%d starts at %tF %tR", boundedValues.size(), this.regression.getRealSize(), date, date));
+				log.log(Level.FINER,
+						String.format("xAxisSize=%d regressionRealSize=%d starts at %tF %tR", this.quantile.getSize(), this.regression.getRealSize(), new Date(timeStamp1_ms), new Date(timeStamp1_ms)));
 			}
 		}
 	}
@@ -1336,6 +1335,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		return this.regression.getResponse(timeStamp_ms);
 	}
 
+	/**
+	 * @return false if there is a linear regression (maybe the number of measurements is too small)
+	 */
 	public boolean isBoundedParabola() {
 		return this.regression.getGamma() != 0.;
 	}

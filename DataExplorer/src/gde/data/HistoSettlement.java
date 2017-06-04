@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -128,20 +129,6 @@ public class HistoSettlement extends Vector<Integer> {
 		}
 
 		/**
-		 * @param fromIndex
-		 * @param toIndex
-		 * @return the average of the portion of the translated values between fromIndex, inclusive, and toIndex, exclusive
-		 */
-		public Double getAverage(int fromIndex, int toIndex) {
-			final ChannelPropertyType channelProperty = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : HistoSettlement.outlierSigmaDefault;
-			final ChannelPropertyType channelProperty2 = HistoSettlement.this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-					: HistoSettlement.outlierRangeFactorDefault;
-			return new Quantile(getSubGrouped(fromIndex, toIndex), EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor).getAvgFigure();
-		}
-
-		/**
 		 * @return the aggregated translated maximum value
 		 */
 		public double getRealMax() {
@@ -238,25 +225,15 @@ public class HistoSettlement extends Vector<Integer> {
 		/**
 		 * @param fromIndex
 		 * @param toIndex
-		 * @return the portion of the aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
+		 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
 		 */
-		public List<Double> getSubGrouped(int fromIndex, int toIndex) {
+		public List<Point2D.Double> getSubPoints(int fromIndex, int toIndex) {
 			int recordSize = toIndex - fromIndex;
-			List<Double> result = new ArrayList<Double>(recordSize);
+			List<Point2D.Double> result = new ArrayList<>(recordSize);
 			for (int i = fromIndex; i < toIndex; i++) {
-				result.add(getReal(i));
+				if (getReal(i) != null) result.add(new Point2D.Double(HistoSettlement.this.parent.timeStep_ms.getTime_ms(i), getReal(i)));
 			}
-			log.log(Level.FINER, getComment(), result);
-			return result;
-		}
-
-		public List<Double> getSubTimeSteps_ms(int fromIndex, int toIndex) {
-			int recordSize = toIndex - fromIndex;
-			List<Double> result = new ArrayList<Double>(recordSize);
-			for (int i = fromIndex; i < toIndex; i++) {
-				result.add(HistoSettlement.this.parent.timeStep_ms.getTime_ms(i));
-			}
-			log.log(Level.FINER, "", result);
+			log.log(Level.FINER, "", Arrays.toString(result.toArray()));
 			return result;
 		}
 
@@ -336,13 +313,13 @@ public class HistoSettlement extends Vector<Integer> {
 			if (transition.isSlope()) {
 				int fromIndex = transition.referenceStartIndex;
 				int toIndex = transition.thresholdEndIndex + 1;
-				SingleResponseRegression regression = new SingleResponseRegression(recordGroup.getSubTimeSteps_ms(fromIndex, toIndex), recordGroup.getSubGrouped(fromIndex, toIndex), RegressionType.LINEAR);
+				SingleResponseRegression regression = new SingleResponseRegression(recordGroup.getSubPoints(fromIndex, toIndex), RegressionType.LINEAR);
 				isPositiveDirection = regression.getSlope() > 0;
 			}
 			else {
 				int fromIndex = transition.referenceStartIndex;
 				int toIndex = transition.recoveryEndIndex + 1;
-				SingleResponseRegression regression = new SingleResponseRegression(recordGroup.getSubTimeSteps_ms(fromIndex, toIndex), recordGroup.getSubGrouped(fromIndex, toIndex), RegressionType.QUADRATIC);
+				SingleResponseRegression regression = new SingleResponseRegression(recordGroup.getSubPoints(fromIndex, toIndex), RegressionType.QUADRATIC);
 				isPositiveDirection = regression.getGamma() < 0;
 			}
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "direction: ", isPositiveDirection);
@@ -720,8 +697,7 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator + recordGroup.getSubGrouped(transition.referenceStartIndex, transition.thresholdEndIndex + 1)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator); //$NON-NLS-1$
 				final RecordGroup divisorRecordGroup = new RecordGroup(logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;

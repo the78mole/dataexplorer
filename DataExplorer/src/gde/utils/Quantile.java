@@ -18,10 +18,12 @@
 ****************************************************************************************/
 package gde.utils;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -42,31 +44,34 @@ import gde.log.Level;
  * @author Thomas Eickert
  */
 public class Quantile {
-	private final static String			$CLASS_NAME						= Quantile.class.getName();
-	private final static Logger			log										= Logger.getLogger($CLASS_NAME);
+	private final static String					$CLASS_NAME						= Quantile.class.getName();
+	private final static Logger					log										= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Corresponds to the interquartile range (<em>0.25 < p < 0.75</em>)
 	 */
-	public final static double			boxplotSigmaFactor		= 0.674489694;
+	public final static double					boxplotSigmaFactor		= 0.674489694;
 	/**
 	 * Specifies the outlier distance limit ODL from the interquartile range (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 * @see <a href="https://www.google.de/search?q=Tukey+boxplot">Tukey Boxplot</a>
 	 */
-	public final static double			boxplotOutlierFactor	= 1.5;
+	public final static double					boxplotOutlierFactor	= 1.5;
 
-	private final List<Integer>			iPopulation;
-	private final List<Double>			dPopulation;
-	private final EnumSet<Fixings>	fixings;
+	private final List<Integer>					iPopulation;
+	private final List<Double>					dPopulation;
+	private final EnumSet<Fixings>			fixings;
+	private final List<Integer>					iOutliers;
+	private final List<Double>					dOutliers;
+	private final List<Point2D.Double>	d2Outliers;
 
-	private double									firstFigure;
-	private double									lastFigure;
-	private Double									maxFigure;
-	private Double									minFigure;
-	private Double									sumFigure;
-	private Double									avgFigure;
-	private Double									sigmaFigure;
+	private double											firstFigure;
+	private double											lastFigure;
+	private Double											maxFigure;
+	private Double											minFigure;
+	private Double											sumFigure;
+	private Double											avgFigure;
+	private Double											sigmaFigure;
 
 	public enum Fixings {
 		REMOVE_NULLS, REMOVE_ZEROS, REMOVE_MAXMIN, IS_SAMPLE
@@ -75,6 +80,24 @@ public class Quantile {
 	public enum BoxplotItems {
 		QUARTILE0, LOWER_WHISKER, QUARTILE1, QUARTILE2, QUARTILE3, UPPER_WHISKER, QUARTILE4
 	};
+
+	/**
+	 * Compares two points by y-coordinate.
+	 */
+	public static final Comparator<Point2D.Double> Y_ORDER = new YOrder();
+
+	// compare points according to their y-coordinate
+	private static class YOrder implements Comparator<Point2D.Double> {
+		@Override
+		public int compare(Point2D.Double p, Point2D.Double q) {
+			if (p.y < q.y) return -1;
+			if (p.y > q.y) return +1;
+			// take the x value for comparison
+			if (p.x < q.x) return -1;
+			if (p.x > q.x) return +1;
+			return 0;
+		}
+	}
 
 	/**
 	 *  Implements the Gauss error function.
@@ -193,8 +216,8 @@ public class Quantile {
 		}
 
 		/**
-		 * http://stats.stackexchange.com/a/56000  OR  https://www.researchgate.net/post/How_do_I_combine_mean_and_standard_deviation_of_two_groups
 		 * @param other
+		 * @see <a href="http://stats.stackexchange.com/a/56000">Formulae</a>
 		 */
 		public void combine(StatsHelper other) {
 			double tmpAvg = this.avg * count / (count + other.count) + other.avg * other.count / (count + other.count);
@@ -206,7 +229,7 @@ public class Quantile {
 	}
 
 	/**
-	 * @param population holds the unordered values (<em>n > 0</em>)
+	 * @param population holds the unordered points (<em>n > 0</em>)
 	 * @param fixings defines how to proceed with the data
 	 * @param sigmaFactor defines the tolerance interval (<em>TI = &plusmn; z * &sigma; with z >= 0</em>)
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
@@ -217,6 +240,9 @@ public class Quantile {
 		}
 		this.dPopulation = null;
 		this.fixings = fixings;
+		this.iOutliers = new ArrayList<Integer>();
+		this.dOutliers = null;
+		this.d2Outliers = null;
 
 		List<Integer> excludes = new ArrayList<Integer>();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) excludes.add(null);
@@ -243,13 +269,62 @@ public class Quantile {
 			// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m)
 			double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
 			double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
-			while (this.iPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierFactor)
+			while (this.iPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierFactor) {
+				this.iOutliers.add(this.iPopulation.get(0));
 				this.iPopulation.remove(0);
-			while (this.iPopulation.get(this.iPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierFactor)
+			}
+			while (this.iPopulation.get(this.iPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierFactor) {
+				this.iOutliers.add(this.iPopulation.get(this.dPopulation.size() - 1));
 				this.iPopulation.remove(this.iPopulation.size() - 1);
+			}
 		}
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.iPopulation.size() + Arrays.toString(this.iPopulation.toArray()));
+	}
+
+	/**
+	 * Uses the <em>y<sub>i</sub></em> data points only.
+	 * @param population holds the unordered data points <em>x<sub>i</sub></em>, <em>y<sub>i</sub></em> (<em>n > 0</em>)
+	 * @param sigmaFactor defines the tolerance interval (<em>TI = &plusmn; z * &sigma; with z >= 0</em>)
+	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
+	 */
+	public Quantile(List<Point2D.Double> population, double sigmaFactor, double outlierFactor) {
+		if (population.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
+		this.iPopulation = null;
+		this.fixings = EnumSet.of(Fixings.IS_SAMPLE);
+		this.iOutliers = null;
+		this.dOutliers = null;
+		this.d2Outliers = new ArrayList<Point2D.Double>();
+
+		this.firstFigure = population.get(0).getY();
+		this.lastFigure = population.get(population.size() - 1).getY();
+
+		ArrayList<Point2D.Double> d2Population = new ArrayList<>(population);
+		Collections.sort(d2Population, Quantile.Y_ORDER);
+
+		this.dPopulation = d2Population.stream().map(p -> p.y).collect(Collectors.toList());
+
+		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m)
+		double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
+		double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
+		while (this.dPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierFactor) {
+			this.dPopulation.remove(0);
+			this.d2Outliers.add(d2Population.get(0));
+			d2Population.remove(0);
+		}
+		while (this.dPopulation.get(this.dPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierFactor) {
+			this.dPopulation.remove(this.dPopulation.size() - 1);
+			this.d2Outliers.add(d2Population.get(d2Population.size() - 1));
+			d2Population.remove(d2Population.size() - 1);
+		}
+
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.dPopulation.size() + Arrays.toString(this.dPopulation.toArray()));
+		if (log.isLoggable(Level.FINEST))
+			log.log(Level.FINEST, String.format("lWhisker=%f q1=%f q2=%f q3=%f uWhisker=%f", getQuantileLowerWhisker(), getQuartile1(), getQuartile2(), getQuartile3(), getQuantileUpperWhisker()));
+
 	}
 
 	/**
@@ -264,6 +339,9 @@ public class Quantile {
 		}
 		this.iPopulation = null;
 		this.fixings = fixings;
+		this.iOutliers = null;
+		this.dOutliers = new ArrayList<Double>();
+		this.d2Outliers = null;
 
 		List<Double> excludes = new ArrayList<Double>();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) excludes.add(null);
@@ -289,10 +367,14 @@ public class Quantile {
 		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m)
 		double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
 		double extremumRange = getQuantile(1. - outlierProbability) - getQuantile(outlierProbability);
-		while (this.dPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierFactor)
+		while (this.dPopulation.get(0) < getQuantile(outlierProbability) - extremumRange * outlierFactor) {
+			this.dOutliers.add(this.dPopulation.get(0));
 			this.dPopulation.remove(0);
-		while (this.dPopulation.get(this.dPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierFactor)
+		}
+		while (this.dPopulation.get(this.dPopulation.size() - 1) > getQuantile(1. - outlierProbability) + extremumRange * outlierFactor) {
+			this.dOutliers.add(this.dPopulation.get(this.dPopulation.size() - 1));
 			this.dPopulation.remove(this.dPopulation.size() - 1);
+		}
 
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.dPopulation.size() + Arrays.toString(this.dPopulation.toArray()));
@@ -310,6 +392,9 @@ public class Quantile {
 		this.dPopulation = null;
 		if (iPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.fixings = fixings;
+		this.iOutliers = null;
+		this.dOutliers = new ArrayList<Double>();
+		this.d2Outliers = null;
 
 		Stream<Integer> stream = iPopulation.parallelStream();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) stream = stream.filter(Objects::nonNull);
@@ -337,6 +422,9 @@ public class Quantile {
 		this.iPopulation = null;
 		if (dPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.fixings = fixings;
+		this.iOutliers = null;
+		this.dOutliers = new ArrayList<Double>();
+		this.d2Outliers = null;
 
 		Stream<Double> stream = dPopulation.parallelStream();
 		if (fixings.contains(Fixings.REMOVE_NULLS)) stream = stream.filter(Objects::nonNull);
@@ -479,10 +567,9 @@ public class Quantile {
 	}
 
 	/**
-	 * calculates the quantile for the population or for a sample.
-	 * the sample quantile is calculated according to R-6, SAS-4, SciPy-(0,0), Maple-5 which is piecewise linear and symmetric.
+	 * The sample quantile is calculated according to R-6, SAS-4, SciPy-(0,0), Maple-5 which is piecewise linear and symmetric.
 	 * @param probabilityCutPoint as value between 0 and 1
-	 * @return
+	 * @return the quantile for the population or for a sample
 	 */
 	public double getQuantile(double probabilityCutPoint) {
 		if (this.dPopulation == null) {
@@ -659,6 +746,18 @@ public class Quantile {
 	 */
 	public int getSize() {
 		return this.dPopulation == null ? this.iPopulation.size() : this.dPopulation.size();
+	}
+
+	/**
+	 * @return the outliers based on the sigmaFactor and the outlierFactor
+	 */
+	public <T> List<T> getOutliers() { // todo split Quantile class into abstract class + specialized classes to avoid unchecked casts
+		if (this.iOutliers != null)
+			return (List<T>) this.iOutliers;
+		else if (this.dOutliers != null)
+			return (List<T>) this.dOutliers;
+		else
+			return (List<T>) this.d2Outliers;
 	}
 
 }
