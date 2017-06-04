@@ -896,13 +896,13 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	}
 
 	/**
-	 * @return true if the record or the suite contains reasonable data
+	 * @return true if the record or the suite contains reasonable data which can be displayed
 	 */
-	@Override // reason is trail record suites with a master record without point values
+	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.trailRecordSuite == null || this.trailRecordSuite.length == 1) {
-			hasReasonableData = super.hasReasonableData();
+			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE && (this.minValue != this.maxValue || this.device.translateValue(this, this.maxValue / 1000.0) != 0.0);
 		}
 		else {
 			for (TrailRecord trailRecord : this.trailRecordSuite) {
