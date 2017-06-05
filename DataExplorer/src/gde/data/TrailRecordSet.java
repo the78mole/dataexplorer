@@ -696,11 +696,12 @@ public class TrailRecordSet extends RecordSet {
 				final int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
 				if (syncMasterRecordOrdinal >= 0) {
 					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name); //$NON-NLS-1$
 						this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
 						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
 						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
 						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name + " syncMinValue=" + this.get(syncMasterRecordOrdinal).syncMinValue //$NON-NLS-1$
+								+ " syncMaxValue=" + this.get(syncMasterRecordOrdinal).syncMaxValue);
 					}
 					if (!this.isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
@@ -726,6 +727,62 @@ public class TrailRecordSet extends RecordSet {
 				}
 			}
 			log.log(Level.FINE, sb.toString());
+		}
+	}
+
+	/**
+	 * update the scale values from sync record if visible
+	 * and update referenced records to enable drawing of curve, set min/max
+	 */
+	@Override // reason is the min/max determination for suites and scope mode elimination
+	public void updateSyncRecordScale() {
+		for (int syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			boolean isAffected = false;
+			int tmpSyncMin = Integer.MAX_VALUE;
+			int tmpSyncMax = Integer.MIN_VALUE;
+			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				TrailRecord tmpTrailRecord = (TrailRecord) tmpRecord;
+				synchronized (tmpTrailRecord) {
+					if (tmpTrailRecord.isVisible && tmpTrailRecord.isDisplayable) {
+						isAffected = true;
+						if (tmpTrailRecord.isTrailSuite()) {
+							int tmpMin = Integer.MAX_VALUE;
+							int tmpMax = Integer.MIN_VALUE;
+							for (TrailRecord trailRecord : tmpTrailRecord.getTrailRecordSuite()) {
+								tmpMin = Math.min(tmpMin, (int) (trailRecord.getMinValue() * trailRecord.syncMasterFactor));
+								tmpMax = Math.max(tmpMax, (int) (trailRecord.getMaxValue() * trailRecord.syncMasterFactor));
+							}
+							// if (tmpMin != 0 || tmpMax != 0) { //
+							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, tmpTrailRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+							if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
+							if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
+							//}
+						}
+						else {
+							int tmpMin = (int) (tmpTrailRecord.getMinValue() * tmpTrailRecord.syncMasterFactor);
+							int tmpMax = (int) (tmpTrailRecord.getMaxValue() * tmpTrailRecord.syncMasterFactor);
+							//if (tmpMin != 0 || tmpMax != 0) {
+							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, tmpTrailRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+							if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
+							if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
+							//}
+						}
+					}
+				}
+			}
+			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				synchronized (tmpRecord) {
+						tmpRecord.syncMinValue = tmpSyncMin;
+						tmpRecord.syncMaxValue = tmpSyncMax;
+				}
+			}
+			Record syncRecord = this.get(syncRecordOrdinal);
+			synchronized (syncRecord) {
+					syncRecord.syncMinValue = tmpSyncMin;
+					syncRecord.syncMaxValue = tmpSyncMax;
+			}
+
+			if (isAffected && log.isLoggable(Level.OFF)) log.log(Level.OFF, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

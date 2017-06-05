@@ -257,8 +257,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						summationSign = false;
 					}
 					trailRecord.addElement(point);
-					minVal = Math.min(minVal, point);
-					maxVal = Math.max(maxVal, point);
 				}
 				else {
 					trailRecord.addElement(point);
@@ -267,7 +265,6 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 					log.log(Level.FINEST, String.format(" %s trail %3d  %s %s %d minVal=%d maxVal=%d", trailRecord.getName(), this.getTrailOrdinal(), histoVault.getLogFilePath(), point, minVal, maxVal)); //$NON-NLS-1$
 			}
 
-			setMinMax(Math.min(minVal, getRealMinValue()), Math.max(maxVal, getRealMaxValue()));
 		}
 		log.log(Level.FINEST, this.getName() + " trail ", this); //$NON-NLS-1$
 	}
