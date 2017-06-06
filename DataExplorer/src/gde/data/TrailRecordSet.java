@@ -379,7 +379,7 @@ public class TrailRecordSet extends RecordSet {
 		if (isReal) {
 			for (String recordKey : this.recordNames) {
 				if (get(recordKey).isActive()) {
-					size = ((TrailRecord) get(recordKey)).getTrailRecordSuite()[0].realSize();
+					size = ((TrailRecord) get(recordKey)).realSize();
 					break;
 				}
 			}
@@ -387,7 +387,7 @@ public class TrailRecordSet extends RecordSet {
 		else {
 			for (String recordKey : this.recordNames) {
 				if (get(recordKey).isActive()) {
-					size = ((TrailRecord) get(recordKey)).getTrailRecordSuite()[0].size();
+					size = ((TrailRecord) get(recordKey)).realSize();
 					break;
 				}
 			}
@@ -655,28 +655,6 @@ public class TrailRecordSet extends RecordSet {
 		}
 	}
 
-	//	/**
-	//	 * check and update visibility status of all records according to the available histo data.
-	//	 * at least an update of the graphics window should be included at the end of this method.
-	//	 */
-	//	public void updateVisibilityStatus(boolean includeReasonableDataCheck) {
-	//		int displayableCounter = 0;
-	//		for (int i = 0; i < this.size(); ++i) {
-	//			Record record = this.get(i);
-	//			if (includeReasonableDataCheck) {
-	//				// todo record.setDisplayable(record.isActive() || record.hasReasonableData()); // was initially: (record.hasReasonableData());
-	//				//	if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
-	//			}
-	//
-	//			if (record.isActive() && record.isDisplayable()) {
-	//				++displayableCounter;
-	//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
-	//			}
-	//		}
-	//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-	//		this.setConfiguredDisplayable(displayableCounter);
-	//	}
-
 	public HistoGraphicsTemplate getTemplate() {
 		return this.template;
 	}
@@ -731,59 +709,61 @@ public class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * update the scale values from sync record if visible
-	 * and update referenced records to enable drawing of curve, set min/max
+	 * Update the scale values from sync record if visible
+	 * and update referenced records to enable drawing of the curve, set min/max.
 	 */
 	@Override // reason is the min/max determination for suites and scope mode elimination
 	public void updateSyncRecordScale() {
-		for (int syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+		for (Map.Entry<Integer, Vector<Record>> syncRecordsEntry : this.scaleSyncedRecords.entrySet()) {
 			boolean isAffected = false;
-			int tmpSyncMin = Integer.MAX_VALUE;
-			int tmpSyncMax = Integer.MIN_VALUE;
-			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				TrailRecord tmpTrailRecord = (TrailRecord) tmpRecord;
-				synchronized (tmpTrailRecord) {
-					if (tmpTrailRecord.isVisible && tmpTrailRecord.isDisplayable) {
-						isAffected = true;
-						if (tmpTrailRecord.isTrailSuite()) {
-							int tmpMin = Integer.MAX_VALUE;
-							int tmpMax = Integer.MIN_VALUE;
-							for (TrailRecord trailRecord : tmpTrailRecord.getTrailRecordSuite()) {
-								tmpMin = Math.min(tmpMin, (int) (trailRecord.getMinValue() * trailRecord.syncMasterFactor));
-								tmpMax = Math.max(tmpMax, (int) (trailRecord.getMaxValue() * trailRecord.syncMasterFactor));
-							}
-							// if (tmpMin != 0 || tmpMax != 0) { //
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, tmpTrailRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
-							if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
-							if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
-							//}
-						}
-						else {
-							int tmpMin = (int) (tmpTrailRecord.getMinValue() * tmpTrailRecord.syncMasterFactor);
-							int tmpMax = (int) (tmpTrailRecord.getMaxValue() * tmpTrailRecord.syncMasterFactor);
-							//if (tmpMin != 0 || tmpMax != 0) {
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, tmpTrailRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
-							if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
-							if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
-							//}
-						}
-					}
+
+			int syncRecordOrdinal = syncRecordsEntry.getKey();
+			TrailRecord syncMasterRecord = (TrailRecord) this.get(syncRecordOrdinal);
+			int tmpMin = Integer.MAX_VALUE;
+			int tmpMax = Integer.MIN_VALUE;
+			for (Record syncRecord : syncRecordsEntry.getValue()) {
+				if (syncRecord.isVisible && syncRecord.isDisplayable) {
+					tmpMin = Math.min(tmpMin, syncRecord.syncMinValue);
+					tmpMax = Math.max(tmpMax, syncRecord.syncMaxValue);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, syncRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				synchronized (tmpRecord) {
-						tmpRecord.syncMinValue = tmpSyncMin;
-						tmpRecord.syncMaxValue = tmpSyncMax;
-				}
-			}
-			Record syncRecord = this.get(syncRecordOrdinal);
-			synchronized (syncRecord) {
-					syncRecord.syncMinValue = tmpSyncMin;
-					syncRecord.syncMaxValue = tmpSyncMax;
+			// now we have the max/min values over all sync records of the current sync group
+			for (Record syncRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				syncRecord.syncMinValue = tmpMin;
+				syncRecord.syncMaxValue = tmpMax;
 			}
 
-			if (isAffected && log.isLoggable(Level.OFF)) log.log(Level.OFF, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			if (isAffected && log.isLoggable(Level.FINER)) log.log(Level.FINER, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpMin / 1000.0 + "; syncMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+	}
+
+	/**
+	 * Set the sync max/min values for visible records inclusive referenced suite records.
+	 * Update records to enable drawing of the curve.
+	 */
+	public void updateAllSyncScales() {
+		for (Record record : this.getRecordsSortedForDisplay()) {
+			TrailRecord actualRecord = (TrailRecord) record;
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
+					+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
+
+			if (actualRecord.isVisible() && actualRecord.isDisplayable()) {
+				if (!actualRecord.isTrailSuite()) {
+					actualRecord.syncMinValue = (int) (actualRecord.getMinValue() * actualRecord.syncMasterFactor);
+					actualRecord.syncMaxValue = (int) (actualRecord.getMaxValue() * actualRecord.syncMasterFactor);
+				}
+				else {
+					actualRecord.syncMinValue = (int) (actualRecord.getSuiteMinValue() * actualRecord.syncMasterFactor);
+					actualRecord.syncMaxValue = (int) (actualRecord.getSuiteMaxValue() * actualRecord.syncMasterFactor);
+				}
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, actualRecord.name + "   syncMin = " + actualRecord.syncMinValue + "; syncMax = " + actualRecord.syncMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+
+		// the same procedure is required for those records which are synchronized
+		updateSyncRecordScale();
+		;
 	}
 
 	/**

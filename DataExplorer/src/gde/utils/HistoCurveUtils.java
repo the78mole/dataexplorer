@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     					2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -69,13 +69,13 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		int numberTicks = 10, miniticks = 5;
 
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
 		//Draw the curve
 		//(yMaxValue - yMinValue) defines the area to be used for the curve
-		double yMaxValue = (record.isScaleSynced() ? record.getSyncMaxValue() : record.getMaxValue()) / 1000.0;
-		double yMinValue = (record.isScaleSynced() ? record.getSyncMinValue() : record.getMinValue()) / 1000.0;
+		double yMaxValue = record.getSyncMaxValue() / 1000.0;
+		double yMinValue = record.getSyncMinValue() / 1000.0;
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
@@ -132,7 +132,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
-		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ 
+		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
@@ -190,7 +190,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 	 * @param y0
 	 * @param width
 	 * @param height
-	 * @param timeLine 
+	 * @param timeLine
 	 */
 	public static void drawHistoCurve(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
@@ -243,72 +243,43 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 	 * @param y0
 	 * @param width
 	 * @param height
-	 * @param timeLine 
+	 * @param timeLine
 	 */
 	public static void drawHistoSuite(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("MinScaleValue=%f   MaxScaleValue=%f   MinDisplayValue=%f   MaxDisplayValue=%f", record.getMinScaleValue(), //$NON-NLS-1$
+				record.getMaxScaleValue(), record.getMinDisplayValue(), record.getMaxDisplayValue()));
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 
-		// get record from the suite which is decisive for the time scale
-		TrailRecord masterRecord = record.getTrailRecordSuite()[0];
-		int displayableSize = masterRecord.size();
-		double displayableTime_ms = masterRecord.getDrawTimeWidth_ms();
+		int xScaleFactor = 1; // x-axis scaling not supported
+		record.setDisplayScaleFactorTime(xScaleFactor);
+		record.setDisplayScaleFactorValue(height);
 
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + masterRecord.getAverageTimeStep_ms()); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
-		{
-			int xScaleFactor = 1; // x-axis scaling not supported
-			record.setDisplayScaleFactorTime(xScaleFactor);
-			record.setDisplayScaleFactorValue(height);
+		List<Point[]> suitePoints = new ArrayList<>(); // display point cache: one row for each record of the suite
+		if (record.getDevice().isGPSCoordinates(record)) {
+			for (int i = 0; i < record.getSuiteSize(); i++) {
+				suitePoints.add(record.getGpsDisplayPoints(timeLine, x0, y0, i));
+			}
+		}
+		else {
+			for (int i = 0; i < record.getSuiteSize(); i++) {
+				suitePoints.add(record.getDisplayPoints(timeLine, x0, y0, i));
+			}
 		}
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
-
-		List<Point[]> suitePoints = new ArrayList<>(); // display point cache: one row for each record of the suite
-		int boxWidth = 0; // boxplot only
-		if (record.getDevice().isGPSCoordinates(record)) { // todo GPS not supported
-			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
-				// this was done in drawScale for the record
-				trailRecord.setMinScaleValue(record.getMinScaleValue());
-				trailRecord.setMaxScaleValue(record.getMaxScaleValue());
-				trailRecord.setMinDisplayValue(record.getMinDisplayValue());
-				trailRecord.setMaxDisplayValue(record.getMaxDisplayValue());
-				// this was done here for the record
-				trailRecord.setDisplayScaleFactorTime(1);
-				trailRecord.setDisplayScaleFactorValue(height); // for getSuiteGpsDisplayPoints
-				suitePoints.add(trailRecord.getSuiteGpsDisplayPoints(timeLine, x0, y0, height));
-			}
-			boxWidth = timeLine.getDensity().getScaledBoxWidth();
-		}
-		else if (record.getTrailRecordSuite().length > 1) {
-			for (TrailRecord trailRecord : record.getTrailRecordSuite()) {
-				// this was done in drawScale for the record
-				trailRecord.setMinScaleValue(record.getMinScaleValue());
-				trailRecord.setMaxScaleValue(record.getMaxScaleValue());
-				trailRecord.setMinDisplayValue(record.getMinDisplayValue());
-				trailRecord.setMaxDisplayValue(record.getMaxDisplayValue());
-				// this was done here for the record
-				trailRecord.setDisplayScaleFactorTime(1);
-				trailRecord.setDisplayScaleFactorValue(height); // for getDisplayPoints
-				suitePoints.add(trailRecord.getDisplayPoints(timeLine, x0, y0));
-			}
-			boxWidth = timeLine.getDensity().getScaledBoxWidth();
-		}
-		else {
-			throw new UnsupportedOperationException();
-		}
 		double averageDuration = ((TrailRecordSet) record.getParent()).getAverageDuration_mm();
 		List<Integer> durations_mm = ((TrailRecordSet) record.getParent()).getDurations_mm();
-		Point[] newSuitePoints = new Point[record.getTrailRecordSuite().length]; // all points for the current x-axis position
-		Point[] oldSuitePoints = new Point[record.getTrailRecordSuite().length]; // all points for the previous x-axis position
-		for (int j = 0; j < suitePoints.get(0).length && j <= displayableSize && displayableSize >= 1; j++) {
+		Point[] newSuitePoints = new Point[record.getSuiteSize()]; // all points for the current x-axis position
+		Point[] oldSuitePoints = new Point[record.getSuiteSize()]; // all points for the previous x-axis position
+		for (int j = 0; j < suitePoints.get(0).length; j++) {
 			if ((suitePoints.get(0)[j]) != null) { // in case of a suite the master triggers the display of all trails
-				for (int i = 0; i < record.getTrailRecordSuite().length; i++) {
+				for (int i = 0; i < record.getSuiteSize(); i++) {
 					oldSuitePoints[i] = newSuitePoints[i];
 					newSuitePoints[i] = suitePoints.get(i)[j];
 				}
@@ -319,6 +290,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 					final int q0PosY = newSuitePoints[0].y, q1PosY = newSuitePoints[1].y, q2PosY = newSuitePoints[2].y, q3PosY = newSuitePoints[3].y, q4PosY = newSuitePoints[4].y,
 							qLowerWhiskerY = newSuitePoints[5].y, qUpperWhiskerY = newSuitePoints[6].y;
 					final int interQuartileRange = q1PosY - q3PosY;
+					int boxWidth = timeLine.getDensity().getScaledBoxWidth();
 					int halfBoxWidth = (int) (boxWidth
 							* (1. + (Math.sqrt(durations_mm.get(j) / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0) / 2.); // divison by 3 is the best fit divisor; 2 results in bigger modulation rates
 					halfBoxWidth = halfBoxWidth < 1 ? 1 : halfBoxWidth;

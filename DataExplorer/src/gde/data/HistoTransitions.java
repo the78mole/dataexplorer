@@ -1041,20 +1041,23 @@ public class HistoTransitions {
 	@Override
 	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%s > %s ", this.previousTriggerState, this.triggerState)); //$NON-NLS-1$
-		sb.append(this.previousTriggerState == TriggerState.WAITING && !this.thresholdDeque.isEmpty() ? this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1)
-				: this.previousTriggerState == TriggerState.TRIGGERED && !this.thresholdDeque.isEmpty() ? this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1)
-						: this.previousTriggerState == TriggerState.RECOVERING && !this.recoveryDeque.isEmpty() ? this.recoveryDeque.getFormatedDuration(this.recoveryDeque.size() - 1) : "null"); //$NON-NLS-1$
-		sb.append(String.format(": referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", this.referenceDeque.size(), this.thresholdDeque.size(), this.recoveryDeque.size())) //$NON-NLS-1$
-				.append(GDE.STRING_NEW_LINE);
-		sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(GDE.STRING_BLANK_AT_BLANK + this.referenceDeque.getTimestamps_100ns()).append(GDE.STRING_NEW_LINE);
-		sb.append(String.format("%38s threshold bench=%.1f extreme=", "", this.thresholdDeque.getBenchmarkValue()) + this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(GDE.STRING_BLANK_AT_BLANK + this.thresholdDeque.getTimestamps_100ns());
-		if (!this.recoveryDeque.isEmpty()) {
-			sb.append(GDE.STRING_NEW_LINE);
-			sb.append(String.format("%38s recovery  bench=%.1f extreme=", "", this.recoveryDeque.getBenchmarkValue()) + this.recoveryDeque.getExtremeValue() + this.recoveryDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(GDE.STRING_BLANK_AT_BLANK + this.recoveryDeque.getTimestamps_100ns());
+		if (this.referenceDeque != null && this.thresholdDeque != null && this.recoveryDeque != null && this.recoveryDeque != null && this.previousTriggerState != null) {
+			sb.append(String.format("%s > %s ", this.previousTriggerState, this.triggerState)); //$NON-NLS-1$
+			sb.append(this.previousTriggerState != null && this.previousTriggerState == TriggerState.WAITING && !this.thresholdDeque.isEmpty()
+					? this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1)
+					: this.previousTriggerState == TriggerState.TRIGGERED && !this.thresholdDeque.isEmpty() ? this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1)
+							: this.previousTriggerState == TriggerState.RECOVERING && !this.recoveryDeque.isEmpty() ? this.recoveryDeque.getFormatedDuration(this.recoveryDeque.size() - 1) : "null"); //$NON-NLS-1$
+			sb.append(String.format(": referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", this.referenceDeque.size(), this.thresholdDeque.size(), this.recoveryDeque.size())) //$NON-NLS-1$
+					.append(GDE.STRING_NEW_LINE);
+			sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(GDE.STRING_BLANK_AT_BLANK + this.referenceDeque.getTimestamps_100ns()).append(GDE.STRING_NEW_LINE);
+			sb.append(String.format("%38s threshold bench=%.1f extreme=", "", this.thresholdDeque.getBenchmarkValue()) + this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(GDE.STRING_BLANK_AT_BLANK + this.thresholdDeque.getTimestamps_100ns());
+			if (!this.recoveryDeque.isEmpty()) {
+				sb.append(GDE.STRING_NEW_LINE);
+				sb.append(String.format("%38s recovery  bench=%.1f extreme=", "", this.recoveryDeque.getBenchmarkValue()) + this.recoveryDeque.getExtremeValue() + this.recoveryDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append(GDE.STRING_BLANK_AT_BLANK + this.recoveryDeque.getTimestamps_100ns());
+			}
 		}
 		return sb.toString();
 	}

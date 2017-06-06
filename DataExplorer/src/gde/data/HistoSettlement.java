@@ -74,6 +74,7 @@ public class HistoSettlement extends Vector<Integer> {
 	public final static double		outlierSigmaDefault				= 3.;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
+	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 */
 	public final static double		outlierRangeFactorDefault	= 2.;
@@ -180,7 +181,7 @@ public class HistoSettlement extends Vector<Integer> {
 		 * @param translatedValue
 		 * @return the recurrentResult aggregated based on the translated value
 		 */
-		private double calculateAggregate(double recurrentResult, int aggregationStepIndex, final double translatedValue) {
+		private double calculateAggregate(double recurrentResult, int aggregationStepIndex, double translatedValue) {
 			if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.AVG) {
 				recurrentResult += (translatedValue - recurrentResult) / (aggregationStepIndex + 1);
 			}
@@ -697,13 +698,13 @@ public class HistoSettlement extends Vector<Integer> {
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getLeveling(), transition);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator); //$NON-NLS-1$
 				final RecordGroup divisorRecordGroup = new RecordGroup(logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
 
 				final double divisor = calculateLevelDelta(divisorRecordGroup, calculus.getDivisorLeveling(), transition);
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator + " divisor " + divisor); //$NON-NLS-1$
 				if (calculus.getCalculusType() == CalculusTypes.RATIO) {
 					reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000.) : denominator / divisor * 1000.); // all internal values are multiplied by 1000
 				}
@@ -871,26 +872,6 @@ public class HistoSettlement extends Vector<Integer> {
 			return returnValue;
 		}
 		return 0;
-	}
-
-	public Integer realRealGet(int index) {
-		return super.get(index);
-	}
-
-	/**
-	 * ET: throws NullPointerException if super.get(index) is null.
-	 * in debugging mode, however, the expression 'super.size() != 0 ? super.get(index) : 0' evaluates to null which is correct.
-	 * could not clarify the reason for the exception <<<
-	 * @param index
-	 */
-	public Integer realGet(int index) {
-		try {
-			return super.size() != 0 ? super.get(index) : 0;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			log.log(Level.WARNING, String.format("%s - %20s: size = %d - indesx = %d", this.parent.name, this.name, this.size(), index)); //$NON-NLS-1$
-			return super.size() != 0 ? super.get(index - 1) : 0;
-		}
 	}
 
 	/**

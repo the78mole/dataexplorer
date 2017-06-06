@@ -431,7 +431,9 @@ public class HistoGraphicsComposite extends Composite {
 		boolean isDrawScaleInRecordColor = this.settings.isDrawScaleInRecordColor();
 		boolean isDrawNameInRecordColor = this.settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
-		trailRecordSet.updateSyncRecordScale();
+
+		// sync scales are used for suites (e.g. boxplot) AND synced records
+		trailRecordSet.updateAllSyncScales();
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
