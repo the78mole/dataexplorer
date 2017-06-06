@@ -4,6 +4,7 @@ Development history / change log, please read from bottom up
 Version 3.3.0 - xx yyy 2017
 OVERVIEW:
 + add UT16E multimeter support
++ add D100 charger support
 + enhance HoTTAdapter support
 + enhance NMEA-Adapter support
 + enhance MC3000 & Q200 support
