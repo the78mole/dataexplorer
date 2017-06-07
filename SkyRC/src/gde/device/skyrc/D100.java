@@ -469,7 +469,7 @@ public class D100 extends MC3000 implements IDevice {
 		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, outletNum + " isProcessing = " + (dataBuffer == null ? (channelBuffer[2] >= 0x01 && channelBuffer[2] <= 3) : (dataBuffer[4] >= 0x01 && dataBuffer[4] <= 3)));
 		if (dataBuffer == null) // initial processing type query
 			return channelBuffer[2] >= 0x01 && channelBuffer[2] <= 3;
-		return (dataBuffer[4] >= 0x01 && dataBuffer[4] <= 3) && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge()
+		return dataBuffer[4] == 0x03 && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge()
 				? false 
 				: (dataBuffer[4] >= 0x01 && dataBuffer[4] <= 3);
 	}
