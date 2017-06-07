@@ -238,7 +238,7 @@ public class TabAreaContextMenu {
 									((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).importDeviceData(file.toPath());
 								}
 								TabAreaContextMenu.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
-							}
+								TabAreaContextMenu.this.application.updateGraphicsWindow();							}
 						}
 					});
 				}
