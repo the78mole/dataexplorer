@@ -18,12 +18,21 @@
 ****************************************************************************************/
 package gde.device.skyrc;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import javax.usb.UsbClaimException;
+import javax.usb.UsbException;
+import javax.xml.bind.JAXBException;
+
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.exception.ApplicationConfigurationException;
@@ -33,23 +42,16 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.WaitTimer;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import javax.usb.UsbClaimException;
-import javax.usb.UsbException;
-import javax.xml.bind.JAXBException;
-
 /**
  * Class to implement SKYRC D100 device
  * @author Winfried Bruegmann
  */
 public class D100 extends MC3000 implements IDevice {
-	final static Logger	log						= Logger.getLogger(D100.class.getName());
+	final static Logger	log					= Logger.getLogger(D100.class.getName());
+	final ChargerDialog	dialog;
 	D100GathererThread	dataGatherThread;
 	D100UsbPort					usbPort;
-	//firmware <=1.07 energy needs calculation
+
 	int[]								resetEnergy		= new int[] { 5, 5 };
 	double[]						energy				= new double[] { 0, 0 };
 
@@ -187,6 +189,7 @@ public class D100 extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3642), Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3648) };
 
 		this.usbPort = new D100UsbPort(this, this.application);
+		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -212,13 +215,14 @@ public class D100 extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3642), Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3648) };
 
 		this.usbPort = new D100UsbPort(this, this.application);
+		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
 	/**
 	 * @return the dialog
 	 */
-	public MC3000Dialog getDialog() {
-		return null; //actually no dialog
+	public DeviceDialog getDialog() {
+		return this.dialog;
 	}
 //
 //	/**

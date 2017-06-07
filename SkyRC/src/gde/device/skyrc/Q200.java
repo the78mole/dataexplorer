@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
+    Copyright (c) 2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.skyrc;
 
@@ -24,6 +24,7 @@ import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.exception.ApplicationConfigurationException;
@@ -47,6 +48,7 @@ import javax.xml.bind.JAXBException;
  */
 public class Q200 extends MC3000 implements IDevice {
 	final static Logger	log						= Logger.getLogger(Q200.class.getName());
+	final ChargerDialog	dialog;
 	Q200GathererThread	dataGatherThread;
 	Q200UsbPort					usbPort;
 	//firmware <=1.07 energy needs calculation
@@ -239,6 +241,7 @@ public class Q200 extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3642), Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3648) };
 
 		this.usbPort = new Q200UsbPort(this, this.application);
+		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -260,13 +263,14 @@ public class Q200 extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3642), Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3648) };
 
 		this.usbPort = new Q200UsbPort(this, this.application);
+		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
 	/**
 	 * @return the dialog
 	 */
-	public MC3000Dialog getDialog() {
-		return null; //actually no dialog
+	public DeviceDialog getDialog() {
+		return this.dialog;
 	}
 
 	/**

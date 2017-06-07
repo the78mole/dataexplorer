@@ -18,6 +18,16 @@
 ****************************************************************************************/
 package gde.device.skyrc;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.logging.Logger;
+
+import javax.usb.UsbClaimException;
+import javax.usb.UsbException;
+import javax.usb.UsbInterface;
+import javax.xml.bind.JAXBException;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -26,6 +36,7 @@ import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.resource.DeviceXmlResource;
@@ -36,16 +47,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.logging.Logger;
-
-import javax.usb.UsbClaimException;
-import javax.usb.UsbException;
-import javax.usb.UsbInterface;
-import javax.xml.bind.JAXBException;
 
 /**
  * Class to implement SKYRC MC3000 device
@@ -1211,7 +1212,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
-	public MC3000Dialog getDialog() {
+	public DeviceDialog getDialog() {
 		return this.dialog;
 	}
 
@@ -1333,14 +1334,14 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				try {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						this.getDialog().dataGatherThread = new MC3000GathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
+						((MC3000Dialog)this.getDialog()).dataGatherThread = new MC3000GathererThread(this.application, this, this.usbPort, activChannel.getNumber(), (MC3000Dialog) this.getDialog());
 						try {
-							if (this.getDialog().dataGatherThread != null && this.usbPort.isConnected()) {
-								this.systemSettings = new MC3000.SystemSettings(this.usbPort.getSystemSettings(this.getDialog().dataGatherThread.getUsbInterface()));
+							if (((MC3000Dialog)this.getDialog()).dataGatherThread != null && this.usbPort.isConnected()) {
+								this.systemSettings = new MC3000.SystemSettings(this.usbPort.getSystemSettings(((MC3000Dialog)this.getDialog()).dataGatherThread.getUsbInterface()));
 								//WaitTimer.delay(100);
 								//this.usbPort.startProcessing(this.getDialog().dataGatherThread.getUsbInterface());
 								WaitTimer.delay(100);
-								this.getDialog().dataGatherThread.start();
+								((MC3000Dialog)this.getDialog()).dataGatherThread.start();
 							}
 							else {
 								this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
@@ -1387,9 +1388,9 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else {
-				if (this.getDialog().dataGatherThread != null) {
+				if (((MC3000Dialog)this.getDialog()).dataGatherThread != null) {
 					//this.usbPort.stopProcessing(this.getDialog().dataGatherThread.getUsbInterface());
-					this.getDialog().dataGatherThread.stopDataGatheringThread(false, null);
+					((MC3000Dialog)this.getDialog()).dataGatherThread.stopDataGatheringThread(false, null);
 				}
 				//if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 				try {
