@@ -215,6 +215,7 @@
                         <transitionCalculus transitionGroupId="100" calculusType="ratio_permille" unsigned="true" referenceGroupId="0" leveling="smooth_minmax" referenceGroupIdDivisor="1" divisorLeveling="smooth_minmax" deltaBasis="bothAvg" comment="Divide the voltage peak value by the current peak value. Determine the peak value by comparing the smoothed threshold extremum value with the smoothed reference value (and recovery extremum value in case of peaks and pulses)."/>
                     </evaluation>
                     <property name="factor" value="1" type="Double" description="Permille is milliOhm"/>
+                    <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="r_i_cells"/>
                     <label>settlementlabel_r_i_pack</label>
                 </Settlement>
                 <Settlement settlementId="17">
