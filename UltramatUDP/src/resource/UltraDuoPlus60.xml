@@ -287,13 +287,13 @@
 			</ReferenceGroups>
 			<TransitionGroups>
                 <TransitionGroup transitionGroupId="0">
-                    <TransitionMapping transitionId="0" comment="for test only">
+                    <TransitionMapping transitionId="0" comment="for test only"/>
                 </TransitionGroup>
                 <TransitionGroup transitionGroupId="3">
-                    <TransitionMapping transitionId="3" comment="for test only">
+                    <TransitionMapping transitionId="3" comment="for test only"/>
                 </TransitionGroup>
                 <TransitionGroup transitionGroupId="6">
-                    <TransitionMapping transitionId="6" comment="for test only">
+                    <TransitionMapping transitionId="6" comment="for test only"/>
                 </TransitionGroup>
 				<TransitionGroup transitionGroupId="100" comment="R_i transitions based on current values">
 					<TransitionMapping transitionId="0" />
@@ -628,13 +628,13 @@
 			</ReferenceGroups>
 			<TransitionGroups>
                 <TransitionGroup transitionGroupId="0">
-                    <TransitionMapping transitionId="0" comment="for test only">
+                    <TransitionMapping transitionId="0" comment="for test only"/>
                 </TransitionGroup>
                 <TransitionGroup transitionGroupId="3">
-                    <TransitionMapping transitionId="3" comment="for test only">
+                    <TransitionMapping transitionId="3" comment="for test only"/>
                 </TransitionGroup>
                 <TransitionGroup transitionGroupId="6">
-                    <TransitionMapping transitionId="6" comment="for test only">
+                    <TransitionMapping transitionId="6" comment="for test only"/>
                 </TransitionGroup>
 				<TransitionGroup transitionGroupId="100" comment="R_i transitions based on current values">
 					<TransitionMapping transitionId="0" />
