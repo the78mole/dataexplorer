@@ -19,7 +19,6 @@
 
 package gde.data;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,9 +42,10 @@ import gde.device.resource.DeviceXmlResource;
 import gde.histocache.HistoVault;
 import gde.log.Level;
 import gde.utils.HistoTimeLine;
-import gde.utils.Quantile;
 import gde.utils.SingleResponseRegression;
 import gde.utils.SingleResponseRegression.RegressionType;
+import gde.utils.Spot;
+import gde.utils.UniversalQuantile;
 
 /**
  * holds histo data points of one measurement or settlement; score points are a third option.
@@ -54,38 +54,39 @@ import gde.utils.SingleResponseRegression.RegressionType;
  * @author Thomas Eickert
  */
 public class TrailRecord extends Record { // todo maybe a better option is to create a common base class for Record and TrailRecord.
-	private final static String				$CLASS_NAME							= TrailRecord.class.getName();
-	private final static long					serialVersionUID				= 110124007964748556L;
-	private final static Logger				log											= Logger.getLogger($CLASS_NAME);
+	private final static String								$CLASS_NAME							= TrailRecord.class.getName();
+	private final static long									serialVersionUID				= 110124007964748556L;
+	private final static Logger								log											= Logger.getLogger($CLASS_NAME);
 
-	public final static String				TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
+	public final static String								TRAIL_TEXT_ORDINAL			= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
-	private final TrailRecordSet			parentTrail;
-	private final MeasurementType			measurementType;																					// measurement / settlement / scoregroup are options
-	private final SettlementType			settlementType;																						// measurement / settlement / scoregroup are options
-	private final ScoreGroupType			scoreGroupType;																						// measurement / settlement / scoregroup are options
-	private int												trailTextSelectedIndex	= -1;															// user selection from applicable trails, is saved in the graphics template
-	private List<String>							applicableTrailsTexts;																		// the user may select one of these entries
-	private List<Integer>							applicableTrailsOrdinals;																	// maps all applicable trails in order to convert the user selection into a valid trail
-	private SuiteRecord[]							trailRecordSuite				= new SuiteRecord[0];							// holds data points in case of trail suites
-	private double										factor									= Double.MIN_VALUE;
-	private double										offset									= Double.MIN_VALUE;
-	private double										reduction								= Double.MIN_VALUE;
+	private final TrailRecordSet							parentTrail;
+	private final MeasurementType							measurementType;																					// measurement / settlement / scoregroup are options
+	private final SettlementType							settlementType;																						// measurement / settlement / scoregroup are options
+	private final ScoreGroupType							scoreGroupType;																						// measurement / settlement / scoregroup are options
+	private int																trailTextSelectedIndex	= -1;															// user selection from applicable trails, is saved in the graphics template
+	private List<String>											applicableTrailsTexts;																		// the user may select one of these entries
+	private List<Integer>											applicableTrailsOrdinals;																	// maps all applicable trails in order to convert the user selection into a valid trail
+	private SuiteRecord[]											trailRecordSuite				= new SuiteRecord[0];							// holds data points in case of trail suites
+	private double														factor									= Double.MIN_VALUE;
+	private double														offset									= Double.MIN_VALUE;
+	private double														reduction								= Double.MIN_VALUE;
 
-	final DeviceXmlResource						xmlResource							= DeviceXmlResource.getInstance();
-	private SingleResponseRegression	regression							= null;
-	private Quantile									quantile								= null;
+	final DeviceXmlResource										xmlResource							= DeviceXmlResource.getInstance();
+	private SingleResponseRegression<Double>	regression							= null;
+	private UniversalQuantile<Spot<Double>>		quantile								= null;
 
 	/**
 	 * Data points of one measurement or line or curve.
 	 * Member of a trail record suite.
 	 */
 	private class SuiteRecord extends Vector<Integer> {
+		private static final long	serialVersionUID	= 8757759753520551985L;
 
-		private final int	trailOrdinal;
+		private final int					trailOrdinal;
 
-		private int				maxRecordValue	= Integer.MIN_VALUE;	// max value of the curve
-		private int				minRecordValue	= Integer.MAX_VALUE;	// min value of the curve
+		private int								maxRecordValue		= Integer.MIN_VALUE;		// max value of the curve
+		private int								minRecordValue		= Integer.MAX_VALUE;		// min value of the curve
 
 		public SuiteRecord(int newTrailOrdinal, int initialCapacity) {
 			super(initialCapacity);
@@ -444,11 +445,11 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		if (!this.isTrailSuite()) {
 			if (this.settings.isXAxisReversed()) {
 				for (int i = 0; i < this.size(); i++)
-					if (this.elementAt(i) != null ) dataTableRow[i + 2] = this.getFormattedTableValue(this.realGet(i) / 1000.);
+					if (this.elementAt(i) != null) dataTableRow[i + 2] = this.getFormattedTableValue(this.realGet(i) / 1000.);
 			}
 			else {
 				for (int i = 0, j = this.size() - 1; i < this.size(); i++, j--)
-					if (this.elementAt(j) != null ) dataTableRow[i + 2] = this.getFormattedTableValue(this.realGet(j) / 1000.);
+					if (this.elementAt(j) != null) dataTableRow[i + 2] = this.getFormattedTableValue(this.realGet(j) / 1000.);
 			}
 		}
 		else if (this.isBoxPlotSuite()) {
@@ -459,9 +460,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0; i < medianRecord.size(); i++) {
 					if (medianRecord.elementAt(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", getFormattedTableValue(lowerWhiskerRecord.get(i) / 1000.)) ); //$NON-NLS-1$
+						sb.append(String.format("%.8s", getFormattedTableValue(lowerWhiskerRecord.get(i) / 1000.))); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(medianRecord.get(i) / 1000.)) ); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(medianRecord.get(i) / 1000.))); //$NON-NLS-1$
 						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(upperWhiskerRecord.get(i) / 1000.))); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
@@ -473,8 +474,8 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 						StringBuilder sb = new StringBuilder();
 						sb.append(String.format("%.8s", getFormattedTableValue(lowerWhiskerRecord.get(j) / 1000.))); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(medianRecord.get(j) / 1000.)) ); //$NON-NLS-1$
-						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(upperWhiskerRecord.get(j) / 1000.)) ); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(medianRecord.get(j) / 1000.))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(upperWhiskerRecord.get(j) / 1000.))); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
@@ -487,9 +488,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 				for (int i = 0; i < middleRecord.size(); i++) {
 					if (middleRecord.elementAt(i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", getFormattedTableValue(lowerRecord.get(i) / 1000.)) ); //$NON-NLS-1$
+						sb.append(String.format("%.8s", getFormattedTableValue(lowerRecord.get(i) / 1000.))); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(middleRecord.get(i) / 1000.)) ); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(middleRecord.get(i) / 1000.))); //$NON-NLS-1$
 						sb.append(delimiter).append(String.format("%.8s", getFormattedTableValue(upperRecord.get(i) / 1000.))); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
@@ -987,12 +988,12 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 	 * @param toIndex
 	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
 	 */
-	public List<Point2D.Double> getSubPoints(Vector<Integer> points, int fromIndex, int toIndex) {
+	public List<Spot<Double>> getSubPoints(Vector<Integer> points, int fromIndex, int toIndex) {
 		int recordSize = toIndex - fromIndex;
-		List<Point2D.Double> result = new ArrayList<>(recordSize);
+		List<Spot<Double>> result = new ArrayList<>(recordSize);
 		for (int i = fromIndex; i < toIndex; i++) {
 			if (points.elementAt(i) != null) {
-				result.add(new Point2D.Double(this.parent.timeStep_ms.getTime_ms(i), this.device.translateValue(this, points.elementAt(i) / 1000.)));
+				result.add(new Spot<Double>(this.parent.timeStep_ms.getTime_ms(i), this.device.translateValue(this, points.elementAt(i) / 1000.)));
 			}
 		}
 		log.log(Level.FINER, "", Arrays.toString(result.toArray()));
@@ -1021,14 +1022,15 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 		final int measureIndex = this.parentTrail.getIndex(timeStamp1_ms);
 		final int deltaIndex = this.parentTrail.getIndex(timeStamp2_ms);
-		final List<Point2D.Double> subPoints = getSubPoints(points, Math.min(measureIndex, deltaIndex), Math.max(measureIndex, deltaIndex) + 1);
+		final List<Spot<Double>> subPoints = getSubPoints(points, Math.min(measureIndex, deltaIndex), Math.max(measureIndex, deltaIndex) + 1);
 
 		if (!subPoints.isEmpty()) {
-			this.quantile = new Quantile(subPoints, 99., 99.); // take all points for display
+			boolean isSample = true;
+			this.quantile = new UniversalQuantile<>(subPoints, isSample); // take all points for display
 
-			Quantile tmpQuantile = new Quantile(subPoints, Quantile.boxplotSigmaFactor, Quantile.boxplotOutlierFactor); // regression without Tukey outliers
+			UniversalQuantile<Spot<Double>> tmpQuantile = new UniversalQuantile<>(subPoints, isSample, UniversalQuantile.boxplotSigmaFactor, UniversalQuantile.boxplotOutlierFactor); // regression without Tukey outliers
 			subPoints.removeAll(tmpQuantile.getOutliers());
-			this.regression = new SingleResponseRegression(subPoints, RegressionType.QUADRATIC);
+			this.regression = new SingleResponseRegression<>(subPoints, RegressionType.QUADRATIC);
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER,
 						String.format("xAxisSize=%d regressionRealSize=%d starts at %tF %tR", this.quantile.getSize(), this.regression.getRealSize(), new Date(timeStamp1_ms), new Date(timeStamp1_ms)));

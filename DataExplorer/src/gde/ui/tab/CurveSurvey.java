@@ -18,8 +18,6 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +43,7 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.Quantile;
 import gde.utils.SingleResponseRegression;
 import gde.utils.SingleResponseRegression.RegressionType;
+import gde.utils.Spot;
 
 /**
  * Curve measuring for the graphics window.
@@ -242,11 +241,11 @@ public class CurveSurvey {
 			NavigableMap<Long, Integer> boundedXpos = this.xPosMeasure < this.xPosDelta ? this.timeLine.getScalePositions().subMap(this.timestampMeasure_ms, true, this.timestampDelta_ms, true)
 					: this.timeLine.getScalePositions().subMap(this.timestampDelta_ms, true, this.timestampMeasure_ms, true);
 
-			List<Point> points = new ArrayList<>(boundedXpos.size());
+			List<Spot<Integer>> points = new ArrayList<>(boundedXpos.size());
 			for (Entry<Long, Integer> entry : boundedXpos.entrySet()) {
-				points.add(new Point(entry.getValue(), this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(entry.getKey()))));
+				points.add(new Spot<>(entry.getValue(), this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(entry.getKey()))));
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "values " + Arrays.toString(points.toArray(new Point2D.Double[0])));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "values " + Arrays.toString(points.toArray()));
 
 			drawRegressionParabolaLine(points, LineMark.PARABOLA_LINE);
 		}
@@ -290,7 +289,7 @@ public class CurveSurvey {
 	 * @param points is a list of the display points approximated by the parabola (one point per log timestamp)
 	 * @param lineMark
 	 */
-	private void drawRegressionParabolaLine(List<Point> points, LineMark lineMark) {
+	private void drawRegressionParabolaLine(List<Spot<Integer>> points, LineMark lineMark) {
 		// set the erase area max/min values
 		double[] boundedParabolaCoefficients = this.trailRecord.getBoundedParabolaCoefficients();
 		double extremumTimeStamp_ms = boundedParabolaCoefficients[1] / boundedParabolaCoefficients[2] / -2.;
@@ -307,7 +306,7 @@ public class CurveSurvey {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yUpperTransversePos=" + this.yUpperTransversePos + " yLowerTransversePos=" + this.yLowerTransversePos); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// determine the display points for all x axis pixels within the bounded survey range
-		SingleResponseRegression singleResponseRegression = new SingleResponseRegression(points, RegressionType.QUADRATIC);
+		SingleResponseRegression<Integer> singleResponseRegression = new SingleResponseRegression<>(points, RegressionType.QUADRATIC);
 
 		int xPosStart = Math.min(this.xPosDelta, this.xPosMeasure);
 		int[] pointArray = new int[Math.abs(this.xPosDelta - this.xPosMeasure) * 2];

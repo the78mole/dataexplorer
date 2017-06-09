@@ -81,9 +81,8 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.io.HistoOsdReaderWriter;
 import gde.log.Level;
 import gde.ui.DataExplorer;
-import gde.utils.Quantile;
-import gde.utils.Quantile.Fixings;
 import gde.utils.StringHelper;
+import gde.utils.UniversalQuantile;
 
 /**
  * aggregated history recordset data related to measurements, settlements and
@@ -158,7 +157,7 @@ public class HistoVault {
 	private static Marshaller										jaxbMarshaller;
 
 	@XmlTransient
-	private final DataExplorer						  		application	= DataExplorer.getInstance();
+	private final DataExplorer									application	= DataExplorer.getInstance();
 	@XmlTransient
 	private final Settings											settings		= Settings.getInstance();
 	@XmlTransient
@@ -1168,10 +1167,10 @@ public class HistoVault {
 							final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 									: HistoSettlement.outlierRangeFactorDefault;
 							// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
-							Quantile quantile = new Quantile(record.getTranslatedValues(), isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
+							UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
 							entryPoints.addPoint(TrailTypes.AVG, (int) (this.device.reverseTranslateValue(record, quantile.getAvgFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.MAX, (int) (this.device.reverseTranslateValue(record, quantile.getMaxFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.MIN, (int) (this.device.reverseTranslateValue(record, quantile.getMinFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.MAX, (int) (this.device.reverseTranslateValue(record, quantile.getPopulationMaxFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.MIN, (int) (this.device.reverseTranslateValue(record, quantile.getPopulationMinFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.SD, (int) (this.device.reverseTranslateValue(record, quantile.getSigmaFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.Q0, (int) (this.device.reverseTranslateValue(record, quantile.getQuartile0()) * 1000.));
 							entryPoints.addPoint(TrailTypes.Q1, (int) (this.device.reverseTranslateValue(record, quantile.getQuartile1()) * 1000.));
@@ -1236,28 +1235,28 @@ public class HistoVault {
 						entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 						if (histoSettlement.realSize() != 0 && histoSettlement.hasReasonableData()) {
-							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
+							entryPoints.addPoint(TrailTypes.REAL_FIRST, histoSettlement.elementAt(0));
+							entryPoints.addPoint(TrailTypes.REAL_LAST, histoSettlement.elementAt(histoSettlement.size() - 1));
 
+							boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 							final ChannelPropertyType channelProperty = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 							final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
 									: HistoSettlement.outlierSigmaDefault;
 							final ChannelPropertyType channelProperty2 = this.device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 							final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 									: HistoSettlement.outlierRangeFactorDefault;
-							Quantile quantile = new Quantile(histoSettlement.getTranslatedValues(), isSampled ? EnumSet.of(Fixings.IS_SAMPLE) : EnumSet.noneOf(Fixings.class), sigmaFactor, outlierFactor);
+							UniversalQuantile<Double> quantile = new UniversalQuantile<>(histoSettlement.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
 
 							entryPoints.addPoint(TrailTypes.REAL_AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.REAL_MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getMaxFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.REAL_MIN, (int) (histoSettlement.reverseTranslateValue(quantile.getMinFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.REAL_MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMaxFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.REAL_MIN, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMinFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.REAL_SD, (int) (histoSettlement.reverseTranslateValue(quantile.getSigmaFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.REAL_FIRST, (int) (histoSettlement.reverseTranslateValue(quantile.getFirstFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.REAL_LAST, (int) (histoSettlement.reverseTranslateValue(quantile.getLastFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.REAL_SUM, (int) (histoSettlement.reverseTranslateValue(quantile.getSumFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.REAL_COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSize() * 1000) * 1000.));
 
 							entryPoints.addPoint(TrailTypes.AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getMaxFigure()) * 1000.));
-							entryPoints.addPoint(TrailTypes.MIN, (int) (histoSettlement.reverseTranslateValue(quantile.getMinFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMaxFigure()) * 1000.));
+							entryPoints.addPoint(TrailTypes.MIN, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMinFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.SD, (int) (histoSettlement.reverseTranslateValue(quantile.getSigmaFigure()) * 1000.));
 							entryPoints.addPoint(TrailTypes.Q0, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile0()) * 1000.));
 							entryPoints.addPoint(TrailTypes.Q1, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile1()) * 1000.));

@@ -43,6 +43,7 @@ import gde.log.Level;
  * this in turn is compensated by the fact that we mostly need 3 quantiles from the same population.
  * @author Thomas Eickert
  */
+@Deprecated // replaced by UniversalQuantile --- reason is spaghetti-like code due to integer, double and 2D-points support  ---  was not deleted for JUnit performance comparisons
 public class Quantile {
 	private final static String					$CLASS_NAME						= Quantile.class.getName();
 	private final static Logger					log										= Logger.getLogger($CLASS_NAME);

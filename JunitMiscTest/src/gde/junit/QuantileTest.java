@@ -13,15 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 									2017 Thomas Eickert
 ****************************************************************************************/
 package gde.junit;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -29,6 +32,8 @@ import java.util.logging.Logger;
 
 import gde.utils.Quantile;
 import gde.utils.Quantile.Fixings;
+import gde.utils.Spot;
+import gde.utils.UniversalQuantile;
 
 public class QuantileTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	private final static String	$CLASS_NAME										= QuantileTest.class.getName();
@@ -49,13 +54,13 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 	private final double				q3Zeros2Null									= 101.;																																											// 75%
 	private final double				q4Zeros2Null									= 99999.;																																										// maximum
 	private final double				q33PerCentZeros2Null					= 25.;
-	private final double				lowerWhiskerZeros2NullLimit		= 10. - (101 - 10) * 1.5;																																		// -126.5																												
-	private final double				upperWhiskerZeros2NullLimit		= 101. + (101 - 10) * 1.5;																																	// 237.5																												
+	private final double				lowerWhiskerZeros2NullLimit		= 10. - (101 - 10) * 1.5;																																		// -126.5
+	private final double				upperWhiskerZeros2NullLimit		= 101. + (101 - 10) * 1.5;																																	// 237.5
 	private final double				qLowerWhiskerZeros2Null				= -5;
 	private final double				qUpperWhiskerZeros2Null				= 175.;
 	private final double				lowerWhiskerSampleWithZeros		= 10. - (101 - 10) * 1.5;																																		// -126.5
 	private final double				upperWhiskerSampleWithZeros		= 101. + (101 - 10) * 1.5;																																	// 237.5
-	private final double				qLowerWhiskerSampleWithZeros	= -129.875;																																									// equals the lower fence (1.5*IQR below Q1) for the sample 
+	private final double				qLowerWhiskerSampleWithZeros	= -129.875;																																									// equals the lower fence (1.5*IQR below Q1) for the sample
 	private final double				qUpperWhiskerSampleWithZeros	= 239.125;																																									// equals the upper fence (1.5*IQR above Q3) for the sample
 	private final double				q0SampleWithZeros							= -99999;																																										// minimum
 	private final double				q1SampleWithZeros							= 8 + .25 * (10 - 8);																																				// 25%
@@ -99,56 +104,236 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 	}
 
 	public void testSortPerformance() {
+		// special double example :  -zero
+		final Double d3 = -0d; // try this code with d3 = 0d; for comparison
+		if (d3 < 0d)
+			System.out.println("is never printed");
+		else
+			System.out.println("Double -zero is equal to +zero");
+		if (Double.compare(d3, 0d) < 0)
+			System.out.println("Double -zero is less compared to +zero");
+		else
+			System.out.println("is never printed");
+
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		for (int i = 0; i < 15; i++) {
 			record.addAll(record);
 		}
+		{
+			this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+			ArrayList<Double> arrayList = new ArrayList<Double>();
+			for (Integer value : record) {
+				arrayList.add(value != null ? value.doubleValue() : null);
+			}
+			Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+			log.log(Level.INFO, ">>> Class Quantile <<<");
+			log.log(Level.INFO, "Avg   " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaRunningOBS());
+			log.log(Level.INFO, "Avg   " + quantileArray.getAvgFigure() + " bisher " + quantileArray.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaRunningOBS());
 
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-		ArrayList<Double> arrayList = new ArrayList<Double>();
-		for (Integer value : record) {
-			arrayList.add(value != null ? value.doubleValue() : null);
+			for (int j = 0; j < 4; j++) {
+				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
+				int qCount = 100;
+				for (int i = 0; i < qCount / 2; i++) {
+					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+					nanoTimeSigmaInt -= System.nanoTime();
+					this.quantile.getSigmaRunningOBS();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					quantileArray.getSigmaRunningOBS();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				nanoTime = System.nanoTime();
+				nanoTimeSigmaInt = 0;
+				nanoTimeSigmaDouble = 0;
+				for (int i = 0; i < qCount / 2; i++) {
+					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), true);
+					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), true);
+					nanoTimeSigmaInt -= System.nanoTime();
+					this.quantile.getSigmaFigure();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					quantileArray.getSigmaFigure();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms Stream -> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				nanoTime = System.nanoTime();
+				nanoTimeSigmaInt = 0;
+				nanoTimeSigmaDouble = 0;
+				for (int i = 0; i < qCount / 2; i++) {
+					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
+					nanoTimeSigmaInt -= System.nanoTime();
+					this.quantile.getSigmaFigure();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					quantileArray.getSigmaFigure();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+			}
 		}
-		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-		log.log(Level.INFO, "Avg   " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
-		log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaRunningOBS());
-		log.log(Level.INFO, "Avg   " + quantileArray.getAvgFigure() + " bisher " + quantileArray.getAvgOBS());
-		log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaRunningOBS());
+		{
+			ArrayList<Point> recordPoints = new ArrayList<>();
+			ArrayList<Point2D.Double> arrayList = new ArrayList<>();
+			int counter = 0;
+			for (Integer value : record) {
+				if (value != null) {
+					recordPoints.add(new Point(counter, value));
+					arrayList.add(new Point2D.Double(counter, value));
+				}
+				counter++;
+			}
+			//			this.quantile = new Quantile(recordPoints,  6, 9);
+			Quantile quantileArray = new Quantile(arrayList, 6, 9);
+			log.log(Level.INFO, ">>> Class Quantile with Point2D <<<");
+			//			log.log(Level.INFO, "Avg   " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
+			//			log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaRunningOBS());
+			log.log(Level.INFO, "Avg   " + quantileArray.getAvgFigure() + " bisher " + quantileArray.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaRunningOBS());
 
-		for (int j = 0; j < 4; j++) {
-			long nanoTime = System.nanoTime(), nanoTimeSigma = 0;
-			int qCount = 100;
-			for (int i = 0; i < qCount / 2; i++) {
-				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-				nanoTimeSigma -= System.nanoTime();
-				this.quantile.getSigmaRunningOBS();
-				quantileArray.getSigmaRunningOBS();
-				nanoTimeSigma += System.nanoTime();
+			for (int j = 0; j < 4; j++) {
+				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
+				int qCount = 100;
+				for (int i = 0; i < qCount / 2; i++) {
+					//					genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
+					quantileArray = new Quantile(arrayList, 6, 9);
+					//					nanoTimeSigmaInt -= System.nanoTime();
+					//					genericQuantile.getSigmaRunningOBS();
+					//					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					quantileArray.getSigmaRunningOBS();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				nanoTime = System.nanoTime();
+				nanoTimeSigmaInt = 0;
+				nanoTimeSigmaDouble = 0;
+				for (int i = 0; i < qCount / 2; i++) {
+					//					genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
+					quantileArray = new Quantile(arrayList, 6, 9);
+					//					nanoTimeSigmaInt -= System.nanoTime();
+					//					genericQuantile.getSigmaFigure();
+					//					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					quantileArray.getSigmaFigure();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
-			log.log(Level.INFO, "ms bisher ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
-			nanoTime = System.nanoTime();
-			nanoTimeSigma = 0;
-			for (int i = 0; i < qCount / 2; i++) {
-				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), true);
-				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), true);
-				nanoTimeSigma -= System.nanoTime();
-				this.quantile.getSigmaFigure();
-				quantileArray.getSigmaFigure();
-				nanoTimeSigma += System.nanoTime();
+		}
+		{
+			List<Integer> recordList = new ArrayList<>(record);
+			ArrayList<Double> arrayList = new ArrayList<>();
+			for (Integer value : record) {
+				arrayList.add(value != null ? value.doubleValue() : null);
 			}
-			log.log(Level.INFO, "ms neu    ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
-			nanoTime = System.nanoTime();
-			nanoTimeSigma = 0;
-			for (int i = 0; i < qCount / 2; i++) {
-				this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-				quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-				nanoTimeSigma -= System.nanoTime();
-				this.quantile.getSigmaFigure();
-				quantileArray.getSigmaFigure();
-				nanoTimeSigma += System.nanoTime();
+			List<Integer> iExclusions = new ArrayList<>();
+			iExclusions.add(null);
+			List<Double> dExclusions = new ArrayList<>();
+			dExclusions.add(null);
+			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6, 9, iExclusions);
+			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6, 9, dExclusions);
+			log.log(Level.INFO, ">>> Class GenericQuantile with Number <<<");
+			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
+			log.log(Level.INFO, "Avg   " + genericArray.getAvgFigure() + " bisher " + genericArray.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + genericArray.getSigmaFigure() + " bisher " + genericArray.getSigmaRunningOBS());
+
+			for (int j = 0; j < 4; j++) {
+				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
+				int qCount = 100;
+				for (int i = 0; i < qCount / 2; i++) {
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6, 9, iExclusions);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6, 9, dExclusions);
+					nanoTimeSigmaInt -= System.nanoTime();
+					genericQuantile.getSigmaRunningOBS();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					genericArray.getSigmaRunningOBS();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				nanoTime = System.nanoTime();
+				nanoTimeSigmaInt = 0;
+				nanoTimeSigmaDouble = 0;
+				for (int i = 0; i < qCount / 2; i++) {
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6, 9, iExclusions);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6, 9, dExclusions);
+					nanoTimeSigmaInt -= System.nanoTime();
+					genericQuantile.getSigmaFigure();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					genericArray.getSigmaFigure();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
-			log.log(Level.INFO, "ms opt    ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigma " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigma));
+		}
+		{
+			List<Spot<Integer>> recordPoints = new ArrayList<>();
+			List<Spot<Integer>> iExclusions = new ArrayList<>();
+			iExclusions.add(null);
+			List<Spot<Double>> arrayPoints = new ArrayList<>();
+			List<Spot<Double>> dExclusions = new ArrayList<>();
+			dExclusions.add(null);
+			int counter = 0;
+			for (Integer value : record) {
+				if (value != null) {
+					recordPoints.add(new Spot<Integer>(counter, value));
+					arrayPoints.add(new Spot<Double>((double) counter, (double) value));
+				}
+				counter++;
+			}
+			UniversalQuantile<Spot<Integer>> genericQuantile = new UniversalQuantile<>(recordPoints, false, 6, 9, iExclusions);
+			UniversalQuantile<Spot<Double>> genericArray = new UniversalQuantile<>(arrayPoints, false, 6, 9, dExclusions);
+			log.log(Level.INFO, ">>> Class GenericQuantile with Spot<Number> <<<");
+			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
+			log.log(Level.INFO, "Avg   " + genericArray.getAvgFigure() + " bisher " + genericArray.getAvgOBS());
+			log.log(Level.INFO, "Sigma " + genericArray.getSigmaFigure() + " bisher " + genericArray.getSigmaRunningOBS());
+
+			for (int j = 0; j < 4; j++) {
+				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
+				int qCount = 100;
+				for (int i = 0; i < qCount / 2; i++) {
+					genericQuantile = new UniversalQuantile<>(recordPoints, false, 6, 9, iExclusions);
+					genericArray = new UniversalQuantile<>(arrayPoints, false, 6, 9, dExclusions);
+					nanoTimeSigmaInt -= System.nanoTime();
+					genericQuantile.getSigmaRunningOBS();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					genericArray.getSigmaRunningOBS();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				nanoTime = System.nanoTime();
+				nanoTimeSigmaInt = 0;
+				nanoTimeSigmaDouble = 0;
+				for (int i = 0; i < qCount / 2; i++) {
+					genericQuantile = new UniversalQuantile<>(recordPoints, false, 6, 9, iExclusions);
+					genericArray = new UniversalQuantile<>(arrayPoints, false, 6, 9, dExclusions);
+					nanoTimeSigmaInt -= System.nanoTime();
+					genericQuantile.getSigmaFigure();
+					nanoTimeSigmaInt += System.nanoTime();
+					nanoTimeSigmaDouble -= System.nanoTime();
+					genericArray.getSigmaFigure();
+					nanoTimeSigmaDouble += System.nanoTime();
+				}
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
+						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+			}
 		}
 	}
 
@@ -156,9 +341,9 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 	 * ET: Vector    Integer performance for sigma based on parallel streams vs. conventional: 17 sec vs. 23 sec
 	 * ET: Vector    Double  performance for sigma based on parallel streams vs. conventional: 39 sec vs. 71 sec
 	 * ET: ArrayList Double  performance for sigma based on parallel streams vs. conventional: 38 sec vs. 69 sec
-	 * ET figures: 10.000 calculations for a Vector / ArrayList with 589.824 elements 
+	 * ET figures: 10.000 calculations for a Vector / ArrayList with 589.824 elements
 	 */
-	private void estSigmaPerformance() {
+	private void estSigmaPerformance() { // ET 10.06.2017 remove sigmaFigure caching before reactivating
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		for (int i = 0; i < 15; i++) {
 			record.addAll(record);
