@@ -47,6 +47,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 
 /**
  * Class to read and write comma separated value files which simulates serial data 
@@ -82,6 +83,7 @@ public class NMEAReaderWriter {
 	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber) throws NotSupportedFileFormatException, IOException, DataInconsitsentException,
 			DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		long startTime = System.nanoTime() / 1000000;
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
 		String recordSetName = GDE.STRING_EMPTY;
@@ -314,6 +316,8 @@ public class NMEAReaderWriter {
 			}
 		}
 
+		if (log.isLoggable(Level.TIME))
+			log.log(Level.TIME,  String.format("read time = %s", StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime)))); //$NON-NLS-1$
 		return recordSet;
 	}
 
