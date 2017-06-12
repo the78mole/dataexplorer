@@ -240,8 +240,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 			iExclusions.add(null);
 			List<Double> dExclusions = new ArrayList<>();
 			dExclusions.add(null);
-			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6, 9, iExclusions);
-			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6, 9, dExclusions);
+			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
+			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
 			log.log(Level.INFO, ">>> Class GenericQuantile with Number <<<");
 			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
 			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
@@ -252,8 +252,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
 				int qCount = 100;
 				for (int i = 0; i < qCount / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordList, false, 6, 9, iExclusions);
-					genericArray = new UniversalQuantile<>(arrayList, false, 6, 9, dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaRunningOBS();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -267,8 +267,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < qCount / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordList, false, 6, 9, iExclusions);
-					genericArray = new UniversalQuantile<>(arrayList, false, 6, 9, dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaFigure();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -295,8 +295,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				}
 				counter++;
 			}
-			UniversalQuantile<Spot<Integer>> genericQuantile = new UniversalQuantile<>(recordPoints, false, 6, 9, iExclusions);
-			UniversalQuantile<Spot<Double>> genericArray = new UniversalQuantile<>(arrayPoints, false, 6, 9, dExclusions);
+			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
+			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
 			log.log(Level.INFO, ">>> Class GenericQuantile with Spot<Number> <<<");
 			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
 			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
@@ -307,8 +307,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
 				int qCount = 100;
 				for (int i = 0; i < qCount / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordPoints, false, 6, 9, iExclusions);
-					genericArray = new UniversalQuantile<>(arrayPoints, false, 6, 9, dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
+					genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaRunningOBS();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -322,8 +322,8 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < qCount / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordPoints, false, 6, 9, iExclusions);
-					genericArray = new UniversalQuantile<>(arrayPoints, false, 6, 9, dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
+					genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaFigure();
 					nanoTimeSigmaInt += System.nanoTime();

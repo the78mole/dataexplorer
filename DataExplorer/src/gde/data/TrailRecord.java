@@ -74,7 +74,7 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 
 	final DeviceXmlResource										xmlResource							= DeviceXmlResource.getInstance();
 	private SingleResponseRegression<Double>	regression							= null;
-	private UniversalQuantile<Spot<Double>>		quantile								= null;
+	private UniversalQuantile<Double>					quantile								= null;
 
 	/**
 	 * Data points of one measurement or line or curve.
@@ -1025,10 +1025,9 @@ public class TrailRecord extends Record { // todo maybe a better option is to cr
 		final List<Spot<Double>> subPoints = getSubPoints(points, Math.min(measureIndex, deltaIndex), Math.max(measureIndex, deltaIndex) + 1);
 
 		if (!subPoints.isEmpty()) {
-			boolean isSample = true;
-			this.quantile = new UniversalQuantile<>(subPoints, isSample); // take all points for display
+			this.quantile = new UniversalQuantile<>(subPoints); // take all points for display
 
-			UniversalQuantile<Spot<Double>> tmpQuantile = new UniversalQuantile<>(subPoints, isSample, UniversalQuantile.boxplotSigmaFactor, UniversalQuantile.boxplotOutlierFactor); // regression without Tukey outliers
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.boxplotSigmaFactor, UniversalQuantile.boxplotOutlierFactor); // eliminate Tukey outliers for regression
 			subPoints.removeAll(tmpQuantile.getOutliers());
 			this.regression = new SingleResponseRegression<>(subPoints, RegressionType.QUADRATIC);
 			if (log.isLoggable(Level.FINER)) {

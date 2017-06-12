@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 import gde.log.Level;
 
 /**
- * Calculates quantiles of a probability distribution after removing outliers.
+ * Immutable quantile calculation of a probability distribution after removing outliers.
  * Is based on a mergesort and thus avg O(n log n).<br>
- * NB: a 500k records clone + sort takes 45 ms (T is {@code Number}) or 90 ms (T is {@code Spot<Number>}) on ET's machine.
+ * NB: a 500k records clone + sort takes 45 ms (T is {@code Number} or {@code Spot<Number>}) on ET's machine.
  * @author Thomas Eickert
  */
 public class UniversalQuantile<T extends Number & Comparable<T>> {
@@ -48,12 +48,13 @@ public class UniversalQuantile<T extends Number & Comparable<T>> {
 	 */
 	public final static double	boxplotOutlierFactor	= 1.5;
 
-	private final List<T>				population;
-	private final List<T>				outcasts;
 	private final boolean				isSample;																									// required for probability calculations from the population
-	private List<T>							trunk;																										// remaining population after removing the elimination members
-	private List<T>							castaways							= new ArrayList<>();								// outlier and outcast members not contained in the trunk
+	private final List<T>				trunk;																										// remaining population after removing the elimination members
+	private final List<T>				outcasts;																									// values to be eliminated from the population
+	private final List<T>				castaways							= new ArrayList<>();								// outlier and outcast members not contained in the trunk
 
+	private T										firstValidElement;
+	private T										lastValidElement;
 	private Double							sumFigure;
 	private Double							avgFigure;
 	private Double							sigmaFigure;
@@ -196,6 +197,38 @@ public class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	/**
+	 * Does not remove outliers.
+	 * @param population is taken as a sample (for the standard deviation)
+	 */
+	public UniversalQuantile(List<Spot<T>> population) {
+		this(population, 99., 99.);
+	}
+
+	/**
+	 * @param population is taken as a sample (for the standard deviation)
+	 * @param sigmaFactor specifies the tolerance interval <em>TI = &plusmn; z * &sigma; with z >= 0</em>
+	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
+	 */
+	public UniversalQuantile(List<Spot<T>> population, double sigmaFactor, double outlierFactor) {
+		if (population == null || population.isEmpty()) throw new IllegalArgumentException("empty population");
+		this.isSample = true;
+		this.outcasts = new ArrayList<T>();
+
+		this.trunk = new ArrayList<T>();
+		for (Spot<T> spot : population) {
+			this.trunk.add(spot.y());
+		}
+
+		Collections.sort(this.trunk);
+
+		this.firstValidElement = population.get(0).y();
+		this.lastValidElement = population.get(population.size() - 1).y();
+
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
+	}
+
+	/**
 	 * @param population
 	 * @param isSample true calculates the sample standard deviation
 	 */
@@ -218,14 +251,13 @@ public class UniversalQuantile<T extends Number & Comparable<T>> {
 	 * @param isSample true calculates the sample standard deviation
 	 * @param sigmaFactor specifies the tolerance interval <em>TI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
-	 * @param outcasts holds list members which are eliminated before the quantiles calculation (non-number input classes rely on object equality!)
+	 * @param outcasts holds list members which are eliminated before the quantiles calculation
 	 */
 	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor, List<T> outcasts) {
 		if (population == null || population.isEmpty()) throw new IllegalArgumentException("empty population");
 		if (outcasts == null) throw new IllegalArgumentException("outcast is null");
-		this.population = population;
 		this.isSample = isSample;
-		this.outcasts = outcasts;
+		this.outcasts = new ArrayList<T>(outcasts);
 
 		if (outcasts.isEmpty()) {
 			this.trunk = new ArrayList<T>(population);
@@ -256,54 +288,41 @@ public class UniversalQuantile<T extends Number & Comparable<T>> {
 		}
 		if (this.trunk.isEmpty()) throw new UnsupportedOperationException("empty trunk");
 
+		this.firstValidElement = null;
+		// walk forward and get the first element which is not in the outcast / outlier lists
+		for (int i = 0; i < population.size(); i++) {
+			T t = population.get(i);
+			if (!this.castaways.contains(t)) {
+				this.firstValidElement = t;
+				break;
+			}
+		}
+		this.lastValidElement = null;
+		// walk backward and get the first element which is not in the outcast / outlier lists
+		for (int j = population.size() - 1; j >= 0; j--) {
+			T t = population.get(j);
+			if (!this.castaways.contains(t)) {
+				this.lastValidElement = t;
+				break;
+			}
+		}
+
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
-	}
-
-	/**
-	 * @return the first element after outcast elimination and removing the outliers
-	 */
-	public T getFirstFlement() {
-		T result = null;
-		// walk forward and get the first element which is not in the outcast / outlier lists
-		for (int i = 0; i < this.population.size(); i++) {
-			T t = this.population.get(i);
-			if (!this.castaways.contains(t)) {
-				result = t;
-				break;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * @return the last element after outcast elimination and removing the outliers
-	 */
-	public T getLastElement() {
-		T result = null;
-		// walk backward and get the first element which is not in the outcast / outlier lists
-		for (int j = this.population.size() - 1; j >= 0; j--) {
-			T t = this.population.get(j);
-			if (!this.castaways.contains(t)) {
-				result = t;
-				break;
-			}
-		}
-		return result;
 	}
 
 	/**
 	 * @return the value of the first element after outcast elimination and removing the outliers
 	 */
 	public double getFirstFigure() {
-		return getFirstFlement().doubleValue();
+		return this.firstValidElement.doubleValue();
 	}
 
 	/**
 	 * @return the value of the last element after outcast elimination and removing the outliers
 	 */
 	public double getLastFigure() {
-		return getLastElement().doubleValue();
+		return this.lastValidElement.doubleValue();
 	}
 
 	/**

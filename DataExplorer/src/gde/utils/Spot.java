@@ -26,7 +26,7 @@ package gde.utils;
  * 	@author Thomas Eickert
  * 	@param <T> supports numbers
  */
-public class Spot<T extends Number> extends Number implements Comparable<Spot<T>> {
+public class Spot<T extends Number> implements Comparable<Spot<T>> {
 	private static final long	serialVersionUID	= -5967345515844485297L;
 
 	private final T						x;																				// x coordinate
@@ -82,38 +82,6 @@ public class Spot<T extends Number> extends Number implements Comparable<Spot<T>
 		if (this.x.doubleValue() < that.x.doubleValue()) return -1;
 		if (this.x.doubleValue() > that.x.doubleValue()) return +1;
 		return 0;
-	}
-
-	/**
-	 * @return the y value
-	 */
-	@Override
-	public double doubleValue() {
-		return this.y.doubleValue();
-	}
-
-	/**
-	 * @return the y value
-	 */
-	@Override
-	public float floatValue() {
-		return this.y.floatValue();
-	}
-
-	/**
-	 * @return the y value
-	 */
-	@Override
-	public int intValue() {
-		return this.y.intValue();
-	}
-
-	/**
-	 * @return the y value
-	 */
-	@Override
-	public long longValue() {
-		return this.y.longValue();
 	}
 
   /**
