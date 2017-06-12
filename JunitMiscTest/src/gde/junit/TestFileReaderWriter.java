@@ -588,7 +588,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from TXT file");
 						activeChannel.setSaved(true);
 
-						NMEAReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1);
+						CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, 
+								new DataParser(device.getDataBlockTimeUnitFactor(), 
+										device.getDataBlockLeader(), device.getDataBlockSeparator().value(), 
+										device.getDataBlockCheckSumType(), device.getDataBlockSize(InputTypes.FILE_IO)));
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 						if (recordSet != null) {
