@@ -27,6 +27,7 @@ DETAILS:
 
 HoTTAdapter*
 	- fix start time stamp using last modified of log file
+	- fix header in graphics window displaying consistent actual date, this is independent of the log file date
 Junsi iCharger (serial communication only)
 	- fix problems with received strings which are not a valid status
 MC3000

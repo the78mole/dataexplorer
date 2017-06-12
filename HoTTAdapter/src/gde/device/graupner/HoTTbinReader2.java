@@ -114,7 +114,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && channelNumber != 4 ? 10 : 1);
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
-		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
+		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -438,7 +438,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
-		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
+		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
