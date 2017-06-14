@@ -22,8 +22,8 @@ package gde.junit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import gde.histoinventory.GeoCodes;
-import gde.histoinventory.GpsCluster;
+import gde.histo.gpslocations.GeoCodes;
+import gde.histo.gpslocations.GpsCluster;
 import gde.utils.GpsCoordinate;
 
 public class GpsClusterTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285

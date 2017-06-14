@@ -52,7 +52,8 @@ import gde.device.IHistoDevice;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histocache.HistoVault;
+import gde.histo.cache.HistoVault;
+import gde.histo.cache.VaultCollector;
 import gde.log.Level;
 import gde.utils.StringHelper;
 
@@ -72,8 +73,8 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 		 * @throws NotSupportedFileFormatException 
 		 * @throws IOException 
 		 */
-	public static List<HistoVault> getTrusses(File file, String objectDirectory) throws IOException, NotSupportedFileFormatException {
-		List<HistoVault> trusses = new ArrayList<HistoVault>();
+	public static List<VaultCollector> getTrusses(File file, String objectDirectory) throws IOException, NotSupportedFileFormatException {
+		List<VaultCollector> trusses = new ArrayList<>();
 		final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(file.toString());
 		final String logObjectKey = header.containsKey(GDE.OBJECT_KEY) ? header.get(GDE.OBJECT_KEY).intern() : GDE.STRING_EMPTY;
 		final int fileVersion = Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION).trim()).intValue();
@@ -87,8 +88,9 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 			final long enhancedStartTimeStamp_ms = HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo);
 			final Channel recordSetInfoChannel = OsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
 			if (recordSetInfoChannel != null) {
-				trusses.add(HistoVault.createTruss(objectDirectory, file, fileVersion, recordSetSize, i, logRecordSetBaseName, header.get(GDE.DEVICE_NAME), enhancedStartTimeStamp_ms,
-						recordSetInfoChannel.getNumber(), logObjectKey));
+				VaultCollector vaultCollector = new VaultCollector(objectDirectory, file, fileVersion, recordSetSize, i, logRecordSetBaseName, header.get(GDE.DEVICE_NAME), enhancedStartTimeStamp_ms,
+						recordSetInfoChannel.getNumber(), logObjectKey);
+				trusses.add(vaultCollector);
 			}
 		}
 		log.log(Level.FINER, " " + trusses.size() + " identified in " + file.getPath()); //$NON-NLS-1$
@@ -104,12 +106,12 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @throws NotSupportedFileFormatException
 	 * @throws DataInconsitsentException
 	 */
-	public static List<HistoVault> readHisto(Path filePath, Collection<HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
-		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
+	public static List<HistoVault> readHisto(Path filePath, Collection<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
+		List<HistoVault> histoVaults = new ArrayList<>();
 		log.log(Level.FINE, "start " + filePath); //$NON-NLS-1$
 		// build job list consisting of recordset ordinal and the corresponding truss
-		Map<Integer, HistoVault> recordSetTrusses = new TreeMap<Integer, HistoVault>();
-		for (HistoVault truss : trusses) {
+		Map<Integer, VaultCollector> recordSetTrusses = new TreeMap<>();
+		for (VaultCollector truss : trusses) {
 			if (truss.getLogFileAsPath().equals(filePath))
 				recordSetTrusses.put(truss.getLogRecordSetOrdinal(), truss);
 			else
@@ -234,7 +236,7 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 
 					recordSetTrusses.get(i).promoteTruss(histoRecordSet, scores);
-					histoVaults.add(recordSetTrusses.get(i));
+					histoVaults.add(recordSetTrusses.get(i).getVault());
 
 					// reduce memory consumption in advance to the garbage collection
 					histoRecordSet.cleanup();

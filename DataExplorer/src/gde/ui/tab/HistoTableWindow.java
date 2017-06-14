@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 package gde.ui.tab;
@@ -52,10 +52,11 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoSet;
-import gde.data.TrailRecord;
-import gde.data.TrailRecordSet;
-import gde.data.TrailRecordSet.DataTag;
-import gde.data.TrailRecordSet.DisplayTag;
+import gde.histo.recordings.HistoTableMapper;
+import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
+import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.recordings.TrailRecordSet.DisplayTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -197,10 +198,10 @@ public class HistoTableWindow extends CTabItem {
 			 * the TableCursor has already internally processed the home/end keyevent
 			 * and changed the row/column, see:
 			 * http://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html
-			 * 
+			 *
 			 * Therefore, we need a Vector that stores the last cell positions, so we can
 			 * access the position before the current position.
-			 * 
+			 *
 			 * @param col
 			 */
 			private void workaroundTableCursor(int col) {
@@ -281,7 +282,7 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 				}
 				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), HistoSet.getInstance().getExcludedTrussesAsText());
-				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$ 
+				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$
 			}
 		});
 
@@ -302,11 +303,11 @@ public class HistoTableWindow extends CTabItem {
 					if (HistoTableWindow.this.dataTable.indexOf(item) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item);
 						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
-						item.setText(trailRecord.getHistoTableRow());
+						item.setText(HistoTableMapper.getTableRow(trailRecord));
 					}
 					else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
-						item.setText(trailRecordSet.getTableTagRow(DisplayTag.fromOrdinal(index)));
+						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, DisplayTag.fromOrdinal(index)));
 					}
 				}
 			}
@@ -377,7 +378,7 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	/**
-	 * query if this component is visible 
+	 * query if this component is visible
 	 * @return true if table window is visible
 	 */
 	public boolean isVisible() {
@@ -403,7 +404,7 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	public boolean isHeaderTextValid() {
-		String[] tableHeaderRow = this.histoSet.getTrailRecordSet().getTableHeaderRow();
+		String[] tableHeaderRow =  HistoTableMapper.getTableHeaderRow(this.histoSet.getTrailRecordSet());
 		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
 			boolean isValid = true;
 			for (int i = 0; i < tableHeaderRow.length; i++) {
@@ -425,7 +426,7 @@ public class HistoTableWindow extends CTabItem {
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
 			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
 				TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
-				isValid = tableItem.getText().equals(trailRecord.getHistoTableRowText()) && tableItem.getText(1).equals(trailRecord.getTrailText());
+				isValid = tableItem.getText().equals(HistoTableMapper.getTableRowText(trailRecord)) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
 			}
 			else {
 				isValid = tableItem.getText().isEmpty();
@@ -460,7 +461,7 @@ public class HistoTableWindow extends CTabItem {
 		// set the data columns of the new header line
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.histoSet != null && this.histoSet.getTrailRecordSet() != null) {
-			String[] tableHeaderRow = this.histoSet.getTrailRecordSet().getTableHeaderRow();
+			String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(this.histoSet.getTrailRecordSet());
 			if (tableHeaderRow.length > 0) {
 				for (String headerString : tableHeaderRow) {
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);

@@ -5,7 +5,7 @@
 // Generated on: 2017.03.25 at 11:38:15 AM MEZ 
 //
 
-package gde.histocache;
+package gde.histo.cache;
 
 import java.util.HashMap;
 
@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import gde.GDE;
 import gde.device.TrailTypes;
-import gde.histocache.HistoVault.PointsTypeAdapter;
+import gde.histo.cache.HistoVault.PointsTypeAdapter;
 
 /**
  * <p>Java class for compartmentType complex type.

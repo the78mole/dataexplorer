@@ -13,10 +13,10 @@
 
  You should have received a copy of the GNU General Public License
  along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
-package gde.histoinventory;
+package gde.histo.gpslocations;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,8 +46,8 @@ import gde.utils.FileUtils;
 import gde.utils.GpsCoordinate;
 
 /**
+ * Gives access to geocode data based on the GPS geocode API.
  * @author Thomas Eickert
- * gives access to geocode data based on the GPS geocode API.
  */
 public class GeoCodes {
 	final static String						$CLASS_NAME	= GeoCodes.class.getName();
@@ -75,25 +75,6 @@ public class GeoCodes {
 				geoFile = closestFile;
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("file from stream %s   file from loop %s", geoFile.getName(), closestFile.getName())); //$NON-NLS-1$
 			}
-			//			{
-			//				File closestGpsFile = null;
-			//				double minDistance = Double.MAX_VALUE;
-			//				for (File file : files) {
-			//					GpsCoordinate tmpCoordinate = new GpsCoordinate(file.getName());
-			//					final double tmpDistance = gpsCoordinate.getDistance(tmpCoordinate);
-			//					if (tmpDistance < minDistance) {
-			//						minDistance = tmpDistance;
-			//					}
-			//					if (minDistance < GeoCodes.settings.getGpsLocationRadius()) {
-			//						closestGpsFile = file;
-			//						break;
-			//					}
-			//				}
-			//				if (closestGpsFile == null) closestGpsFile = aquireGeoData(gpsCoordinate);
-			//				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("file from stream %s   file from loop %s", geoFile.getName(), closestGpsFile.getName())); //$NON-NLS-1$
-			//
-			//				geoFile = closestGpsFile;
-			//			}
 			if (FileUtils.checkFileExist(geoFile.getPath()))
 				location = getLocation(geoFile).replace("Unnamed Road, ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			else

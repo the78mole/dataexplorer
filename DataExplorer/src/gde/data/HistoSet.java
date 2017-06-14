@@ -61,8 +61,12 @@ import gde.device.IHistoDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histocache.HistoVault;
-import gde.histoinventory.FileExclusionData;
+import gde.histo.cache.HistoVault;
+import gde.histo.cache.VaultCollector;
+import gde.histo.cache.VaultManager;
+import gde.histo.exclusions.ExclusionData;
+import gde.histo.recordings.TrailRecordSet;
+import gde.histo.recordings.RecordingsCollector;
 import gde.io.HistoOsdReaderWriter;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -96,18 +100,18 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	private int										totalTrussesCount					= 0;														// available recordsets (from selected files, dead links eliminated)
 	private int										unsuppressedTrussesCount	= 0;														// authorized recordsets (excluded vaults eliminated - by the user in suppress mode)
 	private int										matchingTrussesCount			= 0;														// selected by menu settings (eliminated by checks, e.g. device, object and retrospect period)
-	private int										availableTrussesCount				= 0;														// added to the trailrecordset (empty vaults eliminated, identical vaults eliminated based on setting)
+	private int										availableTrussesCount			= 0;														// added to the trailrecordset (empty vaults eliminated, identical vaults eliminated based on setting)
 	private int										elapsedTime_ms						= 0;														// total time for rebuilding the HistoSet
 
 	public enum DirectoryType {
 		DATA, IMPORT
 	};
 
-	private Map<DirectoryType, Path>	validatedDirectories	= new LinkedHashMap<>();
-	private long											fileSizeSum_B					= 0;																												// size of all the histo files which have been read to build the histo recordsets
-	private TrailRecordSet						trailRecordSet				= null;																											// histo data transformed in a recordset format
-	private Map<String, HistoVault>		unsuppressedTrusses		= new HashMap<>();
-	private Map<String, HistoVault>		suppressedTrusses			= new HashMap<>();
+	private Map<DirectoryType, Path>		validatedDirectories	= new LinkedHashMap<>();
+	private long												fileSizeSum_B					= 0;										// size of all the histo files which have been read to build the histo recordsets
+	private TrailRecordSet							trailRecordSet				= null;									// histo data transformed in a recordset format
+	private Map<String, VaultCollector>	unsuppressedTrusses		= new HashMap<>();
+	private Map<String, VaultCollector>	suppressedTrusses			= new HashMap<>();
 
 	/**
 	 * defines the first step during rebuilding the histoset data.
@@ -226,7 +230,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		{
 			if (this.unsuppressedTrusses.size() > 0) {
 				// step: build the workload map consisting of the cache key and the file path
-				Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(deviceConfigurations);
+				Map<Path, Map<String, VaultCollector>> trussJobs = getTrusses4Screening(deviceConfigurations);
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
 
 				// step: put cached vaults into the histoSet map and reduce workload map
@@ -235,8 +239,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs loaded from cache = %d", trussJobsSize - trussJobs.size())); //$NON-NLS-1$
 
 				// step: transform log files for the truss jobs into vaults and put them into the histoSet map
-				ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
-				for (Map.Entry<Path, Map<String, HistoVault>> pathEntry : trussJobs.entrySet()) {
+				ArrayList<HistoVault> newVaults = new ArrayList<>();
+				for (Map.Entry<Path, Map<String, VaultCollector>> pathEntry : trussJobs.entrySet()) {
 					try {
 						newVaults.addAll(loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue()));
 					}
@@ -306,7 +310,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (this.unsuppressedTrusses.size() > 0) {
 						long nanoTimeCheckFilesSum = -System.nanoTime();
 						// step: build the workload map consisting of the cache key and the file path
-						Map<Path, Map<String, HistoVault>> trussJobs = getTrusses4Screening(DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+						Map<Path, Map<String, VaultCollector>> trussJobs = getTrusses4Screening(DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 						nanoTimeCheckFilesSum += System.nanoTime();
 						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
 							log.log(Level.TIME, String.format("%,5d trusses        job check          time=%,6d [ms]  ::  per second:%5d", this.unsuppressedTrusses.size(), //$NON-NLS-1$
@@ -338,7 +342,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 						long nanoTimeReadRecordSetSum = -System.nanoTime();
 						ArrayList<HistoVault> newVaults = new ArrayList<HistoVault>();
 						int i = 0;
-						for (Map.Entry<Path, Map<String, HistoVault>> trussJobsEntry : trussJobs.entrySet()) {
+						for (Map.Entry<Path, Map<String, VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
 							newVaults.addAll(loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue()));
 							this.fileSizeSum_B += new File(trussJobsEntry.getKey().toString()).length();
 							if (isWithUi) this.application.setProgress((int) (++i * progressCycle + progressStart), sThreadId);
@@ -397,7 +401,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				{
 					if (EnumSet.of(RebuildStep.D_TRAIL_DATA).contains(rebuildStep)) { // saves some time compared to the logic above
 						isRebuilt = true;
-						this.trailRecordSet.refillRecordSet();
+						RecordingsCollector.refillRecordSet(this.trailRecordSet);
 					}
 					if (isWithUi) this.application.setProgress(98, sThreadId);
 				}
@@ -422,32 +426,33 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws IOException
 	 * @return the vaults extracted from the file based on the input trusses
 	 */
-	private List<HistoVault> loadVaultsFromFile(Path filePath, Map<String, HistoVault> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+	private List<HistoVault> loadVaultsFromFile(Path filePath, Map<String, VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		List<HistoVault> histoVaults = null;
 		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
 				: GDE.STRING_EMPTY;
-		if (!supportedImportExtention.isEmpty() && filePath.toString().endsWith(supportedImportExtention)) {
-			histoVaults = ((IHistoDevice) this.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
+		try {
+			if (!supportedImportExtention.isEmpty() && filePath.toString().endsWith(supportedImportExtention))
+				histoVaults = VaultManager.readBin(trusses.values(), filePath);
+			else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD))
+				histoVaults = VaultManager.readOsd(trusses.values(), filePath);
+			else
+				throw new IllegalArgumentException();
 		}
-		else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
-			histoVaults = HistoOsdReaderWriter.readHisto(filePath, trusses.values());
-		}
-
-		if (histoVaults == null) {
+		catch (Exception e) {
 			histoVaults = new ArrayList<HistoVault>();
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 			log.log(Level.INFO, String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
 					this.application.getActiveDevice().getName(), this.application.getActiveChannelNumber(), filePath));
 		}
-		else {
-			// put vaults into the histoSet
-			for (HistoVault histoVault : histoVaults) {
-				if (!histoVault.isTruss()) {
-					List<HistoVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
-					if (timeStampHistoVaults == null) {
-						this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<HistoVault>());
-					}
-					timeStampHistoVaults.add(histoVault);
+
+		// put vaults into the histoSet
+		for (HistoVault histoVault : histoVaults) {
+			if (!histoVault.isTruss()) {
+				List<HistoVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
+				if (timeStampHistoVaults == null) {
+					this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<HistoVault>());
 				}
+				timeStampHistoVaults.add(histoVault);
 			}
 		}
 		return histoVaults;
@@ -459,22 +464,30 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @return total length (bytes) of the original log files of those vaults which were put into the histoset
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	private synchronized long loadVaultsFromCache(Map<Path, Map<String, HistoVault>> trussJobs) throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
+	private synchronized long loadVaultsFromCache(Map<Path, Map<String, VaultCollector>> trussJobs) throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		long localSizeSum_B = 0;
-		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
+		Path cacheFilePath = VaultManager.getVaultsFolder();
 		log.log(Level.FINER, "cacheFilePath=", cacheFilePath); //$NON-NLS-1$
+		VaultManager vaultIO = new VaultManager();
 		if (this.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
-				Iterator<Map.Entry<Path, Map<String, HistoVault>>> trussJobsIterator = trussJobs.entrySet().iterator();
+				Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 				while (trussJobsIterator.hasNext()) {
-					final Map<String, HistoVault> map = trussJobsIterator.next().getValue();
-					final Iterator<Map.Entry<String, HistoVault>> trussesIterator = map.entrySet().iterator();
+					final Map<String, VaultCollector> map = trussJobsIterator.next().getValue();
+					final Iterator<Map.Entry<String, VaultCollector>> trussesIterator = map.entrySet().iterator();
 					while (trussesIterator.hasNext()) {
-						HistoVault truss = trussesIterator.next().getValue();
+						VaultCollector truss = trussesIterator.next().getValue();
 						if (zf.getEntry(truss.getVaultName()) != null) {
-							HistoVault histoVault = HistoVault.load(new BufferedInputStream(zf.getInputStream(zf.getEntry(truss.getVaultName()))));
+							HistoVault histoVault = null;
+							try {
+								histoVault = vaultIO.load(new BufferedInputStream(zf.getInputStream(zf.getEntry(truss.getVaultName()))));
+							}
+							catch (Exception e) {
+								log.log(Level.SEVERE, e.getMessage(), e);
+							}
+
 							// put the vault into the histoSet map and sum up the file length
-							if (!histoVault.isTruss()) {
+							if (histoVault != null && !histoVault.isTruss()) {
 								List<HistoVault> vaultsList = this.get(histoVault.getLogStartTimestamp_ms());
 								if (vaultsList == null) this.put(histoVault.getLogStartTimestamp_ms(), vaultsList = new ArrayList<HistoVault>());
 								vaultsList.add(histoVault);
@@ -490,17 +503,21 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			}
 		}
 		else if (!this.settings.isZippedCache() && FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
-			Iterator<Map.Entry<Path, Map<String, HistoVault>>> trussJobsIterator = trussJobs.entrySet().iterator();
+			Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 			while (trussJobsIterator.hasNext()) {
-				final Map<String, HistoVault> map = trussJobsIterator.next().getValue();
-				final Iterator<Map.Entry<String, HistoVault>> trussesIterator = map.entrySet().iterator();
+				final Map<String, VaultCollector> map = trussJobsIterator.next().getValue();
+				final Iterator<Map.Entry<String, VaultCollector>> trussesIterator = map.entrySet().iterator();
 				while (trussesIterator.hasNext()) {
-					HistoVault truss = trussesIterator.next().getValue();
+					VaultCollector truss = trussesIterator.next().getValue();
 					if (FileUtils.checkFileExist(cacheFilePath.resolve(truss.getVaultName()).toString())) {
 						HistoVault histoVault = null;
 						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(cacheFilePath.resolve(truss.getVaultName()).toFile()))) {
-							histoVault = HistoVault.load(inputStream);
+							histoVault = vaultIO.load(inputStream);
 						}
+						catch (Exception e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
+						}
+
 						// put the vault into the histoSet map and sum up the file length
 						if (histoVault != null && !histoVault.isTruss()) {
 							List<HistoVault> vaultsList = this.get(histoVault.getLogStartTimestamp_ms());
@@ -526,7 +543,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws IOException
 	 */
 	private long storeVaultsInCache(List<HistoVault> newVaults) throws IOException {
-		Path cacheFilePath = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME).resolve(HistoVault.getVaultsDirectory());
+		Path cacheFilePath = VaultManager.getVaultsFolder();
+		VaultManager vaultIO = new VaultManager();
 		if (this.settings.isZippedCache()) {
 			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
 			Map<String, String> env = new HashMap<String, String>();
@@ -538,8 +556,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					if (!FileUtils.checkFileExist(filePath.toString())) {
 						//					if (!filePath.toFile().exists()) {
 						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-							histoVault.store(zipOutputStream);
+							vaultIO.store(histoVault, zipOutputStream);
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
+						}
+						catch (Exception e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
 						}
 					}
 				}
@@ -550,8 +571,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 			for (HistoVault histoVault : newVaults) {
 				Path filePath = cacheFilePath.resolve(histoVault.getVaultFileName());
 				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-					histoVault.store(outputStream);
+					vaultIO.store(histoVault, outputStream);
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
 		}
@@ -660,7 +684,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	private void addTrusses(List<File> files, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
 				: GDE.STRING_EMPTY;
-		FileExclusionData fileExclusionData = null;
+		ExclusionData fileExclusionData = null;
 		int tmpSelectedFilesCount = 0;
 		for (File file : files) {
 			if (file.getName().endsWith(GDE.FILE_ENDING_OSD)) {
@@ -677,10 +701,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				else {
 					tmpSelectedFilesCount++;
 					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
-					for (HistoVault truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
+					for (VaultCollector truss : HistoOsdReaderWriter.getTrusses(actualFile, objectDirectory)) {
 						if (this.settings.isSuppressMode()) {
 							if (fileExclusionData == null || !fileExclusionData.getDataFileDir().equals(actualFile.toPath().getParent())) {
-								fileExclusionData = new FileExclusionData(actualFile.toPath().getParent());
+								fileExclusionData = new ExclusionData(actualFile.toPath().getParent());
 								fileExclusionData.load();
 							}
 							if (fileExclusionData.isExcluded(truss.getLogFileAsPath(), truss.getLogRecordsetBaseName())) {
@@ -701,10 +725,10 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					tmpSelectedFilesCount++;
 					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(file.getName());
-					HistoVault truss = HistoVault.createTruss(objectDirectory, file, 0, Channels.getInstance().size(), recordSetBaseName);
+					VaultCollector truss = new VaultCollector(objectDirectory, file, 0, Channels.getInstance().size(), recordSetBaseName);
 					if (this.settings.isSuppressMode()) {
 						if (fileExclusionData == null || !fileExclusionData.getDataFileDir().equals(file.toPath().getParent())) {
-							fileExclusionData = new FileExclusionData(file.toPath().getParent());
+							fileExclusionData = new ExclusionData(file.toPath().getParent());
 							fileExclusionData.load();
 						}
 						if (fileExclusionData.isExcluded(truss.getLogFileAsPath(), truss.getLogRecordsetBaseName())) {
@@ -738,8 +762,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	*/
-	private Map<Path, Map<String, HistoVault>> getTrusses4Screening(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
-		final Map<Path, Map<String, HistoVault>> trusses4Paths = new LinkedHashMap<Path, Map<String, HistoVault>>();
+	private Map<Path, Map<String, VaultCollector>> getTrusses4Screening(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
+		final Map<Path, Map<String, VaultCollector>> trusses4Paths = new LinkedHashMap<>();
 		final Map<Long, Set<String>> trusses4Start = new HashMap<Long, Set<String>>();
 		final List<Integer> channelMixConfigNumbers;
 		if (this.settings.isChannelMix() && this.application.getActiveDevice().getDeviceGroup() == DeviceTypes.CHARGER)
@@ -751,7 +775,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				: GDE.STRING_EMPTY;
 
 		int invalidRecordSetsCount = 0;
-		for (HistoVault truss : this.unsuppressedTrusses.values()) {
+		for (VaultCollector truss : this.unsuppressedTrusses.values()) {
 			File actualFile = truss.getLogFileAsPath().toFile();
 			if (actualFile.getName().endsWith(GDE.FILE_ENDING_OSD)) {
 				boolean isValidObject = false;
@@ -760,7 +784,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					log.log(Level.INFO, String.format("OSD candidate found for wrong device '%-11s' in %s  %s", truss.getLogDeviceName(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (!channelMixConfigNumbers.contains(truss.getLogChannelNumber())) {
-					log.log(Level.FINE, String.format("OSD candidate for invalid channel  %d '%-11s' in %s  %s", truss.getLogChannelNumber(), truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
+					log.log(Level.FINE,
+							String.format("OSD candidate for invalid channel  %d '%-11s' in %s  %s", truss.getLogChannelNumber(), truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (truss.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 					log.log(Level.FINE, String.format("OSD candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
@@ -778,7 +803,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					isValidObject = true;
 				}
 				if (isValidObject) {
-					if (!trusses4Paths.containsKey(actualFile.toPath())) trusses4Paths.put(actualFile.toPath(), new HashMap<String, HistoVault>());
+					if (!trusses4Paths.containsKey(actualFile.toPath())) trusses4Paths.put(actualFile.toPath(), new HashMap<String, VaultCollector>());
 					if (!trusses4Start.containsKey(truss.getLogStartTimestamp_ms())) trusses4Start.put(truss.getLogStartTimestamp_ms(), new HashSet<String>());
 
 					if (trusses4Start.get(truss.getLogStartTimestamp_ms()).add(truss.getVaultFileName().toString()))
@@ -798,7 +823,8 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 					log.log(Level.FINE, String.format("BIN candidate out of time range      '%-11s' in %s  %s", truss.getRectifiedObjectKey(), actualFile, truss.getStartTimeStampFormatted())); //$NON-NLS-1$
 				}
 				else if (this.application.getActiveObject() != null && !truss.isValidObjectKey(this.application.getObjectKey())) {
-					log.log(Level.INFO, String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$
+					log.log(Level.INFO,
+							String.format("BIN candidate found for wrong object '%-11s' in %s lastModified=%d", truss.getRectifiedObjectKey(), actualFile.getAbsolutePath(), actualFile.lastModified())); //$NON-NLS-1$
 					isValidObject = this.settings.getFilesWithOtherObject();
 				}
 				else if (this.application.getActiveObject() == null || truss.isValidObjectKey(this.application.getObjectKey())) {
@@ -807,7 +833,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 				}
 
 				if (isValidObject) {
-					if (!trusses4Paths.containsKey(actualFile.toPath())) trusses4Paths.put(actualFile.toPath(), new HashMap<String, HistoVault>());
+					if (!trusses4Paths.containsKey(actualFile.toPath())) trusses4Paths.put(actualFile.toPath(), new HashMap<String, VaultCollector>());
 					if (!trusses4Start.containsKey(truss.getLogStartTimestamp_ms())) trusses4Start.put(truss.getLogStartTimestamp_ms(), new HashSet<String>());
 
 					if (trusses4Start.get(truss.getLogStartTimestamp_ms()).add(truss.getVaultFileName().toString()))
@@ -886,12 +912,12 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 */
 	public String getExcludedTrussesAsText() {
 		Path lastFileDir = null;
-		FileExclusionData fileExclusionData = null;
+		ExclusionData fileExclusionData = null;
 		Set<String> exclusionTexts = new HashSet<>();
-		for (HistoVault truss : this.suppressedTrusses.values()) {
+		for (VaultCollector truss : this.suppressedTrusses.values()) {
 			Path fileDir = Paths.get(truss.getLogFilePath()).getParent();
 			if (lastFileDir != fileDir || fileExclusionData == null) {
-				fileExclusionData = new FileExclusionData(fileDir);
+				fileExclusionData = new ExclusionData(fileDir);
 				fileExclusionData.load();
 			}
 			exclusionTexts.add(fileExclusionData.getFormattedProperty(truss.getLogFileAsPath()));
@@ -912,11 +938,11 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	public void clearExcludeHistoLists(Path defaultPath) {
 		Set<Path> exclusionDirectories = new HashSet<>();
 		if (defaultPath != null) exclusionDirectories.add(defaultPath);
-		for (HistoVault truss : this.suppressedTrusses.values()) {
+		for (VaultCollector truss : this.suppressedTrusses.values()) {
 			exclusionDirectories.add(truss.getLogFileAsPath().getParent());
 		}
 		for (Path ignorePath : exclusionDirectories) {
-			new FileExclusionData(ignorePath).delete();
+			new ExclusionData(ignorePath).delete();
 			log.log(Level.FINE, "deleted : ", ignorePath); //$NON-NLS-1$
 		}
 	}
@@ -926,7 +952,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @param recordsetBaseName empty string sets ignore to the file in total
 	 */
 	public synchronized void setExcludeHistoRecordSet(Path filePath, String recordsetBaseName) {
-		final FileExclusionData fileExclusionData = new FileExclusionData(filePath.getParent());
+		final ExclusionData fileExclusionData = new ExclusionData(filePath.getParent());
 		fileExclusionData.load();
 		if (recordsetBaseName.isEmpty()) {
 			fileExclusionData.setProperty((filePath.getFileName().toString()));
@@ -937,7 +963,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		fileExclusionData.store();
 	}
 
-	public Map<String, HistoVault> getUnsuppressedTrusses() {
+	public Map<String, VaultCollector> getUnsuppressedTrusses() {
 		return this.unsuppressedTrusses;
 	}
 
@@ -949,7 +975,7 @@ public class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		if (this.settings.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
 			ArrayList<Path> dataPaths = new ArrayList<Path>();
 			dataPaths.add(Paths.get(this.settings.getDataFilePath()));
-			FileExclusionData.deleteExclusionsDirectory(dataPaths);
+			ExclusionData.deleteExclusionsDirectory(dataPaths);
 
 			this.settings.setDataSettingsAtHomePath(isDataSettingsAtHomePath);
 		}

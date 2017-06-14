@@ -13,11 +13,11 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
-package gde.histoinventory;
+package gde.histo.gpslocations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,9 +32,9 @@ import gde.config.Settings;
 import gde.utils.GpsCoordinate;
 
 /**
+ * Takes a list of GPS coordinates and provides the clusters assigned to the locations.
+ * Uses the maximum cluster distance setting.
  * @author Thomas Eickert
- * takes a list of GPS coordinates and provides the clusters assigned to the locations.
- * uses the maximum cluster distance setting.
  */
 public class GpsCluster extends ArrayList<GpsCoordinate> {
 	private static final long								serialVersionUID	= 5239035277133565077L;
@@ -45,33 +45,34 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 	private Map<GpsCoordinate, GpsCluster>	assignedClusters	= new HashMap<>();
 
 	/**
+	 * Performs great circle based distance clustering.
+	 * Uses the GPS cluster reference coordinate.
+	 * Provides both clustered and remaining GPS coordinates lists.
 	 * @author Thomas Eickert
-	 * performs great circle based distance clustering.
-	 * uses the GPS cluster reference coordinate.
-	 * provides both clustered and remaining GPS coordinates lists.
 	 */
-	class DistanceProcessor implements Consumer<GpsCoordinate> {
+	private class DistanceProcessor implements Consumer<GpsCoordinate> {
 		private final Settings									settings						= Settings.getInstance();
 
 		private GpsCluster											clusteredItems			= new GpsCluster();
-		private Map<GpsCoordinate, GpsCluster>	assignedClusters		= new HashMap<>();
+		private Map<GpsCoordinate, GpsCluster>	identifiedClusters	= new HashMap<>();
 		private GpsCluster											relicts							= new GpsCluster();
 		private List<Double>										relictSqDistances		= new ArrayList<>();
 		private double													relictSqDistanceSum	= 0.;
 
+		@Override
 		public void accept(GpsCoordinate newGpsCoordinate) {
 			if (GpsCluster.this.getReference() == newGpsCoordinate) { // == due to equals override
 				// a distance to myself is not useful
 				log.log(Level.FINEST, "add myself to the empty clusteredItems list", this.clusteredItems.size()); //$NON-NLS-1$
 				this.clusteredItems.add(newGpsCoordinate);
-				this.assignedClusters.put(newGpsCoordinate, this.clusteredItems);
+				this.identifiedClusters.put(newGpsCoordinate, this.clusteredItems);
 			}
 			else {
 				final double distance = GpsCluster.this.getReference().getDistance(newGpsCoordinate);
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("ClusterRadius=%f  distance=%f  to %s", this.settings.getGpsLocationRadius(), distance, newGpsCoordinate)); //$NON-NLS-1$
 				if (distance <= this.settings.getGpsLocationRadius()) {
 					this.clusteredItems.add(newGpsCoordinate);
-					this.assignedClusters.put(newGpsCoordinate, this.clusteredItems);
+					this.identifiedClusters.put(newGpsCoordinate, this.clusteredItems);
 				}
 				else {
 					this.relicts.add(newGpsCoordinate);
@@ -83,7 +84,7 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 
 		public void combine(DistanceProcessor other) {
 			this.clusteredItems.addAll(other.clusteredItems);
-			this.assignedClusters.putAll(other.assignedClusters);
+			this.identifiedClusters.putAll(other.identifiedClusters);
 			this.relicts.addAll(other.relicts);
 			this.relictSqDistances.addAll(other.relictSqDistances);
 			this.relictSqDistanceSum += other.relictSqDistanceSum;
@@ -94,7 +95,7 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 		 */
 		public GpsCoordinate getResiduumReference() {
 			GpsCoordinate residuumReference = null;
-			// select an arbitrary GPS coordinate with probability Square(Distance) 
+			// select an arbitrary GPS coordinate with probability Square(Distance)
 			final double arbitrarySqDistance = Math.random() * this.relictSqDistanceSum;
 			double cumulativeSqDistance = 0.;
 			for (int i = 0; i < this.relictSqDistances.size(); i++) {
@@ -125,8 +126,8 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 		/**
 		 * @return the list of assigned GPS coordinates and the cluster which each individual is assigned to
 		 */
-		public Map<GpsCoordinate, GpsCluster> getAssignedClusters() {
-			return this.assignedClusters;
+		public Map<GpsCoordinate, GpsCluster> getIdentifiedClusters() {
+			return this.identifiedClusters;
 		}
 	}
 
@@ -134,8 +135,8 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 	}
 
 	/**
-	 * calculate the unweighted average of the GPS coordinates in this cluster.
-	 * the algorithm averages the cartesian vectors which supports the lat / lon boundaries correctly.
+	 * Calculate the unweighted average of the GPS coordinates in this cluster.
+	 * The algorithm averages the cartesian vectors which supports the lat / lon boundaries correctly.
 	 * @return the average of all GPS coordinates
 	 */
 	public GpsCoordinate getCenter() {
@@ -161,8 +162,8 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 	}
 
 	/**
-	 * calculate the unweighted average of the GPS coordinates of all clusters.
-	 * the algorithm averages the cartesian vectors which supports the lat / lon boundaries correctly.
+	 * Calculate the unweighted average of the GPS coordinates of all clusters.
+	 * The algorithm averages the cartesian vectors which supports the lat / lon boundaries correctly.
 	 * @return the average of all clusters.
 	 */
 	public GpsCoordinate getClustersCenter() {
@@ -189,7 +190,7 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 	}
 
 	/**
-	 * determine clusters from the GPS coordinates collected up to now.
+	 * Determine clusters from the GPS coordinates collected up to now.
 	 */
 	public void setClusters() {
 		this.assignedClusters.clear();
@@ -200,10 +201,10 @@ public class GpsCluster extends ArrayList<GpsCoordinate> {
 		if (wip.size() > 0) {
 			this.reference = wip.get(wip.size() / 2); // 'random' start location
 			while (wip.size() > 0) {
-				// start analyzing the GPS coordinate list data 
+				// start analyzing the GPS coordinate list data
 				DistanceProcessor distanceProcessor = wip.parallelStream().collect(DistanceProcessor::new, DistanceProcessor::accept, DistanceProcessor::combine);
 				// add the newly assigned coordinates including their cluster assignment to the total assignment list
-				this.assignedClusters.putAll(distanceProcessor.getAssignedClusters());
+				this.assignedClusters.putAll(distanceProcessor.getIdentifiedClusters());
 				// take the remaining GPS coordinate list for the next iteration and take also the optimized reference coordinate
 				wip = distanceProcessor.getResiduumItems();
 				this.setReference(distanceProcessor.getResiduumReference()); // the distance processor accesses this reference in the next iteration step

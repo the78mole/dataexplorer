@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
@@ -63,7 +63,8 @@ import gde.device.graupner.hott.MessageIds;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histocache.HistoVault;
+import gde.histo.cache.HistoVault;
+import gde.histo.cache.VaultCollector;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -243,8 +244,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public HoTTAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -337,7 +338,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	@Override
@@ -347,7 +348,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -363,7 +364,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -835,12 +836,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -886,13 +887,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves 
+	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves
 	 * @param dataBuffer Holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
-	 * @param recordDataSize Number of time steps 
+	 * @param recordDataSize Number of time steps
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public void addDataBufferAsRawDataPointsTest(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addDataBufferAsRawDataPoints"; //$NON-NLS-1$
@@ -942,6 +943,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * @return true if the device supports a native file import for histo purposes
 	 */
+	@Override
 	public boolean isHistoImportSupported() {
 		return this.getClass().equals(HoTTAdapter.class) && !this.getClass().equals(HoTTAdapterD.class) && !this.getClass().equals(HoTTAdapterM.class) && !this.getClass().equals(HoTTAdapterX.class)
 				&& !this.getClass().equals(HoTTViewer.class);
@@ -950,6 +952,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * @return an empty string or the device's import file extention if the device supports a native file import for histo purposes (e.g. '.bin')
 	 */
+	@Override
 	public String getSupportedImportExtention() {
 		String importExtention = GDE.STRING_EMPTY;
 		if (isHistoImportSupported()) {
@@ -963,8 +966,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param maxPoints maximum values from the data buffer which are verified during sampling
 	 * @param minPoints minimum values from the data buffer which are verified during sampling
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
+	@Override
 	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points"); //$NON-NLS-1$
 		int recordTimespan_ms = 10;
@@ -975,24 +979,25 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * create history recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
-	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * since this is a long term operation the progress bar should be updated to signal business to user.
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param filePath 
+	 * @param filePath
 	 * @param trusses referencing a subset of the record sets in the file
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
-	 * @throws IOException 
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
+	 * @throws IOException
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
-	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<HistoVault> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+	@Override
+	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
 		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
-		for (HistoVault truss : trusses) {
+		for (VaultCollector truss : trusses) {
 			if (truss.getLogFilePath().equals(filePath.toString())) {
 				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
 				// add aggregated measurement and settlement points and score points to the truss
 				HoTTbinHistoReader.read(truss);
-				histoVaults.add(truss);
+				histoVaults.add(truss.getVault());
 			}
 			else
 				throw new UnsupportedOperationException("all trusses must carry the same logFilePath"); //$NON-NLS-1$
@@ -1082,7 +1087,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -1109,7 +1114,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(measurement.isActive() && record.hasReasonableData());
-				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -1125,8 +1130,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -1181,7 +1186,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 * as example a file selection dialog could be opened to import serialized ASCII data
 	 */
 	@Override
 	public void open_closeCommPort() {
@@ -1248,8 +1253,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * import device specific *.bin data files
-	 * @param filePath 
+	 * @param filePath
 	 */
+	@Override
 	public void importDeviceData(Path filePath) {
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -1257,7 +1263,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				try {
 					boolean isInitialSwitched = false;
 					HoTTAdapter.this.application.setPortConnected(true);
-					
+
 					if (filePath.getFileName().toString().length() > MIN_FILENAME_LENGTH) {
 						Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
 						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
@@ -1278,10 +1284,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								throw new UnsupportedOperationException();
 
 							if (!isInitialSwitched) {
-								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class) 
+								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class)
 										|| HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
 									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
-									HoTTbinReader.channels.switchChannel(activeChannel.getName());									
+									HoTTbinReader.channels.switchChannel(activeChannel.getName());
 								}
 								else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
 									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
@@ -1451,7 +1457,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -1526,9 +1532,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
@@ -1603,9 +1609,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * calculate labs based on Rx dbm and based on distance from start point
-	 * HoTTAdapterD 
+	 * HoTTAdapterD
 	 * //5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
-	 * //15=DistanceStart, 112=DiffDistance, 113=LapsDistance		
+	 * //15=DistanceStart, 112=DiffDistance, 113=LapsDistance
 	 * @param recordSet
 	 * @param channelNumber
 	 * @param ordinalSourceRx_dbm
@@ -1640,7 +1646,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			//				this.filterStartTimeCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
 			//				this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 			//				this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
-			//				//15=DistanceStart, 112=DiffDistance, 113=LapsDistance		
+			//				//15=DistanceStart, 112=DiffDistance, 113=LapsDistance
 			//				this.filterMinDistDeltaCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 			try {
 				absorptionLevel = Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalSmoothRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
@@ -1716,7 +1722,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 						if ((recordSmoothRx_dbm.get(i) / 1000 - localRxDbmMin) > filterMinDeltaRxDbm) { // check minimal Rx dbm difference
 
-							if (lastRxDbmValue > 0 && recordDiffRx_dbm.get(i) <= 0) { //lap event detected 
+							if (lastRxDbmValue > 0 && recordDiffRx_dbm.get(i) <= 0) { //lap event detected
 								isLapEvent = true;
 								if (lastLapTimeStamp_ms != 0) {
 									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0)); //$NON-NLS-1$
@@ -1737,7 +1743,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								}
 
 								localRxDbmMin = 0; //reset local min value of Rx dbm
-							} //end lap event detected 
+							} //end lap event detected
 							else if (lapTime == 0)
 								if (isLapEvent)
 									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
@@ -1762,7 +1768,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					else
 						recordLapsRx_dbm.set(i, lapTime);
 
-					// find a local minimal value of Rx dbm 
+					// find a local minimal value of Rx dbm
 					if (lastRxDbmValue < 0 && recordDiffRx_dbm.get(i) >= 0) { //local minimum Rx dbm detected
 						if (recordSmoothRx_dbm.get(i) / 1000 < localRxDbmMin) localRxDbmMin = recordSmoothRx_dbm.get(i) / 1000;
 					}

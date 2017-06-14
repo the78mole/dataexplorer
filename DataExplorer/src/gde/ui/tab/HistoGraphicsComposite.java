@@ -57,9 +57,11 @@ import gde.data.HistoSet;
 import gde.data.HistoSet.DirectoryType;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.data.TrailRecord;
-import gde.data.TrailRecordSet;
-import gde.data.TrailRecordSet.DataTag;
+import gde.histo.recordings.HistoGraphicsMapper;
+import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordFormatter;
+import gde.histo.recordings.TrailRecordSet;
+import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -296,7 +298,7 @@ public class HistoGraphicsComposite extends Composite {
 		setRecordSetCommentStandard();
 
 		TrailRecordSet trailRecordSet = getTrailRecordSet();
-		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
@@ -380,7 +382,7 @@ public class HistoGraphicsComposite extends Composite {
 		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 
-		if (trailRecordSet.getRecordDataSize(true) > 0) {
+		if (trailRecordSet.getTimeStepSize() > 0) {
 			// initialize early in order to avoid problems in mouse move events
 			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getFirstTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
 
@@ -423,7 +425,7 @@ public class HistoGraphicsComposite extends Composite {
 		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
 
 		// sync scales are used for suites (e.g. boxplot) AND synced records
-		trailRecordSet.updateAllSyncScales();
+		trailRecordSet.updateAllSyncScales(); // todo should be better done in case of trail selection
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
@@ -440,7 +442,7 @@ public class HistoGraphicsComposite extends Composite {
 				// gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				// gc.drawRectangle(x0, y0-height, width, height);
 				gc.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
-				if (actualRecord.isTrailSuite()) {
+				if (actualRecord.getTrailSelector().isTrailSuite()) {
 					HistoCurveUtils.drawHistoSuite(actualRecord, gc, x0, y0, width, height, this.timeLine);
 				}
 				else {
@@ -680,7 +682,7 @@ public class HistoGraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			TrailRecordSet trailRecordSet = getTrailRecordSet();
-			if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0 && this.canvasImage != null) {
+			if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
@@ -709,7 +711,7 @@ public class HistoGraphicsComposite extends Composite {
 						this.canvasGC.setForeground(trailRecord.getColor());
 
 						long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
-						int yPosMeasureNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(timestampMeasureNew_ms));
+						int yPosMeasureNew = new HistoGraphicsMapper(trailRecord).getVerticalDisplayPos(trailRecordSet.getIndex(timestampMeasureNew_ms));
 						if (timestampMeasureNew_ms != this.curveSurvey.getTimestampMeasure_ms() || yPosMeasureNew != this.curveSurvey.getyPosMeasure()) {
 							// all obsolete lines are cleaned up now draw new position marker
 							this.curveSurvey.clearOldMeasureLines(this.canvasImage);
@@ -740,7 +742,7 @@ public class HistoGraphicsComposite extends Composite {
 						this.canvasGC.setForeground(trailRecord.getColor());
 
 						long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(evt.x); // evt.x is already relative to curve area
-						int yPosDeltaNew = trailRecord.getVerticalDisplayPos(trailRecordSet.getIndex(timestampDeltaNew_ms));
+						int yPosDeltaNew = new HistoGraphicsMapper(trailRecord).getVerticalDisplayPos(trailRecordSet.getIndex(timestampDeltaNew_ms));
 						if (timestampDeltaNew_ms != this.curveSurvey.getTimestampDelta_ms() || yPosDeltaNew != this.curveSurvey.getyPosDelta()) {
 							this.curveSurvey.clearOldMeasureLines(this.canvasImage);
 
@@ -773,7 +775,7 @@ public class HistoGraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			TrailRecordSet trailRecordSet = getTrailRecordSet();
-			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 				String measureRecordKey = trailRecordSet.getRecordKeyMeasurement();
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xDown = point.x;
@@ -822,7 +824,7 @@ public class HistoGraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			TrailRecordSet trailRecordSet = getTrailRecordSet();
-			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xUp = point.x;
 				this.yUp = point.y;
@@ -949,7 +951,7 @@ public class HistoGraphicsComposite extends Composite {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			TrailRecordSet trailRecordSet = getTrailRecordSet();
-			if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+			if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 				if (this.canvasImage != null) this.canvasImage.dispose();
 				this.canvasImage = new Image(GDE.display, this.canvasBounds);
 				this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
@@ -987,7 +989,7 @@ public class HistoGraphicsComposite extends Composite {
 	private String getSelectedMeasurementsAsTable() {
 		Properties displayProps = this.settings.getMeasurementDisplayProperties();
 		TrailRecordSet trailRecordSet = getTrailRecordSet();
-		if (trailRecordSet != null && trailRecordSet.getRecordDataSize(true) > 0) {
+		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
 
 			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799))); //$NON-NLS-1$
@@ -1011,7 +1013,7 @@ public class HistoGraphicsComposite extends Composite {
 			sb.append(GDE.STRING_OR).append(String.format("%-16s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms))); //$NON-NLS-1$
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = (TrailRecord) records.get(i);
-				sb.append(GDE.STRING_OR).append(String.format("%.10s", StringHelper.center(record.getFormattedMeasureValue(index), 10))); //$NON-NLS-1$
+				sb.append(GDE.STRING_OR).append(String.format("%.10s", StringHelper.center(new TrailRecordFormatter(record).getMeasureValue(index), 10))); //$NON-NLS-1$
 			}
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			return sb.append(GDE.STRING_OR).toString();

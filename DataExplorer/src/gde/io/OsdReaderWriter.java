@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
@@ -229,7 +229,6 @@ public class OsdReaderWriter {
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
 
 		List<HashMap<String, String>> recordSetsInfo = readRecordSetsInfo4AllVersions(data_in, header);
-		
 		try { // build the data structure
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
@@ -237,7 +236,7 @@ public class OsdReaderWriter {
 				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 				recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				//recordSetDataPointer = Long.valueOf(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
-				
+
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // 1.st try channelConfiguration not found
 					try { // get channel last digit and use as channel config ordinal
@@ -282,7 +281,7 @@ public class OsdReaderWriter {
 				// "Motor 3"
 				channelConfig = channelConfig.contains(GDE.STRING_BLANK) ? channelConfig.split(GDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
-	
+
 				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true);
 				channel.put(recordSetName, recordSet);
 			}
@@ -749,7 +748,7 @@ public class OsdReaderWriter {
 			int dataSizeRecords = dataSizeRecord * recordSet.getNoneCalculationRecordNames().length;
 			int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
 			byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
-			
+
 	    if (zip_entry != null) {
 	  		data_in = new DataInputStream(zip_input);
 	  		data_in.skip(recordSetFileDataPointer);
@@ -792,7 +791,7 @@ public class OsdReaderWriter {
 			zip_input = null;
 		}
 	}
-	
+
 	/**
 	 * Search through all data files and update the old object key with the new one
 	 * @param oldObjectKey
@@ -806,7 +805,7 @@ public class OsdReaderWriter {
 			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			Iterator<File> iterator = files.iterator();
 			while(iterator.hasNext()){
-				File file  = iterator.next();			
+				File file  = iterator.next();
 				try {
 					String actualFilePath = file.getAbsolutePath();
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
@@ -832,10 +831,10 @@ public class OsdReaderWriter {
 					log.log(Level.WARNING, t.getLocalizedMessage(), t);
 				}
 			}
-			//at this point I have all data files containing the old object key 
+			//at this point I have all data files containing the old object key
 			iterator = files.iterator();
 			while(iterator.hasNext()) {
-				String filePath  = iterator.next().getPath();		
+				String filePath  = iterator.next().getPath();
 				String tmpFilePath = FileUtils.renameFile(filePath, GDE.FILE_ENDING_TMP); // rename existing file to *.tmp
 				File tmpFile = new File(tmpFilePath);
 				File updatedFile = new File(filePath);
@@ -845,7 +844,7 @@ public class OsdReaderWriter {
 					String tmpData;
 					data_in  = new DataInputStream(new FileInputStream(tmpFile));
 					data_out = new DataOutputStream(new FileOutputStream(updatedFile));
-					
+
 					while(!(tmpData = data_in.readUTF()).startsWith(GDE.OBJECT_KEY)) {
 						data_out.writeUTF(tmpData);
 						filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
@@ -855,12 +854,12 @@ public class OsdReaderWriter {
 					sb.append(GDE.OBJECT_KEY).append(newObjectKey).append(GDE.STRING_NEW_LINE);
 					data_out.writeUTF(sb.toString());
 					filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-					
+
 					tmpData = data_in.readUTF();
 					data_out.writeUTF(tmpData);
 					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "filePointer = " + filePointer);
-					
+
 					int numberRecordSets = 0;
 					if (tmpData.startsWith(GDE.RECORD_SET_SIZE)) {
 						numberRecordSets = Integer.valueOf(tmpData.substring(GDE.RECORD_SET_SIZE.length()).trim()).intValue();
@@ -891,7 +890,7 @@ public class OsdReaderWriter {
 				catch (Exception e) {
 					try {
 						if(data_out != null) data_out.close();
-						if (updatedFile.exists()) 
+						if (updatedFile.exists())
 							if(updatedFile.delete())
 								log.log(Level.WARNING, "failed to delete " + filePath);
 						if(data_in != null) data_in.close();
@@ -909,7 +908,7 @@ public class OsdReaderWriter {
 			DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] {e.getMessage()}));
 		}
 		finally {
-			try {			
+			try {
 				if (data_out != null) data_out.close();
 				if (data_in != null) data_in.close();
 			}

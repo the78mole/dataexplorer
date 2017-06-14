@@ -32,7 +32,10 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.TrailRecord;
+import gde.histo.recordings.HistoGraphicsMapper;
+import gde.histo.recordings.TrailRecordCutter;
+import gde.histo.recordings.TrailRecordFormatter;
+import gde.histo.recordings.TrailRecord;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -40,10 +43,10 @@ import gde.ui.SWTResourceManager;
 import gde.utils.HistoTimeLine;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
-import gde.utils.Quantile;
 import gde.utils.SingleResponseRegression;
 import gde.utils.SingleResponseRegression.RegressionType;
 import gde.utils.Spot;
+import gde.utils.UniversalQuantile;
 
 /**
  * Curve measuring for the graphics window.
@@ -76,26 +79,25 @@ public class CurveSurvey {
 		}
 	}
 
-	private final Settings		settings						= Settings.getInstance();
-	private HistoTimeLine			timeLine;
-	private final TrailRecord	trailRecord;
+	private final Settings			settings						= Settings.getInstance();
+	private final HistoTimeLine	timeLine;
+	private final TrailRecord		trailRecord;
 
-	private GC								canvasGC;
-	private Rectangle					curveAreaBounds;
-	private int								offSetX, offSetY;															// curveAreaBounds x / y for performance
+	private TrailRecordCutter				recordSection;
 
-	private long							timestampMeasure_ms, timestampDelta_ms;
-	private int								xPosMeasure					= 0, yPosMeasure = 0;
-	private int								xPosDelta						= 0, yPosDelta = 0;
+	private GC									canvasGC;
+	private Rectangle						curveAreaBounds;
+	private int									offSetX, offSetY;															// curveAreaBounds x / y for performance
 
-	private int								yLowerTransversePos	= Integer.MIN_VALUE;			// keeps bottom position of delta measurement diagonal lines and boxplot
-	private int								yUpperTransversePos	= Integer.MAX_VALUE;			// keeps top position of delta measurement diagonal lines and boxplot
+	private long								timestampMeasure_ms;
+	private long								timestampDelta_ms;
+	private int									xPosMeasure					= 0;
+	private int									yPosMeasure					= 0;
+	private int									xPosDelta						= 0;
+	private int									yPosDelta						= 0;
 
-	public CurveSurvey(GC canvasGC) { // todo this might support the standard graphics window in the future
-		this.canvasGC = canvasGC;
-
-		this.trailRecord = null;
-	}
+	private int									yLowerTransversePos	= Integer.MIN_VALUE;			// keeps bottom position of delta measurement diagonal lines and boxplot
+	private int									yUpperTransversePos	= Integer.MAX_VALUE;			// keeps top position of delta measurement diagonal lines and boxplot
 
 	public CurveSurvey(GC canvasGC, TrailRecord trailRecord, HistoTimeLine timeLine) {
 		this.canvasGC = canvasGC;
@@ -114,7 +116,7 @@ public class CurveSurvey {
 		if (this.yPosMeasure >= Integer.MIN_VALUE) {
 			//			String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
 			statusMessage = Messages.getString(MessageIds.GDE_MSGT0256,
-					new Object[] { this.trailRecord.getName(), this.trailRecord.getFormattedMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)), this.trailRecord.getUnit(),
+					new Object[] { this.trailRecord.getName(), new TrailRecordFormatter(this.trailRecord).getMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)), this.trailRecord.getUnit(),
 							LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) });
 		}
 		else {
@@ -140,31 +142,29 @@ public class CurveSurvey {
 				drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, LineMark.DIAG_LINE);
 			}
 
-			this.trailRecord.setBounds(this.timestampMeasure_ms, this.timestampDelta_ms);
 			if (this.settings.isCurveSurvey()) {
 				drawCurveSurvey();
-				String deltaText = this.trailRecord.getFormattedBoundsDelta();
+				String deltaText = this.recordSection.getFormattedBoundsDelta();
 				String unitText = this.trailRecord.getUnit();
-				String avgText = this.trailRecord.getFormattedBoundsAvg();
-				String slopeText = this.trailRecord.getFormattedBoundsSlope();
+				String avgText = this.recordSection.getFormattedBoundsAvg();
+				String slopeText = this.recordSection.getFormattedBoundsSlope();
 				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848,
 						new Object[] { this.trailRecord.getName(), unitText, deltaText, LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) })
 						+ Messages.getString(MessageIds.GDE_MSGT0879, new Object[] { unitText, avgText, unitText, slopeText });
 			}
 			else {
-				String deltaText = this.trailRecord.getFormattedBoundsDelta();
+				String deltaText = this.recordSection.getFormattedBoundsDelta();
 				String unitText = this.trailRecord.getUnit();
 				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848,
 						new Object[] { this.trailRecord.getName(), unitText, deltaText, LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) });
 			}
 		}
 		else {
-			this.trailRecord.setBounds(this.timestampMeasure_ms, this.timestampDelta_ms);
-			if (this.trailRecord.isValidBounds() && this.settings.isCurveSurvey()) {
+			if (this.recordSection.isValidBounds() && this.settings.isCurveSurvey()) {
 				drawCurveSurvey();
 				String unitText = this.trailRecord.getUnit();
-				String avgText = this.trailRecord.getFormattedBoundsAvg();
-				String slopeText = this.trailRecord.getFormattedBoundsSlope();
+				String avgText = this.recordSection.getFormattedBoundsAvg();
+				String slopeText = this.recordSection.getFormattedBoundsSlope();
 				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848,
 						new Object[] { this.trailRecord.getName(), GDE.STRING_STAR, this.trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) })
 						+ Messages.getString(MessageIds.GDE_MSGT0879, new Object[] { unitText, avgText, unitText, slopeText });
@@ -228,13 +228,15 @@ public class CurveSurvey {
 	 * @param trailRecord
 	 */
 	private void drawCurveSurvey() {
-		if (!this.trailRecord.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
-			int yBoundedAvg = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedAvgValue());
+		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+
+		if (!this.recordSection.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
+			int yBoundedAvg = mapper.getVerticalDisplayPos(this.recordSection.getBoundedAvgValue());
 			drawHorizontalLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure, LineMark.AVG_LINE);
 			drawConnectingLine(this.xPosMeasure, yBoundedAvg, this.xPosDelta, yBoundedAvg, LineMark.AVG_LINE);
 
-			int yRegressionPosMeasure = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedSlopeValue(this.timestampMeasure_ms));
-			int yRegressionPosDelta = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedSlopeValue(this.timestampDelta_ms));
+			int yRegressionPosMeasure = mapper.getVerticalDisplayPos(this.recordSection.getBoundedSlopeValue(this.timestampMeasure_ms));
+			int yRegressionPosDelta = mapper.getVerticalDisplayPos(this.recordSection.getBoundedSlopeValue(this.timestampDelta_ms));
 			drawConnectingLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta, LineMark.SLOPE_LINE);
 		}
 		else {
@@ -243,7 +245,7 @@ public class CurveSurvey {
 
 			List<Spot<Integer>> points = new ArrayList<>(boundedXpos.size());
 			for (Entry<Long, Integer> entry : boundedXpos.entrySet()) {
-				points.add(new Spot<>(entry.getValue(), this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(entry.getKey()))));
+				points.add(new Spot<>(entry.getValue(), mapper.getVerticalDisplayPos(this.recordSection.getBoundedParabolaValue(entry.getKey()))));
 			}
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "values " + Arrays.toString(points.toArray()));
 
@@ -252,35 +254,35 @@ public class CurveSurvey {
 		{
 			int xPosMidBounds = (this.xPosDelta + this.xPosMeasure) / 2;
 			int halfBoxWidth = getBoxWidth() / 2;
-			double[] values = this.trailRecord.getBoundedBoxplotValues();
+			double[] values = this.recordSection.getBoundedBoxplotValues();
 
-			int yPosQuartile1 = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE1.ordinal()]);
+			int yPosQuartile1 = mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.QUARTILE1.ordinal()]);
 			drawHorizontalLine(yPosQuartile1, xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
-			drawHorizontalLine(this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE2.ordinal()]), xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
-			int yPosQuartile3 = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE3.ordinal()]);
+			drawHorizontalLine(mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.QUARTILE2.ordinal()]), xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
+			int yPosQuartile3 = mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.QUARTILE3.ordinal()]);
 			drawHorizontalLine(yPosQuartile3, xPosMidBounds - halfBoxWidth, halfBoxWidth * 2, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds - halfBoxWidth, yPosQuartile3, yPosQuartile1 - yPosQuartile3, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds + halfBoxWidth, yPosQuartile3, yPosQuartile1 - yPosQuartile3, LineMark.BOXPLOT);
 
 			// Connecting lines define the bounds rectangle transverse area
-			int yPosLowerWhisker = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.LOWER_WHISKER.ordinal()]);
+			int yPosLowerWhisker = mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.LOWER_WHISKER.ordinal()]);
 			drawConnectingLine(xPosMidBounds - halfBoxWidth / 2, yPosLowerWhisker, xPosMidBounds + halfBoxWidth / 2, yPosLowerWhisker, LineMark.BOXPLOT);
 			// drawHorizontalLine(yPosLowerWhisker, xPosMidBounds - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds, yPosQuartile1, yPosLowerWhisker - yPosQuartile1, LineMark.BOXPLOT);
 
-			int yPosUpperWhisker = this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.UPPER_WHISKER.ordinal()]);
+			int yPosUpperWhisker = mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.UPPER_WHISKER.ordinal()]);
 			drawConnectingLine(xPosMidBounds - halfBoxWidth / 2, yPosUpperWhisker, xPosMidBounds + halfBoxWidth / 2, yPosUpperWhisker, LineMark.BOXPLOT);
 			// drawHorizontalLine(yPosUpperWhisker, xPosMidBounds - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 			drawVerticalLine(xPosMidBounds, yPosUpperWhisker, yPosQuartile3 - yPosUpperWhisker, LineMark.BOXPLOT);
 
-			if (values[Quantile.BoxplotItems.QUARTILE0.ordinal()] != values[Quantile.BoxplotItems.LOWER_WHISKER.ordinal()])
-				drawOutlier(xPosMidBounds, this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE0.ordinal()]), halfBoxWidth / 4, LineMark.BOXPLOT);
+			if (values[UniversalQuantile.BoxplotItems.QUARTILE0.ordinal()] != values[UniversalQuantile.BoxplotItems.LOWER_WHISKER.ordinal()])
+				drawOutlier(xPosMidBounds, mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.QUARTILE0.ordinal()]), halfBoxWidth / 4, LineMark.BOXPLOT);
 
-			if (values[Quantile.BoxplotItems.QUARTILE4.ordinal()] != values[Quantile.BoxplotItems.UPPER_WHISKER.ordinal()])
-				drawOutlier(xPosMidBounds, this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE4.ordinal()]), halfBoxWidth / 4, LineMark.BOXPLOT);
+			if (values[UniversalQuantile.BoxplotItems.QUARTILE4.ordinal()] != values[UniversalQuantile.BoxplotItems.UPPER_WHISKER.ordinal()])
+				drawOutlier(xPosMidBounds, mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.QUARTILE4.ordinal()]), halfBoxWidth / 4, LineMark.BOXPLOT);
 
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("LW=%d Q1=%d Q2=%d Q3=%d UW=%d ", yPosLowerWhisker, yPosQuartile1, //$NON-NLS-1$
-					this.trailRecord.getVerticalDisplayPos(values[Quantile.BoxplotItems.QUARTILE2.ordinal()]), yPosQuartile3, yPosUpperWhisker));
+					mapper.getVerticalDisplayPos(values[UniversalQuantile.BoxplotItems.QUARTILE2.ordinal()]), yPosQuartile3, yPosUpperWhisker));
 		}
 	}
 
@@ -290,17 +292,19 @@ public class CurveSurvey {
 	 * @param lineMark
 	 */
 	private void drawRegressionParabolaLine(List<Spot<Integer>> points, LineMark lineMark) {
+		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+
 		// set the erase area max/min values
-		double[] boundedParabolaCoefficients = this.trailRecord.getBoundedParabolaCoefficients();
+		double[] boundedParabolaCoefficients = this.recordSection.getBoundedParabolaCoefficients();
 		double extremumTimeStamp_ms = boundedParabolaCoefficients[1] / boundedParabolaCoefficients[2] / -2.;
 		double mid = (this.timestampMeasure_ms + this.timestampDelta_ms) / 2.;
 		if (Math.abs(extremumTimeStamp_ms - mid) <= (Math.abs(this.timestampMeasure_ms - mid))) { // extremum is between
-			int yPosExtremum = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue((long) extremumTimeStamp_ms));
+			int yPosExtremum = mapper.getVerticalDisplayPos(this.recordSection.getBoundedParabolaValue((long) extremumTimeStamp_ms));
 			this.yLowerTransversePos = Math.max(this.yLowerTransversePos, yPosExtremum);
 			this.yUpperTransversePos = Math.min(this.yUpperTransversePos, yPosExtremum);
 		}
-		int yPos1 = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(this.timestampMeasure_ms));
-		int yPos2 = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getBoundedParabolaValue(this.timestampDelta_ms));
+		int yPos1 = mapper.getVerticalDisplayPos(this.recordSection.getBoundedParabolaValue(this.timestampMeasure_ms));
+		int yPos2 = mapper.getVerticalDisplayPos(this.recordSection.getBoundedParabolaValue(this.timestampDelta_ms));
 		this.yLowerTransversePos = Math.max(this.yLowerTransversePos, Math.max(yPos1, yPos2));
 		this.yUpperTransversePos = Math.min(this.yUpperTransversePos, Math.min(yPos1, yPos2));
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yUpperTransversePos=" + this.yUpperTransversePos + " yLowerTransversePos=" + this.yLowerTransversePos); //$NON-NLS-1$ //$NON-NLS-2$
@@ -369,17 +373,19 @@ public class CurveSurvey {
 	 * @param canvasImage
 	 */
 	public void clearOldMeasureLines(Image canvasImage) {
+		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPosMeasure = " + this.yPosMeasure + " yPosDelta = " + this.yPosDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.xPosMeasure > 0 || this.xPosDelta > 0) {
 			eraseVerticalLine(canvasImage, this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 			// no change don't needs to be calculated, but the calculation limits to bounds
-			this.yPosMeasure = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
+			this.yPosMeasure = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(this.timeLine.getAdjacentTimestamp(this.xPosMeasure)));
 			if (isYInCurveAreaBounds(this.yPosMeasure)) eraseHorizontalLine(canvasImage, this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 
 			if (this.trailRecord.getParentTrail().isDeltaMeasurementMode(this.trailRecord.getName())) {
 				eraseVerticalLine(canvasImage, this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 				// no change don't needs to be calculated, but the calculation limits to bounds
-				this.yPosDelta = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
+				this.yPosDelta = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(this.timeLine.getAdjacentTimestamp(this.xPosDelta)));
 				if (isYInCurveAreaBounds(this.yPosDelta)) eraseHorizontalLine(canvasImage, this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 
 				cleanSurveyObsoleteRectangle(canvasImage);
@@ -466,12 +472,14 @@ public class CurveSurvey {
 	 * @param timeStampMeasure_ms is a valid time stamp
 	 */
 	public void setPosMeasure(Rectangle curveAreaBounds, long timeStampMeasure_ms) {
+		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+
 		boolean isNullAcceptable = this.settings.isCurveSurvey(); // allow positioning on timestamps with null values
 		this.curveAreaBounds = curveAreaBounds;
 		this.offSetX = curveAreaBounds.x;
 		this.offSetY = curveAreaBounds.y;
 
-		int yPosMeasureNew = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampMeasure_ms));
+		int yPosMeasureNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampMeasure_ms));
 		if (isNullAcceptable || yPosMeasureNew != Integer.MIN_VALUE) {
 			this.timestampMeasure_ms = timeStampMeasure_ms;
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(timeStampMeasure_ms);
@@ -482,15 +490,16 @@ public class CurveSurvey {
 			long timestampMeasureNew_ms = timeStampMeasure_ms;
 			for (int i = 0; i < this.trailRecord.size(); i++) {
 				timestampMeasureNew_ms = this.trailRecord.getParentTrail().getDisplayTimeStamp_ms(i);
-				yPosMeasureNew = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestampMeasureNew_ms));
+				yPosMeasureNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestampMeasureNew_ms));
 				if (yPosMeasureNew > Integer.MIN_VALUE) break;
 			}
 			this.timestampMeasure_ms = timestampMeasureNew_ms;
 			this.xPosMeasure = this.timeLine.getXPosTimestamp(timestampMeasureNew_ms);
 			this.yPosMeasure = yPosMeasureNew;
 		}
-
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
+
+		this.recordSection = new TrailRecordCutter(this.trailRecord, this.timestampMeasure_ms, this.timestampDelta_ms);
 	}
 
 	/**
@@ -499,12 +508,14 @@ public class CurveSurvey {
 	 * @param timeStampDelta_ms is a valid time stamp
 	 */
 	public void setPosDelta(Rectangle curveAreaBounds, long timeStampDelta_ms) {
+		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+
 		boolean isNullAcceptable = this.settings.isCurveSurvey(); // allow positioning on timestamps with null values
 		this.curveAreaBounds = curveAreaBounds;
 		this.offSetX = curveAreaBounds.x;
 		this.offSetY = curveAreaBounds.y;
 
-		int yPosDeltaNew = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampDelta_ms));
+		int yPosDeltaNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampDelta_ms));
 		if (isNullAcceptable || yPosDeltaNew != Integer.MIN_VALUE) {
 			this.timestampDelta_ms = timeStampDelta_ms;
 			this.xPosDelta = this.timeLine.getXPosTimestamp(timeStampDelta_ms);
@@ -515,15 +526,16 @@ public class CurveSurvey {
 			long timestampDeltaNew_ms = timeStampDelta_ms;
 			for (int i = this.trailRecord.size() - 1; i >= 0; i--) {
 				timestampDeltaNew_ms = this.trailRecord.getParentTrail().getDisplayTimeStamp_ms(i);
-				yPosDeltaNew = this.trailRecord.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestampDeltaNew_ms));
+				yPosDeltaNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestampDeltaNew_ms));
 				if (yPosDeltaNew > Integer.MIN_VALUE) break;
 			}
 			this.timestampDelta_ms = timestampDeltaNew_ms;
 			this.xPosDelta = this.timeLine.getXPosTimestamp(timestampDeltaNew_ms);
 			this.yPosDelta = yPosDeltaNew;
 		}
-
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", this.timestampDelta_ms, this.xPosDelta, this.yPosDelta)); //$NON-NLS-1$
+
+		this.recordSection = new TrailRecordCutter(this.trailRecord, this.timestampMeasure_ms, this.timestampDelta_ms);
 	}
 
 	public GC getCanvasGC() {

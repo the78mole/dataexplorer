@@ -6,7 +6,7 @@
 //
 
 
-package gde.histocache;
+package gde.histo.cache;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

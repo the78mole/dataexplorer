@@ -44,8 +44,8 @@ import org.eclipse.swt.widgets.TableItem;
 
 import gde.GDE;
 import gde.data.HistoSet;
-import gde.data.TrailRecord;
-import gde.data.TrailRecordSet;
+import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -236,7 +236,7 @@ public class HistoSelectorComposite extends Composite {
 				TrailRecord record = (TrailRecord) recordSet.getDisplayRecords().get(i);
 				textSize = record.getName().length() * textExtentFactor;
 				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
-				textSize2 = (int) (record.getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10) * textExtentFactor * 15 / 20.);
+				textSize2 = (int) (record.getTrailSelector().getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10) * textExtentFactor * 15 / 20.);
 				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
 				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 				if (record.isDisplayable()) {
@@ -249,14 +249,14 @@ public class HistoSelectorComposite extends Composite {
 					selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
 					this.editors[i].grabHorizontal = true;
 					this.editors[i].setEditor(selectorCombos[i], item, 1);
-					selectorCombos[i].setItems(record.getApplicableTrailsTexts().toArray(new String[0]));
-					selectorCombos[i].setText(record.getTrailText());
+					selectorCombos[i].setItems(record.getTrailSelector().getApplicableTrailsTexts().toArray(new String[0]));
+					selectorCombos[i].setText(record.getTrailSelector().getTrailText());
 					selectorCombos[i].setToolTipText(!record.getLabel().isEmpty() ? record.getLabel() : Messages.getString(MessageIds.GDE_MSGT0748));
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent event) {
 							Combo combo = (Combo) event.getSource();
-							record.setTrailTextSelectedIndex(combo.getSelectionIndex());
+							record.getTrailSelector().setTrailTextSelectedIndex(combo.getSelectionIndex());
 							HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);
 						}
 					});

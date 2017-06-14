@@ -19,7 +19,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -31,10 +30,11 @@ import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.TrailRecord;
-import gde.data.TrailRecordSet;
 import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.recordings.HistoGraphicsMapper;
+import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.HistoTimeLine.Density;
@@ -91,7 +91,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 		}
 		else {
 			if (device != null) { // adapt to device specific range
-				if (!record.isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
+				if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
 					; // in case of an empty record leave the values unchanged
 				else {
 					yMinValueDisplay = device.translateValue(record, yMinValue);
@@ -214,11 +214,10 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 		StringBuffer sb = new StringBuffer(); // logging purpose
 
 		Point[] points = null;
-		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		if (record.getDevice().isGPSCoordinates(record))
-			points = record.getGpsDisplayPoints(timeLine, x0, y0);
-		else
-			points = record.getDisplayPoints(timeLine, x0, y0);
+		{// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
+			HistoGraphicsMapper mapper = new HistoGraphicsMapper(record);
+			points = record.getDevice().isGPSCoordinates(record) ? mapper.getGpsDisplayPoints(timeLine, x0, y0) : mapper.getDisplayPoints(timeLine, x0, y0);
+		}
 
 		Point newPoint, oldPoint = null;
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
@@ -260,30 +259,24 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 		record.setDisplayScaleFactorTime(xScaleFactor);
 		record.setDisplayScaleFactorValue(height);
 
-		List<Point[]> suitePoints = new ArrayList<>(); // display point cache: one row for each record of the suite
-		if (record.getDevice().isGPSCoordinates(record)) {
-			for (int i = 0; i < record.getSuiteSize(); i++) {
-				suitePoints.add(record.getGpsDisplayPoints(timeLine, x0, y0, i));
-			}
-		}
-		else {
-			for (int i = 0; i < record.getSuiteSize(); i++) {
-				suitePoints.add(record.getDisplayPoints(timeLine, x0, y0, i));
-			}
+		List<Point[]> suitePoints = null; // display point cache: one row for each record of the suite
+		{// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
+			HistoGraphicsMapper mapper = new HistoGraphicsMapper(record);
+			suitePoints = record.getDevice().isGPSCoordinates(record) ? mapper.getSuiteGpsDisplayPoints(timeLine, x0, y0) : mapper.getSuiteDisplayPoints(timeLine, x0, y0);
 		}
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		double averageDuration = ((TrailRecordSet) record.getParent()).getAverageDuration_mm();
 		List<Integer> durations_mm = ((TrailRecordSet) record.getParent()).getDurations_mm();
-		Point[] newSuitePoints = new Point[record.getSuiteSize()]; // all points for the current x-axis position
-		Point[] oldSuitePoints = new Point[record.getSuiteSize()]; // all points for the previous x-axis position
+		Point[] newSuitePoints = new Point[suitePoints.size()]; // all points for the current x-axis position
+		Point[] oldSuitePoints = new Point[suitePoints.size()]; // all points for the previous x-axis position
 		for (int j = 0; j < suitePoints.get(0).length; j++) {
 			if ((suitePoints.get(0)[j]) != null) { // in case of a suite the master triggers the display of all trails
-				for (int i = 0; i < record.getSuiteSize(); i++) {
+				for (int i = 0; i < suitePoints.size(); i++) {
 					oldSuitePoints[i] = newSuitePoints[i];
 					newSuitePoints[i] = suitePoints.get(i)[j];
 				}
-				if (record.isBoxPlotSuite()) {
+				if (record.getTrailSelector().isBoxPlotSuite()) {
 					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newSuitePoints[0].toString());
 					// helper variables
 					final int posX = newSuitePoints[0].x;
@@ -310,7 +303,7 @@ public class HistoCurveUtils { // todo merging with CurveUtils reduces number of
 					gc.drawLine(posX, qUpperWhiskerY, posX, q3PosY);
 					gc.drawLine(posX - halfBoxWidth / 2, qUpperWhiskerY, posX + halfBoxWidth / 2, qUpperWhiskerY);
 				}
-				else if (record.isRangePlotSuite()) { // other suite members do not require a special treatment
+				else if (record.getTrailSelector().isRangePlotSuite()) { // other suite members do not require a special treatment
 					drawHistoMarker(gc, newSuitePoints[0], record.getColor(), timeLine.getDensity());
 					// helper variables
 					final int posX = newSuitePoints[0].x;

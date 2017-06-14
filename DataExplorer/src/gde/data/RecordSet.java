@@ -72,12 +72,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	private final static int					initialRecordCapacity						= 555;
 
-	TimeSteps													timeStep_ms;
+	protected TimeSteps													timeStep_ms;
 
 	String														name;																																																																										//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
-	final Channel											parent;
+	protected final Channel											parent;
 	String														header													= null;
-	String[]													recordNames;																																																																						//Spannung, Strom, ..
+	protected String[]													recordNames;																																																																						//Spannung, Strom, ..
 	String[]													noneCalculationRecords					= new String[0];																																																				//records/measurements which are active or inactive
 	int																noneCalculationRecordsCount			= -1;																																																										//cached count or number of noneCalculationRecords, -1 means not initialized
 	String														description											= GDE.STRING_EMPTY;
@@ -93,10 +93,10 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	Rectangle													drawAreaBounds;																																																																					// draw area in display pixel
 
 	//display in data table
-	Vector<Record>										visibleAndDisplayableRecords		= new Vector<Record>();																																																	//collection of records visible and displayable
-	Vector<Record>										allRecords											= new Vector<Record>();																																																	//collection of all records
+	protected Vector<Record>										visibleAndDisplayableRecords		= new Vector<Record>();																																																	//collection of records visible and displayable
+	protected Vector<Record>										allRecords											= new Vector<Record>();																																																	//collection of all records
 	// sync enabled records
-	HashMap<Integer, Vector<Record>>	scaleSyncedRecords							= new HashMap<Integer, Vector<Record>>(2);																																							//collection of record keys where scales might be synchronized
+	protected HashMap<Integer, Vector<Record>>	scaleSyncedRecords							= new HashMap<Integer, Vector<Record>>(2);																																							//collection of record keys where scales might be synchronized
 
 	//for compare set x min/max and y max (time) might be different
 	boolean														isCompareSet										= false;
@@ -176,11 +176,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	Vector<String>										unsaveReasons										= new Vector<String>();
 	int																changeCounter										= 0;																																																										// indicates change in general
 
-	final DataExplorer								application;																																																																						// pointer to main application
+	protected final DataExplorer								application;																																																																						// pointer to main application
 	final Channels										channels;																																																																								// start point of data hierarchy
-	final IDevice											device;
+	protected final IDevice											device;
 	final static DeviceXmlResource		xmlResource											= DeviceXmlResource.getInstance();
 	private HistoTransitions					histoTransitions;
+	private TreeMap<Long, Transition>						transitions;
 
 	/**
 	 * record set data buffers according the size of given names array, where
@@ -996,7 +997,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * print record names array
 	 * @param recordNames
 	 */
-	static void printRecordNames(String methodName, String[] recordNames) {
+	protected static void printRecordNames(String methodName, String[] recordNames) {
 		StringBuilder sb = new StringBuilder();
 		for (String recordName : recordNames) {
 			sb.append(recordName).append(GDE.STRING_MESSAGE_CONCAT);
@@ -1139,7 +1140,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param unsavedReason
 	 */
 	public void setUnsaved(String unsavedReason) {
-		if (!this.isCompareSet && !(this instanceof TrailRecordSet)) {
+		if (!this.isCompareSet) {
 			this.changeCounter++;
 			this.isSaved = false;
 			if (!this.unsaveReasons.contains(unsavedReason)) {
@@ -2010,7 +2011,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param tmpRecord
 	 * @return
 	 */
-	boolean isRecordContained(int syncMasterRecordOrdinal, Record tmpRecord) {
+	public boolean isRecordContained(int syncMasterRecordOrdinal, Record tmpRecord) {
 		final String $METHOD_NAME = "isRecordContained";
 		boolean isContained = false;
 		synchronized (this.scaleSyncedRecords) {

@@ -64,7 +64,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.HistoSet;
 import gde.data.RecordSet;
-import gde.data.TrailRecordSet;
+import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;

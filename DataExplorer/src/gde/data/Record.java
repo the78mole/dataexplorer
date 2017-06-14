@@ -65,12 +65,12 @@ public class Record extends Vector<Integer> {
 	String											channelConfigKey;																							// used as channelConfigKey
 	String											keyName;
 	TimeSteps										timeStep_ms				= null;																			// timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
-	IDevice											device;
-	int													ordinal;																											// ordinal is referencing the source position of the record relative to the initial
+	protected IDevice						device;
+	protected int								ordinal;																											// ordinal is referencing the source position of the record relative to the initial
 	// device measurement configuration and used to find specific properties
 
-	RecordSet										parent;
-	String											name;																													// measurement name Höhe
+	protected RecordSet					parent;
+	protected String						name;																													// measurement name Höhe
 	String											unit;																													// unit [m]
 	String											symbol;																												// symbol h
 	String											description				= GDE.STRING_BLANK;													// only set if copied into compare set
@@ -141,17 +141,17 @@ public class Record extends Vector<Integer> {
 	boolean												isRoundOut								= false;
 	boolean												isStartpointZero					= false;
 	boolean												isStartEndDefined					= false;
-	DecimalFormat									df;
-	int														numberFormat							= -1;																																																																		// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-	int														maxValue									= 0;																																																																		// max value of the curve
-	int														minValue									= 0;																																																																		// min value of the curve
-	double												maxScaleValue							= this.maxValue;																																																												// overwrite calculated boundaries
-	double												minScaleValue							= this.minValue;
+	protected DecimalFormat				df;
+	protected int									numberFormat							= -1;																																																																		// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+	protected int									maxValue									= 0;																																																																		// max value of the curve
+	protected int									minValue									= 0;																																																																		// min value of the curve
+	protected double							maxScaleValue							= this.maxValue;																																																												// overwrite calculated boundaries
+	protected double							minScaleValue							= this.minValue;
 	DataType											dataType									= Record.DataType.DEFAULT;
 
 	//synchronize
-	int														syncMaxValue							= 0;																																																																		// max value of the curve if synced
-	int														syncMinValue							= 0;																																																																		// min value of the curve if synced
+	protected int									syncMaxValue							= 0;																																																																		// max value of the curve if synced
+	protected int									syncMinValue							= 0;																																																																		// min value of the curve if synced
 
 	// scope view
 	int														scopeMin									= 0;																																																																		// min value of the curve within scope display area
@@ -177,8 +177,8 @@ public class Record extends Vector<Integer> {
 
 	// display the record
 	double												displayScaleFactorTime;
-	double												displayScaleFactorValue;
-	double												syncMasterFactor					= 1.0;																																																																	// synchronized scale and different measurement factors
+	protected double							displayScaleFactorValue;
+	protected double							syncMasterFactor					= 1.0;																																																																	// synchronized scale and different measurement factors
 	double												minDisplayValue;																																																																									// min value in device units, correspond to draw area
 	double												maxDisplayValue;																																																																									// max value in device units, correspond to draw area
 

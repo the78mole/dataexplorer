@@ -5,7 +5,7 @@
 // Generated on: 2016.12.15 at 04:01:10 PM MEZ 
 //
 
-package gde.histocache;
+package gde.histo.cache;
 
 import java.util.ArrayList;
 import java.util.List;

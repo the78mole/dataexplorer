@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     					2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -38,7 +38,7 @@ import gde.device.HistoRandomSample;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histocache.HistoVault;
+import gde.histo.cache.VaultCollector;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.utils.StringHelper;
@@ -46,7 +46,7 @@ import gde.utils.StringHelper;
 /**
  * read Graupner HoTT binary data for history analysis.
  * provide data in a histo recordset.
- * for small files (around 1 minute) no measurements are added to the recordset. 
+ * for small files (around 1 minute) no measurements are added to the recordset.
  * reads one single channel only.
  * supports sampling to maximize the throughput.
  * @author Thomas Eickert
@@ -59,12 +59,12 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		INITIATED, ADDED, PICKED, READ, REVIEWED, FINISHED
 	};
 
-	private static int				recordTimespan_ms	= 10;																																		// HoTT logs data rate defined by the channel log
-	private static long				nanoTime;
-	private static long				currentTime, initiateTime, readTime, reviewTime, addTime, pickTime, finishTime, lastTime;
-	private static Path				filePath;
-	private static RecordSet	tmpRecordSet;
-	private static HistoVault	truss;
+	private static int						recordTimespan_ms	= 10;																																		// HoTT logs data rate defined by the channel log
+	private static long						nanoTime;
+	private static long						currentTime, initiateTime, readTime, reviewTime, addTime, pickTime, finishTime, lastTime;
+	private static Path						filePath;
+	private static RecordSet			tmpRecordSet;
+	private static VaultCollector	truss;
 
 	@Deprecated // shadows the base class method
 	public static synchronized void read(String filePath) throws Exception {
@@ -80,12 +80,12 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 	/**
 	 * @param newTruss which is promoted to a full vault object if the file has a minimum length.
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws DataTypeException
 	 * @throws DataInconsitsentException
 	 */
-	public static synchronized void read(HistoVault newTruss) throws IOException, DataTypeException, DataInconsitsentException {
+	public static synchronized void read(VaultCollector newTruss) throws IOException, DataTypeException, DataInconsitsentException {
 		HoTTbinHistoReader.nanoTime = System.nanoTime();
 		HoTTbinHistoReader.initiateTime = HoTTbinHistoReader.readTime = HoTTbinHistoReader.reviewTime = HoTTbinHistoReader.addTime = HoTTbinHistoReader.pickTime = HoTTbinHistoReader.finishTime = 0;
 		HoTTbinHistoReader.lastTime = System.nanoTime();
@@ -170,8 +170,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	* @param initializeBlocks if this number is greater than zero, the min/max values are initialized
 	* @param maxPoints utilizes the minMax values from a previous run and thus reduces oversampling
 	* @param minPoints utilizes the minMax values from a previous run and thus reduces oversampling
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	* @return
 	*/
 	private static HistoRandomSample readSingle(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
@@ -239,7 +239,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		}
 		else
 			throw new UnsupportedOperationException();
-		
+
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		// read all the data blocks from the file, parse only for the active channel
@@ -600,8 +600,8 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 	* @param initializeBlocks if this number is greater than zero, the min/max values are initialized
 	* @param maxPoints utilizes the minMax values from a previous run and thus reduces oversampling
 	* @param minPoints utilizes the minMax values from a previous run and thus reduces oversampling
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	*/
 	private static HistoRandomSample readMultiple(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple"; //$NON-NLS-1$
@@ -672,7 +672,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		}
 		else
 			throw new UnsupportedOperationException();
-		
+
 		histoRandomSample.setMaxPoints(maxPoints);
 		histoRandomSample.setMinPoints(minPoints);
 		// read all the data blocks from the file, parse only for the active channel

@@ -93,12 +93,13 @@ import gde.data.HistoSet;
 import gde.data.HistoSet.RebuildStep;
 import gde.data.ObjectData;
 import gde.data.RecordSet;
-import gde.data.TrailRecord;
-import gde.data.TrailRecordSet;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.recordings.RecordingsCollector;
+import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -999,7 +1000,7 @@ public class DataExplorer extends Composite {
 					}
 					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
 					if (trailRecordSet != null) {
-						final int tagSize = DataExplorer.this.settings.isDisplayScores() ? trailRecordSet.getActiveDisplayTags().size() : 0;
+						final int tagSize = DataExplorer.this.settings.isDisplayScores() ? trailRecordSet.getDataTags().getActiveDisplayTags().size() : 0;
 						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + tagSize);
 					}
 				}
@@ -2042,7 +2043,7 @@ public class DataExplorer extends Composite {
 	 * @param recordOrdinal this single record is updated from the histo recordset
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
-		DataExplorer.this.histoSet.getTrailRecordSet().setPoints(recordOrdinal);
+		RecordingsCollector.addHistoVaults(this.histoSet.getTrailRecordSet(), recordOrdinal);
 		DataExplorer.this.updateHistoTabs(RebuildStep.F_FILE_CHECK, isWithUi); // ET rebuilds the graphics only if new files have been found
 		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found
 	}

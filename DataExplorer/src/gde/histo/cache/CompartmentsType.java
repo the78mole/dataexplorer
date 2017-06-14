@@ -6,7 +6,7 @@
 //
 
 
-package gde.histocache;
+package gde.histo.cache;
 
 import java.util.ArrayList;
 import java.util.List;

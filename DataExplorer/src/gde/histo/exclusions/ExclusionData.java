@@ -17,7 +17,7 @@
     Copyright (c) 2017 Thomas Eickert
 ****************************************************************************************/
 
-package gde.histoinventory;
+package gde.histo.exclusions;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,8 +29,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -40,15 +38,16 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.log.Level;
 import gde.utils.FileUtils;
+import gde.utils.SecureHash;
 
 /**
- * supports excluding files from history analysis.
- * is based on property files for each data directory.
- * stores the exclusions property files in the user directory if the data directory is not accessible for writing.
+ * Supports excluding files from history analysis.
+ * Is based on property files for each data directory.
+ * Stores the exclusions property files in the user directory if the data directory is not accessible for writing.
  * @author Thomas Eickert
  */
-public class FileExclusionData extends Properties {
-	private final static String	$CLASS_NAME				= FileExclusionData.class.getName();
+public class ExclusionData extends Properties {
+	private final static String	$CLASS_NAME				= ExclusionData.class.getName();
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 	private static final long		serialVersionUID	= -2477509505185819765L;
 
@@ -56,23 +55,23 @@ public class FileExclusionData extends Properties {
 
 	private final Path					dataFileDir;
 
-	public FileExclusionData(Path newDataFileDir) {
+	public ExclusionData(Path newDataFileDir) {
 		super();
 		this.dataFileDir = newDataFileDir;
 	}
 
 	@Deprecated
-	public FileExclusionData() {
+	public ExclusionData() {
 		this.dataFileDir = null;
 	}
 
 	@Deprecated
-	public FileExclusionData(Properties newDefaults) {
+	public ExclusionData(Properties newDefaults) {
 		this.dataFileDir = null;
 	}
 
 	/**
-	 * deletes all exclusions property files from the user directory and the data directories
+	 * Deletes all exclusions property files from the user directory and the data directories
 	 * @param dataDirectories
 	 */
 	public static void deleteExclusionsDirectory(List<Path> dataDirectories) {
@@ -90,6 +89,16 @@ public class FileExclusionData extends Properties {
 	}
 
 	@Override
+	public synchronized String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (String excludedKey : new TreeSet<String>(this.stringPropertyNames())) {
+			sb.append(GDE.STRING_NEW_LINE).append(excludedKey);
+			if (!getProperty(excludedKey).isEmpty()) sb.append(GDE.STRING_BLANK_COLON_BLANK).append(getProperty(excludedKey));
+		}
+		return sb.length() > 0 ? sb.substring(1) : GDE.STRING_EMPTY;
+	}
+
+	@Override
 	public synchronized Object setProperty(String dataFileName, String recordsetBaseName) {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
@@ -97,7 +106,7 @@ public class FileExclusionData extends Properties {
 	}
 
 	/**
-	 * set the dataFileName as excluded for all recordSets.
+	 * Set the dataFileName as excluded for all recordSets.
 	 * @param dataFileName
 	 * @return the previous value which is a csv string
 	 */
@@ -171,7 +180,7 @@ public class FileExclusionData extends Properties {
 		}
 		if (takeUserDir) {
 			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
-			String fileName = sha1(this.dataFileDir.toString());
+			String fileName = SecureHash.sha1(this.dataFileDir.toString());
 			if (exclusionsDir.resolve(fileName).toFile().exists()) {
 				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(exclusionsDir.resolve(fileName).toFile())))) {
 					this.load(reader);
@@ -185,7 +194,7 @@ public class FileExclusionData extends Properties {
 	}
 
 	/**
-	 * write the file if excludes are defined, else delete the file.
+	 * Write the file if excludes are defined, else delete the file.
 	 */
 	public void store() {
 		if (this.size() > 0) {
@@ -204,7 +213,7 @@ public class FileExclusionData extends Properties {
 			}
 			if (takeUserDir) {
 				FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
-				String fileName = sha1(this.dataFileDir.toString());
+				String fileName = SecureHash.sha1(this.dataFileDir.toString());
 				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()), "UTF-8"))) { //$NON-NLS-1$
 					this.store(writer, this.dataFileDir.toString());
 				}
@@ -220,42 +229,12 @@ public class FileExclusionData extends Properties {
 
 	public void delete() {
 		FileUtils.deleteFile(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
-		String fileName = sha1(this.dataFileDir.toString());
+		String fileName = SecureHash.sha1(this.dataFileDir.toString());
 		FileUtils.deleteFile(this.dataFileDir.resolve(exclusionsDir.resolve(fileName)).toString());
-	}
-
-	@Override
-	public synchronized String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (String excludedKey : new TreeSet<String>(this.stringPropertyNames())) {
-			sb.append(GDE.STRING_NEW_LINE).append(excludedKey);
-			if (!getProperty(excludedKey).isEmpty()) sb.append(GDE.STRING_BLANK_COLON_BLANK).append(getProperty(excludedKey));
-		}
-		return sb.length() > 0 ? sb.substring(1) : GDE.STRING_EMPTY;
 	}
 
 	public Path getDataFileDir() {
 		return this.dataFileDir;
-	}
-
-	/**
-	 * @param input
-	 * @return the SHA-1 hash value rendered as a hexadecimal number, 40 digits long
-	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
-	 */
-	private String sha1(String input) {
-		byte[] hashBytes = null;
-		try {
-			hashBytes = MessageDigest.getInstance("SHA1").digest(input.getBytes()); //$NON-NLS-1$
-		}
-		catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		StringBuilder sb = new StringBuilder();
-		for (byte hashByte : hashBytes) {
-			sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
-		}
-		return sb.toString();
 	}
 
 }

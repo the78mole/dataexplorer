@@ -78,10 +78,6 @@ public class Quantile {
 		REMOVE_NULLS, REMOVE_ZEROS, REMOVE_MAXMIN, IS_SAMPLE
 	};
 
-	public enum BoxplotItems {
-		QUARTILE0, LOWER_WHISKER, QUARTILE1, QUARTILE2, QUARTILE3, UPPER_WHISKER, QUARTILE4
-	};
-
 	/**
 	 * Compares two points by y-coordinate.
 	 */
@@ -713,19 +709,6 @@ public class Quantile {
 			}
 		}
 		return value;
-	}
-
-	public double[] getTukeyBoxPlot() {
-		double[] values = new double[7];
-		values[BoxplotItems.QUARTILE0.ordinal()] = getQuartile0();
-		values[BoxplotItems.LOWER_WHISKER.ordinal()] = getQuantileLowerWhisker();
-		values[BoxplotItems.QUARTILE1.ordinal()] = getQuartile1();
-		values[BoxplotItems.QUARTILE2.ordinal()] = getQuartile2();
-		values[BoxplotItems.QUARTILE3.ordinal()] = getQuartile3();
-		values[BoxplotItems.UPPER_WHISKER.ordinal()] = getQuantileUpperWhisker();
-		values[BoxplotItems.QUARTILE4.ordinal()] = getQuartile4();
-
-		return values;
 	}
 
 	/**
