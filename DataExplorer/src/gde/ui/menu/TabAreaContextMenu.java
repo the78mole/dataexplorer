@@ -144,7 +144,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
 						}
 						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
-						TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
+						if (!GDE.IS_OS_ARCH_ARM) TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
 					}
 				}
 				if (type == TabMenuType.HISTOTABLE) {
@@ -195,7 +195,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
 						}
 						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
-						TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
+						if (!GDE.IS_OS_ARCH_ARM) TabAreaContextMenu.this.hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
 					}
 				}
 				if (type == TabMenuType.TABLE && TabAreaContextMenu.this.editTableItem != null) {
@@ -215,13 +215,13 @@ public class TabAreaContextMenu {
 				{
 					this.fileName = new MenuItem(popupMenu, SWT.None);
 					this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
-					this.fileName.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0863));
+					if (!GDE.IS_OS_ARCH_ARM) this.fileName.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0863));
 				}
 				new MenuItem(popupMenu, SWT.SEPARATOR);
 				{
 					this.openRecordSetItem = new MenuItem(popupMenu, SWT.PUSH);
 					this.openRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0849));
-					this.openRecordSetItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0851));
+					if (!GDE.IS_OS_ARCH_ARM) this.openRecordSetItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0851));
 					this.openRecordSetItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -245,7 +245,7 @@ public class TabAreaContextMenu {
 				{
 					this.deleteFileItem = new MenuItem(popupMenu, SWT.PUSH);
 					this.deleteFileItem.setText(Messages.getString(MessageIds.GDE_MSGT0861));
-					this.deleteFileItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0862));
+					if (!GDE.IS_OS_ARCH_ARM) this.deleteFileItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0862));
 					this.deleteFileItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -264,7 +264,7 @@ public class TabAreaContextMenu {
 				{
 					this.openFolderItem = new MenuItem(popupMenu, SWT.PUSH);
 					this.openFolderItem.setText(Messages.getString(MessageIds.GDE_MSGT0873));
-					this.openFolderItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0874));
+					if (!GDE.IS_OS_ARCH_ARM) this.openFolderItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0874));
 					this.openFolderItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -290,7 +290,7 @@ public class TabAreaContextMenu {
 				{
 					this.hideMenuRecordSetItem = new MenuItem(this.hideMenu, SWT.PUSH);
 					this.hideMenuRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0853));
-					this.hideMenuRecordSetItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0854));
+					if (!GDE.IS_OS_ARCH_ARM) this.hideMenuRecordSetItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0854));
 					this.hideMenuRecordSetItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -308,7 +308,7 @@ public class TabAreaContextMenu {
 				{
 					this.hideMenuFileItem = new MenuItem(this.hideMenu, SWT.PUSH);
 					this.hideMenuFileItem.setText(Messages.getString(MessageIds.GDE_MSGT0855));
-					this.hideMenuFileItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0856));
+					if (!GDE.IS_OS_ARCH_ARM) this.hideMenuFileItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0856));
 					this.hideMenuFileItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -326,7 +326,7 @@ public class TabAreaContextMenu {
 				{
 					this.hideMenuRevokeItem = new MenuItem(this.hideMenu, SWT.PUSH);
 					this.hideMenuRevokeItem.setText(Messages.getString(MessageIds.GDE_MSGT0857));
-					this.hideMenuRevokeItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0858));
+					if (!GDE.IS_OS_ARCH_ARM) this.hideMenuRevokeItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0858));
 					this.hideMenuRevokeItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -344,7 +344,7 @@ public class TabAreaContextMenu {
 				{
 					this.suppressModeItem = new MenuItem(popupMenu, SWT.CHECK);
 					this.suppressModeItem.setText(Messages.getString(MessageIds.GDE_MSGT0859));
-					this.suppressModeItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0860));
+					if (!GDE.IS_OS_ARCH_ARM) this.suppressModeItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0860));
 					this.suppressModeItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -385,7 +385,7 @@ public class TabAreaContextMenu {
 				});
 				this.displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.displayGraphicsCommentItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
-				this.displayGraphicsCommentItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
+				if (!GDE.IS_OS_ARCH_ARM) this.displayGraphicsCommentItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
 				this.displayGraphicsCommentItem.addListener(SWT.Selection, new Listener() {
 					@Override
 					public void handleEvent(Event e) {
@@ -399,7 +399,7 @@ public class TabAreaContextMenu {
 				});
 				this.displayGraphicsCurveSurvey = new MenuItem(popupMenu, SWT.CHECK);
 				this.displayGraphicsCurveSurvey.setText(Messages.getString(MessageIds.GDE_MSGT0876));
-				this.displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
+				if (!GDE.IS_OS_ARCH_ARM) this.displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
 				this.displayGraphicsCurveSurvey.addListener(SWT.Selection, new Listener() {
 					@Override
 					public void handleEvent(Event e) {

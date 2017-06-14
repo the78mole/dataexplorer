@@ -826,7 +826,7 @@ public class MenuBar {
 				{
 					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
 					this.recordCommentMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
-					this.recordCommentMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
+					if (!GDE.IS_OS_ARCH_ARM) this.recordCommentMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
 					this.recordCommentMenuItem.setSelection(false);
 					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -846,7 +846,7 @@ public class MenuBar {
 				{
 					this.graphicsCurveSurveyMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
 					this.graphicsCurveSurveyMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0876));
-					this.graphicsCurveSurveyMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
+					if (!GDE.IS_OS_ARCH_ARM) this.graphicsCurveSurveyMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
 					this.graphicsCurveSurveyMenuItem.setSelection(false);
 					this.graphicsCurveSurveyMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
