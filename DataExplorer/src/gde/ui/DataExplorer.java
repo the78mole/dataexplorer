@@ -678,9 +678,16 @@ public class DataExplorer extends Composite {
 					int tabPreviousIndex = DataExplorer.this.tabSelectedIndex;
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
 					DataExplorer.this.tabSelectedIndex = tabFolder.getSelectionIndex();
-					if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
-					if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
-						DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
+					try {
+						if (log.isLoggable(Level.OFF)) 
+							log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
+						
+						if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
+							DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
+						}
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
 					}
 
 					if (tabSelectionIndex == 0) {
