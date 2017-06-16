@@ -2045,7 +2045,8 @@ public class DataExplorer extends Composite {
 	 * @param readFromFiles if true then reload from files; if false then use histo vault data
 	 */
 	public void updateHistoTabs(boolean readFromFiles, boolean rebuildTrails) {
-		updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
+		if (this.histoGraphicsTabItem != null)
+			updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	/**
@@ -2054,8 +2055,8 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
-					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible())) {
+			if (this.histoGraphicsTabItem != null &&  ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
+					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()))) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
@@ -2067,8 +2068,8 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec((Runnable) () -> {
-				if ((!DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) //
-						|| (!DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible())) {
+				if (this.histoGraphicsTabItem != null && ((!DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) //
+						|| (!DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()))) {
 					Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 					try {
 						rebuilThread.start();
