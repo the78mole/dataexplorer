@@ -33,11 +33,11 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.RecordSet;
-import gde.device.HistoRandomSample;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.histo.cache.VaultCollector;
+import gde.histo.device.HistoRandomSample;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.utils.StringHelper;

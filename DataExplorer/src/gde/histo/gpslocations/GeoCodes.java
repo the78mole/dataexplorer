@@ -41,15 +41,15 @@ import org.w3c.dom.NodeList;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
 import gde.utils.FileUtils;
-import gde.utils.GpsCoordinate;
 
 /**
  * Gives access to geocode data based on the GPS geocode API.
  * @author Thomas Eickert
  */
-public class GeoCodes {
+public final class GeoCodes {
 	final static String						$CLASS_NAME	= GeoCodes.class.getName();
 	final static Logger						log					= Logger.getLogger($CLASS_NAME);
 

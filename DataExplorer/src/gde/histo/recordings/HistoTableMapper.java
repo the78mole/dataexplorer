@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.recordings.SuiteRecordList.SuiteMember;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.recordings.TrailRecordSet.DisplayTag;
 import gde.messages.MessageIds;
@@ -33,7 +32,7 @@ import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 
 /**
- * Record data mapping for the histo table tab.
+ * Trail record data mapping for the histo table tab.
  * @author Thomas Eickert (USER)
  */
 public final class HistoTableMapper {
@@ -46,7 +45,7 @@ public final class HistoTableMapper {
 	 * @return the column headers starting with the first data column
 	 */
 	public static String[] getTableHeaderRow(TrailRecordSet trailRecordSet) {
-		int dataSize = trailRecordSet.getRecordDataSize(true);
+		int dataSize = trailRecordSet.getTimeStepSize();
 		String[] headerRow = new String[dataSize];
 		if (HistoTableMapper.settings.isXAxisReversed()) {
 			for (int i = 0; i < dataSize; i++) {
@@ -91,58 +90,31 @@ public final class HistoTableMapper {
 					if (trailRecord.elementAt(j) != null) dataTableRow[i + 2] = formatter.getTableValue(j);
 			}
 		}
-		else if (selector.isBoxPlotSuite()) {
+		else {
 			if (HistoTableMapper.settings.isXAxisReversed()) {
 				for (int i = 0; i < trailRecord.realSize(); i++) {
-					if (trailRecord.suiteManager.elementAt(SuiteMember.MEDIAN, i) != null) {
+					if (trailRecord.getSuiteRecords().getSuiteValue(selector.getTrailType().getSuiteMasterIndex(), i) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", formatter.getTableValue(SuiteMember.LOWER_WHISKER, i))); //$NON-NLS-1$
+						sb.append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteLowerIndex(), i))); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.MEDIAN, i))); //$NON-NLS-1$
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.UPPER_WHISKER, i))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteMasterIndex(), i))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteUpperIndex(), i))); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 				}
 			}
 			else {
 				for (int i = 0, j = trailRecord.realSize() - 1; i < trailRecord.realSize(); i++, j--)
-					if (trailRecord.suiteManager.elementAt(SuiteMember.MEDIAN, j) != null) {
+					if (trailRecord.getSuiteRecords().getSuiteValue(selector.getTrailType().getSuiteMasterIndex(), j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", formatter.getTableValue(SuiteMember.LOWER_WHISKER, j))); //$NON-NLS-1$
+						sb.append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteLowerIndex(), i))); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.MEDIAN, j))); //$NON-NLS-1$
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.UPPER_WHISKER, j))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteMasterIndex(), i))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteUpperIndex(), i))); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
 		}
-		else if (selector.isRangePlotSuite()) {
-			if (HistoTableMapper.settings.isXAxisReversed()) {
-				for (int i = 0; i < trailRecord.realSize(); i++) {
-					if (trailRecord.suiteManager.elementAt(SuiteMember.MIDDLE, i) != null) {
-						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", formatter.getTableValue(SuiteMember.LOWER, i))); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.MIDDLE, i))); //$NON-NLS-1$
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.UPPER, i))); //$NON-NLS-1$
-						dataTableRow[i + 2] = sb.toString().intern();
-					}
-				}
-			}
-			else {
-				for (int i = 0, j = trailRecord.realSize() - 1; i < trailRecord.realSize(); i++, j--)
-					if (trailRecord.suiteManager.elementAt(SuiteMember.MIDDLE, j) != null) {
-						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", formatter.getTableValue(SuiteMember.LOWER, j))); //$NON-NLS-1$
-						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.MIDDLE, j))); //$NON-NLS-1$
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(SuiteMember.MIDDLE, j))); //$NON-NLS-1$
-						dataTableRow[i + 2] = sb.toString().intern();
-					}
-			}
-		}
-		else
-			throw new UnsupportedOperationException();
 
 		return dataTableRow;
 	}
@@ -153,9 +125,9 @@ public final class HistoTableMapper {
 	 * @param displayTag
 	 * @return empty record name and display tag description as a trail text replacement followed by the tag values
 	 */
-	public static String[] getTableTagRow(TrailRecordSet trailRecordSet , DisplayTag displayTag) {
+	public static String[] getTableTagRow(TrailRecordSet trailRecordSet, DisplayTag displayTag) {
 		TrailDataTags dataTags = trailRecordSet.getDataTags();
-		int dataSize = trailRecordSet.getRecordDataSize(true);
+		int dataSize = trailRecordSet.getTimeStepSize();
 		String[] dataTableRow = new String[dataSize + 2];
 
 		if (dataSize > 0) {

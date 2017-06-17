@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
-import gde.utils.GpsCoordinate;
+import gde.histo.utils.GpsCoordinate;
 
 public class GpsClusterTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	private final static String	$CLASS_NAME	= GpsClusterTest.class.getName();

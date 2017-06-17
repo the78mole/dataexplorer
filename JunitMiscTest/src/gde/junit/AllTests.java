@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
@@ -31,12 +31,13 @@ public class AllTests {
 		suite.addTestSuite(TestMathUtils.class);
 		suite.addTestSuite(JarInspectAndExportTest.class);
 		suite.addTestSuite(LogViewReaderTester.class);
+		suite.addTestSuite(TestQuadraticRegression.class);
 		suite.addTestSuite(TestObjectKeyScanner.class);
 		suite.addTestSuite(CleanupTestTemp.class);
 		suite.addTestSuite(QuantileTest.class);
 		suite.addTestSuite(HistoSetTest.class);
 		suite.addTestSuite(GpsClusterTest.class);
-		
+
 		//$JUnit-END$
 		return suite;
 	}

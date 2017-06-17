@@ -25,15 +25,15 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import gde.config.HistoGraphicsTemplate;
-import gde.data.HistoSet;
 import gde.device.IDevice;
 import gde.device.TrailTypes;
 import gde.histo.cache.HistoVault;
+import gde.histo.config.HistoGraphicsTemplate;
+import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
+import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
 import gde.ui.DataExplorer;
-import gde.utils.GpsCoordinate;
 
 /**
  * Collect input data for the trail recordset and subordinate objects.
@@ -44,30 +44,36 @@ public final class RecordingsCollector {
 	private final static String				$CLASS_NAME	= RecordingsCollector.class.getName();
 	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
-	private final static DataExplorer	application	= DataExplorer.getInstance();							// pointer to main application
-	private final static IDevice			device			= application.getActiveDevice();
+	private final static DataExplorer	application	= DataExplorer.getInstance();
+	private final static HistoSet			histoSet		= HistoSet.getInstance();
 
 	/**
-	 * rebuild data contents except building the records list and the synchronized scales data
+	 * Rebuild data contents except building the records list.
 	 */
 	public static synchronized void refillRecordSet(TrailRecordSet trailRecordSet) {
 		trailRecordSet.cleanup();
-		addHistoVaults(trailRecordSet);
+		addVaults(trailRecordSet);
 		setGpsLocationsTags(trailRecordSet);
 		trailRecordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
-	 * Set time steps for the trail recordset and the data points for all displayable trail records.
+	 * Set time steps for the trail recordset and the data points for all trail records.
 	 * Every record takes the selected trail type / score data from the history vault and populates its data.
 	 */
-	public static void addHistoVaults(TrailRecordSet trailRecordSet) {
-		for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
+	public static void addVaults(TrailRecordSet trailRecordSet) {
+		for (String recordName : trailRecordSet.getRecordNames()) {
+			TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordName);
+			if (trailRecord.getTrailSelector().getTrailType().isSuite()) {
+				trailRecord.setSuite(histoSet.size());
+			}
+		}
+		for (Map.Entry<Long, List<HistoVault>> entry : histoSet.entrySet()) {
 			for (HistoVault histoVault : entry.getValue()) {
 				trailRecordSet.addVaultHeader(histoVault);
 
 				for (String recordName : trailRecordSet.getRecordNames()) {
-					add(histoVault, (TrailRecord) trailRecordSet.get(recordName));
+					addVault(histoVault, (TrailRecord) trailRecordSet.get(recordName));
 				}
 			}
 		}
@@ -78,21 +84,19 @@ public final class RecordingsCollector {
 	 * The record takes the selected trail type / score data from the trail record vault and populates its data.
 	 * @param recordOrdinal
 	 */
-	public static synchronized void addHistoVaults(TrailRecordSet trailRecordSet, int recordOrdinal) {
+	public static synchronized void addVaults(TrailRecordSet trailRecordSet, int recordOrdinal) {
 		TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordOrdinal);
-		// the vault does hot hold data for non displayable records (= inactive records)
-		if (trailRecord.isDisplayable()) {
-			trailRecord.clear();
-			for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
-				for (HistoVault histoVault : entry.getValue()) {
-					add(histoVault, trailRecord);
-				}
+
+		trailRecord.clear();
+		trailRecord.setSuite(histoSet.size());
+
+		for (Map.Entry<Long, List<HistoVault>> entry : histoSet.entrySet()) {
+			for (HistoVault histoVault : entry.getValue()) {
+				addVault(histoVault, trailRecord);
 			}
-			trailRecordSet.syncScaleOfSyncableRecords();
 		}
-		else {
-			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, "access vault for non displayable record " + trailRecord.getName()); //$NON-NLS-1$
-		}
+		trailRecordSet.syncScaleOfSyncableRecords();
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, trailRecord.getName() + " " + trailRecord.getTrailSelector().getTrailText());
 	}
 
 	/**
@@ -100,63 +104,58 @@ public final class RecordingsCollector {
 	 * Supports trail suites.
 	 * @param histoVault
 	 */
-	private static void add(HistoVault histoVault, TrailRecord trailRecord) {
-		//		if (this.trailRecordSuite == null) {
-		//			super.addElement(null);
-		//		}
-		//		else
+	private static void addVault(HistoVault histoVault, TrailRecord trailRecord) {
 		if (!trailRecord.getTrailSelector().isTrailSuite()) {
-			Integer point;
-			if (trailRecord.isMeasurement())
-				point = histoVault.getMeasurementPoint(trailRecord.getOrdinal(), trailRecord.getTrailSelector().getTrailOrdinal());
-			else if (trailRecord.isSettlement())
-				point = histoVault.getSettlementPoint(trailRecord.getSettlement().getSettlementId(), trailRecord.getTrailSelector().getTrailOrdinal());
-			else if (trailRecord.isScoreGroup()) {
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST,
-						String.format(" %s trail %3d  %s %s", trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), histoVault.getVaultFileName(), histoVault.getLogFilePath())); //$NON-NLS-1$
-				point = histoVault.getScorePoint(trailRecord.getTrailSelector().getTrailOrdinal());
-			}
-			else
-				throw new UnsupportedOperationException("length == 1"); //$NON-NLS-1$
-
-			trailRecord.addElement(point);
-			if (log.isLoggable(Level.FINEST))
-				log.log(Level.FINEST, String.format(" %s trail %3d  %s %s %d", trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), histoVault.getLogFilePath(), point)); //$NON-NLS-1$
+			trailRecord.addElement(histoVault.getPoint(trailRecord, trailRecord.getTrailSelector().getTrailType()));
 		}
 		else {
-			int masterPoint = 0; // this is the basis value for adding or subtracting standard deviations
-			boolean summationSign = false; // false means subtract, true means add
-			for (SuiteRecord suiteRecord : trailRecord.suiteManager.values()) {
-				Integer point;
-				if (trailRecord.isMeasurement())
-					point = histoVault.getMeasurementPoint(trailRecord.getOrdinal(), suiteRecord.getTrailOrdinal());
-				else if (trailRecord.isSettlement())
-					point = histoVault.getSettlementPoint(trailRecord.getSettlement().getSettlementId(), suiteRecord.getTrailOrdinal());
-				else if (trailRecord.isScoreGroup()) {
-					point = histoVault.getScorePoint(trailRecord.getTrailSelector().getTrailOrdinal());
+			TrailTypes suiteTrailType = trailRecord.getTrailSelector().getTrailType();
+			if (!suiteTrailType.isRangePlot()) {
+				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
+				for (int i = 0; i < suiteTrailType.getSuiteMembers().size(); i++) {
+					suiteRecords.get(i).addElement(histoVault.getPoint(trailRecord, suiteTrailType.getSuiteMembers().get(i)));
 				}
-				else
-					throw new UnsupportedOperationException("length > 1"); //$NON-NLS-1$
+			}
+			else {
+				int tmpSummationFactor = 0;
+				int masterPoint = 0; // this is the base value for adding or subtracting standard deviations
 
-				if (point != null) {
-					if (trailRecord.getTrailSelector().isSuiteForSummation()) {
-						point = summationSign ? masterPoint + 2 * point : masterPoint - 2 * point;
-						summationSign = !summationSign; // toggle the add / subtract mode
+				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
+				for (int i = 0; i < suiteTrailType.getSuiteMembers().size(); i++) {
+					Integer point = histoVault.getPoint(trailRecord, suiteTrailType.getSuiteMembers().get(i));
+					if (point == null) {
+						suiteRecords.get(i).addElement(null);
 					}
 					else {
-						masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
-						summationSign = false;
+						tmpSummationFactor = getSummationFactor(suiteTrailType.getSuiteMembers().get(i), tmpSummationFactor);
+						if (tmpSummationFactor == 0)
+							masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
+						else
+							point = masterPoint + tmpSummationFactor * point * 2;
+
+						suiteRecords.get(i).addElement(point);
 					}
-					suiteRecord.addElement(point);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
+							trailRecord.getTrailSelector().getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
 				}
-				else {
-					suiteRecord.addElement(point);
-				}
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format(" %s trail %3d  %s %s %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
-						trailRecord.getTrailSelector().getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecord.getMinRecordValue(), suiteRecord.getMaxRecordValue()));
 			}
 		}
-		log.log(Level.FINEST, trailRecord.getName());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, trailRecord.getName() + " " + trailRecord.getTrailSelector().getTrailText());
+	}
+
+	/**
+	 * Support adding / subtracting trail values from a preceding suite master record.
+	 * @param trailType
+	 * @param previousFactor the summation factor from the last iteration
+	 * @return the alternating -1/+1 factor for summation trail types; 0 otherwise
+	 */
+	private static int getSummationFactor(TrailTypes trailType, int previousFactor) {
+		if (trailType.isForSummation()) {
+			return previousFactor == 0 ? -1 : previousFactor * -1;
+		}
+		else {
+			return 0;
+		}
 	}
 
 	/**
@@ -164,6 +163,7 @@ public final class RecordingsCollector {
 	 * Support asynchronous geocode fetches from the internet.
 	 */
 	public static void setGpsLocationsTags(TrailRecordSet trailRecordSet) {
+		IDevice device = DataExplorer.application.getActiveDevice();
 		String[] recordNames = trailRecordSet.getRecordNames();
 		// locate the GPS coordinates records
 		TrailRecord latitudeRecord = null, longitudeRecord = null;
@@ -178,7 +178,7 @@ public final class RecordingsCollector {
 		GpsCluster gpsCluster = new GpsCluster();
 		if (latitudeRecord != null && longitudeRecord != null) {
 			// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
-			for (Map.Entry<Long, List<HistoVault>> entry : HistoSet.getInstance().entrySet()) {
+			for (Map.Entry<Long, List<HistoVault>> entry : histoSet.entrySet()) {
 				for (HistoVault histoVault : entry.getValue()) {
 					Integer latitudePoint = histoVault.getMeasurementPoint(latitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 					Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
@@ -240,7 +240,7 @@ public final class RecordingsCollector {
 	 * Take the prioritized trail type from applicable trails if no template setting is available.
 	 * @param record
 	 */
-	private static  void applyTemplateTrailData(TrailRecordSet trailRecordSet, TrailRecord record) {
+	private static void applyTemplateTrailData(TrailRecordSet trailRecordSet, TrailRecord record) {
 		int recordOrdinal = record.getOrdinal();
 		HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 		boolean isValidTemplate = template != null && template.isAvailable();

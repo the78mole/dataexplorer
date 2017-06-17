@@ -32,7 +32,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
-import gde.config.HistoGraphicsTemplate;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TimeSteps;
@@ -44,6 +43,7 @@ import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
 import gde.exception.DataInconsitsentException;
 import gde.histo.cache.HistoVault;
+import gde.histo.config.HistoGraphicsTemplate;
 import gde.log.Level;
 import gde.ui.SWTResourceManager;
 
@@ -203,7 +203,7 @@ public final class TrailRecordSet extends RecordSet {
 
 		// setting all data in this create procedure and the synchronized keyword makes this method thread safe
 		RecordingsCollector.defineTrailTypes(newTrailRecordSet);
-		RecordingsCollector.addHistoVaults(newTrailRecordSet);
+		RecordingsCollector.addVaults(newTrailRecordSet);
 		RecordingsCollector.setGpsLocationsTags(newTrailRecordSet);
 		newTrailRecordSet.syncScaleOfSyncableRecords();
 
@@ -260,17 +260,6 @@ public final class TrailRecordSet extends RecordSet {
 		this.averageDuration_mm = 0;
 
 		this.dataTags.clear();
-	}
-
-	public void addVaultHeader(HistoVault histoVault) {
-		// add values
-		int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
-		this.durations_mm.add(duration_mm);
-		this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("recordSet  startTimeStamp %,d", histoVault.getLogStartTimestamp_ms())); //$NON-NLS-1$
-		this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10);
-
-		this.dataTags.add(histoVault);
 	}
 
 	/**
@@ -335,35 +324,111 @@ public final class TrailRecordSet extends RecordSet {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * @return the number of timesteps
-	 */
-	public int getTimeStepSize() {
-		return this.timeStep_ms.size();
+	@Override
+	@Deprecated
+	public double getAverageTimeStep_ms() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public double getMinimumTimeStep_ms() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public double getMaximumTimeStep_ms() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public double getSigmaTimeStep_ms() {
+		throw new UnsupportedOperationException();
 	}
 
 	/**
-	 * @param timestamp_ms
-	 * @return the position of the timestep which is the closest to the timestamp
+	 * Method to get the sorted record names as array for display purpose.
+	 * Sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
+	 * @return all measurement records and settlement / score records based on display settings
 	 */
-	public int getIndex(long timestamp_ms) {
-		return this.timeStep_ms.getBestIndex(timestamp_ms, Comparator.reverseOrder());
-	}
-
-	/**
-	 * @param index
-	 * @return the dataTags
-	 */
-	public Map<DataTag, String> getDataTags(int index) {
-		if (index >= 0) {
-			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
-			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.dataTags.entrySet()) {
-				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
-			}
-			return dataTags4Index;
+	@Override // reasons: 1. Harmonize display records collections  2. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
+	public Record[] getRecordsSortedForDisplay() {
+		Vector<Record> displayRecords = new Vector<Record>();
+		// add the record with horizontal grid
+		for (Record record : this.getDisplayRecords()) {
+			if (record.getOrdinal() == this.getHorizontalGridRecordOrdinal()) displayRecords.add(record);
 		}
-		else
-			return new HashMap<DataTag, String>();
+		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
+		for (Record record : this.getDisplayRecords()) {
+			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && record.isScaleSyncMaster()) displayRecords.add(record);
+		}
+		// add all others
+		for (Record record : this.getDisplayRecords()) {
+			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && !record.isScaleSyncMaster()) displayRecords.add(record);
+		}
+
+		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
+	}
+
+	/**
+	 * update the collection of visible and displayable records in this record set.
+	 * the sort order conforms to the record insertion order.
+	 */
+	@Override // reason is display sequence independent from record names sequence (record ordinal)
+	public void updateVisibleAndDisplayableRecordsForTable() {
+		this.visibleAndDisplayableRecords.removeAllElements();
+		this.allRecords.removeAllElements();
+		// get by insertion order
+		for (Map.Entry<String, Record> entry : this.entrySet()) {
+			final TrailRecord record = (TrailRecord) entry.getValue();
+			if (record.isMeasurement() || (record.isSettlement() && this.settings.isDisplaySettlements()) || (record.isScoreGroup() && this.settings.isDisplayScores())) {
+				record.setDisplayable(record.isActive() && record.hasReasonableData());
+				if (record.isVisible() && record.isDisplayable()) //only selected records get displayed
+					this.visibleAndDisplayableRecords.add(record);
+				if (record.isDisplayable()) // only records with reasonable data get displayed
+					this.allRecords.add(record);
+			}
+		}
+	}
+
+	/**
+	 * Synchronize scales according device properties.
+	 * Support settlements.
+	 */
+	@Override // reason is access to getFactor, getUnit etc. via this.device.getMeasruementProperty
+	public void syncScaleOfSyncableRecords() {
+		this.synchronizer.syncScales();
+	}
+
+	/**
+	 * Update the scale values from sync record if visible
+	 * and update referenced records to enable drawing of the curve, set min/max.
+	 */
+	@Override // reason is the min/max determination for suites and scope mode elimination
+	public void updateSyncRecordScale() {
+		throw new UnsupportedOperationException("is not required for histo");
+		// this.synchronizer.updateSyncRecordScale();
+	}
+
+	/**
+	 * Set the sync max/min values for visible records inclusive referenced suite records.
+	 * Update records to enable drawing of the curve.
+	 */
+	public void updateAllSyncScales() {
+		this.synchronizer.updateAllSyncScales();
+	}
+
+	public void addVaultHeader(HistoVault histoVault) {
+		int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
+		this.durations_mm.add(duration_mm);
+		this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
+		if (!this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10)) {
+			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("Duplicate recordSet  startTimeStamp %,d  %s", histoVault.getLogStartTimestamp_ms(), histoVault.getLogFilePath())); //$NON-NLS-1$
+		}
+
+		this.dataTags.add(histoVault);
 	}
 
 	/**
@@ -450,54 +515,18 @@ public final class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * Synchronize scales according device properties.
-	 * Support settlements.
+	 * @return the number of timesteps
 	 */
-	@Override // reason is access to getFactor, getUnit etc. via this.device.getMeasruementProperty
-	public void syncScaleOfSyncableRecords() {
-		this.synchronizer.syncScales();
+	public int getTimeStepSize() {
+		return this.timeStep_ms.size();
 	}
 
 	/**
-	 * Update the scale values from sync record if visible
-	 * and update referenced records to enable drawing of the curve, set min/max.
+	 * @param timestamp_ms
+	 * @return the position of the timestep which is the closest to the timestamp
 	 */
-	@Override // reason is the min/max determination for suites and scope mode elimination
-	public void updateSyncRecordScale() {
-		throw new UnsupportedOperationException("is not required for histo");
-		// this.synchronizer.updateSyncRecordScale();
-	}
-
-	/**
-	 * Set the sync max/min values for visible records inclusive referenced suite records.
-	 * Update records to enable drawing of the curve.
-	 */
-	public void updateAllSyncScales() {
-		this.synchronizer.updateAllSyncScales();
-	}
-
-	/**
-	 * Method to get the sorted record names as array for display purpose.
-	 * Sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
-	 * @return all measurement records and settlement / score records based on display settings
-	 */
-	@Override // reasons: 1. Harmonize display records collections  2. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
-	public Record[] getRecordsSortedForDisplay() {
-		Vector<Record> displayRecords = new Vector<Record>();
-		// add the record with horizontal grid
-		for (Record record : this.getDisplayRecords()) {
-			if (record.getOrdinal() == this.getHorizontalGridRecordOrdinal()) displayRecords.add(record);
-		}
-		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
-		for (Record record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && record.isScaleSyncMaster()) displayRecords.add(record);
-		}
-		// add all others
-		for (Record record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && !record.isScaleSyncMaster()) displayRecords.add(record);
-		}
-
-		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
+	public int getIndex(long timestamp_ms) {
+		return this.timeStep_ms.getBestIndex(timestamp_ms, Comparator.reverseOrder());
 	}
 
 	/**
@@ -515,24 +544,19 @@ public final class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * update the collection of visible and displayable records in this record set.
-	 * the sort order conforms to the record insertion order.
+	 * @param index
+	 * @return the dataTags
 	 */
-	@Override // reason is display sequence independent from record names sequence (record ordinal)
-	public void updateVisibleAndDisplayableRecordsForTable() {
-		this.visibleAndDisplayableRecords.removeAllElements();
-		this.allRecords.removeAllElements();
-		// get by insertion order
-		for (Map.Entry<String, Record> entry : this.entrySet()) {
-			final TrailRecord record = (TrailRecord) entry.getValue();
-			if (record.isMeasurement() || (record.isSettlement() && this.settings.isDisplaySettlements()) || (record.isScoreGroup() && this.settings.isDisplayScores())) {
-				record.setDisplayable(record.isActive() && record.hasReasonableData());
-				if (record.isVisible() && record.isDisplayable()) //only selected records get displayed
-					this.visibleAndDisplayableRecords.add(record);
-				if (record.isDisplayable()) // only records with reasonable data get displayed
-					this.allRecords.add(record);
+	public Map<DataTag, String> getDataTags(int index) {
+		if (index >= 0) {
+			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
+			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.dataTags.entrySet()) {
+				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
 			}
+			return dataTags4Index;
 		}
+		else
+			return new HashMap<DataTag, String>();
 	}
 
 	/**
@@ -565,6 +589,19 @@ public final class TrailRecordSet extends RecordSet {
 
 	public HashMap<Integer, Vector<Record>> getScaleSyncedRecords() {
 		return this.scaleSyncedRecords;
+	}
+
+	/**
+	 * @param recordKey the key which record should be measured
+	 * @return true if the record isMeasurementMode or isDeltaMeasurementMode
+	 */
+	public boolean isSurveyMode(String recordKey) {
+		Record record = this.get(recordKey);
+		if (record != null) {
+			return record.isMeasurementMode() || record.isDeltaMeasurementMode();
+		}
+		else
+			return false;
 	}
 
 }

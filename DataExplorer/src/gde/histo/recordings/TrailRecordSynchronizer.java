@@ -29,14 +29,14 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
+import gde.histo.ui.CurveSurvey;
 import gde.log.Level;
-import gde.ui.tab.CurveSurvey;
 
 /**
  * Scale synchronization for measurements, settlements and scores.
  * @author Thomas Eickert (USER)
  */
-public class TrailRecordSynchronizer {
+public final class TrailRecordSynchronizer {
 	private final static String		$CLASS_NAME	= CurveSurvey.class.getName();
 	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
@@ -125,8 +125,8 @@ public class TrailRecordSynchronizer {
 	}
 
 	/**
-	 * Update the scale values from sync record if visible
-	 * and update referenced records to enable drawing of the curve, set min/max.
+	 * Update the scale values from sync record if visible.
+	 * Update referenced records to enable drawing of the curve, set min/max.
 	 */
 	public void updateSyncRecordScale() {
 		for (Map.Entry<Integer, Vector<Record>> syncRecordsEntry : this.trailRecordSet.getScaleSyncedRecords().entrySet()) {

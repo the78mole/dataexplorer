@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     							2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -132,14 +132,14 @@ public class SettingsDialog extends Dialog {
 	CTabItem														generalTabItem;
 	CTabItem														testTabItem;
 	CTabItem														histoTabItem;
-	Button															histoActiveButton;
-	Group																histoScreeningGroup;
-	Group																histoDisplayGroup;
-	Button															histoDisplaySettlementsButton;
-	Button															histoDisplayScoresButton;
-	Button															histoDisplayTagsButton;
-	Group																histoBoxplotGroup;
-	Button															histoSmartStatisticsButton;
+	Button															histoActive;
+	Group																histoScreening;
+	Group																histoDisplay;
+	Button															histoDisplaySettlements;
+	Button															histoDisplayScores;
+	Button															histoDisplayTags;
+	Group																histoBoxplot;
+	Button															histoSmartStatistics;
 	CLabel															histoBoxplotScaleLabel;
 	CCombo															histoBoxplotScale;
 	CLabel															histoBoxplotSizeAdaptationLabel;
@@ -149,22 +149,22 @@ public class SettingsDialog extends Dialog {
 	Button															histoSearchImportPath;
 	Button															histoSearchDataPathImports;
 	Button															histoChannelMix;
-	Group																histoDisplayOptionGroup;
-	Group																histoXAxisGroup;
+	Group																histoDisplayOption;
+	Group																histoXAxis;
 	CLabel															histoSpreadLabel;
 	CCombo															histoSpreadGrade;
-	Button															histoReversedButton;
-	Button															histoLogarithmicDistanceButton;
-	Group																histoFileContentsGroup;
+	Button															histoReversed;
+	Button															histoLogarithmicDistance;
+	Group																histoFileContents;
 	CLabel															histoMaxDurationLabel;
-	Text																histoMaxLogDuration;
+	Text																histoMaxDuration;
 	CLabel															histoSamplingLabel;
 	CCombo															histoSamplingTimespan_ms;
-	Group																histoForceObjectGroup;
+	Group																histoForceObject;
 	Button															histoIgnoreLogObjectKey;
-	CCombo															histoSubdirectoryLevelMax;
+	CCombo															histoSubdirectoryLevel;
 	CLabel															histoSubdirectoryLevelLabel;
-	Group																timeZoneGroup;
+	Group																timeZone;
 	Button															dateTimeUtc;
 	CTabItem														analysisTabItem;
 	CTabFolder													settingsTabFolder;
@@ -242,6 +242,7 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.setText(GDE.NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0300));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.detail) {
 					case SWT.TRAVERSE_ESCAPE:
@@ -637,6 +638,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
 								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 18, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
+									@Override
 									public void verifyText(VerifyEvent e) {
 										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
 										e.doit = StringHelper.verifyPortInput(e.text.trim());
@@ -685,6 +687,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
 								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 29 : 39, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
+									@Override
 									public void verifyText(VerifyEvent e) {
 										//log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text));
 										//e.doit = StringHelper.verifyPortInput(e.text);
@@ -796,67 +799,67 @@ public class SettingsDialog extends Dialog {
 						compositeHistoLayout.marginTop = GDE.IS_MAC ? 3 : 11;
 						this.miscComposite.setLayout(compositeHistoLayout);
 						{
-							this.histoActiveButton = new Button(this.miscComposite, SWT.CHECK);
-							this.histoActiveButton.setLayoutData(new RowData(333, 15));
-							this.histoActiveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.histoActiveButton.setText(Messages.getString(MessageIds.GDE_MSGT0739));
-							this.histoActiveButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0740));
-							this.histoActiveButton.setSelection(this.settings.isHistoActive());
-							this.histoActiveButton.addSelectionListener(new SelectionAdapter() {
+							this.histoActive = new Button(this.miscComposite, SWT.CHECK);
+							this.histoActive.setLayoutData(new RowData(333, 15));
+							this.histoActive.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoActive.setText(Messages.getString(MessageIds.GDE_MSGT0739));
+							this.histoActive.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0740));
+							this.histoActive.setSelection(this.settings.isHistoActive());
+							this.histoActive.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "histoActiveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActiveButton.getSelection());
+									SettingsDialog.log.log(Level.FINEST, "histoActive.widgetSelected, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActive.getSelection());
 									SettingsDialog.this.application.setupHistoWindows();
 								}
 							});
 						}
 						{
-							this.histoDisplayOptionGroup = new Group(this.miscComposite, SWT.NONE);
+							this.histoDisplayOption = new Group(this.miscComposite, SWT.NONE);
 							// kommt von histoXAxisGroup
-							RowData histoDisplayOptionGroupLData = new RowData();
-							histoDisplayOptionGroupLData.width = GDE.IS_MAC ? 480 : 477;
-							this.histoDisplayOptionGroup.setLayoutData(histoDisplayOptionGroupLData);
+							RowData histoDisplayOptionRData = new RowData();
+							histoDisplayOptionRData.width = GDE.IS_MAC ? 480 : 477;
+							this.histoDisplayOption.setLayoutData(histoDisplayOptionRData);
 
 							// kommt von histoForceObjectGroup
-							RowLayout histoDisplayOptionGroupLLayout = new RowLayout(SWT.HORIZONTAL);
-							histoDisplayOptionGroupLLayout.marginTop = histoDisplayOptionGroupLLayout.marginLeft = histoDisplayOptionGroupLLayout.marginRight = histoDisplayOptionGroupLLayout.marginHeight = 2;
-							this.histoDisplayOptionGroup.setLayout(histoDisplayOptionGroupLLayout);
-							this.histoDisplayOptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.histoDisplayOptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0806));
+							RowLayout histoDisplayOptionRLayout = new RowLayout(SWT.HORIZONTAL);
+							histoDisplayOptionRLayout.marginTop = histoDisplayOptionRLayout.marginLeft = histoDisplayOptionRLayout.marginRight = histoDisplayOptionRLayout.marginHeight = 2;
+							this.histoDisplayOption.setLayout(histoDisplayOptionRLayout);
+							this.histoDisplayOption.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoDisplayOption.setText(Messages.getString(MessageIds.GDE_MSGT0806));
 							{
-								this.histoXAxisGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
+								this.histoXAxis = new Group(this.histoDisplayOption, SWT.NONE);
 								RowData histoXAxisGroupLData = new RowData();
 								histoXAxisGroupLData.width = 223;
-								this.histoXAxisGroup.setLayoutData(histoXAxisGroupLData);
+								this.histoXAxis.setLayoutData(histoXAxisGroupLData);
 								FormLayout formLayout = new FormLayout();
 								formLayout.marginTop = 7;
 								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 0;
-								this.histoXAxisGroup.setLayout(formLayout);
-								this.histoXAxisGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoXAxisGroup.setText(Messages.getString(MessageIds.GDE_MSGT0816));
+								this.histoXAxis.setLayout(formLayout);
+								this.histoXAxis.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoXAxis.setText(Messages.getString(MessageIds.GDE_MSGT0816));
 								{
-									this.histoReversedButton = new Button(this.histoXAxisGroup, SWT.CHECK);
+									this.histoReversed = new Button(this.histoXAxis, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 5);
-									this.histoReversedButton.setLayoutData(formData);
-									this.histoReversedButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoReversedButton.setText(Messages.getString(MessageIds.GDE_MSGT0821));
-									this.histoReversedButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0822));
-									this.histoReversedButton.setSelection(this.settings.isXAxisReversed());
-									this.histoReversedButton.addSelectionListener(new SelectionAdapter() {
+									this.histoReversed.setLayoutData(formData);
+									this.histoReversed.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoReversed.setText(Messages.getString(MessageIds.GDE_MSGT0821));
+									this.histoReversed.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0822));
+									this.histoReversed.setSelection(this.settings.isXAxisReversed());
+									this.histoReversed.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoReversedButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setXAxisReversed(SettingsDialog.this.histoReversedButton.getSelection());
+											SettingsDialog.log.log(Level.FINEST, "histoReversed.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setXAxisReversed(SettingsDialog.this.histoReversed.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
 								{
-									this.histoSpreadLabel = new CLabel(this.histoXAxisGroup, SWT.NONE);
+									this.histoSpreadLabel = new CLabel(this.histoXAxis, SWT.NONE);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoReversedButton, 5);
+									formData.top = new FormAttachment(this.histoReversed, 5);
 									this.histoSpreadLabel.setLayoutData(formData);
 									this.histoSpreadLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoSpreadLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
@@ -864,9 +867,9 @@ public class SettingsDialog extends Dialog {
 									this.histoSpreadLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0818));
 								}
 								{
-									this.histoSpreadGrade = new CCombo(this.histoXAxisGroup, SWT.BORDER | SWT.CENTER);
+									this.histoSpreadGrade = new CCombo(this.histoXAxis, SWT.BORDER | SWT.CENTER);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoReversedButton, 5);
+									formData.top = new FormAttachment(this.histoReversed, 5);
 									formData.right = new FormAttachment(100, -5);
 									formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 									formData.width = GDE.IS_LINUX ? 80 : 70;
@@ -886,57 +889,57 @@ public class SettingsDialog extends Dialog {
 									});
 								}
 								{
-									this.histoLogarithmicDistanceButton = new Button(this.histoXAxisGroup, SWT.CHECK);
+									this.histoLogarithmicDistance = new Button(this.histoXAxis, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 5);
 									formData.top = new FormAttachment(this.histoSpreadLabel, 10);
-									this.histoLogarithmicDistanceButton.setLayoutData(formData);
-									this.histoLogarithmicDistanceButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoLogarithmicDistanceButton.setText(Messages.getString(MessageIds.GDE_MSGT0819));
-									this.histoLogarithmicDistanceButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0820));
-									this.histoLogarithmicDistanceButton.setSelection(this.settings.isXAxisLogarithmicDistance());
-									this.histoLogarithmicDistanceButton.addSelectionListener(new SelectionAdapter() {
+									this.histoLogarithmicDistance.setLayoutData(formData);
+									this.histoLogarithmicDistance.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoLogarithmicDistance.setText(Messages.getString(MessageIds.GDE_MSGT0819));
+									this.histoLogarithmicDistance.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0820));
+									this.histoLogarithmicDistance.setSelection(this.settings.isXAxisLogarithmicDistance());
+									this.histoLogarithmicDistance.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoLogarithmicDistanceButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setXAxisLogarithmicDistance(SettingsDialog.this.histoLogarithmicDistanceButton.getSelection());
+											SettingsDialog.log.log(Level.FINEST, "histoLogarithmicDistance.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setXAxisLogarithmicDistance(SettingsDialog.this.histoLogarithmicDistance.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
 							} // end histoXAxis group
 							{
-								this.histoBoxplotGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
-								RowData histoXAxisGroupLData = new RowData();
-								histoXAxisGroupLData.width = 223;
-								this.histoBoxplotGroup.setLayoutData(histoXAxisGroupLData);
+								this.histoBoxplot = new Group(this.histoDisplayOption, SWT.NONE);
+								RowData histoXAxisGroupRData = new RowData();
+								histoXAxisGroupRData.width = 223;
+								this.histoBoxplot.setLayoutData(histoXAxisGroupRData);
 								FormLayout formLayout = new FormLayout();
 								formLayout.marginTop = formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
-								this.histoBoxplotGroup.setLayout(formLayout);
-								this.histoBoxplotGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoBoxplotGroup.setText(Messages.getString(MessageIds.GDE_MSGT0795));
+								this.histoBoxplot.setLayout(formLayout);
+								this.histoBoxplot.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoBoxplot.setText(Messages.getString(MessageIds.GDE_MSGT0795));
 								{
-									this.histoSmartStatisticsButton = new Button(this.histoBoxplotGroup, SWT.CHECK);
+									this.histoSmartStatistics = new Button(this.histoBoxplot, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 5);
-									this.histoSmartStatisticsButton.setLayoutData(formData);
-									this.histoSmartStatisticsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoSmartStatisticsButton.setText(Messages.getString(MessageIds.GDE_MSGT0800));
-									this.histoSmartStatisticsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
-									this.histoSmartStatisticsButton.setSelection(this.settings.isSmartStatistics());
-									this.histoSmartStatisticsButton.addSelectionListener(new SelectionAdapter() {
+									this.histoSmartStatistics.setLayoutData(formData);
+									this.histoSmartStatistics.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoSmartStatistics.setText(Messages.getString(MessageIds.GDE_MSGT0800));
+									this.histoSmartStatistics.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
+									this.histoSmartStatistics.setSelection(this.settings.isSmartStatistics());
+									this.histoSmartStatistics.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoQuantilesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoSmartStatisticsButton.getSelection());
+											SettingsDialog.log.log(Level.FINEST, "histoSmartStatistics.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoSmartStatistics.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false, true);
 										}
 									});
 								}
 								{
-									this.histoBoxplotScaleLabel = new CLabel(this.histoBoxplotGroup, SWT.NONE);
+									this.histoBoxplotScaleLabel = new CLabel(this.histoBoxplot, SWT.NONE);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoSmartStatisticsButton, 5);
+									formData.top = new FormAttachment(this.histoSmartStatistics, 5);
 									this.histoBoxplotScaleLabel.setLayoutData(formData);
 									this.histoBoxplotScaleLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoBoxplotScaleLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
@@ -944,9 +947,9 @@ public class SettingsDialog extends Dialog {
 									this.histoBoxplotScaleLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0813));
 								}
 								{
-									this.histoBoxplotScale = new CCombo(this.histoBoxplotGroup, SWT.BORDER | SWT.CENTER);
+									this.histoBoxplotScale = new CCombo(this.histoBoxplot, SWT.BORDER | SWT.CENTER);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoSmartStatisticsButton, 5);
+									formData.top = new FormAttachment(this.histoSmartStatistics, 5);
 									formData.right = new FormAttachment(100, -5);
 									formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 									formData.width = GDE.IS_LINUX ? 80 : 70;
@@ -966,7 +969,7 @@ public class SettingsDialog extends Dialog {
 									});
 								}
 								{
-									this.histoBoxplotSizeAdaptationLabel = new CLabel(this.histoBoxplotGroup, SWT.NONE);
+									this.histoBoxplotSizeAdaptationLabel = new CLabel(this.histoBoxplot, SWT.NONE);
 									FormData formData = new FormData();
 									formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
 									this.histoBoxplotSizeAdaptationLabel.setLayoutData(formData);
@@ -976,7 +979,7 @@ public class SettingsDialog extends Dialog {
 									this.histoBoxplotSizeAdaptationLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
 								}
 								{
-									this.histoBoxplotSizeAdaptation = new CCombo(this.histoBoxplotGroup, SWT.BORDER | SWT.CENTER);
+									this.histoBoxplotSizeAdaptation = new CCombo(this.histoBoxplot, SWT.BORDER | SWT.CENTER);
 									FormData formData = new FormData();
 									formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
 									formData.right = new FormAttachment(100, -5);
@@ -999,88 +1002,88 @@ public class SettingsDialog extends Dialog {
 								}
 							} // end histoBoxplot group
 							{
-								this.histoDisplayGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
-								RowData groupLData = new RowData();
-								groupLData.width = 223;
-								this.histoDisplayGroup.setLayoutData(groupLData);
+								this.histoDisplay = new Group(this.histoDisplayOption, SWT.NONE);
+								RowData groupRData = new RowData();
+								groupRData.width = 223;
+								this.histoDisplay.setLayoutData(groupRData);
 								FormLayout formLayout = new FormLayout();
 								formLayout.marginTop = 2;
 								formLayout.marginBottom = 2;
 								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
-								this.histoDisplayGroup.setLayout(formLayout);
-								this.histoDisplayGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoDisplayGroup.setText(Messages.getString(MessageIds.GDE_MSGT0847));
+								this.histoDisplay.setLayout(formLayout);
+								this.histoDisplay.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoDisplay.setText(Messages.getString(MessageIds.GDE_MSGT0847));
 								{
-									this.histoDisplaySettlementsButton = new Button(this.histoDisplayGroup, SWT.CHECK);
+									this.histoDisplaySettlements = new Button(this.histoDisplay, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 7);
-									this.histoDisplaySettlementsButton.setLayoutData(formData);
-									this.histoDisplaySettlementsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoDisplaySettlementsButton.setText(Messages.getString(MessageIds.GDE_MSGT0788));
-									this.histoDisplaySettlementsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0789));
-									this.histoDisplaySettlementsButton.setSelection(this.settings.isDisplaySettlements());
-									this.histoDisplaySettlementsButton.addSelectionListener(new SelectionAdapter() {
+									this.histoDisplaySettlements.setLayoutData(formData);
+									this.histoDisplaySettlements.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoDisplaySettlements.setText(Messages.getString(MessageIds.GDE_MSGT0788));
+									this.histoDisplaySettlements.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0789));
+									this.histoDisplaySettlements.setSelection(this.settings.isDisplaySettlements());
+									this.histoDisplaySettlements.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoDisplaySettlementsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setDisplaySettlements(SettingsDialog.this.histoDisplaySettlementsButton.getSelection());
+											SettingsDialog.log.log(Level.FINEST, "histoDisplaySettlements.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setDisplaySettlements(SettingsDialog.this.histoDisplaySettlements.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
 								{
-									this.histoDisplayScoresButton = new Button(this.histoDisplayGroup, SWT.CHECK);
+									this.histoDisplayScores = new Button(this.histoDisplay, SWT.CHECK);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoDisplaySettlementsButton, 5);
+									formData.top = new FormAttachment(this.histoDisplaySettlements, 5);
 									formData.left = new FormAttachment(0, 7);
-									this.histoDisplayScoresButton.setLayoutData(formData);
-									this.histoDisplayScoresButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoDisplayScoresButton.setText(Messages.getString(MessageIds.GDE_MSGT0790));
-									this.histoDisplayScoresButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0791));
-									this.histoDisplayScoresButton.setSelection(this.settings.isDisplayScores());
-									this.histoDisplayScoresButton.addSelectionListener(new SelectionAdapter() {
+									this.histoDisplayScores.setLayoutData(formData);
+									this.histoDisplayScores.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoDisplayScores.setText(Messages.getString(MessageIds.GDE_MSGT0790));
+									this.histoDisplayScores.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0791));
+									this.histoDisplayScores.setSelection(this.settings.isDisplayScores());
+									this.histoDisplayScores.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoDisplayScoresButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setDisplayScores(SettingsDialog.this.histoDisplayScoresButton.getSelection());
+											SettingsDialog.log.log(Level.FINEST, "histoDisplayScores.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setDisplayScores(SettingsDialog.this.histoDisplayScores.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
 								{
-									this.histoDisplayTagsButton = new Button(this.histoDisplayGroup, SWT.CHECK);
+									this.histoDisplayTags = new Button(this.histoDisplay, SWT.CHECK);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoDisplayScoresButton, 5);
+									formData.top = new FormAttachment(this.histoDisplayScores, 5);
 									formData.left = new FormAttachment(0, 7);
-									this.histoDisplayTagsButton.setLayoutData(formData);
-									this.histoDisplayTagsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoDisplayTagsButton.setText(Messages.getString(MessageIds.GDE_MSGT0746));
-									this.histoDisplayTagsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0747));
-									this.histoDisplayTagsButton.setSelection(this.settings.isDisplayTags());
-									this.histoDisplayTagsButton.addSelectionListener(new SelectionAdapter() {
+									this.histoDisplayTags.setLayoutData(formData);
+									this.histoDisplayTags.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoDisplayTags.setText(Messages.getString(MessageIds.GDE_MSGT0746));
+									this.histoDisplayTags.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0747));
+									this.histoDisplayTags.setSelection(this.settings.isDisplayTags());
+									this.histoDisplayTags.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoDisplayTagsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setDisplayTags(SettingsDialog.this.histoDisplayTagsButton.getSelection());
+											SettingsDialog.log.log(Level.FINEST, "histoDisplayTags.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setDisplayTags(SettingsDialog.this.histoDisplayTags.getSelection());
 											SettingsDialog.this.application.updateHistoTabs(false, false);
 										}
 									});
 								}
 							} // end histoDisplay group
 							{
-								this.timeZoneGroup = new Group(this.histoDisplayOptionGroup, SWT.NONE);
-								RowData groupLData = new RowData();
-								groupLData.width = 223;
-								this.timeZoneGroup.setLayoutData(groupLData);
+								this.timeZone = new Group(this.histoDisplayOption, SWT.NONE);
+								RowData groupRData = new RowData();
+								groupRData.width = 223;
+								this.timeZone.setLayoutData(groupRData);
 								FormLayout formLayout = new FormLayout();
 								formLayout.marginTop = 2;
 								formLayout.marginBottom = 2;
 								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
-								this.timeZoneGroup.setLayout(formLayout);
-								this.timeZoneGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.timeZoneGroup.setText(Messages.getString(MessageIds.GDE_MSGT0805));
+								this.timeZone.setLayout(formLayout);
+								this.timeZone.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.timeZone.setText(Messages.getString(MessageIds.GDE_MSGT0805));
 								{
-									this.dateTimeUtc = new Button(this.timeZoneGroup, SWT.CHECK);
+									this.dateTimeUtc = new Button(this.timeZone, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 5);
 									this.dateTimeUtc.setLayoutData(formData);
@@ -1100,23 +1103,23 @@ public class SettingsDialog extends Dialog {
 							} // end timeZoneGroup group
 						} // end histoDisplayOptionGroup
 						{
-							this.histoScreeningGroup = new Group(this.miscComposite, SWT.NONE);
-							RowData histoScreeningGroupLData = new RowData();
-							histoScreeningGroupLData.width = 233;
-							this.histoScreeningGroup.setLayoutData(histoScreeningGroupLData);
+							this.histoScreening = new Group(this.miscComposite, SWT.NONE);
+							RowData histoScreeningGroupRData = new RowData();
+							histoScreeningGroupRData.width = 233;
+							this.histoScreening.setLayoutData(histoScreeningGroupRData);
 							FormLayout formLayout = new FormLayout();
 							formLayout.marginTop = formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
-							this.histoScreeningGroup.setLayout(formLayout);
-							this.histoScreeningGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.histoScreeningGroup.setText(Messages.getString(MessageIds.GDE_MSGT0809));
+							this.histoScreening.setLayout(formLayout);
+							this.histoScreening.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoScreening.setText(Messages.getString(MessageIds.GDE_MSGT0809));
 							{
-								this.histoRetrospectLabel = new CLabel(this.histoScreeningGroup, SWT.NONE);
+								this.histoRetrospectLabel = new CLabel(this.histoScreening, SWT.NONE);
 								this.histoRetrospectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoRetrospectLabel.setText(Messages.getString(MessageIds.GDE_MSGT0832));
 								this.histoRetrospectLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0833));
 							}
 							{
-								this.histoRetrospectMonths = new Text(this.histoScreeningGroup, SWT.RIGHT | SWT.BORDER);
+								this.histoRetrospectMonths = new Text(this.histoScreening, SWT.RIGHT | SWT.BORDER);
 								FormData formData = new FormData();
 								formData.right = new FormAttachment(100, -5);
 								this.histoRetrospectMonths.setLayoutData(formData);
@@ -1124,6 +1127,7 @@ public class SettingsDialog extends Dialog {
 								this.histoRetrospectMonths.setText(String.format("  %9d", SettingsDialog.this.settings.getRetrospectMonths()));
 								this.histoRetrospectMonths.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0833));
 								this.histoRetrospectMonths.addVerifyListener(new VerifyListener() {
+									@Override
 									public void verifyText(VerifyEvent e) {
 										log.log(Level.FINEST, GDE.STRING_EMPTY + StringHelper.verifyPortInput(e.text.trim()));
 										e.doit = StringHelper.verifyPortInput(e.text.trim());
@@ -1160,7 +1164,7 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.histoSearchDataPathImports = new Button(this.histoScreeningGroup, SWT.CHECK);
+								this.histoSearchDataPathImports = new Button(this.histoScreening, SWT.CHECK);
 								FormData formData = new FormData();
 								formData.left = new FormAttachment(0, 5);
 								formData.top = new FormAttachment(this.histoRetrospectMonths, 7);
@@ -1179,7 +1183,7 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.histoSearchImportPath = new Button(this.histoScreeningGroup, SWT.CHECK);
+								this.histoSearchImportPath = new Button(this.histoScreening, SWT.CHECK);
 								FormData formData = new FormData();
 								formData.left = new FormAttachment(0, 5);
 								formData.top = new FormAttachment(this.histoSearchDataPathImports, 7);
@@ -1198,19 +1202,19 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.histoForceObjectGroup = new Group(this.histoScreeningGroup, SWT.NONE);
-								RowLayout histoForceObjectGroupLLayout = new RowLayout(SWT.HORIZONTAL);
-								histoForceObjectGroupLLayout.marginTop = 2;
-								histoForceObjectGroupLLayout.marginLeft = 2;
-								this.histoForceObjectGroup.setLayout(histoForceObjectGroupLLayout);
-								FormData histoForceObjectGroupLData = new FormData();
-								histoForceObjectGroupLData.top = new FormAttachment(this.histoSearchImportPath, 7);
-								histoForceObjectGroupLData.width = 223;
-								this.histoForceObjectGroup.setLayoutData(histoForceObjectGroupLData);
-								this.histoForceObjectGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoForceObjectGroup.setText(Messages.getString(MessageIds.GDE_MSGT0794));
+								this.histoForceObject = new Group(this.histoScreening, SWT.NONE);
+								RowLayout histoForceObjectGroupRLayout = new RowLayout(SWT.HORIZONTAL);
+								histoForceObjectGroupRLayout.marginTop = 2;
+								histoForceObjectGroupRLayout.marginLeft = 2;
+								this.histoForceObject.setLayout(histoForceObjectGroupRLayout);
+								FormData formData = new FormData();
+								formData.top = new FormAttachment(this.histoSearchImportPath, 7);
+								formData.width = 223;
+								this.histoForceObject.setLayoutData(formData);
+								this.histoForceObject.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoForceObject.setText(Messages.getString(MessageIds.GDE_MSGT0794));
 								{
-									this.histoIgnoreLogObjectKey = new Button(this.histoForceObjectGroup, SWT.CHECK | SWT.LEFT);
+									this.histoIgnoreLogObjectKey = new Button(this.histoForceObject, SWT.CHECK | SWT.LEFT);
 									this.histoIgnoreLogObjectKey.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoIgnoreLogObjectKey.setText(Messages.getString(MessageIds.GDE_MSGT0796));
 									this.histoIgnoreLogObjectKey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0797));
@@ -1218,7 +1222,7 @@ public class SettingsDialog extends Dialog {
 									this.histoIgnoreLogObjectKey.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoSkipFilesWithoutObject.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "histoIgnoreLogObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setFilesWithOtherObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
 											SettingsDialog.this.settings.setFilesWithoutObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
 											SettingsDialog.this.application.setupHistoWindows();
@@ -1227,9 +1231,9 @@ public class SettingsDialog extends Dialog {
 								}
 							} // end histoForceObjectGroup
 							{
-								this.histoSubdirectoryLevelLabel = new CLabel(this.histoScreeningGroup, SWT.NONE);
+								this.histoSubdirectoryLevelLabel = new CLabel(this.histoScreening, SWT.NONE);
 								FormData formData = new FormData();
-								formData.top = new FormAttachment(this.histoForceObjectGroup, 7);
+								formData.top = new FormAttachment(this.histoForceObject, 7);
 								this.histoSubdirectoryLevelLabel.setLayoutData(formData);
 								this.histoSubdirectoryLevelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoSubdirectoryLevelLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
@@ -1237,40 +1241,40 @@ public class SettingsDialog extends Dialog {
 								this.histoSubdirectoryLevelLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0872));
 							}
 							{
-								this.histoSubdirectoryLevelMax = new CCombo(this.histoScreeningGroup, SWT.BORDER | SWT.CENTER);
+								this.histoSubdirectoryLevel = new CCombo(this.histoScreening, SWT.BORDER | SWT.CENTER);
 								FormData formData = new FormData();
-								formData.top = new FormAttachment(this.histoForceObjectGroup, 5);
+								formData.top = new FormAttachment(this.histoForceObject, 5);
 								formData.right = new FormAttachment(100, -5);
 								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 								formData.width = GDE.IS_LINUX ? 50 : 40;
-								this.histoSubdirectoryLevelMax.setLayoutData(formData);
-								this.histoSubdirectoryLevelMax.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.histoSubdirectoryLevel.setLayoutData(formData);
+								this.histoSubdirectoryLevel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								//this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
-								this.histoSubdirectoryLevelMax.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5" });
-								this.histoSubdirectoryLevelMax.setText(GDE.STRING_BLANK + String.valueOf(SettingsDialog.this.settings.getSubDirectoryLevelMax()));
-								this.histoSubdirectoryLevelMax.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0872));
-								this.histoSubdirectoryLevelMax.addSelectionListener(new SelectionAdapter() {
+								this.histoSubdirectoryLevel.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5" });
+								this.histoSubdirectoryLevel.setText(GDE.STRING_BLANK + String.valueOf(SettingsDialog.this.settings.getSubDirectoryLevelMax()));
+								this.histoSubdirectoryLevel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0872));
+								this.histoSubdirectoryLevel.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "histoSubdirectoryLevelMax.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.setSubDirectoryLevelMax(SettingsDialog.this.histoSubdirectoryLevelMax.getText().trim());
+										SettingsDialog.log.log(Level.FINEST, "histoSubdirectoryLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSubDirectoryLevelMax(SettingsDialog.this.histoSubdirectoryLevel.getText().trim());
 										SettingsDialog.this.application.setupHistoWindows();
 									}
 								});
 							}
 						} // end histoScreening group
 						{
-							this.histoFileContentsGroup = new Group(this.miscComposite, SWT.NONE);
-							RowData histoFileContentsGroupLData = new RowData();
-							histoFileContentsGroupLData.width = 223;
-							this.histoFileContentsGroup.setLayoutData(histoFileContentsGroupLData);
+							this.histoFileContents = new Group(this.miscComposite, SWT.NONE);
+							RowData histoFileContentsGroupRData = new RowData();
+							histoFileContentsGroupRData.width = 223;
+							this.histoFileContents.setLayoutData(histoFileContentsGroupRData);
 							FormLayout formLayout1 = new FormLayout();
 							formLayout1.marginTop = formLayout1.marginLeft = formLayout1.marginRight = formLayout1.marginHeight = 2;
-							this.histoFileContentsGroup.setLayout(formLayout1);
-							this.histoFileContentsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.histoFileContentsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0804));
+							this.histoFileContents.setLayout(formLayout1);
+							this.histoFileContents.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.histoFileContents.setText(Messages.getString(MessageIds.GDE_MSGT0804));
 							{
-								this.histoSamplingLabel = new CLabel(this.histoFileContentsGroup, SWT.NONE);
+								this.histoSamplingLabel = new CLabel(this.histoFileContents, SWT.NONE);
 								FormData formData = new FormData();
 								this.histoSamplingLabel.setLayoutData(formData);
 								this.histoSamplingLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1279,7 +1283,7 @@ public class SettingsDialog extends Dialog {
 								this.histoSamplingLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
 							}
 							{
-								this.histoSamplingTimespan_ms = new CCombo(this.histoFileContentsGroup, SWT.BORDER | SWT.CENTER);
+								this.histoSamplingTimespan_ms = new CCombo(this.histoFileContents, SWT.BORDER | SWT.CENTER);
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoMaxDurationLabel, 5);
 								formData.right = new FormAttachment(100, -5);
@@ -1301,7 +1305,7 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.histoChannelMix = new Button(this.histoFileContentsGroup, SWT.CHECK);
+								this.histoChannelMix = new Button(this.histoFileContents, SWT.CHECK);
 								FormData formData = new FormData();
 								formData.left = new FormAttachment(0, 5);
 								formData.top = new FormAttachment(this.histoSamplingLabel, 7);
@@ -1774,7 +1778,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "createObjectsFromDirectoriesButton.widgetSelected, event=", evt); //$NON-NLS-1$
-										// find directories which might represent object keys 
+										// find directories which might represent object keys
 										List<String> objectCandidates = SettingsDialog.this.settings.getObjectKeyCandidates();
 										if (objectCandidates.size() > 0) {
 											Collections.sort(objectCandidates, String.CASE_INSENSITIVE_ORDER);
@@ -2105,7 +2109,7 @@ public class SettingsDialog extends Dialog {
 							this.tree.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt); //$NON-NLS-1$ 
+									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt); //$NON-NLS-1$
 									TreeItem tmpItem = (TreeItem) evt.item;
 									if (tmpItem.getParentItem() != null) {
 										StringBuilder sb = new StringBuilder();
@@ -2132,12 +2136,14 @@ public class SettingsDialog extends Dialog {
 
 			this.dialogShell.addHelpListener(new HelpListener() {
 
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					SettingsDialog.log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					SettingsDialog.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_1.html"); //$NON-NLS-1$
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					SettingsDialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (SettingsDialog.this.settings.getActiveDevice().startsWith(Settings.EMPTY)) SettingsDialog.this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
@@ -2239,6 +2245,7 @@ public class SettingsDialog extends Dialog {
 								SettingsDialog.this.settings.isSerialPortBlackListEnabled() ? SettingsDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 						GDE.display.syncExec(new Runnable() {
+							@Override
 							public void run() {
 								if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) {
 									if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
@@ -2442,10 +2449,10 @@ public class SettingsDialog extends Dialog {
 
 	/**
 	 * Scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list.
-	 * Identify object keys with empty directories or without directories and query the user for deletion.  
+	 * Identify object keys with empty directories or without directories and query the user for deletion.
 	 */
 	private void rebuildObjectKeysAsync() {
-		// scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list  
+		// scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list
 		final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner(true);
 		objLnkSearch.start();
 		new Thread() {
@@ -2472,7 +2479,7 @@ public class SettingsDialog extends Dialog {
 						SettingsDialog.this.application.setObjectList(realObjectKeys.toArray(new String[0]), SettingsDialog.this.settings.getActiveObject());
 					}
 				}
-				else if (getParent().isDisposed()) 
+				else if (getParent().isDisposed())
 					SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0034));
 				else
 					SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.GDE_MSGI0034));

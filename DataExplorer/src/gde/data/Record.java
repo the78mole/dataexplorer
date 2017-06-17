@@ -74,7 +74,7 @@ public class Record extends Vector<Integer> {
 	String											unit;																													// unit [m]
 	String											symbol;																												// symbol h
 	String											description				= GDE.STRING_BLANK;													// only set if copied into compare set
-	Boolean											isActive;
+	protected Boolean						isActive;
 	boolean											isDisplayable;
 	boolean											isVisible					= true;
 	StatisticsType							statistics				= null;
@@ -1292,6 +1292,7 @@ public class Record extends Vector<Integer> {
 	public void setActive(Boolean newValue) {
 		this.isActive = newValue;
 	}
+
 	/**
 	 * @return if record data represented by calculation
 	 */

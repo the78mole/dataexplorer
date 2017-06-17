@@ -51,7 +51,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.HistoSet;
+import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.HistoTableMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;

@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Record;
-import gde.histo.recordings.SuiteRecordList.SuiteMember;
 
 /**
  * Output formatting based on trailRecord data.
@@ -130,12 +129,12 @@ public final class TrailRecordFormatter {
 	}
 
 	/**
-	 * @param suiteMember
+	 * @param suiteOrdinal
 	 * @param index
 	 * @return the formatted value also for GPS coordinates
 	 */
-	public String getTableValue(SuiteMember suiteMember, int index) {
-		return ((Record) this.trailRecord).getFormattedTableValue(this.trailRecord.suiteManager.getSuiteRecord(suiteMember).get(index) /1000.);
+	public String getTableValue(int suiteOrdinal, int index) {
+		return ((Record) this.trailRecord).getFormattedTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) /1000.);
 	}
 
 	/**

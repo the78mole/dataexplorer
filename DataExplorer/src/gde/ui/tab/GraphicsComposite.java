@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -69,9 +69,9 @@ import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.CurveUtils;
 import gde.utils.GraphicsUtils;
 import gde.utils.LocalizedDateTime;
-import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
+import gde.utils.LocalizedDateTime.DateTimePattern;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -693,7 +693,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * this method is called in case of an paint event (redraw) and draw the containing records 
+	 * this method is called in case of an paint event (redraw) and draw the containing records
 	 * @param evt
 	 */
 	void drawAreaPaintControl(PaintEvent evt) {
@@ -709,7 +709,7 @@ public class GraphicsComposite extends Composite {
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
 		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		//get gc for other drawing operations
-		this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); 
+		this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
 
 		RecordSet recordSet = null;
 		switch (this.graphicsType) {
@@ -787,7 +787,7 @@ public class GraphicsComposite extends Composite {
 		int numberCurvesLeft = 0;
 		for (Record tmpRecord : recordSet.getRecordsSortedForDisplay()) {
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$ 
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
@@ -850,7 +850,7 @@ public class GraphicsComposite extends Composite {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + (long) totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
 		this.timeLine.drawTimeLine(recordSet, gc, x0, y0 + 1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (long) totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
 
-		// draw draw area bounding 
+		// draw draw area bounding
 		gc.setForeground(this.curveAreaBorderColor);
 
 		gc.drawLine(x0 - 1, yMax - 1, xMax + 1, yMax - 1);
@@ -901,7 +901,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * draw horizontal (curve) grid lines according the vector prepared during daring specified curve scale 
+	 * draw horizontal (curve) grid lines according the vector prepared during daring specified curve scale
 	 * @param recordSet
 	 * @param gc the graphics context to be used
 	 * @param bounds
@@ -1040,8 +1040,8 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * draws horizontal line as defined relative to curve draw area, where there is an offset from left and an offset from top  
-	 * for performance reason specify line width, line style and line color outside 
+	 * draws horizontal line as defined relative to curve draw area, where there is an offset from left and an offset from top
+	 * for performance reason specify line width, line style and line color outside
 	 * @param posFromLeft
 	 * @param posFromTop
 	 * @param length
@@ -1051,8 +1051,8 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * draws vertical line as defined relative to curve draw area, where there is an offset from left and an offset from top 
-	 * for performance reason specify line width, line style and line color outside 
+	 * draws vertical line as defined relative to curve draw area, where there is an offset from left and an offset from top
+	 * for performance reason specify line width, line style and line color outside
 	 * @param posFromTop
 	 * @param posFromLeft
 	 * @param length
@@ -1062,8 +1062,8 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * draws line as defined relative to curve draw area, where there is an offset from left and an offset from top 
-	 * for performance reason specify line width, line style and line color outside 
+	 * draws line as defined relative to curve draw area, where there is an offset from left and an offset from top
+	 * for performance reason specify line width, line style and line color outside
 	 * @param posFromTop1
 	 * @param posFromLeft1
 	 * @param posFromTop2
@@ -1076,7 +1076,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * erase a vertical line by re-drawing the curve area image 
+	 * erase a vertical line by re-drawing the curve area image
 	 * @param posFromLeft
 	 * @param posFromTop
 	 * @param length
@@ -1087,7 +1087,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * erase a horizontal line by re-drawing the curve area image 
+	 * erase a horizontal line by re-drawing the curve area image
 	 * @param posFromTop
 	 * @param posFromLeft
 	 * @param length
@@ -1130,7 +1130,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * erase connecting line by re-drawing the curve area image 
+	 * erase connecting line by re-drawing the curve area image
 	 * @param posFromLeft1
 	 * @param posFromTop1
 	 * @param posFromLeft2
@@ -1319,7 +1319,7 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void updatePanMenueButton() {
 		this.application.getMenuBar().enablePanButton(this.isZoomMouse || this.isPanMouse);
@@ -1701,7 +1701,7 @@ public class GraphicsComposite extends Composite {
 			RecordSet recordSet = (this.graphicsType == GraphicsType.NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
 					: (this.graphicsType == GraphicsType.COMPARE) ? this.application.getCompareSet() : this.application.getUtilitySet();
 			if (this.canvasImage != null && recordSet != null) {
-				// 
+				//
 				if (recordSet.isCutLeftEdgeEnabled()) {
 					this.application.getMenuToolBar().enableCutButtons(true, false);
 				}
@@ -1882,7 +1882,7 @@ public class GraphicsComposite extends Composite {
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
 					this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); 
+					this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 					graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 					GC graphicsGC = new GC(graphicsImage);

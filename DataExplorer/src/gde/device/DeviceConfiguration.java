@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     					2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -164,7 +164,7 @@ public class DeviceConfiguration {
 		}
 	}
 
-	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) 
+	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public DeviceConfiguration(String xmlFileName) throws FileNotFoundException, JAXBException {
 
 		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
@@ -187,11 +187,11 @@ public class DeviceConfiguration {
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
-	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) 
+	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public DeviceConfiguration(String xmlFileName, Unmarshaller tmpUnmarshaller) throws FileNotFoundException, JAXBException {
 
 		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
@@ -214,7 +214,7 @@ public class DeviceConfiguration {
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
@@ -667,7 +667,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the end point address of the interface to be used for write communication 
+	 * @return the end point address of the interface to be used for write communication
 	 */
 	public byte getUsbEndpointIn() {
 		return Byte.valueOf(this.usbPort.getUsbInterface().getEndPointIn().substring(2), 16);
@@ -860,7 +860,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * there are two data block format input types, 
+	 * there are two data block format input types,
 	 * - FILE_IO, where the data comes in most cases in character form
 	 * - SERIAL_IO, where the data are received through serial connection in bytes
 	 * @param inputType the input type to query the input size
@@ -875,7 +875,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * there are two data block format types, 
+	 * there are two data block format types,
 	 * - VALUE, where the data comes in most cases in character form with file I/O and defines the number of values, example CSV file input
 	 * - BYTE, where the data are received through serial connection in bytes
 	 * @param formatType the format to query the input size
@@ -1287,14 +1287,14 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the channel type by given channel number 
+	 * @return the channel type by given channel number
 	 */
 	public ChannelType getChannelType(int channelConfigNumber) {
 		return this.deviceProps.getChannels().channel.get(channelConfigNumber - 1);
 	}
 
 	/**
-	 * @return the channel types by given channel number 
+	 * @return the channel types by given channel number
 	 */
 	public ChannelTypes getChannelTypes(int channelConfigNumber) {
 		return this.deviceProps.getChannels().channel.get(channelConfigNumber - 1).getType();
@@ -1310,7 +1310,7 @@ public class DeviceConfiguration {
 
 	/**
 	 * set a new channel type using a channel number
-	 * @param newChannleType the channel type by given channel number 
+	 * @param newChannleType the channel type by given channel number
 	 * @param channelNumber
 	 */
 	public void setChannelTypes(ChannelTypes newChannleType, int channelNumber) {
@@ -1523,7 +1523,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * get the properties from a channel/configuration and record key name 
+	 * get the properties from a channel/configuration and record key name
 	 * @param channelConfigNumber
 	 * @param measurementOrdinal
 	 * @return List of properties to according measurement
@@ -1536,7 +1536,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * get the properties from a channel/configuration and record key name 
+	 * get the properties from a channel/configuration and record key name
 	 * @param channelConfigKey
 	 * @param measurementOrdinal
 	 * @return List of properties to according measurement
@@ -2266,25 +2266,25 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	public CTabItem getUtilityGraphicsTabItem() {
 		return null;
 	}
 
 	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	public CTabItem getUtilityDeviceTabItem() {
 		return null;
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	public boolean isActualRecordSetWithGpsData() {
@@ -2335,7 +2335,7 @@ public class DeviceConfiguration {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " +this.getStateType().getProperty().get(0).getName() 
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " +this.getStateType().getProperty().get(0).getName()
 				: Messages.getString(MessageIds.GDE_MSGT0272)	: Messages.getString(MessageIds.GDE_MSGT0272);
 	}
 
@@ -2344,7 +2344,7 @@ public class DeviceConfiguration {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemNameReplacement() {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + xmlResource.getReplacement(this.getStateType().getProperty().get(0).getName()) 
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + xmlResource.getReplacement(this.getStateType().getProperty().get(0).getName())
 			: Messages.getString(MessageIds.GDE_MSGT0272)	: Messages.getString(MessageIds.GDE_MSGT0272);
 	}
 
@@ -2353,7 +2353,7 @@ public class DeviceConfiguration {
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateName(final int stateNumber) {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? this.getStateType().getProperty().get(stateNumber).getName() 
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? this.getStateType().getProperty().get(stateNumber).getName()
 				: "state_data_recording" : "state_data_recording";
 	}
 
@@ -2362,7 +2362,7 @@ public class DeviceConfiguration {
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateNameReplacement(final int stateNumber) {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateType().getProperty().get(stateNumber).getName()) 
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateType().getProperty().get(stateNumber).getName())
 				: xmlResource.getReplacement("state_data_recording") : xmlResource.getReplacement("state_data_recording");
 	}
 
@@ -2460,7 +2460,7 @@ public class DeviceConfiguration {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @param channelConfigNumber
 	 * @param validMeasurementNames based on the current or any previous configuration
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames) {
 		final Vector<String> tmpCalculationRecords = new Vector<String>();
@@ -2470,7 +2470,7 @@ public class DeviceConfiguration {
 		// record names may not match device measurements, but device measurements might be more then existing records
 		for (int i = 0; i < deviceMeasurements.length && i < validMeasurementNames.length; ++i) {
 			final MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
-			if (!measurement.isCalculation()) { // active or inactive 
+			if (!measurement.isCalculation()) { // active or inactive
 				tmpCalculationRecords.add(validMeasurementNames[i]);
 			}
 			//else
@@ -2550,15 +2550,15 @@ public class DeviceConfiguration {
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
-	 * 2 current drop more or equal than 2 measurements 
+	 * 2 current drop more or equal than 2 measurements
 	 */
 	public int getCurrentSmoothIndex() {
 		return 0;
 	}
 
 	/**
-	 * query if the measurements get build up dynamically while reading (import) the data 
-	 * the implementation must create measurementType while reading the import data, 
+	 * query if the measurements get build up dynamically while reading (import) the data
+	 * the implementation must create measurementType while reading the import data,
 	 * refer to Weatronic-Telemetry implementation DataHeader
 	 * @return true|false, default is false and we have a constant measurement size defined in device XML
 	 */
@@ -2576,6 +2576,19 @@ public class DeviceConfiguration {
 			initChannelGroups();
 		}
 		return this.channelGroups[channelConfigNumberI - 1] > -1 && this.channelGroups[channelConfigNumberI - 1] == this.channelGroups[channelConfigNumberJ - 1];
+	}
+
+	/**
+	 * Checks the channel mix setting.
+	 * @return the 1-based config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
+	 */
+	public List<Integer> getChannelMixConfigNumbers() {
+		final List<Integer> channelMixConfigNumbers;
+		if (this.settings.isChannelMix() && getDeviceGroup() == DeviceTypes.CHARGER)
+			channelMixConfigNumbers = getChannelBundle(DataExplorer.getInstance().getActiveChannelNumber());
+		else
+			channelMixConfigNumbers = Arrays.asList(new Integer[] { DataExplorer.getInstance().getActiveChannelNumber() });
+		return channelMixConfigNumbers;
 	}
 
 	/**

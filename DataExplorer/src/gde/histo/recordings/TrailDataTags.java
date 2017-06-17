@@ -31,8 +31,8 @@ import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.recordings.TrailRecordSet.DisplayTag;
+import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
-import gde.utils.GpsCoordinate;
 
 /**
  * Tags corresponding to timestep entries.

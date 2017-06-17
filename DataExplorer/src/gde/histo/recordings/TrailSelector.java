@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
@@ -38,7 +37,7 @@ import gde.log.Level;
 import gde.ui.DataExplorer;
 
 /**
- * Handles the trail type assignment to a trailRecord.
+ * Handle the trail type assignment to a trailRecord.
  * @author Thomas Eickert
  */
 public final class TrailSelector {
@@ -46,17 +45,16 @@ public final class TrailSelector {
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
 	private final Settings					settings								= Settings.getInstance();
-	private final IDevice						device									= DataExplorer.application.getActiveDevice();
 	private final DeviceXmlResource	xmlResource							= DeviceXmlResource.getInstance();
 
 	private final TrailRecord				trailRecord;
-	private final MeasurementType		measurementType;																											// measurement / settlement / scoregroup are options
-	private final SettlementType		settlementType;																												// measurement / settlement / scoregroup are options
-	private final ScoreGroupType		scoreGroupType;																												// measurement / settlement / scoregroup are options
+	private final MeasurementType		measurementType;																					// measurement / settlement / scoregroup are options
+	private final SettlementType		settlementType;																						// measurement / settlement / scoregroup are options
+	private final ScoreGroupType		scoreGroupType;																						// measurement / settlement / scoregroup are options
 
-	private int											trailTextSelectedIndex	= -1;																					// user selection from applicable trails, is saved in the graphics template
-	private List<String>						applicableTrailsTexts;																								// the user may select one of these entries
-	private List<Integer>						applicableTrailsOrdinals;																							// maps all applicable trails in order to convert the user selection into a valid trail
+	private int											trailTextSelectedIndex	= -1;															// user selection from applicable trails, is saved in the graphics template
+	private List<String>						applicableTrailsTexts;																		// the user may select one of these entries
+	private List<Integer>						applicableTrailsOrdinals;																	// maps all applicable trails in order to convert the user selection into a valid trail
 
 	public TrailSelector(TrailRecord trailRecord) {
 		this.trailRecord = trailRecord;
@@ -98,9 +96,9 @@ public final class TrailSelector {
 	}
 
 	/**
-	 * analyze device configuration entries to find applicable trail types.
-	 * build applicable trail type lists for display purposes.
-	 * use device settings trigger texts for trigger trail types and score labels for score trail types; message texts otherwise.
+	 * Analyze device configuration entries to find applicable trail types.
+	 * Build applicable trail type lists for display purposes.
+	 * Use device settings trigger texts for trigger trail types and score labels for score trail types; message texts otherwise.
 	 */
 	public void setApplicableTrailTypes() {
 		final boolean[] applicablePrimitiveTrails;
@@ -230,7 +228,8 @@ public final class TrailSelector {
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
 					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-						StatisticsType referencedStatistics = this.device.getMeasurementStatistic(this.trailRecord.getParentTrail().getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
+						StatisticsType referencedStatistics = DataExplorer.application.getActiveDevice().getMeasurementStatistic(this.trailRecord.getParentTrail().getChannelConfigNumber(),
+								measurementStatistics.getRatioRefOrdinal());
 						applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
 						applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
 					}
@@ -297,14 +296,7 @@ public final class TrailSelector {
 	 * @param value position / index of the trail type in the current list of applicable trails
 	 */
 	public void setTrailTextSelectedIndex(int value) {
-		if (this.trailTextSelectedIndex != value) {
-			this.trailTextSelectedIndex = value;
-
-			if (isTrailSuite()) {
-				List<TrailTypes> suite = TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).getSuiteMembers();
-				this.trailRecord.setSuite(suite);
-			}
-		}
+		this.trailTextSelectedIndex = value;
 	}
 
 	/**
@@ -322,20 +314,20 @@ public final class TrailSelector {
 		return this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex);
 	}
 
+	public TrailTypes getTrailType() {
+		return TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex));
+	}
+
 	public boolean isTrailSuite() {
-		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isSuite() : false;
+		return this.scoreGroupType == null ? getTrailType().isSuite() : false;
 	}
 
 	public boolean isRangePlotSuite() {
-		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isRangePlot() : false;
+		return this.scoreGroupType == null ? getTrailType().isRangePlot() : false;
 	}
 
 	public boolean isBoxPlotSuite() {
-		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isBoxPlot() : false;
-	}
-
-	public boolean isSuiteForSummation() {
-		return this.scoreGroupType == null ? TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex)).isForSummation() : false;
+		return this.scoreGroupType == null ? getTrailType().isBoxPlot() : false;
 	}
 
 	public StatisticsType getStatistics() {

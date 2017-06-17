@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import gde.GDE;
+import gde.histo.utils.SingleResponseRegression;
+import gde.histo.utils.SingleResponseRegression.RegressionType;
+import gde.histo.utils.Spot;
+import gde.histo.utils.UniversalQuantile;
 import gde.log.Level;
-import gde.utils.SingleResponseRegression;
-import gde.utils.SingleResponseRegression.RegressionType;
-import gde.utils.Spot;
-import gde.utils.UniversalQuantile;
 
 /**
- * Defines a view on a section of the trail record.
+ * Define a view on a section of the trail record.
  * @author Thomas Eickert
  */
 public final class TrailRecordCutter {
@@ -76,11 +76,7 @@ public final class TrailRecordCutter {
 	}
 
 	public boolean isValidBounds() {
-		return this.regression != null;
-	}
-
-	public double[] getBoundedParabolaCoefficients() {
-		return new double[] { this.regression.getAlpha(), this.regression.getBeta(), this.regression.getGamma() };
+		return this.regression != null || this.quantile != null;
 	}
 
 	/**

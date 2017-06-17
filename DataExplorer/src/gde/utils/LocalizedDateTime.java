@@ -13,14 +13,14 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 
 /**
- * dates, times and durations in the format applicable for the user's locale and for the user's UTC setting.
- * this class replaces StringHelper.getFormatedTime(...).
- * use this class for all user output, e.g. display, print. 
- * do not use for file output or for log output.
- * may require more detailed localization for additional languages, e.g. '2j 11:34' ('j' stands for 'day' in French)
+ * Dates, times and durations in the format applicable for the user's locale and for the user's UTC setting.
+ * Replaces StringHelper.getFormatedTime(...).
+ * Use this class for all user output, e.g. display, print.
+ * Do not use for file output or for log output.
+ * May require more detailed localization for additional languages, e.g. '2j 11:34' ('j' stands for 'day' in French).
  * @author Thomas Eickert
  */
-public class LocalizedDateTime {
+public final class LocalizedDateTime {
 
 	public static void testUtc() {
 		long ts = System.currentTimeMillis();
@@ -28,14 +28,14 @@ public class LocalizedDateTime {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //$NON-NLS-1$
 		SimpleDateFormat sdfUTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
 
-		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdf.format(localTime)); //$NON-NLS-1$ 
+		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdf.format(localTime)); //$NON-NLS-1$
 		//		2017-01-06 13:00:25.791  2017/01/06 13:00:25
-		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime)); //$NON-NLS-1$ 
+		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime)); //$NON-NLS-1$
 		//		2017-01-06 13:00:25.791  2017-01-06T13:00:25Z
 
 		// print UTC
 		sdfUTC.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime) + "  " + sdfUTC.format(ts)); //$NON-NLS-1$//$NON-NLS-2$ 
+		System.out.println(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, ts) + "  " + sdfUTC.format(localTime) + "  " + sdfUTC.format(ts)); //$NON-NLS-1$//$NON-NLS-2$
 		//		2017-01-06 13:00:25.791  2017-01-06T12:00:25Z  2017-01-06T12:00:25Z
 	}
 
@@ -68,7 +68,7 @@ public class LocalizedDateTime {
 		}
 
 		/**
-		 * @return the standard pattern  
+		 * @return the standard pattern
 		 */
 		@Override
 		public String toString() {
@@ -119,7 +119,7 @@ public class LocalizedDateTime {
 		}
 
 		/**
-		 * @return the standard pattern  
+		 * @return the standard pattern
 		 */
 		@Override
 		public String toString() {
@@ -189,7 +189,7 @@ public class LocalizedDateTime {
 	/**
 	 * @param timestamp1_ms
 	 * @param timestamp2_ms
-	 * @return the duration between the epoch timestamps ('dd HH:mm' preceded by the number of months if applicable) 
+	 * @return the duration between the epoch timestamps ('dd HH:mm' preceded by the number of months if applicable)
 	 */
 	public static String getFormatedDistance(long timestamp1_ms, long timestamp2_ms) {
 		if (Math.abs(timestamp1_ms - timestamp2_ms) > GDE.ONE_HOUR_MS * 24) {

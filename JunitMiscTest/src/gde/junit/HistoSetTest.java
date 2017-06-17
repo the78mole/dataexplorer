@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 									2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -28,9 +28,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import gde.data.Channel;
-import gde.data.HistoSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.histo.datasources.HistoSet;
 import gde.utils.FileUtils;
 
 public class HistoSetTest extends TestSuperClass { // TODO for junit tests in general it may be better to choose another directory structure: http://stackoverflow.com/a/2388285
@@ -54,13 +54,12 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		return problemFileNames;
 	}
 
-
 	/**
 	 * fills histoSet by reading all logs into all devices and all channels.
 	 * uses cache data.
-	 * ET Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files resulting in 223 vaults (using a zipped cache): 
-	 *  - 1st run w/o vault cache 72 sec 
-	 *  - 2nd run with vault cache 23 sec  
+	 * ET Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files resulting in 223 vaults (using a zipped cache):
+	 *  - 1st run w/o vault cache 72 sec
+	 *  - 2nd run with vault cache 23 sec
 	 */
 	public void testBuildHistoSet4TestSamples() {
 		System.out
@@ -72,25 +71,24 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 
 		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
 		// >>> take one of these optional data sources for a smaller test portion <<<
-//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Thomas", "DataExplorer"));
-//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Winfried", "DataExplorer"));
+		//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Thomas", "DataExplorer"));
+		//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Winfried", "DataExplorer"));
 
 		FileUtils.checkDirectoryAndCreate(this.dataPath.toString());
 		histoSet.initialize();
 		try {
-			histoSet.setHistoFilePaths4Test(this.dataPath.toPath(), 5);
-
 			for (Entry<String, DeviceConfiguration> deviceEntry : this.deviceConfigurations.entrySet()) {
 				IDevice device = setDevice(deviceEntry.getKey());
 				setupDataChannels(device);
 				setupDeviceChannelObject(deviceEntry.getKey(), 1, "");
 				for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 					this.channels.setActiveChannelNumber(channelEntry.getKey());
-					histoSet.rebuild4Test( this.deviceConfigurations);
-					System.out
-							.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
+					histoSet.rebuild4Test(this.deviceConfigurations);
+					System.out.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
 				}
 			}
+
+			histoSet.setHistoFilePaths4Test(this.dataPath.toPath(), 5, this.deviceConfigurations);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

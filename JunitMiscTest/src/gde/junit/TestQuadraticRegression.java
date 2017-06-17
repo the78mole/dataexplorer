@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import gde.utils.SingleResponseRegression;
-import gde.utils.SingleResponseRegression.RegressionType;
-import gde.utils.Spot;
+import gde.histo.utils.SingleResponseRegression;
+import gde.histo.utils.Spot;
+import gde.histo.utils.SingleResponseRegression.RegressionType;
 
 public class TestQuadraticRegression extends TestSuperClass {
 	static Logger								log					= Logger.getLogger(TestQuadraticRegression.class.getName());

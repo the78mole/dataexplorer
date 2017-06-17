@@ -29,14 +29,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,11 +41,11 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.validation.SchemaFactory;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.IDevice;
+import gde.device.TrailTypes;
+import gde.histo.recordings.TrailRecord;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
@@ -104,7 +100,7 @@ import gde.utils.StringHelper;
 
 /**
  * Suitable for history persistence and xml serialization.
- * May exist in two stages:
+ * The object has two stages:
  *  - truss: does not hold measurement, settlement or score points
  *  - vault: the number of points conform to the device xml for settlements and scores, but only a subset of measurements is required
  * Find the constructors and non-xsd code a good way down for simplified merging with JAXB generated class.
@@ -120,15 +116,11 @@ public class HistoVault {
 	final private static Logger									log					= Logger.getLogger($CLASS_NAME);
 
 	private static JAXBContext									jaxbContext;
-	private static Unmarshaller									jaxbUnmarshaller;
-	private static Marshaller										jaxbMarshaller;
 
 	@XmlTransient
 	private final DataExplorer									application	= DataExplorer.getInstance();
 	@XmlTransient
 	private final Settings											settings		= Settings.getInstance();
-	@XmlTransient
-	private final IDevice												device			= this.application.getActiveDevice();
 
 	@XmlElement(required = true)
 	protected String														vaultName;
@@ -674,12 +666,7 @@ public class HistoVault {
 		this.scores = value;
 	}
 
-
 	/* non JAXB members : start */
-
-	public static Path getCacheDirectory() {
-		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
-	}
 
 	/**
 	 * @return context singleton (creating the context is slow)
@@ -694,41 +681,6 @@ public class HistoVault {
 			}
 		}
 		return HistoVault.jaxbContext;
-	}
-
-	/**
-	 * @return cached instance (unmarshaller is not thread safe) which is ~100 ms faster than creating a new instance from a cached JaxbContext instance
-	 */
-	public static Unmarshaller getUnmarshaller() {
-		if (HistoVault.jaxbUnmarshaller == null) {
-			final Path path = getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
-			try {
-				HistoVault.jaxbUnmarshaller = getJaxbContext().createUnmarshaller();
-				HistoVault.jaxbUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
-			}
-			catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return HistoVault.jaxbUnmarshaller;
-	}
-
-	/**
-	 * @return cached instance (marshaller is not thread safe) which is ~100 ms faster than creating a new instance from a cached JaxbContext instance
-	 */
-	public static Marshaller getMarshaller() {
-		if (HistoVault.jaxbMarshaller == null) {
-			final Path path = getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
-			try {
-				HistoVault.jaxbMarshaller = getJaxbContext().createMarshaller();
-				HistoVault.jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-				HistoVault.jaxbMarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
-			}
-			catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return HistoVault.jaxbMarshaller;
 	}
 
 	@Deprecated // for marshalling purposes only
@@ -752,7 +704,7 @@ public class HistoVault {
 	public HistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal, String logRecordSetBaseName,
 			String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
 		this.vaultDataExplorerVersion = GDE.VERSION;
-		this.vaultDeviceKey = VaultManager.getActiveDeviceKey();
+		this.vaultDeviceKey = VaultAttributes.getActiveDeviceKey();
 		this.vaultDeviceName = this.application.getActiveDevice().getName();
 		this.vaultChannelNumber = this.application.getActiveChannelNumber();
 		this.vaultObjectKey = this.application.getObjectKey();
@@ -770,8 +722,8 @@ public class HistoVault {
 		this.logObjectKey = logObjectKey;
 		this.logStartTimestampMs = logStartTimestamp_ms;
 
-		this.vaultDirectory = VaultManager.getVaultsDirectoryName();
-		this.vaultName = VaultManager.getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal);
+		this.vaultDirectory = VaultAttributes.getVaultsDirectoryName();
+		this.vaultName = VaultAttributes.getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal);
 		this.vaultCreatedMs = System.currentTimeMillis();
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
 				String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
@@ -852,6 +804,28 @@ public class HistoVault {
 	}
 
 	/**
+	 * @param trailRecord
+	 * @param trailType
+	 * @return the vault value for the selected trail type
+	 */
+	public Integer getPoint(TrailRecord trailRecord, TrailTypes trailType) {
+		Integer point;
+		if (trailRecord.isMeasurement())
+			point = getMeasurementPoint(trailRecord.getOrdinal(), trailType.ordinal());
+		else if (trailRecord.isSettlement())
+			point = getSettlementPoint(trailRecord.getSettlement().getSettlementId(), trailType.ordinal());
+		else if (trailRecord.isScoreGroup()) {
+			point = getScorePoint(trailType.ordinal());
+		}
+		else
+			throw new UnsupportedOperationException();
+
+		if (log.isLoggable(Level.FINEST))
+			log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), getVaultFileName(), getLogFilePath())); //$NON-NLS-1$
+		return point;
+	}
+
+	/**
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
 	public String getStartTimeStampFormatted() {
@@ -876,29 +850,8 @@ public class HistoVault {
 		return this.logObjectKey.isEmpty() ? this.logObjectDirectory : this.logObjectKey;
 	}
 
-	/**
-	 * @return the validated object key
-	 */
-	public Optional<String> getValidatedObjectKey() {
-		return this.settings.getValidatedObjectKey(this.logObjectKey);
-	}
-
-	/**
-	 * @return boolean value to verify if given object key is valid
-	 */
-	public boolean isValidObjectKey(final String objectKey) {
-		return this.settings.getValidatedObjectKey(objectKey).isPresent();
-	}
-
 	public boolean isTruss() {
 		return this.getMeasurements().isEmpty();
-	}
-
-	/**
-	 * @return the log file path
-	 */
-	public Path getLogFileAsPath() {
-		return Paths.get(this.logFilePath);
 	}
 
 	/**

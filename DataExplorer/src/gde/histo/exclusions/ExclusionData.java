@@ -36,38 +36,41 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.utils.SecureHash;
 import gde.log.Level;
 import gde.utils.FileUtils;
-import gde.utils.SecureHash;
 
 /**
- * Supports excluding files from history analysis.
+ * Excluding files from history analysis via user activity.
  * Is based on property files for each data directory.
  * Stores the exclusions property files in the user directory if the data directory is not accessible for writing.
  * @author Thomas Eickert
  */
-public class ExclusionData extends Properties {
-	private final static String	$CLASS_NAME				= ExclusionData.class.getName();
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
-	private static final long		serialVersionUID	= -2477509505185819765L;
+public final class ExclusionData extends Properties {
+	private final static String		$CLASS_NAME				= ExclusionData.class.getName();
+	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
+	private static final long			serialVersionUID	= -2477509505185819765L;
 
-	private static final Path		exclusionsDir			= Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
+	private static ExclusionData	currentInstance;
 
-	private final Path					dataFileDir;
+	private final Path						dataFileDir;
 
-	public ExclusionData(Path newDataFileDir) {
-		super();
-		this.dataFileDir = newDataFileDir;
+	/**
+	 * @param newDataFileDir
+	 * @return the instance which is only created anew if the data file directory has changed
+	 */
+	public static ExclusionData getInstance(Path newDataFileDir) {
+		if (currentInstance == null || !currentInstance.dataFileDir.equals(newDataFileDir)) {
+			currentInstance = new ExclusionData(newDataFileDir);
+		}
+		return currentInstance;
 	}
 
-	@Deprecated
-	public ExclusionData() {
-		this.dataFileDir = null;
-	}
+	public static boolean isExcluded(Path newDataFileDir, String recordsetBaseName) {
+		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
-	@Deprecated
-	public ExclusionData(Properties newDefaults) {
-		this.dataFileDir = null;
+		String exclusionValue = getInstance(newDataFileDir.getParent()).getProperty(newDataFileDir.getFileName().toString());
+		return exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
 	}
 
 	/**
@@ -75,6 +78,7 @@ public class ExclusionData extends Properties {
 	 * @param dataDirectories
 	 */
 	public static void deleteExclusionsDirectory(List<Path> dataDirectories) {
+		Path exclusionsDir = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		FileUtils.deleteDirectory(exclusionsDir.toString());
 		for (Path dataPath : dataDirectories) {
 			try {
@@ -86,6 +90,22 @@ public class ExclusionData extends Properties {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
+	}
+
+	private ExclusionData(Path newDataFileDir) {
+		super();
+		this.dataFileDir = newDataFileDir;
+		load();
+	}
+
+	@Deprecated
+	public ExclusionData() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Deprecated
+	public ExclusionData(Properties newDefaults) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -132,37 +152,8 @@ public class ExclusionData extends Properties {
 		}
 	}
 
-	/**
-	 * @param key is the data file name of the vault / truss
-	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname')
-	 */
-	public String getFormattedProperty(String key) {
-		return getProperty(key).isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + getProperty(key);
-	}
-
-	/**
-	 * @param dataFilePath is the full data file path of the vault / truss
-	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname')
-	 */
-	public String getFormattedProperty(Path dataFilePath) {
-		String dataFileName = dataFilePath.getFileName().toString();
-		return getFormattedProperty(dataFileName);
-	}
-
-	/**
-	 * @param dataFilePath
-	 * @param recordsetBaseName
-	 * @return true if the full data file path exists in the excluded list and the recordset base name is excluded (i.e. is in the list or is empty in the list)
-	 */
-	public boolean isExcluded(Path dataFilePath, String recordsetBaseName) {
-		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
-
-		String dataFileName = dataFilePath.getFileName().toString();
-		return dataFilePath.getParent().equals(this.dataFileDir) && this.getProperty(dataFileName) != null
-				&& (this.getProperty(dataFileName).isEmpty() || this.getProperty(dataFileName).contains(recordsetBaseName));
-	}
-
-	public void load() {
+	private void load() {
+		Path exclusionsDir = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 		if (!takeUserDir) {
 			FileUtils.checkDirectoryAndCreate(this.dataFileDir.toString());
@@ -197,6 +188,7 @@ public class ExclusionData extends Properties {
 	 * Write the file if excludes are defined, else delete the file.
 	 */
 	public void store() {
+		Path exclusionsDir = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		if (this.size() > 0) {
 			boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 			if (!takeUserDir) {
@@ -228,13 +220,13 @@ public class ExclusionData extends Properties {
 	}
 
 	public void delete() {
+		Path exclusionsDir = Paths.get( //
+				Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		FileUtils.deleteFile(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
 		String fileName = SecureHash.sha1(this.dataFileDir.toString());
 		FileUtils.deleteFile(this.dataFileDir.resolve(exclusionsDir.resolve(fileName)).toString());
-	}
 
-	public Path getDataFileDir() {
-		return this.dataFileDir;
+		currentInstance = null;
 	}
 
 }

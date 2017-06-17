@@ -30,14 +30,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import gde.utils.Quantile;
-import gde.utils.Quantile.Fixings;
-import gde.utils.Spot;
-import gde.utils.UniversalQuantile;
+import gde.histo.utils.Quantile;
+import gde.histo.utils.Quantile.Fixings;
+import gde.histo.utils.Spot;
+import gde.histo.utils.UniversalQuantile;
 
 public class QuantileTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	private final static String	$CLASS_NAME										= QuantileTest.class.getName();
 	private final static Logger	log														= Logger.getLogger($CLASS_NAME);
+
+	/**
+	 * value 100; reduce to 0 to shorten the elapsed Junit test time
+	 */
+	private final static int		performanceTestLoops					= 100;
 
 	private Quantile						quantile;
 	private final Integer[]			recordArray										= { 99999, -99999, null, 0, null, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, -5 };	// Size = 18
@@ -134,8 +139,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
-				int qCount = 100;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 					nanoTimeSigmaInt -= System.nanoTime();
@@ -150,7 +154,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), true);
 					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), true);
 					nanoTimeSigmaInt -= System.nanoTime();
@@ -165,7 +169,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 					nanoTimeSigmaInt -= System.nanoTime();
@@ -200,8 +204,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
-				int qCount = 100;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					//					genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
 					quantileArray = new Quantile(arrayList, 6, 9);
 					//					nanoTimeSigmaInt -= System.nanoTime();
@@ -216,7 +219,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					//					genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
 					quantileArray = new Quantile(arrayList, 6, 9);
 					//					nanoTimeSigmaInt -= System.nanoTime();
@@ -250,8 +253,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
-				int qCount = 100;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
 					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
 					nanoTimeSigmaInt -= System.nanoTime();
@@ -266,7 +268,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
 					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
 					nanoTimeSigmaInt -= System.nanoTime();
@@ -305,8 +307,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
-				int qCount = 100;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
 					genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
 					nanoTimeSigmaInt -= System.nanoTime();
@@ -321,7 +322,7 @@ public class QuantileTest extends TestSuperClass { // TODO maybe better to choos
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
-				for (int i = 0; i < qCount / 2; i++) {
+				for (int i = 0; i < performanceTestLoops / 2; i++) {
 					genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
 					genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
 					nanoTimeSigmaInt -= System.nanoTime();

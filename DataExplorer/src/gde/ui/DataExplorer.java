@@ -89,17 +89,20 @@ import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.HistoSet;
-import gde.data.HistoSet.RebuildStep;
 import gde.data.ObjectData;
 import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.datasources.HistoSet;
+import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoGraphicsWindow;
+import gde.histo.ui.HistoTableWindow;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -117,14 +120,11 @@ import gde.ui.tab.CellVoltageWindow;
 import gde.ui.tab.DataTableWindow;
 import gde.ui.tab.DigitalWindow;
 import gde.ui.tab.FileCommentWindow;
-import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
-import gde.ui.tab.HistoGraphicsComposite.HistoGraphicsMode;
-import gde.ui.tab.HistoGraphicsWindow;
-import gde.ui.tab.HistoTableWindow;
 import gde.ui.tab.ObjectDescriptionWindow;
 import gde.ui.tab.StatisticsWindow;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
@@ -2044,7 +2044,7 @@ public class DataExplorer extends Composite {
 	 * @param recordOrdinal this single record is updated from the histo recordset
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
-		RecordingsCollector.addHistoVaults(this.histoSet.getTrailRecordSet(), recordOrdinal);
+		RecordingsCollector.addVaults(this.histoSet.getTrailRecordSet(), recordOrdinal);
 		DataExplorer.this.updateHistoTabs(RebuildStep.F_FILE_CHECK, isWithUi); // ET rebuilds the graphics only if new files have been found
 		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found
 	}
@@ -2095,7 +2095,7 @@ public class DataExplorer extends Composite {
 		boolean isRebuilt = false;
 		try {
 			setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));
-			isRebuilt = this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
+			isRebuilt = this.histoSet.getHistoSetCollector().rebuild4Screening(rebuildStep, isWithUi);
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 				if (this.histoSet.getTrailRecordSet() != null)
@@ -2494,7 +2494,7 @@ public class DataExplorer extends Composite {
 	public void clearMeasurementModes() {
 		if (isRecordSetVisible(GraphicsType.HISTO)) {
 			this.histoSet.getTrailRecordSet().clearMeasurementModes();
-			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
@@ -2522,14 +2522,14 @@ public class DataExplorer extends Composite {
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
-			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			this.histoSet.getTrailRecordSet().setMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE, false);
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE);
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
@@ -2564,14 +2564,14 @@ public class DataExplorer extends Composite {
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.FINE )) log.log(Level.FINE, recordKey);
 		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
-			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			this.histoSet.getTrailRecordSet().setDeltaMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE_DELTA, false);
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE_DELTA);
 		}
 		else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);

@@ -41,15 +41,15 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.GraphicsTemplate;
-import gde.config.HistoGraphicsTemplate;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.HistoSet;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.histo.config.HistoGraphicsTemplate;
+import gde.histo.datasources.HistoSet;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -60,8 +60,8 @@ import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.dialog.TimeSetDialog;
 import gde.ui.dialog.edit.DevicePropertiesEditor;
-import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 
 /**
  * menu bar implementation class for the DataExplorer

@@ -29,14 +29,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import gde.config.Settings;
-import gde.utils.GpsCoordinate;
+import gde.histo.utils.GpsCoordinate;
 
 /**
  * Takes a list of GPS coordinates and provides the clusters assigned to the locations.
  * Uses the maximum cluster distance setting.
  * @author Thomas Eickert
  */
-public class GpsCluster extends ArrayList<GpsCoordinate> {
+public final class GpsCluster extends ArrayList<GpsCoordinate> {
 	private static final long								serialVersionUID	= 5239035277133565077L;
 	private final static String							$CLASS_NAME				= GpsCluster.class.getName();
 	private final static Logger							log								= Logger.getLogger($CLASS_NAME);

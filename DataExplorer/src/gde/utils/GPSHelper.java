@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
 
 /**

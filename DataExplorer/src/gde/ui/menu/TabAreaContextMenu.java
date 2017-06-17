@@ -37,8 +37,9 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.HistoSet;
-import gde.device.IHistoDevice;
+import gde.histo.datasources.HistoSet;
+import gde.histo.device.IHistoDevice;
+import gde.histo.exclusions.ExclusionActivity;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -295,7 +296,7 @@ public class TabAreaContextMenu {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							TabAreaContextMenu.this.histoSet.setExcludeHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()),
+							ExclusionActivity.setExcludeRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()),
 									popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString());
 
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
@@ -313,7 +314,7 @@ public class TabAreaContextMenu {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							TabAreaContextMenu.this.histoSet.setExcludeHistoRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()), GDE.STRING_EMPTY);
+							ExclusionActivity.setExcludeRecordSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()), GDE.STRING_EMPTY);
 
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
@@ -332,9 +333,9 @@ public class TabAreaContextMenu {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()) != null)
-								TabAreaContextMenu.this.histoSet.clearExcludeHistoLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
+								ExclusionActivity.clearExcludeLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
 							else
-								TabAreaContextMenu.this.histoSet.clearExcludeHistoLists(null);
+								ExclusionActivity.clearExcludeLists(null);
 
 							TabAreaContextMenu.this.application.setupHistoWindows();
 						}

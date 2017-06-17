@@ -37,17 +37,16 @@ import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
-import gde.histo.recordings.SuiteRecordList.SuiteMember;
+import gde.histo.utils.Spot;
 import gde.log.Level;
-import gde.utils.Spot;
 
 /**
- * Holds histo data points of one measurement or settlement; score points are a third option.
+ * Hold histo data points of one measurement or settlement; score points are a third option.
  * A histo data point holds one aggregated value (e.g. max, avg, quantile).
  * Supports suites, i.e. records for multiple trails for combined curves.
  * @author Thomas Eickert
  */
-public class TrailRecord extends Record {
+public final class TrailRecord extends Record {
 	private final static String		$CLASS_NAME					= TrailRecord.class.getName();
 	private final static long			serialVersionUID		= 110124007964748556L;
 	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
@@ -60,7 +59,7 @@ public class TrailRecord extends Record {
 	private final ScoreGroupType	scoreGroupType;																				// measurement / settlement / scoregroup are options
 	private final TrailSelector		trailSelector;
 
-	final SuiteRecordList						suiteManager;
+	private final SuiteRecords		suiteRecords;
 
 	private double								factor							= Double.MIN_VALUE;
 	private double								offset							= Double.MIN_VALUE;
@@ -69,7 +68,7 @@ public class TrailRecord extends Record {
 	final DeviceXmlResource				xmlResource					= DeviceXmlResource.getInstance();
 
 	/**
-	 * Creates a vector for a measurementType to hold data points.
+	 * Create a vector for a measurementType to hold data points.
 	 * @param newDevice
 	 * @param newOrdinal
 	 * @param measurementType
@@ -85,11 +84,11 @@ public class TrailRecord extends Record {
 		this.scoreGroupType = null;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteManager = new SuiteRecordList(this);
+		this.suiteRecords = new SuiteRecords(this);
 	}
 
 	/**
-	 * Creates a vector for a settlementType to hold data points.
+	 * Create a vector for a settlementType to hold data points.
 	 * @param newDevice
 	 * @param newOrdinal
 	 * @param settlementType
@@ -105,11 +104,11 @@ public class TrailRecord extends Record {
 		this.scoreGroupType = null;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteManager = new SuiteRecordList(this);
+		this.suiteRecords = new SuiteRecords(this);
 	}
 
 	/**
-	 * Creates a vector for a scoregroupType to hold all scores of a scoregroup.
+	 * Create a vector for a scoregroupType to hold all scores of a scoregroup.
 	 * The scores are not related to time steps.
 	 * @param newDevice
 	 * @param newOrdinal
@@ -126,7 +125,7 @@ public class TrailRecord extends Record {
 		this.scoreGroupType = scoregroupType;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteManager = new SuiteRecordList(this);
+		this.suiteRecords = new SuiteRecords(this);
 	}
 
 	@Override
@@ -197,39 +196,20 @@ public class TrailRecord extends Record {
 	}
 
 	/**
+	 * Clear the record subordinate objects.
+	 */
+	@Override
+	public void clear() {
+		this.suiteRecords.clear();
+		super.clear();
+	}
+
+	/**
 	 * @return the point size of a single curve or a suite
 	 */
 	@Override
 	public int realSize() {
-		return this.trailSelector.isTrailSuite() ? this.suiteManager.realSize() : super.size();
-	}
-
-	public TrailRecordSet getParentTrail() {
-		return this.parentTrail;
-	}
-
-	public boolean isMeasurement() {
-		return this.measurementType != null;
-	}
-
-	public boolean isSettlement() {
-		return this.settlementType != null;
-	}
-
-	public boolean isScoreGroup() {
-		return this.scoreGroupType != null;
-	}
-
-	public MeasurementType getMeasurement() {
-		return this.measurementType;
-	}
-
-	public SettlementType getSettlement() {
-		return this.settlementType;
-	}
-
-	public ScoreGroupType getScoregroup() {
-		return this.scoreGroupType;
+		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.size();
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
@@ -333,46 +313,18 @@ public class TrailRecord extends Record {
 		return this.minScaleValue;
 	}
 
-	public int getSuiteMaxValue() {
-		return this.suiteManager.getSuiteMaxValue() == this.suiteManager.getSuiteMinValue() ? this.suiteManager.getSuiteMaxValue() + 100 : this.suiteManager.getSuiteMaxValue();
-	}
-
-	public int getSuiteMinValue() {
-		return this.suiteManager.getSuiteMaxValue() == this.suiteManager.getSuiteMinValue() ? this.suiteManager.getSuiteMinValue() - 100 : this.suiteManager.getSuiteMinValue();
-	}
-
-	/**
-	 * Defines new suite records from the trailType list
-	 * @param suiteTrails holds the trail types applicable for the suite
-	 */
-	public void setSuite(List<TrailTypes> suiteTrails) {
-		this.suiteManager.setSuite(suiteTrails);
-	}
-
-	public String getNameReplacement() {
-		return getDeviceXmlReplacement(this.name);
-	}
-
-	/**
-	 * @return the localized value of the label property from the device channel entry or an empty string.
-	 */
-	public String getLabel() {
-		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoreGroupType.getLabel();
-		return getDeviceXmlReplacement(label);
-	}
-
 	/**
 	 * @return true if the record or the suite contains reasonable data which can be displayed
 	 */
 	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
-		if (this.suiteManager.getSuiteLength() == 0) {
+		if (this.suiteRecords.getSuiteLength() == 0) {
 			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE
 					&& (this.minValue != this.maxValue || this.device.translateValue(this, this.maxValue / 1000.0) != 0.0);
 		}
 		else {
-			for (SuiteRecord suiteRecord : this.suiteManager.values()) {
+			for (SuiteRecord suiteRecord : this.suiteRecords.values()) {
 				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE
 						&& (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || this.device.translateValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
 					hasReasonableData = true;
@@ -384,61 +336,20 @@ public class TrailRecord extends Record {
 	}
 
 	/**
+	 * @return true if the record is active and has data values
+	 */
+	@Override // reason is size for suite records
+	public boolean isActive() {
+		return this.isActive == null || this.realSize() == 0 ? false : this.isActive;
+	}
+
+	/**
 	 * @return true if the record is the scale sync master and if the record is for display according to histo display settings
 	 */
 	@Override // reason are the histo display settings which hide records
 	public boolean isScaleVisible() {
 		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoreGroup() && this.settings.isDisplayScores());
 		return isValidDisplayRecord && super.isScaleVisible();
-	}
-
-	/**
-	 * Supports suites.
-	 * @param timeStamp1_ms
-	 * @param timeStamp2_ms
-	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned list is empty.)
-	 */
-	public List<Spot<Double>> getSubPoints(long timeStamp1_ms, long timeStamp2_ms) {
-		int index1 = this.getIndex(timeStamp1_ms);
-		int index2 = this.getIndex(timeStamp2_ms);
-		int fromIndex = Math.min(index1, index2);
-		int toIndex = Math.max(index1, index2) + 1;
-
-		int recordSize = toIndex - fromIndex;
-		List<Spot<Double>> result = new ArrayList<>(recordSize);
-
-		Vector<Integer> points = this.getPoints();
-		for (int i = fromIndex; i < toIndex; i++) {
-			if (points.elementAt(i) != null) {
-				result.add(new Spot<Double>(this.parentTrail.getTime_ms(i), this.device.translateValue(this, points.elementAt(i) / 1000.)));
-			}
-		}
-		log.log(Level.FINER, "", Arrays.toString(result.toArray()));
-		return result;
-	}
-
-	/**
-	 * @param timeStamp_ms
-	 * @return the index fitting exactly to the timeStamp
-	 */
-	public int getIndex(long timeStamp_ms) {
-		return this.parentTrail.getIndex(timeStamp_ms);
-	}
-
-	/**
-	 * @return the uncloned point values of the record or suite master
-	 */
-	public Vector<Integer> getPoints() {
-		final Vector<Integer> points;
-		if (!this.trailSelector.isTrailSuite())
-			points = this;
-		else if (this.getTrailSelector().isBoxPlotSuite())
-			points = this.suiteManager.getSuiteRecord(SuiteMember.MEDIAN);
-		else if (this.getTrailSelector().isRangePlotSuite())
-			points = this.suiteManager.getSuiteRecord(SuiteMember.MIDDLE);
-		else
-			throw new UnsupportedOperationException();
-		return points;
 	}
 
 	@Override
@@ -549,16 +460,9 @@ public class TrailRecord extends Record {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * @param replacementKey
-	 * @return the replacement name of the specified key or an empty string if there is no key entry
-	 */
-	private String getDeviceXmlReplacement(String replacementKey) {
-		return replacementKey != null ? this.xmlResource.getReplacement(replacementKey) : GDE.STRING_EMPTY;
-	}
-
-	public TrailSelector getTrailSelector() {
-		return this.trailSelector;
+	@Override
+	public double getDisplayScaleFactorValue() {
+		return this.displayScaleFactorValue;
 	}
 
 	public void setSyncMinValue(int syncMinValue) {
@@ -573,9 +477,126 @@ public class TrailRecord extends Record {
 		return this.syncMasterFactor;
 	}
 
-	@Override
-	public double getDisplayScaleFactorValue() {
-		return this.displayScaleFactorValue;
+	public TrailRecordSet getParentTrail() {
+		return this.parentTrail;
+	}
+
+	public boolean isMeasurement() {
+		return this.measurementType != null;
+	}
+
+	public boolean isSettlement() {
+		return this.settlementType != null;
+	}
+
+	public boolean isScoreGroup() {
+		return this.scoreGroupType != null;
+	}
+
+	public MeasurementType getMeasurement() {
+		return this.measurementType;
+	}
+
+	public SettlementType getSettlement() {
+		return this.settlementType;
+	}
+
+	public ScoreGroupType getScoregroup() {
+		return this.scoreGroupType;
+	}
+
+	/**
+	 * Supports suites.
+	 * @param timeStamp1_ms
+	 * @param timeStamp2_ms
+	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned list is empty.)
+	 */
+	public List<Spot<Double>> getSubPoints(long timeStamp1_ms, long timeStamp2_ms) {
+		int index1 = this.getIndex(timeStamp1_ms);
+		int index2 = this.getIndex(timeStamp2_ms);
+		int fromIndex = Math.min(index1, index2);
+		int toIndex = Math.max(index1, index2) + 1;
+
+		int recordSize = toIndex - fromIndex;
+		List<Spot<Double>> result = new ArrayList<>(recordSize);
+
+		Vector<Integer> points = this.getPoints();
+		for (int i = fromIndex; i < toIndex; i++) {
+			if (points.elementAt(i) != null) {
+				result.add(new Spot<Double>(this.parentTrail.getTime_ms(i), this.device.translateValue(this, points.elementAt(i) / 1000.)));
+			}
+		}
+		log.log(Level.FINER, "", Arrays.toString(result.toArray()));
+		return result;
+	}
+
+	/**
+	 * @param timeStamp_ms
+	 * @return the index fitting exactly to the timeStamp
+	 */
+	public int getIndex(long timeStamp_ms) {
+		return this.parentTrail.getIndex(timeStamp_ms);
+	}
+
+	/**
+	 * @return the uncloned point values of the record or suite master
+	 */
+	public Vector<Integer> getPoints() {
+		final Vector<Integer> points;
+		if (!this.trailSelector.isTrailSuite())
+			points = this;
+		else
+			points = this.suiteRecords.get(this.trailSelector.getTrailType().getSuiteMasterIndex());
+
+		return points;
+	}
+
+	public int getSuiteMaxValue() {
+		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMaxValue() + 100 : this.suiteRecords.getSuiteMaxValue();
+	}
+
+	public int getSuiteMinValue() {
+		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMinValue() - 100 : this.suiteRecords.getSuiteMinValue();
+	}
+
+	/**
+	 * Defines new suite records from the selected trail and the suite master record.
+	 * @param initialCapacity
+	 */
+	public void setSuite(int initialCapacity) {
+		this.suiteRecords.clear();
+
+		List<TrailTypes> suiteMembers = this.trailSelector.getTrailType().getSuiteMembers();
+		for (int i = 0; i < suiteMembers.size(); i++)
+			this.suiteRecords.put(i, new SuiteRecord(suiteMembers.get(i).ordinal(), initialCapacity));
+	}
+
+	public String getNameReplacement() {
+		return getDeviceXmlReplacement(this.name);
+	}
+
+	/**
+	 * @return the localized value of the label property from the device channel entry or an empty string.
+	 */
+	public String getLabel() {
+		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoreGroupType.getLabel();
+		return getDeviceXmlReplacement(label);
+	}
+
+	/**
+	 * @param replacementKey
+	 * @return the replacement name of the specified key or an empty string if there is no key entry
+	 */
+	private String getDeviceXmlReplacement(String replacementKey) {
+		return replacementKey != null ? this.xmlResource.getReplacement(replacementKey) : GDE.STRING_EMPTY;
+	}
+
+	public TrailSelector getTrailSelector() {
+		return this.trailSelector;
+	}
+
+	public SuiteRecords getSuiteRecords() {
+		return this.suiteRecords;
 	}
 
 }

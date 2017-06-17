@@ -19,13 +19,11 @@
 package gde.data;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -42,10 +40,12 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
-import gde.device.TransitionGroupType;
 import gde.device.TriggerType;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
+import gde.histo.transitions.GroupTransitions;
+import gde.histo.transitions.Transition;
+import gde.histo.transitions.TransitionTableMapper;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
@@ -56,10 +56,10 @@ import gde.ui.SWTResourceManager;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.CalculationThread;
 import gde.utils.CellVoltageValues;
-import gde.utils.LocalizedDateTime.DateTimePattern;
-import gde.utils.LocalizedDateTime.DurationPattern;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
+import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.LocalizedDateTime.DurationPattern;
 
 /**
  * RecordSet class holds all the data records for the configured measurement of a device
@@ -180,7 +180,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final Channels										channels;																																																																								// start point of data hierarchy
 	protected final IDevice											device;
 	final static DeviceXmlResource		xmlResource											= DeviceXmlResource.getInstance();
-	private HistoTransitions					histoTransitions;
+	private GroupTransitions										histoTransitions;
 	private TreeMap<Long, Transition>						transitions;
 
 	/**
@@ -529,9 +529,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		this.addNoneCalculationRecordsPoints(points);
 	}
 
-	public HistoTransitions getHistoTransitions() {
-		if (this.histoTransitions == null) {
-			this.histoTransitions = new HistoTransitions(this);
+	/**
+	 * Uses cached transitions if the record data size has not changed (no gathering mode).
+	 * @return the transitions identified for this recordset
+	 */
+	public GroupTransitions getHistoTransitions() {
+		boolean isOutdated = this.histoTransitions != null && this.histoTransitions.getRecordDataSize() != this.getRecordDataSize(true);
+		if (this.histoTransitions == null || isOutdated) {
+			this.histoTransitions = new GroupTransitions(this);
 			this.histoTransitions.add4Channel(this.channels.getActiveChannelNumber());
 		}
 		return this.histoTransitions;
@@ -550,20 +555,10 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		this.device.prepareDataTableRow(this, dataTableRow, index);
 
 		if (this.settings.isDataTableTransitions()) {
-			HashMap<Integer, TransitionGroupType> transitionGroups = this.device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
-			dataTableRow = Arrays.copyOf(dataTableRow, this.size() + 1 + transitionGroups.size());
-
-			int i = this.size() + 1;
-			for (Entry<Integer, TransitionGroupType> transitionsGroupsEntry : transitionGroups.entrySet()) {
-				TreeMap<Long, Transition> transitions2 = this.getHistoTransitions().getTransitions(transitionsGroupsEntry.getKey());
-				Transition transition = transitions2.get((long) this.getTime_ms(index));
-				if (transition != null) {
-					dataTableRow[i] = Integer.toString(transition.transitionType.getTransitionId());
-				}
-				i++;
-			}
+			return TransitionTableMapper.getExtendedRow(this, index, dataTableRow);
 		}
-		return dataTableRow;
+		else
+			return dataTableRow;
 	}
 
 	/**
@@ -2426,4 +2421,9 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		}
 		return -1;
 	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
 }
