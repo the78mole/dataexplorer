@@ -83,6 +83,13 @@ public final class TrailRecordCutter {
 		return new double[] { this.regression.getAlpha(), this.regression.getBeta(), this.regression.getGamma() };
 	}
 
+	/**
+	 * @return the parabola spots which correspond to the regression input values
+	 */
+	public List<Spot<Double>> getBoundedParabolaValues() {
+		return this.regression.getResponse();
+	}
+
 	public double getBoundedParabolaValue(long timeStamp_ms) {
 		return this.regression.getResponse(timeStamp_ms);
 	}

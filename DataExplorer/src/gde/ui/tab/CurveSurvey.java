@@ -21,7 +21,6 @@ package gde.ui.tab;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.logging.Logger;
 
@@ -33,9 +32,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.recordings.HistoGraphicsMapper;
+import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordCutter;
 import gde.histo.recordings.TrailRecordFormatter;
-import gde.histo.recordings.TrailRecord;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -53,7 +52,7 @@ import gde.utils.UniversalQuantile;
  * Supports linear regression and boxplot for delta measurements.
  * @author Thomas Eickert
  */
-public class CurveSurvey {
+public final class CurveSurvey {
 	private final static String	$CLASS_NAME	= CurveSurvey.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -83,7 +82,7 @@ public class CurveSurvey {
 	private final HistoTimeLine	timeLine;
 	private final TrailRecord		trailRecord;
 
-	private TrailRecordCutter				recordSection;
+	private TrailRecordCutter		recordSection;
 
 	private GC									canvasGC;
 	private Rectangle						curveAreaBounds;
@@ -116,8 +115,8 @@ public class CurveSurvey {
 		if (this.yPosMeasure >= Integer.MIN_VALUE) {
 			//			String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
 			statusMessage = Messages.getString(MessageIds.GDE_MSGT0256,
-					new Object[] { this.trailRecord.getName(), new TrailRecordFormatter(this.trailRecord).getMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)), this.trailRecord.getUnit(),
-							LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) });
+					new Object[] { this.trailRecord.getName(), new TrailRecordFormatter(this.trailRecord).getMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)),
+							this.trailRecord.getUnit(), LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) });
 		}
 		else {
 			statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), GDE.STRING_STAR, this.trailRecord.getUnit(), GDE.STRING_STAR });
@@ -244,8 +243,8 @@ public class CurveSurvey {
 					: this.timeLine.getScalePositions().subMap(this.timestampDelta_ms, true, this.timestampMeasure_ms, true);
 
 			List<Spot<Integer>> points = new ArrayList<>(boundedXpos.size());
-			for (Entry<Long, Integer> entry : boundedXpos.entrySet()) {
-				points.add(new Spot<>(entry.getValue(), mapper.getVerticalDisplayPos(this.recordSection.getBoundedParabolaValue(entry.getKey()))));
+			for (Spot<Double> entry : this.recordSection.getBoundedParabolaValues()) {
+				points.add(new Spot<Integer>(this.timeLine.getXPosTimestamp((long) entry.x().doubleValue()), mapper.getVerticalDisplayPos(entry.y())));
 			}
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "values " + Arrays.toString(points.toArray()));
 

@@ -20,6 +20,9 @@ package gde.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import gde.log.Level;
 
 /**
  *  Immutable regression analysis class for one response variable,
@@ -33,7 +36,9 @@ import java.util.List;
  *  @author Kevin Wayne
  *  @author Thomas Eickert
  */
-public class SingleResponseRegression<T extends Number> { // todo harmonize with /DataExplorer/src/gde/utils/LinearRegression.java
+public final class SingleResponseRegression<T extends Number> {
+	private final static String	$CLASS_NAME	= SingleResponseRegression.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	public enum RegressionType {
 		LINEAR, QUADRATIC
@@ -191,10 +196,18 @@ public class SingleResponseRegression<T extends Number> { // todo harmonize with
 	*/
 	public double getGamma() {
 		if (!isQuadratic()) throw new UnsupportedOperationException();
-		double numerator = this.zybar * this.xxbar - this.xybar * this.zxbar;
-		double denominator = this.zzbar * this.xxbar - this.zxbar * this.zxbar;
-
-		return numerator / denominator;
+		if (this.n <= 2)
+			return 0.;
+		else {
+			double numerator = this.zybar * this.xxbar - this.xybar * this.zxbar;
+			double denominator = this.zzbar * this.xxbar - this.zxbar * this.zxbar;
+			if (denominator == 0.) {
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, "numerator=" + numerator + "  denominator=" + denominator);
+				return 0.;
+			}
+			else
+				return numerator / denominator;
+		}
 	}
 
 	/**
@@ -202,8 +215,17 @@ public class SingleResponseRegression<T extends Number> { // todo harmonize with
 	*/
 	public double getBeta() {
 		if (!isQuadratic()) throw new UnsupportedOperationException();
-		double numerator = this.xybar - getGamma() * this.zxbar;
-		return numerator / this.xxbar;
+		if (this.n <= 1)
+			return 0.;
+		else {
+			double numerator = this.xybar - getGamma() * this.zxbar;
+			double denominator = this.xxbar;
+			if (denominator == 0.) {
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, "numerator=" + numerator + "  denominator=" + denominator);
+				return 0.;
+			}
+			return numerator / denominator;
+		}
 	}
 
 	/**
@@ -215,9 +237,21 @@ public class SingleResponseRegression<T extends Number> { // todo harmonize with
 	}
 
 	/**
-	* @param  xValue the independent variable
-	* @return the expected response {@code y} given the value of the independent variable {@code x}
+	* @return the expected response {@code y} for all the input values of the independent variable {@code x}
 	*/
+	public List<Spot<Double>> getResponse() {
+		List<Spot<Double>> responses = new ArrayList<>();
+		for (int i = 0; i < this.xx.size(); i++) {
+			responses.add(new Spot<Double>(this.xx.get(i), getResponse(this.xx.get(i))));
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "xResponse=" + responses.get(i).x() + "  yResponse=" + responses.get(i).y());
+		}
+		return responses;
+	}
+
+	/**
+	 * @param  xValue the independent variable
+	 * @return the expected response {@code y} given the value of the independent variable {@code x}
+	 */
 	public double getResponse(double xValue) {
 		if (isQuadratic())
 			return getAlpha() + getBeta() * xValue + getGamma() * xValue * xValue;
