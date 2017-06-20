@@ -343,7 +343,7 @@ public class HistoTableWindow extends CTabItem {
 			@Override
 			public void keyReleased(KeyEvent event) {
 				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyReleased, keycode: " + event.keyCode)); //$NON-NLS-1$
-				if (event.keyCode == SWT.MOD2) {
+				if (event.keyCode == SWT.MOD2 && HistoTableWindow.this.rowVector.size() > 0) { // ET 20.06.2017 2nd condition added due to rowVector.get index violation
 					int rowIndex = HistoTableWindow.this.rowVector.get(HistoTableWindow.this.rowVector.size() - 1) + this.selectionFlowIndex;
 					// check table bounds reached
 					rowIndex = rowIndex < 0 ? 0 : rowIndex > HistoTableWindow.this.dataTable.getItems().length - 1 ? HistoTableWindow.this.dataTable.getItems().length - 1 : rowIndex;
