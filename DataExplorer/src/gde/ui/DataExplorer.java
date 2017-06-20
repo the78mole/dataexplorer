@@ -420,9 +420,10 @@ public class DataExplorer extends Composite {
 				StringBuilder sb = new StringBuilder();
 				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0016)).append(GDE.STRING_NEW_LINE);
 				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0017)).append(GDE.STRING_NEW_LINE);
-				application.openMessageDialog(GDE.shell, sb.toString());
-				if (this.settings.isHistoCacheTemplateUpdated()) // shut up in this case
-					sb.append(Messages.getString(MessageIds.GDE_MSGI0068)).append(GDE.STRING_NEW_LINE);
+				if (this.settings.isHistoCacheTemplateUpdated() && sb.length() == 0)
+					; // shut up in this case --- sb.append(Messages.getString(MessageIds.GDE_MSGI0068)).append(GDE.STRING_NEW_LINE);
+				else
+					application.openMessageDialog(GDE.shell, sb.toString());
 			}
 
 			GDE.shell.addControlListener(new ControlListener() {
