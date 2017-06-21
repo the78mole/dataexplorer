@@ -2510,13 +2510,6 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
-	 */
-	public void resetMeasurements() {
-		//do nothing, actually only HoTTAdapter2 needs this function
-	}
-
-	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
 	 * @return

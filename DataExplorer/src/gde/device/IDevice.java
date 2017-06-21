@@ -999,11 +999,6 @@ public interface IDevice {
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet);
 
 	/**
-	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
-	 */
-	public void resetMeasurements();
-
-	/**
 	 * remove a MeasurementType object from channel with channel number as given
 	 * @param channelConfigNumber
 	 * @param removeMeasurementType

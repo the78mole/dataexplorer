@@ -239,10 +239,6 @@ public class HistoOsdReaderWriter extends OsdReaderWriter {
 					// reduce memory consumption in advance to the garbage collection
 					histoRecordSet.cleanup();
 
-					//reset, previous manipulated channel types measurements (p.e. set active = null as calculation)
-					// WBrueg does resetMeasurements also revert the manipulations done in OsdReaderWriter.buildRecordSet(...) ?
-					histoRecordSet.getDevice().resetMeasurements(); // WBrueg not sure if channel manipulations affect logs which are currently displayed in the standard tabs and also rely on channel manipulations 
-
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
 							recordSetTrusses.get(i).getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp)); 
 				}
