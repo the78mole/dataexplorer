@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -278,8 +277,6 @@ public class FileHandler {
 			String fileDeviceName = osdHeader.get(GDE.DEVICE_NAME);
 			// check and switch device, if required
 			IDevice activeDevice = this.application.getActiveDevice();
-			String previousDeviceName = activeDevice.getName();
-			Integer previousChannelNumber = this.application.getActiveChannelNumber();
 			if (activeDevice == null || !activeDevice.getName().equals(fileDeviceName)) { // new device in file
 				this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
 			}
@@ -321,20 +318,6 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				OsdReaderWriter.read(openFilePath);
-				if (previousChannelNumber != null && previousDeviceName.equals(this.application.getActiveDevice().getName())) {
-					// try to show the recordset which corresponds to the channel selected by the user 
-					for (Entry<String, String> headerEntry : osdHeader.entrySet()) {
-						if (headerEntry.getKey().contains(GDE.RECORD_SET_NAME)) {
-							final String channelNumber = OsdReaderWriter.getRecordSetProperties(headerEntry.getValue()).get(GDE.CHANNEL_CONFIG_NAME).split(GDE.STRING_BLANK_COLON_BLANK)[0];
-							if (Integer.parseInt(channelNumber) == previousChannelNumber) {
-								this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
-								final String recordSetName = OsdReaderWriter.getRecordSetName(headerEntry.getValue());
-								this.application.getActiveChannel().switchRecordSet(recordSetName);
-								break;
-							}
-						}
-					}
-				}
 				this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
 				if (!existAsObjectLinkFile) this.channels.getActiveChannel().setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
 			}

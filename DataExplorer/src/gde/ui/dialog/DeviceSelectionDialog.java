@@ -1095,10 +1095,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.setCellVoltageTabItemVisible(activeDevice.isVoltagePerCellTabRequested());
 			this.application.setUtilGraphicsWindowVisible(activeDevice.isUtilityGraphicsTabRequested(), GDE.STRING_EMPTY);
 			this.application.registerCustomTabItem(activeDevice.isUtilityDeviceTabRequested() ? activeDevice.getUtilityDeviceTabItem() : null);
-			// do not call setupDataChannels because it rebuilds again the histo tabs which also done by updateDialogEntries
-			if (activeDevice != null && (previousActiveDevice == null || !activeDevice.getName().equals(previousActiveDevice.getName()))) { 
-				setupDataChannels(activeDevice);
-			}
+			setupDataChannels(activeDevice);
 			this.application.setupDataTableHeader();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
