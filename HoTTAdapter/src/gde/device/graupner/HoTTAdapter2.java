@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -46,7 +47,6 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.IHistoDevice;
 import gde.device.MeasurementPropertyTypes;
-import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -57,6 +57,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
 /**
@@ -1110,19 +1111,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	}
 
 	/**
-	 * reset the measurements of all channels to cleanup previous manipulation from cross check measurements
-	 */
-	@Override
-	public void resetMeasurements() {
-		for (int i = 1; i <= this.getChannelCount(); i++) {
-			List<MeasurementType> measurement = this.getChannelMeasuremtsReplacedNames(i);
-			for (MeasurementType measurementType : measurement) {
-				measurementType.setActive(true);
-			}
-		}
-	}
-
-	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
 	 * - calculated measurements could be later on added to the device properties XML
 	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
@@ -1179,14 +1167,15 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			return recordKeys;
 		}
 
-		//this part of code is only neeeded for OSD files saved before 8.2.7
+		//this part of code is only needed for OSD files saved before 8.2.7
 		cleanedRecordNames = new Vector<String>();
-		int noneCalculationRecords = 0;
+		int noneCalculationRecordsCount = 0;
 		for (String fileRecord : fileRecordsProperties) {
-			if (fileRecord.contains("_isActive=true") || fileRecord.contains("_name=Ch ")) ++noneCalculationRecords;
+			if (fileRecord.contains("_isActive=true") || fileRecord.contains("_name=Ch ")) {
+				++noneCalculationRecordsCount;
+			}
 		}
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
-			List<MeasurementType> measurements = this.getChannelMeasuremtsReplacedNames(recordSet.getChannelConfigNumber());
 			switch (fileRecordsProperties.length) {
 			case 44: //Android HoTTAdapter3
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
@@ -1213,11 +1202,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 62: //62=Capacity M, 
 					case 63: //63=Power M, 
 					case 64: //64=Revolution M, 
-						measurements.get(i).setActive(null);
+						recordSet.get(i).setActive(null);
 						break;
 					default:
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+						if (fileRecordsProperties[j].contains("_isActive=false")) 
+							recordSet.get(j++).setActive(false);
 						break;
 					}
 				}
@@ -1227,10 +1217,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i <= 58) {
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+						if (fileRecordsProperties[j].contains("_isActive=false")) 
+							recordSet.get(j++).setActive(false);
 					}
 					else
-						measurements.get(i).setActive(null);
+						recordSet.get(i).setActive(null);
 				}
 				break;
 
@@ -1238,10 +1229,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i != 59 && i <= 75) {
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+						if (fileRecordsProperties[j].contains("_isActive=false")) 
+							recordSet.get(j++).setActive(false);
 					}
 					else
-						measurements.get(i).setActive(null);
+						recordSet.get(i).setActive(null);
 				}
 				break;
 
@@ -1251,19 +1243,19 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i != 59) {
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) measurements.get(j++).setActive(false);
+						if (fileRecordsProperties[j].contains("_isActive=false")) 
+							recordSet.get(j++).setActive(false);
 					}
 					else
-						measurements.get(i).setActive(null);
+						recordSet.get(i).setActive(null);
 				}
 				break;
 			}
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}
-		else if ((recordKeys.length - noneCalculationRecords) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
+		else if ((recordKeys.length - noneCalculationRecordsCount) > 0) { //added VoltageRx_min, Revolution E with 3.1.9
 			//load older recordSet where added VoltageRx_min, Revolution E (with 3.1.9) needs to be removed
-			List<MeasurementType> measurements = this.getChannelMeasuremtsReplacedNames(recordSet.getChannelConfigNumber());
-			switch (noneCalculationRecords) {
+			switch (noneCalculationRecordsCount) {
 			case 44: //Android HoTTAdapter3
 				for (int i = 0; i < recordKeys.length; i++) {
 					switch (i) {
@@ -1289,10 +1281,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 62: //62=Capacity M, 
 					case 63: //63=Power M, 
 					case 64: //64=Revolution M, 
-						measurements.get(i).setActive(null);
+						recordSet.get(i).setActive(null);
 						break;
 					default:
-						if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						if (fileRecordsProperties[i].contains("_isActive=false")) 
+							recordSet.get(i).setActive(false);
 						break;
 					}
 				}
@@ -1301,32 +1294,36 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			case 57: //HoTTAdapter2 without channels prior to 3.0.8
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i > 58)
-						measurements.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						recordSet.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+						recordSet.get(i).setActive(false);
 				}
 				break;
 
 			case 58: //HoTTAdapter2 without channels prior to 3.0.8
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i > 58)
-						measurements.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						recordSet.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+						recordSet.get(i).setActive(false);
 				}
 				break;
 
 			case 73: //HoTTAdapter2 with channels prior to 3.0.8
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i == 59 || i > 74)
-						measurements.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						recordSet.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+						recordSet.get(i).setActive(false);
 				}
 				break;
 
 			case 74: //HoTTAdapter2 with channels prior to 3.0.8
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i == 59 || i > 74)
-						measurements.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						recordSet.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+						recordSet.get(i).setActive(false);
 				}
 				break;
 
@@ -1335,14 +1332,34 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			default:
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i == 59)
-						measurements.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) measurements.get(i).setActive(false);
+						recordSet.get(i).setActive(null);
+					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+						recordSet.get(i).setActive(false);
 				}
 				break;
 			}
 			//recordKeys = recordKeys; keeps unchanged
 		}
-
+		//set noneCalculationRecordsNames for this recordSet since it deviate to initial measurements
+		cleanedRecordNames = new Vector<String>();
+		for (int i = 0,j = 0; i < recordSet.size(); i++) {
+			try {
+				Record record = recordSet.get(i);
+				if (j < recordKeys.length && record.getName().equals(recordKeys[j])) {
+					if(!record.isCalculation()) {
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						cleanedRecordNames.add(recordProps.get(Record.NAME));
+					}
+					++j;
+				}
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+		}
+		recordSet.setNoneCalculationRecordNames(cleanedRecordNames.toArray(new String[1]));
+//		System.out.println("noneCalculationRecords = " + noneCalculationRecordsCount);
+//		System.out.println("recordSet.getNoneCalculationMeasurementNames.length = " + this.getNoneCalculationMeasurementNames(recordSet.getChannelConfigNumber(), recordKeys).length);
 		return recordKeys;
 	}
 
