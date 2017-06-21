@@ -675,7 +675,7 @@ public class D100 extends MC3000 implements IDevice {
 			if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
-			if (record.isActive() != measurement.isActive()) {
+			if (record.isActive() && record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());

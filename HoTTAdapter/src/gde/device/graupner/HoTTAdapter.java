@@ -1101,7 +1101,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
-			if (record.isActive() != measurement.isActive()) {
+			if (record.isActive() && record.isActive() != measurement.isActive()) { //corrected values from older OSD might be overwritten p.e. VoltageRx_min
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());

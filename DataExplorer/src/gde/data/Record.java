@@ -74,7 +74,7 @@ public class Record extends Vector<Integer> {
 	String											unit;																													// unit [m]
 	String											symbol;																												// symbol h
 	String											description				= GDE.STRING_BLANK;													// only set if copied into compare set
-	boolean											isActive;
+	Boolean											isActive;
 	boolean											isDisplayable;
 	boolean											isVisible					= true;
 	StatisticsType							statistics				= null;
@@ -1283,14 +1283,20 @@ public class Record extends Vector<Integer> {
 	 * @return the isActive
 	 */
 	public boolean isActive() {
-		return this.isActive;
+		return this.isActive == null || this.size() == 0 ? false : this.isActive;
 	}
 
 	/**
 	 * set isActive value
 	 */
-	public void setActive(boolean newValue) {
+	public void setActive(Boolean newValue) {
 		this.isActive = newValue;
+	}
+	/**
+	 * @return if record data represented by calculation
+	 */
+	public boolean isCalculation() {
+		return this.isActive == null ? true : false;
 	}
 
 	/**
@@ -1997,7 +2003,7 @@ public class Record extends Vector<Integer> {
 		sb.append(NAME).append(GDE.STRING_EQUAL).append(this.name).append(DELIMITER);
 		sb.append(UNIT).append(GDE.STRING_EQUAL).append(this.unit == null ? GDE.STRING_EMPTY : this.unit).append(DELIMITER);
 		sb.append(SYMBOL).append(GDE.STRING_EQUAL).append(this.symbol == null || this.symbol.equals("null") ? GDE.STRING_EMPTY : this.symbol).append(DELIMITER);
-		sb.append(IS_ACTIVE).append(GDE.STRING_EQUAL).append(this.isActive).append(DELIMITER);
+		sb.append(IS_ACTIVE).append(GDE.STRING_EQUAL).append(this.isActive()).append(DELIMITER);
 		sb.append(IS_DIPLAYABLE).append(GDE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
 		sb.append(IS_VISIBLE).append(GDE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
 		sb.append(MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
@@ -2082,8 +2088,8 @@ public class Record extends Vector<Integer> {
 		}
 
 		tmpValue = recordProps.get(NAME);
-		if (tmpValue != null && tmpValue.length() > 0 && !this.name.trim().equalsIgnoreCase(tmpValue.trim())) {
-			this.setName(tmpValue.trim()); // might replace the record set key as well
+		if (tmpValue != null && tmpValue.length() > 0) {
+			this.setName(tmpValue); //replace the record set key as well
 		}
 	}
 

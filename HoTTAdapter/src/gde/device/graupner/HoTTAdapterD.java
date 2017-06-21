@@ -1011,7 +1011,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 
 			// update active state and displayable state if configuration switched with other names
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
-			if (record.isActive() != measurement.isActive()) {
+			if (record.isActive() && record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());

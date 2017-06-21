@@ -1272,7 +1272,7 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			if (MC3000.log.isLoggable(java.util.logging.Level.FINE)) MC3000.log.log(java.util.logging.Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
-			if (record.isActive() != measurement.isActive()) {
+			if (record.isActive() && record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
