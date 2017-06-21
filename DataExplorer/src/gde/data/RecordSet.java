@@ -79,6 +79,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	String														header													= null;
 	String[]													recordNames;																																																																						//Spannung, Strom, ..
 	String[]													noneCalculationRecords					= new String[0];																																																				//records/measurements which are active or inactive
+	int																noneCalculationRecordsCount			= -1;																																																										//cached count or number of noneCalculationRecords, -1 means not initialized
 	String														description											= GDE.STRING_EMPTY;
 	boolean														isSaved													= false;																																																								//indicates if the record set is saved to file
 	boolean														isRaw														= false;																																																								//indicates imported file with raw data, no translation at all
@@ -180,7 +181,6 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	final IDevice											device;
 	final static DeviceXmlResource		xmlResource											= DeviceXmlResource.getInstance();
 	private HistoTransitions					histoTransitions;
-	private TreeMap<Long, Transition>	transitions;
 
 	/**
 	 * record set data buffers according the size of given names array, where
@@ -496,7 +496,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		final String $METHOD_NAME = "addNoneCalculationRecordsPoints"; //$NON-NLS-1$
 		if (points.length <= this.getNoneCalculationRecordNames().length) {
 			for (int i = 0; i < points.length; i++) {
-				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
+				try {
+					this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
+				}
+				catch (Exception e) {
+					// temp
+				}
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
@@ -843,13 +848,24 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
+	 * method to set the sorted active or in active record names as string array
+	 *  - records which does not have inactive or active flag are calculated from active or inactive
+	 *  - all records not calculated may have the active status and must be stored
+	 *  - set this during IDevice.crossCheckMeasurements() to cache this and avoid recalculation based on initial device measurements
+	 */
+	public void setNoneCalculationRecordNames(final String[] recordNames) {
+		this.noneCalculationRecords = recordNames;
+	}
+
+	/**
 	 * method to get the sorted active or in active record names as string array
 	 *  - records which does not have inactive or active flag are calculated from active or inactive
 	 *  - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names
 	 */
 	public String[] getNoneCalculationRecordNames() {
-		this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
+		if (this.noneCalculationRecords.length == 0 )
+			this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
 		return this.noneCalculationRecords;
 	}
 
@@ -2046,16 +2062,21 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 					}
 				}
 			}
-			Record syncRecord = this.get(syncRecordOrdinal);
-			synchronized (syncRecord) {
-				if (this.isScopeMode) {
-					syncRecord.scopeMin = tmpSyncMin;
-					syncRecord.scopeMax = tmpSyncMax;
+			if (syncRecordOrdinal < this.realSize()) {
+				Record syncRecord = this.get(syncRecordOrdinal);
+				synchronized (syncRecord) {
+					if (this.isScopeMode) {
+						syncRecord.scopeMin = tmpSyncMin;
+						syncRecord.scopeMax = tmpSyncMax;
+					}
+					else {
+						syncRecord.syncMinValue = tmpSyncMin;
+						syncRecord.syncMaxValue = tmpSyncMax;
+					}
 				}
-				else {
-					syncRecord.syncMinValue = tmpSyncMin;
-					syncRecord.syncMaxValue = tmpSyncMax;
-				}
+			}
+			else {
+				log.log(Level.WARNING, String.format("Check device XML regarding <property name=\"scale_sync_ref_ordinal\" value=\"%d\" type=\"Integer\" />", syncRecordOrdinal));
 			}
 
 			if (isAffected && log.isLoggable(Level.FINE)) log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
