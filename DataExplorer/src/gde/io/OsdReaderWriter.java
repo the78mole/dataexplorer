@@ -216,14 +216,10 @@ public class OsdReaderWriter {
     }
 		String channelConfig = GDE.STRING_EMPTY;
 		String recordSetName = GDE.STRING_EMPTY;
-		String recordSetComment = GDE.STRING_EMPTY;
-		String recordSetProperties = GDE.STRING_EMPTY;
-		String[] recordsProperties;
 		int recordDataSize = 0;
 		long recordSetDataPointer = 0;
 		Channel channel = null;
 		RecordSet recordSet = null;
-		IDevice device = OsdReaderWriter.application.getActiveDevice();
 		boolean isFirstRecordSetDisplayed = false;
 
 		HashMap<String, String> header = getHeader(filePath);
@@ -233,18 +229,12 @@ public class OsdReaderWriter {
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
 
 		List<HashMap<String, String>> recordSetsInfo = readRecordSetsInfo4AllVersions(data_in, header);
-
-		//reset, previous manipulated channel types measurements (p.e. set active = null as calculation)
-		device.resetMeasurements();
 		
 		try { // build the data structure
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
 				recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
 				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-				recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
-				recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
-				recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 				recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				//recordSetDataPointer = Long.valueOf(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				
