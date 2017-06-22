@@ -149,10 +149,12 @@ public class NMEAReaderWriter {
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
 				//skip SM GPS-Logger setup sentence
-				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
+				while ((line = reader.readLine()) != null && 
+						(line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name())
-						|| !line.startsWith(device.getDataBlockLeader()) || !data.isSupportedSentence(line.substring(1, 6))) {
+						|| !line.startsWith(device.getDataBlockLeader()) 
+						|| !data.isSupportedSentence(line.substring(1, line.indexOf(device.getDataBlockSeparator().value(), 2))))) {
 					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
 							|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 							|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name()))) {
@@ -160,7 +162,7 @@ public class NMEAReaderWriter {
 						setupLine.add(line);
 						data.parse(setupLine, lineNumber);
 					}
-					else if (line != null && !data.isSupportedSentence(line.substring(1, 6))) {
+					else if (line != null && line.startsWith(device.getDataBlockLeader()) && !data.isSupportedSentence(line.substring(1, line.indexOf(device.getDataBlockSeparator().value(), 2)))) {
 						log.log(Level.WARNING, filePath + " line number " + lineNumber + " does not starts with supported NMEA sentence" + line.substring(1, 6) + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 					else {
