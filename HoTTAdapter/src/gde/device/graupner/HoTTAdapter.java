@@ -1257,6 +1257,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	@Override
 	public void importDeviceData(Path filePath) {
+		if (!application.getDeviceSelectionDialog().checkDataSaved()) return;
+
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
@@ -1265,6 +1267,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					HoTTAdapter.this.application.setPortConnected(true);
 
 					if (filePath.getFileName().toString().length() > MIN_FILENAME_LENGTH) {
+						for (Channel channel : channels.values()) {
+							channel.clear();
+						}
+
 						Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
 						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 						try {
