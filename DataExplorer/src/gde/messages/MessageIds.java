@@ -1,4 +1,4 @@
-/************************************************************************************** 
+/**************************************************************************************
   	This file is part of GNU DataExplorer.
 
 		GNU DataExplorer is free software: you can redistribute it and/or modify
@@ -14,15 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann 
+Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.messages;
 
-/** 
- * @author Winfried Brügmann 
- * Do not edit, MessageIds are generated from messages.properties 
- */ 
-public class MessageIds { 
+/**
+ * @author Winfried Brügmann
+ * Do not edit, MessageIds are generated from messages.properties
+ */
+public class MessageIds {
 
 	public final static String	GDE_MSGE0001 = "GDE_MSGE0001";
 	public final static String	GDE_MSGE0002 = "GDE_MSGE0002";
@@ -1018,7 +1018,7 @@ public class MessageIds {
 	public final static String	GDE_MSGT0845 = "GDE_MSGT0845";
 	public final static String	GDE_MSGT0846 = "GDE_MSGT0846";
 	public final static String	GDE_MSGT0847 = "GDE_MSGT0847";
-	public final static String	GDE_MSGT0848 = "GDE_MSGT0848"; 
+	public final static String	GDE_MSGT0848 = "GDE_MSGT0848";
 	public final static String	GDE_MSGT0849 = "GDE_MSGT0849";
 	public final static String	GDE_MSGT0850 = "GDE_MSGT0850";
 	public final static String	GDE_MSGT0851 = "GDE_MSGT0851";
@@ -1041,7 +1041,7 @@ public class MessageIds {
 	public final static String	GDE_MSGT0868 = "GDE_MSGT0868";
 	public final static String	GDE_MSGT0869 = "GDE_MSGT0869";
 	public final static String	GDE_MSGT0870 = "GDE_MSGT0870";
-	public final static String	GDE_MSGT0871 = "GDE_MSGT0871"; 
+	public final static String	GDE_MSGT0871 = "GDE_MSGT0871";
 	public final static String	GDE_MSGT0872 = "GDE_MSGT0872";
 	public final static String	GDE_MSGT0873 = "GDE_MSGT0873";
 	public final static String	GDE_MSGT0874 = "GDE_MSGT0874";
@@ -1049,4 +1049,10 @@ public class MessageIds {
 	public final static String	GDE_MSGT0876 = "GDE_MSGT0876";
 	public final static String	GDE_MSGT0877 = "GDE_MSGT0877";
 	public final static String	GDE_MSGT0878 = "GDE_MSGT0878";
-	public final static String	GDE_MSGT0879 = "GDE_MSGT0879"; }
+	public final static String	GDE_MSGT0879 = "GDE_MSGT0879";
+	public final static String	GDE_MSGT0880 = "GDE_MSGT0880";
+	public final static String	GDE_MSGT0881 = "GDE_MSGT0881";
+	public final static String	GDE_MSGT0882 = "GDE_MSGT0882";
+	public final static String	GDE_MSGT0883 = "GDE_MSGT0883";
+	public final static String	GDE_MSGT0884 = "GDE_MSGT0884";
+	public final static String	GDE_MSGT0885 = "GDE_MSGT0885"; }

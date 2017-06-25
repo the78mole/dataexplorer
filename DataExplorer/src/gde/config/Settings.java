@@ -173,7 +173,8 @@ public class Settings extends Properties {
 	final static String							GPS_LOCATION_RADIUS							= "gps_location_radius";																																					//$NON-NLS-1$
 	final static String							GPS_ADDRESS_TYPE								= "gps_address_type";																																							//$NON-NLS-1$
 	final static String							SUBDIRECTORY_LEVEL_MAX					= "subdirectory_level_max";																																				//$NON-NLS-1$
-	final static String							IS_DATA_TABLE_TRANSITIONS					= "is_data_table_transitions";																																				//$NON-NLS-1$
+	final static String							IS_DATA_TABLE_TRANSITIONS				= "is_data_table_transitions";																																		//$NON-NLS-1$
+	final static String							IS_FIRST_RECORDSET_CHOICE				= "is_first_recordset_choice";																																		//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -777,6 +778,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_ADDRESS_TYPE, getGpsAddressType())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_TABLE_TRANSITIONS, isDataTableTransitions())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2914,7 +2916,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param isCurveSurvey true extended curve delta measuring display
+	 * @param enabled true extended curve delta measuring display
 	 */
 	public void setDataTableTransitions(boolean enabled) {
 		this.setProperty(Settings.IS_DATA_TABLE_TRANSITIONS, String.valueOf(enabled));
@@ -2925,6 +2927,20 @@ public class Settings extends Properties {
 	 */
 	public boolean isDataTableTransitions() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_TABLE_TRANSITIONS, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param enabled true if after loading a file the first recordset is shown
+	 */
+	public void setFirstRecordSetChoice(boolean enabled) {
+		this.setProperty(Settings.IS_FIRST_RECORDSET_CHOICE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if after loading a file the first recordset is shown
+	 */
+	public boolean isFirstRecordSetChoice() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_FIRST_RECORDSET_CHOICE, "true")); //$NON-NLS-1$
 	}
 
 }

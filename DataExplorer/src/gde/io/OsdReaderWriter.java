@@ -20,6 +20,7 @@ package gde.io;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -65,10 +66,79 @@ import gde.utils.StringHelper;
  * This class reads and writes DataExplorer file format
  */
 public class OsdReaderWriter {
-	final static Logger									log												= Logger.getLogger(OsdReaderWriter.class.getName());
+	final static Logger				log					= Logger.getLogger(OsdReaderWriter.class.getName());
 
-	final static DataExplorer						application								= DataExplorer.getInstance();
-	final static Channels 							channels 									= Channels.getInstance();
+	final static DataExplorer	application	= DataExplorer.getInstance();
+	final static Channels			channels		= Channels.getInstance();
+	final static Settings			settings		= Settings.getInstance();
+
+	/**
+	 * Determine the record set for display.
+	 * Criteria are the record set name trunk and channel number (supports a language neutral selection).
+	 * @author Thomas Eickert (USER)
+	 */
+	private final class RecordSetSelector {
+
+		private boolean	isFixed;
+		private int			channelNumber				= -1;
+		private String	channelName					= null;
+		private String	recordSetNameTrunk	= null;
+
+		RecordSetSelector(String newRecordSetName) {
+			this();
+			// ET this prevents finding the correct channel   --  this.isFixed = !settings.isFirstRecordSetChoice();
+			this.recordSetNameTrunk = newRecordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? newRecordSetName : newRecordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		}
+
+		RecordSetSelector() {
+			this.channelNumber = application.getActiveChannel().getNumber();
+			this.channelName = application.getActiveChannel().getChannelConfigKey();
+		}
+
+		void setBestFit(int newChannelNumber, String newChannelName, String newRecordSetName) {
+			if (!this.isFixed) {
+				String newNameTrunk = newRecordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? newRecordSetName : newRecordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+				if (settings.isFirstRecordSetChoice()) {
+					// standard case
+					this.isFixed = true;
+					this.channelNumber = newChannelNumber;
+					this.recordSetNameTrunk = newNameTrunk;
+				}
+				else if (this.recordSetNameTrunk == null) {
+					// try to preserve the channel selection (use case: opened via standard menu etc.)
+					if (this.channelNumber == newChannelNumber) {
+						this.isFixed = true;
+						this.channelNumber = newChannelNumber;
+						this.recordSetNameTrunk = newNameTrunk;
+					}
+				}
+				else if (this.recordSetNameTrunk.equals(newNameTrunk)) {
+					// a specific record set is requested (use case: opened from histo)
+					this.isFixed = true;
+					this.channelNumber = newChannelNumber;
+					this.recordSetNameTrunk = newNameTrunk;
+				}
+				else if (this.channelName.equals(newChannelName)) {
+					throw new UnsupportedOperationException("channel number does not match but the channel name does"); // ET for data conformity checks only  -  may be removed
+				}
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("isFixed isFirstRecordSetChoice=%b  recordSetNameTrunk=%-22s  channelNumber=%d  channelName=%-22s",
+						settings.isFirstRecordSetChoice(), this.recordSetNameTrunk, this.channelNumber, this.channelName));
+			}
+		}
+
+		boolean isBestFitFound() {
+			return this.isFixed;
+		}
+
+		boolean isMatchToBestFit(int newChannelNumber, String newRecordSetName) {
+			if (this.isFixed) {
+				return this.recordSetNameTrunk.equals(newRecordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? newRecordSetName : newRecordSetName.substring(0, RecordSet.MAX_NAME_LENGTH))
+						&& this.channelNumber == newChannelNumber;
+			}
+			else
+				return false;
+		}
+	}
 
 	/**
 	 * get data file header data
@@ -81,18 +151,18 @@ public class OsdReaderWriter {
 
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
 		FileInputStream file_input = null;
-		DataInputStream data_in    = null;
+		DataInputStream data_in = null;
 		ZipInputStream zip_input = null;
 		try {
 			filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-	    zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
-	    ZipEntry zip_entry = zip_input.getNextEntry();
-	    if (zip_entry != null) {
-	  		data_in = new DataInputStream(zip_input);
-	  		return readHeader(filePath, data_in);
-	    }
+			zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+			ZipEntry zip_entry = zip_input.getNextEntry();
+			if (zip_entry != null) {
+				data_in = new DataInputStream(zip_input);
+				return readHeader(filePath, data_in);
+			}
 			file_input = new FileInputStream(new File(filePath));
-			data_in    = new DataInputStream(file_input);
+			data_in = new DataInputStream(file_input);
 			return readHeader(filePath, data_in);
 		}
 		finally {
@@ -113,16 +183,15 @@ public class OsdReaderWriter {
 	private static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormatException {
 		String line;
 		HashMap<String, String> header = new HashMap<String, String>();
-		int headerCounter = GDE.OSD_FORMAT_HEADER_KEYS.length+1;
+		int headerCounter = GDE.OSD_FORMAT_HEADER_KEYS.length + 1;
 
 		line = data_in.readUTF();
-		line = line.substring(0, line.length()-1);
+		line = line.substring(0, line.length() - 1);
 		log.log(Level.FINE, line);
-		if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION))
-			throw new NotSupportedFileFormatException(filePath);
+		if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION)) throw new NotSupportedFileFormatException(filePath);
 
-		String sVersion = line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) ? line.substring(GDE.DATA_EXPLORER_FILE_VERSION.length(), GDE.DATA_EXPLORER_FILE_VERSION.length()+1).trim()
-				: line.substring(GDE.LEGACY_FILE_VERSION.length(), GDE.LEGACY_FILE_VERSION.length()+1).trim();
+		String sVersion = line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) ? line.substring(GDE.DATA_EXPLORER_FILE_VERSION.length(), GDE.DATA_EXPLORER_FILE_VERSION.length() + 1).trim()
+				: line.substring(GDE.LEGACY_FILE_VERSION.length(), GDE.LEGACY_FILE_VERSION.length() + 1).trim();
 		int version;
 		try {
 			version = Integer.valueOf(sVersion).intValue(); // one digit only
@@ -137,7 +206,7 @@ public class OsdReaderWriter {
 		case 2: // added OBJECT_KEY to header
 		case 3: // added startTimeStamp to recordSet
 		case 4: // enable more measurements which leads to property string length more than 2**16 character
-			header.put(GDE.DATA_EXPLORER_FILE_VERSION, GDE.STRING_EMPTY+version);
+			header.put(GDE.DATA_EXPLORER_FILE_VERSION, GDE.STRING_EMPTY + version);
 			boolean isHeaderComplete = false;
 			while (!isHeaderComplete && headerCounter-- > 0) {
 				line = data_in.readUTF();
@@ -168,12 +237,12 @@ public class OsdReaderWriter {
 									byte[] bytes = new byte[length];
 									data_in.readFully(bytes);
 									line = new String(bytes, "UTF8");
-									line = line.substring(0, line.length()-1);
+									line = line.substring(0, line.length() - 1);
 									break;
 								}
 								if (line.startsWith(GDE.RECORD_SET_NAME)) {
 									log.log(Level.FINE, line);
-									header.put((lastReordNumber-headerCounter)+GDE.STRING_BLANK+GDE.RECORD_SET_NAME, line.substring(GDE.RECORD_SET_NAME.length()));
+									header.put((lastReordNumber - headerCounter) + GDE.STRING_BLANK + GDE.RECORD_SET_NAME, line.substring(GDE.RECORD_SET_NAME.length()));
 								}
 							}
 							isHeaderComplete = true;
@@ -200,37 +269,53 @@ public class OsdReaderWriter {
 	 * @throws DataInconsitsentException
 	 */
 	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
+		return read(filePath, new OsdReaderWriter().new RecordSetSelector());
+	}
+
+	/**
+	 * read complete file data and display the requested record set
+	 * @param filePath
+	 * @param recordSetName
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NotSupportedFileFormatException
+	 * @throws DataInconsitsentException
+	 */
+	public static RecordSet read(String filePath, String recordSetName) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
+		return read(filePath, new OsdReaderWriter().new RecordSetSelector(recordSetName));
+	}
+
+	private static RecordSet read(String filePath, RecordSetSelector recordSetSelector) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
 		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
-    ZipEntry zip_entry = zip_input.getNextEntry();
-    FileInputStream file_input = null;
-    DataInputStream data_in = null;
-    if (zip_entry != null) {
-  		data_in = new DataInputStream(zip_input);
-    }
-    else {
-    	zip_input.close();
-    	zip_input = null;
-  		file_input = new FileInputStream(new File(filePath));
-  		data_in    = new DataInputStream(file_input);
-    }
+		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+		ZipEntry zip_entry = zip_input.getNextEntry();
+		FileInputStream file_input = null;
+		DataInputStream data_in = null;
+		if (zip_entry != null) {
+			data_in = new DataInputStream(zip_input);
+		}
+		else {
+			zip_input.close();
+			zip_input = null;
+			file_input = new FileInputStream(new File(filePath));
+			data_in = new DataInputStream(file_input);
+		}
 		String channelConfig = GDE.STRING_EMPTY;
 		String recordSetName = GDE.STRING_EMPTY;
 		int recordDataSize = 0;
 		long recordSetDataPointer = 0;
 		Channel channel = null;
 		RecordSet recordSet = null;
-		boolean isFirstRecordSetDisplayed = false;
 
 		HashMap<String, String> header = getHeader(filePath);
 		ChannelTypes channelType = ChannelTypes.valueOf(header.get(GDE.CHANNEL_CONFIG_TYPE).trim());
 		String objectKey = header.get(GDE.OBJECT_KEY) != null ? header.get(GDE.OBJECT_KEY) : GDE.STRING_EMPTY;
-		while(!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
+		while (!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
 
 		List<HashMap<String, String>> recordSetsInfo = readRecordSetsInfo4AllVersions(data_in, header);
 		try { // build the data structure
-			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
+			for (HashMap<String, String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
 				recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
 				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
@@ -240,7 +325,7 @@ public class OsdReaderWriter {
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // 1.st try channelConfiguration not found
 					try { // get channel last digit and use as channel config ordinal
-						channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length()-1)));
+						channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length() - 1)));
 						channelConfig = channel.getChannelConfigKey();
 						recordSetInfo.put(GDE.CHANNEL_CONFIG_NAME, channelConfig);
 					}
@@ -262,7 +347,8 @@ public class OsdReaderWriter {
 					}
 				}
 				if (channel == null) { // 3.rd try channelConfiguration not found
-					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n" + Messages.getString(MessageIds.GDE_MSGI0020);
+					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n"
+							+ Messages.getString(MessageIds.GDE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
 					channel = new Channel(channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
@@ -275,7 +361,7 @@ public class OsdReaderWriter {
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
 				}
 				channels.setActiveChannelNumber(channel.getNumber());
-				OsdReaderWriter.application.selectObjectKey(objectKey);	//calls channel.setObjectKey(objectKey);
+				OsdReaderWriter.application.selectObjectKey(objectKey); //calls channel.setObjectKey(objectKey);
 				// "3 : Motor"
 				channelConfig = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
 				// "Motor 3"
@@ -284,22 +370,21 @@ public class OsdReaderWriter {
 
 				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true);
 				channel.put(recordSetName, recordSet);
+
+				if (!recordSetSelector.isBestFitFound()) recordSetSelector.setBestFit(channel.getNumber(), channelConfig, recordSetName);
 			}
+
 			MenuToolBar menuToolBar = OsdReaderWriter.application.getMenuToolBar();
 			if (menuToolBar != null) {
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
 			}
 
-			String[] firstRecordSet = new String[2];
-			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
+			long unreadDataPointer = -1;
+			for (HashMap<String, String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
 				recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
 				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-				if (firstRecordSet[0] == null || firstRecordSet[1] == null) {
-					firstRecordSet[0] = channelConfig;
-					firstRecordSet[1] = recordSetName;
-				}
 				recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordDataSize = " + recordDataSize);
 				recordSetDataPointer = Long.valueOf(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER)).longValue();
@@ -307,22 +392,26 @@ public class OsdReaderWriter {
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
 				int numberRecordAndTimeStamp = recordSet.getNoneCalculationRecordNames().length + (recordSet.isTimeStepConstant() ? 0 : 1);
-				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp  * recordDataSize);
-				if (recordSetName.equals(firstRecordSet[1])) {
+				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
+
+				if (recordSetSelector.isBestFitFound() && !recordSetSelector.isMatchToBestFit(channel.getNumber(), recordSetName)) {
+					// defer reading any unused recordsets until a recordset is actually required
+					if (unreadDataPointer <= -1) unreadDataPointer = recordSetDataPointer;
+					if (log.isLoggable(Level.FINER))
+						log.log(Level.FINER, String.format("skipped  channelConfigName=%-22s recordSetName=%-40s unreadDataPointer=%,d", channelConfig, recordSetName, unreadDataPointer));
+				}
+				else {
+					// take the matching record set or take the first one
+					if (unreadDataPointer > -1) unreadDataPointer = skipData(data_in, recordSetDataPointer, unreadDataPointer);
+
 					long startTime = new Date().getTime();
 					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
 					data_in.readFully(buffer);
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
 					recordSet.updateVisibleAndDisplayableRecordsForTable();
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (new Date().getTime() - startTime)));
-				}
-				// display the first record set data while reading the rest of the data
-				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null && application.getMenuToolBar() != null) {
-					isFirstRecordSetDisplayed = true;
-					channel.setFileName(filePath);
-					channel.setFileDescription(header.get(GDE.FILE_COMMENT));
-					channel.setSaved(true);
-					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
+
+					if (application.getMenuToolBar() != null) displayRecordSet(filePath, header.get(GDE.FILE_COMMENT), channelConfig, recordSetName);
 				}
 			}
 
@@ -342,6 +431,46 @@ public class OsdReaderWriter {
 			file_input = null;
 			zip_input = null;
 		}
+	}
+
+	/**
+	 * @param data_in
+	 * @param recordSetDataPointer
+	 * @param unreadDataPointer
+	 * @return
+	 * @throws IOException
+	 * @throws EOFException
+	 */
+	private static long skipData(DataInputStream data_in, long recordSetDataPointer, long unreadDataPointer) throws IOException, EOFException {
+		// make up all deferred readings in one single step
+		long toSkip = recordSetDataPointer - unreadDataPointer;
+		while (toSkip > 0) { // The skip method may, for a variety of reasons, end up skipping over some smaller number of bytes, possibly 0. The actual number of bytes skipped is returned.
+			toSkip -= data_in.skip(toSkip);
+			if (toSkip > 0) {
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "toSkip=" + toSkip); //$NON-NLS-1$
+				if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size"); //$NON-NLS-1$
+			}
+		}
+		unreadDataPointer = -1;
+		return unreadDataPointer;
+	}
+
+	/**
+	 * Display the record set data.
+	 * @param filePath
+	 * @param fileDescription
+	 * @param channelConfigName
+	 * @param recordSetName
+	 */
+	private static void displayRecordSet(String filePath, String fileDescription, String channelConfigName, String recordSetName) {
+		Channel channel = channels.get(channels.getChannelNumber(channelConfigName));
+		channel.setFileName(filePath);
+		channel.setFileDescription(fileDescription);
+		channel.setSaved(true);
+
+		String displayRecordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		channels.switchChannel(channels.getChannelNumber(channelConfigName), displayRecordSetName);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigName=" + channelConfigName, "  recordSetName=" + recordSetName); //$NON-NLS-1$
 	}
 
 	/**
@@ -396,7 +525,7 @@ public class OsdReaderWriter {
 			log.log(Level.FINE, sb.toString());
 		}
 
-		String [] recordKeys = device.crossCheckMeasurements(recordsProperties, recordSet);
+		String[] recordKeys = device.crossCheckMeasurements(recordsProperties, recordSet);
 		// check if the file content fits measurements form device properties XML which was used to create the record set
 		for (int i = 0; i < recordKeys.length; ++i) {
 			Record record = recordSet.get(recordKeys[i]);
@@ -468,16 +597,19 @@ public class OsdReaderWriter {
 		try { // get channel last digit and use as channel config ordinal : 'Channel/Configuration Name: 1 : Ausgang 1'
 			channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length() - 1)));
 			// channelConfigKey = channel.getChannelConfigKey();
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			// ignore and keep channel as null
-		} catch (NullPointerException e) {
+		}
+		catch (NullPointerException e) {
 			// ignore and keep channel as null
 		}
 		if (channel == null) { // 2.nd try channelConfiguration not found
 			try { // try to get channel startsWith configuration name : 'Channel/Configuration Name: 1 : Receiver'
 				channel = channels.get(Integer.valueOf(channelConfig.split(GDE.STRING_BLANK)[0]));
 				// channelConfigKey = channel.getChannelConfigKey();
-			} catch (NullPointerException | NumberFormatException e) {
+			}
+			catch (NullPointerException | NumberFormatException e) {
 				// ignore and keep channel as null
 			}
 		}
@@ -526,7 +658,7 @@ public class OsdReaderWriter {
 		fullQualifiedFilePath = fullQualifiedFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		if (activeChannel != null && fullQualifiedFilePath != null && useVersion != 0) {
 			ZipOutputStream file_out = new ZipOutputStream(new FileOutputStream(new File(fullQualifiedFilePath)));
-			file_out.putNextEntry(new ZipEntry(fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1)));
+			file_out.putNextEntry(new ZipEntry(fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1)));
 			DataOutputStream data_out = new DataOutputStream(file_out);
 			IDevice activeDevice = OsdReaderWriter.application.getActiveDevice();
 			boolean isObjectOriented = OsdReaderWriter.application.isObjectoriented();
@@ -590,10 +722,9 @@ public class OsdReaderWriter {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
 							sbs[i] = new StringBuilder();
-							sbs[i].append(GDE.RECORD_SET_NAME).append(recordSet.getName()).append(GDE.DATA_DELIMITER)
-								.append(GDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getNumber()).append(GDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(GDE.DATA_DELIMITER)
-								.append(GDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(GDE.DATA_DELIMITER)
-								.append(GDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(GDE.DATA_DELIMITER);
+							sbs[i].append(GDE.RECORD_SET_NAME).append(recordSet.getName()).append(GDE.DATA_DELIMITER).append(GDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getNumber())
+									.append(GDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(GDE.DATA_DELIMITER).append(GDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription())
+									.append(GDE.DATA_DELIMITER).append(GDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(GDE.DATA_DELIMITER);
 							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
 							for (String recordKey : recordSet.getRecordNames()) {
 								sbs[i].append(GDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
@@ -601,9 +732,11 @@ public class OsdReaderWriter {
 							sbs[i].append(GDE.DATA_DELIMITER).append(GDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(GDE.DATA_DELIMITER); //$NON-NLS-1$
 							filePointer += GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
 							filePointer += GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
-								+ (GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length + GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								+ " filePointer = " + filePointer); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
+									"line lenght = " //$NON-NLS-1$
+											+ (GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length + GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 //$NON-NLS-1$//$NON-NLS-2$
+													+ GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$
+											+ " filePointer = " + filePointer); //$NON-NLS-1$
 
 							if (log.isLoggable(Level.FINE)) {
 								StringBuilder sb1 = new StringBuilder().append(recordSet.getName()).append(GDE.STRING_MESSAGE_CONCAT);
@@ -632,8 +765,8 @@ public class OsdReaderWriter {
 							data_out.writeInt(sbs[i].toString().getBytes("UTF8").length);
 							data_out.write(sbs[i].toString().getBytes("UTF8"));
 							int sizeRecord = recordSet.getRecordDataSize(true);
-							recordSizes.put(recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i], sizeRecord);
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i] + "=" + sizeRecord);
+							recordSizes.put(recordSetChannel.getNumber() + GDE.STRING_UNDER_BAR + recordSetNames[i], sizeRecord);
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber() + GDE.STRING_UNDER_BAR + recordSetNames[i] + "=" + sizeRecord);
 							int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * sizeRecord;
 							int dataSizeRecords = dataSizeRecord * recordSet.getNoneCalculationRecordNames().length;
 							int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
@@ -653,8 +786,8 @@ public class OsdReaderWriter {
 						if (recordSet != null) {
 							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName(), application.getStatusBar() != null);
 							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
-							int sizeRecord = recordSizes.get(recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i]);
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i] + "=" + sizeRecord);
+							int sizeRecord = recordSizes.get(recordSetChannel.getNumber() + GDE.STRING_UNDER_BAR + recordSetNames[i]);
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber() + GDE.STRING_UNDER_BAR + recordSetNames[i] + "=" + sizeRecord);
 							int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * sizeRecord;
 							int dataSizeRecords = dataSizeRecord * noneCalculationRecordNames.length;
 							int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
@@ -663,13 +796,13 @@ public class OsdReaderWriter {
 							int l = 0;
 							if (!recordSet.isTimeStepConstant()) {
 								for (int j = 0; j < sizeRecord; ++j, l += GDE.SIZE_BYTES_INTEGER) {
-										long timeStamp = recordSet.getTime(j);
-										//log.log(Level.FINER, ""+point);
-										bytes[0] = (byte) ((timeStamp >>> 24) & 0xFF);
-										bytes[1] = (byte) ((timeStamp >>> 16) & 0xFF);
-										bytes[2] = (byte) ((timeStamp >>> 8) & 0xFF);
-										bytes[3] = (byte) ((timeStamp >>> 0) & 0xFF);
-										System.arraycopy(bytes, 0, buffer, l, GDE.SIZE_BYTES_INTEGER);
+									long timeStamp = recordSet.getTime(j);
+									//log.log(Level.FINER, ""+point);
+									bytes[0] = (byte) ((timeStamp >>> 24) & 0xFF);
+									bytes[1] = (byte) ((timeStamp >>> 16) & 0xFF);
+									bytes[2] = (byte) ((timeStamp >>> 8) & 0xFF);
+									bytes[3] = (byte) ((timeStamp >>> 0) & 0xFF);
+									System.arraycopy(bytes, 0, buffer, l, GDE.SIZE_BYTES_INTEGER);
 								}
 							}
 							if (recordSet.isRaw()) {
@@ -690,7 +823,7 @@ public class OsdReaderWriter {
 								for (int j = 0; j < sizeRecord; ++j) {
 									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += GDE.SIZE_BYTES_INTEGER) {
 										Record record = recordSet.get(noneCalculationRecordNames[k]);
-										int point = Double.valueOf(device.reverseTranslateValue(record, record.realGet(j)/1000.0)*1000.0).intValue();
+										int point = Double.valueOf(device.reverseTranslateValue(record, record.realGet(j) / 1000.0) * 1000.0).intValue();
 										//log.log(Level.FINER, ""+point);
 										bytes[0] = (byte) ((point >>> 24) & 0xFF);
 										bytes[1] = (byte) ((point >>> 16) & 0xFF);
@@ -710,7 +843,7 @@ public class OsdReaderWriter {
 				//update/write link if object oriented
 				if (isObjectOriented && !fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM)) {
 					OperatingSystemHelper.createFileLink(fullQualifiedFilePath,
-							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
 				}
 			}
 			finally {
@@ -736,10 +869,10 @@ public class OsdReaderWriter {
 	 */
 	public static synchronized void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
 		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
-    ZipEntry zip_entry = zip_input.getNextEntry();
+		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+		ZipEntry zip_entry = zip_input.getNextEntry();
 		RandomAccessFile random_in = null;
-    DataInputStream data_in = null;
+		DataInputStream data_in = null;
 		try {
 			long recordSetFileDataPointer = recordSet.getFileDataPointer();
 			int recordFileDataSize = recordSet.getFileDataSize();
@@ -749,18 +882,18 @@ public class OsdReaderWriter {
 			int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
 			byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
 
-	    if (zip_entry != null) {
-	  		data_in = new DataInputStream(zip_input);
-	  		data_in.skip(recordSetFileDataPointer);
-	  		data_in.readFully(buffer);
-	    }
-	    else {
-	    	zip_input.close();
-	    	zip_input = null;
-	    	random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$;
+			if (zip_entry != null) {
+				data_in = new DataInputStream(zip_input);
+				data_in.skip(recordSetFileDataPointer);
+				data_in.readFully(buffer);
+			}
+			else {
+				zip_input.close();
+				zip_input = null;
+				random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$;
 				random_in.seek(recordSetFileDataPointer);
 				random_in.readFully(buffer);
-	    }
+			}
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
 			recordSet.updateVisibleAndDisplayableRecordsForTable();
 			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
@@ -804,8 +937,8 @@ public class OsdReaderWriter {
 			//scan all data files for object key
 			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			Iterator<File> iterator = files.iterator();
-			while(iterator.hasNext()){
-				File file  = iterator.next();
+			while (iterator.hasNext()) {
+				File file = iterator.next();
 				try {
 					String actualFilePath = file.getAbsolutePath();
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
@@ -833,8 +966,8 @@ public class OsdReaderWriter {
 			}
 			//at this point I have all data files containing the old object key
 			iterator = files.iterator();
-			while(iterator.hasNext()) {
-				String filePath  = iterator.next().getPath();
+			while (iterator.hasNext()) {
+				String filePath = iterator.next().getPath();
 				String tmpFilePath = FileUtils.renameFile(filePath, GDE.FILE_ENDING_TMP); // rename existing file to *.tmp
 				File tmpFile = new File(tmpFilePath);
 				File updatedFile = new File(filePath);
@@ -842,10 +975,10 @@ public class OsdReaderWriter {
 				try {
 					long filePointer = 0;
 					String tmpData;
-					data_in  = new DataInputStream(new FileInputStream(tmpFile));
+					data_in = new DataInputStream(new FileInputStream(tmpFile));
 					data_out = new DataOutputStream(new FileOutputStream(updatedFile));
 
-					while(!(tmpData = data_in.readUTF()).startsWith(GDE.OBJECT_KEY)) {
+					while (!(tmpData = data_in.readUTF()).startsWith(GDE.OBJECT_KEY)) {
 						data_out.writeUTF(tmpData);
 						filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
 					}
@@ -870,30 +1003,27 @@ public class OsdReaderWriter {
 					int deltaSizeObjectKey = newObjectKey.getBytes("UTF8").length - oldObjectKey.getBytes("UTF8").length;
 
 					//RecordSetName :: ChannelConfigurationName :: RecordSetComment :: RecordSetProperties :: RecordDataSize :: RecordSetDataPointer
-					for (int i=0; i<numberRecordSets; ++i) {
+					for (int i = 0; i < numberRecordSets; ++i) {
 						tmpData = data_in.readUTF();
-						long dataPointer = Long.parseLong(tmpData.substring(tmpData.length()-11).trim());
-						tmpData = tmpData.substring(0, tmpData.length()-11) + String.format("%10s\n", dataPointer + deltaSizeObjectKey);
+						long dataPointer = Long.parseLong(tmpData.substring(tmpData.length() - 11).trim());
+						tmpData = tmpData.substring(0, tmpData.length() - 11) + String.format("%10s\n", dataPointer + deltaSizeObjectKey);
 						data_out.writeUTF(tmpData);
 					}
 
 					//read/write until EOF binary data
 					byte[] buffer = new byte[4096];
 					int len = 0;
-					while((len = data_in.read(buffer)) > 0) {
+					while ((len = data_in.read(buffer)) > 0) {
 						data_out.write(buffer, 0, len);
 					}
-
 
 					FileUtils.renameFile(tmpFilePath, GDE.FILE_ENDING_BAK); // rename existing file to *.bak
 				}
 				catch (Exception e) {
 					try {
-						if(data_out != null) data_out.close();
-						if (updatedFile.exists())
-							if(updatedFile.delete())
-								log.log(Level.WARNING, "failed to delete " + filePath);
-						if(data_in != null) data_in.close();
+						if (data_out != null) data_out.close();
+						if (updatedFile.exists()) if (updatedFile.delete()) log.log(Level.WARNING, "failed to delete " + filePath);
+						if (data_in != null) data_in.close();
 					}
 					catch (IOException e1) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -905,7 +1035,7 @@ public class OsdReaderWriter {
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] {e.getMessage()}));
+			DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] { e.getMessage() }));
 		}
 		finally {
 			try {

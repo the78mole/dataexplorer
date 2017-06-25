@@ -165,7 +165,9 @@ public class SettingsDialog extends Dialog {
 	CCombo															histoSubdirectoryLevel;
 	CLabel															histoSubdirectoryLevelLabel;
 	Group																timeZone;
-	Button															dateTimeUtc;
+	Button															dateTimeUtcButton;
+	Group																fileOpenGroup;
+	Button															firstRecordSetButton;
 	CTabItem														analysisTabItem;
 	CTabFolder													settingsTabFolder;
 	Slider															alphaSlider;
@@ -1002,6 +1004,67 @@ public class SettingsDialog extends Dialog {
 								}
 							} // end histoBoxplot group
 							{
+								this.fileOpenGroup = new Group(this.histoDisplayOption, SWT.NONE);
+								RowData groupLData = new RowData();
+								groupLData.width = 223;
+								this.fileOpenGroup.setLayoutData(groupLData);
+								FormLayout formLayout = new FormLayout();
+								formLayout.marginTop = 2;
+								formLayout.marginBottom = 2;
+								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
+								this.fileOpenGroup.setLayout(formLayout);
+								this.fileOpenGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.fileOpenGroup.setText(Messages.getString(MessageIds.GDE_MSGT0880));
+								{
+									this.firstRecordSetButton = new Button(this.fileOpenGroup, SWT.CHECK);
+									FormData formData = new FormData();
+									formData.left = new FormAttachment(0, 5);
+									this.firstRecordSetButton.setLayoutData(formData);
+									this.firstRecordSetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.firstRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT0881));
+									this.firstRecordSetButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0882));
+									this.firstRecordSetButton.setSelection(this.settings.isFirstRecordSetChoice());
+									this.firstRecordSetButton.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											SettingsDialog.log.log(Level.FINEST, "firstRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setFirstRecordSetChoice(SettingsDialog.this.firstRecordSetButton.getSelection());
+										}
+									});
+								}
+							} // end fileOpenGroup group
+							{
+								this.timeZone= new Group(this.histoDisplayOption, SWT.NONE);
+								RowData groupLData = new RowData();
+								groupLData.width = 223;
+								this.timeZone.setLayoutData(groupLData);
+								FormLayout formLayout = new FormLayout();
+								formLayout.marginTop = 2;
+								formLayout.marginBottom = 2;
+								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
+								this.timeZone.setLayout(formLayout);
+								this.timeZone.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.timeZone.setText(Messages.getString(MessageIds.GDE_MSGT0805));
+								{
+									this.dateTimeUtcButton = new Button(this.timeZone, SWT.CHECK);
+									FormData formData = new FormData();
+									formData.left = new FormAttachment(0, 5);
+									this.dateTimeUtcButton.setLayoutData(formData);
+									this.dateTimeUtcButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.dateTimeUtcButton.setText(Messages.getString(MessageIds.GDE_MSGT0810));
+									this.dateTimeUtcButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0811));
+									this.dateTimeUtcButton.setSelection(this.settings.isDateTimeUtc());
+									this.dateTimeUtcButton.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											SettingsDialog.log.log(Level.FINEST, "dateTimeUtcButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setDateTimeUtc(SettingsDialog.this.dateTimeUtcButton.getSelection());
+											SettingsDialog.this.application.updateHistoTabs(false, false);
+										}
+									});
+								}
+							} // end timeZoneGroup group
+							{
 								this.histoDisplay = new Group(this.histoDisplayOption, SWT.NONE);
 								RowData groupRData = new RowData();
 								groupRData.width = 223;
@@ -1070,37 +1133,6 @@ public class SettingsDialog extends Dialog {
 									});
 								}
 							} // end histoDisplay group
-							{
-								this.timeZone = new Group(this.histoDisplayOption, SWT.NONE);
-								RowData groupRData = new RowData();
-								groupRData.width = 223;
-								this.timeZone.setLayoutData(groupRData);
-								FormLayout formLayout = new FormLayout();
-								formLayout.marginTop = 2;
-								formLayout.marginBottom = 2;
-								formLayout.marginLeft = formLayout.marginRight = formLayout.marginHeight = 2;
-								this.timeZone.setLayout(formLayout);
-								this.timeZone.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.timeZone.setText(Messages.getString(MessageIds.GDE_MSGT0805));
-								{
-									this.dateTimeUtc = new Button(this.timeZone, SWT.CHECK);
-									FormData formData = new FormData();
-									formData.left = new FormAttachment(0, 5);
-									this.dateTimeUtc.setLayoutData(formData);
-									this.dateTimeUtc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.dateTimeUtc.setText(Messages.getString(MessageIds.GDE_MSGT0810));
-									this.dateTimeUtc.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0811));
-									this.dateTimeUtc.setSelection(this.settings.isDateTimeUtc());
-									this.dateTimeUtc.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "dateTimeUtc.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setDateTimeUtc(SettingsDialog.this.dateTimeUtc.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false, false);
-										}
-									});
-								}
-							} // end timeZoneGroup group
 						} // end histoDisplayOptionGroup
 						{
 							this.histoScreening = new Group(this.miscComposite, SWT.NONE);
