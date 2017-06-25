@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
@@ -203,7 +203,8 @@ public class FileHandler {
 			}
 			fileName = (fileDescriptionDate.length() > 0 ? fileDescriptionDate : StringHelper.getDate()) + GDE.STRING_UNDER_BAR;
 		}
-		if (application.isObjectoriented() && Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
+		if (application.isObjectoriented() && Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null
+				&& Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
 			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
 		}
 		if (addRecordSetName && this.application.getActiveChannel() != null && this.application.getActiveChannel().getActiveRecordSet() != null) {
@@ -305,8 +306,8 @@ public class FileHandler {
 				// at this point we have a channel/config ordinal
 				Channel channel = this.channels.get(channelNumber);
 				if (channel.size() > 0) { // check for records to be exchanged
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0010,
-							new Object[] { channelNumber + GDE.STRING_BLANK_COLON_BLANK + channel.getChannelConfigKey() }));
+					int answer = this.application
+							.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0010, new Object[] { channelNumber + GDE.STRING_BLANK_COLON_BLANK + channel.getChannelConfigKey() }));
 					if (answer != SWT.OK) return;
 				}
 				// clean existing channel record sets for new data
@@ -331,6 +332,40 @@ public class FileHandler {
 		catch (Throwable e) {
 			FileHandler.log.log(Level.WARNING, e.getMessage(), e);
 			this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+		}
+	}
+
+	/**
+	 * Open a DataExplorer file, load data into a cleaned device/channel and display the requested record set.
+	 * @param openFilePath
+	 * @param recordSetName
+	 */
+	public void openOsdFile(String openFilePath, String recordSetName) {
+		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
+			// either no unsaved data exist or the user wants to discard the changes
+			try {
+				openFilePath = OperatingSystemHelper.getLinkContainedFilePath(openFilePath); // check if windows link
+
+				for (Channel channel : this.channels.values()) {
+					channel.clear();
+				}
+
+				this.application.enableMenuActions(false);
+				try {
+					OsdReaderWriter.read(openFilePath, recordSetName);
+					this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+				}
+				catch (Exception e) {
+					FileHandler.log.log(Level.WARNING, e.getMessage(), e);
+					this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+				}
+				this.application.enableMenuActions(true);
+				this.application.updateSubHistoryMenuItem(openFilePath);
+			}
+			catch (Throwable e) {
+				FileHandler.log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
 		}
 	}
 
@@ -464,8 +499,7 @@ public class FileHandler {
 			IDevice activeDevice = this.application.getActiveDevice();
 			String channelType = activeDevice.getChannelTypes(channelNumber).name();
 			String channelConfigName = activeDevice.getChannelNameReplacement(channelNumber);
-			FileHandler.log.log(Level.FINE,
-					"channelConfigName = " + channelConfigName + " (" + GDE.CHANNEL_CONFIG_TYPE + channelType + "; " + GDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			FileHandler.log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + GDE.CHANNEL_CONFIG_TYPE + channelType + "; " + GDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Channel channel = this.channels.get(channelNumber);
 
 			if (channel != null && this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET && this.channels.size() > 1) {
@@ -473,7 +507,7 @@ public class FileHandler {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0006, new Object[] { channelConfigName }));
 					if (answer != SWT.OK) return;
 
-					// clean existing channel for new data, if channel does not exist ignore, 
+					// clean existing channel for new data, if channel does not exist ignore,
 					// this will be covered by the reader by creating a new channel
 					channel.clear();
 				}
@@ -541,8 +575,8 @@ public class FileHandler {
 				// ignore
 			}
 		}
-		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KMZ }, path, fileName != null && fileName.length() > 4 ? fileName
-				: getFileNameProposal(true));
+		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KMZ }, path,
+				fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
 		String kmzFilePath = kmlFileDialog.open();
 		if (kmzFilePath != null && kmlFileDialog.getFileName().length() > 4) {
 			if (FileUtils.checkFileExist(kmzFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { kmzFilePath }))) {
@@ -651,10 +685,8 @@ public class FileHandler {
 	 * @param pdodOrdinal
 	 * @param accelerationXYZ
 	 */
-		public void exportFileGPX(final String dialogName, 
-				final int latitudeOrdinal, final int longitudeOrdinal, final int altitudeOrdinal, final int speedOrdinal, final int satellitesOrdinal, 
-				final int hdopOrdinal, final int vdopOrdinal, final int pdodOrdinal,
-				final int[] accelerationXYZ) {
+	public void exportFileGPX(final String dialogName, final int latitudeOrdinal, final int longitudeOrdinal, final int altitudeOrdinal, final int speedOrdinal, final int satellitesOrdinal,
+			final int hdopOrdinal, final int vdopOrdinal, final int pdodOrdinal, final int[] accelerationXYZ) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
@@ -682,7 +714,8 @@ public class FileHandler {
 				// ignore
 			}
 		}
-			FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
+		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path,
+				fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
 		String gpxFilePath = gpxFileDialog.open();
 		if (gpxFilePath != null && gpxFilePath.length() > 4) {
 			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
@@ -692,8 +725,7 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-					GPXWriter.write(gpxFilePath, activeRecordSet, latitudeOrdinal, longitudeOrdinal, altitudeOrdinal, speedOrdinal, satellitesOrdinal, 
-							hdopOrdinal, vdopOrdinal, pdodOrdinal, accelerationXYZ);
+				GPXWriter.write(gpxFilePath, activeRecordSet, latitudeOrdinal, longitudeOrdinal, altitudeOrdinal, speedOrdinal, satellitesOrdinal, hdopOrdinal, vdopOrdinal, pdodOrdinal, accelerationXYZ);
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
@@ -743,8 +775,8 @@ public class FileHandler {
 				// ignore
 			}
 		}
-		FileDialog igcFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_IGC }, path, fileName != null && fileName.length() > 4 ? fileName
-				: getFileNameProposal(true));
+		FileDialog igcFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_IGC }, path,
+				fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
 		String igcFilePath = igcFileDialog.open();
 		if (igcFilePath != null && igcFileDialog.getFileName().length() > 4) {
 			if (FileUtils.checkFileExist(igcFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { igcFilePath }))) {

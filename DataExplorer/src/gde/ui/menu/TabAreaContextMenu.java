@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
@@ -37,9 +38,9 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.datasources.HistoSet;
 import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionActivity;
+import gde.histo.recordings.TrailRecordSet;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -60,7 +61,6 @@ public class TabAreaContextMenu {
 
 	private final DataExplorer	application	= DataExplorer.getInstance();
 	private final Settings			settings		= Settings.getInstance();
-	private final HistoSet			histoSet		= HistoSet.getInstance();
 
 	MenuItem										curveSelectionItem;
 	MenuItem										displayGraphicsHeaderItem;
@@ -233,13 +233,15 @@ public class TabAreaContextMenu {
 										? ((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
 
 								if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
-									new FileHandler().openOsdFile(file.getAbsolutePath());
+									String recordSetName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString().split(Pattern.quote(TrailRecordSet.BASE_NAME_SEPARATOR))[0];
+									new FileHandler().openOsdFile(file.getAbsolutePath(), recordSetName);
 								}
 								else if (!validatedImportExtention.isEmpty() && file.getAbsolutePath().endsWith(validatedImportExtention)) {
 									((IHistoDevice) TabAreaContextMenu.this.application.getActiveDevice()).importDeviceData(file.toPath());
 								}
 								TabAreaContextMenu.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
-								TabAreaContextMenu.this.application.updateGraphicsWindow();							}
+								TabAreaContextMenu.this.application.updateGraphicsWindow();
+							}
 						}
 					});
 				}
