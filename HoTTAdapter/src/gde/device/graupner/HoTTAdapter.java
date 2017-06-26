@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBException;
 
@@ -1103,7 +1104,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
+			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + DeviceXmlResource.getInstance().getReplacement(this.getMeasurementNames(channelConfigNumber)[i])); //$NON-NLS-1$
 
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
 			if (record.isActive() && record.isActive() != measurement.isActive()) { //corrected values from older OSD might be overwritten p.e. VoltageRx_min
@@ -1231,8 +1233,37 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							try {
 								HoTTbinReader.read(selectedImportFile); // , HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								if (!isInitialSwitched) {
-									Channel receiverChannel = HoTTAdapter.this.channels.get(1);
-									HoTTbinReader.channels.switchChannel(receiverChannel.getName());
+									if (HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet() == null) {
+										Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();
+										HoTTbinReader.channels.switchChannel(selectedChannel.getName());
+									}
+									else {
+										String recordSetType = HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet().getName().split(Pattern.quote("["))[0].split(Pattern.quote(")"))[1];
+										Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();
+
+										// find the latest recordSet just imported by this method
+										if (Settings.getInstance().isFirstRecordSetChoice()) {
+											String lastCurrentNumber = "";
+											String lastNameMatch = null;
+											for (String tmpName : selectedChannel.getRecordSetNames()) {
+												String currentNumber = tmpName.split(Pattern.quote(")"))[0];
+												if (!currentNumber.equals(lastCurrentNumber)) {
+													lastCurrentNumber = currentNumber;
+													lastNameMatch = tmpName;
+												}
+											}
+											HoTTbinReader.channels.switchChannel(selectedChannel.getName());
+											selectedChannel.switchRecordSet(lastNameMatch);
+										}
+										else {
+											String lastNameMatch = null;
+											for (String tmpName : selectedChannel.getRecordSetNames()) {
+												if (tmpName.contains(recordSetType)) lastNameMatch = tmpName;
+											}
+											HoTTbinReader.channels.switchChannel(selectedChannel.getName());
+											selectedChannel.switchRecordSet(lastNameMatch);
+										}
+									}
 									isInitialSwitched = true;
 								}
 								WaitTimer.delay(500);
@@ -1257,7 +1288,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	@Override
 	public void importDeviceData(Path filePath) {
-		if (!application.getDeviceSelectionDialog().checkDataSaved()) return;
+		if (!this.application.getDeviceSelectionDialog().checkDataSaved()) return;
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -1267,7 +1298,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					HoTTAdapter.this.application.setPortConnected(true);
 
 					if (filePath.getFileName().toString().length() > MIN_FILENAME_LENGTH) {
-						for (Channel channel : channels.values()) {
+						for (Channel channel : HoTTAdapter.this.channels.values()) {
 							channel.clear();
 						}
 
@@ -1290,20 +1321,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								throw new UnsupportedOperationException();
 
 							if (!isInitialSwitched) {
-								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class)
-										|| HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
-									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
-									HoTTbinReader.channels.switchChannel(activeChannel.getName());
+								Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();
+								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
+									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
 								}
 								else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
-									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
-									HoTTbinReader2.channels.switchChannel(activeChannel.getName());
-									activeChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
+									HoTTbinReader2.channels.switchChannel(selectedChannel.getName());
+									// WBrueg 2017-06-26 required? selectedChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
+									selectedChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
 								}
 								else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class)) {
-									Channel activeChannel = HoTTAdapter.this.application.getActiveChannel();
-									HoTTbinReader.channels.switchChannel(activeChannel.getName());
-									activeChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
+									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
+									// WBrueg 2017-06-26 required? selectedChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
+									selectedChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
 								}
 								else
 									throw new UnsupportedOperationException();
@@ -1435,7 +1465,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
-	 * @return
+	 * @return true if the record is a latitude or longitude record
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
