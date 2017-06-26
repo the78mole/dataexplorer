@@ -198,7 +198,7 @@ public final class DirectoryScanner {
 				File actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(file.getAbsolutePath()));
 				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
 				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-				if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555)) {
+				if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !file.exists()) {
 					log.log(Level.WARNING, "Dead OSD link " + file + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!file.delete()) {
 						log.log(Level.WARNING, "could not delete link file ", file); //$NON-NLS-1$
