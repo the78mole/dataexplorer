@@ -61,7 +61,7 @@ public final class TrailRecordSetFormatter {
 				else {
 					final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
 					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length() : record.getName().length());
-					final String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					final String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sb.append(GDE.STRING_OR).append(String.format(format, name, unit));
 				}
 			}
