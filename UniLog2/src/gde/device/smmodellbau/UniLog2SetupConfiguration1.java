@@ -66,6 +66,9 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	final UniLog2Dialog							dialog;
 	final DataExplorer							application;
 	final UniLog2SetupReaderWriter	configuration;
+	
+	CLabel													serialNumberLabel, firmwareLabel;
+	Text														serialNumberText, firmwareText;
 
 	Group														commonAdjustmentsGroup, logStartStopGroup;
 	CLabel													dataRateLabel, currentSensorTypeLabel, propellerBladesLabel, motorPolsLabel, gearFactorLabel, varioTriggerLevelLabel, varioTriggerSinkLevelLabel, varioToneLabel,
@@ -83,6 +86,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	Composite												addonComposite;
 	CLabel													frskyIdLabel;
 	Button													fixSerialNumberButton;
+	Button													robbeTBoxButton;
 	CCombo													frskyIdCombo;
 
 	final String[]									dataRateValues				= { " 20 Hz", " 10 Hz", "  5 Hz", "  2 Hz", "  1 Hz" };
@@ -97,7 +101,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	final String[]									frskyIDs							= { " 0x00", " 0xA1", " 0x22", " 0x83", " 0xE4", " 0x45", " 0xC6", " 0x67", " 0x48", " 0xE9", " 0x6A", " 0xCB", " 0xAC", " 0x0D", " 0x8E",
 			" 0x2F", " 0xD0", " 0x71", " 0xF2", " 0x53", " 0x34", " 0x95", " 0x16", " 0xB7", " 0x98", " 0x39", " 0xBA", " 0x1B" };
 
-	final String[]									telemetrieTypes				= { " - - - ", " Futaba", " JR DMSS", " HoTT GAM", " HoTT EAM", " HoTT ESC", " JetiDuplex", " M-Link", " FrSky", " HoTT Vario" };
+	final String[]									telemetrieTypes				= { " - - - ", " Futaba", " JR DMSS", " HoTT GAM", " HoTT EAM", " HoTT ESC", " JetiDuplex", " M-Link", " FrSky", " HoTT Vario", " Spektrum" };
 	final String[]									capacityResets				= Messages.getString(MessageIds.GDE_MSGT2581).split(GDE.STRING_COMMA);
 	final String[]									currentOffsets				= Messages.getString(MessageIds.GDE_MSGT2582).split(GDE.STRING_COMMA);
 	final String[]									varioFactors;
@@ -179,6 +183,9 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	 * update values according to red configuration values
 	 */
 	public void updateValues() {
+		this.serialNumberText.setText(GDE.STRING_EMPTY + this.configuration.serialNumber);
+		this.firmwareText.setText(String.format(" %.2f", this.configuration.firmwareVersion / 100.0)); //$NON-NLS-1$
+
 		this.dataRateCombo.select(this.configuration.dataRate - 1); //remove 50 Hz
 		this.currentSensorCombo.select(this.configuration.currentSensorType);
 		this.a1ModusCombo.select(this.configuration.modusA1);
@@ -203,6 +210,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.telemetrieTypeCombo.select(this.configuration.telemetrieType);
 		this.frskyIdCombo.select(this.configuration.frskyAddr - 1);
 		this.fixSerialNumberButton.setSelection(this.configuration.serialNumberFix == 1 ? true : false);
+		this.robbeTBoxButton.setSelection(this.configuration.robbe_T_Box == 1 ? true : false);
 
 		this.autoStartCurrentButton.setSelection((this.configuration.startModus & 0x0001) > 0);
 		this.autoStartRxButton.setSelection((this.configuration.startModus & 0x0002) > 0);
@@ -226,12 +234,48 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.commonAdjustmentsGroup.setLayout(commonAdjustmentsGroupLayout);
 				FormData commonAdjustmentsGroupLData = new FormData();
 				commonAdjustmentsGroupLData.width = 290;
-				commonAdjustmentsGroupLData.height = 455;
+				commonAdjustmentsGroupLData.height = 495;
 				commonAdjustmentsGroupLData.left = new FormAttachment(0, 1000, 12);
 				commonAdjustmentsGroupLData.top = new FormAttachment(0, 1000, 5);
 				this.commonAdjustmentsGroup.setLayoutData(commonAdjustmentsGroupLData);
 				this.commonAdjustmentsGroup.setText(Messages.getString(MessageIds.GDE_MSGT2533));
 				this.commonAdjustmentsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				{
+					this.serialNumberLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData serialNumberLabelLData = new RowData();
+					serialNumberLabelLData.width = GDE.IS_LINUX ? 90 : 100;
+					serialNumberLabelLData.height = 20;
+					this.serialNumberLabel.setLayoutData(serialNumberLabelLData);
+					this.serialNumberLabel.setText(Messages.getString(MessageIds.GDE_MSGT2534));
+					this.serialNumberLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.serialNumberText = new Text(this.commonAdjustmentsGroup, SWT.RIGHT | SWT.BORDER);
+					RowData serialNumberTextLData = new RowData();
+					serialNumberTextLData.width = 50;
+					serialNumberTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					this.serialNumberText.setLayoutData(serialNumberTextLData);
+					this.serialNumberText.setEditable(false);
+					this.serialNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.firmwareLabel = new CLabel(this.commonAdjustmentsGroup, SWT.RIGHT);
+					RowData firmwareLabelLData = new RowData();
+					firmwareLabelLData.width = GDE.IS_LINUX ? 65 : 75;
+					firmwareLabelLData.height = 20;
+					this.firmwareLabel.setLayoutData(firmwareLabelLData);
+					this.firmwareLabel.setText(Messages.getString(MessageIds.GDE_MSGT2535));
+					this.firmwareLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.firmwareText = new Text(this.commonAdjustmentsGroup, SWT.BORDER | SWT.RIGHT);
+					RowData firmwareTextLData = new RowData();
+					firmwareTextLData.width = GDE.IS_LINUX ? 35 : 40;
+					firmwareTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					this.firmwareText.setLayoutData(firmwareTextLData);
+					this.firmwareText.setEditable(false);
+					this.firmwareText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
 				{
 					this.fillerComposite = new Composite(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
@@ -273,7 +317,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.addonComposite.setLayout(new FormLayout());
 					RowData addonCompositeLData = new RowData();
 					addonCompositeLData.width = 285;
-					addonCompositeLData.height = 22;
+					addonCompositeLData.height = 44;
 					this.addonComposite.setLayoutData(addonCompositeLData);
 					{
 						this.frskyIdLabel = new CLabel(this.addonComposite, SWT.NONE);
@@ -287,20 +331,39 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						this.frskyIdLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 					{
-						this.fixSerialNumberButton = new Button(this.addonComposite, SWT.CHECK | SWT.RIGHT);
+						this.fixSerialNumberButton = new Button(this.addonComposite, SWT.CHECK | SWT.LEFT);
 						FormData sensorTypeLabelLData = new FormData();
 						sensorTypeLabelLData.width = 135;
 						sensorTypeLabelLData.height = 20;
 						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
 						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 0);
 						this.fixSerialNumberButton.setLayoutData(sensorTypeLabelLData);
-						this.fixSerialNumberButton.setText("fix serial number");
+						this.fixSerialNumberButton.setText(Messages.getString(MessageIds.GDE_MSGT2592));
 						this.fixSerialNumberButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.fixSerialNumberButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								UniLog2SetupConfiguration1.log.log(Level.FINEST, "fixSerialNumberButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								UniLog2SetupConfiguration1.this.configuration.serialNumberFix = (short) (UniLog2SetupConfiguration1.this.fixSerialNumberButton.getSelection() ? 1 : 0);
+								UniLog2SetupConfiguration1.this.configuration.serialNumberFix = (byte) (UniLog2SetupConfiguration1.this.fixSerialNumberButton.getSelection() ? 1 : 0);
+								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+						});
+					}
+					{
+						this.robbeTBoxButton = new Button(this.addonComposite, SWT.CHECK | SWT.LEFT);
+						FormData sensorTypeLabelLData = new FormData();
+						sensorTypeLabelLData.width = 115;
+						sensorTypeLabelLData.height = 20;
+						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
+						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 22);
+						this.robbeTBoxButton.setLayoutData(sensorTypeLabelLData);
+						this.robbeTBoxButton.setText(Messages.getString(MessageIds.GDE_MSGT2593));
+						this.robbeTBoxButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.robbeTBoxButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								UniLog2SetupConfiguration1.log.log(Level.FINEST, "robbeTBoxButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UniLog2SetupConfiguration1.this.configuration.robbe_T_Box = (byte) (UniLog2SetupConfiguration1.this.robbeTBoxButton.getSelection() ? 1 : 0);
 								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 						});
@@ -903,7 +966,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				logStartStopGroupLData.width = 290;
 				logStartStopGroupLData.height = 105;
 				logStartStopGroupLData.left = new FormAttachment(0, 1000, 12);
-				logStartStopGroupLData.top = new FormAttachment(0, 1000, 485);
+				logStartStopGroupLData.top = new FormAttachment(0, 1000, 530);
 				this.logStartStopGroup.setLayoutData(logStartStopGroupLData);
 				this.logStartStopGroup.setText(Messages.getString(MessageIds.GDE_MSGT2526));
 				this.logStartStopGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1104,15 +1167,24 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.frskyIdLabel.setVisible(false);
 		this.frskyIdCombo.setVisible(false);
 		this.fixSerialNumberButton.setVisible(false);
+		this.robbeTBoxButton.setVisible(false);
 		if (UniLog2SetupConfiguration2.mLinkGroupStatic != null && !UniLog2SetupConfiguration2.mLinkGroupStatic.isDisposed()) {
 			UniLog2SetupConfiguration2.mLinkGroupStatic.setVisible(false);
 		}
 		if (UniLog2SetupConfiguration2.jetiExGroupStatic != null && !UniLog2SetupConfiguration2.jetiExGroupStatic.isDisposed()) {
 			UniLog2SetupConfiguration2.jetiExGroupStatic.setVisible(false);
 		}
+		if (UniLog2SetupConfiguration2.spektrumAdapterGroupStatic != null && !UniLog2SetupConfiguration2.spektrumAdapterGroupStatic.isDisposed()) {
+			UniLog2SetupConfiguration2.spektrumAdapterGroupStatic.setVisible(false);
+		}
 
 		if (this.telemetrieTypeCombo != null && !this.telemetrieTypeCombo.isDisposed()) {
 			switch (this.telemetrieTypeCombo.getSelectionIndex()) {
+			case 10: //Spektrum
+				if (UniLog2SetupConfiguration2.spektrumAdapterGroupStatic != null && !UniLog2SetupConfiguration2.spektrumAdapterGroupStatic.isDisposed()) {
+					UniLog2SetupConfiguration2.spektrumAdapterGroupStatic.setVisible(true);
+				}
+				break;
 			case 8: // FrSky
 				this.frskyIdLabel.setVisible(true);
 				this.frskyIdCombo.setVisible(true);
@@ -1130,6 +1202,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				break;
 			case 1: //Futaba
 				this.fixSerialNumberButton.setVisible(true);
+				this.robbeTBoxButton.setVisible(true);
 				break;
 			default:
 				break;

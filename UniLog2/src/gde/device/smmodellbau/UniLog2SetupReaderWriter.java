@@ -60,7 +60,9 @@ public class UniLog2SetupReaderWriter {
 	final static int		TEL_ALARM_ANALOG_3			= 0x0200;
 	final static int		TEL_ALARM_CLIMB					= 0x0400;
 	final static int		TEL_ALARM_SINK					= 0x0800;
-	final static int		TEL_ALARM_ENERGIE				= 0x1000;
+	final static int		TEL_ALARM_ENERGY				= 0x1000;
+	final static int		TEL_ALARM_RPM_MIN				= 0x2000;
+	final static int		TEL_ALARM_RPM_MAX				= 0x4000;
 
 	final static int		AUTO_START_CURRENT			= 0x0001;
 	final static int		AUTO_START_RX						= 0x0002;
@@ -119,7 +121,8 @@ public class UniLog2SetupReaderWriter {
 	short							varioOffMotor						= 0;							// 25 Vario_aus_bei_Motor
 	int								jetiValueVisibility			= 0xFFFFFFFF;			// 26/27 Jeti_EX_Ausblenden
 	short							varioFactor							= 0;							// 28 Vario Faktor
-	short							serialNumberFix					= 0;							// 29 fixe_Seriennummer;
+	byte							serialNumberFix					= 0;							// 29.. fixe_Seriennummer;
+	byte							robbe_T_Box							= 0;							// ..29 Robbe_T_Box
 	short							setTime									= 0;							// 30 Zeit_setzen
 	short							varioFilter							= 1;							// 31 Vario filter
 	//short[] A = new short[6]; 																// 32-37
@@ -138,7 +141,9 @@ public class UniLog2SetupReaderWriter {
 	short							analogAlarm2Direct			= 0;							// 50 0 = >; 1 = <
 	short							analogAlarm3Direct			= 0;							// 51 0 = >; 1 = <
 	short							energyAlarm							= 0;							// 52 0 = >; 1 = <
-	//short[] B = new short[12]; 																// 53-64
+	short							rpmMinAlarm							= 0;							// 53 0 = >; 1 = <
+	short							rpmMaxAlarm							= 0;							// 54 0 = >; 1 = <
+	//short[] B = new short[10]; 																// 55-64
 	byte							mLinkAddressVoltage			= 0;							// 
 	byte							mLinkAddressCurrent			= 1;							// 65 0 - 15, "--"
 	byte							mLinkAddressRevolution	= 2;							// 
@@ -157,8 +162,14 @@ public class UniLog2SetupReaderWriter {
 	byte							mLinkAddressCell6				= 15;							//
 	byte							mLinkAddressHeightGain	= 6;							// 73
 	byte							mLinkAddressEnergy			= 15;							// 
-	byte[]						sbusStartSlot						= new byte[8];		// 74 - 77
-	//short[] C = new short[190/2 - 77]; 																																			// 77-95
+	byte[]						sbusStartSlot						= new byte[16];		// 74 - 81
+	byte							spektrumSensors					= 0;							// 82..
+	byte							spektrumNumber					= 0;							// ..82
+	byte							mLinkAddressRemainCap		= 15;							// 83..
+	byte							mLinkAddressFree				= 15;							// ..83
+	//short[] C = new short[190/2 - (93 - 84)]; 								// 84-93
+	short							betaVersion							= 0;							// 94
+	short							hardwareVersion					= 0;							// 95
 	short							checkSum;																	// 96
 
 	byte[]						setupData								= new byte[192];
@@ -187,7 +198,7 @@ public class UniLog2SetupReaderWriter {
 				}
 				this.serialNumber = DataParser.parse2Short(buffer, 0);
 				this.firmwareVersion = DataParser.parse2Short(buffer, 2);
-				if (this.firmwareVersion != 112) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2501));
+				if (this.firmwareVersion != 114) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2501));
 				this.dataRate = DataParser.parse2Short(buffer, 4); //0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
 				this.startModus = DataParser.parse2Short(buffer, 6); //AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
 				this.startCurrent = DataParser.parse2Short(buffer, 8); //1 - 50 A
@@ -214,7 +225,8 @@ public class UniLog2SetupReaderWriter {
 				this.varioOffMotor = DataParser.parse2Short(buffer, 48); // 25 Vario_aus_bei_Motor on=0 off=1
 				this.jetiValueVisibility = DataParser.parse2Int(buffer, 50); // 26/27 Jeti_EX_Ausblenden
 				this.varioFactor = DataParser.parse2Short(buffer, 54); // 28 Vario Faktor
-				this.serialNumberFix = DataParser.parse2Short(buffer, 56); // 29 fixe_Seriennummer;
+				this.serialNumberFix = buffer[56]; // 29.. fixe_Seriennummer;
+				this.robbe_T_Box = buffer[57]; // ..29 Robbe_T_Box;
 				this.setTime = DataParser.parse2Short(buffer, 58); // 30 Zeit_setzen
 				this.varioFilter = DataParser.parse2Short(buffer, 60); // 31 Vario filter
 				//short[] A = new short[6]; 													 // 32-37
@@ -234,7 +246,9 @@ public class UniLog2SetupReaderWriter {
 				this.analogAlarm2Direct = DataParser.parse2Short(buffer, 98); // 50 0 = >; 1 = <
 				this.analogAlarm3Direct = DataParser.parse2Short(buffer, 100); // 51 0 = >; 1 = <
 				this.energyAlarm = DataParser.parse2Short(buffer, 102); // 52 0 = >; 1 = <
-				//short[] B = new short[12]; // 52-64
+				this.rpmMinAlarm = DataParser.parse2Short(buffer, 104); // 53 0 = >; 1 = <
+				this.rpmMaxAlarm = DataParser.parse2Short(buffer, 106); // 54 0 = >; 1 = <
+				//short[] B = new short[12]; // 55-64
 				this.mLinkAddressVoltage = buffer[128]; //0 - 15, "--"
 				this.mLinkAddressCurrent = buffer[129]; //0 - 15, "--"
 				this.mLinkAddressRevolution = buffer[130]; //0 - 15, "--"
@@ -253,8 +267,14 @@ public class UniLog2SetupReaderWriter {
 				this.mLinkAddressCell6 = buffer[143]; //0 - 15, "--"
 				this.mLinkAddressHeightGain = buffer[144]; //0 - 15, "--"
 				this.mLinkAddressEnergy = buffer[145]; //0 - 15, "--"
-				System.arraycopy(buffer, 146, this.sbusStartSlot, 0, 8); // 74 - 77
-				//short[] C = new short[190/2 - 77]; 																																			// 77-95
+				System.arraycopy(buffer, 146, this.sbusStartSlot, 0, 16); // 74 - 81
+				this.spektrumSensors = buffer[162];	// 82..
+				this.spektrumNumber = buffer[163];	// ..82
+				this.mLinkAddressRemainCap = buffer[164]; //83.. 0 - 15, "--"
+				this.mLinkAddressFree = buffer[165]; //83.. 0 - 15, "--"
+				//short[] C = new short[190/2 - 83]; 	
+				this.betaVersion = DataParser.parse2Short(buffer, 186); // 94
+				this.hardwareVersion = DataParser.parse2Short(buffer, 188); // 95
 				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));
 
 				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.FINE))
@@ -340,8 +360,8 @@ public class UniLog2SetupReaderWriter {
 				buffer[53] = (byte) ((this.jetiValueVisibility & 0xFF000000) >> 24);
 				buffer[54] = (byte) (this.varioFactor & 0x00FF); // 28 Vario Faktor 0-40
 				buffer[55] = (byte) ((this.varioFactor & 0xFF00) >> 8);
-				buffer[56] = (byte) (this.serialNumberFix & 0x00FF); // 29 fixe_Seriennummer 0/1
-				buffer[57] = (byte) ((this.serialNumberFix & 0xFF00) >> 8);
+				buffer[56] = (byte) (this.serialNumberFix & 0x00FF); // 29.. fixe_Seriennummer
+				buffer[57] = (byte) (this.robbe_T_Box & 0x00FF); // ..29 Robbe_T_Box
 				buffer[58] = (byte) (this.setTime & 0x00FF); // 30 Zeit_setzen 0/1
 				buffer[59] = (byte) ((this.setTime & 0xFF00) >> 8);
 				buffer[60] = (byte) (this.varioFilter & 0x00FF); // 31 Vario filter 0-2
@@ -380,7 +400,11 @@ public class UniLog2SetupReaderWriter {
 				buffer[101] = (byte) ((this.analogAlarm3Direct & 0xFF00) >> 8);
 				buffer[102] = (byte) (this.energyAlarm & 0x00FF); //52 0 = >; 1 = <
 				buffer[103] = (byte) ((this.energyAlarm & 0xFF00) >> 8);
-				//short[] B = new short[13]; // 46-64
+				buffer[104] = (byte) (this.rpmMinAlarm & 0x00FF); //52 0 = >; 1 = <
+				buffer[105] = (byte) ((this.rpmMinAlarm & 0xFF00) >> 8);
+				buffer[106] = (byte) (this.rpmMaxAlarm & 0x00FF); //52 0 = >; 1 = <
+				buffer[107] = (byte) ((this.rpmMaxAlarm & 0xFF00) >> 8);
+				//short[] B = new short[10]; // 55-64
 				buffer[128] = this.mLinkAddressVoltage; //0 - 15, "--"
 				buffer[129] = this.mLinkAddressCurrent; //0 - 15, "--"
 				buffer[130] = this.mLinkAddressRevolution; //0 - 15, "--"
@@ -399,8 +423,17 @@ public class UniLog2SetupReaderWriter {
 				buffer[143] = this.mLinkAddressCell6; //0 - 15, "--"
 				buffer[144] = this.mLinkAddressHeightGain; //0 - 15, "--"
 				buffer[145] = this.mLinkAddressEnergy; //0 - 15, "--"
-				System.arraycopy(this.sbusStartSlot, 0, buffer, 146, 8); // 74 - 77
-				//short[] C = new short[190/2 - 72]; 					// 73-95
+				System.arraycopy(this.sbusStartSlot, 0, buffer, 146, 8); // 74 - 81
+				buffer[162] = this.spektrumSensors; // 82..
+				buffer[163] = this.spektrumNumber; // ..82
+				buffer[164] = this.mLinkAddressRemainCap; // 83.. 0 - 15, "--"
+				buffer[165] = this.mLinkAddressFree; // ..83 0 - 15, "--"
+				//short[] C = new short190/2 - (93 - 84)]; 					// 84-93
+				buffer[186] = (byte) (this.betaVersion & 0x00FF); // 95
+				buffer[187] = (byte) ((this.betaVersion & 0xFF00) >> 8);
+				buffer[188] = (byte) (this.hardwareVersion & 0x00FF); // 95
+				buffer[189] = (byte) ((this.hardwareVersion & 0xFF00) >> 8);
+				
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
 				tmpCheckSum = Checksum.CRC16(chkBuffer, 0);
@@ -421,7 +454,7 @@ public class UniLog2SetupReaderWriter {
 	}
 	
 	public int getJetiMeasurementCount() {
-		int count = 19;
+		int count = 20;
 		for (int i = 0; i < GDE.SIZE_BYTES_INTEGER * 8; i++) {
 			count -= (this.jetiValueVisibility >> i) & 0x00000001;
 		}
