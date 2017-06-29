@@ -1163,7 +1163,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		}
 	}
 
-	private void changeVisibility() {
+	public void changeVisibility() {
 		this.frskyIdLabel.setVisible(false);
 		this.frskyIdCombo.setVisible(false);
 		this.fixSerialNumberButton.setVisible(false);

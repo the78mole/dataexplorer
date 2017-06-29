@@ -253,6 +253,7 @@ public class UniLog2Dialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (UniLog2Dialog.this.tabFolder.getSelectionIndex() == 2) {
+								UniLog2Dialog.this.configuration1Composite.changeVisibility();
 								UniLog2Dialog.this.saveChangesButton.setText(Messages.getString(MessageIds.GDE_MSGT2518));
 								UniLog2Dialog.this.saveChangesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2524));
 								UniLog2Dialog.this.loggerSetup.loadSetup();

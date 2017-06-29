@@ -48,7 +48,7 @@ public class SetupReaderWriter {
 	final Shell					parent;
 
 	final static int		TEL_ALARM_HEIGHT						= 0x0001;
-	final static int		TEL_ALARM_SPEED							= 0x0002;
+	final static int		TEL_ALARM_SPEED_MAX					= 0x0002;
 	final static int		TEL_ALARM_DISTANCE_MAX			= 0x0004;
 	final static int		TEL_ALARM_TRIP_LENGTH				= 0x0008;
 	final static int		TEL_ALARM_VOLTAGE_RX				= 0x0010;
@@ -58,61 +58,86 @@ public class SetupReaderWriter {
 	final static int		TEL_ALARM_VOLTAGE_UL				= 0x0080;
 	final static int		TEL_ALARM_CAPACITY_UL				= 0x0100;
 	final static int		TEL_ALARM_DISTANCE_MIN			= 0x0200;
+	final static int		TEL_ALARM_SPEED_MIN					= 0x0400;
 
 	//$SETUP,192 Byte*
-	int									serialNumber								= 357;																									// 1
-	int									datarate										= 0;																										// 2 0 = 10Hz, 1 = 5Hz, 2 = 2Hz, 1 = 1Hz
-	int									startModus									= 1;																										// 3 0 = „manuell“, 1 = „3D-Fix“, 2 = „ >20 m“, 3 = „>20 km/h“
+	short								serialNumber								= 357;																									// 1
+	short								datarate										= 0;																										// 2 0 = 10Hz, 1 = 5Hz, 2 = 2Hz, 1 = 1Hz
+	short								startModus									= 1;																										// 3 0 = „manuell“, 1 = „3D-Fix“, 2 = „ >20 m“, 3 = „>20 km/h“
 	short								timeZone										= 2;																										// 4 -12 --> +12 step 1
-	int									units												= 0;																										// 5
-	int									varioThreshold							= 3;																										// 6  0 --> 50 step 1
-	int									varioTon										= 0;																										// 7
-	int									stopModus										= 0;																										// 8 0=OFF; 1=no motion
-	int									modusDistance								= 0;																										// 9 0=3D; 1=2D
-	int									varioThresholdSink					= 8;																										// 10 0 --> 50 step 1
-	int									daylightSavingModus					= 1;																										// 11 0=manual; 1=auto
-	int									telemetryType								= 0;																										// 12 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky
-	int									rxControl										= 0;																										// 13 0=OFF, 1=Min/Live/Max 2=StartPoint
+	short								units												= 0;																										// 5
+	short								varioThreshold							= 3;																										// 6  0 --> 50 step 1
+	short								varioTon										= 0;																										// 7
+	short								stopModus										= 0;																										// 8 0=OFF; 1=no motion
+	short								modusDistance								= 0;																										// 9 0=3D; 1=2D
+	short								varioThresholdSink					= 8;																										// 10 0 --> 50 step 1
+	short								daylightSavingModus					= 1;																										// 11 0=manual; 1=auto
+	short								telemetryType								= 0;																										// 12 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky
+	short								rxControl										= 0;																										// 13 0=OFF, 1=Min/Live/Max 2=StartPoint
 	int									jetiExMask									= 0xFFFFFFFF;																						// 14,15 bit0=undefined, bit1=time bit*=refer to converter
-	int									varioFactor									= 0;																										// 16 1 + factor/10
-	//short[] A = new short[1]; // 16
-	int									telemetryAlarms							= 0x0013;																								// 18 
-	int									heightAlarm									= 200;																									// 19 10m --> 4000m step 50
-	int									speedAlarm									= 200;																									// 20 10km/h --> 1000km/h
-	int									distanceMaxAlarm						= 500;																									// 21 10m --> 5000m
-	int									voltageRxAlarm							= 450;																									// 22 300 --> 800 V/100
-	int									tripLengthAlarm							= 50;																										// 23 10km/10 --> 999km/10
-	int									currentUlAlarm							= 100;																									// 24 1A --> 400A
-	int									voltageStartUlAlarm					= 124;																									// 25 10V/10 --> 600V/10
-	int									voltageUlAlarm							= 100;																									// 26 10V/10 --> 600V/10
-	int									capacityUlAlarm							= 2000;																									// 27 100mAh --> 30000mAh
-	int									distanceMinAlarm						= 0;																										// 28 0 - 500
-	//short[] B = new short[9]; // 29-37
-	int									mLinkAddressVario						= 0;																										// 38 0 - 15, "--"
-	int									mLinkAddressSpeed						= 1;																										// 39
-	int									mLinkAddressDirection				= 3;																										// 40
-	int									mLinkAddressHeight					= 4;																										// 41
-	int									mLinkAddressDistance				= 7;																										// 42
-	int									mLinkAddressTripLength			= 8;																										// 43
-	int									mLinkAddressSpeedMax				= 2;																										// 44
-	int									mLinkAddressHeightMax				= 5;																										// 45
-	int									mLinkAddressVoltageUL				= 9;																										// 46
-	int									mLinkAddressCurrentUL				= 10;																										// 47
-	int									mLinkAddressRevolutionUL		= 11;																										// 48
-	int									mLinkAddressCapacityUL			= 12;																										// 49
-	int									mLinkAddressFlightDirection	= 13;																										// 50
-	int									mLinkAddressDirectionRel		= 14;																										// 51
-	int									mLinkAddressIntHeight				= 6;																										// 52
-	//short[] C = short int[1]; // 52-53
-	int									firmwareVersion							= 103;																									// 54
-	int									modusIGC										= 1;																										// 55
+	short								varioFactor									= 0;																										// 16 1 + factor/10
+	short								frskyAddr 									= 0; 																										// 17 0x00 -> 0x1B
+	short								telemetryAlarms							= 0x0013;																								// 18 
+	short								heightAlarm									= 200;																									// 19 10m --> 4000m step 50
+	short								speedMaxAlarm								= 200;																									// 20 10km/h --> 1000km/h
+	short								distanceMaxAlarm						= 500;																									// 21 10m --> 5000m
+	short								voltageRxAlarm							= 450;																									// 22 300 --> 800 V/100
+	short								tripLengthAlarm							= 50;																										// 23 10km/10 --> 999km/10
+	short								currentUlAlarm							= 100;																									// 24 1A --> 400A
+	short								voltageStartUlAlarm					= 124;																									// 25 10V/10 --> 600V/10
+	short								voltageUlAlarm							= 100;																									// 26 10V/10 --> 600V/10
+	short								capacityUlAlarm							= 2000;																									// 27 100mAh --> 30000mAh
+	short								distanceMinAlarm						= 0;																										// 28 0 - 500
+	byte								serialNumberFix							= 0;																										// 29.. fixe_Seriennummer;
+	byte								robbe_T_Box									= 0;																										// ..29 Robbe_T_Box
+	short								varioFilter									= 0;																										// 30 Vario filter
+	short								speedMinAlarm								= 30;																										// 31 10km/h --> 1000km/h
+	//short[] B = new short[6]; // 32-37
+	byte								mLinkAddressVario						= 0;																										// 38.. 0 - 15, "--"
+	byte								mLinkAddressVoltageRx				= 16;																										// ..38 0 - 15, "--"
+	byte								mLinkAddressSpeed						= 1;																										// 39..
+	byte								mLinkAddressFree39					= 0;																										// ..39
+	byte								mLinkAddressDirection				= 3;																										// 40..
+	byte								mLinkAddressFree40					= 0;																										// ..40
+	byte								mLinkAddressHeight					= 4;																										// 41..
+	byte								mLinkAddressFree41					= 0;																										// ..41
+	byte								mLinkAddressDistance				= 7;																										// 42..
+	byte								mLinkAddressFree42					= 0;																										// ..42
+	byte								mLinkAddressTripLength			= 8;																										// 43..
+	byte								mLinkAddressFree43					= 0;																										// ..43
+	byte								mLinkAddressSpeedMax				= 2;																										// 44..
+	byte								mLinkAddressFree44					= 0;																										// ..44
+	byte								mLinkAddressHeightMax				= 5;																										// 45..
+	byte								mLinkAddressFree45					= 0;																										// ..45
+	byte								mLinkAddressENL							= 9;																										// 46..
+	byte								mLinkAddressFree46					= 0;																										// ..46
+	byte								mLinkAddressAccX						= 10;																										// 47..
+	byte								mLinkAddressFree47					= 0;																										// ..47
+	byte								mLinkAddressAccY						= 11;																										// 48..
+	byte								mLinkAddressFree48					= 0;																										// ..48
+	byte								mLinkAddressAccZ						= 12;																										// 49..
+	byte								mLinkAddressFree49					= 0;																										// ..49
+	byte								mLinkAddressFlightDirection	= 13;																										// 50..
+	byte								mLinkAddressFree50					= 0;																										// ..50
+	byte								mLinkAddressDirectionRel		= 14;																										// 51..
+	byte								mLinkAddressFree51					= 0;																										// ..51
+	byte								mLinkAddressHeightGain			= 6;																										// 52..
+	byte								mLinkAddressFree52					= 0;																										// ..52
+	//short[] C = short int[1]; 																																						// 53
+	short								firmwareVersion							= 119;																									// 54
+	short								modusIGC										= 1;																										// 55
 	byte 								startSlotSBUS[] 						= new byte[8];																					// 56-59
-	//int[]							unused											= new int[192 - 62 * 2];
-	int 								betaVersion									= 0;																										// 60
-	int 								hardwareVersion							= 0;																										// 61
-	short								checkSum;																																						// 62
+	byte								spektrumSensors							= 0;																										// 60..
+	byte								spektrumNumber							= 0;																										// ..60
+	int									fixPositionLatitude					= 0;																										// 61,62
+	int									fixPositionLongitude				= 0;																										// 63,64
+	short 							fixPositionAltitude					= 0;																										// 65
+	//short[]						unused											= new short[192 - 68 * 2];
+	short 							betaVersion									= 0;																										// 94
+	short								hardwareVersion							= 0;																										// 95
+	short								checkSum;																																						// 96
 
-	int[]								setupData										= new int[96];
+	short[]							setupData										= new short[192];
 
 	public SetupReaderWriter(Shell useParent, GPSLogger useDevice) {
 		this.parent = useParent;
@@ -136,58 +161,68 @@ public class SetupReaderWriter {
 				if (size != 192) {
 					log.log(Level.SEVERE, "error reading configuration file, data size != 192 Bytes!"); //$NON-NLS-1$
 				}
-				this.serialNumber 					= (buffer[1] << 8) + (buffer[0] & 0x00FF);
-				this.datarate 							= (buffer[3] << 8) + (buffer[2] & 0x00FF);
-				this.startModus 						= (buffer[5] << 8) + (buffer[4] & 0x00FF);
-				this.timeZone 							= (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
+				this.serialNumber 					= DataParser.parse2Short(buffer, 0);
+				this.datarate 							= DataParser.parse2Short(buffer, 2);
+				this.startModus 						= DataParser.parse2Short(buffer, 4);
+				this.timeZone 							= DataParser.parse2Short(buffer, 6);
 				//units
-				this.varioThreshold 				= (buffer[11] << 8) + (buffer[10] & 0x00FF);
-				this.varioTon 							= (buffer[13] << 8) + (buffer[12] & 0x00FF);
-				this.stopModus 							= (buffer[15] << 8) + (buffer[14] & 0x00FF);
-				this.modusDistance					= (buffer[17] << 8) + (buffer[16] & 0x00FF);
-				this.varioThresholdSink			= (buffer[19] << 8) + (buffer[18] & 0x00FF);
-				this.daylightSavingModus		= (buffer[21] << 8) + (buffer[20] & 0x00FF);
-				this.telemetryType					= (buffer[23] << 8) + (buffer[22] & 0x00FF);
-				this.rxControl							= (buffer[25] << 8) + (buffer[24] & 0x00FF);
+				this.varioThreshold 				= DataParser.parse2Short(buffer, 10);
+				this.varioTon 							= DataParser.parse2Short(buffer, 12);
+				this.stopModus 							= DataParser.parse2Short(buffer, 14);
+				this.modusDistance					= DataParser.parse2Short(buffer, 16);
+				this.varioThresholdSink			= DataParser.parse2Short(buffer, 18);
+				this.daylightSavingModus		= DataParser.parse2Short(buffer, 20);
+				this.telemetryType					= DataParser.parse2Short(buffer, 22);
+				this.rxControl							= DataParser.parse2Short(buffer, 24);
 				this.jetiExMask							= DataParser.parse2Int(buffer, 26);
 				this.varioFactor 						= DataParser.parse2Short(buffer, 30);
-				//A[6]
-				this.telemetryAlarms 				= (buffer[35] << 8) + (buffer[34] & 0x00FF);
-				this.heightAlarm 						= (buffer[37] << 8) + (buffer[36] & 0x00FF);
-				this.speedAlarm 						= (buffer[39] << 8) + (buffer[38] & 0x00FF);
-				this.distanceMaxAlarm 					= (buffer[41] << 8) + (buffer[40] & 0x00FF);
-				this.voltageRxAlarm 				= (buffer[43] << 8) + (buffer[42] & 0x00FF);
-				this.tripLengthAlarm 				= (buffer[45] << 8) + (buffer[44] & 0x00FF);
-				this.currentUlAlarm 				= (buffer[47] << 8) + (buffer[46] & 0x00FF);
-				this.voltageStartUlAlarm 		= (buffer[49] << 8) + (buffer[48] & 0x00FF);
-				this.voltageUlAlarm 				= (buffer[51] << 8) + (buffer[50] & 0x00FF);
-				this.capacityUlAlarm 				= (buffer[53] << 8) + (buffer[52] & 0x00FF);
-				this.distanceMinAlarm				= (buffer[55] << 8) + (buffer[54] & 0x00FF);
-				//B[10]
-				this.mLinkAddressVario 				= (buffer[75] << 8) + (buffer[74] & 0x00FF);
-				this.mLinkAddressSpeed 				= (buffer[77] << 8) + (buffer[76] & 0x00FF);
-				this.mLinkAddressDirection 		= (buffer[79] << 8) + (buffer[78] & 0x00FF);
-				this.mLinkAddressHeight 			= (buffer[81] << 8) + (buffer[80] & 0x00FF);
-				this.mLinkAddressDistance 		= (buffer[83] << 8) + (buffer[82] & 0x00FF);
-				this.mLinkAddressTripLength 	= (buffer[85] << 8) + (buffer[84] & 0x00FF);
-				this.mLinkAddressSpeedMax			= (buffer[87] << 8) + (buffer[86] & 0x00FF);		// 44
-				this.mLinkAddressHeightMax		= (buffer[89] << 8) + (buffer[88] & 0x00FF);		// 45
-				this.mLinkAddressVoltageUL		= (buffer[91] << 8) + (buffer[90] & 0x00FF);		// 46
-				this.mLinkAddressCurrentUL		= (buffer[93] << 8) + (buffer[92] & 0x00FF);		// 47
-				this.mLinkAddressRevolutionUL	= (buffer[95] << 8) + (buffer[94] & 0x00FF);		// 48
-				this.mLinkAddressCapacityUL		= (buffer[97] << 8) + (buffer[96] & 0x00FF);		// 49		
-				this.mLinkAddressFlightDirection	= (buffer[99] << 8) + (buffer[98] & 0x00FF);// 50
-				this.mLinkAddressDirectionRel	= (buffer[101] << 8) + (buffer[100] & 0x00FF);	// 51
-				this.mLinkAddressIntHeight		= (buffer[103] << 8) + (buffer[102] & 0x00FF);	// 52
-				//C[2]
-				this.firmwareVersion 					= (buffer[107] << 8) + (buffer[106] & 0x00FF);	// 54
-				if (this.firmwareVersion != 116) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2000));
-				this.modusIGC 								= (buffer[109] << 8) + (buffer[108] & 0x00FF);	// 55
+				this.frskyAddr							= DataParser.parse2Short(buffer, 32);
+				this.telemetryAlarms 				= DataParser.parse2Short(buffer, 34);
+				this.heightAlarm 						= DataParser.parse2Short(buffer, 36);
+				this.speedMaxAlarm 					= DataParser.parse2Short(buffer, 38);
+				this.distanceMaxAlarm 			= DataParser.parse2Short(buffer, 40);
+				this.voltageRxAlarm 				= DataParser.parse2Short(buffer, 42);
+				this.tripLengthAlarm 				= DataParser.parse2Short(buffer, 44);
+				this.currentUlAlarm 				= DataParser.parse2Short(buffer, 46);
+				this.voltageStartUlAlarm 		= DataParser.parse2Short(buffer, 48);
+				this.voltageUlAlarm 				= DataParser.parse2Short(buffer, 50);
+				this.capacityUlAlarm 				= DataParser.parse2Short(buffer, 52);
+				this.distanceMinAlarm				= DataParser.parse2Short(buffer, 54);
+				this.serialNumberFix 				= buffer[56]; // 29.. fixe_Seriennummer;
+				this.robbe_T_Box 						= buffer[57]; // ..29 Robbe_T_Box;
+				this.varioFilter 						= DataParser.parse2Short(buffer, 58); // 30 Vario filter
+				this.speedMinAlarm					= DataParser.parse2Short(buffer, 60);	// 31 10km/h --> 1000km/h
+				//B[6]
+				this.mLinkAddressVario 				= buffer[74];		// 38..
+				this.mLinkAddressVario 				= buffer[75];		// ..38
+				this.mLinkAddressSpeed 				= buffer[76];		// 39..
+				this.mLinkAddressDirection 		= buffer[78];		// 40..
+				this.mLinkAddressHeight 			= buffer[80];		// 41..
+				this.mLinkAddressDistance 		= buffer[82];		// 42..
+				this.mLinkAddressTripLength 	= buffer[84];		// 43..
+				this.mLinkAddressSpeedMax			= buffer[86];		// 44..
+				this.mLinkAddressHeightMax		= buffer[88];		// 45..
+				this.mLinkAddressENL		= buffer[90];		// 46..
+				this.mLinkAddressAccX		= buffer[92];		// 47..
+				this.mLinkAddressAccY	= buffer[94];		// 48..
+				this.mLinkAddressAccZ		= buffer[96];		// 49..		
+				this.mLinkAddressFlightDirection	= buffer[98];// 50..
+				this.mLinkAddressDirectionRel	= buffer[100];	// 51..
+				this.mLinkAddressHeightGain		= buffer[102];	// 52..
+				//short[] C 									= short int[1]; // 53..
+				this.firmwareVersion 					= DataParser.parse2Short(buffer, 106);	// 54
+				if (this.firmwareVersion != 119) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2000));
+				this.modusIGC 								= DataParser.parse2Short(buffer, 108);	// 55
 				System.arraycopy(buffer, 110, this.startSlotSBUS, 0, 8);
+				this.spektrumSensors 					= buffer[118];	// 60..
+				this.spektrumNumber 					= buffer[119];	// ..60
+				this.fixPositionLatitude			= DataParser.parse2Int(buffer, 120);		// 61,62
+				this.fixPositionLongitude			= DataParser.parse2Int(buffer, 124);		// 63,64
+				this.fixPositionAltitude			= DataParser.parse2Short(buffer, 128);	// 65
 				//unused
-				this.betaVersion 							= (buffer[187] << 8) + (buffer[186] & 0x00FF);	// 60
-				this.hardwareVersion 					= (buffer[189] << 8) + (buffer[188] & 0x00FF);	// 61
-				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));// 62
+				this.betaVersion 							= DataParser.parse2Short(buffer, 186);	// 94
+				this.hardwareVersion 					= DataParser.parse2Short(buffer, 188);	// 95
+				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));// 96
 
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
@@ -245,13 +280,14 @@ public class SetupReaderWriter {
 				buffer[29] = (byte) ((this.jetiExMask & 0xFF000000) >> 24);
 				buffer[30] = (byte) (this.varioFactor & 0x00FF);
 				buffer[31] = (byte) ((this.varioFactor & 0xFF00) >> 8);
-				//A 6
+				buffer[32] = (byte) (this.frskyAddr & 0x00FF);						// 17 0x00 -> 0x1B
+				buffer[33] = (byte) ((this.frskyAddr & 0xFF00) >> 8);
 				buffer[34] = (byte) (this.telemetryAlarms & 0x00FF);
 				buffer[35] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
 				buffer[36] = (byte) (this.heightAlarm & 0x00FF);
 				buffer[37] = (byte) ((this.heightAlarm & 0xFF00) >> 8);
-				buffer[38] = (byte) (this.speedAlarm & 0x00FF);
-				buffer[39] = (byte) ((this.speedAlarm & 0xFF00) >> 8);
+				buffer[38] = (byte) (this.speedMaxAlarm & 0x00FF);
+				buffer[39] = (byte) ((this.speedMaxAlarm & 0xFF00) >> 8);
 				buffer[40] = (byte) (this.distanceMaxAlarm & 0x00FF);
 				buffer[41] = (byte) ((this.distanceMaxAlarm & 0xFF00) >> 8);
 				buffer[42] = (byte) (this.voltageRxAlarm & 0x00FF);
@@ -269,53 +305,71 @@ public class SetupReaderWriter {
 				buffer[53] = (byte) ((this.capacityUlAlarm & 0xFF00) >> 8);
 				buffer[54] = (byte) (this.distanceMinAlarm & 0x00FF);
 				buffer[55] = (byte) ((this.distanceMinAlarm & 0xFF00) >> 8);
-				//B 10
-				buffer[74] = (byte) (this.mLinkAddressVario & 0x00FF);
-				buffer[75] = (byte) ((this.mLinkAddressVario & 0xFF00) >> 8);
-				buffer[76] = (byte) (this.mLinkAddressSpeed & 0x00FF);
-				buffer[77] = (byte) ((this.mLinkAddressSpeed & 0xFF00) >> 8);
-				buffer[78] = (byte) (this.mLinkAddressDirection & 0x00FF);
-				buffer[79] = (byte) ((this.mLinkAddressDirection & 0xFF00) >> 8);
-				buffer[80] = (byte) (this.mLinkAddressHeight & 0x00FF);
-				buffer[81] = (byte) ((this.mLinkAddressHeight & 0xFF00) >> 8);
-				buffer[82] = (byte) (this.mLinkAddressDistance & 0x00FF);
-				buffer[83] = (byte) ((this.mLinkAddressDistance & 0xFF00) >> 8);
-				buffer[84] = (byte) (this.mLinkAddressTripLength & 0x00FF);
-				buffer[85] = (byte) ((this.mLinkAddressTripLength & 0xFF00) >> 8);
-				buffer[86] = (byte) (this.mLinkAddressSpeedMax & 0x00FF);					// 44
-				buffer[87] = (byte) ((this.mLinkAddressSpeedMax & 0xFF00) >> 8);	// 44
-				buffer[88] = (byte) (this.mLinkAddressHeightMax & 0x00FF);				// 45
-				buffer[89] = (byte) ((this.mLinkAddressHeightMax & 0xFF00) >> 8);	// 45
-				buffer[90] = (byte) (this.mLinkAddressVoltageUL & 0x00FF);				// 46
-				buffer[91] = (byte) ((this.mLinkAddressVoltageUL & 0xFF00) >> 8);	// 46
-				buffer[92] = (byte) (this.mLinkAddressCurrentUL & 0x00FF);				// 47
-				buffer[93] = (byte) ((this.mLinkAddressCurrentUL & 0xFF00) >> 8);	// 47
-				buffer[94] = (byte) (this.mLinkAddressRevolutionUL & 0x00FF);				// 48
-				buffer[95] = (byte) ((this.mLinkAddressRevolutionUL & 0xFF00) >> 8);// 48
-				buffer[96] = (byte) (this.mLinkAddressCapacityUL & 0x00FF);					// 49
-				buffer[97] = (byte) ((this.mLinkAddressCapacityUL & 0xFF00) >> 8);	// 49
-				buffer[98] = (byte) (this.mLinkAddressFlightDirection & 0x00FF);				// 50
-				buffer[99] = (byte) ((this.mLinkAddressFlightDirection & 0xFF00) >> 8);	// 50
-				buffer[100] = (byte) (this.mLinkAddressDirectionRel & 0x00FF);					// 51
-				buffer[101] = (byte) ((this.mLinkAddressDirectionRel & 0xFF00) >> 8);		// 51
-				buffer[102] = (byte) (this.mLinkAddressIntHeight & 0x00FF);							// 51
-				buffer[103] = (byte) ((this.mLinkAddressIntHeight & 0xFF00) >> 8);			// 51
-				//C 10
+				buffer[56] = this.serialNumberFix; 											// 29.. fixe_Seriennummer;
+				buffer[57] = this.robbe_T_Box; 													// ..29 Robbe_T_Box;
+				buffer[58] = (byte) (this.varioFilter & 0x00FF);				// 30 Vario filter
+				buffer[59] = (byte) ((this.varioFilter & 0xFF00) >> 8);
+				buffer[60] = (byte) (this.speedMinAlarm & 0x00FF);			// 31 10km/h --> 1000km/h
+				buffer[61] = (byte) ((this.speedMinAlarm & 0xFF00) >> 8);
+				//B[6]
+				buffer[74] = this.mLinkAddressVario;															// 38..
+				buffer[75] = this.mLinkAddressVoltageRx;													// ..38
+				buffer[76] = (byte) (this.mLinkAddressSpeed & 0x00FF);						// 39..
+				buffer[77] = 0;
+				buffer[78] = (byte) (this.mLinkAddressDirection & 0x00FF);				// 40..
+				buffer[79] = 0;
+				buffer[80] = (byte) (this.mLinkAddressHeight & 0x00FF);						// 41..
+				buffer[81] = 0;
+				buffer[82] = (byte) (this.mLinkAddressDistance & 0x00FF);					// 42..
+				buffer[83] = 0;
+				buffer[84] = (byte) (this.mLinkAddressTripLength & 0x00FF);				// 43..
+				buffer[85] = 0;
+				buffer[86] = (byte) (this.mLinkAddressSpeedMax & 0x00FF);					// 44..
+				buffer[87] = 0;
+				buffer[88] = (byte) (this.mLinkAddressHeightMax & 0x00FF);				// 45..
+				buffer[89] = 0;
+				buffer[90] = (byte) (this.mLinkAddressENL & 0x00FF);				// 46..
+				buffer[91] = 0;
+				buffer[92] = (byte) (this.mLinkAddressAccX & 0x00FF);				// 47..
+				buffer[93] = 0;
+				buffer[94] = (byte) (this.mLinkAddressAccY & 0x00FF);			// 48..
+				buffer[95] = 0;
+				buffer[96] = (byte) (this.mLinkAddressAccZ & 0x00FF);				// 49..
+				buffer[97] = 0;
+				buffer[98] = (byte) (this.mLinkAddressFlightDirection & 0x00FF);	// 50..
+				buffer[99] = 0;
+				buffer[100] = (byte) (this.mLinkAddressDirectionRel & 0x00FF);		// 51..
+				buffer[101] = 0;
+				buffer[102] = (byte) (this.mLinkAddressHeightGain & 0x00FF);			// 52..
+				buffer[103] = 0;
+				//C 10																														// 53
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);							// 54
 				buffer[107] = (byte) ((this.firmwareVersion & 0xFF00) >> 8);			// 54
 				buffer[108] = (byte) (this.modusIGC & 0x00FF);										// 55
 				buffer[109] = (byte) ((this.modusIGC & 0xFF00) >> 8);							// 55
 				System.arraycopy(this.startSlotSBUS, 0, buffer, 110, 8);					// 56-59 
+				buffer[118] = this.spektrumSensors;																// 60..
+				buffer[119] = this.spektrumNumber;																// ..60
+				buffer[120] = (byte) (this.fixPositionLatitude & 0x000000FF); 		// 61,62
+				buffer[121] = (byte) ((this.fixPositionLatitude & 0x0000FF00) >> 8);
+				buffer[122] = (byte) ((this.fixPositionLatitude & 0x00FF0000) >> 16);
+				buffer[123] = (byte) ((this.fixPositionLatitude & 0xFF000000) >> 24);
+				buffer[124] = (byte) (this.fixPositionLongitude & 0x000000FF); 		// 63,64
+				buffer[125] = (byte) ((this.fixPositionLongitude & 0x0000FF00) >> 8);
+				buffer[126] = (byte) ((this.fixPositionLongitude & 0x00FF0000) >> 16);
+				buffer[127] = (byte) ((this.fixPositionLongitude & 0xFF000000) >> 24);
+				buffer[128] = (byte) (this.fixPositionAltitude & 0x00FF);					// 65
+				buffer[129] = (byte) ((this.fixPositionAltitude & 0xFF00) >> 8);	
 				//unused 
-				buffer[186] = (byte) (this.betaVersion & 0x00FF);									// 60
-				buffer[187] = (byte) ((this.betaVersion & 0xFF00) >> 8);					// 60
-				buffer[188] = (byte) (this.hardwareVersion & 0x00FF);							// 61
-				buffer[189] = (byte) ((this.hardwareVersion & 0xFF00) >> 8);			// 61
+				buffer[186] = (byte) (this.betaVersion & 0x00FF);									// 94..
+				buffer[187] = (byte) ((this.betaVersion & 0xFF00) >> 8);					// ..94
+				buffer[188] = (byte) (this.hardwareVersion & 0x00FF);							// 95..
+				buffer[189] = (byte) ((this.hardwareVersion & 0xFF00) >> 8);			// ..95
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
 				tmpCheckSum = Checksum.CRC16(chkBuffer, 0);
-				buffer[190] = (byte) (tmpCheckSum & 0x00FF);											// 62
-				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);								// 62
+				buffer[190] = (byte) (tmpCheckSum & 0x00FF);											// 96..
+				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);								// ..96
 
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "$SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length));
 				FileOutputStream file_out = new FileOutputStream(setupFile);

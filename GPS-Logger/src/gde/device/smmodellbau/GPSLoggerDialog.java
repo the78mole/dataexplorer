@@ -116,7 +116,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(650, 145 + this.measurementsCount * 29 + 50 + 42); //header + tab + label + this.measurementsCount * 23 + buttons
+				this.dialogShell.setSize(650, 145 + this.measurementsCount * 31 + 60 + 42); //header + tab + label + this.measurementsCount * 23 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -216,6 +216,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
+							GPSLoggerDialog.this.configuration1Composite.changeVisibility();
 							if (GPSLoggerDialog.this.tabFolder.getSelectionIndex() == GPSLoggerDialog.this.tabFolder.getItemCount()-1) 
 								GPSLoggerDialog.this.loggerSetup.loadSetup();
 							GPSLoggerDialog.this.configuration1Composite.updateValues();

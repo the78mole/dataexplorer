@@ -11,6 +11,8 @@ OVERVIEW:
 + enhance VC820 & VC840 support
 + enhance History analysis to full functional beta version (pls enable in preferences)
 + enhance serial port detection for virtual serial ports
++ enhance SM GPS-Logger support
++ enhance SM UniLog2 support 
 
 DETAILS:
 - fix analog display of synchronized master record
@@ -38,6 +40,10 @@ UT16E multimeter
 	- add support
 S32, latest and greatest JLog
 	- correct RPM factor
+SM GPS-Logger (1+2) 
+	- update configuration capability to FW 1.19
+SM UniLog2
+	- update configuration capability to FW 1.14
 VC820, VC840
 	- fix table update problem while starting new recording in table view
 History analysis
