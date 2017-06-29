@@ -78,7 +78,7 @@ public final class TrailRecord extends Record {
 		super(newDevice, newOrdinal, newName, measurementType.getSymbol(), measurementType.getUnit(), measurementType.isActive(), null, measurementType.getProperty(), initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, measurementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, MeasurementType measurementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
-		super.parent = parentTrail;
+		super.parent = null; // we currently have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord
 		this.measurementType = measurementType;
 		this.settlementType = null;
 		this.scoreGroupType = null;
@@ -98,7 +98,7 @@ public final class TrailRecord extends Record {
 		super(newDevice, newOrdinal, newName, settlementType.getSymbol(), settlementType.getUnit(), settlementType.isActive(), null, settlementType.getProperty(), initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, settlementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, SettlementType settlementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
-		super.parent = parentTrail;
+		super.parent = null;
 		this.measurementType = null;
 		this.settlementType = settlementType;
 		this.scoreGroupType = null;
@@ -119,7 +119,7 @@ public final class TrailRecord extends Record {
 		super(newDevice, newOrdinal, newName, scoregroupType.getSymbol(), scoregroupType.getUnit(), scoregroupType.isActive(), null, scoregroupType.getProperty(), initialCapacity);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, scoregroupType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, ScoregroupType scoregroupType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
-		super.parent = parentTrail;
+		super.parent = null;
 		this.measurementType = null;
 		this.settlementType = null;
 		this.scoreGroupType = scoregroupType;
@@ -209,7 +209,7 @@ public final class TrailRecord extends Record {
 	 */
 	@Override
 	public int realSize() {
-		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.size();
+		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
@@ -309,8 +309,18 @@ public final class TrailRecord extends Record {
 	}
 
 	@Override // reason is missing zoom mode
+	public void setMaxScaleValue(double newMaxScaleValue) {
+		this.maxScaleValue = newMaxScaleValue;
+	}
+
+	@Override // reason is missing zoom mode
 	public double getMinScaleValue() {
 		return this.minScaleValue;
+	}
+
+	@Override // reason is missing zoom mode
+	public void setMinScaleValue(double newMinScaleValue) {
+		this.minScaleValue = newMinScaleValue;
 	}
 
 	/**
@@ -465,8 +475,18 @@ public final class TrailRecord extends Record {
 		return this.displayScaleFactorValue;
 	}
 
+	@Override // reason is missing scope mode
+	public int getSyncMinValue() {
+		return this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : this.syncMinValue;
+	}
+
 	public void setSyncMinValue(int syncMinValue) {
 		this.syncMinValue = syncMinValue;
+	}
+
+	@Override // reason is missing scope mode
+	public int getSyncMaxValue() {
+		return this.syncMaxValue == this.syncMinValue ? this.syncMaxValue + 100 : this.syncMaxValue;
 	}
 
 	public void setSyncMaxValue(int syncMaxValue) {
@@ -479,6 +499,50 @@ public final class TrailRecord extends Record {
 
 	public TrailRecordSet getParentTrail() {
 		return this.parentTrail;
+	}
+
+	@Override // reason is missing zoom mode
+	public boolean isRoundOut() {
+		return this.isRoundOut;
+	}
+
+	@Override
+	public void setRoundOut(boolean enabled) {
+		this.isRoundOut = enabled;
+	}
+
+	@Override // reason is missing zoom mode
+	public boolean isStartpointZero() {
+		return this.isStartpointZero;
+	}
+
+	@Override
+	public void setStartpointZero(boolean enabled) {
+		this.isStartpointZero = enabled;
+	}
+
+	@Override // reason is missing zoom mode
+	public boolean isStartEndDefined() {
+		return this.isStartEndDefined;
+	}
+
+	/**
+	 * sets the min-max values as displayed 4.0 - 200.5
+	 * @param enabled
+	 * @param newMinScaleValue
+	 * @param newMaxScaleValue
+	 */
+	@Override // reason is unused channelConfigKey
+	public void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue) {
+		this.isStartEndDefined = enabled;
+		if (enabled) {
+			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
+			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
+		}
+		else {
+			this.maxScaleValue = this.parentTrail.getDevice().translateValue(this, this.maxValue / 1000.0);
+			this.minScaleValue = this.parentTrail.getDevice().translateValue(this, this.minValue / 1000.0);
+		}
 	}
 
 	public boolean isMeasurement() {

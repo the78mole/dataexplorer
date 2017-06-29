@@ -87,6 +87,7 @@ import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
+import gde.data.AbstractRecordSet;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.ObjectData;
@@ -100,9 +101,9 @@ import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.HistoGraphicsWindow;
 import gde.histo.ui.HistoTableWindow;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -120,11 +121,11 @@ import gde.ui.tab.CellVoltageWindow;
 import gde.ui.tab.DataTableWindow;
 import gde.ui.tab.DigitalWindow;
 import gde.ui.tab.FileCommentWindow;
+import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.ui.tab.ObjectDescriptionWindow;
 import gde.ui.tab.StatisticsWindow;
-import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
@@ -681,9 +682,9 @@ public class DataExplorer extends Composite {
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
 					DataExplorer.this.tabSelectedIndex = tabFolder.getSelectionIndex();
 					try {
-						if (log.isLoggable(Level.OFF)) 
+						if (log.isLoggable(Level.OFF))
 							log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
-						
+
 						if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
 							DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
 						}
@@ -2352,7 +2353,7 @@ public class DataExplorer extends Composite {
 	/**
 	 * @return the associated recordset - might be a compare / util / histo recordset
 	 */
-	public RecordSet getRecordSetOfVisibleTab() {
+	public AbstractRecordSet getRecordSetOfVisibleTab() {
 		if (this.isRecordSetVisible(GraphicsType.NORMAL))
 			return this.getActiveRecordSet();
 		else if (this.isRecordSetVisible(GraphicsType.COMPARE))

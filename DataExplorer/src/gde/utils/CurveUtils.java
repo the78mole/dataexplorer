@@ -13,22 +13,23 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
-
-import gde.GDE;
-import gde.data.Record;
-import gde.device.IDevice;
-import gde.log.Level;
-import gde.ui.DataExplorer;
 
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+
+import gde.GDE;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.ui.DataExplorer;
 
 /**
  * This class contains utilities to draw curves and vertical scales
@@ -53,7 +54,8 @@ public class CurveUtils {
 	 */
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
-		final boolean isCompareSet = record.getParent().isCompareSet();
+		RecordSet parent = ((RecordSet) record.getParent());
+		final boolean isCompareSet = parent.isCompareSet();
 		int numberTicks = 10, miniticks = 5;
 
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -69,7 +71,7 @@ public class CurveUtils {
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
 		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
-		boolean isRaw = record.getParent().isRaw();
+		boolean isRaw = parent.isRaw();
 
 		if ( Math.abs(yMaxValue - yMinValue) < .0001 && !isRaw) {
 			yMinValueDisplay = yMinValue = Double.valueOf(yMinValue - 1).intValue();
@@ -144,7 +146,7 @@ public class CurveUtils {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		String graphText = (record.isScaleSyncMaster() ? record.getSyncMasterName()	: recordName);
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
-		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
@@ -157,7 +159,7 @@ public class CurveUtils {
 		gc.setLineWidth(2);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		boolean isPositionLeft = record.isPositionLeft();
-		int positionNumber = isCompareSet ? 0 : record.getParent().getAxisPosition(recordName, isPositionLeft);
+		int positionNumber = isCompareSet ? 0 : parent.getAxisPosition(recordName, isPositionLeft);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
 		if (isDrawScaleInRecordColor) gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
 		else gc.setForeground(DataExplorer.COLOR_BLACK);
@@ -205,6 +207,8 @@ public class CurveUtils {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName()+ String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
+		RecordSet parent = ((RecordSet) record.getParent());
+
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
@@ -227,7 +231,7 @@ public class CurveUtils {
 		//xScaleFactor+=2;
 		// calculate scale factor to fit time into draw bounds display pixel based
 		double xTimeFactor = width / displayableTime_ms; // * (xScaleFactor - 0.44);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$		
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
 		record.setDisplayScaleFactorTime(xTimeFactor);
 		record.setDisplayScaleFactorValue(height);
 
@@ -247,7 +251,7 @@ public class CurveUtils {
 
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-			if (record.getParent().isCompareSet()) {// compare set might contain records with different size
+			if (parent.isCompareSet()) {// compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
 				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms()) - record.findBestIndex(record.getZoomTimeOffset());
 				int j = 0;
@@ -279,7 +283,7 @@ public class CurveUtils {
 				newPoint = record.getDisplayEndPoint(width);
 				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			}
-			else { 
+			else {
 				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(j, x0, y0);

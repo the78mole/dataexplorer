@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Record;
-import gde.data.RecordSet;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.histo.ui.CurveSurvey;
@@ -69,7 +68,7 @@ public final class TrailRecordSynchronizer {
 						if (log.isLoggable(Level.FINER))
 							log.log(Level.FINER, "add syncMaster " + syncMasterRecord.getName() + " syncMinValue=" + syncMasterRecord.getSyncMinValue() + " syncMaxValue=" + syncMasterRecord.getSyncMaxValue());
 					}
-					if (!((RecordSet) this.trailRecordSet).isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
+					if (!this.trailRecordSet.isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
 							scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 						else

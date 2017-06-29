@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.renschler;
@@ -37,7 +37,6 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.PropertyType;
-import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -55,8 +54,8 @@ public class Picolario2 extends Picolario {
 
 	/**
 	 * @param iniFile
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public Picolario2(String iniFile) throws FileNotFoundException, JAXBException {
 		super(iniFile);
@@ -67,7 +66,7 @@ public class Picolario2 extends Picolario {
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
-	
+
 
 	/**
 	 * constructor using existing device configuration
@@ -98,7 +97,7 @@ public class Picolario2 extends Picolario {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	@Override
@@ -108,7 +107,7 @@ public class Picolario2 extends Picolario {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -124,7 +123,7 @@ public class Picolario2 extends Picolario {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -138,21 +137,21 @@ public class Picolario2 extends Picolario {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	@Override
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//noop due to previous parsed CSV data
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -164,7 +163,7 @@ public class Picolario2 extends Picolario {
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		if(!recordSet.isTimeStepConstant()) {
 			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 			byte[] timeStampBuffer = new byte[timeStampBufferSize];
@@ -175,18 +174,18 @@ public class Picolario2 extends Picolario {
 			}
 		}
 		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
-		
+
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-			
+
 			//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 			for (int j=0,k=0; j < points.length; j++) {
 				switch (j) {
 				case 3://3=Climb
 				case 6://6=Capacity
 				case 7://7=Power
-					//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 6=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)					
+					//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 6=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
 					break;
 
 				default:
@@ -195,13 +194,13 @@ public class Picolario2 extends Picolario {
 					break;
 				}
 			}
-			
-			if(recordSet.isTimeStepConstant()) 
+
+			if(recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
 				recordSet.addPoints(points, timeStamps.get(i)/10.0);
 
-			
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		this.makeInActiveDisplayable(recordSet);
@@ -220,15 +219,15 @@ public class Picolario2 extends Picolario {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				
+
 				//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
-				switch (index) { 
+				switch (index) {
 				case 0: //Höhe/Height
 					PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 					property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 					boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-					
+
 					if (subtractFirst) {
 						reduction = record.getFirst()/1000.0;
 					}
@@ -243,7 +242,7 @@ public class Picolario2 extends Picolario {
 					factor = recordSet.get(3).getFactor(); // 1=height
 					break;
 				}
-				
+
 				dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				++index;
 			}
@@ -251,7 +250,7 @@ public class Picolario2 extends Picolario {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -288,7 +287,7 @@ public class Picolario2 extends Picolario {
 					}
 				}
 				catch (Throwable e) {
-					log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
+					log.log(Level.SEVERE, record.getAbstractParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
 				}
 				break;
 
@@ -338,10 +337,10 @@ public class Picolario2 extends Picolario {
 				}
 			}
 			catch (Throwable e) {
-				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
+				log.log(Level.SEVERE, record.getAbstractParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
 			}
 			break;
-		
+
 		case 3: // 3=slope calculation needs height factor for calculation
 			factor = this.getMeasurementFactor(record.getParent().getChannelConfigNumber(), 0); // 1=height
 			break;
@@ -360,7 +359,7 @@ public class Picolario2 extends Picolario {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
 			//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
-			// calculate the values required		
+			// calculate the values required
 			Record slopeRecord = recordSet.get(3);//3=Steigrate
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
@@ -468,7 +467,7 @@ public class Picolario2 extends Picolario {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 * as example a file selection dialog could be opened to import serialized ASCII data
 	 */
 	@Override
 	public void open_closeCommPort() {
@@ -506,7 +505,7 @@ public class Picolario2 extends Picolario {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -524,7 +523,7 @@ public class Picolario2 extends Picolario {
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$
 			}
 
 			if (record.isActive() && record.isDisplayable()) {

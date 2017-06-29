@@ -332,8 +332,8 @@ public final class HistoSelectorComposite extends Composite {
 			HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(false);
 			tableItem.setData(DataExplorer.OLD_STATE, false);
 		}
-		activeRecord.getParent().syncScaleOfSyncableRecords();
-		activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
+		activeRecord.getParentTrail().syncScaleOfSyncableRecords();
+		activeRecord.getParentTrail().updateVisibleAndDisplayableRecordsForTable();
 	}
 
 	/**

@@ -13,19 +13,19 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.FileNotFoundException;
+
+import javax.xml.bind.JAXBException;
 
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.log.Level;
-
-import java.io.FileNotFoundException;
-
-import javax.xml.bind.JAXBException;
 
 /**
  * Graupner HoTT device class with Mikrokopter adaptation, GPS coordinates in decimal degrees instead of degree decimal mintes
@@ -34,8 +34,8 @@ import javax.xml.bind.JAXBException;
 public class HoTTAdapterM extends HoTTAdapter {
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public HoTTAdapterM(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -63,7 +63,7 @@ public class HoTTAdapterM extends HoTTAdapter {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				int ordinal = record.getOrdinal();
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
-				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
+				if ((ordinal == 1 || ordinal == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude
 					dataTableRow[index + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
@@ -94,7 +94,7 @@ public class HoTTAdapterM extends HoTTAdapter {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if (record.getParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude 
+		if (record.getAbstractParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			newValue = value / 1000.0;
 		}
@@ -118,7 +118,7 @@ public class HoTTAdapterM extends HoTTAdapter {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  ) 
+		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getAbstractParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  )
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			newValue = value * 1000.0;
 		}
@@ -128,5 +128,5 @@ public class HoTTAdapterM extends HoTTAdapter {
 
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
-	}	
+	}
 }

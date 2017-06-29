@@ -32,6 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
+import gde.data.AbstractRecordSet;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.data.TimeSteps;
@@ -41,23 +42,22 @@ import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
 import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
-import gde.exception.DataInconsitsentException;
 import gde.histo.cache.HistoVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.log.Level;
 import gde.ui.SWTResourceManager;
 
 /**
- * Holds histo trail records for the configured measurements of a device supplemented by settlements and scores.
+ * Hold histo trail records for the configured measurements of a device supplemented by settlements and scores.
  * The display sequence is the linked hashmap sequence whereas the ordinals refer to the sequence of measurements + settlements + scoregroups.
  * @author Thomas Eickert
  */
-public final class TrailRecordSet extends RecordSet {
-	private final static String						$CLASS_NAME						= TrailRecordSet.class.getName();
-	private final static long							serialVersionUID			= -1580283867987273535L;
-	private final static Logger						log										= Logger.getLogger($CLASS_NAME);
+public final class TrailRecordSet extends AbstractRecordSet {
+	private static final String						$CLASS_NAME						= TrailRecordSet.class.getName();
+	private static final long							serialVersionUID			= -1580283867987273535L;
+	private static final Logger						log										= Logger.getLogger($CLASS_NAME);
 
-	private final static int							initialRecordCapacity	= 111;
+	private static final int							initialRecordCapacity	= 111;
 
 	private final HistoGraphicsTemplate		template;																															// graphics template holds view configuration
 
@@ -73,7 +73,7 @@ public final class TrailRecordSet extends RecordSet {
 		/**
 		 * use this instead of values() to avoid repeatedly cloning actions.
 		 */
-		public final static DisplayTag values[] = values();
+		public static final DisplayTag values[] = values();
 
 		public static DisplayTag fromOrdinal(int ordinal) {
 			return DisplayTag.values[ordinal];
@@ -85,40 +85,17 @@ public final class TrailRecordSet extends RecordSet {
 	};
 
 	/**
-	 * Holds trail records for measurements, settlements and scores.
+	 * Hold trail records for measurements, settlements and scores.
 	 * @param useDevice the instance of the device
 	 * @param channelNumber the channel number to be used
 	 * @param recordNames
 	 */
-	public TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames) {
-		super(useDevice, channelNumber, "Trail", recordNames, -1, true, true); //$NON-NLS-1$
+	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames) {
+		super(useDevice, channelNumber, "Trail", recordNames, -1); //$NON-NLS-1$
 		String deviceSignature = useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber;
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		if (this.template != null) this.template.load();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
-	}
-
-	/**
-	 * copy constructor - used to copy a trail record set where the configuration comes from the device properties file.
-	 * @param recordSet
-	 * @param newChannelConfiguration
-	 */
-	@Deprecated
-	private TrailRecordSet(TrailRecordSet recordSet, int dataIndex, boolean isFromBegin) {
-		super(recordSet, dataIndex, isFromBegin);
-		this.template = null;
-	}
-
-	/**
-	 * clone method re-writes data points of all records of this record set.
-	 * @param dataIndex
-	 * @param isFromBegin - if true, the given index is the index where the record starts after this operation.  - if false, the given index represents the last data point index of the records
-	 * @return new created trail record set
-	 */
-	@Override
-	@Deprecated
-	public TrailRecordSet clone(int dataIndex, boolean isFromBegin) {
-		return new TrailRecordSet(this, dataIndex, isFromBegin);
 	}
 
 	/**
@@ -211,38 +188,59 @@ public final class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * method to create a record set with given name "1) Laden" containing records according the device channle/configuration
-	 * which are loaded from device properties file
-	 * @param recordSetName the name of the record set
-	 * @param device the instance of the device
-	 * @param channelConfigNumber (number of the outlet or configuration)
-	 * @param isRaw defines if the data needs translation using device specific properties
-	 * @param isFromFile defines if a configuration change must be recorded to signal changes
-	 * @return a record set containing all records (empty) as specified
+	 * overwrites default HashMap method
 	 */
-	@Deprecated
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile) {
-		throw new UnsupportedOperationException();
+	@Override
+	public Record put(String key, Record record) {
+		return super.put(key, record);
 	}
 
 	/**
-	 * method to create a record set with given name "1) Laden" containing records according the given record names, symbols and units
-	 * active status as well as statistics and properties are used from device properties
-	 * @param recordSetName the name of the record set
-	 * @param device the instance of the device
-	 * @param channelConfigNumber (name of the outlet or configuration)
-	 * @param recordNames array of names to be used for created records
-	 * @param recordSymbols array of symbols to be used for created records
-	 * @param recordUnits array of units to be used for created records
-	 * @param timeStep_ms
-	 * @param isRaw defines if the data needs translation using device specific properties
-	 * @param isFromFile defines if a configuration change must be recorded to signal changes
-	 * @return a record set containing all records (empty) as specified
+	 * @return the horizontalGridRecord ordinal
 	 */
-	@Deprecated
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
-			boolean isRaw, boolean isFromFile) {
-		throw new UnsupportedOperationException();
+	@Override
+	public int getHorizontalGridRecordOrdinal() {
+		return this.horizontalGridRecordOrdinal;
+	}
+
+	/**
+	 * Synchronize scales according device properties.
+	 * Support settlements.
+	 */
+	@Override
+	public void syncScaleOfSyncableRecords() {
+		this.synchronizer.syncScales();
+	}
+
+	/**
+	 * Update the collection of visible and displayable records in this record set.
+	 * The sort order conforms to the record insertion order.
+	 */
+	@Override
+	public void updateVisibleAndDisplayableRecordsForTable() {
+		this.visibleAndDisplayableRecords.removeAllElements();
+		this.allRecords.removeAllElements();
+		// get by insertion order
+		for (Map.Entry<String, Record> entry : this.entrySet()) {
+			final TrailRecord record = (TrailRecord) entry.getValue();
+			if (record.isMeasurement() || (record.isSettlement() && this.settings.isDisplaySettlements()) || (record.isScoreGroup() && this.settings.isDisplayScores())) {
+				record.setDisplayable(record.isActive() && record.hasReasonableData());
+				if (record.isVisible() && record.isDisplayable()) //only selected records get displayed
+					this.visibleAndDisplayableRecords.add(record);
+				if (record.isDisplayable()) // only records with reasonable data get displayed
+					this.allRecords.add(record);
+			}
+		}
+	}
+
+	/**
+	 * Update the scale values from sync record if visible
+	 * and update referenced records to enable drawing of the curve, set min/max.
+	 */
+	@Override
+	public void updateSyncRecordScale() {
+		throw new UnsupportedOperationException("is not required for histo");
+		// this.synchronizer.updateSyncRecordScale();
 	}
 
 	/**
@@ -250,7 +248,6 @@ public final class TrailRecordSet extends RecordSet {
 	 * Keeps initial capacities.
 	 * Does not clear any fields in the recordSet, the records or in timeStep.
 	 */
-	@Override
 	public void cleanup() {
 		super.timeStep_ms.clear();
 		for (String recordName : super.getRecordNames()) {
@@ -263,97 +260,10 @@ public final class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * method to add a series of points to the associated records
-	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException
-	 */
-	@Deprecated
-	@Override
-	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * method to add a series of points to the associated records
-	 * @param points as int[], where the length must fit records.size()
-	 * @param time_ms
-	 * @throws DataInconsitsentException
-	 */
-	@Deprecated
-	@Override
-	public synchronized void addPoints(int[] points, double time_ms) throws DataInconsitsentException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * method to add a series of points to none calculation records (records active or inactive)
-	 * @param points as int[], where the length must fit records.size()
-	 * @throws DataInconsitsentException
-	 */
-	@Deprecated
-	@Override
-	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * method to add a series of points to none calculation records (records active or inactive)
-	 * @param points as int[], where the length must fit records.size()
-	 * @param time_ms
-	 * @throws DataInconsitsentException
-	 */
-	@Deprecated
-	@Override
-	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * add a new time step to the time steps vector
-	 * @param timeValue
-	 */
-	@Deprecated
-	@Override
-	public void addTimeStep_ms(double timeValue) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated // replaced by getTimeStepSize()
-	@Override
-	public int getRecordDataSize(boolean isReal) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public double getAverageTimeStep_ms() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public double getMinimumTimeStep_ms() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public double getMaximumTimeStep_ms() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public double getSigmaTimeStep_ms() {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
 	 * Method to get the sorted record names as array for display purpose.
 	 * Sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
 	 * @return all measurement records and settlement / score records based on display settings
 	 */
-	@Override // reasons: 1. Harmonize display records collections  2. The data vector of trail records holding a record suite is empty -> (TrailRecord) record).getTrailRecordSuite().length > 1
 	public Record[] getRecordsSortedForDisplay() {
 		Vector<Record> displayRecords = new Vector<Record>();
 		// add the record with horizontal grid
@@ -373,43 +283,12 @@ public final class TrailRecordSet extends RecordSet {
 	}
 
 	/**
-	 * update the collection of visible and displayable records in this record set.
-	 * the sort order conforms to the record insertion order.
+	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
+	 * For devices with none constant time step between measurement points it returns the average value.
+	 * Do not use for calculation, use for logging purpose only.
 	 */
-	@Override // reason is display sequence independent from record names sequence (record ordinal)
-	public void updateVisibleAndDisplayableRecordsForTable() {
-		this.visibleAndDisplayableRecords.removeAllElements();
-		this.allRecords.removeAllElements();
-		// get by insertion order
-		for (Map.Entry<String, Record> entry : this.entrySet()) {
-			final TrailRecord record = (TrailRecord) entry.getValue();
-			if (record.isMeasurement() || (record.isSettlement() && this.settings.isDisplaySettlements()) || (record.isScoreGroup() && this.settings.isDisplayScores())) {
-				record.setDisplayable(record.isActive() && record.hasReasonableData());
-				if (record.isVisible() && record.isDisplayable()) //only selected records get displayed
-					this.visibleAndDisplayableRecords.add(record);
-				if (record.isDisplayable()) // only records with reasonable data get displayed
-					this.allRecords.add(record);
-			}
-		}
-	}
-
-	/**
-	 * Synchronize scales according device properties.
-	 * Support settlements.
-	 */
-	@Override // reason is access to getFactor, getUnit etc. via this.device.getMeasruementProperty
-	public void syncScaleOfSyncableRecords() {
-		this.synchronizer.syncScales();
-	}
-
-	/**
-	 * Update the scale values from sync record if visible
-	 * and update referenced records to enable drawing of the curve, set min/max.
-	 */
-	@Override // reason is the min/max determination for suites and scope mode elimination
-	public void updateSyncRecordScale() {
-		throw new UnsupportedOperationException("is not required for histo");
-		// this.synchronizer.updateSyncRecordScale();
+	public double getAverageTimeStep_ms() {
+		return this.timeStep_ms.getAverageTimeStep_ms();
 	}
 
 	/**
@@ -501,7 +380,7 @@ public final class TrailRecordSet extends RecordSet {
 					isHorizontalGridOrdinalSet = true;
 				}
 			}
-			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+			// ET 29.06.2017 this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
@@ -541,6 +420,20 @@ public final class TrailRecordSet extends RecordSet {
 	 	 */
 	public double getAverageDuration_mm() {
 		return this.averageDuration_mm;
+	}
+
+	/**
+	 * @return the maximum time of this record set, which should correspond to the first entry in timeSteps
+	 */
+	public double getMaxTime_ms() {
+		return this.timeStep_ms.getMaxTime_ms();
+	}
+
+	/**
+	 * @return the record set start time stamp
+	 */
+	public long getStartTimeStamp() {
+		return this.timeStep_ms.getStartTimeStamp();
 	}
 
 	/**

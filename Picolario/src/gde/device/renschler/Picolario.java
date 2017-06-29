@@ -13,10 +13,16 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.renschler;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -37,12 +43,6 @@ import gde.utils.CalculationThread;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
 import gde.utils.StringHelper;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 /**
  * Picolariolog device main implementation class
@@ -65,8 +65,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * @param iniFile
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public Picolario(String iniFile) throws FileNotFoundException, JAXBException {
 		super(iniFile);
@@ -101,6 +101,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		//nothing to do here
 		return lov2osdMap;
@@ -110,16 +111,18 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		return ""; //$NON-NLS-1$
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
+	@Override
 	public int getLovDataByteSize() {
 		return 16;  // 0x0C = 12 + 4 (counter)
 	}
@@ -128,13 +131,14 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
+	@Override
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int offset = 4;
 		int size = this.getLovDataByteSize();
@@ -144,8 +148,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-	
-		for (int i = 0; i < recordDataSize; i++) { 
+
+		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
@@ -159,7 +163,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+	@Override
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here - refer to translateValue/reverseTranslateValue
 		points[0] = Integer.valueOf(dataBuffer[2]) * 1000;
 
@@ -171,17 +176,18 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte the emissing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -189,15 +195,15 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
-			
+
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
-			
+
 			recordSet.addPoints(points);
-			
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -207,6 +213,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
@@ -214,7 +221,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				
+
 				switch (index) { // 0=Spannung, 1=Höhe, 2=Steigung
 				case 0: //Spannung/Voltage
 					break;
@@ -223,7 +230,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 					property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 					boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-					
+
 					if (subtractFirst) {
 						reduction = record.getFirst()/1000.0;
 					}
@@ -241,7 +248,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					log.log(Level.WARNING, "exceed known record names"); //$NON-NLS-1$
 					break;
 				}
-				
+
 				dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				++index;
 			}
@@ -249,13 +256,14 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
 	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
 	 * @return double with the adapted value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		final String $METHOD_NAME = "translateValue()";
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
@@ -285,7 +293,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					}
 				}
 				catch (Throwable e) {
-					log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
+					log.log(Level.SEVERE, record.getAbstractParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
 				}
 			}
 
@@ -308,6 +316,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented (((value - offset + firstLastAdaption)/factor) + reduction)
 	 * @return double with the adapted value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 		final String $METHOD_NAME = "reverseTranslateValue()";
@@ -334,7 +343,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 			}
 			catch (Throwable e) {
-				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
+				log.log(Level.SEVERE, record.getAbstractParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
 			}
 		}
 
@@ -352,11 +361,12 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		recordSet.setAllDisplayable();
 	}
@@ -364,11 +374,12 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive and to be calculated records
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
 			// 0=Spannung, 1=Höhe, 2=Steigrate
-			// calculate the values required		
+			// calculate the values required
 			Record slopeRecord = recordSet.get(2);//2=Steigrate
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
@@ -393,8 +404,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
-		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION, 
+		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION,
 				DO_NO_ADAPTION, DO_OFFSET_HEIGHT, DO_SUBTRACT_FIRST, DO_SUBTRACT_LAST,
 				CalculationThread.REGRESSION_INTERVAL_SEC, CalculationThread.REGRESSION_TYPE};
 	}
@@ -414,10 +426,11 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public PicolarioSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
+	@Override
 	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {

@@ -13,10 +13,20 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -42,16 +52,6 @@ import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
 import gde.utils.StringHelper;
 import gnu.io.NoSuchPortException;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * UniLog default device implementation, just copied from Sample project
@@ -87,27 +87,27 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public static final String	LOV_A2_UNIT = " A2Einheit="; //$NON-NLS-1$
 	public static final String	LOV_A3_UNIT = " A3Einheit="; //$NON-NLS-1$
 
-//	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG	= new String[] { LOV_N_100_W, LOV_NUMBER_CELLS, LOV_RPM_CHECKED, 
-//		LOV_A1_CHECKED, LOV_A2_CHECKED, LOV_A3_CHECKED, LOV_RPM_NAME, LOV_A1_NAME, LOV_A2_NAME, LOV_A3_NAME, LOV_RPM_OFFSET, 
+//	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG	= new String[] { LOV_N_100_W, LOV_NUMBER_CELLS, LOV_RPM_CHECKED,
+//		LOV_A1_CHECKED, LOV_A2_CHECKED, LOV_A3_CHECKED, LOV_RPM_NAME, LOV_A1_NAME, LOV_A2_NAME, LOV_A3_NAME, LOV_RPM_OFFSET,
 //		LOV_A1_OFFSET, LOV_A2_OFFSET, LOV_A3_OFFSET, LOV_RPM_FACTOR, LOV_A1_FACTOR, LOV_A2_FACTOR, LOV_A3_FACTOR,
 //		LOV_RPM_UNIT, LOV_A1_UNIT, LOV_A1_UNIT, LOV_A2_UNIT, LOV_A3_UNIT,
 //		LOV_CURRENT_OFFSET, LOV_NUMBER_MOTOR, LOV_RPM2_FACTOR, LOV_CURRENT_INVERT,
 //	};
 
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_2		= new String[] { 	// 2=current
-		LOV_CURRENT_OFFSET, LOV_CURRENT_INVERT };																																			
+		LOV_CURRENT_OFFSET, LOV_CURRENT_INVERT };
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_6		= new String[] { 	// 6=votagePerCell
-		LOV_NUMBER_CELLS };																																			
+		LOV_NUMBER_CELLS };
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_7		= new String[] {	// 7=revolutionSpeed
 		LOV_RPM_CHECKED, LOV_RPM_NAME, LOV_RPM_UNIT, LOV_RPM_FACTOR, LOV_RPM_OFFSET, LOV_RPM2_FACTOR, LOV_NUMBER_MOTOR };
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_8		= new String[] { 	// 8=efficiency
 		LOV_N_100_W };																																																																																																																									//A1 Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_11	= new String[] { 	//11=a1Value
-		LOV_A1_CHECKED, LOV_A1_NAME, LOV_A1_UNIT, LOV_A1_OFFSET, LOV_A1_FACTOR	};							
+		LOV_A1_CHECKED, LOV_A1_NAME, LOV_A1_UNIT, LOV_A1_OFFSET, LOV_A1_FACTOR	};
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_12	= new String[] { 	//12=a2Value
-		LOV_A2_CHECKED, LOV_A2_NAME, LOV_A2_UNIT, LOV_A2_OFFSET, LOV_A2_FACTOR };									
+		LOV_A2_CHECKED, LOV_A2_NAME, LOV_A2_UNIT, LOV_A2_OFFSET, LOV_A2_FACTOR };
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_13	= new String[] { 	//13=a3Value
-		LOV_A3_CHECKED, LOV_A3_NAME, LOV_A3_UNIT, LOV_A3_OFFSET, LOV_A3_FACTOR };									
+		LOV_A3_CHECKED, LOV_A3_NAME, LOV_A3_UNIT, LOV_A3_OFFSET, LOV_A3_FACTOR };
 
 	public final static String		A1_FACTOR									= "a1_"+IDevice.FACTOR; //$NON-NLS-1$
 	public final static String		A1_OFFSET									= "a1_"+IDevice.OFFSET; //$NON-NLS-1$
@@ -115,13 +115,13 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		A2_OFFSET									= "a2_"+IDevice.OFFSET; //$NON-NLS-1$
 	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR; //$NON-NLS-1$
 	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET; //$NON-NLS-1$
-	
+
 	public final static String		NUMBER_CELLS							= MeasurementPropertyTypes.NUMBER_CELLS.value();
 	public final static String		PROP_N_100_W							= MeasurementPropertyTypes.PROP_N_100_W.value();
-	
+
 	public final static String		IS_INVERT_CURRENT					= MeasurementPropertyTypes.IS_INVERT_CURRENT.value();
 	public final static String		CURRENT_OFFSET						= IDevice.OFFSET;
-	
+
 	public final static String		NUMBER_MOTOR							= MeasurementPropertyTypes.NUMBER_MOTOR.value();
 	public final static String		REVOLUTION_FACTOR					= MeasurementPropertyTypes.REVOLUTION_FACTOR.value();
 	public final static String		RPM_FACTOR								= IDevice.FACTOR;
@@ -138,8 +138,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using properties file
 	 * @param deviceProperties
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -156,7 +156,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
-	 * @throws NoSuchPortException 
+	 * @throws NoSuchPortException
 	 */
 	public UniLog(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
@@ -175,11 +175,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-				
+
 		lov2osdMap.put(LOV_CURRENT_OFFSET, CURRENT_OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_CURRENT_INVERT, IS_INVERT_CURRENT	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		lov2osdMap.put(LOV_NUMBER_CELLS, NUMBER_CELLS + "=_" + "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		lov2osdMap.put(LOV_RPM_CHECKED, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -187,10 +188,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		//lov2osdMap.put(LOV_RPM_UNIT, 		Record.UNIT);
 		lov2osdMap.put(LOV_RPM_OFFSET, 		IDevice.OFFSET 		+ "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_RPM_FACTOR, 		IDevice.FACTOR 		+ "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
-		lov2osdMap.put(LOV_NUMBER_MOTOR, 	NUMBER_MOTOR); 
+		lov2osdMap.put(LOV_NUMBER_MOTOR, 	NUMBER_MOTOR);
 		lov2osdMap.put(LOV_RPM2_FACTOR, 	REVOLUTION_FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_N_100_W, 			PROP_N_100_W			+ "=_" + "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
-	
+
 		lov2osdMap.put(LOV_A1_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_A2_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_A3_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -209,14 +210,15 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 		return lov2osdMap;
 	}
-	
+
 	/**
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		String recordSetInfo = GDE.STRING_EMPTY;
 		for (int j = 0; j < this.getNumberOfMeasurements(channelNumber); j++) {
@@ -237,7 +239,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					}
 				}
 			}
-			else if (j == 7) { // 7=revolutionSpeed LOV_CONFIG_DATA_KEYS_UNILOG_7	
+			else if (j == 7) { // 7=revolutionSpeed LOV_CONFIG_DATA_KEYS_UNILOG_7
 				HashMap<String, String> configData = StringHelper.splitString(header.get(GDE.LOV_CONFIG_DATA), GDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_7);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_7) {
 					if (configData.containsKey(lovKey)) {
@@ -279,17 +281,18 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			recordSetInfo = recordSetInfo + GDE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
 		}
-		
+
 		return recordSetInfo;
 	}
-	
+
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
+	@Override
 	public int getLovDataByteSize() {
-		return 32; 
+		return 32;
 	}
-	
+
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
@@ -298,19 +301,20 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int timeStep_ms = 0;		
+		int timeStep_ms = 0;
 		int size = this.getLovDataByteSize();
 		byte[] readBuffer = new byte[size];
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		for (int i = 2; i < recordDataSize; i++) { // skip UniLog min/max line
-			
+
 			System.arraycopy(dataBuffer, i*size, readBuffer, 0, size);
 
 			// time milli seconds
@@ -322,7 +326,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			recordSet.addPoints(convertDataBytes(points, readBuffer));
-			
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -334,11 +338,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
 		String lineSep = GDE.LINE_SEPARATOR;
 		int tmpValue = 0;
-		
+
 		// voltageReceiver *** power/drive *** group
 		tmpValue = (((dataBuffer[7] & 0xFF) << 8) + (dataBuffer[6] & 0xFF)) & 0x0FFF;
 		points[0] = (tmpValue * 10); //0=voltageReceiver
@@ -350,7 +355,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		points[1] = (tmpValue * 10); //1=voltage
 		if (log.isLoggable(Level.FINE)) sb.append("voltage [V] = " + points[1]).append(lineSep); //$NON-NLS-1$
 
-		// current *** power/drive *** group - asymmetric for 400 A sensor 
+		// current *** power/drive *** group - asymmetric for 400 A sensor
 		tmpValue = (((dataBuffer[11] & 0xFF) << 8) + (dataBuffer[10] & 0xFF));
 		tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
 		points[2] = tmpValue * 10; //2=current [A]
@@ -395,12 +400,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[11] = Integer.valueOf(tmpValue * 100); //11=a1Value
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a1Modus = " + a1Modus).append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("a1Modus = " + a1Modus).append(lineSep); //$NON-NLS-1$
 			if (a1Modus == 0)
 				sb.append("temperatur [°C] = " + points[12]).append(lineSep); //$NON-NLS-1$
-			else if (a1Modus == 1)  
+			else if (a1Modus == 1)
 				sb.append("voltage [mV] = " + points[12]).append(lineSep); //$NON-NLS-1$
-			else if (a1Modus == 2)  
+			else if (a1Modus == 2)
 				sb.append("speed 250 [km/h] = " + points[12]).append(lineSep); //$NON-NLS-1$
 			else if (a1Modus == 3)
 				sb.append("speed 400 [km/h] = " + points[12]).append(lineSep); //$NON-NLS-1$
@@ -422,9 +427,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			sb.append("a2Modus = " + a2Modus).append(lineSep); //$NON-NLS-1$
 			if (a2Modus == 0)
 				sb.append("tempreature [°C] = " + points[12]).append(lineSep); //$NON-NLS-1$
-			else if (a2Modus == 1)  
+			else if (a2Modus == 1)
 				sb.append("impulseTime [us] = " + points[12]).append(lineSep); //$NON-NLS-1$
-			else if (a2Modus == 2)  
+			else if (a2Modus == 2)
 				sb.append("voltage [mV] = " + points[12]).append(lineSep); //$NON-NLS-1$
 			else if (a2Modus == 3)
 				sb.append("capacity [mAh] = " + points[12]).append(lineSep); //$NON-NLS-1$
@@ -454,22 +459,23 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			else
 				sb.append("a3Value = " + points[13]).append(lineSep); //$NON-NLS-1$
 		}
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -478,7 +484,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
 			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
@@ -491,11 +497,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
 			recordSet.setTimeStep_ms(timeStamps.lastElement()/(double)(timeStamps.size()-1)/10.0); //UniLog has constant time step, even if the XML says -1
 		}
-		
+
 		for (int i = 0; i < recordDataSize; i++) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-			
+
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
@@ -506,13 +512,13 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			points[7] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
 			//points[8] = new Double(eta * 1000).intValue();//8=efficiency
 			points[9] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
-			//points[10] = slope			
+			//points[10] = slope
 			points[11] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
 			points[12] = (((convertBuffer[24]&0xff) << 24) + ((convertBuffer[25]&0xff) << 16) + ((convertBuffer[26]&0xff) << 8) + ((convertBuffer[27]&0xff) << 0));
 			points[13] = (((convertBuffer[28]&0xff) << 24) + ((convertBuffer[29]&0xff) << 16) + ((convertBuffer[30]&0xff) << 8) + ((convertBuffer[31]&0xff) << 0));
-			
+
 			recordSet.addPoints(points);
-			
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -522,6 +528,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
@@ -533,8 +540,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				double rpmFactor = 1;
 				double numberMotor = 1;
 				PropertyType property = null;
-				
-				switch (index) { 
+
+				switch (index) {
 				case 0: //voltageReceiver
 				case 1: //voltage
 					break;
@@ -583,15 +590,15 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					log.log(Level.WARNING, "exceed known record names"); //$NON-NLS-1$
 					break;
 				}
-				
-				dataTableRow[index+1] = record.getDecimalFormat().format((offset + (((record.realGet(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor));				
+
+				dataTableRow[index+1] = record.getDecimalFormat().format((offset + (((record.realGet(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor));
 				++index;
 			}
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -599,22 +606,23 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double newValue = value;
-		
+
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		PropertyType property = null;
 		switch (record.getOrdinal()) {
 		case 2: //2=current [A]
 			newValue = value + record.getOffset();
 			break;
-			
+
 		case 7: //7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			newValue = value * record.getFactor() / numberMotor;
 			break;
-			
+
 		case 9: //9=height [m]
 			property = record.getProperty(UniLog.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
@@ -630,10 +638,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			catch (Throwable e) {
-				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+				log.log(Level.SEVERE, record.getAbstractParent().getName() + " " + record.getName() + " " + e.getMessage());
 			}
 			break;
-			
+
 		case 11: //11=a1Value
 		case 12: //12=a2Value
 		case 13: //13=a3Value
@@ -643,7 +651,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		default:
 			break;
 		}
-		
+
 		return newValue;
 	}
 
@@ -652,22 +660,23 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double newValue = value;
-		
+
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		PropertyType property = null;
 		switch (record.getOrdinal()) {
 		case 2: //2=current [A]:
 			newValue = value - record.getOffset();
 			break;
-			
+
 		case 7: //7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			newValue = value * numberMotor / record.getFactor();
 			break;
-			
+
 		case 9: //9=height [m]
 			property = record.getProperty(UniLog.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
@@ -683,10 +692,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			catch (Throwable e) {
-				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+				log.log(Level.SEVERE, record.getAbstractParent().getName() + " " + record.getName() + " " + e.getMessage());
 			}
 			break;
-			
+
 		case 11: //11=a1Value
 		case 12: //12=a2Value
 		case 13: //13=a3Value
@@ -702,10 +711,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		Record record;
@@ -716,14 +726,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(i);		
+			record = recordSet.get(i);
 			measurement = this.getMeasurement(channelConfigNumber, i);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
-			
+
 			// update active state and displayable state if configuration switched with other names
 			if (includeReasonableDataCheck) {
 				boolean state = record.hasReasonableData();
-				log.log(Level.TIME, record.getName() + " hasReasonableData " + state); //$NON-NLS-1$ 
+				log.log(Level.TIME, record.getName() + " hasReasonableData " + state); //$NON-NLS-1$
 				record.setActive(state);
 				//record.setVisible(state);
 				record.setDisplayable(state);
@@ -735,7 +745,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		
+
 		if (!includeReasonableDataCheck) {
 			// updateStateCurrentDependent
 			boolean enabled = recordSet.get(2).isActive();
@@ -757,13 +767,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		}
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
-	
+
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//do not forget to make record displayable -> record.setDisplayable(true);
 		if (recordSet.isRaw()) {
@@ -771,18 +782,18 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			Record record;
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 			int displayableCounter = 0;
-			
+
 			// check if measurements isActive == false and set to isDisplayable == false
-			for (Record tmpRecord : recordSet.values()) {			
+			for (Record tmpRecord : recordSet.values()) {
 				if (tmpRecord.isActive() && tmpRecord.isDisplayable()) {
-					if (log.isLoggable(Level.FINE)) 
+					if (log.isLoggable(Level.FINE))
 						log.log(Level.FINE, "add to displayable counter: " + tmpRecord.getName());
 					++displayableCounter;
 				}
 			}
 
 			record = recordSet.get(3);// 3=capacity [Ah]
-			if (log.isLoggable(Level.FINE)) 
+			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, "start data calculation for record = " + record.getName()); //$NON-NLS-1$
 			record.setDisplayable(false);
 			record.clear();
@@ -800,7 +811,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			record = recordSet.get(4); //4=power
-			if (log.isLoggable(Level.FINE)) 
+			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, "start data calculation for record = " + record.getName()); //$NON-NLS-1$
 			record.setDisplayable(false);
 			record.clear();
@@ -816,7 +827,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			record = recordSet.get(5); //5=energy
-			if (log.isLoggable(Level.FINE)) 
+			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, "start data calculation for record = " + record.getName()); //$NON-NLS-1$
 			record.setDisplayable(false);
 			record.clear();
@@ -835,7 +846,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			record = recordSet.get(6);// 6=votagePerCell
-			if (log.isLoggable(Level.FINE)) 
+			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, "start data calculation for record = " + record.getName()); //$NON-NLS-1$
 			record.setDisplayable(false);
 			record.clear();
@@ -869,7 +880,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
 					double eta = motorPower * 100.0 / recordPower.get(i);
 					eta = eta > 100 ? record.lastElement()/1000.0 : eta < 0 ? 0 : eta;
-					if (log.isLoggable(Level.FINER)) 
+					if (log.isLoggable(Level.FINER))
 						log.log(Level.FINER, String.format("current=%5.1f; recordRevolution=%5.0f; recordPower=%6.2f; motorPower=%6.2f eta=%5.1f", recordCurrent.get(i)/1000.0, recordRevolution.get(i)/1000.0, recordPower.get(i)/1000.0, motorPower/1000.0, eta));
 					record.add(Double.valueOf(eta * 1000).intValue());
 				}
@@ -905,7 +916,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				isNoSlopeCalculationStarted = false;
 				++displayableCounter;
 			}
-			
+
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 			recordSet.setConfiguredDisplayable(displayableCounter);
 
@@ -935,9 +946,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
-		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION, 
-				NUMBER_CELLS, PROP_N_100_W, 
+		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION,
+				NUMBER_CELLS, PROP_N_100_W,
 				CalculationThread.REGRESSION_INTERVAL_SEC, CalculationThread.REGRESSION_TYPE};
 	}
 
@@ -950,7 +962,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		recordSet.setRecordSetDescription(String.format("%s; \n%s : %s; %s : %s; ",  //$NON-NLS-1$
 				recordSet.getRecordSetDescription(), SERIAL_NUMBER, this.getDialog().serialNumber, FIRMEWARE_VERSION, this.getDialog().unilogVersion));
 	}
-	
+
 	/**
 	 * invert data of current curve
 	 */
@@ -969,10 +981,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		}
 		record.setMinMax(min, max);
 	}
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
+	@Override
 	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
@@ -1012,7 +1025,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}
-	
+
 	/**
 	 * get the analog modus of A1, A2 and A3 to update the analog measurements of the given channel configuration
 	 * @param dataBuffer
@@ -1039,7 +1052,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			sb.append("a3Modus = " + a3Modus).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 		}
-		
+
 		MeasurementType measurement = this.getMeasurement(channelConfigKey, 11); // 11=A1
 		measurement.setName(UniLogDialog.A1_MODUS_NAMES[a1Modus].trim());
 		measurement.setUnit(UniLogDialog.A1_MODUS_UNITS[a1Modus].trim());
@@ -1047,7 +1060,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		measurement = this.getMeasurement(channelConfigKey, 12); // 12=A2
 		measurement.setName(UniLogDialog.A2_MODUS_NAMES[a2Modus].trim());
 		measurement.setUnit(UniLogDialog.A2_MODUS_UNITS[a2Modus].trim());
-		
+
 		measurement = this.getMeasurement(channelConfigKey, 13); // 13=A3
 		measurement.setName(UniLogDialog.A3_MODUS_NAMES[a3Modus].trim());
 		measurement.setUnit(UniLogDialog.A3_MODUS_UNITS[a3Modus].trim());

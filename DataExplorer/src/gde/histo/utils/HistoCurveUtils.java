@@ -34,7 +34,6 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
@@ -66,7 +65,7 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 	 * @param bounds
 	 * @param dashLineStyle to be used for the custom line style
 	 */
-	public static void drawCurveGrid(RecordSet recordSet, GC gc, Rectangle bounds, int[] dashLineStyle) {
+	public static void drawCurveGrid(TrailRecordSet recordSet, GC gc, Rectangle bounds, int[] dashLineStyle) {
 		gc.setLineWidth(1);
 		gc.setLineDash(dashLineStyle);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
@@ -174,7 +173,7 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 		gc.setLineWidth(2);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		boolean isPositionLeft = record.isPositionLeft();
-		int positionNumber = record.getParent().getAxisPosition(record.getName(), isPositionLeft);
+		int positionNumber = record.getParentTrail().getAxisPosition(record.getName(), isPositionLeft);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " positionNumber = " + positionNumber); //$NON-NLS-1$
 		if (isDrawScaleInRecordColor)
 			gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
@@ -223,7 +222,7 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 	 */
 	public static void drawHistoCurve(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -231,11 +230,10 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 		gc.setLineStyle(record.getLineStyle());
 
 		// get the number of data points size to be drawn
-		int displayableSize = record.size();
+		int displayableSize = record.realSize();
 
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
-		double displayableTime_ms = record.getDrawTimeWidth_ms();
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize); //$NON-NLS-1$
 
 		record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
 		record.setDisplayScaleFactorValue(height);
@@ -272,7 +270,7 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 	 */
 	public static void drawHistoSuite(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("MinScaleValue=%f   MaxScaleValue=%f   MinDisplayValue=%f   MaxDisplayValue=%f", record.getMinScaleValue(), //$NON-NLS-1$
 				record.getMaxScaleValue(), record.getMinDisplayValue(), record.getMaxDisplayValue()));
 
@@ -290,8 +288,8 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 		PointArray oldPoints = null;
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
-		double averageDuration = ((TrailRecordSet) record.getParent()).getAverageDuration_mm();
-		Iterator<Integer> durationIterator = ((TrailRecordSet) record.getParent()).getDurations_mm().iterator();
+		double averageDuration = record.getParentTrail().getAverageDuration_mm();
+		Iterator<Integer> durationIterator = record.getParentTrail().getDurations_mm().iterator();
 		for (PointArray pointArray : suitePoints) {
 			if (pointArray == null) {
 				; // neither boxplot nor the rangeplot needs this information

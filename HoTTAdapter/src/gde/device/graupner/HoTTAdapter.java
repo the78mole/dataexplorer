@@ -1043,7 +1043,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if (record.getParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude
+		if (record.getAbstractParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude
 			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			int grad = ((int) (value / 1000));
 			double minuten = (value - (grad * 1000.0)) / 10.0;
@@ -1070,7 +1070,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude )
+		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getAbstractParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude )
 			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;

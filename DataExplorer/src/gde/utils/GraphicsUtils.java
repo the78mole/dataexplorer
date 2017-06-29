@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
+import gde.data.AbstractRecordSet;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.log.Level;
@@ -41,7 +42,7 @@ import gde.ui.SWTResourceManager;
  */
 public class GraphicsUtils {
 	private static Logger log = Logger.getLogger(GraphicsUtils.class.getName());
-	
+
 	static DataExplorer application = DataExplorer.getInstance();
 
 	/**
@@ -57,8 +58,8 @@ public class GraphicsUtils {
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
 	 * @param isPositionLeft position of to be drawn scale
-	 * @param numberTickmarks 
-	 * @param isDrawNumbersInRecordColor 
+	 * @param numberTickmarks
+	 * @param isDrawNumbersInRecordColor
 	 */
 	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks, boolean isDrawNumbersInRecordColor) {
 
@@ -66,11 +67,11 @@ public class GraphicsUtils {
 
 		int yTop = y0-height+1;
 		double deltaScale = (maxValue - minValue);
-		int numberTicks = numberTickmarks == 0 ? height / 50 >= 2 ? height / 50 : 1 : numberTickmarks; // initial start value 
+		int numberTicks = numberTickmarks == 0 ? height / 50 >= 2 ? height / 50 : 1 : numberTickmarks; // initial start value
 		int maxNumberTicks = height / 25 >= 2 ? height / 25 : 1;
 		double deltaScaleValue = deltaScale;
 		double minScaleValue, maxScaleValue;
-		
+
 		if (record.isRoundOut() || record.isStartEndDefined()) {
 			minScaleValue = minValue;
 			maxScaleValue = maxValue;
@@ -85,16 +86,16 @@ public class GraphicsUtils {
 		}
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("deltaScaleValue = %10.6f - deltaScale = %10.6f", deltaScaleValue, deltaScale));
 		DecimalFormat df = record.getDecimalFormat();
-		 
+
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
-		RecordSet recordSet = record.getParent();
+		AbstractRecordSet recordSet = record.getAbstractParent();
 		boolean isBuildGridVector = recordSet.getHorizontalGridType() != RecordSet.HORIZONTAL_GRID_NONE && recordSet.getHorizontalGridRecordOrdinal() == record.getOrdinal();
-		
+
 		if (record.getNumberScaleTicks() != numberTicks) {
 			record.setNumberScaleTicks(numberTicks);
 			int cleanwidth = 35; //ticklength + gap + dist;
-			if (isPositionLeft) 
+			if (isPositionLeft)
 				gc.fillRectangle(x0 - cleanwidth, yTop, cleanwidth, height);
 			else
 				gc.fillRectangle(x0+1, yTop, cleanwidth, height);
@@ -102,11 +103,11 @@ public class GraphicsUtils {
 
 		int dist = 10;
 		if (!isPositionLeft) {
-			ticklength = ticklength * -1; // mirror drawing direction 
+			ticklength = ticklength * -1; // mirror drawing direction
 			gap = gap * -1;
 			dist = dist * -1;
 		}
-		
+
 		gc.setLineWidth(1);
 		if (numberTicks>1) {
 			double deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
@@ -135,7 +136,7 @@ public class GraphicsUtils {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "yTickPosition=" + yTickPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 					gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 				}
-				//draw numbers to the scale	
+				//draw numbers to the scale
 				if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
 				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				drawTextCentered(record.getFormattedScaleValue(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
@@ -164,7 +165,7 @@ public class GraphicsUtils {
 	}
 
 	/**
-	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees) centered. 
+	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees) centered.
 	 * Uses the current font, color, and background.
 	 * @param string the text to draw
 	 * @param x the x coordinate of the center of the drawing rectangle
@@ -186,17 +187,17 @@ public class GraphicsUtils {
 		stringGc.drawText(string, 0, 0);
 
 		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
-		if (isHorizontal) { // draw the horizontally image onto the original GC		
+		if (isHorizontal) { // draw the horizontally image onto the original GC
 			gc.drawImage(stringImage, x - pt.x / 2, y - pt.y / 2);
 		}
-		else { // draw the image vertically onto the original GC	
+		else { // draw the image vertically onto the original GC
 			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, String.format("%s_%s_%s", string, (gc.getBackground().toString()), (gc.getForeground().toString())));
 		}
 		stringGc.dispose();
 	}
 
 	/**
-	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees) centered. 
+	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees) centered.
 	 * Uses the current font, color, and background.
 	 * @param string the text to draw
 	 * @param x the x left delta coordinate of the drawing rectangle
@@ -207,7 +208,7 @@ public class GraphicsUtils {
 	public static void drawText(String string, int x, int y, GC gc, int style) {
 		Display display = Display.getCurrent();
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
-	
+
 		Point pt = gc.textExtent(string); // string dimensions
 		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
 		GC stringGc = new GC(stringImage); //SWTResourceManager.getGC(stringImage);
@@ -221,14 +222,14 @@ public class GraphicsUtils {
 		if (isHorizontal) {	// draw the horizontally image onto the original GC
 			gc.drawImage(stringImage, x, y);
 		}
-		else { // draw the image vertically onto the original GC			
+		else { // draw the image vertically onto the original GC
 			drawVerticalImage(stringImage, x, y, gc, style, string);
 		}
 		stringGc.dispose();
 	}
 
 	/**
-	 * Draws time line text horizontal [min, hrs], where hrs is bold 
+	 * Draws time line text horizontal [min, hrs], where hrs is bold
 	 * attention: prerequisite is to have gc.setFont called before calling this method !
 	 * @param string the text to draw
 	 * @param x the x coordinate of the top left corner of the drawing rectangle
@@ -248,7 +249,7 @@ public class GraphicsUtils {
 		stringGc.setFont(gc.getFont());
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
 		stringGc.drawText(string, 0, 0);
-		
+
 		if (string.contains(", ")) { // string [min, hrs]
 			int boldTextOffset = gc.textExtent(string.split(", ")[0]+", ").x;
 			stringGc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));

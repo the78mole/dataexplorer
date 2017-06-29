@@ -41,6 +41,7 @@ import gde.device.MeasurementType;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
+import gde.histo.recordings.TrailRecord;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -138,9 +139,9 @@ public class Record extends Vector<Integer> {
 	Color													color											= DataExplorer.COLOR_BLACK;
 	int														lineWidth									= 1;
 	int														lineStyle									= SWT.LINE_SOLID;
-	boolean												isRoundOut								= false;
-	boolean												isStartpointZero					= false;
-	boolean												isStartEndDefined					= false;
+	protected boolean							isRoundOut								= false;
+	protected boolean							isStartpointZero					= false;
+	protected boolean							isStartEndDefined					= false;
 	protected DecimalFormat				df;
 	protected int									numberFormat							= -1;																																																																		// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
 	protected int									maxValue									= 0;																																																																		// max value of the curve
@@ -179,8 +180,8 @@ public class Record extends Vector<Integer> {
 	double												displayScaleFactorTime;
 	protected double							displayScaleFactorValue;
 	protected double							syncMasterFactor					= 1.0;																																																																	// synchronized scale and different measurement factors
-	double												minDisplayValue;																																																																									// min value in device units, correspond to draw area
-	double												maxDisplayValue;																																																																									// max value in device units, correspond to draw area
+	protected double							minDisplayValue;																																																																									// min value in device units, correspond to draw area
+	protected double							maxDisplayValue;																																																																									// max value in device units, correspond to draw area
 
 	//current drop, make curve capable to be smoothed
 	boolean												isVoltageRecord						= false;
@@ -644,18 +645,21 @@ public class Record extends Vector<Integer> {
 
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		if (this.parent.scaleSyncedRecords.get(this.ordinal) != null && this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
-			sb.append(GDE.STRING_BLANK).append(this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1
-					? this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR).append(GDE.STRING_DOT);
+		HashMap<Integer, Vector<Record>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
+		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
+			sb.append(GDE.STRING_BLANK)
+					.append(
+							syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR)
+					.append(GDE.STRING_DOT);
 			sb.append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
-			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.ordinal)) {
+			for (Record tmpRecord : syncedRecords.get(this.ordinal)) {
 				if (tmpRecord.isDisplayable && tmpRecord.realSize() > 1) trailer = tmpRecord.name;
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
 		}
 		else {
-			sb.append(GDE.STRING_MESSAGE_CONCAT).append(this.parent.scaleSyncedRecords.get(this.ordinal).lastElement().name);
+			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().name);
 		}
 		return sb.toString();
 	}
@@ -741,7 +745,7 @@ public class Record extends Vector<Integer> {
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementFactor(this.parent.parent.number, this.ordinal);
+				value = this.getDevice().getMeasurementFactor(this.getAbstractParent().parent.number, this.ordinal);
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
@@ -764,7 +768,7 @@ public class Record extends Vector<Integer> {
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementOffset(this.parent.parent.number, this.ordinal);
+				value = this.getDevice().getMeasurementOffset(this.getAbstractParent().parent.number, this.ordinal);
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
@@ -787,7 +791,7 @@ public class Record extends Vector<Integer> {
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else {
 			try {
-				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parent.parent.number, this.ordinal, IDevice.REDUCTION);
+				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.getAbstractParent().parent.number, this.ordinal, IDevice.REDUCTION);
 				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
 			}
 			catch (RuntimeException e) {
@@ -1251,6 +1255,14 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
+	 * Temporarily used as long as we have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord.
+	 * @return the parent also for TrailRecord instances
+	 */
+	public AbstractRecordSet getAbstractParent() {
+		return this instanceof TrailRecord ? ((TrailRecord) this).getParentTrail() : this.parent;
+	}
+
+	/**
 	 * @return the parent
 	 */
 	public RecordSet getParent() {
@@ -1351,7 +1363,7 @@ public class Record extends Vector<Integer> {
 	 * @return time step in msec
 	 */
 	public double getAverageTimeStep_ms() {
-		return this.timeStep_ms == null ? this.parent.getAverageTimeStep_ms() : this.timeStep_ms.getAverageTimeStep_ms();
+		return this.timeStep_ms == null ? this.getAbstractParent().getAverageTimeStep_ms() : this.timeStep_ms.getAverageTimeStep_ms();
 	}
 
 	/**
@@ -1377,7 +1389,7 @@ public class Record extends Vector<Integer> {
 	 * @param time_ms
 	 * @return two index values around the given time
 	 */
-	public int[] findBoundingIndexes(double time_ms) {
+	private int[] findBoundingIndexes(double time_ms) {
 		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
 		if (this.elementCount > 0) {
 			indexs[0] = indexs[0] > this.elementCount - 1 ? this.elementCount - 1 : indexs[0];
@@ -1475,8 +1487,8 @@ public class Record extends Vector<Integer> {
 	 */
 	public DecimalFormat getDecimalFormat() {
 		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
-		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(this));
+		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this)).df : this.df;
 	}
 
 	/**
@@ -1498,7 +1510,7 @@ public class Record extends Vector<Integer> {
 	 * @return the device
 	 */
 	public IDevice getDevice() {
-		if (this.device == null) this.device = this.parent.getDevice();
+		if (this.device == null) this.device = this.getAbstractParent().getDevice();
 
 		return this.device;
 	}
@@ -1833,9 +1845,10 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		if (this.parent.isOneOfSyncableRecord(this) && this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor();
-			this.displayScaleFactorValue = this.displayScaleFactorValue * syncMasterFactor;
+		AbstractRecordSet abstractParent = this.getAbstractParent();
+		if (abstractParent.isOneOfSyncableRecord(this) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
+			this.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this)).getFactor();
+			this.displayScaleFactorValue = this.displayScaleFactorValue * this.syncMasterFactor;
 		}
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
 				drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
@@ -1852,8 +1865,8 @@ public class Record extends Vector<Integer> {
 		else
 			this.minDisplayValue = newMinDisplayValue;
 
-		if (this.parent.isOneOfSyncableRecord(this)) {
-			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+		if (this.getAbstractParent().isOneOfSyncableRecord(this)) {
+			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this))) {
 				tmpRecord.minDisplayValue = this.minDisplayValue;
 			}
 		}
@@ -1869,8 +1882,8 @@ public class Record extends Vector<Integer> {
 		else
 			this.maxDisplayValue = newMaxDisplayValue;
 
-		if (this.parent.isOneOfSyncableRecord(this)) {
-			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+		if (this.getAbstractParent().isOneOfSyncableRecord(this)) {
+			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this))) {
 				tmpRecord.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
@@ -2449,22 +2462,22 @@ public class Record extends Vector<Integer> {
 	 * @return the isScaleSynced
 	 */
 	public boolean isScaleSynced() {
-		return this.parent.isOneOfSyncableRecord(this);
+		return this.getAbstractParent().isOneOfSyncableRecord(this);
 	}
 
 	/**
 	 * @return true if the record represents a scale synchronize master record
 	 */
 	public boolean isScaleSyncMaster() {
-		return this.parent.scaleSyncedRecords.containsKey(this.ordinal);
+		return this.getAbstractParent().scaleSyncedRecords.containsKey(this.ordinal);
 	}
 
 	/**
 	 * @return true if the record is the scale sync master
 	 */
 	public boolean isScaleVisible() {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.parent.isOneOfSyncableRecord(this));
-		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(this));
+		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal) : !this.getAbstractParent().isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
 	}
 
 	/**

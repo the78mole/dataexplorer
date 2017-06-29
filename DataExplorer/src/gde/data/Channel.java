@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.data;
@@ -49,7 +49,7 @@ import gde.utils.StringHelper;
 public class Channel extends HashMap<String, RecordSet> {
 	static final long							serialVersionUID	= 26031957;
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
-	
+
 	final int											number;							// 1
 	String												channelConfigName;	// Ausgang
 	String												name;								// 1 : Ausgang
@@ -64,7 +64,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	final DataExplorer						application;
 	final Channels								parent;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
-	
+
 	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.GDE_MSGT0400);
 	public final static String		UNSAVED_REASON_REMOVE_OBJECT_KEY	= Messages.getString(MessageIds.GDE_MSGT0401);
 	public final static String		UNSAVED_REASON_CHANGED_OBJECT_DATA	= Messages.getString(MessageIds.GDE_MSGT0402);
@@ -82,10 +82,10 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.channelConfigName = useChannelConfigName;
 		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + this.channelConfigName;
 		this.type = channelType;
-		
+
 		String templateFileName = this.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + this.name.split(GDE.STRING_COLON)[0].trim();
 		this.template = new GraphicsTemplate(templateFileName);
-		this.fileDescription = DataExplorer.getInstance().isObjectoriented() 
+		this.fileDescription = DataExplorer.getInstance().isObjectoriented()
 			? this.fileDescription + GDE.STRING_BLANK + this.application.getObjectKey() : this.fileDescription;
 	}
 
@@ -108,7 +108,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 		String templateFileName = this.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + this.name.split(GDE.STRING_COLON)[0];
 		this.template = new GraphicsTemplate(templateFileName);
-		this.fileDescription = DataExplorer.getInstance().isObjectoriented() 
+		this.fileDescription = DataExplorer.getInstance().isObjectoriented()
 			? this.fileDescription + GDE.STRING_BLANK + this.application.getObjectKey() : this.fileDescription;
 	}
 
@@ -152,12 +152,12 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
-	 * method to get size within channels instance to avoid stack overflow due to never ending recursion 
+	 * method to get size within channels instance to avoid stack overflow due to never ending recursion
 	 */
 	private int _size(){
 		return super.size();
 	}
-	
+
 	/**
 	 * method to calculate next record set number, usually a record starts with a number followed by ")"
 	 * this method is used to build a new record set name while gathering data "3") flight record
@@ -177,12 +177,12 @@ public class Channel extends HashMap<String, RecordSet> {
 				}
 			}
 		}
-		else 
+		else
 			recordNumber = 1;
-		
+
 		return recordNumber;
 	}
-	
+
 	/**
 	 * method to calculate next record set number, usually a record starts with a number followed by ")"
 	 * this method is used to build a new record set name while gathering data "3") flight record
@@ -192,16 +192,16 @@ public class Channel extends HashMap<String, RecordSet> {
 		Vector<Integer> sortedNumbers = new Vector<Integer>(this.size());
 		if (this.size() != 0) {
 			String[] sortedRecordSetNames = this.getRecordSetNames();
-			for (int i = 0; i < sortedRecordSetNames.length; ++i) {
+			for (String sortedRecordSetName : sortedRecordSetNames) {
 				try {
-					sortedNumbers.add(Integer.valueOf(sortedRecordSetNames[i].split("[)]")[0])); //$NON-NLS-1$
+					sortedNumbers.add(Integer.valueOf(sortedRecordSetName.split("[)]")[0])); //$NON-NLS-1$
 				}
 				catch (NumberFormatException e) {
 					// is alpha no numeric or no ")"
 				}
 			}
 		}
-		
+
 		return !sortedNumbers.contains(availableNum) ? availableNum : getNextRecordSetNumber();
 	}
 
@@ -230,8 +230,8 @@ public class Channel extends HashMap<String, RecordSet> {
 			synchronized (channels) {
 				for (int i = 1; i <= channels.size(); ++i) {
 					String[] recordSetNames = channels.get(i).getUnsortedRecordSetNames();
-					for (int j = 0; j < recordSetNames.length; j++) {
-						if (recordSetNames[j] != null) namesVector.add(recordSetNames[j]);
+					for (String recordSetName : recordSetNames) {
+						if (recordSetName != null) namesVector.add(recordSetName);
 					}
 				}
 			}
@@ -240,9 +240,9 @@ public class Channel extends HashMap<String, RecordSet> {
 		Arrays.sort(keys, this.comparator);
 		return keys;
 	}
-	
+
 	/**
-	 * method to get unsorted recordNames within channels instance to avoid stack overflow due to never ending recursion 
+	 * method to get unsorted recordNames within channels instance to avoid stack overflow due to never ending recursion
 	 * @return String[] containing the records names
 	 */
 	public String[] getUnsortedRecordSetNames() {
@@ -251,11 +251,11 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * query the last displayed record set name, in case of ChannelTypes.TYPE_CONFIG the last used entry is returned
-	 */ 
+	 */
 	public String getLastActiveRecordSetName() {
 //		if (this.type == ChannelTypes.TYPE_CONFIG && this.keySet() != null)
 //			return this.keySet().toArray(new String[1])[0];
-//		
+//
 		return this.lastActiveRecordSet == null ? this.getFirstRecordSetName() : this.lastActiveRecordSet.name;
 	}
 
@@ -269,14 +269,14 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * query the first record set name, in case of ChannelTypes.TYPE_CONFIG the first entry of keySet might returned
-	 */ 
+	 */
 	public String getFirstRecordSetName() {
 		if (this.type == ChannelTypes.TYPE_CONFIG && this.keySet() != null)
 			return this.keySet().toArray(new String[1])[0];
-		
+
 		return this.getRecordSetNames()[0];
 	}
-	
+
 	/**
 	 * get the name of the channel " 1: Ausgang"
 	 * @return String
@@ -365,9 +365,10 @@ public class Channel extends HashMap<String, RecordSet> {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
 		}
 	}
-	
+
 	/**
-	 * method to apply the graphics template definition colors to an record set
+	 * method to apply the graphics template definition colors to an record set.
+	 * Not applicable for TrailRecordSets!
 	 */
 	public void applyTemplateBasics(String recordSetKey) {
 		RecordSet recordSet = this.get(recordSetKey);
@@ -431,23 +432,25 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setColor(lastActiveRecord.color);
 					record.setLineWidth(lastActiveRecord.lineWidth);
 					record.setLineStyle(lastActiveRecord.lineStyle);
-					record.setRoundOut(lastActiveRecord.isRoundOut); //$NON-NLS-1$
-					record.setStartpointZero(lastActiveRecord.isStartpointZero); //$NON-NLS-1$
+					record.setRoundOut(lastActiveRecord.isRoundOut);
+					record.setStartpointZero(lastActiveRecord.isStartpointZero);
 					record.setStartEndDefined(lastActiveRecord.isStartEndDefined, lastActiveRecord.getMinScaleValue(), lastActiveRecord.getMaxScaleValue());
-					record.setNumberFormat(lastActiveRecord.numberFormat); //$NON-NLS-1$
+					record.setNumberFormat(lastActiveRecord.numberFormat);
+
+					RecordSet lastActiveParent = (RecordSet) lastActiveRecord.parent;
 					//smooth current drop
-					recordSet.setSmoothAtCurrentDrop(lastActiveRecord.parent.isSmoothAtCurrentDrop);
+					recordSet.setSmoothAtCurrentDrop(lastActiveParent.isSmoothAtCurrentDrop);
 					//smooth voltage curve
-					recordSet.setSmoothVoltageCurve(lastActiveRecord.parent.isSmoothVoltageCurve);
+					recordSet.setSmoothVoltageCurve(lastActiveParent.isSmoothVoltageCurve);
 					// time grid
-					recordSet.setTimeGridColor(lastActiveRecord.parent.timeGridColor);
-					recordSet.setTimeGridLineStyle(lastActiveRecord.parent.timeGridLineStyle);
-					recordSet.setTimeGridType(lastActiveRecord.parent.timeGridType);
+					recordSet.setTimeGridColor(lastActiveParent.timeGridColor);
+					recordSet.setTimeGridLineStyle(lastActiveParent.timeGridLineStyle);
+					recordSet.setTimeGridType(lastActiveParent.timeGridType);
 					// curve grid
-					recordSet.setHorizontalGridColor(lastActiveRecord.parent.horizontalGridColor);
-					recordSet.setHorizontalGridLineStyle(lastActiveRecord.parent.horizontalGridLineStyle);
-					recordSet.setHorizontalGridType(lastActiveRecord.parent.horizontalGridType);
-					recordSet.setHorizontalGridRecordOrdinal(lastActiveRecord.parent.horizontalGridRecordOrdinal >= 0 ? lastActiveRecord.parent.horizontalGridRecordOrdinal : 0);
+					recordSet.setHorizontalGridColor(lastActiveParent.horizontalGridColor);
+					recordSet.setHorizontalGridLineStyle(lastActiveParent.horizontalGridLineStyle);
+					recordSet.setHorizontalGridType(lastActiveParent.horizontalGridType);
+					recordSet.setHorizontalGridRecordOrdinal(lastActiveParent.horizontalGridRecordOrdinal >= 0 ? lastActiveParent.horizontalGridRecordOrdinal : 0);
 					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "record = " + record.name + " isVisible=" + record.isVisible + " isPositionLeft=" + record.isPositionLeft + " isStartpointZero=" + record.isStartpointZero);
 				}
 			}
@@ -457,7 +460,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.application.updateGraphicsWindow();
 			}
 		}
-	}	
+	}
 
 	/**
 	 * method to apply the graphics template definition to an record set
@@ -520,7 +523,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 		}
 	}
-	
+
 	/**
 	 * remove active record set and records
 	 * @param deleteRecordSetName
@@ -530,7 +533,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		if (this.size() == 0) this.activeRecordSet = null;
 		else this.activeRecordSet = this.get(this.getRecordSetNames()[0]);
 	}
-	
+
 	/**
 	 * @return the activeRecordSet
 	 */
@@ -544,20 +547,20 @@ public class Channel extends HashMap<String, RecordSet> {
 	public void setActiveRecordSet(String recordSetKey) {
 		this.application.checkUpdateFileComment();
 		this.application.checkUpdateRecordSetComment();
-		
+
 		RecordSet newActiveRecordSet = this.get(recordSetKey);
 		if (newActiveRecordSet != null) {
 			this.activeRecordSet = newActiveRecordSet;
 		}
 	}
-	
+
 	/**
 	 * @param newActiveRecordSet to set
 	 */
 	public void setActiveRecordSet(RecordSet newActiveRecordSet) {
 		this.activeRecordSet = newActiveRecordSet;
 	}
-	
+
 	/**
 	 * switch the record set according selection and set applications active channel
 	 * @param recordSetName p.e. "1) Laden"
@@ -575,6 +578,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // execute asynchronous
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					updateForSwitchRecordSet(activeChannel, recordSetKey);
 				}
@@ -609,7 +613,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.application.resetGraphicsWindowZoomAndMeasurement();
 			if (recordSet.isRecalculation)
 				recordSet.checkAllDisplayable(); // updates graphics window
-			
+
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateMenusRegardingGPSData();
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
@@ -633,7 +637,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		return channelNumber;
 	}
-	
+
 	/**
 	 * @return the type as ordinal
 	 */
@@ -693,9 +697,9 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else {
 			this.isSaved = is_saved;
-		}		
+		}
 	}
-	
+
 	/**
 	 * set a unsaved reason marker to enable unsaved data warning
 	 * valid arguments are UNSAVED_REASON_ADD_OBJECT_KEY, UNSAVED_REASON_REMOVE_OBJECT_KEY, UNSAVED_REASON_CHANGED_OBJECT_DATA
@@ -708,11 +712,11 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 	}
 
-	
+
 	/**
 	 * check if all record sets have its data loaded, if required load data from file
 	 * this method can be used to check prior to save modified data
-	 * the behavior which record set data is checked and loaded depends on the method this.getRecordSetNames() 
+	 * the behavior which record set data is checked and loaded depends on the method this.getRecordSetNames()
 	 */
 	public synchronized void checkAndLoadData() {
 		String fullQualifiedFileName = this.getFullQualifiedFileName();
