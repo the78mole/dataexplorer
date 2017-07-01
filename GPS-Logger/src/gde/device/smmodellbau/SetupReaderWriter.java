@@ -211,7 +211,6 @@ public class SetupReaderWriter {
 				this.mLinkAddressHeightGain		= buffer[102];	// 52..
 				//short[] C 									= short int[1]; // 53..
 				this.firmwareVersion 					= DataParser.parse2Short(buffer, 106);	// 54
-				if (this.firmwareVersion != 119) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW2000));
 				this.modusIGC 								= DataParser.parse2Short(buffer, 108);	// 55
 				System.arraycopy(buffer, 110, this.startSlotSBUS, 0, 8);
 				this.spektrumSensors 					= buffer[118];	// 60..

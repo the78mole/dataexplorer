@@ -198,7 +198,6 @@ public class UniLog2SetupReaderWriter {
 				}
 				this.serialNumber = DataParser.parse2Short(buffer, 0);
 				this.firmwareVersion = DataParser.parse2Short(buffer, 2);
-				if (this.firmwareVersion != 114) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW2501));
 				this.dataRate = DataParser.parse2Short(buffer, 4); //0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
 				this.startModus = DataParser.parse2Short(buffer, 6); //AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
 				this.startCurrent = DataParser.parse2Short(buffer, 8); //1 - 50 A

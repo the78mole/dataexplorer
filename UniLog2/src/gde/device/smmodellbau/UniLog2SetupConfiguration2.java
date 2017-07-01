@@ -2492,7 +2492,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 320);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 135;
+				mLinkAddressesGroupLData.height = 145;
 				this.spektrumAdapterGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.spektrumAdapterGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.spektrumAdapterGroup.setText(Messages.getString(MessageIds.GDE_MSGT2594));
