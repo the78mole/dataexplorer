@@ -100,7 +100,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 	final String[]									spektrumAddresses = { " 0 ", " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "};
 	Button													spektrumEscSensor, spektrumCurrentSensor, spektrumVarioSensor, spektrumLiPoMonitor;
 
-	final int												labelWidth							= 115;
+	final int												labelWidth							= 110;
 	final int												textWidth								= 25;
 	final int												sliderWidth							= 125;
 	final int												sliderMinimum						= 0;

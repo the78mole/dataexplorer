@@ -102,7 +102,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	CLabel									fixLatitudeLabel, fixLongitudeLabel, fixHeightLabel, fixLatitudeUnitLabel, fixLongitudeUnitLabel, fixHeightUnitLabel;
 	Text										fixLatitudeText, fixLongitudeText, fixHeightText;
 
-	final int								labelWidth					= 115;
+	final int								labelWidth					= 110;
 	final int								textWidth						= 25;
 	final int								sliderWidth					= 125;
 	final int								sliderMinimum				= 0;
@@ -249,7 +249,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 2);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = GDE.IS_MAC ? 375 : 380;
+				mLinkAddressesGroupLData.height = GDE.IS_MAC ? 375 : 400;
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.mLinkAddressesGroup.setText(Messages.getString(MessageIds.GDE_MSGT2058));
@@ -1503,7 +1503,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.width = 290;
 				unilogTelemtryAlarmsGroupLData.height = 143;
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 410);
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 430);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1852,7 +1852,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 5);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 135;
+				mLinkAddressesGroupLData.height = 145;
 				this.spektrumAdapterGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.spektrumAdapterGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.spektrumAdapterGroup.setText(Messages.getString(MessageIds.GDE_MSGT2094));
@@ -2010,7 +2010,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData fixGpsStartPositionGroupLData = new FormData();
 				fixGpsStartPositionGroupLData.width = 290;
 				fixGpsStartPositionGroupLData.height = 143;
-				fixGpsStartPositionGroupLData.top = new FormAttachment(0, 1000, 410);
+				fixGpsStartPositionGroupLData.top = new FormAttachment(0, 1000, 430);
 				fixGpsStartPositionGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.fixGpsStartPositionGroup.setLayoutData(fixGpsStartPositionGroupLData);
 				this.fixGpsStartPositionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -2066,7 +2066,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixLatitudeText = new Text(this.fixGpsStartPositionGroup, SWT.RIGHT | SWT.BORDER);
 					this.fixLatitudeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1LData = new RowData();
-					addressText1LData.width = 90;
+					addressText1LData.width = GDE.IS_LINUX ? 80 : 90;
 					addressText1LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.fixLatitudeText.setLayoutData(addressText1LData);
 					this.fixLatitudeText.setText("0000.0000 N");
@@ -2126,7 +2126,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixLongitudeText = new Text(this.fixGpsStartPositionGroup, SWT.RIGHT | SWT.BORDER);
 					this.fixLongitudeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1LData = new RowData();
-					addressText1LData.width = 90;
+					addressText1LData.width = GDE.IS_LINUX ? 80 : 90;
 					addressText1LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.fixLongitudeText.setLayoutData(addressText1LData);
 					this.fixLongitudeText.setText("00000.0000 E");
@@ -2186,7 +2186,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixHeightText = new Text(this.fixGpsStartPositionGroup, SWT.RIGHT | SWT.BORDER);
 					this.fixHeightText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1LData = new RowData();
-					addressText1LData.width = 90;
+					addressText1LData.width = GDE.IS_LINUX ? 80 : 90;
 					addressText1LData.height = GDE.IS_MAC ? 14 : GDE.IS_LINUX ? 10 : 13;
 					this.fixHeightText.setLayoutData(addressText1LData);
 					this.fixHeightText.setText("000");

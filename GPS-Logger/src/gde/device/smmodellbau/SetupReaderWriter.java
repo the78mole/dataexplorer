@@ -202,16 +202,16 @@ public class SetupReaderWriter {
 				this.mLinkAddressTripLength 	= buffer[84];		// 43..
 				this.mLinkAddressSpeedMax			= buffer[86];		// 44..
 				this.mLinkAddressHeightMax		= buffer[88];		// 45..
-				this.mLinkAddressENL		= buffer[90];		// 46..
-				this.mLinkAddressAccX		= buffer[92];		// 47..
-				this.mLinkAddressAccY	= buffer[94];		// 48..
-				this.mLinkAddressAccZ		= buffer[96];		// 49..		
+				this.mLinkAddressENL					= buffer[90];		// 46..
+				this.mLinkAddressAccX					= buffer[92];		// 47..
+				this.mLinkAddressAccY					= buffer[94];		// 48..
+				this.mLinkAddressAccZ					= buffer[96];		// 49..		
 				this.mLinkAddressFlightDirection	= buffer[98];// 50..
 				this.mLinkAddressDirectionRel	= buffer[100];	// 51..
 				this.mLinkAddressHeightGain		= buffer[102];	// 52..
 				//short[] C 									= short int[1]; // 53..
 				this.firmwareVersion 					= DataParser.parse2Short(buffer, 106);	// 54
-				if (this.firmwareVersion != 119) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2000));
+				if (this.firmwareVersion != 119) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW2000));
 				this.modusIGC 								= DataParser.parse2Short(buffer, 108);	// 55
 				System.arraycopy(buffer, 110, this.startSlotSBUS, 0, 8);
 				this.spektrumSensors 					= buffer[118];	// 60..

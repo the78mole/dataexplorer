@@ -286,7 +286,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.telemetrieTypeLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData telemetrieTypeLabelLData = new RowData();
-					telemetrieTypeLabelLData.width = 135;
+					telemetrieTypeLabelLData.width = 130;
 					telemetrieTypeLabelLData.height = 20;
 					this.telemetrieTypeLabel.setLayoutData(telemetrieTypeLabelLData);
 					this.telemetrieTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2580));
@@ -322,7 +322,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					{
 						this.frskyIdLabel = new CLabel(this.addonComposite, SWT.NONE);
 						FormData frskyIdLabelLData = new FormData();
-						frskyIdLabelLData.width = 135;
+						frskyIdLabelLData.width = 130;
 						frskyIdLabelLData.height = 20;
 						frskyIdLabelLData.left = new FormAttachment(0, 1000, 2);
 						frskyIdLabelLData.top = new FormAttachment(0, 1000, 0);
@@ -333,7 +333,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					{
 						this.fixSerialNumberButton = new Button(this.addonComposite, SWT.CHECK | SWT.LEFT);
 						FormData sensorTypeLabelLData = new FormData();
-						sensorTypeLabelLData.width = 135;
+						sensorTypeLabelLData.width = 130;
 						sensorTypeLabelLData.height = 20;
 						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
 						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 0);
@@ -394,7 +394,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.dataRateLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData dataRateLabelLData = new RowData();
-					dataRateLabelLData.width = 135;
+					dataRateLabelLData.width = 130;
 					dataRateLabelLData.height = 20;
 					this.dataRateLabel.setLayoutData(dataRateLabelLData);
 					this.dataRateLabel.setText(Messages.getString(MessageIds.GDE_MSGT2536));
@@ -422,7 +422,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.currentSensorTypeLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData currentSensorTypeLabelLData = new RowData();
-					currentSensorTypeLabelLData.width = 135;
+					currentSensorTypeLabelLData.width = 130;
 					currentSensorTypeLabelLData.height = 20;
 					this.currentSensorTypeLabel.setLayoutData(currentSensorTypeLabelLData);
 					this.currentSensorTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2537));
@@ -450,7 +450,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a1ModusLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData a1ModusLabelLData = new RowData();
-					a1ModusLabelLData.width = 135;
+					a1ModusLabelLData.width = 130;
 					a1ModusLabelLData.height = 20;
 					this.a1ModusLabel.setLayoutData(a1ModusLabelLData);
 					this.a1ModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2538));
@@ -479,7 +479,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a2ModusLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData a2ModusLabelLData = new RowData();
-					a2ModusLabelLData.width = 135;
+					a2ModusLabelLData.width = 130;
 					a2ModusLabelLData.height = 20;
 					this.a2ModusLabel.setLayoutData(a2ModusLabelLData);
 					this.a2ModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2539));
@@ -508,7 +508,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a3ModusLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData a3ModusLabelLData = new RowData();
-					a3ModusLabelLData.width = 135;
+					a3ModusLabelLData.width = 130;
 					a3ModusLabelLData.height = 20;
 					this.a3ModusLabel.setLayoutData(a3ModusLabelLData);
 					this.a3ModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2540));
@@ -537,7 +537,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.propellerBladesLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData propellerBladesLabelLData = new RowData();
-					propellerBladesLabelLData.width = 135;
+					propellerBladesLabelLData.width = 130;
 					propellerBladesLabelLData.height = 20;
 					this.propellerBladesLabel.setLayoutData(propellerBladesLabelLData);
 					this.propellerBladesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2541));
@@ -574,7 +574,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.gearFactorLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData gearFactorLabelLData = new RowData();
-					gearFactorLabelLData.width = 135;
+					gearFactorLabelLData.width = 130;
 					gearFactorLabelLData.height = 20;
 					this.gearFactorLabel.setLayoutData(gearFactorLabelLData);
 					this.gearFactorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2543));
@@ -650,7 +650,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.varioTriggerLevelLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData varioTriggerLevelLabelLData = new RowData();
-					varioTriggerLevelLabelLData.width = 135;
+					varioTriggerLevelLabelLData.width = 130;
 					varioTriggerLevelLabelLData.height = 20;
 					this.varioTriggerLevelLabel.setLayoutData(varioTriggerLevelLabelLData);
 					this.varioTriggerLevelLabel.setText(Messages.getString(MessageIds.GDE_MSGT2544));
@@ -688,7 +688,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.varioTriggerSinkLevelLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData varioTriggerSinkLevelLabelLData = new RowData();
-					varioTriggerSinkLevelLabelLData.width = 135;
+					varioTriggerSinkLevelLabelLData.width = 130;
 					varioTriggerSinkLevelLabelLData.height = 20;
 					this.varioTriggerSinkLevelLabel.setLayoutData(varioTriggerSinkLevelLabelLData);
 					this.varioTriggerSinkLevelLabel.setText(Messages.getString(MessageIds.GDE_MSGT2513));
@@ -726,7 +726,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.varioToneLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData varioToneLabelLData = new RowData();
-					varioToneLabelLData.width = 135;
+					varioToneLabelLData.width = 130;
 					varioToneLabelLData.height = 20;
 					this.varioToneLabel.setLayoutData(varioToneLabelLData);
 					this.varioToneLabel.setText(Messages.getString(MessageIds.GDE_MSGT2545));
@@ -754,7 +754,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.varioFactorLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData varioFactorLabelLData = new RowData();
-					varioFactorLabelLData.width = 135;
+					varioFactorLabelLData.width = 130;
 					varioFactorLabelLData.height = 20;
 					this.varioFactorLabel.setLayoutData(varioFactorLabelLData);
 					this.varioFactorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2586));
@@ -782,7 +782,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.varioFilterLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData varioFilterLabelLData = new RowData();
-					varioFilterLabelLData.width = 135;
+					varioFilterLabelLData.width = 130;
 					varioFilterLabelLData.height = 20;
 					this.varioFilterLabel.setLayoutData(varioFilterLabelLData);
 					this.varioFilterLabel.setText(Messages.getString(MessageIds.GDE_MSGT2587));
@@ -810,7 +810,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.limiterModusLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData limiterModusLabelLData = new RowData();
-					limiterModusLabelLData.width = 135;
+					limiterModusLabelLData.width = 130;
 					limiterModusLabelLData.height = 20;
 					this.limiterModusLabel.setLayoutData(limiterModusLabelLData);
 					this.limiterModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2546));
@@ -838,7 +838,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.energyLimitLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData energyLimitLabelLData = new RowData();
-					energyLimitLabelLData.width = 135;
+					energyLimitLabelLData.width = 130;
 					energyLimitLabelLData.height = 20;
 					this.energyLimitLabel.setLayoutData(energyLimitLabelLData);
 					this.energyLimitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2547));
@@ -876,7 +876,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.minMaxRxLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData minMaxRxLabelLData = new RowData();
-					minMaxRxLabelLData.width = 135;
+					minMaxRxLabelLData.width = 130;
 					minMaxRxLabelLData.height = 20;
 					this.minMaxRxLabel.setLayoutData(minMaxRxLabelLData);
 					this.minMaxRxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2548));
@@ -904,7 +904,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.capacityResetLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData capacityResetLabelLData = new RowData();
-					capacityResetLabelLData.width = 135;
+					capacityResetLabelLData.width = 130;
 					capacityResetLabelLData.height = 20;
 					this.capacityResetLabel.setLayoutData(capacityResetLabelLData);
 					this.capacityResetLabel.setText(Messages.getString(MessageIds.GDE_MSGT2583));
@@ -932,7 +932,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.currentOffsetLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData currentOffsetLabelLData = new RowData();
-					currentOffsetLabelLData.width = 135;
+					currentOffsetLabelLData.width = 130;
 					currentOffsetLabelLData.height = 20;
 					this.currentOffsetLabel.setLayoutData(currentOffsetLabelLData);
 					this.currentOffsetLabel.setText(Messages.getString(MessageIds.GDE_MSGT2584));
@@ -980,7 +980,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.autoStartCurrentButton = new Button(this.logStartStopGroup, SWT.CHECK);
 					RowData startByCurrentButtonLData = new RowData();
-					startByCurrentButtonLData.width = 135;
+					startByCurrentButtonLData.width = 130;
 					startByCurrentButtonLData.height = 19;
 					this.autoStartCurrentButton.setLayoutData(startByCurrentButtonLData);
 					this.autoStartCurrentButton.setText(Messages.getString(MessageIds.GDE_MSGT2527));
@@ -1030,7 +1030,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.autoStartRxButton = new Button(this.logStartStopGroup, SWT.CHECK | SWT.LEFT);
 					RowData rxTriggerButtonLData = new RowData();
-					rxTriggerButtonLData.width = 135;
+					rxTriggerButtonLData.width = 130;
 					rxTriggerButtonLData.height = 16;
 					this.autoStartRxButton.setLayoutData(rxTriggerButtonLData);
 					this.autoStartRxButton.setText(Messages.getString(MessageIds.GDE_MSGT2528));
@@ -1080,7 +1080,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.autoStartTimeButton = new Button(this.logStartStopGroup, SWT.CHECK | SWT.LEFT);
 					RowData timeTriggerButtonLData = new RowData();
-					timeTriggerButtonLData.width = 135;
+					timeTriggerButtonLData.width = 130;
 					timeTriggerButtonLData.height = 16;
 					this.autoStartTimeButton.setLayoutData(timeTriggerButtonLData);
 					this.autoStartTimeButton.setText(Messages.getString(MessageIds.GDE_MSGT2530));
@@ -1130,7 +1130,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.autoStopLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
 					RowData autoStopLabelLData = new RowData();
-					autoStopLabelLData.width = 135;
+					autoStopLabelLData.width = 130;
 					autoStopLabelLData.height = 20;
 					this.autoStopLabel.setLayoutData(autoStopLabelLData);
 					this.autoStopLabel.setText(Messages.getString(MessageIds.GDE_MSGT2532));
