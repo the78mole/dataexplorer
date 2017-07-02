@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
@@ -36,8 +36,6 @@ import gde.config.Settings;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 /**
@@ -45,10 +43,11 @@ import gde.ui.DataExplorer;
  * @author Winfried Brügmann
  */
 public class ObjectKeyScanner extends Thread {
-	final private static Logger	log				= Logger.getLogger(ObjectKeyScanner.class.getName());
+	final private static Logger	log					= Logger.getLogger(ObjectKeyScanner.class.getName());
 
-	final private Settings			settings	= Settings.getInstance();
-	String											objectKey	= GDE.STRING_EMPTY;
+	final private DataExplorer	application	= DataExplorer.getInstance();
+	final private Settings			settings		= Settings.getInstance();
+	String											objectKey		= GDE.STRING_EMPTY;
 	//ET 20170511		boolean											searchForKeys			= false;
 	final boolean								addToExistentKeys;
 	final Vector<String>				objectKeys;
@@ -56,9 +55,10 @@ public class ObjectKeyScanner extends Thread {
 	private List<String>				obsoleteObjectKeys;
 
 	/**
-	 * constructor to create a object key scanner, 
-	 * starting this as thread all the sub files of the given data path are scanned for object key references 
-	 * and a file link will be created in a directory named with the object key
+	 * constructor to create a object key scanner,
+	 * starting this as thread all the sub files of the given data path are scanned for object key references
+	 * and a file link will be created in a directory named with the object key.
+	 * If newAddToExistentKeys is true: Provide obsolete object keys, i.e. without object directory or with empty directory.
 	 * @param newAddToExistentKeys false will build a new object key list from scratch on without caring about any existing object keys
 	 */
 	public ObjectKeyScanner(boolean newAddToExistentKeys) {
@@ -74,8 +74,8 @@ public class ObjectKeyScanner extends Thread {
 	}
 
 	/**
-	 * constructor to create a object key scanner, 
-	 * starting this as thread all the sub files of the given data path are scanned for object key references 
+	 * constructor to create a object key scanner,
+	 * starting this as thread all the sub files of the given data path are scanned for object key references
 	 * and a file link will be created in a directory named with the object key
 	 * @param newObjectKey the object key to be used for scanning existing files
 	 */
@@ -98,7 +98,8 @@ public class ObjectKeyScanner extends Thread {
 			String objectKeyDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + this.objectKey;
 
 			if (this.objectKey.length() > 1) { // use exact defined object key
-				//check directory and cleanup if already exist 
+				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+				//check directory and cleanup if already exist
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
 
 				// check if object key known (settings)
@@ -116,6 +117,9 @@ public class ObjectKeyScanner extends Thread {
 
 				//scan all data files for object key
 				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
+				final int progressDistance = 50;
+				double progressStep = (99. - this.application.getProgressPercentage()) / (files.size() + 1.) * progressDistance;
+				int i = 0;
 				for (File file : files) {
 					try {
 						String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -129,6 +133,8 @@ public class ObjectKeyScanner extends Thread {
 								}
 							}
 						}
+						if (this.application.getMenuToolBar() != null && i % progressDistance == 0) this.application.setProgress((int) (i * progressStep), sThreadId);
+						i++;
 					}
 					catch (IOException e) {
 						log.log(Level.WARNING, file.getAbsolutePath(), e);
@@ -140,54 +146,69 @@ public class ObjectKeyScanner extends Thread {
 						log.log(Level.WARNING, t.getLocalizedMessage(), t);
 					}
 				}
+				if (this.application.getMenuToolBar() != null) this.application.setProgress(100, sThreadId);
 			}
 			else { // search for all available keys
 				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !"); //$NON-NLS-1$ //$NON-NLS-2$
+				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+				final int progressPercentageLimit = 80;
 
 				final File rootDirectory = new File(this.settings.getDataFilePath());
+				log.log(Level.FINE, "this.settings.getDataFilePath() = " + rootDirectory.toString());
 				this.objectKeys.clear();
 				HashMap<String, Vector<File>> objectFilesMap = new HashMap<String, Vector<File>>();
-				int fileCounter = 0;
-				//ET 20170511				if (this.searchForKeys) {
-				log.log(Level.FINE, "this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
-				List<File> files = FileUtils.getFileListing(rootDirectory, 1);
-				for (File file : files) {
-					try {
-						String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-						if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD)) {
-							fileCounter++;
-							if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
-								log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
-								String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
-								if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
-									if (!this.objectKeys.contains(foundObjectKey)) {
-										log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
-										this.objectKeys.add(foundObjectKey);
-										Vector<File> tmpObjectFiles = new Vector<File>();
-										tmpObjectFiles.add(file);
-										objectFilesMap.put(foundObjectKey, tmpObjectFiles);
+				{
+					int fileCounter = 0;
+					//ET 20170511				if (this.searchForKeys) {
+					List<File> files = FileUtils.getFileListing(rootDirectory, 1);
+					final int progressDistance = 50;
+					double progressStep = (99. - this.application.getProgressPercentage()) / (files.size() + 1.) * progressDistance;
+					int i = 0;
+					for (File file : files) {
+						try {
+							String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+							if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD)) {
+								fileCounter++;
+								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
+									log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
+									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
+									if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
+										if (!this.objectKeys.contains(foundObjectKey)) {
+											log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
+											this.objectKeys.add(foundObjectKey);
+											Vector<File> tmpObjectFiles = new Vector<File>();
+											tmpObjectFiles.add(file);
+											objectFilesMap.put(foundObjectKey, tmpObjectFiles);
+										}
+										else {
+											objectFilesMap.get(foundObjectKey).add(file);
+										}
+										log.log(Level.FINE, "add file " + file.getName() + " to object key " + foundObjectKey); //$NON-NLS-1$
 									}
-									else {
-										objectFilesMap.get(foundObjectKey).add(file);
-									}
-									log.log(Level.FINE, "add file " + file.getName() + " to object key " + foundObjectKey); //$NON-NLS-1$
 								}
 							}
+							if (this.application.getMenuToolBar() != null && i % progressDistance == 0) this.application.setProgress((int) (i * progressStep), sThreadId);
+							i++;
+						}
+						catch (IOException e) {
+							log.log(Level.WARNING, e.getLocalizedMessage(), e);
+						}
+						catch (NotSupportedFileFormatException e) {
+							log.log(Level.WARNING, e.getLocalizedMessage(), e);
+						}
+						catch (Throwable t) {
+							log.log(Level.WARNING, t.getLocalizedMessage(), t);
 						}
 					}
-					catch (IOException e) {
-						log.log(Level.WARNING, e.getLocalizedMessage(), e);
-					}
-					catch (NotSupportedFileFormatException e) {
-						log.log(Level.WARNING, e.getLocalizedMessage(), e);
-					}
-					catch (Throwable t) {
-						log.log(Level.WARNING, t.getLocalizedMessage(), t);
-					}
+					log.log(Level.FINE, "scanned " + fileCounter + " files for object key , foundKeysSize=" + this.objectKeys.size()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				{
+				if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageLimit, sThreadId);
+				{ // createFileLinks: Take the object key list and create file links for all files assigned to object keys.
+					int progressPercentageStart = this.application.getProgressPercentage();
+					double progressStep = (100. - progressPercentageStart) / (this.objectKeys.size() + 1.);
+
+					int j = 0;
 					Iterator<String> iterator = this.objectKeys.iterator();
-					log.log(Level.FINE, "scanned " + fileCounter + " files for object key , found following keys :"); //$NON-NLS-1$ //$NON-NLS-2$
 					//iterate all found object keys
 					while (iterator.hasNext()) {
 						String tmpObjKey = iterator.next();
@@ -206,51 +227,59 @@ public class ObjectKeyScanner extends Thread {
 								log.log(Level.WARNING, e.getLocalizedMessage(), e);
 							}
 						}
+						j++;
+						if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageStart + (int) (j * progressStep), sThreadId);
 					}
 				}
 				if (this.addToExistentKeys) {
-					final String deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 					Set<String> newObjectList = Settings.getInstance().getRealObjectKeys();
-					newObjectList.remove(deviceOriented);
 					if (newObjectList.addAll(this.objectKeys) || !newObjectList.equals(new HashSet<>(this.objectKeys))) {
-						DataExplorer.getInstance().setObjectList(newObjectList.toArray(new String[0]), this.settings.getActiveObject());
+						this.application.setObjectList(newObjectList.toArray(new String[0]), this.settings.getActiveObject());
 						log.log(Level.FINE, "object list updated: ", newObjectList); //$NON-NLS-1$
 					}
 
-					// get current object key list as a basis for determining the obsolete object keys
-					this.obsoleteObjectKeys = new ArrayList<>(Settings.getInstance().getRealObjectKeys());
-					// build list of object keys without a directory or an empty directory based on the current user selection
-					this.obsoleteObjectKeys.remove(deviceOriented);
-					this.obsoleteObjectKeys.removeAll(this.settings.getObjectKeyCandidates());
-					for (File dir : FileUtils.getDirectories(rootDirectory)) {
-						if (!FileUtils.getFileListing(dir, Integer.MAX_VALUE).isEmpty()) {
-							if (GDE.IS_WINDOWS) {
-								// iterate due to windows which allows only one directory for object keys with casing differences
-								ListIterator<String> iterator = this.obsoleteObjectKeys.listIterator();
-								while (iterator.hasNext()) {
-									if (iterator.next().toLowerCase().equals(dir.getName().toLowerCase())) {
-										iterator.remove();
-										// break; leave this statement out to eliminate multiple casing versions of the name 
-									}
-								}
-							}
-							else {
-								this.obsoleteObjectKeys.remove(dir.getName());
-							}
-						}
-					}
-					log.log(Level.INFO, "obsoleteObjectKeys: ", this.obsoleteObjectKeys); //$NON-NLS-1$
+					this.obsoleteObjectKeys = getObsoleteObjectKeys(rootDirectory);
 				}
 				else {
-					DataExplorer.getInstance().setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());
+					this.application.setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());
 				}
-				//
-				//				}
+				if (this.application.getMenuToolBar() != null) this.application.setProgress(100, sThreadId);
 			}
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.WARNING, e.getLocalizedMessage(), e);
 		}
+	}
+
+	/**
+	 * Build list of object keys without a directory or an empty directory based on the current user selection.
+	 * @param rootDirectory
+	 * @throws FileNotFoundException
+	 */
+	private List<String> getObsoleteObjectKeys(File rootDirectory) throws FileNotFoundException {
+		// get current object key list as a basis for determining the obsolete object keys
+		List<String> resultObjectKeys = new ArrayList<>(this.settings.getRealObjectKeys());
+		resultObjectKeys.removeAll(this.settings.getObjectKeyCandidates());
+
+		for (File dir : FileUtils.getDirectories(rootDirectory)) {
+			if (!FileUtils.getFileListing(dir, Integer.MAX_VALUE).isEmpty()) {
+				if (GDE.IS_WINDOWS) {
+					// iterate due to windows which allows only one directory for object keys with casing differences
+					ListIterator<String> iterator = resultObjectKeys.listIterator();
+					while (iterator.hasNext()) {
+						if (iterator.next().toLowerCase().equals(dir.getName().toLowerCase())) {
+							iterator.remove();
+							// break; leave this statement out to eliminate multiple casing versions of the name
+						}
+					}
+				}
+				else {
+					resultObjectKeys.remove(dir.getName());
+				}
+			}
+		}
+		log.log(Level.INFO, "obsoleteObjectKeys: ", resultObjectKeys); //$NON-NLS-1$
+		return resultObjectKeys;
 	}
 
 	//	/**
