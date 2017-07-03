@@ -49,7 +49,7 @@ public final class VaultProxy {
 	 */
 	public static Unmarshaller getUnmarshaller() {
 		if (jaxbUnmarshaller == null) {
-			final Path path = VaultAttributes.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+			final Path path = ExtendedVault.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			try {
 				jaxbUnmarshaller = HistoVault.getJaxbContext().createUnmarshaller();
 				jaxbUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
@@ -66,7 +66,7 @@ public final class VaultProxy {
 	 */
 	public static Marshaller getMarshaller() {
 		if (jaxbMarshaller == null) {
-			final Path path = VaultAttributes.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+			final Path path = ExtendedVault.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			try {
 				jaxbMarshaller = HistoVault.getJaxbContext().createMarshaller();
 				jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

@@ -33,10 +33,7 @@ public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
 	private static final long		serialVersionUID	= -5963216308453730035L;
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	private final TrailRecord		trailRecord;
-
-	public SuiteRecords(TrailRecord trailRecord) {
-		this.trailRecord = trailRecord;
+	public SuiteRecords() {
 	}
 
 	public int getSuiteMaxValue() {

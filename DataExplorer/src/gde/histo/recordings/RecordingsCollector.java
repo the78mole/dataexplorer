@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import gde.device.IDevice;
 import gde.device.TrailTypes;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
@@ -68,8 +68,8 @@ public final class RecordingsCollector {
 				trailRecord.setSuite(histoSet.size());
 			}
 		}
-		for (Map.Entry<Long, List<HistoVault>> entry : histoSet.entrySet()) {
-			for (HistoVault histoVault : entry.getValue()) {
+		for (Map.Entry<Long, List<ExtendedVault>> entry : histoSet.entrySet()) {
+			for (ExtendedVault histoVault : entry.getValue()) {
 				trailRecordSet.addVaultHeader(histoVault);
 
 				for (String recordName : trailRecordSet.getRecordNames()) {
@@ -90,8 +90,8 @@ public final class RecordingsCollector {
 		trailRecord.clear();
 		trailRecord.setSuite(histoSet.size());
 
-		for (Map.Entry<Long, List<HistoVault>> entry : histoSet.entrySet()) {
-			for (HistoVault histoVault : entry.getValue()) {
+		for (Map.Entry<Long, List<ExtendedVault>> entry : histoSet.entrySet()) {
+			for (ExtendedVault histoVault : entry.getValue()) {
 				addVault(histoVault, trailRecord);
 			}
 		}
@@ -104,7 +104,7 @@ public final class RecordingsCollector {
 	 * Supports trail suites.
 	 * @param histoVault
 	 */
-	private static void addVault(HistoVault histoVault, TrailRecord trailRecord) {
+	private static void addVault(ExtendedVault histoVault, TrailRecord trailRecord) {
 		if (!trailRecord.getTrailSelector().isTrailSuite()) {
 			trailRecord.addElement(histoVault.getPoint(trailRecord, trailRecord.getTrailSelector().getTrailType()));
 		}
@@ -178,8 +178,8 @@ public final class RecordingsCollector {
 		GpsCluster gpsCluster = new GpsCluster();
 		if (latitudeRecord != null && longitudeRecord != null) {
 			// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
-			for (Map.Entry<Long, List<HistoVault>> entry : histoSet.entrySet()) {
-				for (HistoVault histoVault : entry.getValue()) {
+			for (Map.Entry<Long, List<ExtendedVault>> entry : histoSet.entrySet()) {
+				for (ExtendedVault histoVault : entry.getValue()) {
 					Integer latitudePoint = histoVault.getMeasurementPoint(latitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 					Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 

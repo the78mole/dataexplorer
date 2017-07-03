@@ -25,7 +25,7 @@ import java.util.List;
 
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 
 /**
@@ -57,7 +57,7 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @throws IOException
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
-	public List<HistoVault>  getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
+	public List<ExtendedVault>  getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * Reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .

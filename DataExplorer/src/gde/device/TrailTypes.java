@@ -152,8 +152,8 @@ public enum TrailTypes {
 	@XmlEnumValue("suite_q1_q2_q3")
 	SUITE_Q1_Q2_Q3(1007, Messages.getString(MessageIds.GDE_MSGT0787), true, new TrailTypes[] { Q2, Q1, Q3 });
 
-	public final static int										RANGE_PLOT_SIZE	= 3;
-	public final static int										BOX_PLOT_SIZE		= 7;
+	public static final int										RANGE_PLOT_SIZE		= 3;
+	public static final int										BOX_PLOT_SIZE			= 7;
 
 	private final int													displaySequence;
 	private final boolean											isForSummation;
@@ -168,15 +168,15 @@ public enum TrailTypes {
 	/**
 	 * Use this instead of values() to avoid repeatedly cloning actions.
 	 */
-	public final static TrailTypes						values[]				= values();
-	private final static TrailTypes						displayValues[]	= values().clone();									// sorted
+	public static final TrailTypes						VALUES[]					= values();
+	private static final TrailTypes						DISPLAY_VALUES[]	= values().clone();									// sorted
 
-	private final static EnumSet<TrailTypes>	primitives			= EnumSet.noneOf(TrailTypes.class);
-	private final static EnumSet<TrailTypes>	suites					= EnumSet.noneOf(TrailTypes.class);
-	private final static EnumSet<TrailTypes>	substitutes			= EnumSet.noneOf(TrailTypes.class);
-	private static TrailTypes									substitute			= null;
+	private static final EnumSet<TrailTypes>	PRIMITIVES				= EnumSet.noneOf(TrailTypes.class);
+	private static final EnumSet<TrailTypes>	SUITES						= EnumSet.noneOf(TrailTypes.class);
+	private static final EnumSet<TrailTypes>	SUBSTITUTES				= EnumSet.noneOf(TrailTypes.class);
+	private static TrailTypes									substitute				= null;
 
-	private TrailTypes[]											suiteMembers		= new TrailTypes[0];
+	private TrailTypes[]											suiteMembers			= new TrailTypes[0];
 
 	private TrailTypes(int displaySequence, boolean isForSummation, boolean isTriggered, String displayName) { // legacy
 		this.displaySequence = displaySequence;
@@ -223,18 +223,18 @@ public enum TrailTypes {
 	}
 
 	static {
-		Arrays.sort(displayValues, (o1, o2) -> o1.displaySequence < o2.displaySequence ? -1 : o1.displaySequence > o2.displaySequence ? +1 : 0);
-		for (TrailTypes trailType : values) {
-			if (trailType.isSubstitute) substitutes.add(trailType);
+		Arrays.sort(DISPLAY_VALUES, (o1, o2) -> o1.displaySequence < o2.displaySequence ? -1 : o1.displaySequence > o2.displaySequence ? +1 : 0);
+		for (TrailTypes trailType : VALUES) {
+			if (trailType.isSubstitute) SUBSTITUTES.add(trailType);
 			if (trailType.isSubstitute) substitute = trailType;
-			if (!trailType.isSuite()) primitives.add(trailType);
-			if (trailType.isSuite()) suites.add(trailType);
+			if (!trailType.isSuite()) PRIMITIVES.add(trailType);
+			if (trailType.isSuite()) SUITES.add(trailType);
 		}
 	}
 
 	public static TrailTypes fromDisplayName(String displayName) {
 		if (displayName != null) {
-			for (TrailTypes trailType : TrailTypes.values) {
+			for (TrailTypes trailType : TrailTypes.VALUES) {
 				if (displayName.equalsIgnoreCase(trailType.displayName)) {
 					return trailType;
 				}
@@ -244,21 +244,21 @@ public enum TrailTypes {
 	}
 
 	public static TrailTypes fromOrdinal(int ordinal) {
-		return TrailTypes.values[ordinal];
+		return TrailTypes.VALUES[ordinal];
 	}
 
 	/**
 	 * @return all trail types in display order
 	 */
 	public static TrailTypes[] getDisplayValues() {
-		return displayValues;
+		return DISPLAY_VALUES;
 	}
 
 	/**
 	 * @return the valid default trail types in case no trails have been assigned to a measurement or settlement
 	 */
 	public static EnumSet<TrailTypes> getSubstitutes() {
-		return substitutes;
+		return SUBSTITUTES;
 	}
 
 	/**
@@ -273,14 +273,14 @@ public enum TrailTypes {
 	 * @return the non-Suite trail types
 	 */
 	public static EnumSet<TrailTypes> getPrimitives() {
-		return primitives;
+		return PRIMITIVES;
 	}
 
 	/**
 	 * @return the suite trail types
 	 */
 	public static EnumSet<TrailTypes> getSuites() {
-		return suites;
+		return SUITES;
 	}
 
 	public String getSuiteMembersToString() {

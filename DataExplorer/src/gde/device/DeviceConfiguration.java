@@ -2595,7 +2595,7 @@ public class DeviceConfiguration {
 	 * @param channelConfigNumber is a 1-based number
 	 * @return the 1-based config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
 	 */
-	public List<Integer> getChannelBundle(int channelConfigNumber) {
+	private List<Integer> getChannelBundle(int channelConfigNumber) {
 		List<Integer> result = new ArrayList<Integer>();
 		if (this.channelGroups == null) {
 			initChannelGroups();

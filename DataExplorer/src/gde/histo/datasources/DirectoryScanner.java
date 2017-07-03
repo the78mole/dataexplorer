@@ -66,8 +66,8 @@ public final class DirectoryScanner {
 	private int																directoryFilesCount				= 0;																// all directory files
 	private int																selectedFilesCount				= 0;																// selected from directory files (selected by extension)
 
-	private final Map<String, VaultCollector>	unsuppressedTrusses				= new HashMap<>();// authorized recordsets (excluded vaults eliminated - by the user in suppress mode)
-	private final Map<String, VaultCollector>	suppressedTrusses					= new HashMap<>(); // excluded vaults
+	private final Map<String, VaultCollector>	unsuppressedTrusses				= new HashMap<>();									// authorized recordsets (excluded vaults eliminated - by the user in suppress mode)
+	private final Map<String, VaultCollector>	suppressedTrusses					= new HashMap<>();									// excluded vaults
 
 	public enum DirectoryType {
 		DATA, IMPORT
@@ -209,15 +209,16 @@ public final class DirectoryScanner {
 					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
 					for (VaultCollector truss : HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory)) {
 						if (this.settings.isSuppressMode()) {
-							if (ExclusionData.isExcluded(truss.getLogFileAsPath(), truss.getLogRecordsetBaseName())) {
-								log.log(Level.INFO, String.format("OSD candidate is in the exclusion list %s %s   %s", actualFile, truss.getLogRecordsetBaseName(), truss.getStartTimeStampFormatted())); //$NON-NLS-1$
-								this.suppressedTrusses.put(truss.getVaultName(), truss);
+							if (ExclusionData.isExcluded(truss.getVault().getLogFileAsPath(), truss.getVault().getLogRecordsetBaseName())) {
+								log.log(Level.INFO,
+										String.format("OSD candidate is in the exclusion list %s %s   %s", actualFile, truss.getVault().getLogRecordsetBaseName(), truss.getVault().getStartTimeStampFormatted())); //$NON-NLS-1$
+								this.suppressedTrusses.put(truss.getVault().getVaultName(), truss);
 							}
 							else
-								this.unsuppressedTrusses.put(truss.getVaultName(), truss);
+								this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
 						}
 						else
-							this.unsuppressedTrusses.put(truss.getVaultName(), truss);
+							this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
 					}
 				}
 			}
@@ -229,15 +230,15 @@ public final class DirectoryScanner {
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(file.getName());
 					VaultCollector truss = new VaultCollector(objectDirectory, file, 0, Channels.getInstance().size(), recordSetBaseName);
 					if (this.settings.isSuppressMode()) {
-						if (ExclusionData.isExcluded(truss.getLogFileAsPath(), truss.getLogRecordsetBaseName())) {
-							log.log(Level.INFO, String.format("BIN candidate is in the exclusion list %s %s  %s", file, truss.getLogRecordsetBaseName(), truss.getStartTimeStampFormatted())); //$NON-NLS-1$
-							this.suppressedTrusses.put(truss.getVaultName(), truss);
+						if (ExclusionData.isExcluded(truss.getVault().getLogFileAsPath(), truss.getVault().getLogRecordsetBaseName())) {
+							log.log(Level.INFO, String.format("BIN candidate is in the exclusion list %s %s  %s", file, truss.getVault().getLogRecordsetBaseName(), truss.getVault().getStartTimeStampFormatted())); //$NON-NLS-1$
+							this.suppressedTrusses.put(truss.getVault().getVaultName(), truss);
 						}
 						else
-							this.unsuppressedTrusses.put(truss.getVaultName(), truss);
+							this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
 					}
 					else
-						this.unsuppressedTrusses.put(truss.getVaultName(), truss);
+						this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
 				}
 			}
 			else {

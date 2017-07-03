@@ -1363,7 +1363,7 @@ public class Record extends Vector<Integer> {
 	 * @return time step in msec
 	 */
 	public double getAverageTimeStep_ms() {
-		return this.timeStep_ms == null ? this.getAbstractParent().getAverageTimeStep_ms() : this.timeStep_ms.getAverageTimeStep_ms();
+		return this.timeStep_ms == null ? this.parent.getAverageTimeStep_ms() : this.timeStep_ms.getAverageTimeStep_ms();
 	}
 
 	/**

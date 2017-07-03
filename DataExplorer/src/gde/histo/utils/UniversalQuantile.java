@@ -34,24 +34,24 @@ import gde.log.Level;
  * @author Thomas Eickert
  */
 public final class UniversalQuantile<T extends Number & Comparable<T>> {
-	private final static String	$CLASS_NAME						= UniversalQuantile.class.getName();
-	private final static Logger	log										= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME							= UniversalQuantile.class.getName();
+	private final static Logger	log											= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Corresponds to the interquartile range (<em>0.25 < p < 0.75</em>)
 	 */
-	public final static double	boxplotSigmaFactor		= 0.674489694;
+	public static final double	BOXPLOT_SIGMA_FACTOR		= 0.674489694;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 * @see <a href="https://www.google.de/search?q=Tukey+boxplot">Tukey Boxplot</a>
 	 */
-	public final static double	boxplotOutlierFactor	= 1.5;
+	public static final double	BOXPLOT_OUTLIER_FACTOR	= 1.5;
 
-	private final boolean				isSample;																									// required for probability calculations from the population
-	private final List<T>				trunk;																										// remaining population after removing the elimination members
-	private final List<T>				outcasts;																									// values to be eliminated from the population
-	private final List<T>				castaways							= new ArrayList<>();								// outlier and outcast members not contained in the trunk
+	private final boolean				isSample;																										// required for probability calculations from the population
+	private final List<T>				trunk;																											// remaining population after removing the elimination members
+	private final List<T>				outcasts;																										// values to be eliminated from the population
+	private final List<T>				castaways								= new ArrayList<>();								// outlier and outcast members not contained in the trunk
 
 	private T										firstValidElement;
 	private T										lastValidElement;

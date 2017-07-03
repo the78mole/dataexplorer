@@ -44,7 +44,7 @@ public final class ExclusionActivity {
 		Set<Path> exclusionDirectories = new HashSet<>();
 		if (defaultPath != null) exclusionDirectories.add(defaultPath);
 		for (VaultCollector truss : HistoSet.getInstance().getSuppressedTrusses().values()) {
-			exclusionDirectories.add(truss.getLogFileAsPath().getParent());
+			exclusionDirectories.add(truss.getVault().getLogFileAsPath().getParent());
 		}
 		for (Path ignorePath : exclusionDirectories) {
 			ExclusionData.getInstance(ignorePath).delete();

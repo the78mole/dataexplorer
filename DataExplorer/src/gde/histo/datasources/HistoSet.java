@@ -33,7 +33,7 @@ import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
@@ -48,7 +48,7 @@ import gde.ui.DataExplorer;
  * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
  * @author Thomas Eickert
  */
-public final class HistoSet extends TreeMap<Long, List<HistoVault>> {
+public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 	private final static String	$CLASS_NAME				= HistoSet.class.getName();
 	private static final long		serialVersionUID	= 1111377035274863787L;
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
@@ -98,7 +98,7 @@ public final class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		/**
 		 * use this to avoid repeatedly cloning actions instead of values()
 		 */
-		public static RebuildStep	values[]	= values();
+		public static RebuildStep	VALUES[]	= values();
 
 		private RebuildStep(int scopeOfWork) {
 			this.scopeOfWork = scopeOfWork;
@@ -150,7 +150,7 @@ public final class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	@Override
 	public void clear() {
 		// deep clear in order to reduce memory consumption prior to garbage collection
-		for (List<HistoVault> timestampHistoVaults : this.values()) {
+		for (List<ExtendedVault> timestampHistoVaults : this.values()) {
 			timestampHistoVaults.clear();
 		}
 		super.clear();
@@ -166,9 +166,9 @@ public final class HistoSet extends TreeMap<Long, List<HistoVault>> {
 	 * @param vaults in state 'truss' or full vaults
 	 * @return the file length sum for all vaults added to the histoSet
 	 */
-	public long putFullVaults(List<HistoVault> vaults) {
+	public long putFullVaults(List<ExtendedVault> vaults) {
 		long localSizeSum_B = 0;
-		for (HistoVault histoVault : vaults) {
+		for (ExtendedVault histoVault : vaults) {
 			if (!histoVault.isTruss()) {
 				putVault(histoVault);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
@@ -179,10 +179,10 @@ public final class HistoSet extends TreeMap<Long, List<HistoVault>> {
 		return localSizeSum_B;
 	}
 
-	private void putVault(HistoVault histoVault) {
-		List<HistoVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
+	private void putVault(ExtendedVault histoVault) {
+		List<ExtendedVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
 		if (timeStampHistoVaults == null) {
-			this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<HistoVault>());
+			this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
 		}
 		timeStampHistoVaults.add(histoVault);
 	}

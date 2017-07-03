@@ -149,7 +149,7 @@ public final class HistoRandomSample {
 	 * @param maxPoints log measurement points with a length equal to the number of log measurement points
 	 * @param minPoints measurement points with a length equal to the number of log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
-	 * @return
+	 * @return a new instance
 	 */
 	public static HistoRandomSample createHistoRandomSample(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms) {
 		return new HistoRandomSample(channelNumber, maxPoints, minPoints, newRecordTimespan_ms);

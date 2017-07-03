@@ -135,27 +135,27 @@ public final class TrailSelector {
 			for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
 				if (applicablePrimitiveTrails[i]) {
 					this.applicableTrailsOrdinals.add(i);
-					if (TrailTypes.values[i].isTriggered()) {
-						if (TrailTypes.values[i].equals(TrailTypes.REAL_COUNT_TRIGGERED)) {
+					if (TrailTypes.VALUES[i].isTriggered()) {
+						if (TrailTypes.VALUES[i].equals(TrailTypes.REAL_COUNT_TRIGGERED)) {
 							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getCountTriggerText()));
 						}
-						else if (TrailTypes.values[i].equals(TrailTypes.REAL_SUM_TRIGGERED)) {
+						else if (TrailTypes.VALUES[i].equals(TrailTypes.REAL_SUM_TRIGGERED)) {
 							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getSumTriggerText()));
 						}
-						else if (TrailTypes.values[i].equals(TrailTypes.REAL_TIME_SUM_TRIGGERED)) {
+						else if (TrailTypes.VALUES[i].equals(TrailTypes.REAL_TIME_SUM_TRIGGERED)) {
 							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getSumTriggerTimeText()));
 						}
-						else if (TrailTypes.values[i].equals(TrailTypes.REAL_AVG_RATIO_TRIGGERED)) {
+						else if (TrailTypes.VALUES[i].equals(TrailTypes.REAL_AVG_RATIO_TRIGGERED)) {
 							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getRatioText()));
 						}
-						else if (TrailTypes.values[i].equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
+						else if (TrailTypes.VALUES[i].equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
 							this.applicableTrailsTexts.add(getDeviceXmlReplacement(getStatistics().getRatioText()));
 						}
 						else
 							throw new UnsupportedOperationException("TrailTypes.isTriggered"); //$NON-NLS-1$
 					}
 					else {
-						this.applicableTrailsTexts.add(TrailTypes.values[i].getDisplayName().intern());
+						this.applicableTrailsTexts.add(TrailTypes.VALUES[i].getDisplayName().intern());
 					}
 				}
 			}
@@ -281,7 +281,7 @@ public final class TrailSelector {
 		for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
 			if (applicablePrimitiveTrails[i]) {
 				this.applicableTrailsOrdinals.add(i);
-				this.applicableTrailsTexts.add(TrailTypes.values[i].getDisplayName().intern());
+				this.applicableTrailsTexts.add(TrailTypes.VALUES[i].getDisplayName().intern());
 			}
 		}
 		return applicablePrimitiveTrails;

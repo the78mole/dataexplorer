@@ -49,7 +49,7 @@ public final class TrailRecordCutter {
 		if (!subPoints.isEmpty()) {
 			this.quantile = new UniversalQuantile<>(subPoints); // take all points for display
 
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.boxplotSigmaFactor, UniversalQuantile.boxplotOutlierFactor); // eliminate Tukey outliers for regression
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.BOXPLOT_SIGMA_FACTOR, UniversalQuantile.BOXPLOT_OUTLIER_FACTOR); // eliminate Tukey outliers for regression
 			subPoints.removeAll(tmpQuantile.getOutliers());
 			this.regression = new SingleResponseRegression<>(subPoints, RegressionType.QUADRATIC);
 			if (log.isLoggable(Level.FINER)) {

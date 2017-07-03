@@ -20,8 +20,6 @@
 package gde.histo.cache;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.EnumSet;
@@ -64,7 +62,7 @@ public final class VaultCollector {
 	final private static String	$CLASS_NAME	= VaultCollector.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private HistoVault					histoVault;
+	private ExtendedVault				vault;
 
 	private final DataExplorer	application	= DataExplorer.getInstance();
 	private final Settings			settings		= Settings.getInstance();
@@ -95,15 +93,14 @@ public final class VaultCollector {
 	 */
 	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal, String logRecordsetBaseName, String logDeviceName,
 			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
-		this.histoVault = new HistoVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName,
+		this.vault = new ExtendedVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName,
 				logStartTimestamp_ms, logChannelNumber, logObjectKey);
 	}
 
 	@Override
 	public String toString() {
 		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s", //$NON-NLS-1$
-				this.histoVault.getVaultDeviceName(), this.histoVault.getLogChannelNumber(), this.histoVault.getLogRecordSetOrdinal(), this.histoVault.getStartTimeStampFormatted(),
-				this.histoVault.getLogFilePath());
+				this.vault.getVaultDeviceName(), this.vault.getLogChannelNumber(), this.vault.getLogRecordSetOrdinal(), this.vault.getStartTimeStampFormatted(), this.vault.getLogFilePath());
 	}
 
 	/**
@@ -113,14 +110,14 @@ public final class VaultCollector {
 	 */
 	public void promoteTruss(RecordSet recordSet, Integer[] scorePoints) {
 		if (recordSet.getRecordDataSize(true) > 0) {
-			this.histoVault.logStartTimestampMs = recordSet.getStartTimeStamp();
+			this.vault.logStartTimestampMs = recordSet.getStartTimeStamp();
 
 			boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 			setMeasurementPoints(recordSet, isSampled);
 
 			{
 				GroupTransitions transitions = new GroupTransitions(recordSet);
-				transitions.add4Channel(this.histoVault.logChannelNumber);
+				transitions.add4Channel(this.vault.logChannelNumber);
 
 				LinkedHashMap<String, SettlementRecord> histoSettlements;
 				if (transitions.getTransitionsCount() > 0) {
@@ -140,21 +137,21 @@ public final class VaultCollector {
 	 * @param isSampled
 	 */
 	private void setMeasurementPoints(RecordSet recordSet, boolean isSampled) {
-		List<MeasurementType> channelMeasurements = this.application.getActiveDevice().getChannelMeasuremts(this.histoVault.getLogChannelNumber());
+		List<MeasurementType> channelMeasurements = this.application.getActiveDevice().getChannelMeasuremts(this.vault.getLogChannelNumber());
 		for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 			MeasurementType measurementType = channelMeasurements.get(i);
 			Record record = recordSet.get(recordSet.getRecordNames()[i]);
 
 			CompartmentType entryPoints = new CompartmentType(i, measurementType.getName(), DataTypes.fromDataType(record.getDataType()));
-			this.histoVault.getMeasurements().put(i, entryPoints);
+			this.vault.getMeasurements().put(i, entryPoints);
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 			Map<TrailTypes, Integer> trailPoints = new HashMap<>();
 
 			if (record == null) {
-				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.histoVault.getLogFilePath())); //$NON-NLS-1$
+				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
 			}
 			else if (!record.hasReasonableData()) {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.histoVault.getLogFilePath())); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
 			}
 			else {
 				StatisticsType measurementStatistics = measurementType.getStatistics();
@@ -179,14 +176,14 @@ public final class VaultCollector {
 	private LinkedHashMap<String, SettlementRecord> determineSettlements(RecordSet recordSet, GroupTransitions transitions) {
 		LinkedHashMap<String, SettlementRecord> histoSettlements = new LinkedHashMap<String, SettlementRecord>();
 
-		for (SettlementType settlementType : this.application.getActiveDevice().getDeviceConfiguration().getChannel(this.histoVault.logChannelNumber).getSettlements().values()) {
+		for (SettlementType settlementType : this.application.getActiveDevice().getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
 			if (settlementType.getEvaluation() != null) {
 				final TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
 				final TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
 				final TransitionCalculusType calculationType = settlementType.getEvaluation().getTransitionCalculus();
 
 				if (transitionFigureType != null) {
-					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.histoVault.logChannelNumber);
+					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					FigureEvaluator evaluator = new FigureEvaluator(histoSettlement);
 					for (Transition transition : transitions.get(transitionFigureType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
@@ -194,7 +191,7 @@ public final class VaultCollector {
 					histoSettlements.put(settlementType.getName(), histoSettlement);
 				}
 				else if (transitionAmountType != null) {
-					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.histoVault.logChannelNumber);
+					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					AmountEvaluator evaluator = new AmountEvaluator(histoSettlement);
 					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
@@ -202,7 +199,7 @@ public final class VaultCollector {
 					histoSettlements.put(settlementType.getName(), histoSettlement);
 				}
 				else if (calculationType != null) {
-					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.histoVault.logChannelNumber);
+					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					CalculusEvaluator evaluator = new CalculusEvaluator(histoSettlement);
 					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
@@ -287,7 +284,7 @@ public final class VaultCollector {
 			}
 			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 				Record referencedRecord = recordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
-				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.histoVault.getLogChannelNumber(), measurementStatistics.getRatioRefOrdinal());
+				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), measurementStatistics.getRatioRefOrdinal());
 				if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
 					if (referencedStatistics.isAvg()) {
 						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.)
@@ -327,10 +324,10 @@ public final class VaultCollector {
 		trailPoints.put(TrailTypes.REAL_LAST, record.elementAt(record.size() - 1));
 
 		final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.outlierSigmaDefault;
+		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
 		final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 		final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-				: SettlementRecord.outlierRangeFactorDefault;
+				: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 		// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
 		trailPoints.put(TrailTypes.AVG, (int) (device.reverseTranslateValue(record, quantile.getAvgFigure()) * 1000.));
@@ -366,7 +363,7 @@ public final class VaultCollector {
 			SettlementRecord histoSettlement = entry.getValue();
 			SettlementType settlementType = histoSettlement.getSettlement();
 			CompartmentType entryPoints = new CompartmentType(settlementType.getSettlementId(), settlementType.getName(), DataTypes.DEFAULT);
-			this.histoVault.getSettlements().put(settlementType.getSettlementId(), entryPoints);
+			this.vault.getSettlements().put(settlementType.getSettlementId(), entryPoints);
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 			if (histoSettlement.realSize() != 0 && histoSettlement.hasReasonableData()) {
@@ -374,10 +371,10 @@ public final class VaultCollector {
 				entryPoints.addPoint(TrailTypes.REAL_LAST, histoSettlement.elementAt(histoSettlement.realSize() - 1));
 
 				final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-				final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.outlierSigmaDefault;
+				final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
 				final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 				final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-						: SettlementRecord.outlierRangeFactorDefault;
+						: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 				UniversalQuantile<Double> quantile = new UniversalQuantile<>(histoSettlement.getTranslatedValues(), true, sigmaFactor, outlierFactor);
 
 				entryPoints.addPoint(TrailTypes.REAL_AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
@@ -406,7 +403,7 @@ public final class VaultCollector {
 				entryPoints.addPoint(TrailTypes.SUM, (int) (histoSettlement.reverseTranslateValue(quantile.getSumFigure()) * 1000.));
 				entryPoints.addPoint(TrailTypes.COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSize()) * 1000.));
 			}
-			log.log(Level.FINER, histoSettlement.getName() + " data ", this.histoVault.getSettlements()); //$NON-NLS-1$
+			log.log(Level.FINER, histoSettlement.getName() + " data ", this.vault.getSettlements()); //$NON-NLS-1$
 		}
 	}
 
@@ -431,17 +428,17 @@ public final class VaultCollector {
 	private void setScorePoints(Integer[] scorePoints) {
 		for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
 			if (scorePoints[scoreLabelTypes.ordinal()] != null) {
-				this.histoVault.getScores().put(scoreLabelTypes.ordinal(), new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]));
+				this.vault.getScores().put(scoreLabelTypes.ordinal(), new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scorePoints[scoreLabelTypes.ordinal()]));
 			}
 		}
-		log.log(Level.FINE, "scores ", this.histoVault.getScores()); //$NON-NLS-1$
+		log.log(Level.FINE, "scores ", this.vault.getScores()); //$NON-NLS-1$
 	}
 
 	public boolean isConsistentDevice() {
-		if (this.application.getActiveDevice() != null && !this.histoVault.getLogDeviceName().equals(this.application.getActiveDevice().getName())
-				&& !(this.histoVault.logDeviceName.startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter //$NON-NLS-1$ //$NON-NLS-2$
-			log.log(Level.INFO, String.format("%s candidate found for wrong device '%-11s' in %s  %s", getLogFileExtension(), this.histoVault.getLogDeviceName(), this.histoVault.getLogFilePath(), //$NON-NLS-1$
-					this.getStartTimeStampFormatted()));
+		if (this.application.getActiveDevice() != null && !this.vault.getLogDeviceName().equals(this.application.getActiveDevice().getName())
+				&& !(this.vault.logDeviceName.startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.INFO, String.format("%s candidate found for wrong device '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogDeviceName(), this.vault.getLogFilePath(), //$NON-NLS-1$
+					this.vault.getStartTimeStampFormatted()));
 			return false;
 		}
 		else
@@ -449,10 +446,10 @@ public final class VaultCollector {
 	}
 
 	public boolean isConsistentChannel(List<Integer> channelMixConfigNumbers) {
-		if (!channelMixConfigNumbers.contains(this.histoVault.logChannelNumber)) {
+		if (!channelMixConfigNumbers.contains(this.vault.logChannelNumber)) {
 			log.log(Level.FINE,
-					String.format("%s candidate for invalid channel  %d '%-11s' in %s  %s", getLogFileExtension(), this.histoVault.getLogChannelNumber(), this.histoVault.getRectifiedObjectKey(), //$NON-NLS-1$
-					this.histoVault.getLogFilePath(), this.getStartTimeStampFormatted()));
+					String.format("%s candidate for invalid channel  %d '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogChannelNumber(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
+					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
 		}
 		else
@@ -465,9 +462,9 @@ public final class VaultCollector {
 	}
 
 	public boolean isConsistentStartTimeStamp(long minStartTimeStamp_ms) {
-		if (this.histoVault.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
-			log.log(Level.FINE, String.format("%s candidate out of time range      '%-11s' in %s  %s", getLogFileExtension(), this.histoVault.getRectifiedObjectKey(), //$NON-NLS-1$
-					this.histoVault.getLogFilePath(), this.getStartTimeStampFormatted()));
+		if (this.vault.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
+			log.log(Level.FINE, String.format("%s candidate out of time range      '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
+					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
 		}
 		else
@@ -478,80 +475,25 @@ public final class VaultCollector {
 		boolean isValidObject = false;
 		boolean isValidatedObjectKey = this.settings.getValidatedObjectKey(this.application.getObjectKey()).isPresent();
 		if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
-			log.log(Level.INFO, String.format("%s candidate found for empty object '%-11s' in %s  %s", getLogFileExtension(), this.histoVault.getLogObjectKey(), //$NON-NLS-1$
-					this.histoVault.getLogFilePath(), this.getStartTimeStampFormatted()));
+			log.log(Level.INFO, String.format("%s candidate found for empty object '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogObjectKey(), //$NON-NLS-1$
+					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = this.settings.getFilesWithoutObject();
 		}
 		else if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
-			log.log(Level.INFO, String.format("%s candidate found for wrong object '%-11s' in %s  %s", getLogFileExtension(), this.histoVault.getRectifiedObjectKey(), //$NON-NLS-1$
-					this.histoVault.getLogFilePath(), this.getStartTimeStampFormatted()));
+			log.log(Level.INFO, String.format("%s candidate found for wrong object '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
+					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = this.settings.getFilesWithOtherObject();
 		}
 		else if (this.application.getActiveObject() == null || isValidatedObjectKey) {
-			log.log(Level.FINE, String.format("%s candidate found for object       '%-11s' in %s  %s", getLogFileExtension(), this.histoVault.getRectifiedObjectKey(), //$NON-NLS-1$
-					this.histoVault.getLogFilePath(), this.getStartTimeStampFormatted()));
+			log.log(Level.FINE, String.format("%s candidate found for object       '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
+					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = true;
 		}
 		return isValidObject;
 	}
 
-	/**
-	 * @return the name (SHA1 checksum length 40)
-	 */
-	public String getVaultName() {
-		return this.histoVault.getVaultName();
-	}
-
-	public int getVaultChannelNumber() {
-		return this.histoVault.getVaultChannelNumber();
-	}
-
-	public String getLogFilePath() {
-		return this.histoVault.getLogFilePath();
-	}
-
-	public Path getLogFileAsPath() {
-		return Paths.get(this.histoVault.logFilePath);
-	}
-
-	public int getLogRecordSetOrdinal() {
-		return this.histoVault.getLogRecordSetOrdinal();
-	}
-
-	public String getLogRecordsetBaseName() {
-		return this.histoVault.getLogRecordsetBaseName();
-	}
-
-	public int getLogChannelNumber() {
-		return this.histoVault.getLogChannelNumber();
-	}
-
-	public long getLogStartTimestamp_ms() {
-		return this.histoVault.getLogStartTimestamp_ms();
-	}
-
-	/**
-	 * @return yyyy-MM-dd HH:mm:ss
-	 */
-	public String getStartTimeStampFormatted() {
-		return this.histoVault.getStartTimeStampFormatted();
-	}
-
-	public Path getVaultFileName() {
-		return this.histoVault.getVaultFileName();
-	}
-
-	private String getLogFileExtension() {
-		String extension = "";
-		int i = this.histoVault.logFilePath.lastIndexOf('.');
-		if (i > 0) {
-			extension = this.histoVault.logFilePath.substring(i + 1);
-		}
-		return extension;
-	}
-
-	public HistoVault getVault() {
-		return this.histoVault;
+	public ExtendedVault getVault() {
+		return this.vault;
 	}
 
 }

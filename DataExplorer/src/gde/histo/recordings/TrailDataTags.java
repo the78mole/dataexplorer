@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import gde.GDE;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.TrailRecordSet.DataTag;
@@ -59,7 +60,7 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 		this.put(DataTag.GPS_LOCATION, this.dataGpsLocations);
 	}
 
-	public void add(HistoVault histoVault) {
+	public void add(ExtendedVault histoVault) {
 		this.dataFilePath.add(histoVault.getLogFilePath().intern());
 		this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
 		this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
@@ -84,6 +85,22 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	}
 
 	/**
+	 * @param index
+	 * @return the dataTags
+	 */
+	public Map<DataTag, String> getByIndex(int index) {
+		if (index >= 0) {
+			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
+			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.entrySet()) {
+				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
+			}
+			return dataTags4Index;
+		}
+		else
+			return new HashMap<DataTag, String>();
+	}
+
+		/**
 	 * @return the tags which have been filled
 	 */
 	public EnumSet<DisplayTag> getActiveDisplayTags() {

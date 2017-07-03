@@ -32,8 +32,8 @@ import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.LocalizedDateTime;
-import gde.utils.StringHelper;
 import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.StringHelper;
 
 /**
  *
@@ -68,8 +68,8 @@ public final class TrailRecordSetFormatter {
 			sb.append(GDE.STRING_OR).append(GDE.LINE_SEPARATOR);
 
 			final int index = trailRecordSet.getIndex(timestamp_ms);
-			sb.append(String.format("%-11.11s", trailRecordSet.getDataTags(index).get(DataTag.RECORDSET_BASE_NAME))); //$NON-NLS-1$
-			sb.append(GDE.STRING_OR).append(String.format("%-16s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms))); //$NON-NLS-1$
+			sb.append(String.format("%-11.11s", trailRecordSet.getDataTags().getByIndex(index).get(DataTag.RECORDSET_BASE_NAME))); //$NON-NLS-1$
+			sb.append(GDE.STRING_OR).append(String.format("%-16s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms)).substring(0, 16)); //$NON-NLS-1$
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = (TrailRecord) records.get(i);
 				sb.append(GDE.STRING_OR).append(String.format("%.10s", StringHelper.center(new TrailRecordFormatter(record).getMeasureValue(index), 10))); //$NON-NLS-1$

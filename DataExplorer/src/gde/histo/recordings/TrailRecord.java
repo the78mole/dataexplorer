@@ -84,7 +84,7 @@ public final class TrailRecord extends Record {
 		this.scoreGroupType = null;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteRecords = new SuiteRecords(this);
+		this.suiteRecords = new SuiteRecords();
 	}
 
 	/**
@@ -104,7 +104,7 @@ public final class TrailRecord extends Record {
 		this.scoreGroupType = null;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteRecords = new SuiteRecords(this);
+		this.suiteRecords = new SuiteRecords();
 	}
 
 	/**
@@ -125,7 +125,7 @@ public final class TrailRecord extends Record {
 		this.scoreGroupType = scoregroupType;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteRecords = new SuiteRecords(this);
+		this.suiteRecords = new SuiteRecords();
 	}
 
 	@Override
@@ -228,7 +228,7 @@ public final class TrailRecord extends Record {
 			}
 			else
 				try {
-					this.factor = this.getDevice().getMeasurementFactor(this.parentTrail.getChannelNumber(), this.ordinal);
+					this.factor = this.getDevice().getMeasurementFactor(this.parentTrail.getChannelConfigNumber(), this.ordinal);
 				}
 				catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
@@ -252,7 +252,7 @@ public final class TrailRecord extends Record {
 				this.offset = this.measurementType.getOffset();
 			else
 				try {
-					this.offset = this.getDevice().getMeasurementOffset(this.parentTrail.getChannelNumber(), this.ordinal);
+					this.offset = this.getDevice().getMeasurementOffset(this.parentTrail.getChannelConfigNumber(), this.ordinal);
 				}
 				catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
@@ -276,7 +276,7 @@ public final class TrailRecord extends Record {
 				this.reduction = this.measurementType.getReduction();
 			else
 				try {
-					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parentTrail.getChannelNumber(), this.ordinal, IDevice.REDUCTION);
+					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parentTrail.getChannelConfigNumber(), this.ordinal, IDevice.REDUCTION);
 					if (strValue != null && strValue.length() > 0) this.reduction = Double.valueOf(strValue.trim().replace(',', '.'));
 				}
 				catch (RuntimeException e) {

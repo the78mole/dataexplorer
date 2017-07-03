@@ -462,7 +462,6 @@ public class AbstractAnalyzer {
 	 * @author Thomas Eickert
 	 */
 	protected class LevelChecker {
-		final private Record					transitionRecord;
 		final private TransitionType	transitionType;
 
 		final private double					absoluteDelta;						// ensures for DELTA_FACTOR transitions a minimum delta between the translated value and the base value derived from the reference period
@@ -476,7 +475,6 @@ public class AbstractAnalyzer {
 		 * @param transitionType
 		 */
 		LevelChecker(Record transitionRecord, TransitionType transitionType) {
-			this.transitionRecord = transitionRecord;
 			this.transitionType = transitionType;
 
 			this.isDeltaFactor = this.transitionType.getValueType() == TransitionValueTypes.DELTA_FACTOR;

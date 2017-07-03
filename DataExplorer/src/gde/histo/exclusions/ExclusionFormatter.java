@@ -43,8 +43,8 @@ public final class ExclusionFormatter {
 	public static String getExcludedTrussesAsText() {
 		Set<String> exclusionTexts = new HashSet<>();
 		for (VaultCollector truss : HistoSet.getInstance().getSuppressedTrusses().values()) {
-			Path fileDir = truss.getLogFileAsPath().getParent();
-			exclusionTexts.add(getFormattedProperty(ExclusionData.getInstance(fileDir), truss.getLogFileAsPath().getFileName().toString()));
+			Path fileDir = truss.getVault().getLogFileAsPath().getParent();
+			exclusionTexts.add(getFormattedProperty(ExclusionData.getInstance(fileDir), truss.getVault().getLogFileAsPath().getFileName().toString()));
 		}
 
 		StringBuilder sb = new StringBuilder();

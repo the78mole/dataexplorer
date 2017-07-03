@@ -51,12 +51,12 @@ import gde.data.RecordSet;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.IHistoDevice;
+import gde.histo.recordings.TrailRecordSet;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
-import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
 /**
@@ -86,7 +86,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			StringBuilder sb = new StringBuilder();
 			final String line = GDE.RECORD_SET_NAME + GDE.STRING_EMPTY + header.get(sb.append(i + 1).append(GDE.STRING_BLANK).append(GDE.RECORD_SET_NAME).toString());
 			final HashMap<String, String> recordSetInfo = OsdReaderWriter.getRecordSetProperties(line);
-			final String logRecordSetBaseName = String.format("%s | %s", recordSetInfo.get(GDE.RECORD_SET_NAME), recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME)).intern();
+			final String logRecordSetBaseName = String.format("%s%s%s", recordSetInfo.get(GDE.RECORD_SET_NAME), TrailRecordSet.BASE_NAME_SEPARATOR, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
 			final long enhancedStartTimeStamp_ms = HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo);
 			final Channel recordSetInfoChannel = OsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
 			if (recordSetInfoChannel != null) {
@@ -108,14 +108,14 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @throws NotSupportedFileFormatException
 	 * @throws DataInconsitsentException
 	 */
-	public static List<HistoVault> readVaults(Path filePath, Collection<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
-		List<HistoVault> histoVaults = new ArrayList<>();
+	public static List<ExtendedVault> readVaults(Path filePath, Collection<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException {
+		List<ExtendedVault> histoVaults = new ArrayList<>();
 		log.log(Level.FINE, "start " + filePath); //$NON-NLS-1$
 		// build job list consisting of recordset ordinal and the corresponding truss
 		Map<Integer, VaultCollector> recordSetTrusses = new TreeMap<>();
 		for (VaultCollector truss : trusses) {
-			if (truss.getLogFileAsPath().equals(filePath))
-				recordSetTrusses.put(truss.getLogRecordSetOrdinal(), truss);
+			if (truss.getVault().getLogFileAsPath().equals(filePath))
+				recordSetTrusses.put(truss.getVault().getLogRecordSetOrdinal(), truss);
 			else
 				throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
 		}
@@ -174,7 +174,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 						}
 						unreadDataPointer = -1;
 					}
-					RecordSet histoRecordSet = OsdReaderWriter.buildRecordSet(recordSetTrusses.get(i).getLogRecordsetBaseName(), recordSetTrusses.get(i).getLogChannelNumber(), recordSetInfo, false);
+					RecordSet histoRecordSet = OsdReaderWriter.buildRecordSet(recordSetTrusses.get(i).getVault().getLogRecordsetBaseName(), recordSetTrusses.get(i).getVault().getLogChannelNumber(), recordSetInfo, false);
 					String[] noneCalculationMeasurementNames = histoRecordSet.getNoneCalculationRecordNames();
 					int numberRecordAndTimeStamp = noneCalculationMeasurementNames.length + (histoRecordSet.isTimeStepConstant() ? 0 : 1);
 
@@ -202,7 +202,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 								minPoints[index] = Integer.parseInt(recordProperties.get(Record.MIN_VALUE).trim());
 							}
 						}
-						((IHistoDevice) histoRecordSet.getDevice()).setSampling(recordSetTrusses.get(i).getLogChannelNumber(), maxPoints, minPoints);
+						((IHistoDevice) histoRecordSet.getDevice()).setSampling(recordSetTrusses.get(i).getVault().getLogChannelNumber(), maxPoints, minPoints);
 					}
 					histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
 
@@ -211,7 +211,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					final Double[] packagesLost = HistoOsdReaderWriter.parsePackageLoss(recordSetComment);
 					final String[] sensors = HistoOsdReaderWriter.parseSensors(recordSetComment);
 					final Double logDataVersion = HistoOsdReaderWriter.parseFirmware(recordSetComment);
-					final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
+					final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 					// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 					// scores for duration and timestep values are filled in by the HistoRecordSet
 					scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = recordDataSize;
@@ -244,7 +244,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					histoRecordSet.cleanup();
 
 					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
-							recordSetTrusses.get(i).getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));
+							recordSetTrusses.get(i).getVault().getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));
 				}
 			}
 			log.log(Level.TIME, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoVaults.size(), recordSetsInfo.size(), //$NON-NLS-1$
@@ -264,20 +264,6 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			recordKeys[i] = recordProperties.get(Record.NAME);
 		}
 		return recordKeys;
-	}
-
-	/**
-	 * @param fileRecordsProperties
-	 * @param channelConfigNumber
-	 * @return current measurement names for exactly the number of records in the recordset
-	 */
-	private static String[] getMeasurementNames(String[] fileRecordsProperties, int channelConfigNumber) {
-		final String[] measurementNames = DataExplorer.application.getActiveDevice().getMeasurementNames(channelConfigNumber);
-		List<String> cleanedRecordNames = new ArrayList<String>();
-		for (int i = 0; i < fileRecordsProperties.length; i++) {
-			cleanedRecordNames.add(measurementNames[i]);
-		}
-		return cleanedRecordNames.toArray(new String[cleanedRecordNames.size()]);
 	}
 
 	/**

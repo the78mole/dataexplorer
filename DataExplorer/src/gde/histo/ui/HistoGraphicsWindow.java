@@ -55,13 +55,11 @@ public final class HistoGraphicsWindow extends CTabItem {
 	private HistoGraphicsComposite	graphicsComposite;
 
 	private final DataExplorer			application = DataExplorer.getInstance();
-	private final String						tabName;
 
 	public HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = currentDisplayTab;
-		this.tabName = Messages.getString(MessageIds.GDE_MSGT0792);
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0792));
 	}
@@ -69,7 +67,7 @@ public final class HistoGraphicsWindow extends CTabItem {
 	public synchronized void create() {
 		this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
 		this.setControl(this.graphicSashForm);
-		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm, "  " + Messages.getString(MessageIds.GDE_MSGT0254)); //$NON-NLS-1$
+		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm);
 		this.graphicsComposite = new HistoGraphicsComposite(this.graphicSashForm);
 		this.graphicSashForm.setWeights(new int[] { 117, GDE.shell.getClientArea().width - 117 });
 	}

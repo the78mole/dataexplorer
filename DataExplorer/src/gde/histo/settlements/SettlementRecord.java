@@ -28,6 +28,7 @@ import gde.GDE;
 import gde.data.RecordSet;
 import gde.device.DataTypes;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.SettlementType;
@@ -42,22 +43,22 @@ import gde.log.Level;
  * @author Thomas Eickert
  */
 public final class SettlementRecord extends Vector<Integer> {
-	final static String									$CLASS_NAME								= SettlementRecord.class.getName();
-	final static long										serialVersionUID					= 6130190003229390899L;
-	final static Logger									log												= Logger.getLogger($CLASS_NAME);
+	private static final String					$CLASS_NAME										= SettlementRecord.class.getName();
+	private static final long						serialVersionUID							= 6130190003229390899L;
+	private static final Logger					log														= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * We allow 1 lower and 1 upper outlier for a log with 740 measurements
 	 */
-	public final static double					outlierSigmaDefault				= 3.;
+	public static final double					OUTLIER_SIGMA_DEFAULT					= 3.;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 */
-	public final static double					outlierRangeFactorDefault	= 2.;
+	public static final double					OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
 
-	private final static int						initialRecordCapacity			= 22;
+	private static final int						INITIAL_RECORD_CAPACITY			= 22;
 
 	private final SettlementType				settlement;
 
@@ -65,7 +66,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	private final int										logChannelNumber;
 	String															name;																																			// measurement name Höhe
 
-	List<PropertyType>									properties								= new ArrayList<PropertyType>();								// offset, factor, reduction, ...
+	List<PropertyType>									properties										= new ArrayList<>();														// offset, factor, reduction, ...
 	private UniversalQuantile<Integer>	quantile									= null;
 
 	/**
@@ -75,7 +76,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	 * @param logChannelNumber
 	 */
 	public SettlementRecord(SettlementType newSettlement, RecordSet parent, int logChannelNumber) {
-		super(initialRecordCapacity);
+		super(INITIAL_RECORD_CAPACITY);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newSettlement.getName() + " Settlement(IDevice , SettlementType , int )"); //$NON-NLS-1$
 		this.settlement = newSettlement;
 		this.name = newSettlement.getName();

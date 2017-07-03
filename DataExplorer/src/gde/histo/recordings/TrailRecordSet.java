@@ -42,7 +42,7 @@ import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
 import gde.device.ScoreLabelTypes;
 import gde.device.SettlementType;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.log.Level;
 import gde.ui.SWTResourceManager;
@@ -57,12 +57,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	private static final long							serialVersionUID			= -1580283867987273535L;
 	private static final Logger						log										= Logger.getLogger($CLASS_NAME);
 
-	private static final int							initialRecordCapacity	= 111;
+	public static final String						BASE_NAME_SEPARATOR	= " | ";
 
 	private final HistoGraphicsTemplate		template;																															// graphics template holds view configuration
 
-	private final List<Integer>						durations_mm					= new ArrayList<Integer>(initialRecordCapacity);
-	private double												averageDuration_mm		= 0;
+	private final List<Integer>						durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
 
 	private final TrailDataTags						dataTags							= new TrailDataTags();
 	private final TrailRecordSynchronizer	synchronizer					= new TrailRecordSynchronizer(this);
@@ -73,10 +72,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		/**
 		 * use this instead of values() to avoid repeatedly cloning actions.
 		 */
-		public static final DisplayTag values[] = values();
+		public static final DisplayTag VALUES[] = values();
 
 		public static DisplayTag fromOrdinal(int ordinal) {
-			return DisplayTag.values[ordinal];
+			return DisplayTag.VALUES[ordinal];
 		}
 	}
 
@@ -109,7 +108,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.getName() + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
-		newTrailRecordSet.timeStep_ms = new TimeSteps(-1, initialRecordCapacity);
+		newTrailRecordSet.timeStep_ms = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
 		LinkedHashMap<Integer, SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlements();
 		LinkedHashMap<Integer, ScoreGroupType> channelScoreGroups = device.getDeviceConfiguration().getChannel(channelConfigNumber).getScoreGroups();
@@ -133,7 +132,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (SettlementType settlement : channelSettlements.values()) {
 				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false) {
-					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
+					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
 					newTrailRecordSet.put(settlement.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -144,7 +143,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		{// display section 2: all measurements
 			for (int i = 0; i < channelMeasurements.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-				TrailRecord tmpRecord = new TrailRecord(device, i, measurement.getName(), measurement, newTrailRecordSet, initialRecordCapacity); // ordinal starts at 0
+				TrailRecord tmpRecord = new TrailRecord(device, i, measurement.getName(), measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY	); // ordinal starts at 0
 				newTrailRecordSet.put(measurement.getName(), tmpRecord);
 				tmpRecord.setColorDefaultsAndPosition(i);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added measurement record for " + measurement.getName() + " - " + i); //$NON-NLS-1$ //$NON-NLS-2$
@@ -155,7 +154,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (SettlementType settlement : channelSettlements.values()) {
 				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (!(topPlacementProperty != null ? Boolean.valueOf(topPlacementProperty.getValue()) : false)) {
-					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, initialRecordCapacity);
+					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
 					newTrailRecordSet.put(settlement.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -254,7 +253,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			((TrailRecord) super.get(recordName)).clear();
 		}
 		this.durations_mm.clear();
-		this.averageDuration_mm = 0;
 
 		this.dataTags.clear();
 	}
@@ -283,15 +281,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
-	 * For devices with none constant time step between measurement points it returns the average value.
-	 * Do not use for calculation, use for logging purpose only.
-	 */
-	public double getAverageTimeStep_ms() {
-		return this.timeStep_ms.getAverageTimeStep_ms();
-	}
-
-	/**
 	 * Set the sync max/min values for visible records inclusive referenced suite records.
 	 * Update records to enable drawing of the curve.
 	 */
@@ -299,10 +288,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		this.synchronizer.updateAllSyncScales();
 	}
 
-	public void addVaultHeader(HistoVault histoVault) {
+	public void addVaultHeader(ExtendedVault histoVault) {
 		int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
 		this.durations_mm.add(duration_mm);
-		this.averageDuration_mm += (duration_mm - this.averageDuration_mm) / this.durations_mm.size();
 		if (!this.timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10)) {
 			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("Duplicate recordSet  startTimeStamp %,d  %s", histoVault.getLogStartTimestamp_ms(), histoVault.getLogFilePath())); //$NON-NLS-1$
 		}
@@ -394,7 +382,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * @return the number of timesteps
+	 * @return the number of timesteps (equals the size of the trailrecords /suiterecords)
 	 */
 	public int getTimeStepSize() {
 		return this.timeStep_ms.size();
@@ -415,51 +403,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.durations_mm;
 	}
 
-	/**
-	 * @return the average of the individual durations for all trails
-	 	 */
-	public double getAverageDuration_mm() {
-		return this.averageDuration_mm;
-	}
-
-	/**
-	 * @return the maximum time of this record set, which should correspond to the first entry in timeSteps
-	 */
-	public double getMaxTime_ms() {
-		return this.timeStep_ms.getMaxTime_ms();
-	}
-
-	/**
-	 * @return the record set start time stamp
-	 */
-	public long getStartTimeStamp() {
-		return this.timeStep_ms.getStartTimeStamp();
-	}
-
-	/**
-	 * @param index
-	 * @return the dataTags
-	 */
-	public Map<DataTag, String> getDataTags(int index) {
-		if (index >= 0) {
-			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
-			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.dataTags.entrySet()) {
-				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
-			}
-			return dataTags4Index;
-		}
-		else
-			return new HashMap<DataTag, String>();
-	}
-
-	/**
-	 * @return the dataTags
-	 */
 	public TrailDataTags getDataTags() {
 		return this.dataTags;
 	}
 
-	public long getFirstTimeStamp_ms() {
+	public long getTopTimeStamp_ms() {
 		return this.timeStep_ms.firstElement() / 10;
 	}
 
@@ -476,7 +424,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 	}
 
-	public int getChannelNumber() {
+	@Override
+	public int getChannelConfigNumber() {
 		return this.parent.getNumber();
 	}
 

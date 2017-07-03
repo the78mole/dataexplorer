@@ -25,8 +25,6 @@
 
 package gde.histo.cache;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -37,18 +35,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.TrailTypes;
-import gde.histo.recordings.TrailRecord;
-import gde.log.Level;
-import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
 
 /**
  * aggregated history recordset data related to measurements, settlements and
@@ -116,11 +105,6 @@ public class HistoVault {
 	final private static Logger									log					= Logger.getLogger($CLASS_NAME);
 
 	private static JAXBContext									jaxbContext;
-
-	@XmlTransient
-	private final DataExplorer									application	= DataExplorer.getInstance();
-	@XmlTransient
-	private final Settings											settings		= Settings.getInstance();
 
 	@XmlElement(required = true)
 	protected String														vaultName;
@@ -668,6 +652,10 @@ public class HistoVault {
 
 	/* non JAXB members : start */
 
+	public ExtendedVault getExtendedVault() {
+	 return new ExtendedVault(this);
+	}
+
 	/**
 	 * @return context singleton (creating the context is slow)
 	 */
@@ -681,177 +669,6 @@ public class HistoVault {
 			}
 		}
 		return HistoVault.jaxbContext;
-	}
-
-	@Deprecated // for marshalling purposes only
-	public HistoVault() {
-	}
-
-	/**
-	 * @param objectDirectory validated object key
-	 * @param filePath file name + lastModified + file length are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param fileLastModified_ms
-	 * @param fileLength in bytes
-	 * @param fileVersion is the version of the log origin file
-	 * @param logRecordSetSize is the number of recordsets in the log origin file
-	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
-	 * @param logRecordSetBaseName the base name without recordset number
-	 * @param logStartTimestamp_ms of the log or recordset
-	 * @param logDeviceName
-	 * @param logChannelNumber may differ from UI settings in case of channel mix
-	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
-	 */
-	public HistoVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal, String logRecordSetBaseName,
-			String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
-		this.vaultDataExplorerVersion = GDE.VERSION;
-		this.vaultDeviceKey = VaultAttributes.getActiveDeviceKey();
-		this.vaultDeviceName = this.application.getActiveDevice().getName();
-		this.vaultChannelNumber = this.application.getActiveChannelNumber();
-		this.vaultObjectKey = this.application.getObjectKey();
-		this.vaultSamplingTimespanMs = this.settings.getSamplingTimespan_ms();
-		this.logFilePath = filePath.toString(); // toString in order to avoid 'Object' during marshalling
-		this.logFileLastModified = fileLastModified_ms;
-		this.logFileLength = fileLength;
-		this.logFileVersion = fileVersion;
-		this.logRecordSetSize = logRecordSetSize;
-		this.logObjectDirectory = objectDirectory;
-		this.logRecordSetOrdinal = logRecordSetOrdinal;
-		this.logRecordsetBaseName = logRecordSetBaseName;
-		this.logDeviceName = logDeviceName;
-		this.logChannelNumber = logChannelNumber;
-		this.logObjectKey = logObjectKey;
-		this.logStartTimestampMs = logStartTimestamp_ms;
-
-		this.vaultDirectory = VaultAttributes.getVaultsDirectoryName();
-		this.vaultName = VaultAttributes.getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal);
-		this.vaultCreatedMs = System.currentTimeMillis();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
-				String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
-						objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
-						StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //$NON-NLS-1$
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(this.vaultName).append(GDE.STRING_COMMA_BLANK);
-		sb.append("isTruss=").append(isTruss()).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logChannelNumber=").append(this.logChannelNumber).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logObjectKey=").append(this.logObjectKey).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append(this.logFilePath).append(GDE.STRING_COMMA_BLANK);
-		sb.append("vaultDirectory=").append(this.vaultDirectory); //$NON-NLS-1$
-		return sb.toString();
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @return empty in case of unavailable measurement
-	 */
-	public HashMap<Integer, PointType> getMeasurementPoints(int measurementOrdinal) {
-		return this.getMeasurements().containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>() : this.getMeasurements().get(measurementOrdinal).getTrails();
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @param trailOrdinal
-	 * @return null in case of unavailable measurement or trail
-	 */
-	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal) ? this.getMeasurements().get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @return empty in case of unavailable settlementId
-	 */
-	public HashMap<Integer, PointType> getSettlementPoints(int settlementId) {
-		return this.getSettlements().containsKey(settlementId) ? new HashMap<Integer, PointType>() : this.getSettlements().get(settlementId).getTrails();
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @param trailOrdinal
-	 * @return null in case of unavailable settlement or trail
-	 */
-	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
-		if (this.getSettlements().containsKey(settlementId)) {
-			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal) ? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
-		}
-		else {
-			return null;
-		}
-	}
-
-	public HashMap<Integer, PointType> getScorePoints() {
-		return this.getScores();
-	}
-
-	/**
-	 * @param scoreLabelOrdinal
-	 * @return null in case of unavailable score
-	 */
-	public Integer getScorePoint(int scoreLabelOrdinal) {
-		return this.getScores().get(scoreLabelOrdinal).getValue();
-	}
-
-	/**
-	 * @param trailRecord
-	 * @param trailType
-	 * @return the vault value for the selected trail type
-	 */
-	public Integer getPoint(TrailRecord trailRecord, TrailTypes trailType) {
-		Integer point;
-		if (trailRecord.isMeasurement())
-			point = getMeasurementPoint(trailRecord.getOrdinal(), trailType.ordinal());
-		else if (trailRecord.isSettlement())
-			point = getSettlementPoint(trailRecord.getSettlement().getSettlementId(), trailType.ordinal());
-		else if (trailRecord.isScoreGroup()) {
-			point = getScorePoint(trailType.ordinal());
-		}
-		else
-			throw new UnsupportedOperationException();
-
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), getVaultFileName(), getLogFilePath())); //$NON-NLS-1$
-		return point;
-	}
-
-	/**
-	 * @return yyyy-MM-dd HH:mm:ss
-	 */
-	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.logStartTimestampMs); //$NON-NLS-1$
-	}
-
-	/**
-	 * @return relative path (directory name)
-	 */
-	public Path getVaultDirectoryPath() {
-		return Paths.get(this.vaultDirectory);
-	}
-
-	public Path getVaultFileName() {
-		return Paths.get(this.vaultName);
-	}
-
-	/**
-	 * @return the non-validated object key or alternatively (if empty) the non-validated object directory
-	 */
-	public String getRectifiedObjectKey() {
-		return this.logObjectKey.isEmpty() ? this.logObjectDirectory : this.logObjectKey;
-	}
-
-	public boolean isTruss() {
-		return this.getMeasurements().isEmpty();
 	}
 
 	/**

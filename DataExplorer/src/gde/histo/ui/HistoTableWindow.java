@@ -71,18 +71,18 @@ import gde.ui.menu.TabAreaContextMenu.TabMenuType;
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	private final static String				$CLASS_NAME				= HistoTableWindow.class.getName();
-	private final static Logger				log								= Logger.getLogger($CLASS_NAME);
+	private final static String				$CLASS_NAME					= HistoTableWindow.class.getName();
+	private final static Logger				log									= Logger.getLogger($CLASS_NAME);
 
-	private final static int					textExtentFactor	= 6;
+	private static final int					TEXT_EXTENT_FACTOR	= 6;
 
-	private final HistoSet						histoSet					= HistoSet.getInstance();
+	private final HistoSet						histoSet						= HistoSet.getInstance();
 
 	private Table											dataTable;
 	private TableColumn								recordsColumn;
 	private TableCursor								cursor;
-	private Vector<Integer>						rowVector					= new Vector<Integer>(2);
-	private Vector<Integer>						topindexVector		= new Vector<Integer>(2);
+	private Vector<Integer>						rowVector						= new Vector<Integer>(2);
+	private Vector<Integer>						topindexVector			= new Vector<Integer>(2);
 
 	private final DataExplorer				application;
 	private final Channels						channels;
@@ -272,7 +272,7 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				}
 				else {
-					final Map<DataTag, String> dataTags = trailRecordSet.getDataTags(columnNumber - 2);
+					final Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(columnNumber - 2);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
@@ -445,12 +445,12 @@ public class HistoTableWindow extends CTabItem {
 
 		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0749);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.recordsColumn.setWidth((int) (recordTitle.length() * textExtentFactor * 15 / 10.));
+		this.recordsColumn.setWidth((int) (recordTitle.length() * TEXT_EXTENT_FACTOR * 15 / 10.));
 		this.recordsColumn.setText(recordTitle);
 
 		String curveTypeHeader = Messages.getString(MessageIds.GDE_MSGT0828);
 		this.recordsColumn = new TableColumn(this.dataTable, SWT.LEFT);
-		this.recordsColumn.setWidth((int) (curveTypeHeader.length() * textExtentFactor * 15 / 10.));
+		this.recordsColumn.setWidth((int) (curveTypeHeader.length() * TEXT_EXTENT_FACTOR * 15 / 10.));
 		this.recordsColumn.setText(curveTypeHeader);
 
 		// set the data columns of the new header line
@@ -460,7 +460,7 @@ public class HistoTableWindow extends CTabItem {
 			if (tableHeaderRow.length > 0) {
 				for (String headerString : tableHeaderRow) {
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-					column.setWidth((int) (headerString.length() * textExtentFactor * 21 / 20.));
+					column.setWidth((int) (headerString.length() * TEXT_EXTENT_FACTOR * 21 / 20.));
 					column.setText(headerString.intern());
 				}
 			}

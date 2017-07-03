@@ -388,7 +388,7 @@ public final class HistoGraphicsComposite extends Composite {
 
 		if (trailRecordSet.getTimeStepSize() > 0) {
 			// initialize early in order to avoid problems in mouse move events
-			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getFirstTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
+			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getTopTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
 
 			// draw curves for each active record
 			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
@@ -551,7 +551,7 @@ public final class HistoGraphicsComposite extends Composite {
 					this.graphicCanvas.setCursor(this.application.getCursor());
 					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
 						final Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
-						final String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
+						final String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
 						if (text != null) {
 							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) this.graphicCanvas.setToolTipText(text);
 						}
@@ -602,7 +602,7 @@ public final class HistoGraphicsComposite extends Composite {
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 					}
 					else {
-						final Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags(getTrailRecordSet().getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // evt.x is already relative to curve area
+						final Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet().getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // evt.x is already relative to curve area
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 					}

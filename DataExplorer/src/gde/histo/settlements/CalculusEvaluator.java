@@ -203,6 +203,378 @@ public final class CalculusEvaluator {
 		}
 	}
 
+	/**
+	 * The delta level is the difference of the levels in the reference / recovery phase compared to the threshold phase.
+	 * @author Thomas Eickert (USER)
+	 */
+	private class DeltaLevelCalculator {
+
+		DeltaBasisTypes	deltaBasis;
+		RecordGroup			tmpRecordGroup;
+		Transition			transition;
+
+		public DeltaLevelCalculator(DeltaBasisTypes deltaBasis, RecordGroup tmpRecordGroup, Transition transition) {
+			this.deltaBasis = deltaBasis;
+			this.tmpRecordGroup = tmpRecordGroup;
+			this.transition = transition;
+		}
+
+		/**
+		 * @return the level delta based on the first value of the phases
+		 */
+		public double calcFirst() {
+			final double deltaValue;
+			double referenceExtremum = 0.;
+			double thresholdExtremum = 0.;
+			double recoveryExtremum = 0.;
+			for (int j = this.transition.getReferenceStartIndex(); j < this.transition.getReferenceEndIndex() + 1; j++) {
+				Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+				if (aggregatedValue != null) {
+					referenceExtremum = aggregatedValue;
+					break;
+				}
+			}
+			// one additional time step before and after in order to cope with potential measurement latencies
+			for (int j = this.transition.getThresholdStartIndex() - 1; j < this.transition.getThresholdEndIndex() + 1 + 1; j++) {
+				Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+				if (aggregatedValue != null) {
+					thresholdExtremum = aggregatedValue;
+					break;
+				}
+			}
+			if (this.transition.getRecoveryStartIndex() > 0) {
+				for (int j = this.transition.getRecoveryStartIndex(); j < this.transition.getRecoveryEndIndex() + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null) {
+						recoveryExtremum = aggregatedValue;
+						break;
+					}
+				}
+			}
+
+			deltaValue = calcDeltaValue(isPositiveTransition(), referenceExtremum, thresholdExtremum, recoveryExtremum);
+			return deltaValue;
+		}
+
+		/**
+		 * @return the level delta based on the last value of the phases
+		 */
+		public double calcLast() {
+			final double deltaValue;
+			double referenceExtremum = 0.;
+			double thresholdExtremum = 0.;
+			double recoveryExtremum = 0.;
+			for (int j = this.transition.getReferenceEndIndex(); j >= this.transition.getReferenceStartIndex(); j--) {
+				Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+				if (aggregatedValue != null) {
+					referenceExtremum = aggregatedValue;
+					break;
+				}
+			}
+			// one additional time step before and after in order to cope with potential measurement latencies
+			for (int j = this.transition.getThresholdEndIndex() + 1; j >= this.transition.getThresholdStartIndex() - 1; j--) {
+				Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+				if (aggregatedValue != null) {
+					thresholdExtremum = aggregatedValue;
+					break;
+				}
+			}
+			if (this.transition.getRecoveryStartIndex() > 0) {
+				for (int j = this.transition.getRecoveryEndIndex(); j >= this.transition.getRecoveryStartIndex(); j--) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null) {
+						recoveryExtremum = aggregatedValue;
+						break;
+					}
+				}
+			}
+
+			deltaValue = calcDeltaValue(isPositiveTransition(), referenceExtremum, thresholdExtremum, recoveryExtremum);
+			return deltaValue;
+		}
+
+		/**
+		 * @return the level delta based on the mid value of the phases
+		 */
+		public double calcMid() {
+			final double deltaValue;
+			double referenceExtremum = 0.;
+			double thresholdExtremum = 0.;
+			double recoveryExtremum = 0.;
+			if (this.transition.getReferenceSize() > 1) {
+				int midIndex = (this.transition.getReferenceStartIndex() + this.transition.getReferenceEndIndex()) / 2;
+				for (int i = midIndex, j = midIndex + 1; i <= this.transition.getReferenceEndIndex() && j >= this.transition.getReferenceStartIndex(); i++, j--) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(i);
+					if (aggregatedValue != null) {
+						referenceExtremum = aggregatedValue;
+						break;
+					}
+					aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null) {
+						referenceExtremum = aggregatedValue;
+						break;
+					}
+				}
+			}
+			else {
+				referenceExtremum = this.tmpRecordGroup.getReal(this.transition.getReferenceStartIndex());
+			}
+			if (this.transition.getThresholdSize() > 1) {
+				int midIndex = (this.transition.getThresholdStartIndex() + this.transition.getThresholdEndIndex()) / 2;
+				for (int i = midIndex, j = midIndex; i <= this.transition.getThresholdEndIndex() && j >= this.transition.getThresholdStartIndex(); j--) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(i);
+					if (aggregatedValue != null) {
+						thresholdExtremum = aggregatedValue;
+						break;
+					}
+					aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null) {
+						thresholdExtremum = aggregatedValue;
+						break;
+					}
+				}
+			}
+			else {
+				thresholdExtremum = this.tmpRecordGroup.getReal(this.transition.getThresholdStartIndex());
+			}
+			if (this.transition.getRecoveryStartIndex() > 0) {
+				if (this.transition.getRecoverySize() > 1) {
+					int midIndex = (this.transition.getRecoveryStartIndex() + this.transition.getRecoveryEndIndex()) / 2;
+					for (int i = midIndex, j = midIndex; i <= this.transition.getRecoveryEndIndex() && j >= this.transition.getRecoveryStartIndex(); j--) {
+						Double aggregatedValue = this.tmpRecordGroup.getReal(i);
+						if (aggregatedValue != null) {
+							recoveryExtremum = aggregatedValue;
+							break;
+						}
+						aggregatedValue = this.tmpRecordGroup.getReal(j);
+						if (aggregatedValue != null) {
+							recoveryExtremum = aggregatedValue;
+							break;
+						}
+					}
+				}
+				else {
+					recoveryExtremum = this.tmpRecordGroup.getReal(this.transition.getRecoveryStartIndex());
+				}
+			}
+
+			deltaValue = calcDeltaValue(isPositiveTransition(), referenceExtremum, thresholdExtremum, recoveryExtremum);
+			return deltaValue;
+		}
+
+		/**
+		 * @return the level delta based on the average value of the phases
+		 */
+		public double calcAvg() {
+			final double deltaValue;
+			double referenceExtremum = 0.;
+			double thresholdExtremum = 0.;
+			double recoveryExtremum = 0.;
+			double value = 0.;
+			int skipCount = 0;
+			for (int j = this.transition.getReferenceStartIndex(); j < this.transition.getReferenceEndIndex() + 1; j++) {
+				Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+				if (aggregatedValue != null)
+					value += (aggregatedValue - value) / (j - this.transition.getReferenceStartIndex() + 1);
+				else
+					skipCount++;
+			}
+			referenceExtremum = value / (this.transition.getReferenceSize() - skipCount);
+			value = 0.;
+			skipCount = 0;
+			// one additional time step before and after in order to cope with potential measurement latencies
+			for (int j = this.transition.getThresholdStartIndex() - 1; j < this.transition.getThresholdEndIndex() + 1 + 1; j++) {
+				Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+				if (aggregatedValue != null)
+					value += (aggregatedValue - value) / (j - this.transition.getThresholdStartIndex() + 1);
+				else
+					skipCount++;
+			}
+			thresholdExtremum = value / (this.transition.getThresholdSize() - skipCount);
+			if (this.transition.getRecoveryStartIndex() > 0) {
+				value = 0.;
+				skipCount = 0;
+				for (int j = this.transition.getRecoveryStartIndex(); j < this.transition.getRecoveryEndIndex() + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null)
+						value += (aggregatedValue - value) / (j - this.transition.getRecoveryStartIndex() + 1);
+					else
+						skipCount++;
+				}
+				recoveryExtremum = value / (this.transition.getRecoverySize() - skipCount);
+			}
+
+			deltaValue = calcDeltaValue(isPositiveTransition(), referenceExtremum, thresholdExtremum, recoveryExtremum);
+			return deltaValue;
+		}
+
+		/**
+		 * @return the level delta based on the extremum value of the phases
+		 */
+		public double calcMinMax() {
+			final double deltaValue;
+			double referenceExtremum = 0.;
+			double thresholdExtremum = 0.;
+			double recoveryExtremum = 0.;
+			// determine the direction of the peak or pulse or slope
+			final boolean isPositiveDirection = isPositiveTransition();
+
+			if (isPositiveDirection) {
+				referenceExtremum = Double.MAX_VALUE;
+				for (int j = this.transition.getReferenceStartIndex(); j < this.transition.getReferenceEndIndex() + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null && aggregatedValue < referenceExtremum) referenceExtremum = aggregatedValue;
+				}
+				thresholdExtremum = -Double.MAX_VALUE;
+				// one additional time step before and after in order to cope with potential measurement latencies
+				for (int j = this.transition.getThresholdStartIndex() - 1; j < this.transition.getThresholdEndIndex() + 1 + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null && aggregatedValue > thresholdExtremum) thresholdExtremum = aggregatedValue;
+				}
+				if (this.transition.getRecoveryStartIndex() > 0) {
+					recoveryExtremum = Double.MAX_VALUE;
+					for (int j = this.transition.getRecoveryStartIndex(); j < this.transition.getRecoveryEndIndex() + 1; j++) {
+						Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+						if (aggregatedValue != null && aggregatedValue < recoveryExtremum) recoveryExtremum = aggregatedValue;
+					}
+				}
+			}
+			else {
+				referenceExtremum = -Double.MAX_VALUE;
+				for (int j = this.transition.getReferenceStartIndex(); j < this.transition.getReferenceEndIndex() + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null && aggregatedValue > referenceExtremum) referenceExtremum = aggregatedValue;
+				}
+				thresholdExtremum = Double.MAX_VALUE;
+				// one additional time step before and after in order to cope with potential measurement latencies
+				for (int j = this.transition.getThresholdStartIndex() - 1; j < this.transition.getThresholdEndIndex() + 1 + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null && aggregatedValue < thresholdExtremum) thresholdExtremum = aggregatedValue;
+				}
+				if (this.transition.getRecoveryStartIndex() > 0) {
+					recoveryExtremum = -Double.MAX_VALUE;
+					for (int j = this.transition.getRecoveryStartIndex(); j < this.transition.getRecoveryEndIndex() + 1; j++) {
+						Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+						if (aggregatedValue != null && aggregatedValue > recoveryExtremum) recoveryExtremum = aggregatedValue;
+					}
+				}
+			}
+			deltaValue = calcDeltaValue(isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
+			return deltaValue;
+		}
+
+		/**
+		 * Smoothing includes removing outliers and determining a level value based on a setting quantile cut point.
+		 * @return the level delta based on the smoothed extremum value of the phases
+		 */
+		public double calcSmoothMinMax() {
+			final double deltaValue;
+			double referenceExtremum = 0.;
+			double thresholdExtremum = 0.;
+			double recoveryExtremum = 0.;
+			// determine the direction of the peak or pulse or slope
+			final boolean isPositiveDirection = isPositiveTransition();
+
+			final IDevice device = DataExplorer.application.getActiveDevice();
+			final Settings settings = Settings.getInstance();
+			final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
+			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
+			final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
+			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
+					: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
+			final double probabilityCutPoint = !isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance();
+			{
+				List<Double> values = new ArrayList<Double>();
+				for (int j = this.transition.getReferenceStartIndex(); j < this.transition.getReferenceEndIndex() + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null) values.add(aggregatedValue);
+				}
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+				referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
+			}
+			{
+				List<Double> values = new ArrayList<Double>();
+				// one additional time step before and after in order to cope with potential measurement latencies
+				for (int j = this.transition.getThresholdStartIndex() - 1; j < this.transition.getThresholdEndIndex() + 1 + 1; j++) {
+					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+					if (aggregatedValue != null) values.add(aggregatedValue);
+				}
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
+			}
+			{
+				if (this.transition.getRecoveryStartIndex() > 0) {
+					List<Double> values = new ArrayList<Double>();
+					for (int j = this.transition.getRecoveryStartIndex(); j < this.transition.getRecoveryEndIndex() + 1; j++) {
+						Double aggregatedValue = this.tmpRecordGroup.getReal(j);
+						if (aggregatedValue != null) values.add(aggregatedValue);
+					}
+					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+					recoveryExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
+				}
+			}
+			deltaValue = calcDeltaValue(isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
+			return deltaValue;
+		}
+
+		/**
+		 * @param isPositiveDirection
+		 * @param referenceExtremum
+		 * @param thresholdExtremum
+		 * @param recoveryExtremum
+		 * @return the delta value of the reference / recovery phase and the threshold phase
+		 */
+		private double calcDeltaValue(boolean isPositiveDirection, double referenceExtremum, double thresholdExtremum, double recoveryExtremum) {
+			double deltaValue = 0.;
+
+			if (this.transition.isSlope() || this.deltaBasis == null || this.deltaBasis == DeltaBasisTypes.REFERENCE)
+				deltaValue = thresholdExtremum - referenceExtremum;
+			else if (this.deltaBasis == DeltaBasisTypes.RECOVERY)
+				deltaValue = thresholdExtremum - recoveryExtremum;
+			else if (this.deltaBasis == DeltaBasisTypes.BOTH_AVG)
+				deltaValue = thresholdExtremum - (referenceExtremum + recoveryExtremum) / 2.;
+			else if (this.deltaBasis == DeltaBasisTypes.INNER)
+				deltaValue = isPositiveDirection ? thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum);
+			else if (this.deltaBasis == DeltaBasisTypes.OUTER)
+				deltaValue = isPositiveDirection ? thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum);
+			else
+				throw new UnsupportedOperationException();
+
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
+					, referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, this.deltaBasis));
+			return deltaValue;
+		}
+
+		/**
+		 * @param recordGroup
+		 * @param transition
+		 * @return true if the transition has a positive peak / pulse or a positive slope
+		 */
+		private boolean isPositiveTransition() {
+			final boolean isPositiveDirection;
+			{
+				if (this.transition.isSlope()) {
+					int fromIndex = this.transition.getReferenceStartIndex();
+					int toIndex = this.transition.getThresholdEndIndex() + 1;
+					SingleResponseRegression<Double> regression = new SingleResponseRegression<>(this.tmpRecordGroup.getSubPoints(fromIndex, toIndex), RegressionType.LINEAR);
+					isPositiveDirection = regression.getSlope() > 0;
+				}
+				else {
+					int fromIndex = this.transition.getReferenceStartIndex();
+					int toIndex = this.transition.getRecoveryEndIndex() + 1;
+					SingleResponseRegression<Double> regression = new SingleResponseRegression<>(this.tmpRecordGroup.getSubPoints(fromIndex, toIndex), RegressionType.QUADRATIC);
+					isPositiveDirection = regression.getGamma() < 0;
+				}
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "direction: ", isPositiveDirection);
+			}
+			return isPositiveDirection;
+		}
+
+	}
+
 	private final SettlementRecord				histoSettlement;
 	private final TransitionCalculusType	calculus;
 	private final ChannelType							logChannel;
@@ -260,7 +632,8 @@ public final class CalculusEvaluator {
 
 			this.histoSettlement.add(reverseTranslatedResult);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-					String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
+					String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.histoSettlement.getName(), //$NON-NLS-1$
+							(int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1)
 							, reverseTranslatedResult, calculusType));
 		}
 	}
@@ -276,404 +649,31 @@ public final class CalculusEvaluator {
 	private double calculateLevelDelta(RecordGroup tmpRecordGroup, LevelingTypes leveling, Transition transition) {
 		final double deltaValue;
 
+		DeltaLevelCalculator deltaLevelCalculator = new DeltaLevelCalculator(this.calculus.getDeltaBasis(), tmpRecordGroup, transition);
+
 		if (leveling == LevelingTypes.FIRST) {
-			deltaValue = calcFirst(tmpRecordGroup, transition);
+			deltaValue = deltaLevelCalculator.calcFirst();
 		}
 		else if (leveling == LevelingTypes.LAST) {
-			deltaValue = calcLast(tmpRecordGroup, transition);
+			deltaValue = deltaLevelCalculator.calcLast();
 		}
 		else if (leveling == LevelingTypes.MID) {
-			deltaValue = calcMid(tmpRecordGroup, transition);
+			deltaValue = deltaLevelCalculator.calcMid();
 		}
 		else if (leveling == LevelingTypes.AVG) {
-			deltaValue = calcAvg(tmpRecordGroup, transition);
+			deltaValue = deltaLevelCalculator.calcAvg();
 		}
 		else if (leveling == LevelingTypes.MINMAX) {
-			deltaValue = calcMinMax(tmpRecordGroup, transition);
+			deltaValue = deltaLevelCalculator.calcMinMax();
 		}
 		else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
-			deltaValue = calcSmoothMinMax(tmpRecordGroup, transition);
+			deltaValue = deltaLevelCalculator.calcSmoothMinMax();
 		}
 		else {
 			throw new UnsupportedOperationException();
 		}
 
 		return deltaValue;
-	}
-
-	/**
-	 * @param tmpRecordGroup
-	 * @param transition
-	 * @return
-	 */
-	private double calcFirst(RecordGroup tmpRecordGroup, Transition transition) {
-		final double deltaValue;
-		double referenceExtremum = 0.;
-		double thresholdExtremum = 0.;
-		double recoveryExtremum = 0.;
-		for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
-			Double aggregatedValue = tmpRecordGroup.getReal(j);
-			if (aggregatedValue != null) {
-				referenceExtremum = aggregatedValue;
-				break;
-			}
-		}
-		// one additional time step before and after in order to cope with potential measurement latencies
-		for (int j = transition.getThresholdStartIndex() - 1; j < transition.getThresholdEndIndex() + 1 + 1; j++) {
-			Double aggregatedValue = tmpRecordGroup.getReal(j);
-			if (aggregatedValue != null) {
-				thresholdExtremum = aggregatedValue;
-				break;
-			}
-		}
-		if (transition.getRecoveryStartIndex() > 0) {
-			for (int j = transition.getRecoveryStartIndex(); j < transition.getRecoveryEndIndex() + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null) {
-					recoveryExtremum = aggregatedValue;
-					break;
-				}
-			}
-		}
-		// determine the direction of the peak or pulse or slope
-		final boolean isPositiveDirection = isPositiveTransition(tmpRecordGroup, transition);
-
-		deltaValue = calcDeltaValue(LevelingTypes.FIRST, transition, isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
-		return deltaValue;
-	}
-
-	/**
-	 * @param tmpRecordGroup
-	 * @param transition
-	 * @return
-	 */
-	private double calcLast(RecordGroup tmpRecordGroup, Transition transition) {
-		final double deltaValue;
-		double referenceExtremum = 0.;
-		double thresholdExtremum = 0.;
-		double recoveryExtremum = 0.;
-		for (int j = transition.getReferenceEndIndex(); j >= transition.getReferenceStartIndex(); j--) {
-			Double aggregatedValue = tmpRecordGroup.getReal(j);
-			if (aggregatedValue != null) {
-				referenceExtremum = aggregatedValue;
-				break;
-			}
-		}
-		// one additional time step before and after in order to cope with potential measurement latencies
-		for (int j = transition.getThresholdEndIndex() + 1; j >= transition.getThresholdStartIndex() - 1; j--) {
-			Double aggregatedValue = tmpRecordGroup.getReal(j);
-			if (aggregatedValue != null) {
-				thresholdExtremum = aggregatedValue;
-				break;
-			}
-		}
-		if (transition.getRecoveryStartIndex() > 0) {
-			for (int j = transition.getRecoveryEndIndex(); j >= transition.getRecoveryStartIndex(); j--) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null) {
-					recoveryExtremum = aggregatedValue;
-					break;
-				}
-			}
-		}
-		// determine the direction of the peak or pulse or slope
-		final boolean isPositiveDirection = isPositiveTransition(tmpRecordGroup, transition);
-
-		deltaValue = calcDeltaValue(LevelingTypes.LAST, transition, isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
-		return deltaValue;
-	}
-
-	/**
-	 * @param tmpRecordGroup
-	 * @param transition
-	 * @return
-	 */
-	private double calcMid(RecordGroup tmpRecordGroup, Transition transition) {
-		final double deltaValue;
-		double referenceExtremum = 0.;
-		double thresholdExtremum = 0.;
-		double recoveryExtremum = 0.;
-		if (transition.getReferenceSize() > 1) {
-			int midIndex = (transition.getReferenceStartIndex() + transition.getReferenceEndIndex()) / 2;
-			for (int i = midIndex, j = midIndex + 1; i <= transition.getReferenceEndIndex() && j >= transition.getReferenceStartIndex(); i++, j--) {
-				Double aggregatedValue = tmpRecordGroup.getReal(i);
-				if (aggregatedValue != null) {
-					referenceExtremum = aggregatedValue;
-					break;
-				}
-				aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null) {
-					referenceExtremum = aggregatedValue;
-					break;
-				}
-			}
-		}
-		else {
-			referenceExtremum = tmpRecordGroup.getReal(transition.getReferenceStartIndex());
-		}
-		if (transition.getThresholdSize() > 1) {
-			int midIndex = (transition.getThresholdStartIndex() + transition.getThresholdEndIndex()) / 2;
-			for (int i = midIndex, j = midIndex; i <= transition.getThresholdEndIndex() && j >= transition.getThresholdStartIndex(); j--) {
-				Double aggregatedValue = tmpRecordGroup.getReal(i);
-				if (aggregatedValue != null) {
-					thresholdExtremum = aggregatedValue;
-					break;
-				}
-				aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null) {
-					thresholdExtremum = aggregatedValue;
-					break;
-				}
-			}
-		}
-		else {
-			thresholdExtremum = tmpRecordGroup.getReal(transition.getThresholdStartIndex());
-		}
-		if (transition.getRecoveryStartIndex() > 0) {
-			if (transition.getRecoverySize() > 1) {
-				int midIndex = (transition.getRecoveryStartIndex() + transition.getRecoveryEndIndex()) / 2;
-				for (int i = midIndex, j = midIndex; i <= transition.getRecoveryEndIndex() && j >= transition.getRecoveryStartIndex(); j--) {
-					Double aggregatedValue = tmpRecordGroup.getReal(i);
-					if (aggregatedValue != null) {
-						recoveryExtremum = aggregatedValue;
-						break;
-					}
-					aggregatedValue = tmpRecordGroup.getReal(j);
-					if (aggregatedValue != null) {
-						recoveryExtremum = aggregatedValue;
-						break;
-					}
-				}
-			}
-			else {
-				recoveryExtremum = tmpRecordGroup.getReal(transition.getRecoveryStartIndex());
-			}
-		}
-		// determine the direction of the peak or pulse or slope
-		final boolean isPositiveDirection = isPositiveTransition(tmpRecordGroup, transition);
-
-		deltaValue = calcDeltaValue(LevelingTypes.MID, transition, isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
-		return deltaValue;
-	}
-
-	/**
-	 * @param tmpRecordGroup
-	 * @param transition
-	 * @return
-	 */
-	private double calcAvg(RecordGroup tmpRecordGroup, Transition transition) {
-		final double deltaValue;
-		double referenceExtremum = 0.;
-		double thresholdExtremum = 0.;
-		double recoveryExtremum = 0.;
-		double value = 0.;
-		int skipCount = 0;
-		for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
-			Double aggregatedValue = tmpRecordGroup.getReal(j);
-			if (aggregatedValue != null)
-				value += (aggregatedValue - value) / (j - transition.getReferenceStartIndex() + 1);
-			else
-				skipCount++;
-		}
-		referenceExtremum = value / (transition.getReferenceSize() - skipCount);
-		value = 0.;
-		skipCount = 0;
-		// one additional time step before and after in order to cope with potential measurement latencies
-		for (int j = transition.getThresholdStartIndex() - 1; j < transition.getThresholdEndIndex() + 1 + 1; j++) {
-			Double aggregatedValue = tmpRecordGroup.getReal(j);
-			if (aggregatedValue != null)
-				value += (aggregatedValue - value) / (j - transition.getThresholdStartIndex() + 1);
-			else
-				skipCount++;
-		}
-		thresholdExtremum = value / (transition.getThresholdSize() - skipCount);
-		if (transition.getRecoveryStartIndex() > 0) {
-			value = 0.;
-			skipCount = 0;
-			for (int j = transition.getRecoveryStartIndex(); j < transition.getRecoveryEndIndex() + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null)
-					value += (aggregatedValue - value) / (j - transition.getRecoveryStartIndex() + 1);
-				else
-					skipCount++;
-			}
-			recoveryExtremum = value / (transition.getRecoverySize() - skipCount);
-		}
-		// determine the direction of the peak or pulse or slope
-		final boolean isPositiveDirection = isPositiveTransition(tmpRecordGroup, transition);
-
-		deltaValue = calcDeltaValue(LevelingTypes.AVG, transition, isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
-		return deltaValue;
-	}
-
-	/**
-	 * @param tmpRecordGroup
-	 * @param transition
-	 * @return
-	 */
-	private double calcMinMax(RecordGroup tmpRecordGroup, Transition transition) {
-		final double deltaValue;
-		double referenceExtremum = 0.;
-		double thresholdExtremum = 0.;
-		double recoveryExtremum = 0.;
-		// determine the direction of the peak or pulse or slope
-		final boolean isPositiveDirection = isPositiveTransition(tmpRecordGroup, transition);
-
-		if (isPositiveDirection) {
-			referenceExtremum = Double.MAX_VALUE;
-			for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null && aggregatedValue < referenceExtremum) referenceExtremum = aggregatedValue;
-			}
-			thresholdExtremum = -Double.MAX_VALUE;
-			// one additional time step before and after in order to cope with potential measurement latencies
-			for (int j = transition.getThresholdStartIndex() - 1; j < transition.getThresholdEndIndex() + 1 + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null && aggregatedValue > thresholdExtremum) thresholdExtremum = aggregatedValue;
-			}
-			if (transition.getRecoveryStartIndex() > 0) {
-				recoveryExtremum = Double.MAX_VALUE;
-				for (int j = transition.getRecoveryStartIndex(); j < transition.getRecoveryEndIndex() + 1; j++) {
-					Double aggregatedValue = tmpRecordGroup.getReal(j);
-					if (aggregatedValue != null && aggregatedValue < recoveryExtremum) recoveryExtremum = aggregatedValue;
-				}
-			}
-		}
-		else {
-			referenceExtremum = -Double.MAX_VALUE;
-			for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null && aggregatedValue > referenceExtremum) referenceExtremum = aggregatedValue;
-			}
-			thresholdExtremum = Double.MAX_VALUE;
-			// one additional time step before and after in order to cope with potential measurement latencies
-			for (int j = transition.getThresholdStartIndex() - 1; j < transition.getThresholdEndIndex() + 1 + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null && aggregatedValue < thresholdExtremum) thresholdExtremum = aggregatedValue;
-			}
-			if (transition.getRecoveryStartIndex() > 0) {
-				recoveryExtremum = -Double.MAX_VALUE;
-				for (int j = transition.getRecoveryStartIndex(); j < transition.getRecoveryEndIndex() + 1; j++) {
-					Double aggregatedValue = tmpRecordGroup.getReal(j);
-					if (aggregatedValue != null && aggregatedValue > recoveryExtremum) recoveryExtremum = aggregatedValue;
-				}
-			}
-		}
-		deltaValue = calcDeltaValue(LevelingTypes.MINMAX, transition, isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
-		return deltaValue;
-	}
-
-	/**
-	 * @param tmpRecordGroup
-	 * @param transition
-	 * @return
-	 */
-	private double calcSmoothMinMax(RecordGroup tmpRecordGroup, Transition transition) {
-		final double deltaValue;
-		double referenceExtremum = 0.;
-		double thresholdExtremum = 0.;
-		double recoveryExtremum = 0.;
-		// determine the direction of the peak or pulse or slope
-		final boolean isPositiveDirection = isPositiveTransition(tmpRecordGroup, transition);
-
-		final IDevice device = DataExplorer.application.getActiveDevice();
-		final Settings settings = Settings.getInstance();
-		final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.outlierSigmaDefault;
-		final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-		final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-				: SettlementRecord.outlierRangeFactorDefault;
-		final double probabilityCutPoint = !isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance();
-		{
-			List<Double> values = new ArrayList<Double>();
-			for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null) values.add(aggregatedValue);
-			}
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
-			referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
-		}
-		{
-			List<Double> values = new ArrayList<Double>();
-			// one additional time step before and after in order to cope with potential measurement latencies
-			for (int j = transition.getThresholdStartIndex() - 1; j < transition.getThresholdEndIndex() + 1 + 1; j++) {
-				Double aggregatedValue = tmpRecordGroup.getReal(j);
-				if (aggregatedValue != null) values.add(aggregatedValue);
-			}
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
-			thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance());
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
-		}
-		{
-			if (transition.getRecoveryStartIndex() > 0) {
-				List<Double> values = new ArrayList<Double>();
-				for (int j = transition.getRecoveryStartIndex(); j < transition.getRecoveryEndIndex() + 1; j++) {
-					Double aggregatedValue = tmpRecordGroup.getReal(j);
-					if (aggregatedValue != null) values.add(aggregatedValue);
-				}
-				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
-				recoveryExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
-			}
-		}
-		deltaValue = calcDeltaValue(LevelingTypes.SMOOTH_MINMAX, transition, isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
-		return deltaValue;
-	}
-
-	/**
-	 * @param leveling
-	 * @param transition
-	 * @param isPositiveDirection
-	 * @param referenceExtremum
-	 * @param thresholdExtremum
-	 * @param recoveryExtremum
-	 * @return
-	 */
-	private double calcDeltaValue(LevelingTypes leveling, Transition transition, boolean isPositiveDirection, double referenceExtremum, double thresholdExtremum, double recoveryExtremum) {
-		double deltaValue = 0.;
-		DeltaBasisTypes deltaBasis = this.calculus.getDeltaBasis();
-		if (transition.isSlope() || deltaBasis == null || deltaBasis == DeltaBasisTypes.REFERENCE)
-			deltaValue = thresholdExtremum - referenceExtremum;
-		else if (deltaBasis == DeltaBasisTypes.RECOVERY)
-			deltaValue = thresholdExtremum - recoveryExtremum;
-		else if (deltaBasis == DeltaBasisTypes.BOTH_AVG)
-			deltaValue = thresholdExtremum - (referenceExtremum + recoveryExtremum) / 2.;
-		else if (deltaBasis == DeltaBasisTypes.INNER)
-			deltaValue = isPositiveDirection ? thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum);
-		else if (deltaBasis == DeltaBasisTypes.OUTER)
-			deltaValue = isPositiveDirection ? thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum);
-		else
-			throw new UnsupportedOperationException();
-
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%s referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
-				, leveling.value(), referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, deltaBasis));
-		return deltaValue;
-	}
-
-	/**
-	 * @param recordGroup
-	 * @param transition
-	 * @return true if the transition has a positive peak / pulse or a positive slope
-	 */
-	private boolean isPositiveTransition(RecordGroup tmpRecordGroup, Transition transition) {
-		final boolean isPositiveDirection;
-		{
-			if (transition.isSlope()) {
-				int fromIndex = transition.getReferenceStartIndex();
-				int toIndex = transition.getThresholdEndIndex() + 1;
-				SingleResponseRegression<Double> regression = new SingleResponseRegression<>(tmpRecordGroup.getSubPoints(fromIndex, toIndex), RegressionType.LINEAR);
-				isPositiveDirection = regression.getSlope() > 0;
-			}
-			else {
-				int fromIndex = transition.getReferenceStartIndex();
-				int toIndex = transition.getRecoveryEndIndex() + 1;
-				SingleResponseRegression<Double> regression = new SingleResponseRegression<>(tmpRecordGroup.getSubPoints(fromIndex, toIndex), RegressionType.QUADRATIC);
-				isPositiveDirection = regression.getGamma() < 0;
-			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "direction: ", isPositiveDirection);
-		}
-		return isPositiveDirection;
 	}
 
 }

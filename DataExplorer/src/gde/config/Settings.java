@@ -277,7 +277,7 @@ public class Settings extends Properties {
 		/**
 		 * use this instead of values() to avoid repeatedly cloning actions.
 		 */
-		public final static GeoCodeGoogle values[] = values();
+		public static final GeoCodeGoogle VALUES[] = values();
 	};
 
 	/**
@@ -2889,7 +2889,7 @@ public class Settings extends Properties {
 			this.setProperty(Settings.GPS_ADDRESS_TYPE, ordinal.name());
 		}
 		catch (Exception e) {
-			this.setProperty(Settings.GPS_ADDRESS_TYPE, GeoCodeGoogle.values[1].name());
+			this.setProperty(Settings.GPS_ADDRESS_TYPE, GeoCodeGoogle.VALUES[1].name());
 		}
 	}
 

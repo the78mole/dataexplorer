@@ -32,7 +32,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
-import gde.device.resource.DeviceXmlResource;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -51,9 +50,8 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 
 	public static final int											MAX_NAME_LENGTH									= 40;
 
-	protected static final int									initialRecordCapacity						= 55;
+	protected static final int									INITIAL_RECORD_CAPACITY					= 55;
 	protected static final String								DESCRIPTION_TEXT_LEAD						= Messages.getString(MessageIds.GDE_MSGT0129);
-	protected static final DeviceXmlResource		xmlResource											= DeviceXmlResource.getInstance();
 
 	protected final DataExplorer								application;																																	// pointer to main application
 	protected final Channels										channels;																																			// start point of data hierarchy
@@ -513,17 +511,10 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * For devices with none constant time step between measurement points it returns the average value.
-	 * Do not use for calculation, use for logging purpose only.
-	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
-	 */
-	public abstract double getAverageTimeStep_ms();
-
-		/**
-	 * @param syncMasterRecordOrdinal
-	 * @param tmpRecord
-	 * @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
-	 */
+	* @param syncMasterRecordOrdinal
+	* @param tmpRecord
+	* @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
+	*/
 	public boolean isRecordContained(int syncMasterRecordOrdinal, Record tmpRecord) {
 		final String $METHOD_NAME = "isRecordContained";
 		boolean isContained = false;

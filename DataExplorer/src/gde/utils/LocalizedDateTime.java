@@ -110,7 +110,7 @@ public final class LocalizedDateTime {
 		/**
 		 * use this to avoid repeatedly cloning actions instead of values()
 		 */
-		public final static DurationPattern	values[]	= values();
+		public static final DurationPattern	VALUES[]	= values();
 
 		private DurationPattern(int displaySequence, String userPattern, String userUtcPattern) {
 			this.displaySequence = displaySequence;
@@ -145,7 +145,7 @@ public final class LocalizedDateTime {
 		 */
 		public static DurationPattern get(DateTimePattern dateTimePattern) {
 			DurationPattern result = DurationPattern.dd_HH_mm;
-			for (DurationPattern durationPattern : DurationPattern.values) {
+			for (DurationPattern durationPattern : DurationPattern.VALUES) {
 				if (durationPattern.toString().equals(dateTimePattern.toString())) {
 					result = durationPattern;
 					break;

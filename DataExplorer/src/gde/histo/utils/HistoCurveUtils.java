@@ -35,7 +35,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
-import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.PointArray;
@@ -231,8 +230,6 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 
 		// get the number of data points size to be drawn
 		int displayableSize = record.realSize();
-
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize); //$NON-NLS-1$
 
 		record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
@@ -288,14 +285,14 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 		PointArray oldPoints = null;
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
-		double averageDuration = record.getParentTrail().getAverageDuration_mm();
-		Iterator<Integer> durationIterator = record.getParentTrail().getDurations_mm().iterator();
+		List<Integer> durations_mm = record.getParentTrail().getDurations_mm();
+		double averageDuration = durations_mm.parallelStream().mapToDouble(d -> d).average().getAsDouble();
+		Iterator<Integer> durationIterator = durations_mm.iterator();
 		for (PointArray pointArray : suitePoints) {
 			if (pointArray == null) {
 				; // neither boxplot nor the rangeplot needs this information
 			}
 			else {
-				TrailTypes trailType = record.getTrailSelector().getTrailType();
 				if (record.getTrailSelector().isBoxPlotSuite()) {
 					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
 					// helper variables

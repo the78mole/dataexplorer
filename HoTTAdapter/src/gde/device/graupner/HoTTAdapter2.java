@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
@@ -49,7 +49,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.IHistoDevice;
 import gde.io.DataParser;
@@ -70,8 +70,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public HoTTAdapter2(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -187,7 +187,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 			case HoTTAdapter2.SENSOR_TYPE_GENERAL_19200:
 				if (dataBuffer.length == 48) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
+					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 					//8=Height, 9=Climb 1, 10=Climb 3
 					//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 					points[18] = DataParser.parse2Short(dataBuffer, 40) * 1000;
@@ -217,9 +217,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 			case HoTTAdapter2.SENSOR_TYPE_ELECTRIC_19200:
 				if (dataBuffer.length == 51) {
-					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
+					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2
 					//8=Height, 9=Climb 1, 10=Climb 3
-					//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+					//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2
 					points[35] = DataParser.parse2Short(dataBuffer, 40) * 1000;
 					points[36] = DataParser.parse2Short(dataBuffer, 38) * 1000;
 					points[37] = DataParser.parse2Short(dataBuffer, 42) * 1000;
@@ -627,12 +627,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -789,8 +789,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -811,7 +811,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 13=Latitude, 14=Longitude 9=Height
 				int recordSize = recordLatitude.realSize();
 				int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
-				//check GPS latitude and longitude				
+				//check GPS latitude and longitude
 				int indexGPS = 0;
 				int i = 0;
 				for (; i < recordSize; ++i) {
@@ -821,7 +821,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						break;
 					}
 				}
-				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
+				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation
 
 				GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
 				//GPSHelper.calculateLabs(this, recordSet, latOrdinal, lonOrdinal, distOrdinal, tripOrdinal, 15);
@@ -829,7 +829,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 			if (recordSet.getChannelConfigNumber() == 6) { // do lab calculation with configuration Lab-Time only
 				//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-				//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
+				//15=DistanceStart, 75=DiffDistance, 76=LapsDistance
 				runLabsCalculation(recordSet, 6, 5, 72, 73, 74, 15, 75, 76);
 			}
 			//recordSet.syncScaleOfSyncableRecords();
@@ -1044,7 +1044,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -1129,7 +1129,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 
-		switch (recordSet.getChannelConfigNumber()) { //8.2.7 introduce additional ESC measurement values and additional channelConfig	
+		switch (recordSet.getChannelConfigNumber()) { //8.2.7 introduce additional ESC measurement values and additional channelConfig
 		case 1://Standard
 		case 2://GAM
 		case 3://EAM
@@ -1166,7 +1166,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			else //osd saved with 8.2.7 with the added ESC measurements
 				return recordKeys;
 			break;
-		case 6://Lab-Time			
+		case 6://Lab-Time
 			//66=TemperatureM 2 67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
 			//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm 15=DistanceStart, 75=DiffDistance, 76=LapsDistance
 			return recordKeys;
@@ -1186,32 +1186,32 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					switch (i) {
 					case 8: //8=VoltageRxMin
-					case 23: //23=Balance G, 
-					case 24: //24=CellVoltage G1 
+					case 23: //23=Balance G,
+					case 24: //24=CellVoltage G1
 					case 25: //25=CellVoltage G2
-					case 26: //25=CellVoltage G3 
+					case 26: //25=CellVoltage G3
 					case 27: //25=CellVoltage G4
 					case 28: //25=CellVoltage G5
 					case 29: //29=CellVoltage G6
-					case 32: //32=Voltage G1, 
-					case 33: //33=Voltage G2, 
-					case 34: //34=Temperature G1, 
+					case 32: //32=Voltage G1,
+					case 33: //33=Voltage G2,
+					case 34: //34=Temperature G1,
 					case 35: //35=Temperature G2
-					case 36: //36=Voltage E, 
-					case 37: //37=Current E, 
-					case 38: //38=Capacity E, 
-					case 39: //39=Power E, 
+					case 36: //36=Voltage E,
+					case 37: //37=Current E,
+					case 38: //38=Capacity E,
+					case 39: //39=Power E,
 					case 59: //59=Revolution E
-					case 60: //60=Voltage M, 
-					case 61: //61=Current M, 
-					case 62: //62=Capacity M, 
-					case 63: //63=Power M, 
-					case 64: //64=Revolution M, 
+					case 60: //60=Voltage M,
+					case 61: //61=Current M,
+					case 62: //62=Capacity M,
+					case 63: //63=Power M,
+					case 64: //64=Revolution M,
 						recordSet.get(i).setActive(null);
 						break;
 					default:
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) 
+						if (fileRecordsProperties[j].contains("_isActive=false"))
 							recordSet.get(j++).setActive(false);
 						break;
 					}
@@ -1222,7 +1222,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i <= 58) {
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) 
+						if (fileRecordsProperties[j].contains("_isActive=false"))
 							recordSet.get(j++).setActive(false);
 					}
 					else
@@ -1234,7 +1234,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i != 59 && i <= 75) {
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) 
+						if (fileRecordsProperties[j].contains("_isActive=false"))
 							recordSet.get(j++).setActive(false);
 					}
 					else
@@ -1248,7 +1248,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					if (i != 8 && i != 59) {
 						cleanedRecordNames.add(recordKeys[i]);
-						if (fileRecordsProperties[j].contains("_isActive=false")) 
+						if (fileRecordsProperties[j].contains("_isActive=false"))
 							recordSet.get(j++).setActive(false);
 					}
 					else
@@ -1265,31 +1265,31 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0; i < recordKeys.length; i++) {
 					switch (i) {
 					case 8: //8=VoltageRxMin
-					case 23: //23=Balance G, 
-					case 24: //24=CellVoltage G1 
+					case 23: //23=Balance G,
+					case 24: //24=CellVoltage G1
 					case 25: //25=CellVoltage G2
-					case 26: //25=CellVoltage G3 
+					case 26: //25=CellVoltage G3
 					case 27: //25=CellVoltage G4
 					case 28: //25=CellVoltage G5
 					case 29: //29=CellVoltage G6
-					case 32: //32=Voltage G1, 
-					case 33: //33=Voltage G2, 
-					case 34: //34=Temperature G1, 
+					case 32: //32=Voltage G1,
+					case 33: //33=Voltage G2,
+					case 34: //34=Temperature G1,
 					case 35: //35=Temperature G2
-					case 36: //36=Voltage E, 
-					case 37: //37=Current E, 
-					case 38: //38=Capacity E, 
-					case 39: //39=Power E, 
+					case 36: //36=Voltage E,
+					case 37: //37=Current E,
+					case 38: //38=Capacity E,
+					case 39: //39=Power E,
 					case 59: //59=Revolution E
-					case 60: //60=Voltage M, 
-					case 61: //61=Current M, 
-					case 62: //62=Capacity M, 
-					case 63: //63=Power M, 
-					case 64: //64=Revolution M, 
+					case 60: //60=Voltage M,
+					case 61: //61=Current M,
+					case 62: //62=Capacity M,
+					case 63: //63=Power M,
+					case 64: //64=Revolution M,
 						recordSet.get(i).setActive(null);
 						break;
 					default:
-						if (fileRecordsProperties[i].contains("_isActive=false")) 
+						if (fileRecordsProperties[i].contains("_isActive=false"))
 							recordSet.get(i).setActive(false);
 						break;
 					}
@@ -1300,7 +1300,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i > 58)
 						recordSet.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+					else if (fileRecordsProperties[i].contains("_isActive=false"))
 						recordSet.get(i).setActive(false);
 				}
 				break;
@@ -1309,7 +1309,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i > 58)
 						recordSet.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+					else if (fileRecordsProperties[i].contains("_isActive=false"))
 						recordSet.get(i).setActive(false);
 				}
 				break;
@@ -1318,7 +1318,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i == 59 || i > 74)
 						recordSet.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+					else if (fileRecordsProperties[i].contains("_isActive=false"))
 						recordSet.get(i).setActive(false);
 				}
 				break;
@@ -1327,7 +1327,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i == 59 || i > 74)
 						recordSet.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+					else if (fileRecordsProperties[i].contains("_isActive=false"))
 						recordSet.get(i).setActive(false);
 				}
 				break;
@@ -1338,7 +1338,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				for (int i = 0; i < recordKeys.length; i++) {
 					if (i == 8 || i == 59)
 						recordSet.get(i).setActive(null);
-					else if (fileRecordsProperties[i].contains("_isActive=false")) 
+					else if (fileRecordsProperties[i].contains("_isActive=false"))
 						recordSet.get(i).setActive(false);
 				}
 				break;
@@ -1382,21 +1382,21 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 * create history recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
-	 * since this is a long term operation the progress bar should be updated to signal business to user. 
+	 * since this is a long term operation the progress bar should be updated to signal business to user.
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param filePath 
+	 * @param filePath
 	 * @param trusses referencing a subset of the record sets in the file
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
-	 * @throws IOException 
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
+	 * @throws IOException
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
 	@Override
-	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
+	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+		List<ExtendedVault> histoVaults = new ArrayList<>();
 		for (VaultCollector truss : trusses) {
-			if (truss.getLogFilePath().equals(filePath.toString())) {
+			if (truss.getVault().getLogFilePath().equals(filePath.toString())) {
 				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
 				// add aggregated measurement and settlement points and score points to the truss
 				HoTTbinHistoReader2.read(truss);

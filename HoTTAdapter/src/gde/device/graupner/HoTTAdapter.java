@@ -61,7 +61,7 @@ import gde.device.graupner.hott.MessageIds;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.HistoRandomSample;
 import gde.histo.device.IHistoDevice;
@@ -135,7 +135,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		ESC("ESC", 7); //$NON-NLS-1$
 		private final String				value;
 		private final int						channelNumber;
-		public static final Sensor	values[]	= values();	// use this to avoid cloning if calling values()
+		public static final Sensor	VALUES[]	= values();	// use this to avoid cloning if calling values()
 
 		private Sensor(String v, int channelNumber) {
 			this.value = v;
@@ -147,11 +147,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 
 		public static Sensor fromOrdinal(int ordinal) {
-			return Sensor.values[ordinal];
+			return Sensor.VALUES[ordinal];
 		}
 
 		public static Sensor fromChannelNumber(int channelNumber) {
-			for (Sensor sensor : Sensor.values) {
+			for (Sensor sensor : Sensor.VALUES) {
 				if (channelNumber == sensor.channelNumber) {
 					return sensor;
 				}
@@ -187,7 +187,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 		public static List<Sensor> getAsList() {
 			List<HoTTAdapter.Sensor> sensors = new ArrayList<HoTTAdapter.Sensor>();
-			for (Sensor sensor : Sensor.values) {
+			for (Sensor sensor : Sensor.VALUES) {
 				sensors.add(sensor);
 			}
 			return sensors;
@@ -899,8 +899,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		final String $METHOD_NAME = "addDataBufferAsRawDataPoints"; //$NON-NLS-1$
 		long currentTime, readTime = 0, addTime = 0, pickTime = 0, lastTime = System.nanoTime();
 		if (recordSet.getNoneCalculationRecordNames().length != recordSet.size()) {
-			throw new DataInconsitsentException(
-					Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, recordSet.size(), recordSet.getNoneCalculationRecordNames().length }));
+			throw new DataInconsitsentException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0036,
+					new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, recordSet.size(), recordSet.getNoneCalculationRecordNames().length }));
 			// log.log(Level.SEVERE, "RecordSet.size = " + pointsLength + " not equal to recordSet.getNoneCalculationRecordNames().length " + recordSet.getNoneCalculationRecordNames().length); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		log.log(Level.FINER, String.format("%s holds %,d time steps (rows) with %d measurements (columns)", recordSet.getChannelConfigName(), recordDataSize, recordSet.size())); //$NON-NLS-1$
@@ -990,10 +990,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
 	@Override
-	public List<HistoVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-		List<HistoVault> histoVaults = new ArrayList<HistoVault>();
+	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+		List<ExtendedVault> histoVaults = new ArrayList<>();
 		for (VaultCollector truss : trusses) {
-			if (truss.getLogFilePath().equals(filePath.toString())) {
+			if (truss.getVault().getLogFilePath().equals(filePath.toString())) {
 				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
 				// add aggregated measurement and settlement points and score points to the truss
 				HoTTbinHistoReader.read(truss);
@@ -1416,7 +1416,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * exports the actual displayed data set to KML file format
-	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
+	 * @param isGarminExtension
 	 */
 	public void export2GPX(final boolean isGarminExtension) {
 		// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx

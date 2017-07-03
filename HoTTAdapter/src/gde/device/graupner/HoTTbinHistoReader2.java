@@ -89,7 +89,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.lastTime = System.nanoTime();
 
 		HoTTbinHistoReader2.truss = newTruss;
-		HoTTbinHistoReader2.filePath = truss.getLogFileAsPath();
+		HoTTbinHistoReader2.filePath = truss.getVault().getLogFileAsPath();
 		File file = HoTTbinHistoReader2.filePath.toFile();
 		try (BufferedInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {
 			HoTTbinHistoReader2.read(data_in);
@@ -119,12 +119,12 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTAdapter2 device = (HoTTAdapter2) HoTTbinHistoReader2.application.getActiveDevice();
 		boolean isChannelsChannel = device.channels.getActiveChannelNumber() == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
 		long numberDatablocks = file.length() / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
-		tmpRecordSet = RecordSet.createRecordSet(truss.getLogRecordsetBaseName(), device, HoTTbinHistoReader2.application.getActiveChannelNumber(), true, true, false);
+		tmpRecordSet = RecordSet.createRecordSet(truss.getVault().getLogRecordsetBaseName(), device, HoTTbinHistoReader2.application.getActiveChannelNumber(), true, true, false);
 		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
 		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
 		tmpRecordSet.descriptionAppendFilename(HoTTbinHistoReader2.filePath.getFileName().toString());
 		if (HoTTbinHistoReader2.log.isLoggable(Level.FINE))
-			HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinHistoReader2.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getLogRecordsetBaseName());
+			HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinHistoReader2.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getVault().getLogRecordsetBaseName());
 
 		if (file.length() > NUMBER_LOG_RECORDS_MIN * dataBlockSize) {
 			try {
@@ -440,7 +440,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			}
 		}
 		if (doFullRead) {
-			final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
+			final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 			// scores for duration and timestep values are filled in by the HistoVault
 			scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
@@ -777,7 +777,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			}
 		}
 		if (doFullRead) {
-			final Integer[] scores = new Integer[ScoreLabelTypes.values.length];
+			final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 			// scores for duration and timestep values are filled in by the HistoVault
 			scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
@@ -799,7 +799,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader2.dataBlockSize;
 			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.values.length;
+			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.VALUES.length;
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 

@@ -39,7 +39,7 @@ import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.cache.HistoVault;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
@@ -72,14 +72,14 @@ public final class HistoTimeLine {
 		/**
 		 * use this to avoid repeatedly cloning actions instead of  values()
 		 */
-		public final static Density	values[]					= values();
+		public static final Density	VALUES[]					= values();
 
 		private Density(int boxWidth) {
 			this.boxWidth = boxWidth;
 		}
 
 		public static Density fromOrdinal(int ordinal) {
-			return Density.values[ordinal];
+			return Density.VALUES[ordinal];
 		}
 
 		public static String toString(Density density) {
@@ -131,7 +131,7 @@ public final class HistoTimeLine {
 		if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
 		// calculate the maximum time to be displayed and define the corresponding label format
-		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getStartTimeStamp() - (long) this.trailRecordSet.getMaxTime_ms());
+		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getTopTimeStamp_ms() - this.trailRecordSet.getLastTimeStamp_ms());
 
 		String timeLineDescription;
 		Point pt; // to calculate the space required to draw the time values
@@ -244,7 +244,7 @@ public final class HistoTimeLine {
 		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
 		long lastTimeStamp = 0;
 		long applicableDistancesSum = 0;
-		for (Entry<Long, List<HistoVault>> entry : this.histoSet.subMap(this.leftmostTimeStamp, true, this.rightmostTimeStamp, true).entrySet()) {
+		for (Entry<Long, List<ExtendedVault>> entry : this.histoSet.subMap(this.leftmostTimeStamp, true, this.rightmostTimeStamp, true).entrySet()) {
 			long currentTimeStamp = entry.getKey();
 			if (HistoTimeLine.log.isLoggable(Level.FINER)) {
 				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());

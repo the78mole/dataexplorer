@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     							2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -34,14 +34,14 @@ import gde.ui.DataExplorer;
  * @author Winfried Brügmann
  */
 public class Channels extends HashMap<Integer, Channel> {
-	final static long		serialVersionUID			= 26031957;
-	final static Logger	log										= Logger.getLogger(Channels.class.getName());
+	final static long		serialVersionUID				= 26031957;
+	final static Logger	log											= Logger.getLogger(Channels.class.getName());
 
-	final static int		channelNameMinLength	= 3;																					// 'GPS'
+	static final int		CHANNEL_NAME_MIN_LENGTH	= 3;																					// 'GPS'
 
-	static Channels			channles							= null;
-	int									activeChannelNumber		= 1;																					// default at least one channel must exist
-	String[]						channelNames					= new String[1];
+	static Channels			channles								= null;
+	int									activeChannelNumber			= 1;																					// default at least one channel must exist
+	String[]						channelNames						= new String[1];
 	final DataExplorer	application;
 
 	/**
@@ -84,14 +84,14 @@ public class Channels extends HashMap<Integer, Channel> {
 	}
 
 	/**
-	 * query the channel number by given string, if string not found channel number 1 is returned 
+	 * query the channel number by given string, if string not found channel number 1 is returned
 	 * @param channelName
 	 * @return channel number
 	 */
 	public int getChannelNumber(String channelName) {
 		int searchedNumber = 1;
 
-		if (channelName != null && channelName.length() >= channelNameMinLength) {
+		if (channelName != null && channelName.length() >= CHANNEL_NAME_MIN_LENGTH) {
 			// "2 : Outlet", use the first digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_COLON) && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
 				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());

@@ -117,13 +117,6 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 		}
 
 		/**
-		 * @return the clusteredItems
-		 */
-		public GpsCluster getClusteredItems() {
-			return this.clusteredItems;
-		}
-
-		/**
 		 * @return the list of assigned GPS coordinates and the cluster which each individual is assigned to
 		 */
 		public Map<GpsCoordinate, GpsCluster> getIdentifiedClusters() {

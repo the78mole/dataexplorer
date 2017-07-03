@@ -61,7 +61,6 @@ public final class SettlementCollector {
 	private final static String				$CLASS_NAME	= RecordingsCollector.class.getName();
 	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
-	private final static DataExplorer	application	= DataExplorer.getInstance();					// pointer to main application
 	private final static Settings			settings		= Settings.getInstance();
 
 	/**
@@ -593,10 +592,10 @@ public final class SettlementCollector {
 		}
 		else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
 			final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.outlierSigmaDefault;
+			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
 			final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-					: SettlementRecord.outlierRangeFactorDefault;
+					: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 			final double probabilityCutPoint = !isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance();
 			{
 				List<Double> values = new ArrayList<Double>();

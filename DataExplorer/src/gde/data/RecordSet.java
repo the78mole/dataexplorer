@@ -38,6 +38,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.TriggerType;
+import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.histo.transitions.GroupTransitions;
 import gde.histo.transitions.TransitionTableMapper;
@@ -256,7 +257,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @param isFromBegin
 	 */
 	private RecordSet(RecordSet recordSet, int dataIndex, boolean isFromBegin) {
-		super(recordSet, xmlResource.getReplacements(recordSet.recordNames.clone())); // copy record names without possible syncableName
+		super(recordSet, DeviceXmlResource.getInstance().getReplacements(recordSet.recordNames.clone())); // copy record names without possible syncableName
 
 		// update child records
 		for (String recordKey : this.recordNames) {
@@ -817,11 +818,11 @@ public final class RecordSet extends AbstractRecordSet {
 		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms(), initialRecordCapacity);
+		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms(), INITIAL_RECORD_CAPACITY);
 
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), initialRecordCapacity);
+			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), INITIAL_RECORD_CAPACITY);
 			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added record for " + recordNames[i] + " - " + newRecordSet.size()); //$NON-NLS-1$
