@@ -59,6 +59,8 @@ public final class SettlementRecord extends Vector<Integer> {
 	public static final double					OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
 
 	private static final int						INITIAL_RECORD_CAPACITY			= 22;
+	private static final String					BELOW_LIMIT								= MeasurementPropertyTypes.BELOW_LIMIT.value();
+	private static final String					BEYOND_LIMIT							= MeasurementPropertyTypes.BEYOND_LIMIT.value();
 
 	private final SettlementType				settlement;
 
@@ -95,6 +97,22 @@ public final class SettlementRecord extends Vector<Integer> {
 		for (PropertyType property : newProperties) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%20s - %s = %s", recordRef.name, property.getName(), property.getValue())); //$NON-NLS-1$
 			this.properties.add(property.clone());
+		}
+	}
+
+	@Override
+	public synchronized boolean add(Integer e) {
+		double translateValue = translateValue(e / 1000.0);
+		if (translateValue > getBeyondLimit()) {
+			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("beyond limit=%f value=%f   %s", getBeyondLimit(), translateValue, this.name)); //$NON-NLS-1$
+			return false;
+		}
+		else if (translateValue < getBelowLimit()) {
+			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("below limit=%f value=%f   %s", getBelowLimit(),translateValue, this.name)); //$NON-NLS-1$
+			return false;
+		}
+		else {
+			return super.add(e);
 		}
 	}
 
@@ -273,6 +291,28 @@ public final class SettlementRecord extends Vector<Integer> {
 
 	public int getLogChannelNumber() {
 		return this.logChannelNumber;
+	}
+
+	private double getBeyondLimit() {
+		double value = Double.MAX_VALUE;
+		PropertyType property = this.getProperty(BEYOND_LIMIT);
+		if (property != null)
+			value = Double.valueOf(property.getValue());
+		else {
+			// take default
+		}
+		return value;
+	}
+
+	private double getBelowLimit() {
+		double value = -Double.MAX_VALUE;
+		PropertyType property = this.getProperty(BELOW_LIMIT);
+		if (property != null)
+			value = Double.valueOf(property.getValue());
+		else {
+			// take default
+		}
+		return value;
 	}
 
 }

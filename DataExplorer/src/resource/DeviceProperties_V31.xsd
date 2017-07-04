@@ -941,6 +941,8 @@
 			<xs:enumeration value="google_earth_is_random_color" />
 			<xs:enumeration value="filter_factor" />
 			<xs:enumeration value="tolerate_sign_change" />
+			<xs:enumeration value="beyond_limit" />
+			<xs:enumeration value="below_limit" />
 			<xs:enumeration value="none_specified" />
 		</xs:restriction>
 	</xs:simpleType>

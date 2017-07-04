@@ -216,6 +216,7 @@
                     </evaluation>
                     <property name="factor" value="1" type="Double" description="Permille is milliOhm"/>
                     <property name="scale_sync_ref_ordinal" value="19" type="Integer" description="r_i_cells"/>
+                    <property name="beyond_limit" value="1111.1" type="Double" description="Discard Ri values bigger or equal"/>
                     <label>settlementlabel_r_i_pack</label>
                 </Settlement>
                 <Settlement settlementId="17">
