@@ -69,12 +69,16 @@
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_9.html">Cell Voltage Window</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_91.html">Curve compare</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_91.html">Curve Compare Window</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_92.html">File comment</A> </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_92.html">Data set comment</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_92.html">File and Data Set Comment</A> </BR>
+
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_93.html">Object characteristic</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_93.html">Object Characteristics</A> </BR>
+</BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_94.html">History Graphics View</A> </BR>
+</BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_95.html">History Table View</A> </BR>
 </BR>
 <A HREF="HelpInfo_A.html">Device properties files</A> </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_A1.html">DevicePropertiesEditor</A> </BR>
@@ -119,7 +123,22 @@
 </UL>
 </P>
 
-<P>Using the tabulator "Miscelanious" it is possible to configure the graphics view.
+<P>The Tabulator &quot;History&quot; enable history analysis and its configuration.
+Overall, this type of analysis should be used for equal measurements coming through the same device from one object.
+For instance a history analysis doesn't make sense using measurements of all different batteries, LiPo, NiMH and different cell numbers, you ever charge with your charger.
+</P>
+<P align=center><IMG SRC="images/SettingsDialog_H.png" NAME="SettingsDialog_Historie" ALIGN=CENTER></P>
+<P>
+The configuration entries have tool tips to explain its advantages and what to be used for. 
+In most cases you will see the change directly while have a history graphics view in background and modify the configuration settings.
+</BR>
+<B>Hint: </B>Quartiles and smart values are additional statistical calculated values, gives the enhanced selection capability of the curves selector.
+Using this enhanced statistic calculation possible configured <A HREF="HelpInfo_5.html">trigger</A> doesn't get used anymore during history analysis.
+</BR>
+More information related to history analysis you will find at <A HREF="HelpInfo_94.html">history analysis view</A>
+</P>
+
+<P>Using the tabulator "Miscellaneous" it is possible to configure the graphics view.
 Better differentiation between the different curves and their dependent scale the record color can be used.
 </P>
 <P align=center><IMG SRC="images/SettingsDialog_2.png" NAME="SettingsDialog_2" ALIGN=CENTER></P>
@@ -137,10 +156,17 @@ The "Maintenance" tabulator contains some buttons to refresh or remove some appl
 Pushing the buttons will "Create Desktop Launcher" or "Remove Desktop Launcher" will create or remove such icons.
 The other two buttons enable the DataExplorer MIME type registration to associate the file endings *.osd and *.lov or remove this registration.
 </P>
-<P align=center><IMG SRC="images/SettingsDialog_2.png" NAME="SettingsDialog_2" ALIGN=CENTER></P>
+<P align=center><IMG SRC="images/SettingsDialog_3.png" NAME="SettingsDialog_3" ALIGN=CENTER></P>
 <P>The button "Create Link Files" will scan all data files under the configured folder and create all missing object directories as well as the associating link files.
 The button "Clean Link File" will delete object related link files but not the object description files nor the object related directories.
 This function helps to move data files to different system/platform or for backup purpose. 
+</BR>
+Defining object keys may turn out as a cumbersome work: Speed up this task by pressing the button "Create Objects"! 
+The system will scan the standard data path (and the import directory and identify 'object folders'. 
+The object folder names are put in the object key list in the menu bar on the main screen which in turn allows you to select the log files more precisely.
+</BR>
+The "Clear Cache" button clears the cache directory which is kept in your user account directory. 
+However, clearing the cache is not necessary as it holds a minimum of aggregated data which is deduced from the original log files.
 </BR>
 Using the button "Resource Consumption" will print the operating system handle usage status to the trace.log files.
 </BR>
@@ -187,7 +213,7 @@ Otherwise the amount of log statements is very high.
 	limited to 512 Mbyte.
 </UL>
 </P>
-<P ALIGN=CENTER><img src="images/Settingsdialog_3.png" name="Settingsdialog_3" ALIGN=CENTER >
+<P ALIGN=CENTER><img src="images/Settingsdialog_4.png" name="Settingsdialog_4" ALIGN=CENTER >
 </P>
 <P>The class based log level allows to set a logging level for selected class(es) which reduce the amount of trace statements and helps analyzing class centric.
 A context menu enables the log level selection.

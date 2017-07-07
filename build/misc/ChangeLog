@@ -13,6 +13,7 @@ OVERVIEW:
 + enhance serial port detection for virtual serial ports
 + enhance SM GPS-Logger support
 + enhance SM UniLog2 support 
++ update documentation
 
 DETAILS:
 - fix analog display of synchronized master record

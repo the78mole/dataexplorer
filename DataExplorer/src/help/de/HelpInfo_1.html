@@ -57,22 +57,26 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Der Kurvenselektor</A></BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoomen und Positionieren</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Fenster &quot;Statistik&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Fenster Statistik</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Fenster &quot;Tabelle&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Fenster Tabelle</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Fenster &quot;Digital&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Fenster Digitalanzeige</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Fenster &quot;Analog&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Fenster Analoganzeige</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Fenster &quot;Zellenspannung&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Fenster Zellenspannung</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_91.html">Fenster &quot;Kurvenvergleich&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_91.html">Fenster Kurvenvergleich</A> </BR>
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_92.html">Fenster &quot;Dateikommentar&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_92.html">Datei- und Datensatz-Kommentar</A> </BR>
 
 </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_93.html">Fenster &quot;Objektcharakteristik&quot;</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_93.html">Fenster Objektcharakteristik</A> </BR>
+</BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_94.html">Fenster Historiengrafik</A> </BR>
+</BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_95.html">Fenster Historientabelle</A> </BR>
 </BR>
 <A HREF="HelpInfo_A.html">Gerätekonfigurationsdateien</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_A1.html">Ger&auml;teeigenschafteneditor</A> </BR>
@@ -133,6 +137,21 @@
 </UL>
 </P>
 
+<P>Im Tabulator &quot;Historie&quot; kann eine Historienauswertung eingeschaltet und konfiguriert werden.
+Generell kann man sagen, dass diese Art der Auswertung nur für gleiche Messwerte, die an einem Objekt vorgenommen wurden sinn ergibt.
+Historienauswertung über alle jemals geladenen Akkus, mit den verschiedensten Spannungen und Kapazitäten und unterschiedlicher Chemie, wird wenig übersichtlich sein und wenig Erkenntnisse bringen.
+</P>
+<P align=center><IMG SRC="images/SettingsDialog_H.png" NAME="SettingsDialog_Historie" ALIGN=CENTER></P>
+<P>
+Die einzelnen Konfigurationsabschnitte sind mit Hilfetexten hinterlegt.
+Man kann die Konfiguration verändern und sieht in vielen Fällen die direkte Auswirkung auf der angezeigten Historien-Grafik.
+</BR>
+<B>Hinweis: </B>Quartile und Smart-Werte berechnet weitere statistische Werte, ermöglicht dann eine erweiterte Auswahl im Kurvenselektor.
+Durch die erweiterte Statistik, werden allerdings mögliche konfigurierte <A HREF="HelpInfo_5.html">Trigger</A> nicht berücksichtigt.
+</BR>
+Weitere Informationen zu diesem Thema <A HREF="HelpInfo_94.html">Historienauswertung</A> findet man wenn man dem Link folgt.
+</P>
+
 <P>Im Tabulator &quot;Verschiedenes&quot; kann das Aussehen der Grafik beeinflusst werden.
 Zur besseren Unterscheidung bzw. Zuordnung von Kurve zu Skala, k&ouml;nnen jeweils die Farben der Kuven auf die ausw&auml;hlbaren Elemente &uuml;bertragen werden.
 </P>
@@ -156,6 +175,14 @@ F&uuml;r Mac OS X wird das nicht unterst&uuml;tzt bzw. ist es unnötig.
 Die Taste "L&ouml;sche Linkdateien" löscht alle Linkdateien in den Objektverzeichnissen aber nicht die Verzeichnisse und Objektbeschreibungen.
 Nicht verändert werden dabei die Dateien, die die Objektbeschreibung enthält. 
 Beide Funktionen sind sehr praktisch, wenn man Anwendungsdatendateien auf eine andere Ausf&uuml;hrungsplattform umziehen oder sichern möchte.
+</BR>
+Die Taste "Erstelle Objekte" stellt eine sehr hilfreiche Funktion bereit.
+Hier werden unterhalb des Standard-Datenpfades alle Dateien gescannt und versucht in Objekte einzuordnen.
+Dabei werden neue Objektverzeichnisse angelegt, die Dateien sortiert und die Objektliste vervollständigt.
+Danach lässt sich die Historien-Grafik durch Anwahl eines Objektes wesentlich präziser aufbauen.
+</BR>
+"Cache Bereinigen" im Historie Segment löscht den Inhalt des Historie-Cache Verzeichnisses.
+Das kann hilfreich sein die Historie ganz neu aufzubauen oder Speicherplatz aufzuräumen.
 </BR>
 &Uuml;ber die Taste "Resourcenverbrauch" wird in die aktuelle trace.log Datei die Anzahl von Betriebssystemhandles für die einzelnen verwendeten Programmobjekte geschrieben.
 </BR>

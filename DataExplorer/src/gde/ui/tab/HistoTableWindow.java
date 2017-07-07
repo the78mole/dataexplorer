@@ -290,7 +290,7 @@ public class HistoTableWindow extends CTabItem {
 			@Override
 			public void helpRequested(HelpEvent evt) {
 				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
-				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_95.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		this.dataTable.addListener(SWT.SetData, new Listener() {

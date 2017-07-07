@@ -93,7 +93,6 @@ public class HistoGraphicsComposite extends Composite {
 	private final Settings			settings						= Settings.getInstance();
 	private final Channels			channels						= Channels.getInstance();
 	private final HistoTimeLine	timeLine						= new HistoTimeLine();
-	private final SashForm			graphicSashForm;
 	private final GraphicsType	graphicsType;
 
 	Menu												popupmenu;
@@ -135,7 +134,6 @@ public class HistoGraphicsComposite extends Composite {
 	HistoGraphicsComposite(final SashForm useParent) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
-		this.graphicSashForm = useParent;
 		this.graphicsType = GraphicsType.HISTO;
 
 		//get the background colors
@@ -179,7 +177,7 @@ public class HistoGraphicsComposite extends Composite {
 				switch (HistoGraphicsComposite.this.graphicsType) {
 				default:
 				case NORMAL:
-					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_94.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				}
 			}
@@ -270,14 +268,6 @@ public class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
-				}
-			});
-
-			this.recordSetComment.addHelpListener(new HelpListener() {
-				@Override
-				public void helpRequested(HelpEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 		}
