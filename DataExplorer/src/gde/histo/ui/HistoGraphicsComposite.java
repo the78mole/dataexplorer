@@ -85,7 +85,6 @@ public final class HistoGraphicsComposite extends Composite {
 	private final Settings						settings				= Settings.getInstance();
 	private final Channels						channels				= Channels.getInstance();
 	private final HistoTimeLine				timeLine				= new HistoTimeLine();
-	private final SashForm						graphicSashForm;
 	private final GraphicsType				graphicsType;
 
 	Menu															popupmenu;
@@ -121,10 +120,9 @@ public final class HistoGraphicsComposite extends Composite {
 
 	private HistoGraphicsMeasurement	graphicsMeasurement;
 
-	HistoGraphicsComposite(final SashForm useParent) {
+	HistoGraphicsComposite(SashForm useParent) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
-		this.graphicSashForm = useParent;
 		this.graphicsType = GraphicsType.HISTO;
 
 		//get the background colors
@@ -167,8 +165,8 @@ public final class HistoGraphicsComposite extends Composite {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.helpRequested " + evt); //$NON-NLS-1$
 				switch (HistoGraphicsComposite.this.graphicsType) {
 				default:
-				case NORMAL:
-					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				case HISTO:
+					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_94.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				}
 			}
@@ -259,14 +257,6 @@ public final class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
-				}
-			});
-
-			this.recordSetComment.addHelpListener(new HelpListener() {
-				@Override
-				public void helpRequested(HelpEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 		}
@@ -471,10 +461,20 @@ public final class HistoGraphicsComposite extends Composite {
 		this.graphicsMeasurement = new HistoGraphicsMeasurement(this.graphicCanvas, this.recordSetComment, this.timeLine);
 		this.setModeState(mode);
 
-		long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
-		long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 3 * 2);
+		if (mode == HistoGraphicsMode.MEASURE_DELTA) {
+			if (this.timeLine.getScalePositions().size() > 1) {
+				int margin = this.curveAreaBounds.width / (this.timeLine.getScalePositions().size() + 1);
+				long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(margin);
+				long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width - margin);
 
-		this.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms, this.canvasImage, this.curveAreaBounds);
+				this.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms, this.canvasImage, this.curveAreaBounds);
+			}
+		}
+		else {
+			long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
+			long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width * 2 / 3);
+			this.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms, this.canvasImage, this.curveAreaBounds);
+		}
 	}
 
 	/**

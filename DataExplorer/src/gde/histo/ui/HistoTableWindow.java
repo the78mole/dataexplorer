@@ -67,7 +67,7 @@ import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
 import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
- * Histo display class, displays the histo in table form.
+ * Display the history in table form.
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
@@ -118,7 +118,7 @@ public class HistoTableWindow extends CTabItem {
 		this.cursor = new TableCursor(this.dataTable, SWT.NONE);
 		this.cursor.addKeyListener(new KeyListener() {
 			@Override
-			public void keyReleased(final KeyEvent event) {
+			public void keyReleased(KeyEvent event) {
 				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, ("cursor.keyReleased, keycode: " + event.keyCode)); //$NON-NLS-1$
 
 				if (event.stateMask == SWT.MOD1) {
@@ -273,7 +273,7 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				}
 				else {
-					final Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(columnNumber - 2);
+					Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(columnNumber - 2);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
@@ -289,7 +289,7 @@ public class HistoTableWindow extends CTabItem {
 			@Override
 			public void helpRequested(HelpEvent evt) {
 				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
-				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_95.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		this.dataTable.addListener(SWT.SetData, new Listener() {
@@ -418,7 +418,7 @@ public class HistoTableWindow extends CTabItem {
 
 	public boolean isRowTextAndTrailValid() {
 		boolean isValid = false;
-		final TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
 		for (int j = 0; j < this.dataTable.getItems().length; j++) {
 			TableItem tableItem = this.dataTable.getItems()[j];
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);

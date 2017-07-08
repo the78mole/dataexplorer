@@ -92,36 +92,38 @@
 <H1><A NAME="history_graphics_window"></A>History Graphics View</H1>
 <P>
 This display tab window presents the log files on a time line – starting with the most recent log file for the selected device and object. 
-This view was designed for a convenient analysis of new log files. 
-Whenever your devices created a new log file, you only have to make sure that it is placed in a directory in the standard data path.
-The analysis will mainly use saved OSD-files of your device and selected object.
-Depending on the device implementation raw log data might also used through the given import path. 
-If you activate the history graphics view it will show you the new log data in a quite transparent manner on a time line with the preceding log files. 
-As the view will come up with the same settings as the last time you used it, you will be able to focus on the most essential measurements and curve types in a quick and easy manner. 
-In case of any inconsistencies or potential issues you might open the log files in the standard graphics window for a detailed analysis.
-Hint: Make this tab visible by activating the history in the settings.
-The settings table on the left allows you to focus on the most relevant measurements. Please note that you may select various specific curve types and curve bundles in the selection boxes. In general, the graphics configuration of the history graphics view is organized in a very similar manner to the graphics view which is the leftmost tab in the main window.
+<P>
+The analysis uses <A HREF="HelpInfo_B.html">OSD files</A> of your device and selected object.
+Preferably they are accessed via link files in the object directory.
+<P>
+However, if you did not define an object or if you selected 'device oriented', the device folder is browsed.
+This is the reason why it is recommended arranging the log files in <A HREF="HelpInfo_01.html">object folders</A> which are sub-directories in the standard data path (refer to <A HREF="HelpInfo_1.html">Preferences dialog</A> 'Maintenance').
+Having added an object (see last paragraphs <A HREF="HelpInfo_32.html">here</A>) a folder with the object name is created. 
+The system will place a link file in such an <A HREF="HelpInfo_01.html">object folder</A> for future OSD files.
+<P>
 The history graphics view fetches its data whenever you click on the tab. This ensures that the graphics is refreshed whenever you add new log files to the directories.
-Some basic history graphics settings are available in 'Preferences' > 'History'.
-You might also use the object selection in the device tool bar if you want to focus on a specific object. 
-The prerequisite is object key names which correspond to object directory names. 
-This is the reason why it is recommend arranging the log files in object directories which are sub-directories in the standard data path (refer to <A HREF="HelpInfo_1.html">Preferences dialog</A> 'Maintenance').
-</BR>
-<B>Hint: </B>Make this tab visible by activating the history in the settings.
+<P>
+<B>Hint: </B>Make this tab visible by activating the history in the  <A HREF="HelpInfo_1.html">Preferences dialog</A> 'History'.
 </P>
 <P><IMG SRC="images/History_Graphics_Window.png" NAME="History_Graphics_Window" ALIGN=CENTER></P>
 <P>
-Depending on the selected device and configured history analysis deviations from the shown picture might be possible.
+Depending on the selected device and and history settings deviations from the shown picture might be possible.
 The device configuration XML and the actual implementation state will have its influence as well.
 </BR>
-The enhanced curves selector enable more statistical values in dependency of the history configuration.
-It make sense to store graphics templates for the history analysis view as well, since it holds different values compared to the standard graphics templates.
+The enhanced <A HREF="HelpInfo_41.html">curve selector</A> enables various statistical values in dependency of the history configuration.
 </BR>
-The context menu of the graphics area contains additional capabilities related to the analysis.
-It is possible to load a specific data set directly into the graphics view while some data seams debatable.
-A file or data set showing extreme values might be set to hidden.
-</P>
-<P><B>Hint: </B>If a device support raw file import it might be possible to include this files into analysis if the device implementation support this.
+It makes sense to store <A HREF="HelpInfo_33.html">graphics templates</A> for the history analysis view as well, since they hold different values compared to the standard graphics templates.
+<P>
+Additional capabilities of the graphics area <A HREF="HelpInfo_34.html">context menu</A>:
+<UL>
+	<LI>load a data set into the <A HREF="HelpInfo_4.html">graphics view</A>
+	<LI>delete a file (such as log files caused by tests)
+	<LI>set a file or data set to hidden (e.g. extreme values or outliers)
+	<LI>toggle hiding ('Selective history')
+	<LI>interactive analyses via 'Curve survey' in combination with 'Measurement' (see some way down <A HREF="HelpInfo_41.html">here</A>)
+</UL>
+<P><B>Hint: </B>If a device supports a raw file import  (see item 'Import' <A HREF="HelpInfo_3.html">here</A>) it might be possible to include these files into the analysis.
+This allows you to bypass creating OSD files.
 </P>
 <P ALIGN=LEFT><A HREF="HelpInfo_92.html">&lt;&lt;== previous</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_A.html">next ==&gt;&gt;</A></P>

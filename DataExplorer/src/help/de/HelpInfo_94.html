@@ -89,28 +89,38 @@
 <DIV ID="Content" DIR="LTR">
 <H1><A NAME="history_graphics_window"></A>Fenster Historiengrafik</H1>
 <P>
-Wählt man dieses Fenster über seinen Tabulator an findet im Hintergrund eine Analyse der aktuell auf Gerät und Objekt bezogenen Daten statt und werden auf einer Zeitlinie dargestellt.
-Die analysierten Daten kommen vorzugsweise aus selbst gespeicherten OSD-Dateien, die sich als Link im Objektverzeichnis befinden.
-Ist kein Objekt angelegt oder gerätebezogen eingestellt, wird das gesamte dem Gerät zugeordnete Ordner durchsucht. 
-Hierbei kann es passieren, dass im Falle eines Ladegerätes LiPo-Akkus unterschiedlicher Zellenanzahl und NiMH unterschiedlicher Zellenanzahl u.s.w. in die Auswertung kommen.
-Um solche Situationen zu vermeiden solle man Objekte anlegen und nur OSD-Dateien von diesem Objekt hier ablegen.
-Nachdem ein Objekt angelegt wurde wird dazu auch der zugehörende Ordner mit gleichem Namen angelegt und beim Sichern von Daten die OSD-Dateien als Link hier abgelegt.
-</BR>
-<B>Hinweis: </B>Dieses Tabulatorfenster ist nur sichtbar, wenn man in den Einstellungen Historiendaten auswerten ausgewählt hat.
+Wählt man diesen Tabulator an, findet im Hintergrund eine Analyse der aktuell auf Gerät und Objekt bezogenen Dateien statt. 
+Sie werden auf einer Zeitlinie dargestellt.
+<P/>
+Die analysierten Daten kommen vorzugsweise aus selbst gespeicherten <A HREF="HelpInfo_B.html">OSD-Dateien</A> mit Objektzuordnung.
+Ist kein Objekt angelegt oder 'gerätebezogen' eingestellt, wird der gesamte dem Gerät zugeordnete Ordner durchsucht. 
+Hierbei kann es passieren, dass im Falle eines Ladegerätes beispielsweise LiPo-Akkus unterschiedlicher Zellenanzahl und NiMH unterschiedlicher Zellenanzahl in die Auswertung kommen.
+<P/>
+Um solche Situationen zu vermeiden, sollte man Objekte anlegen und OSD-Dateien ausschließlich im passenden <A HREF="HelpInfo_01.html">Objektordner</A> ablegen. 
+Beim Neuanlegen eines Objektes (siehe letzte Abschnitte <A HREF="HelpInfo_32.html">hier</A>) wird dazu auch der zugehörende Ordner mit gleichem Namen angelegt. 
+Für künftige OSD-Dateien werden dann Verknüpfungen im <A HREF="HelpInfo_01.html">Objektordner</A> erstellt.
+<P/>
+<B>Hinweis: </B>Dieses Tabulatorfenster ist nur sichtbar, wenn man in den <A HREF="HelpInfo_1.html">Einstellungen</A> 'Historiendaten auswerten' ausgewählt hat.
 </P>
 <P><IMG SRC="images/History_Graphics_Window.png" NAME="History_Graphics_Window" ALIGN=CENTER></P>
 <P>
-Je nach gewähltem Gerät können die ermittelten Daten vom Umfang der zusätzlich berechneten Werte vom oben gezeigten abweichen.
-Der Geräte-Implementierungsstandund der Inhalt der Geräte beschreibenden XML tragen ihren Teil dazu bei.
+Je nach gewähltem Gerät und Historien-Einstellungen kann der Umfang der zusätzlich berechneten Werte vom oben Gezeigten abweichen.
+Der Geräte-Implementierungsstand und der Inhalt der Geräte beschreibenden XML tragen ihren Teil dazu bei.
 </BR>
-Der erweiterte Kurvenselektor ermöglicht die Auswahl bestimmter statistischer Werte in Abhängigkeit der Einstellungen.
-Es ist ratsam für die Historienauswertung ebenfalls Grafik-Templates zu sichern, sie unterscheiden sich durch die erweiterten Einstellungen von den normalen Grafik-Templates.
+Der erweiterte <A HREF="HelpInfo_41.html">Kurvenselektor</A> ermöglicht die Auswahl bestimmter statistischer Werte in Abhängigkeit der Einstellungen.
 </BR>
-Das Kontext-Menü des Grafikbereichs zeigt ebenfalls auf die Auswertung zugeschnittenen Möglichkeiten.
-Es kann beispielsweise der zu einem Messpunkt zugehörige Datensatz direkt in die Anzeige gebracht werden.
-Eine Datei die Werte mit starken Ausreissern zeigt kann ausgeblendet werden.
-</P>
-<P><B>Hinweis: </B>Unterstützt ein Gerät den Import von Log-Dateien können auch diese in die Auswertung mit einbezogen werden, wenn die aktuelle Geräte-Implementierung das unterstützt.
+Es ist ratsam, für die Historienauswertung ebenfalls <A HREF="HelpInfo_33.html">Grafikvorlagen</A> zu sichern. Sie unterscheiden sich durch die erweiterten Einstellungen von den normalen Templates.
+<P>
+Zusätzliche Funktionen im <A HREF="HelpInfo_34.html">Kontext-Menü</A> des Grafikbereichs:
+<UL>
+	<LI>Datensatz im <A HREF="HelpInfo_4.html">Grafikfenster</A> anzeigen
+	<LI>Datei löschen (etwa Logs entstanden aus Tests)
+	<LI>Datei aus der Historiengrafik ausblenden (beispielsweise ein Ausrei&szlig;er)
+	<LI>Ausblenden ein-/ausschalten ('Selektive Historie')
+	<LI>interaktive Trendanalysen mit 'Detailmessung' in Verbindung mit 'Kurven vermessen' (siehe weiter unten <A HREF="HelpInfo_41.html">hier</A>) 
+</UL>
+<P><B>Hinweis: </B>Unterstützt ein Gerät den Import von Log-Dateien (siehe Punkt 'Import' <A HREF="HelpInfo_3.html">hier</A>), können auch diese in die Auswertung mit einbezogen werden, wenn die aktuelle Geräte-Implementierung dies bereits unterstützt.
+So ist es möglich, in diesen Fällen auf OSD-Dateien zu verzichten.
 </P>
 <P ALIGN=LEFT><A HREF="HelpInfo_92.html">&lt;&lt;== zur&uuml;ck</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_A.html">weiter ==&gt;&gt;</A></P>
