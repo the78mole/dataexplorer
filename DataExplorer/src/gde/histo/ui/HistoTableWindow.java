@@ -305,7 +305,8 @@ public class HistoTableWindow extends CTabItem {
 					}
 					else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
-						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, DisplayTag.fromOrdinal(index)));
+						DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags().toArray(new DisplayTag[] {});
+						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, activeDisplayTags[index]));
 					}
 				}
 			}

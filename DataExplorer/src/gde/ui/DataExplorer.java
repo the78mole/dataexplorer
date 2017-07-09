@@ -1002,7 +1002,7 @@ public class DataExplorer extends Composite {
 					}
 					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
 					if (trailRecordSet != null) {
-						final int tagSize = DataExplorer.this.settings.isDisplayScores() ? trailRecordSet.getDataTags().getActiveDisplayTags().size() : 0;
+						final int tagSize = DataExplorer.this.settings.isDisplayScores() && trailRecordSet.getDataTags().getActiveDisplayTags() != null ? trailRecordSet.getDataTags().getActiveDisplayTags().size() : 0;
 						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + tagSize);
 					}
 				}

@@ -19,6 +19,8 @@
 
 package gde.histo.recordings;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -40,17 +42,19 @@ import gde.log.Level;
  * @author Thomas Eickert (USER)
  */
 public final class TrailDataTags extends HashMap<DataTag, List<String>> {
-	private final static String		$CLASS_NAME							= TrailDataTags.class.getName();
-	private static final long			serialVersionUID				= -1091858232851684060L;
-	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME							= TrailDataTags.class.getName();
+	private static final long		serialVersionUID				= -1091858232851684060L;
+	private final static Logger	log											= Logger.getLogger($CLASS_NAME);
 
-	private final List<String>		dataLinkPaths						= new ArrayList<String>();
-	private final List<String>		dataFilePaths						= new ArrayList<String>();
-	private final List<String>		dataChannelNumbers			= new ArrayList<String>();
-	private final List<String>		dataRectifiedObjectKeys	= new ArrayList<String>();
-	private final List<String>		dataRecordsetBaseNames	= new ArrayList<String>();
-	private final List<String>		dataRecordSetOrdinals		= new ArrayList<String>();
-	private final List<String>		dataGpsLocations				= new ArrayList<String>();
+	private final List<String>	dataLinkPaths						= new ArrayList<String>();
+	private final List<String>	dataFilePaths						= new ArrayList<String>();
+	private final List<String>	dataChannelNumbers			= new ArrayList<String>();
+	private final List<String>	dataRectifiedObjectKeys	= new ArrayList<String>();
+	private final List<String>	dataRecordsetBaseNames	= new ArrayList<String>();
+	private final List<String>	dataRecordSetOrdinals		= new ArrayList<String>();
+	private final List<String>	dataGpsLocations				= new ArrayList<String>();
+
+	private EnumSet<DisplayTag>	activeDisplayTags				= null;													// caching
 
 	public TrailDataTags() {
 		this.put(DataTag.LINK_PATH, this.dataLinkPaths);
@@ -60,6 +64,13 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 		this.put(DataTag.RECORDSET_BASE_NAME, this.dataRecordsetBaseNames);
 		this.put(DataTag.RECORDSET_ORDINAL, this.dataRecordsetBaseNames);
 		this.put(DataTag.GPS_LOCATION, this.dataGpsLocations);
+	}
+
+	@Override
+	public void clear() {
+		super.clear();
+
+		this.activeDisplayTags = null;
 	}
 
 	public void add(ExtendedVault histoVault) {
@@ -103,14 +114,58 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 			return new HashMap<DataTag, String>();
 	}
 
-		/**
-	 * @return the tags which have been filled
-	 */
+	/**
+	* @return the tags which have been filled and carry non-redundant data
+	*/
 	public EnumSet<DisplayTag> getActiveDisplayTags() {
-		EnumSet<DisplayTag> activeDisplayTags = EnumSet.allOf(DisplayTag.class);
-		if (this.get(DataTag.GPS_LOCATION).size() != this.get(DataTag.RECORDSET_BASE_NAME).size()) activeDisplayTags.remove(DisplayTag.GPS_LOCATION);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "activeDisplayTags.size()=", activeDisplayTags.size()); //$NON-NLS-1$
-		return activeDisplayTags;
+		if (this.activeDisplayTags == null) {
+			EnumSet<DisplayTag> resultTags = EnumSet.allOf(DisplayTag.class);
+
+			if (!this.get(DataTag.FILE_PATH).isEmpty()) {
+				{
+					if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
+				}
+				{
+					Path directoryPath = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent();
+					Path basePath = directoryPath.getParent();
+					boolean sameDirectory = true;
+					boolean sameBase = true;
+					for (String filePath : this.get(DataTag.FILE_PATH)) {
+						Path path = Paths.get(filePath);
+						if (!path.getParent().equals(directoryPath)) sameDirectory = false;
+						if (!path.getParent().getParent().equals(basePath)) sameBase = false;
+						if (!sameDirectory && !sameBase) break;
+					}
+					if (sameDirectory) resultTags.remove(DisplayTag.DIRECTORY_NAME);
+					if (sameBase) resultTags.remove(DisplayTag.BASE_PATH);
+				}
+				{
+					String channelNumber = this.get(DataTag.CHANNEL_NUMBER).get(0);
+					boolean sameChannel = true;
+					for (String tmp : this.get(DataTag.CHANNEL_NUMBER)) {
+						if (!tmp.equals(channelNumber)) {
+							sameChannel = false;
+							break;
+						}
+					}
+					if (sameChannel) resultTags.remove(DisplayTag.CHANNEL_NUMBER);
+				}
+				{
+					String objectKey = this.get(DataTag.RECTIFIED_OBJECTKEY).get(0);
+					boolean sameObject = true;
+					for (String tmp : this.get(DataTag.RECTIFIED_OBJECTKEY)) {
+						if (!tmp.equals(objectKey)) {
+							sameObject = false;
+							break;
+						}
+					}
+					if (sameObject) resultTags.remove(DisplayTag.RECTIFIED_OBJECTKEY);
+				}
+				this.activeDisplayTags = resultTags;
+			}
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "activeDisplayTags.size()=", resultTags.size()); //$NON-NLS-1$
+		}
+		return this.activeDisplayTags;
 	}
 
 	public List<String> getDataGpsLocations() {
