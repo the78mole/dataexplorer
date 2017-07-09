@@ -268,12 +268,14 @@ public class HistoTableWindow extends CTabItem {
 				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "row=" + rowNumber + "  column=" + columnNumber); //$NON-NLS-1$ //$NON-NLS-2$
 				if (HistoTableWindow.this.dataTable.getColumnCount() <= 2 || columnNumber < 2 || trailRecordSet == null || trailRecordSet.isEmpty()) {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), null);
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				}
 				else {
 					final Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(columnNumber - 2);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 				}

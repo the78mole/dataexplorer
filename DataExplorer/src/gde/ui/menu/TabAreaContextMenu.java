@@ -88,7 +88,7 @@ public class TabAreaContextMenu {
 	};
 
 	public enum TabMenuOnDemand {
-		IS_CURSOR_IN_CANVAS, DATA_FILE_PATH, RECORDSET_BASE_NAME, EXCLUDED_LIST
+		IS_CURSOR_IN_CANVAS, DATA_LINK_PATH, DATA_FILE_PATH, RECORDSET_BASE_NAME, EXCLUDED_LIST
 	};
 
 	public void createMenu(Menu popupMenu, TabMenuType type) {
@@ -253,11 +253,21 @@ public class TabAreaContextMenu {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deleteFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// check if the file exists and if the user really wants to delete it
 							File file = new File(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString());
-							if (FileUtils.checkFileExist(file.getPath())
-									&& TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
-								FileUtils.deleteFile(file.getPath());
-
-								TabAreaContextMenu.this.application.setupHistoWindows();
+							if (FileUtils.checkFileExist(file.getPath())) {
+								String linkFilePath = popupMenu.getData(TabMenuOnDemand.DATA_LINK_PATH.toString()).toString();
+								if (file.getPath().endsWith(GDE.FILE_ENDING_DOT_OSD) && !linkFilePath.isEmpty()) {
+									FileUtils.deleteFile(linkFilePath);
+									if (TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0071, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
+										FileUtils.deleteFile(file.getPath());
+										TabAreaContextMenu.this.application.setupHistoWindows();
+									}
+								}
+								else {
+									if (TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
+										FileUtils.deleteFile(file.getPath());
+										TabAreaContextMenu.this.application.setupHistoWindows();
+									}
+								}
 							}
 						}
 					});

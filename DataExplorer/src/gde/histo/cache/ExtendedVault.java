@@ -149,6 +149,7 @@ public final class ExtendedVault extends HistoVault {
 		this.vaultObjectKey = this.application.getObjectKey();
 		this.vaultSamplingTimespanMs = this.settings.getSamplingTimespan_ms();
 
+		this.logLinkPath = GDE.STRING_EMPTY;
 		this.logFilePath = filePath.toString(); // toString in order to avoid 'Object' during marshalling
 		this.logFileLastModified = fileLastModified_ms;
 		this.logFileLength = fileLength;
@@ -190,6 +191,7 @@ public final class ExtendedVault extends HistoVault {
 		this.vaultObjectKey = histoVault.vaultObjectKey;
 		this.vaultSamplingTimespanMs = histoVault.vaultSamplingTimespanMs;
 
+		this.logLinkPath = histoVault.logLinkPath;
 		this.logFilePath = histoVault.logFilePath;
 		this.logFileLastModified = histoVault.logFileLastModified;
 		this.logFileLength = histoVault.logFileLength;
@@ -219,6 +221,7 @@ public final class ExtendedVault extends HistoVault {
 		sb.append("logChannelNumber=").append(this.logChannelNumber).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
 		sb.append("logObjectKey=").append(this.logObjectKey).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
 		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
+		sb.append(this.logLinkPath).append(GDE.STRING_COMMA_BLANK);
 		sb.append(this.logFilePath).append(GDE.STRING_COMMA_BLANK);
 		sb.append("vaultDirectory=").append(this.vaultDirectory); //$NON-NLS-1$
 		return sb.toString();

@@ -44,7 +44,8 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	private static final long			serialVersionUID				= -1091858232851684060L;
 	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
 
-	private final List<String>		dataFilePath						= new ArrayList<String>();
+	private final List<String>		dataLinkPaths						= new ArrayList<String>();
+	private final List<String>		dataFilePaths						= new ArrayList<String>();
 	private final List<String>		dataChannelNumbers			= new ArrayList<String>();
 	private final List<String>		dataRectifiedObjectKeys	= new ArrayList<String>();
 	private final List<String>		dataRecordsetBaseNames	= new ArrayList<String>();
@@ -52,7 +53,8 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	private final List<String>		dataGpsLocations				= new ArrayList<String>();
 
 	public TrailDataTags() {
-		this.put(DataTag.FILE_PATH, this.dataFilePath);
+		this.put(DataTag.LINK_PATH, this.dataLinkPaths);
+		this.put(DataTag.FILE_PATH, this.dataFilePaths);
 		this.put(DataTag.CHANNEL_NUMBER, this.dataChannelNumbers);
 		this.put(DataTag.RECTIFIED_OBJECTKEY, this.dataRectifiedObjectKeys);
 		this.put(DataTag.RECORDSET_BASE_NAME, this.dataRecordsetBaseNames);
@@ -61,7 +63,8 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	}
 
 	public void add(ExtendedVault histoVault) {
-		this.dataFilePath.add(histoVault.getLogFilePath().intern());
+		this.dataLinkPaths.add(histoVault.getLogLinkPath().intern());
+		this.dataFilePaths.add(histoVault.getLogFilePath().intern());
 		this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
 		this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
 		this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());
@@ -114,8 +117,12 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 		return this.dataGpsLocations;
 	}
 
-	public List<String> getDataFilePath() {
-		return this.dataFilePath;
+	public List<String> getDataLinkPaths() {
+		return this.dataLinkPaths;
+	}
+
+	public List<String> getDataFilePaths() {
+		return this.dataFilePaths;
 	}
 
 	public List<String> getDataChannelNumbers() {

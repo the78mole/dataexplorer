@@ -13,21 +13,11 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     							2016,2017 Thomas Eickert
 ****************************************************************************************/
 package gde;
-
-import gde.config.Settings;
-import gde.data.RecordSet;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
 
 import java.awt.SplashScreen;
 import java.io.File;
@@ -66,6 +56,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
+import gde.config.Settings;
+import gde.data.RecordSet;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
+
 /**
  * @author Winfried Brügmann
  * class with less import statements hosting the main method to build a controlled classpath
@@ -88,7 +88,7 @@ public class GDE {
 	public static final String							NAME_LONG													= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String							DEVICE_PROPERTIES_XSD_VERSION			= "_V31";																																																										//$NON-NLS-1$
 	public final static String							GRAPHICS_TEMPLATES_XSD_VERSION		= "_V08";																																																										//$NON-NLS-1$
-	public final static String							HISTO_CACHE_ENTRIES_XSD_VERSION		= "_V01";																																																										//$NON-NLS-1$
+	public final static String							HISTO_CACHE_ENTRIES_XSD_VERSION		= "_V02";																																																										//$NON-NLS-1$
 	public final static String							CLEAN_SETTINGS_WHILE_SHUTDOWN			= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 	public final static String							TEMP_FILE_STEM										= "~TempFile";
 
@@ -98,7 +98,7 @@ public class GDE {
 	public static final boolean							IS_MAC_COCOA											= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");			//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean							IS_ARCH_DATA_MODEL_64							= System.getProperty("sun.arch.data.model").equals("64");																																		//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean							IS_OS_ARCH_ARM										= System.getProperty("os.arch").toLowerCase().startsWith("arm");																																		//$NON-NLS-1$ //$NON-NLS-2$
-	
+
 
 	public static final String							STRING_BASE_PACKAGE								= "gde";																																																										//$NON-NLS-1$
 
@@ -112,8 +112,8 @@ public class GDE {
 			? System.getProperty("java.io.tmpdir")																																																																														//$NON-NLS-1$
 			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;																																																																			//$NON-NLS-1$
 
-	public final static int									SIZE_BYTES_INTEGER								= Integer.SIZE / 8;																																																					// 32 bits / 8 bits per byte 
-	public final static int									SIZE_BYTES_LONG										= Long.SIZE / 8;																																																						// 64 bits / 8 bits per byte 
+	public final static int									SIZE_BYTES_INTEGER								= Integer.SIZE / 8;																																																					// 32 bits / 8 bits per byte
+	public final static int									SIZE_BYTES_LONG										= Long.SIZE / 8;																																																						// 64 bits / 8 bits per byte
 	public final static int									SIZE_UTF_SIGNATURE								= 2;																																																												// 2 byte UTF line header
 	public final static long								ONE_HOUR_MS												= 1 * 60 * 60 * 1000;
 
@@ -245,7 +245,7 @@ public class GDE {
 	public static int												WIDGET_FONT_SIZE;
 	public final static String							WIDGET_FONT_NAME									= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : GDE.IS_MAC ? "Lucida Grande" : "Sans Serif";																		//$NON-NLS-1$ //$NON-NLS-2$
 
-	// number ranges for message IDs 
+	// number ranges for message IDs
 	public static final int									NUMBER_RANGE_MIN_GDE							= 0;
 	public static final int									NUMBER_RANGE_MAX_GDE							= 1000;
 	public static final int									NUMBER_RANGE_MIN_SAMPLE_SIM				= 1001;
@@ -393,7 +393,7 @@ public class GDE {
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + GDE.VERSION);
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Screen resolution [dpi] = " + GDE.display.getDPI().y);
 
-			//build the main thread context classloader to enable dynamic plugin class loading 
+			//build the main thread context classloader to enable dynamic plugin class loading
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 			//ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "class loader build, test it");
@@ -445,9 +445,9 @@ public class GDE {
 	 * find the class loader of the given class
 	 * @return URL ClassLoader
 	 * @throws MalformedURLException
-	 * @throws URISyntaxException 
-	 * @throws ApplicationConfigurationException 
-	 * @throws ClassNotFoundException 
+	 * @throws URISyntaxException
+	 * @throws ApplicationConfigurationException
+	 * @throws ClassNotFoundException
 	 */
 	public static ClassLoader getClassLoader() throws MalformedURLException, URISyntaxException, ApplicationConfigurationException {
 		final String $METHOD_NAME = "getClassLoader"; //$NON-NLS-1$
@@ -517,6 +517,7 @@ public class GDE {
 		}
 		log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "using class loader URL = " + urls.toString()); //$NON-NLS-1$
 		ClassLoader newLoader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
+			@Override
 			public URLClassLoader run() {
 				return new URLClassLoader(urls.toArray(new URL[1]));
 			}
@@ -628,6 +629,7 @@ public class GDE {
 		//		}
 
 		splashShell.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				if (GDE.splash != null && !GDE.splash.isDisposed()) GDE.splash.close();
 				if (GDE.startSplash != null) GDE.startSplash.close();

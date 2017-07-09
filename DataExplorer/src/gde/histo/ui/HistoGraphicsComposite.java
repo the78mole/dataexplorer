@@ -54,7 +54,6 @@ import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
-import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
@@ -183,18 +182,18 @@ public final class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					final String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-					final StringBuilder sb = new StringBuilder();
+					String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
+					StringBuilder sb = new StringBuilder();
 					String toolTipText = GDE.STRING_EMPTY;
 					for (Entry<DirectoryType, Path> directoryEntry : HistoGraphicsComposite.this.histoSet.getValidatedDirectories().entrySet()) {
-						final String truncatedPath = directoryEntry.getValue().getFileName().toString().length() > 22 ? directoryEntry.getValue().getFileName().toString().substring(0, 22) + ellipsisText
+						String truncatedPath = directoryEntry.getValue().getFileName().toString().length() > 22 ? directoryEntry.getValue().getFileName().toString().substring(0, 22) + ellipsisText
 								: directoryEntry.getValue().getFileName().toString();
 						sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
 						toolTipText += GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
 					}
-					final String levelsText = Settings.getInstance().getSubDirectoryLevelMax() > 0
+					String levelsText = Settings.getInstance().getSubDirectoryLevelMax() > 0
 							? GDE.STRING_NEW_LINE + "+ " + Settings.getInstance().getSubDirectoryLevelMax() + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT0870) : GDE.STRING_EMPTY; //$NON-NLS-1$
-					final String tmpHeaderText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
+					String tmpHeaderText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
 					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
 						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeaderText);
 					}
@@ -472,9 +471,6 @@ public final class HistoGraphicsComposite extends Composite {
 		this.graphicsMeasurement = new HistoGraphicsMeasurement(this.graphicCanvas, this.recordSetComment, this.timeLine);
 		this.setModeState(mode);
 
-		TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(trailRecordSet.getRecordKeyMeasurement());
-		HistoGraphicsMapper mapper = new HistoGraphicsMapper(trailRecord);
-
 		long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
 		long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 3 * 2);
 
@@ -550,8 +546,8 @@ public final class HistoGraphicsComposite extends Composite {
 				{
 					this.graphicCanvas.setCursor(this.application.getCursor());
 					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
-						final Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
-						final String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
+						Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
+						String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
 						if (text != null) {
 							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) this.graphicCanvas.setToolTipText(text);
 						}
@@ -598,11 +594,13 @@ public final class HistoGraphicsComposite extends Composite {
 					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
 					if (this.xDown == 0 || this.xDown == this.curveAreaBounds.width) {
+						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 					}
 					else {
-						final Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet().getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // evt.x is already relative to curve area
+						Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet().getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // evt.x is already relative to curve area
+						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 					}

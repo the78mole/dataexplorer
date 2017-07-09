@@ -208,6 +208,7 @@ public final class DirectoryScanner {
 					tmpSelectedFilesCount++;
 					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
 					for (VaultCollector truss : HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory)) {
+						truss.getVault().setLogLinkPath(file.getAbsolutePath());
 						if (this.settings.isSuppressMode()) {
 							if (ExclusionData.isExcluded(truss.getVault().getLogFileAsPath(), truss.getVault().getLogRecordsetBaseName())) {
 								log.log(Level.INFO,
