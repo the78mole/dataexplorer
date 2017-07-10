@@ -1067,7 +1067,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.histoDisplay = new Group(this.histoDisplayOption, SWT.NONE);
 								RowData groupRData = new RowData();
-								groupRData.width = 223;
+								groupRData.width = 464;
 								this.histoDisplay.setLayoutData(groupRData);
 								FormLayout formLayout = new FormLayout();
 								formLayout.marginTop = 2;
@@ -1097,8 +1097,7 @@ public class SettingsDialog extends Dialog {
 								{
 									this.histoDisplayScores = new Button(this.histoDisplay, SWT.CHECK);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoDisplaySettlements, 5);
-									formData.left = new FormAttachment(0, 7);
+									formData.left = new FormAttachment(this.histoDisplaySettlements, 55);
 									this.histoDisplayScores.setLayoutData(formData);
 									this.histoDisplayScores.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoDisplayScores.setText(Messages.getString(MessageIds.GDE_MSGT0790));
@@ -1116,8 +1115,7 @@ public class SettingsDialog extends Dialog {
 								{
 									this.histoDisplayTags = new Button(this.histoDisplay, SWT.CHECK);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoDisplayScores, 5);
-									formData.left = new FormAttachment(0, 7);
+									formData.left = new FormAttachment(this.histoDisplayScores, 55);
 									this.histoDisplayTags.setLayoutData(formData);
 									this.histoDisplayTags.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoDisplayTags.setText(Messages.getString(MessageIds.GDE_MSGT0746));
@@ -2254,9 +2252,10 @@ public class SettingsDialog extends Dialog {
 	 */
 	private int getTimeFormatIndex() {
 		int index = 0; // relativ
-		String format = this.settings.getTimeFormat().toString().trim();
+		String format = this.settings.getTimeFormat().toString().trim().substring(0, 3);
 		for (; index < this.timeFormatCombo.getItemCount(); index++) {
-			if (this.timeFormatCombo.getItems()[index].trim().equals(format)) return index;
+			if (this.timeFormatCombo.getItems()[index].trim().startsWith(format)) 
+				return index;
 		}
 		return index;
 	}
