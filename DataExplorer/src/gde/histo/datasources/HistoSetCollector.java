@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
+import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
@@ -72,12 +73,12 @@ public final class HistoSetCollector {
 	private final Settings				settings								= Settings.getInstance();
 
 	private HistoSet							histoSet;
-	private int										matchingTrussesCount		= 0;																	// selected by menu settings (eliminated by checks, e.g. device, object and retrospect period)
-	private int										availableTrussesCount		= 0;																	// added to the trailrecordset (empty vaults eliminated, identical vaults eliminated based on setting)
-	private long									fileSizeSum_B						= 0;																	// size of all the histo files which have been read to build the histo recordsets
-	private int										elapsedTime_ms					= 0;																	// total time for rebuilding the HistoSet
+	private int										matchingTrussesCount		= 0;																// selected by menu settings (eliminated by checks, e.g. device, object and retrospect period)
+	private int										availableTrussesCount		= 0;																// added to the trailrecordset (empty vaults eliminated, identical vaults eliminated based on setting)
+	private long									fileSizeSum_B						= 0;																// size of all the histo files which have been read to build the histo recordsets
+	private int										elapsedTime_ms					= 0;																// total time for rebuilding the HistoSet
 
-	private TrailRecordSet				trailRecordSet					= null;																// histo data transformed in a recordset format
+	private TrailRecordSet				trailRecordSet					= null;															// histo data transformed in a recordset format
 
 	public enum LoadProgress {
 		STARTED(2), INITIALIZED(5), SCANNED(11), MATCHED(22), RESTORED(50), LOADED(80), CACHED(97), CONVERTED(99);
@@ -193,15 +194,25 @@ public final class HistoSetCollector {
 				// step: put cached vaults into the histoSet map and reduce workload map
 				int trussJobsSize = trussJobs.size();
 				ProgressManager progress = new ProgressManager(false);
-				this.fileSizeSum_B = this.histoSet.putFullVaults(VaultReaderWriter.loadVaultsFromCache(trussJobs, progress));
+				for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, progress)) {
+					if (!histoVault.isTruss()) {
+						this.histoSet.putVault(histoVault);
+						this.fileSizeSum_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+					}
+				}
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs loaded from cache = %d", trussJobsSize - trussJobs.size())); //$NON-NLS-1$
 
 				// step: transform log files for the truss jobs into vaults and put them into the histoSet map
 				ArrayList<ExtendedVault> newVaults = new ArrayList<>();
 				for (Map.Entry<Path, Map<String, VaultCollector>> pathEntry : trussJobs.entrySet()) {
 					try {
-						newVaults.addAll(VaultReaderWriter.loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue()));
-						this.histoSet.putFullVaults(newVaults);
+						for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue())) {
+							if (!histoVault.isTruss()) {
+								this.histoSet.putVault(histoVault);
+								this.fileSizeSum_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+							}
+							newVaults.add(histoVault);
+						}
 					}
 					catch (Exception e) {
 						throw new UnsupportedOperationException(pathEntry.getKey().toString(), e);
@@ -272,61 +283,68 @@ public final class HistoSetCollector {
 					else {
 						Map<Path, Map<String, VaultCollector>> trussJobs;
 						{
-						long nanoTimeCheckFilesSum = -System.nanoTime();
-						// step: build the workload map consisting of the cache key and the file path
+							long nanoTimeCheckFilesSum = -System.nanoTime();
+							// step: build the workload map consisting of the cache key and the file path
 							trussJobs = getTrusses4Screening(DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
-						nanoTimeCheckFilesSum += System.nanoTime();
+							nanoTimeCheckFilesSum += System.nanoTime();
 							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
 								log.log(Level.TIME, String.format("%,5d trusses        job check          time=%,6d [ms]  ::  per second:%5d", trussesCount, //$NON-NLS-1$
-								TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), trussesCount * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
+										TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), trussesCount * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
 							progress.set(LoadProgress.MATCHED.endPercentage);
 						}
-						long fileSizeSumCached_B;
+						long fileSizeSumCached_B = 0;
 						{// step: put cached vaults into the histoSet map and reduce workload map
-						long nanoTimeReadVaultSum = -System.nanoTime();
-						int tmpHistoSetsSize = this.histoSet.size();
+							long nanoTimeReadVaultSum = -System.nanoTime();
+							int tmpHistoSetsSize = this.histoSet.size();
 							int jobSize = trussJobs.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum();
 							progress.reInit(LoadProgress.RESTORED.endPercentage, jobSize, 1);
-							List<ExtendedVault> vaults = VaultReaderWriter.loadVaultsFromCache(trussJobs, progress);
-							fileSizeSumCached_B = this.fileSizeSum_B = this.histoSet.putFullVaults(vaults);
-						nanoTimeReadVaultSum += System.nanoTime();
-						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum) > 0) log.log(Level.TIME,
+							for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, progress)) {
+								if (!histoVault.isTruss()) {
+									this.histoSet.putVault(histoVault);
+									fileSizeSumCached_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+								}
+							}
+							this.fileSizeSum_B = fileSizeSumCached_B;
+							nanoTimeReadVaultSum += System.nanoTime();
+							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum) > 0) log.log(Level.TIME,
 								String.format("%,5d vaults         load from cache    time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size() - tmpHistoSetsSize, //$NON-NLS-1$
 											TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum), (this.histoSet.size() - tmpHistoSetsSize) * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum),
-										this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
+											this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
 							int realProgress = DataExplorer.application.getProgressPercentage()
 									+ (int) ((LoadProgress.CACHED.endPercentage - DataExplorer.application.getProgressPercentage()) * this.histoSet.size() / (double) (this.histoSet.size() + 10 * jobSize)); // 10 is the estimated processing time ratio between reading from files and reading from cache
 							progress.set(Math.max(LoadProgress.RESTORED.endPercentage, realProgress));
 						}
-						ArrayList<ExtendedVault> newVaults;
+						ArrayList<ExtendedVault> newVaults = new ArrayList<>();
 						{// step: transform log files from workload map into vaults and put them into the histoSet map
-						long nanoTimeReadRecordSetSum = -System.nanoTime();
+							long nanoTimeReadRecordSetSum = -System.nanoTime();
 							int jobSize = trussJobs.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum();
 							progress.reInit(LoadProgress.CACHED.endPercentage, jobSize, 1);
-							newVaults = new ArrayList<>();
-						for (Map.Entry<Path, Map<String, VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
-								List<ExtendedVault> histoVaults = VaultReaderWriter.loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue());
-								this.histoSet.putFullVaults(histoVaults);
-								newVaults.addAll(histoVaults);
-							this.fileSizeSum_B += new File(trussJobsEntry.getKey().toString()).length();
+							for (Map.Entry<Path, Map<String, VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
+								for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue())) {
+									if (!histoVault.isTruss()) {
+										this.histoSet.putVault(histoVault);
+										this.fileSizeSum_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+									}
+									newVaults.add(histoVault);
+								}
 								progress.countInLoop(trussJobsEntry.getValue().size());
-						}
-						nanoTimeReadRecordSetSum += System.nanoTime();
-						if (newVaults.size() > 0) log.log(Level.TIME,
+							}
+							nanoTimeReadRecordSetSum += System.nanoTime();
+							if (newVaults.size() > 0) log.log(Level.TIME,
 								String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
-										TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
-										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
+											TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
+											(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
 						}
 						{// step: save vaults in the file system
-						long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
-						if (newVaults.size() > 0) {
-							cacheSize_B = VaultReaderWriter.storeVaultsInCache(newVaults);
-						}
-						nanoTimeWriteVaultSum += System.nanoTime();
-						if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
+							long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
+							if (newVaults.size() > 0) {
+								cacheSize_B = VaultReaderWriter.storeVaultsInCache(newVaults);
+							}
+							nanoTimeWriteVaultSum += System.nanoTime();
+							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
 								String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
-										TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
-										(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
+											TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
+											(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
 							progress.set(LoadProgress.CACHED.endPercentage);
 						}
 						// step: identify duplicate vaults (origin is duplicated log files with the same contents)
@@ -360,7 +378,7 @@ public final class HistoSetCollector {
 						log.log(Level.TIME,
 								String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size(), //$NON-NLS-1$
 										new Date().getTime() - startTimeFileValid, this.histoSet.size() * 1000 / (new Date().getTime() - startTimeFileValid),
-										this.fileSizeSum_B / 1000 / (new Date().getTime() - startTimeFileValid)));
+										(int) (this.fileSizeSum_B / 1000. / (new Date().getTime() - startTimeFileValid) + .5)));
 					}
 				}
 				{
@@ -392,7 +410,7 @@ public final class HistoSetCollector {
 	private Map<Path, Map<String, VaultCollector>> getTrusses4Screening(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 		final Map<Path, Map<String, VaultCollector>> trusses4Paths = new LinkedHashMap<>();
 		final Map<Long, Set<String>> trusses4Start = new HashMap<Long, Set<String>>();
-		final List<Integer> channelMixConfigNumbers= this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
+		final List<Integer> channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
 		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
 				: GDE.STRING_EMPTY;

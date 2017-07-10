@@ -554,7 +554,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
 			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000;
+			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() + 2) * 1000; // +2 for channel / receiver
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 
@@ -945,7 +945,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.dataBlockSize;
 			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = HoTTAdapter.Sensor.VALUES.length;
+			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() + 2) * 1000; // +2 for channel / receiver
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 

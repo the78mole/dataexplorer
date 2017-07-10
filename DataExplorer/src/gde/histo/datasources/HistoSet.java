@@ -162,29 +162,16 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 	}
 
 	/**
-	 * Add vaults to the histoSet and discard trusses.
-	 * @param vaults in state 'truss' or full vaults
-	 * @return the file length sum for all vaults added to the histoSet
+	 * @param histoVault
 	 */
-	public long putFullVaults(List<ExtendedVault> vaults) {
-		long localSizeSum_B = 0;
-		for (ExtendedVault histoVault : vaults) {
-			if (!histoVault.isTruss()) {
-				putVault(histoVault);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
-						histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
-				localSizeSum_B += Paths.get(histoVault.getLogFilePath()).toFile().length();
-			}
-		}
-		return localSizeSum_B;
-	}
-
-	private void putVault(ExtendedVault histoVault) {
+	public void putVault(ExtendedVault histoVault) {
 		List<ExtendedVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
 		if (timeStampHistoVaults == null) {
 			this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
 		}
 		timeStampHistoVaults.add(histoVault);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
+				histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
 	}
 
 	public void setHistoFilePaths4Test(Path filePath, int subDirLevelMax, TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
@@ -239,8 +226,9 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 	public String getDirectoryScanStatistics() {
 		return Messages.getString(MessageIds.GDE_MSGI0064,
 				new Object[] { String.format("%,d", this.directoryScanner.getDirectoryFilesCount()), String.format("%,d", this.directoryScanner.getSelectedFilesCount()), //
-						String.format("%,d", this.directoryScanner.getSuppressedTrusses().size() +  this.directoryScanner.getUnsuppressedTrusses().size()), String.format("%,d", this.directoryScanner.getUnsuppressedTrusses().size()), //
-						String.format("%,d",  this.histoSetCollector.getMatchingTrussesCount()), String.format("%,d", this.histoSetCollector.getAvailableTrussesCount()), //
+						String.format("%,d", this.directoryScanner.getSuppressedTrusses().size() + this.directoryScanner.getUnsuppressedTrusses().size()),
+						String.format("%,d", this.directoryScanner.getUnsuppressedTrusses().size()), //
+						String.format("%,d", this.histoSetCollector.getMatchingTrussesCount()), String.format("%,d", this.histoSetCollector.getAvailableTrussesCount()), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.) });
 
 	}
