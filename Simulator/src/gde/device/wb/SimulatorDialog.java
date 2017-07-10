@@ -230,7 +230,7 @@ public class SimulatorDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "currentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							//TODO add your code for currentCombo.widgetSelected
+							//add your code for currentCombo.widgetSelected
 						}
 					});
 				}
@@ -259,7 +259,7 @@ public class SimulatorDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							//TODO add your code for voltageCombo.widgetSelected
+							//add your code for voltageCombo.widgetSelected
 						}
 					});
 				}
@@ -315,7 +315,7 @@ public class SimulatorDialog extends DeviceDialog {
 					@Override
 					public void keyReleased(KeyEvent evt) {
 						log.log(Level.FINE, "dialogShell.keyReleased, event=" + evt); //$NON-NLS-1$
-						//TODO add your code for dialogShell.keyReleased
+						//add your code for dialogShell.keyReleased
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {

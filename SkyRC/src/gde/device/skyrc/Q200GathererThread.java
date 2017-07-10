@@ -385,8 +385,8 @@ public class Q200GathererThread extends Thread {
 				Q200GathererThread.log.logp(Level.FINE, Q200GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 				recordSet = channel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
-				//TODO recordSet.get(5).setUnit(device.getTemperatureUnit());
-				//TODO recordSet.get(6).setUnit(device.getTemperatureUnit());
+				//recordSet.get(5).setUnit(device.getTemperatureUnit()); -> actual the temperature unit can not be red from device
+				//recordSet.get(6).setUnit(device.getTemperatureUnit());
 				//channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), processRecordSetKey);

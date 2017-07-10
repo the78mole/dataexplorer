@@ -38,7 +38,7 @@ public class PrepareTranslation {
 	 * 
 	 */
 	public PrepareTranslation() {
-		// TODO Auto-generated constructor stub
+		// empty default constructor
 	}
 
 	/**

@@ -35,7 +35,9 @@ import gde.histo.utils.Quantile.Fixings;
 import gde.histo.utils.Spot;
 import gde.histo.utils.UniversalQuantile;
 
-public class QuantileTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
+public class QuantileTest extends TestSuperClass { 
+	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285 
+	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
 	private final static String	$CLASS_NAME										= QuantileTest.class.getName();
 	private final static Logger	log														= Logger.getLogger($CLASS_NAME);
 

@@ -156,7 +156,6 @@ public class Picolario2LogReader {
 					recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 				}
 
-				//TODO recordSet.setStartTimeStamp(startTimeStamp_ms);
 				if (application.getMenuToolBar() != null) {
 					activeChannel.applyTemplate(recordSetName, false);
 				}

@@ -57,12 +57,10 @@ public final class LocalizedDateTime {
 		mmssSSS(20, "mm:ss.SSS", "mm:ss.SSS'Z'"), //$NON-NLS-1$ //$NON-NLS-2$
 		ssSSS(28, "ss.SSS", "ss.SSS'Z'"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		private final int			displaySequence;
 		private final String	userPattern;
 		private final String	userUtcPattern;
 
 		private DateTimePattern(int displaySequence, String userPattern, String userUtcPattern) {
-			this.displaySequence = displaySequence;
 			this.userPattern = userPattern;
 			this.userUtcPattern = userUtcPattern;
 		}
@@ -103,7 +101,6 @@ public final class LocalizedDateTime {
 		mm_ss_SSS(24, "mm:ss.SSS", "mm:ss.SSS"), //$NON-NLS-1$ //$NON-NLS-2$
 		ss_SSS(28, "ss.SSS", "ss.SSS"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		private final int										displaySequence;
 		private final String								userPattern;
 		private final String								userUtcPattern;
 
@@ -113,7 +110,6 @@ public final class LocalizedDateTime {
 		public static final DurationPattern	VALUES[]	= values();
 
 		private DurationPattern(int displaySequence, String userPattern, String userUtcPattern) {
-			this.displaySequence = displaySequence;
 			this.userPattern = userPattern;
 			this.userUtcPattern = userUtcPattern;
 		}

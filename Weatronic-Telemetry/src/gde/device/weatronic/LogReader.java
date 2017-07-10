@@ -454,7 +454,7 @@ public class LogReader {
 		}
 
 		private void setupMeasurement(final gde.data.Record.DataType dataType, final int channelConfig, final int measurementOrdinal, String name, String unit, boolean isActive, double factor,
-				double offset, boolean isClearStatistics) { //TODO individual statistics required?
+				double offset, boolean isClearStatistics) {
 			++this.realUsedMeasurementCount;
 			MeasurementType gdeMeasurement = LogReader.device.getMeasurement(channelConfig, measurementOrdinal);
 			if (!name.equals(gdeMeasurement.getName())) {
@@ -545,7 +545,7 @@ public class LogReader {
 		}
 
 		private void setupMeasurement(final int channelConfig, final int measurementOrdinal, Measurement measurement, 
-				boolean isClearStatistics) {//TODO individual statistics required?
+				boolean isClearStatistics) {
 			++this.realUsedMeasurementCount;
 			MeasurementType gdeMeasurement = LogReader.device.getMeasurement(channelConfig, measurementOrdinal);
 			if (!measurement.getName().equals(gdeMeasurement.getName())) {
@@ -1088,7 +1088,7 @@ public class LogReader {
 				break;
 			case EVENT: //RecordType.EVENT
 				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("RecordType.EVENT");
-				//TODO structure of record type event is unknown 
+				//structure of record type event is unknown and not included in available specification
 				this.recordEvent = new RecordEvent(buffer);
 				break;
 
@@ -1183,7 +1183,7 @@ public class LogReader {
 					System.arraycopy(LogReader.buf_length, 0, LogReader.buf_log_record, 0, 4);
 					readByteCount += 4;
 					readByteCount += data_in.read(LogReader.buf_log_record, 4, logRecordLength - 4);
-					//TODO CRC check should occur at first
+					//CRC check should occur at first
 					//boolean isOK = Checksum.CRC16CCITT(buf_log_record, 0, buf_log_record.length-2) == DataParser.parse2UnsignedShort(buf_log_record, buf_log_record.length-2);
 					//System.out.println("CRC = " + isOK);
 					timeStamp = DataParser.parse2Long(LogReader.buf_log_record, 4);

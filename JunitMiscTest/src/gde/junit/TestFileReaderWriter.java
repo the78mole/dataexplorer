@@ -1209,24 +1209,19 @@ public class TestFileReaderWriter extends TestSuperClass {
 			fail(e.toString());
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail(e.toString());
 		}
 		catch (NotSupportedFileFormatException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (DataInconsitsentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (DataTypeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (NotSupportedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

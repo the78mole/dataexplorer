@@ -26,7 +26,9 @@ import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.utils.GpsCoordinate;
 
-public class GpsClusterTest extends TestSuperClass { // TODO maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
+public class GpsClusterTest extends TestSuperClass { 
+	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285 
+	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
 	private final static String	$CLASS_NAME	= GpsClusterTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 

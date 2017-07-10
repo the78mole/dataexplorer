@@ -1209,7 +1209,7 @@ public class CurveSelectorContextMenu {
 						else
 							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0005));
 
-						//TODO check, why this is required before zoom operation ?
+						//this is required before zoom operation
 						CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsMode.RESET, false);
 					}
 				}

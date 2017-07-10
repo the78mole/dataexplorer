@@ -1771,8 +1771,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				thread.join();
 			}
 			catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 			for (int i = 0; i < recordDiffRx_dbm.realSize(); ++i) {
@@ -1858,8 +1857,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				thread.join();
 			}
 			catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 			for (int i = 0; i < recordDiffDistance.realSize(); ++i) {

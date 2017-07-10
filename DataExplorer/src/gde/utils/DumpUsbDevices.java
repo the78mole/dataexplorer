@@ -29,6 +29,7 @@ public class DumpUsbDevices {
 	 * @param device
 	 *            The USB device to dump.
 	 */
+	@SuppressWarnings("unchecked")
 	private static void dumpDevice(final UsbDevice device) {
 		// Dump information about the device itself
 		System.out.println(device);

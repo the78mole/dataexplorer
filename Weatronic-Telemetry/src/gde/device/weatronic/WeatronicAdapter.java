@@ -566,25 +566,21 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 
 	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getLovDataByteSize() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		// TODO Auto-generated method stub
-
+		return;
 	}
 }

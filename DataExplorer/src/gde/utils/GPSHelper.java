@@ -425,18 +425,14 @@ public class GPSHelper {
 			//input records
 			Record recordLatitude = recordSet.get(recordOrdinalLatitude);
 			Record recordLongitude = recordSet.get(recordOrdinalLongitude);
-			Record recordDistance = recordSet.get(recordOrdinalDistance);
 			Record recordSpeed = recordSet.get(recordOrdinalSpeed);
-			Record recordTrip = recordOrdinalTrip >= 0 ? recordSet.get(recordOrdinalTrip) : null;
 			int recordSize = recordLatitude.realSize();
 
 			if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData()) {
 				//check GPS latitude and longitude				
-				int indexGPS = 0;
 				int i = 0;
 				for (; i < recordSize; ++i) {
 					if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
-						indexGPS = i;
 						break;
 					}
 				}
@@ -445,32 +441,9 @@ public class GPSHelper {
 				int filterIndexCount = (int) (6000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
 				
 				//find near by visit point
-				int minDistance = recordDistance.get(i);
-				int maxDistance = recordDistance.get(i);
-				int tempDistanceStart = 0;
 				double lapStartTime;
-				int lapStartTrip;
-				
-//				while (i < recordSize-filterIndexCount && ((tempDistanceStart = recordDistance.get(i)) >= maxDistance || recordDistance.get(i+filterIndexCount) >= maxDistance)) {
-//					maxDistance = tempDistanceStart;
-//					++i;
-//				}
-//				log.log(Level.OFF, recordSet.getFormatedTime_sec(i, false) + " maxDistance = " + device.translateValue(recordDistance, maxDistance/1000.0)); //$NON-NLS-1$
-//				i+=filterIndexCount; //time filter to short lap
-//									
-//				minDistance = maxDistance;
-//				int equalCounter = 0;
-//				while (i < recordSize-filterIndexCount && ((tempDistanceStart = recordDistance.get(i)) <= minDistance || recordDistance.get(i+filterIndexCount) <= minDistance)) {
-//					if (minDistance == tempDistanceStart) equalCounter++;
-//					else equalCounter = 0;
-//					minDistance = tempDistanceStart;
-//					++i;
-//				}
-//				log.log(Level.OFF, recordSet.getFormatedTime_sec(i, false) + " minDistance = " + device.translateValue(recordDistance, minDistance/1000.0));//$NON-NLS-1$
-//				i-=equalCounter/2;
-				
+								
 				lapStartTime = recordSet.getTime_ms(i);
-				lapStartTrip = recordTrip != null ? recordTrip.get(i) : 0;
 				
 				//calculate index delta for 12 sec filter time
 				filterIndexCount = (15); //(int) (20000 / (recordSet.getTime_ms(recordSize - 1) / recordSize));
@@ -547,7 +520,6 @@ public class GPSHelper {
 													recordSpeed.get(i)/1000));
 //													(recordTrip != null ? recordTrip.get(i) : 0) - lapStartTrip));//$NON-NLS-1$
 									lapStartTime = recordSet.getTime_ms(i);
-									lapStartTrip = recordTrip != null ? recordTrip.get(i) : 0;
 									i+=filterIndexCount;//time filter to short lap
 									j+=1;
 								}
@@ -570,7 +542,6 @@ public class GPSHelper {
 													recordSpeed.get(i)/1000));
 //													(recordTrip != null ? recordTrip.get(i) : 0) - lapStartTrip));//$NON-NLS-1$
 									lapStartTime = recordSet.getTime_ms(i);
-									lapStartTrip = recordTrip != null ? recordTrip.get(i) : 0;
 									i+=filterIndexCount;//time filter to short lap
 									j+=1;
 								}

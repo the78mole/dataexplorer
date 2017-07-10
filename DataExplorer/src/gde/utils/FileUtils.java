@@ -93,15 +93,21 @@ public class FileUtils {
 	public static void copyFile(File in, File out) throws IOException {
 		FileChannel inChannel = null;
 		FileChannel outChannel = null;
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
 		try {
-			inChannel = new FileInputStream(in).getChannel();
-			outChannel = new FileOutputStream(out).getChannel();
+			fis = new FileInputStream(in);
+			fos = new FileOutputStream(out);
+			inChannel = fis.getChannel();
+			outChannel= fos.getChannel();
 			inChannel.transferTo(0, inChannel.size(), outChannel);
 		}
 		catch (IOException e) {
 			throw e;
 		}
 		finally {
+			if (fis != null) fis.close();
+			if (fos != null) fos.close();
 			if (inChannel != null) inChannel.close();
 			if (outChannel != null) outChannel.close();
 		}

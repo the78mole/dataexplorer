@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import java.text.DecimalFormat;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -85,7 +84,6 @@ public class GraphicsUtils {
 			deltaScaleValue = (maxScaleValue - minScaleValue);
 		}
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("deltaScaleValue = %10.6f - deltaScale = %10.6f", deltaScaleValue, deltaScale));
-		DecimalFormat df = record.getDecimalFormat();
 
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();

@@ -396,7 +396,7 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(Level.FINER, getConfiguration());
 		}
 
-		public void set25Type(int type) { //TODO this is unclear, set only in combination with special configurations
+		public void set25Type(int type) { //this is unclear, set only in combination with special configurations, may be JLog2.5 
 			this.config[25] = GDE.STRING_EMPTY + type;
 			JLog2Configuration.log.log(Level.FINER, getConfiguration());
 		}
@@ -2719,7 +2719,7 @@ public class JLog2Configuration extends Composite {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								JLog2Configuration.log.log(Level.FINEST, "speedSensorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								//TODO configuration.setHV2BecVoltage(speedSensorButton.getSelection() ? 1 : 0);
+								configuration.setHV2BecVoltage(speedSensorButton.getSelection() ? 1 : 0);
 							}
 						});
 					}

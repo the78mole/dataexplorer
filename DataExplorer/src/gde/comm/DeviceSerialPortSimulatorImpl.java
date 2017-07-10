@@ -123,7 +123,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							try {
 								if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
 									fileType = GDE.FILE_ENDING_STAR_OSD;
-									//TODO add implementation to use *.osd files as simulation data input
+									//add implementation to use *.osd files as simulation data input
 								}
 								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
 									fileType = GDE.FILE_ENDING_STAR_LOV;

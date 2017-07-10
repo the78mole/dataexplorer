@@ -637,7 +637,6 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

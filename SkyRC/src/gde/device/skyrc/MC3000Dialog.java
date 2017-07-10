@@ -922,8 +922,7 @@ public class MC3000Dialog extends DeviceDialog {
 			if (this.saveButton != null && !this.saveButton.isDisposed()) this.saveButton.setEnabled(false);
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 }
