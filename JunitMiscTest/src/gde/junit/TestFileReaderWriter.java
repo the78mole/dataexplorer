@@ -646,6 +646,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+							if (fileDeviceName.contains("Weatronic"))
+								continue; //TODO fix Weatronic CSV export
 							System.out.println(fileDeviceName + " working with : " + file);
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
@@ -718,15 +720,13 @@ public class TestFileReaderWriter extends TestSuperClass {
 			for (File file : files) {
 				String filePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 				if (filePath.toLowerCase().endsWith(".osd") && !filePath.contains("Av4ms_FV_x69")) {
-//					if (!filePath.contains("2013-04-13_Cappuccino_BT_Vergleich_PLoss"))
-//						continue;
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
 							if(this.legacyDeviceNames.get(fileDeviceName) != null) 
 								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName); 
-							if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu"))
+							if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu") || fileDeviceName.contains("HoTTAdapterD"))
 								continue;
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
