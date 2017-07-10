@@ -347,8 +347,7 @@ public class OsdReaderWriter {
 					}
 				}
 				if (channel == null) { // 3.rd try channelConfiguration not found
-					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n"
-							+ Messages.getString(MessageIds.GDE_MSGI0020);
+					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n" + Messages.getString(MessageIds.GDE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
 					channel = new Channel(channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
@@ -722,9 +721,10 @@ public class OsdReaderWriter {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
 							sbs[i] = new StringBuilder();
-							sbs[i].append(GDE.RECORD_SET_NAME).append(recordSet.getName()).append(GDE.DATA_DELIMITER).append(GDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getNumber())
-									.append(GDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(GDE.DATA_DELIMITER).append(GDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription())
-									.append(GDE.DATA_DELIMITER).append(GDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(GDE.DATA_DELIMITER);
+							sbs[i].append(GDE.RECORD_SET_NAME).append(recordSet.getName()).append(GDE.DATA_DELIMITER)
+								.append(GDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getNumber()).append(GDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(GDE.DATA_DELIMITER)
+								.append(GDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(GDE.DATA_DELIMITER)
+								.append(GDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(GDE.DATA_DELIMITER);
 							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
 							for (String recordKey : recordSet.getRecordNames()) {
 								sbs[i].append(GDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
@@ -732,8 +732,7 @@ public class OsdReaderWriter {
 							sbs[i].append(GDE.DATA_DELIMITER).append(GDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(GDE.DATA_DELIMITER); //$NON-NLS-1$
 							filePointer += GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
 							filePointer += GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-									"line lenght = " //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE,		"line lenght = " //$NON-NLS-1$
 											+ (GDE.SIZE_BYTES_INTEGER + sbs[i].toString().getBytes("UTF8").length + GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 //$NON-NLS-1$//$NON-NLS-2$
 													+ GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$
 											+ " filePointer = " + filePointer); //$NON-NLS-1$
@@ -1022,7 +1021,9 @@ public class OsdReaderWriter {
 				catch (Exception e) {
 					try {
 						if (data_out != null) data_out.close();
-						if (updatedFile.exists()) if (updatedFile.delete()) log.log(Level.WARNING, "failed to delete " + filePath);
+						if (updatedFile.exists()) 
+							if(updatedFile.delete())
+								log.log(Level.WARNING, "failed to delete " + filePath);
 						if (data_in != null) data_in.close();
 					}
 					catch (IOException e1) {

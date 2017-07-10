@@ -237,6 +237,7 @@ public class TestSuperClass extends TestCase {
 			}
 			this.channels.setChannelNames(channelNames);
 		}
+		this.application.initiateUnitTestEnvironment(activeDevice, this.channels, "");
 	}
 
 	/**
