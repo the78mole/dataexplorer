@@ -43,7 +43,6 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
-import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;

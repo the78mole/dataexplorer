@@ -46,7 +46,6 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
-import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
