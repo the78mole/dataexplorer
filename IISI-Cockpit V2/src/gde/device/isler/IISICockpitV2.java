@@ -298,33 +298,31 @@ public class IISICockpitV2 extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
-		if (true)
-			return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
-		else {
-			try {
-				int index = 0;
-				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-					double offset = record.getOffset(); // != 0 if curve has an defined offset
-					double reduction = record.getReduction();
-					double factor = record.getFactor(); // != 1 if a unit translation is required
-					switch (record.getDataType()) {
-					case GPS_LATITUDE:
-					case GPS_LONGITUDE:
-						dataTableRow[index + 1] = String.format("%02.6f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
-						break;
-
-					default:
-						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-						break;
-					}
-					++index;
-				}
-			}
-			catch (RuntimeException e) {
-				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-			}
-			return dataTableRow;
-		}
+		return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
+		//previous code, replaced by super class generic implementation
+		//			try {
+		//				int index = 0;
+		//				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+		//					double offset = record.getOffset(); // != 0 if curve has an defined offset
+		//					double reduction = record.getReduction();
+		//					double factor = record.getFactor(); // != 1 if a unit translation is required
+		//					switch (record.getDataType()) {
+		//					case GPS_LATITUDE:
+		//					case GPS_LONGITUDE:
+		//						dataTableRow[index + 1] = String.format("%02.6f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
+		//						break;
+		//
+		//					default:
+		//						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+		//						break;
+		//					}
+		//					++index;
+		//				}
+		//			}
+		//			catch (RuntimeException e) {
+		//				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+		//			}
+		//			return dataTableRow;
 	}
 
 	/**

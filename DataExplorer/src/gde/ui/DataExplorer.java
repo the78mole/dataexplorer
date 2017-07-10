@@ -1009,7 +1009,7 @@ public class DataExplorer extends Composite {
 			}
 		});
 		//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
-		if (false) { //todo is there any requirement to clean the table ???
+		if (false) { //TODO -> ET is there any requirement to clean the table ???
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				if (this.histoTableTabItem != null) {
 					this.histoTableTabItem.cleanTable();
