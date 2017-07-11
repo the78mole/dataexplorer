@@ -345,10 +345,7 @@ public class TimeSteps extends Vector<Long> {
 				for (; index < elementCount; index++) {
 					if (value <= this.get(index)) break;
 				}
-				// WBrueg the algorithm sometimes finds the next index (index+1)
-				// this might be better: if (index + 1 <= this.elementCount && value <= (this.get(index) + this.get(index - 1)) / 2) index = index - 1;
-				// ~ O(n/2) complexity compared to getBestIndex O(log n) which makes a difference of some ms elapsed time on ET's machine (this.size = 78808).
-				if (index + 1 <= this.elementCount - 1 && value > (this.get(index + 1) + this.get(index)) / 2) index = index + 1;
+				if (index + 1 <= this.elementCount && value <= (this.get(index) + this.get(index - 1)) / 2) index = index - 1;
 			}
 		}
 		//log.log(Level.INFO, "index=" + index);

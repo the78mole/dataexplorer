@@ -1330,12 +1330,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								}
 								else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
 									HoTTbinReader2.channels.switchChannel(selectedChannel.getName());
-									// WBrueg 2017-06-26 required? selectedChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
 									selectedChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
 								}
 								else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class)) {
 									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
-									// WBrueg 2017-06-26 required? selectedChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
 									selectedChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
 								}
 								else

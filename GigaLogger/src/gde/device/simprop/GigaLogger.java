@@ -264,7 +264,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(Record record) { // todo WBrueg prepareDataTableRow differs from translateValue
+	public boolean isGPSCoordinates(Record record) {
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) {
 			//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 			return true;
