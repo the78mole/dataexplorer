@@ -377,7 +377,7 @@ public final class HistoSetCollector {
 										this.histoSet.size() > 0 ? this.histoSet.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
 						log.log(Level.TIME,
 								String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size(), //$NON-NLS-1$
-										new Date().getTime() - startTimeFileValid, this.histoSet.size() * 1000 / (new Date().getTime() - startTimeFileValid),
+										new Date().getTime() - startTimeFileValid, (int) (this.histoSet.size() * 1000. / (new Date().getTime() - startTimeFileValid) + .5),
 										(int) (this.fileSizeSum_B / 1000. / (new Date().getTime() - startTimeFileValid) + .5)));
 					}
 				}

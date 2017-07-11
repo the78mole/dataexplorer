@@ -67,8 +67,8 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
-import gde.histo.device.HistoRandomSample;
 import gde.histo.device.IHistoDevice;
+import gde.histo.device.UniversalSampler;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -244,7 +244,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	static double								latitudeToleranceFactor				= 90.0;
 	static double								longitudeToleranceFactor			= 25.0;
 
-	protected HistoRandomSample	histoRandomSample;
+	protected UniversalSampler						histoRandomSample;
 
 	/**
 	 * constructor using properties file
@@ -870,8 +870,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (this.histoRandomSample == null) {
 				recordSet.addPoints(points,
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
-			}
-			else if (this.histoRandomSample.isValidSample(points,
+			} else if (this.histoRandomSample.isValidSample(points,
 					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
 				recordSet.addPoints(points,
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
@@ -924,8 +923,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			lastTime = currentTime;
 			if (this.histoRandomSample == null) {
 				recordSet.addPoints(points, intBuffer.get(i) / 10.0);
-			}
-			else if (this.histoRandomSample.isValidSample(points, intBuffer.get(i) / 10)) {
+			} else if (this.histoRandomSample.isValidSample(points, intBuffer.get(i) / 10)) {
 				recordSet.addPoints(points, intBuffer.get(i) / 10.0);
 			}
 			// if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%,11d: points[0..3] %,11d/%,11d/%,11d/%,11d", (int) timeStamp, points[0] , points[1], points[2] , points[3])); //$NON-NLS-1$ // currentTime = System.nanoTime();
@@ -976,7 +974,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points"); //$NON-NLS-1$
 		int recordTimespan_ms = 10;
-		this.histoRandomSample = HistoRandomSample.createHistoRandomSample(channelNumber, maxPoints, minPoints, recordTimespan_ms);
+		this.histoRandomSample = UniversalSampler.createSampler(channelNumber, maxPoints, minPoints, recordTimespan_ms);
 	}
 
 	/**
@@ -1002,8 +1000,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				// add aggregated measurement and settlement points and score points to the truss
 				HoTTbinHistoReader.read(truss);
 				histoVaults.add(truss.getVault());
-			}
-			else
+			} else
 				throw new UnsupportedOperationException("all trusses must carry the same logFilePath"); //$NON-NLS-1$
 		}
 		return histoVaults;
@@ -1022,14 +1019,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
 				if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { // Receiver
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
-				}
-				else {
+				} else {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				++index;
 			}
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			HoTTAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
@@ -1079,8 +1074,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
-		}
-		else {
+		} else {
 			newValue = (value - offset) / factor + reduction;
 		}
 
@@ -1239,8 +1233,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 									if (HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet() == null) {
 										Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();
 										HoTTbinReader.channels.switchChannel(selectedChannel.getName());
-									}
-									else {
+									} else {
 										String recordSetType = HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet().getName().split(Pattern.quote("["))[0].split(Pattern.quote(")"))[1];
 										Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();
 
@@ -1257,8 +1250,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 											}
 											HoTTbinReader.channels.switchChannel(selectedChannel.getName());
 											selectedChannel.switchRecordSet(lastNameMatch);
-										}
-										else {
+										} else {
 											String lastNameMatch = null;
 											for (String tmpName : selectedChannel.getRecordSetNames()) {
 												if (tmpName.contains(recordSetType)) lastNameMatch = tmpName;
@@ -1270,14 +1262,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 									isInitialSwitched = true;
 								}
 								WaitTimer.delay(500);
-							}
-							catch (Exception e) {
+							} catch (Exception e) {
 								HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
-				}
-				finally {
+				} finally {
 					HoTTAdapter.this.application.setPortConnected(false);
 				}
 			}
@@ -1327,28 +1317,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();
 								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
 									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
-								}
-								else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
+								} else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
 									HoTTbinReader2.channels.switchChannel(selectedChannel.getName());
 									selectedChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
-								}
-								else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class)) {
+								} else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class)) {
 									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
 									selectedChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
-								}
-								else
+								} else
 									throw new UnsupportedOperationException();
 								isInitialSwitched = true;
 							}
 
 							WaitTimer.delay(500);
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 						}
 					}
-				}
-				finally {
+				} finally {
 					HoTTAdapter.this.application.setPortConnected(false);
 				}
 			}
@@ -1594,13 +1579,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			Constructor<?> constructor = c.getDeclaredConstructor();
 			if (constructor != null) {
 				constructor.newInstance();
-			}
-			else {
+			} else {
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 				rc = false;
 			}
-		}
-		catch (final Throwable t) {
+		} catch (final Throwable t) {
 			HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
 			rc = false;
 		}
@@ -1614,27 +1597,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		Object inst = null;
 		try {
 			//loading MDLViewer running into trouble since it fails copying Arial.ttf
-      final File fontFile = new File(System.getProperty("java.io.tmpdir"), "Arial.ttf"); //$NON-NLS-1$ //$NON-NLS-2$
-			InputStream is = getClass().getResourceAsStream("/Arial.ttf"); 
+			final File fontFile = new File(System.getProperty("java.io.tmpdir"), "Arial.ttf"); //$NON-NLS-1$ //$NON-NLS-2$
+			InputStream is = getClass().getResourceAsStream("/Arial.ttf");
 			try {
-				if (!fontFile.exists() || fontFile.length() == 0)
-					Files.copy(is, fontFile.getAbsoluteFile().toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-			}
-			catch (final IOException e) {
+				if (!fontFile.exists() || fontFile.length() == 0) Files.copy(is, fontFile.getAbsoluteFile().toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+			} catch (final IOException e) {
 				throw new RuntimeException(e);
-			}
-			finally {
+			} finally {
 				try {
-					if ( is != null) {
-						 is.close();
+					if (is != null) {
+						is.close();
 					}
-				}
-				catch (IOException ioe) {
+				} catch (IOException ioe) {
 					System.out.println("Error while closing stream: " + ioe);
 				}
 			}
 
-      String className = "gde.mdl.ui.MdlTabItem";//$NON-NLS-1$
+			String className = "gde.mdl.ui.MdlTabItem";//$NON-NLS-1$
 			HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
@@ -1655,8 +1634,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 				inst = constructor.newInstance(new Object[] { this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount() });
 			}
-		}
-		catch (final Throwable t) {
+		} catch (final Throwable t) {
 			t.printStackTrace();
 		}
 		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.OFF) && inst != null) HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading TabItem " + ((CTabItem) inst).getText()); //$NON-NLS-1$
@@ -1708,38 +1686,32 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			//				this.filterMinDistDeltaCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 			try {
 				absorptionLevel = Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalSmoothRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// ignore and use intial value
 			}
 			try {
 				filterStartTime = 1000 * Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalDiffRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// ignore and use intial value
 			}
 			try {
 				filterMaxTime = 1000 * Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalSourceRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// ignore and use intial value
 			}
 			try {
 				filterLapMinTime_ms = 1000 * Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalLabsRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// ignore and use intial value
 			}
 			try {
 				filterMinDeltaRxDbm = Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalDiffRx_dbm, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// ignore and use intial value
 			}
 			try {
 				filterMinDeltaDist = Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalDiffDist, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim());
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// ignore and use intial value
 			}
 		}
@@ -1767,8 +1739,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			thread.start();
 			try {
 				thread.join();
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 
@@ -1790,8 +1761,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								if (lapTime != 0) {
 									if (lapCount % 2 == 0) {
 										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
-									}
-									else {
+									} else {
 										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 								}
@@ -1853,8 +1823,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			thread.start();
 			try {
 				thread.join();
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 
@@ -1876,8 +1845,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								if (lapTime != 0) {
 									if (lapCount % 2 == 0) {
 										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "\n%02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
-									}
-									else {
+									} else {
 										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 								}
