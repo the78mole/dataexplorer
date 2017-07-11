@@ -23,11 +23,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import gde.data.RecordSet;
 import gde.device.TransitionGroupType;
-import gde.histo.recordings.TrailRecordFormatter;
 import gde.ui.DataExplorer;
 
 /**
@@ -36,8 +34,6 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class TransitionTableMapper {
-	private final static String	$CLASS_NAME	= TrailRecordFormatter.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * @param index

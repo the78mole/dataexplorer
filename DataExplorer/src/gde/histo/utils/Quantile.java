@@ -43,7 +43,7 @@ import gde.log.Level;
  * this in turn is compensated by the fact that we mostly need 3 quantiles from the same population.
  * @author Thomas Eickert
  */
-@Deprecated // replaced by UniversalQuantile --- reason is spaghetti-like code due to integer, double and 2D-points support  ---  was not deleted for JUnit performance comparisons
+// replaced by UniversalQuantile --- reason is spaghetti-like code due to integer, double and 2D-points support  ---  was not deleted for JUnit performance comparisons
 public class Quantile {
 	private final static String					$CLASS_NAME						= Quantile.class.getName();
 	private final static Logger					log										= Logger.getLogger($CLASS_NAME);
@@ -384,7 +384,6 @@ public class Quantile {
 	 * @param iPopulation
 	 * @param fixings define how to proceed with the data
 	 */
-	@Deprecated
 	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings, boolean obsolete) {
 		this.dPopulation = null;
 		if (iPopulation.isEmpty()) throw new UnsupportedOperationException();
@@ -414,7 +413,6 @@ public class Quantile {
 	 * @param dPopulation
 	 * @param fixings define how to proceed with the data
 	 */
-	@Deprecated
 	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings, boolean obsolete) {
 		this.iPopulation = null;
 		if (dPopulation.isEmpty()) throw new UnsupportedOperationException();
@@ -735,7 +733,7 @@ public class Quantile {
 	/**
 	 * @return the outliers based on the sigmaFactor and the outlierFactor
 	 */
-	public <T> List<T> getOutliers() { // todo split Quantile class into abstract class + specialized classes to avoid unchecked casts
+	public <T> List<T> getOutliers() {
 		if (this.iOutliers != null)
 			return (List<T>) this.iOutliers;
 		else if (this.dOutliers != null)

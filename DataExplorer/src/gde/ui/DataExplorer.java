@@ -1008,24 +1008,6 @@ public class DataExplorer extends Composite {
 				}
 			}
 		});
-		//			if (activeRecordSet == null || requestingRecordSetName.isEmpty()) {
-		if (false) { //TODO -> ET is there any requirement to clean the table ???
-			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-				if (this.histoTableTabItem != null) {
-					this.histoTableTabItem.cleanTable();
-				}
-			}
-			else {
-				GDE.display.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						if (DataExplorer.this.histoTableTabItem != null) {
-							DataExplorer.this.histoTableTabItem.cleanTable();
-						}
-					}
-				});
-			}
-		}
 	}
 
 	/**

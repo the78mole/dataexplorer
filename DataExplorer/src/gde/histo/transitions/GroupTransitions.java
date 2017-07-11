@@ -21,7 +21,6 @@ package gde.histo.transitions;
 
 import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import gde.data.RecordSet;
 
@@ -30,9 +29,7 @@ import gde.data.RecordSet;
  * @author Thomas Eickert (USER)
  */
 public final class GroupTransitions extends HashMap<Integer, TreeMap<Long, Transition>> {
-	private final static String	$CLASS_NAME				= TransitionCollector.class.getName();
 	private static final long		serialVersionUID	= 4194776523408560821L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	private final RecordSet			recordSet;
 	private final int						recordDataSize;

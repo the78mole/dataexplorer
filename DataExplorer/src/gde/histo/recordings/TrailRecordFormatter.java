@@ -21,7 +21,6 @@ package gde.histo.recordings;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Record;
@@ -31,8 +30,6 @@ import gde.data.Record;
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordFormatter {
-	private final static String			$CLASS_NAME	= TrailRecordFormatter.class.getName();
-	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final TrailRecord				trailRecord;
 

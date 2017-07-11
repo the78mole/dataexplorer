@@ -19,15 +19,11 @@
 
 package gde.histo.recordings;
 
-import java.util.logging.Logger;
-
 /**
  * Data points of multiple measurements or lines or curves.
  * @author Thomas Eickert (USER)
  */
 public final class PointArray {
-	private final static String	$CLASS_NAME	= PointArray.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	private int									x;																					// x value of the curve
 	private final Integer[]			y;																					// y values of the curve

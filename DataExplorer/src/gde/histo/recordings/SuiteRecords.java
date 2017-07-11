@@ -20,7 +20,6 @@
 package gde.histo.recordings;
 
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 /**
  * Suite records for trail records.
@@ -29,9 +28,7 @@ import java.util.logging.Logger;
  * @author Thomas Eickert
  */
 public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
-	private final static String	$CLASS_NAME				= SuiteRecords.class.getName();
 	private static final long		serialVersionUID	= -5963216308453730035L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	public SuiteRecords() {
 	}

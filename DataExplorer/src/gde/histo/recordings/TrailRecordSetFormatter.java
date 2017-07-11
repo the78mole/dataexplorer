@@ -21,7 +21,6 @@ package gde.histo.recordings;
 
 import java.util.Properties;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -40,8 +39,6 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordSetFormatter {
-	private final static String		$CLASS_NAME	= TrailRecordFormatter.class.getName();
-	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
 	private final static Settings	settings		= Settings.getInstance();
 	private final static Channels	channels		= Channels.getInstance();

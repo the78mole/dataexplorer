@@ -27,7 +27,6 @@ package gde.histo.utils;
  * 	@param <T> supports numbers
  */
 public final class Spot<T extends Number> implements Comparable<Spot<T>> {
-	private static final long	serialVersionUID	= -5967345515844485297L;
 
 	private final T						x;																				// x coordinate
 	private final T						y;																				// y coordinate

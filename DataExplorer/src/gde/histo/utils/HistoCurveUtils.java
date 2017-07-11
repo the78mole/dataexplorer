@@ -51,7 +51,7 @@ import gde.utils.MathUtils;
  * Support histo curves, suites of curves.
  * @author Thomas Eickert
  */
-public final class HistoCurveUtils { // todo merging with CurveUtils reduces number of classes
+public final class HistoCurveUtils {
 	private final static String		$CLASS_NAME	= HistoTimeLine.class.getName();
 	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
@@ -404,7 +404,7 @@ public final class HistoCurveUtils { // todo merging with CurveUtils reduces num
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
 
 		// sync scales are used for suites (e.g. boxplot) AND synced records
-		trailRecordSet.updateAllSyncScales(); // todo should be better done in case of trail selection
+		trailRecordSet.updateAllSyncScales(); // should be better done in case of trail selection
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();

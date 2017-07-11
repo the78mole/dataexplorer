@@ -22,11 +22,9 @@ package gde.histo.exclusions;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.histo.cache.VaultCollector;
-import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.HistoSet;
 
 /**
@@ -34,8 +32,6 @@ import gde.histo.datasources.HistoSet;
  * @author Thomas Eickert (USER)
  */
 public final class ExclusionFormatter {
-	private final static String								$CLASS_NAME								= DirectoryScanner.class.getName();
-	private final static Logger								log												= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * @return the exclusion information for the trusses excluded from the history

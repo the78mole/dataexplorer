@@ -20,7 +20,6 @@
 package gde.histo.recordings;
 
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -36,8 +35,6 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * @author Thomas Eickert (USER)
  */
 public final class HistoTableMapper {
-	private final static String		$CLASS_NAME	= HistoTableMapper.class.getName();
-	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
 	private final static Settings	settings		= Settings.getInstance();
 

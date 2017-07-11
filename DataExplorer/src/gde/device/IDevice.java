@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device;
@@ -30,12 +30,12 @@ import gde.exception.DataInconsitsentException;
 import gde.utils.CalculationThread;
 
 /**
- * Defines the interface for all device implementations, it also covers some interface methods from 
+ * Defines the interface for all device implementations, it also covers some interface methods from
  * DeviceDialog as well as DeviceSerialPort
  * @author Winfried Brügmann
  */
 public interface IDevice {
-	// define some global constants for data calculation 
+	// define some global constants for data calculation
 	public static final String	OFFSET							= MeasurementPropertyTypes.OFFSET.value();
 	public static final String	FACTOR							= MeasurementPropertyTypes.FACTOR.value();
 	public static final String	REDUCTION						= MeasurementPropertyTypes.REDUCTION.value();
@@ -189,16 +189,16 @@ public interface IDevice {
 	public boolean isUtilityDeviceTabRequested();
 
 	/**
-	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	public CTabItem getUtilityGraphicsTabItem();
 
 	/**
-	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device
 	 * specific specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	public CTabItem getUtilityDeviceTabItem();
 
@@ -336,7 +336,7 @@ public interface IDevice {
 	public void setDataBlockTimeUnit(TimeUnitTypes value);
 
 	/**
-	 * @return query the time factor, needed for CVS 2 serial data parser, time steps are internal used in msec. 
+	 * @return query the time factor, needed for CVS 2 serial data parser, time steps are internal used in msec.
 	 */
 	public int getDataBlockTimeUnitFactor();
 
@@ -440,7 +440,7 @@ public interface IDevice {
 	public List<MeasurementType> getChannelMeasuremtsReplacedNames(int channelConfigNumber);
 
 	/**
-	 * get the properties from a channel/configuration and record key name 
+	 * get the properties from a channel/configuration and record key name
 	 * @param channelConfigNumber
 	 * @param measurementOrdinal
 	 * @return list of properties according measurement
@@ -448,7 +448,7 @@ public interface IDevice {
 	public List<PropertyType> getProperties(int channelConfigNumber, int measurementOrdinal);
 
 	/**
-	 * get the properties from a channel/configuration and record key name 
+	 * get the properties from a channel/configuration and record key name
 	 * @param channelConfigKey
 	 * @param measurementOrdinal
 	 * @return list of properties according measurement
@@ -826,7 +826,7 @@ public interface IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param doUpdateProgressBar
@@ -837,7 +837,7 @@ public interface IDevice {
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
@@ -893,7 +893,7 @@ public interface IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -920,7 +920,7 @@ public interface IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 * as example a file selection dialog could be opened to import serialized ASCII data
 	 */
 	public void open_closeCommPort();
 
@@ -946,7 +946,7 @@ public interface IDevice {
 	public int[] getCellVoltageOrdinals();
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * @return true|false
 	 */
 	public boolean isActualRecordSetWithGpsData();
@@ -984,7 +984,7 @@ public interface IDevice {
 	 *  - all records not calculated may have the active status and must be stored
 	 * @param channelConfigNumber
 	 * @param validMeasurementNames based on the current or any previous configuration
-	 * @return String[] containing record names 
+	 * @return String[] containing record names
 	 */
 	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames);
 
@@ -1019,7 +1019,7 @@ public interface IDevice {
 	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
-	 * @return
+	 * @return true if the record is a latitude or longitude record
 	 */
 	public boolean isGPSCoordinates(Record record);
 
@@ -1049,7 +1049,7 @@ public interface IDevice {
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
-	 * 2 current drop more or equal than 2 measurements 
+	 * 2 current drop more or equal than 2 measurements
 	 */
 	public int getCurrentSmoothIndex();
 
@@ -1069,7 +1069,7 @@ public interface IDevice {
 	public byte getUsbInterface();
 
 	/**
-	 * @return the end point address of the interface to be used for write communication 
+	 * @return the end point address of the interface to be used for write communication
 	 */
 	public byte getUsbEndpointIn();
 
@@ -1079,8 +1079,8 @@ public interface IDevice {
 	public byte getUsbEndpointOut();
 
 	/**
-	 * query if the measurements get build up dynamically while reading (import) the data 
-	 * the implementation must create measurementType while reading the import data, 
+	 * query if the measurements get build up dynamically while reading (import) the data
+	 * the implementation must create measurementType while reading the import data,
 	 * refer to Weatronic-Telemetry implementation DataHeader
 	 * @return true|false, default is false and we have a constant measurement size defined in device XML
 	 */

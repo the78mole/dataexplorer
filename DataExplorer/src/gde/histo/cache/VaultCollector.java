@@ -147,15 +147,12 @@ public final class VaultCollector {
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 			Map<TrailTypes, Integer> trailPoints = new HashMap<>();
 
-			if (record == null) {
-				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("no record found for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
-			}
-			else if (!record.hasReasonableData()) {
+			if (!record.hasReasonableData()) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
 			}
 			else {
 				StatisticsType measurementStatistics = measurementType.getStatistics();
-				if (measurementStatistics != null) { // todo this creates trail types mismatch  :  && record.hasReasonableData()) {
+				if (measurementStatistics != null) { // this creates trail types mismatch  :  && record.hasReasonableData()) {
 					trailPoints.putAll(getTrailStatisticsPoints(record, measurementStatistics, recordSet));
 				}
 				trailPoints.putAll(getTrailPoints(record, isSampled));
@@ -228,7 +225,7 @@ public final class VaultCollector {
 		int triggerRefOrdinal = -1;
 		if (measurementStatistics.getTriggerRefOrdinal() != null) {
 			int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
-			//todo	if (record.isDisplayable()) { the record may be displayable later --- but note that calculating trigger ranges requires displayable true
+			// if (record.isDisplayable()) { the record may be displayable later --- but note that calculating trigger ranges requires displayable true
 			triggerRefOrdinal = tmpOrdinal;
 			//								}
 		}
@@ -371,7 +368,8 @@ public final class VaultCollector {
 				entryPoints.addPoint(TrailTypes.REAL_LAST, histoSettlement.elementAt(histoSettlement.realSize() - 1));
 
 				final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-				final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
+				final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue())
+						: SettlementRecord.OUTLIER_SIGMA_DEFAULT;
 				final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 				final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
 						: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
@@ -449,7 +447,7 @@ public final class VaultCollector {
 		if (!channelMixConfigNumbers.contains(this.vault.logChannelNumber)) {
 			log.log(Level.FINE,
 					String.format("%s candidate for invalid channel  %d '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogChannelNumber(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
-					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+							this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
 		}
 		else
