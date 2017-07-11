@@ -43,6 +43,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	public static final double	BOXPLOT_SIGMA_FACTOR		= 0.674489694;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
+	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 * @see <a href="https://www.google.de/search?q=Tukey+boxplot">Tukey Boxplot</a>
 	 */

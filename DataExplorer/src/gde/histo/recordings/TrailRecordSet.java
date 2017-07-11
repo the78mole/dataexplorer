@@ -53,18 +53,18 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public final class TrailRecordSet extends AbstractRecordSet {
-	private static final String						$CLASS_NAME						= TrailRecordSet.class.getName();
-	private static final long							serialVersionUID			= -1580283867987273535L;
-	private static final Logger						log										= Logger.getLogger($CLASS_NAME);
+	private static final String						$CLASS_NAME					= TrailRecordSet.class.getName();
+	private static final long							serialVersionUID		= -1580283867987273535L;
+	private static final Logger						log									= Logger.getLogger($CLASS_NAME);
 
 	public static final String						BASE_NAME_SEPARATOR	= " | ";
 
 	private final HistoGraphicsTemplate		template;																															// graphics template holds view configuration
 
-	private final List<Integer>						durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final List<Integer>						durations_mm				= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
 
-	private final TrailDataTags						dataTags							= new TrailDataTags();
-	private final TrailRecordSynchronizer	synchronizer					= new TrailRecordSynchronizer(this);
+	private final TrailDataTags						dataTags						= new TrailDataTags();
+	private final TrailRecordSynchronizer	synchronizer				= new TrailRecordSynchronizer(this);
 
 	public enum DisplayTag {
 		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, GPS_LOCATION;
@@ -143,7 +143,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		{// display section 2: all measurements
 			for (int i = 0; i < channelMeasurements.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-				TrailRecord tmpRecord = new TrailRecord(device, i, measurement.getName(), measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY	); // ordinal starts at 0
+				TrailRecord tmpRecord = new TrailRecord(device, i, measurement.getName(), measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY); // ordinal starts at 0
 				newTrailRecordSet.put(measurement.getName(), tmpRecord);
 				tmpRecord.setColorDefaultsAndPosition(i);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added measurement record for " + measurement.getName() + " - " + i); //$NON-NLS-1$ //$NON-NLS-2$
@@ -226,8 +226,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				record.setDisplayable(record.isActive() && record.hasReasonableData());
 				if (record.isVisible() && record.isDisplayable()) //only selected records get displayed
 					this.visibleAndDisplayableRecords.add(record);
-				if (record.isDisplayable()) // only records with reasonable data get displayed
-					this.allRecords.add(record);
+				this.allRecords.add(record);
 			}
 		}
 	}

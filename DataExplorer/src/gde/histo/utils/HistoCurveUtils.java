@@ -408,9 +408,8 @@ public final class HistoCurveUtils {
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
-			if (log.isLoggable(Level.FINE) && isActualRecordEnabled)
-				log.log(Level.FINE, "record=" + actualRecord.getName() + "  isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE) && isActualRecordEnabled) log.log(Level.FINE, String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", actualRecord.getName(), //$NON-NLS-1$
+					actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
 			if (actualRecord.isScaleVisible())
 				HistoCurveUtils.drawHistoScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
