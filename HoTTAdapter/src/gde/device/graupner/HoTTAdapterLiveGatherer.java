@@ -569,7 +569,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 
 				if (++measurementCount % 5 == 0) {
 					for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
-						System.out.println("update recordSet = " + recordSet.getName());
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 				}

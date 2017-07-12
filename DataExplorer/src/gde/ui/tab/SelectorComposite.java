@@ -169,7 +169,7 @@ public class SelectorComposite extends Composite {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (SelectorComposite.log.isLoggable(Level.FINEST)) SelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
-					if (evt != null && evt.item != null) {
+					if (evt != null && evt.item != null && !evt.item.isDisposed()) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
 						SelectorComposite.this.application.updateAllTabs(true, false);
 					}
