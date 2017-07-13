@@ -59,9 +59,10 @@ History analysis
 			- delete it permanently (e.g. unintentional recordings)
 	- user interface enhancements
 		- identify the source files via x-axis tool tips showing the filename
-		- show the GPS location an a human readable text in the history table
 		- show source directories in the graphics header tooltip
 		- enhance smart statistics (quantiles, boxplots) and outlier identification
+		- show the GPS location in a human readable text in the history table
+		  (requires internet access)
 	- minor enhancements
 		- support print and screen capturing
 		- integrate files from subdirectories (maximum directory level setting) 
