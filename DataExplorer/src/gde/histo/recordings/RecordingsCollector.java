@@ -96,7 +96,7 @@ public final class RecordingsCollector {
 			}
 		}
 		trailRecordSet.syncScaleOfSyncableRecords();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, trailRecord.getName() + " " + trailRecord.getTrailSelector().getTrailText());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, " " + trailRecord.getTrailSelector());
 	}
 
 	/**
@@ -105,18 +105,17 @@ public final class RecordingsCollector {
 	 * @param histoVault
 	 */
 	private static void addVault(ExtendedVault histoVault, TrailRecord trailRecord) {
-		if (!trailRecord.getTrailSelector().isTrailSuite()) {
-			trailRecord.addElement(histoVault.getPoint(trailRecord, trailRecord.getTrailSelector().getTrailType()));
-		}
-		else {
-			TrailTypes suiteTrailType = trailRecord.getTrailSelector().getTrailType();
+		TrailSelector trailSelector = trailRecord.getTrailSelector();
+		if (!trailSelector.isTrailSuite()) {
+			trailRecord.addElement(histoVault.getPoint(trailRecord, trailSelector.getTrailType()));
+		} else {
+			TrailTypes suiteTrailType = trailSelector.getTrailType();
 			if (!suiteTrailType.isRangePlot()) {
 				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
 				for (int i = 0; i < suiteTrailType.getSuiteMembers().size(); i++) {
 					suiteRecords.get(i).addElement(histoVault.getPoint(trailRecord, suiteTrailType.getSuiteMembers().get(i)));
 				}
-			}
-			else {
+			} else {
 				int tmpSummationFactor = 0;
 				int masterPoint = 0; // this is the base value for adding or subtracting standard deviations
 
@@ -125,8 +124,7 @@ public final class RecordingsCollector {
 					Integer point = histoVault.getPoint(trailRecord, suiteTrailType.getSuiteMembers().get(i));
 					if (point == null) {
 						suiteRecords.get(i).addElement(null);
-					}
-					else {
+					} else {
 						tmpSummationFactor = getSummationFactor(suiteTrailType.getSuiteMembers().get(i), tmpSummationFactor);
 						if (tmpSummationFactor == 0)
 							masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
@@ -136,11 +134,11 @@ public final class RecordingsCollector {
 						suiteRecords.get(i).addElement(point);
 					}
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
-							trailRecord.getTrailSelector().getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
+							trailSelector.getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, trailRecord.getName() + " " + trailRecord.getTrailSelector().getTrailText());
+		log.log(Level.FINER, " " , trailSelector);
 	}
 
 	/**
@@ -152,8 +150,7 @@ public final class RecordingsCollector {
 	private static int getSummationFactor(TrailTypes trailType, int previousFactor) {
 		if (trailType.isForSummation()) {
 			return previousFactor == 0 ? -1 : previousFactor * -1;
-		}
-		else {
+		} else {
 			return 0;
 		}
 	}
@@ -194,8 +191,7 @@ public final class RecordingsCollector {
 				Thread gpsLocationsThread = new Thread((Runnable) () -> setGpsLocationTags(gpsCluster, trailRecordSet), "setGpsLocationTags"); //$NON-NLS-1$
 				try {
 					gpsLocationsThread.start();
-				}
-				catch (RuntimeException e) {
+				} catch (RuntimeException e) {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
 			}
@@ -230,7 +226,7 @@ public final class RecordingsCollector {
 		for (String trailRecordName : trailRecordNames) {
 			TrailRecord trailRecord = ((TrailRecord) trailRecordSet.get(trailRecordName));
 			trailRecord.getTrailSelector().setApplicableTrailTypes();
-			applyTemplateTrailData(trailRecordSet, trailRecord);
+			applyTemplateTrailData(trailRecord);
 		}
 	}
 
@@ -240,23 +236,28 @@ public final class RecordingsCollector {
 	 * Take the prioritized trail type from applicable trails if no template setting is available.
 	 * @param record
 	 */
-	private static void applyTemplateTrailData(TrailRecordSet trailRecordSet, TrailRecord record) {
-		int recordOrdinal = record.getOrdinal();
-		HistoGraphicsTemplate template = trailRecordSet.getTemplate();
-		boolean isValidTemplate = template != null && template.isAvailable();
-		// histo properties
-		if (isValidTemplate && template.getProperty(recordOrdinal + TrailRecord.TRAIL_TEXT_ORDINAL) != null) {
-			record.getTrailSelector().setTrailTextSelectedIndex(Integer.parseInt(template.getProperty(recordOrdinal + TrailRecord.TRAIL_TEXT_ORDINAL)));
+	private static void applyTemplateTrailData(TrailRecord record) {
+		HistoGraphicsTemplate template = record.getParentTrail().getTemplate();
+		TrailSelector trailSelector = record.getTrailSelector();
+		if (template != null && template.isAvailable()) {
+			String property = template.getProperty(record.getOrdinal() + TrailRecord.TRAIL_TEXT_ORDINAL);
+			if (property != null) {
+				int propertyValue = Integer.parseInt(property);
+				if (propertyValue >= 0 && propertyValue < trailSelector.getApplicableTrailsTexts().size()) {
+					trailSelector.setTrailTextSelectedIndex(propertyValue);
+				} else { // the property value points to a trail which does not exist
+					trailSelector.setMostApplicableTrailTextOrdinal();
+				}
+			} else { // the property might miss because of a new measurement / settlement
+				trailSelector.setMostApplicableTrailTextOrdinal();
+			}
+		} else {
+			trailSelector.setMostApplicableTrailTextOrdinal();
 		}
-		else { // the template is not a histo template or the property is a new measurement / settlement
-			record.getTrailSelector().setMostApplicableTrailTextOrdinal();
-		}
-		if (record.getTrailSelector().getTrailTextSelectedIndex() < 0) {
+		if (trailSelector.getTrailTextSelectedIndex() < 0) {
 			log.log(Level.INFO, String.format("%s : no trail types identified", record.getName())); //$NON-NLS-1$
-		}
-		else {
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, String.format("%s : selected trail type=%s ordinal=%d", record.getName(), record.getTrailSelector().getTrailText(), record.getTrailSelector().getTrailTextSelectedIndex())); //$NON-NLS-1$
+		} else {
+			log.log(Level.FINER, "", trailSelector); //$NON-NLS-1$
 		}
 	}
 

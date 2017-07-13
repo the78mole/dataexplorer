@@ -64,6 +64,11 @@ public final class TrailSelector {
 		this.scoreGroupType = trailRecord.getScoregroup();
 	}
 
+	@Override
+	public String toString() {
+		return String.format("selected trail for %22s type='%-11s' ordinal=%d", this.trailRecord.getName(), this.getTrailText(), this.getTrailTextSelectedIndex()); //$NON-NLS-1$
+	}
+
 	/**
 	 * Select the most prioritized trail from the applicable trails.
 	 */
