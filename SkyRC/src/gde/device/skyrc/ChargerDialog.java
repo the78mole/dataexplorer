@@ -21,13 +21,10 @@ package gde.device.skyrc;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -35,11 +32,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.comm.IDeviceCommPort;
@@ -62,8 +59,8 @@ public class ChargerDialog extends DeviceDialog {
 	Button												closeButton;
 
 	Composite											boundsComposite;
-	CLabel												infoText;
-	CLabel 												infoText2;
+	Text													infoText;
+	Text 													infoText2;
 
 	final IDevice									device;						// get device specific things, get serial port, ...
 	final IDeviceCommPort					comPort;				// open/close port execute getData()....
@@ -137,35 +134,29 @@ public class ChargerDialog extends DeviceDialog {
 					});
 					{
 						FormData infoTextLData = new FormData();
-						infoTextLData.height = 50;
-						infoTextLData.left = new FormAttachment(0, 1000, 12);
-						infoTextLData.top = new FormAttachment(0, 1000, 20);
-						infoTextLData.right = new FormAttachment(1000, 1000, -12);
-						this.infoText = new CLabel(this.boundsComposite, SWT.SHADOW_IN | SWT.CENTER | SWT.EMBEDDED);
+						infoTextLData.height = 120;
+						infoTextLData.left = new FormAttachment(0, 1000, 5);
+						infoTextLData.top = new FormAttachment(0, 1000, 10);
+						infoTextLData.right = new FormAttachment(1000, 1000, -5);
+						this.infoText = new Text(this.boundsComposite, SWT.MULTI | SWT.WRAP | SWT.LEFT);
 						this.infoText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText(Messages.getString(MessageIds.GDE_MSGT3690));
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-						this.infoText.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+						this.infoText.setEditable(false);
 					}
 					{
 						FormData configGroupLData = new FormData();
-						configGroupLData.height = 80;
-						configGroupLData.left = new FormAttachment(0, 1000, 12);
-						configGroupLData.top = new FormAttachment(0, 1000, 90);
-						configGroupLData.right = new FormAttachment(1000, 1000, -12);
-						this.infoText2 = new CLabel(this.boundsComposite, SWT.CENTER);
-						RowLayout configGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+						configGroupLData.height = 40;
+						configGroupLData.left = new FormAttachment(0, 1000, 5);
+						configGroupLData.top = new FormAttachment(0, 1000, 140);
+						configGroupLData.right = new FormAttachment(1000, 1000, -5);
+						this.infoText2 = new Text(this.boundsComposite, SWT.MULTI | SWT.WRAP | SWT.LEFT);
 						this.infoText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.infoText2.setLayout(configGroupLayout);
 						this.infoText2.setLayoutData(configGroupLData);
 						this.infoText2.setText(Messages.getString(MessageIds.GDE_MSGT3691));
-						this.infoText2.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent evt) {
-								ChargerDialog.log.log(Level.FINEST, "configGroup.paintControl, event=" + evt); //$NON-NLS-1$
-							}
-						});
-						this.infoText2.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+						this.infoText2.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+						this.infoText2.setEditable(false);
 					}
 					{
 						FormData closeButtonLData = new FormData();
@@ -186,24 +177,6 @@ public class ChargerDialog extends DeviceDialog {
 						});
 						this.closeButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
-					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
-						@Override
-						public void mouseEnter(MouseEvent evt) {
-							ChargerDialog.log.log(Level.FINE, "boundsComposite.mouseEnter, event=" + evt); //$NON-NLS-1$
-							fadeOutAplhaBlending(evt, ChargerDialog.this.boundsComposite.getSize(), 10, 10, 10, 15);
-						}
-
-						@Override
-						public void mouseHover(MouseEvent evt) {
-							ChargerDialog.log.log(Level.FINEST, "boundsComposite.mouseHover, event=" + evt); //$NON-NLS-1$
-						}
-
-						@Override
-						public void mouseExit(MouseEvent evt) {
-							ChargerDialog.log.log(Level.FINE, "boundsComposite.mouseExit, event=" + evt); //$NON-NLS-1$
-							fadeInAlpaBlending(evt, ChargerDialog.this.boundsComposite.getSize(), 10, 10, -10, 15);
-						}
-					});
 				} // end boundsComposite
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.open();
