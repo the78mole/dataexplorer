@@ -403,8 +403,7 @@ public class Record extends Vector<Integer> {
 			for (int i = dataIndex; i < record.realSize(); i++) {
 				this.add(record.realGet(i).intValue());
 			}
-		}
-		else {
+		} else {
 			for (int i = 0; i < dataIndex; i++) {
 				this.add(record.realGet(i).intValue());
 			}
@@ -412,11 +411,9 @@ public class Record extends Vector<Integer> {
 
 		if (record.timeStep_ms != null && !record.timeStep_ms.isConstant) { //time step vector must be updated as well
 			this.timeStep_ms = record.timeStep_ms.clone(dataIndex, isFromBegin);
-		}
-		else if (record.timeStep_ms != null && record.timeStep_ms.isConstant) {
+		} else if (record.timeStep_ms != null && record.timeStep_ms.isConstant) {
 			this.timeStep_ms = record.timeStep_ms.clone();
-		}
-		else {
+		} else {
 			this.timeStep_ms = null; //refer to parent time steps
 		}
 
@@ -529,8 +526,7 @@ public class Record extends Vector<Integer> {
 		// set position defaults
 		if (recordOrdinal % 2 == 0) {
 			this.setPositionLeft(true); //position left
-		}
-		else {
+		} else {
 			this.setPositionLeft(false); // position right
 		}
 	}
@@ -553,8 +549,7 @@ public class Record extends Vector<Integer> {
 		final String $METHOD_NAME = "add"; //$NON-NLS-1$
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
-		}
-		else {
+		} else {
 			if (point > this.maxValue)
 				this.maxValue = point;
 			else if (point < this.minValue) this.minValue = point;
@@ -574,8 +569,7 @@ public class Record extends Vector<Integer> {
 						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
 					}
 					this.dropEndIndex = index + ((index - this.dropStartIndex) + 1);
-				}
-				else { // normal data point
+				} else { // normal data point
 					if (index >= this.dropEndIndex && this.dropStartIndex != 0) {
 						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, this.dropEndIndex });
 						this.dropStartIndex = 0;
@@ -591,21 +585,18 @@ public class Record extends Vector<Integer> {
 				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
 					if (this.dropStartIndex == 0) {
 						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
-					}
-					else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
+					} else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
 						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
 						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
 						this.dropIndexWritten = true;
 					}
 					this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
-				}
-				else { // normal data point
+				} else { // normal data point
 					if (index > this.dropEndIndex && this.dropStartIndex != 0) {
 						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, this.dropEndIndex });
 						this.dropStartIndex = 0;
 						this.dropIndexWritten = true;
-					}
-					else if (this.dropStartIndex != 0) {
+					} else if (this.dropStartIndex != 0) {
 						this.dropIndexWritten = false;
 					}
 				}
@@ -620,8 +611,7 @@ public class Record extends Vector<Integer> {
 		final String $METHOD_NAME = "set"; //$NON-NLS-1$
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
-		}
-		else {
+		} else {
 			if (point > this.maxValue)
 				this.maxValue = point;
 			else if (point < this.minValue) this.minValue = point;
@@ -647,9 +637,8 @@ public class Record extends Vector<Integer> {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
 		HashMap<Integer, Vector<Record>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
 		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
-			sb.append(GDE.STRING_BLANK)
-					.append(
-							syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR)
+			sb.append(GDE.STRING_BLANK).append(
+					syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR)
 					.append(GDE.STRING_DOT);
 			sb.append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
@@ -657,8 +646,7 @@ public class Record extends Vector<Integer> {
 				if (tmpRecord.isDisplayable && tmpRecord.realSize() > 1) trailer = tmpRecord.name;
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
-		}
-		else {
+		} else {
 			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().name);
 		}
 		return sb.toString();
@@ -746,8 +734,7 @@ public class Record extends Vector<Integer> {
 		else
 			try {
 				value = this.getDevice().getMeasurementFactor(this.getAbstractParent().parent.number, this.ordinal);
-			}
-			catch (RuntimeException e) {
+			} catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
 			}
 		return value;
@@ -769,8 +756,7 @@ public class Record extends Vector<Integer> {
 		else
 			try {
 				value = this.getDevice().getMeasurementOffset(this.getAbstractParent().parent.number, this.ordinal);
-			}
-			catch (RuntimeException e) {
+			} catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
 			}
 		return value;
@@ -793,8 +779,7 @@ public class Record extends Vector<Integer> {
 			try {
 				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.getAbstractParent().parent.number, this.ordinal, IDevice.REDUCTION);
 				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
-			}
-			catch (RuntimeException e) {
+			} catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
 			}
 		}
@@ -884,21 +869,18 @@ public class Record extends Vector<Integer> {
 									this.minValueTriggered = this.maxValueTriggered = point;
 								}
 								this.tmpTriggerRange = new TriggerRange(i);
-							}
-							else {
+							} else {
 								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
 								if (point < this.minValueTriggered) this.minValueTriggered = point;
 							}
-						}
-						else {
+						} else {
 							if (this.triggerRanges != null && this.tmpTriggerRange != null) {
 								this.tmpTriggerRange.setOut(i);
 								this.triggerRanges.add(this.tmpTriggerRange);
 								this.tmpTriggerRange = null;
 							}
 						}
-					}
-					else { // point value must below trigger level
+					} else { // point value must below trigger level
 						if (point < deviceTriggerlevel) {
 							if (this.tmpTriggerRange == null) {
 								if (this.triggerRanges == null) {
@@ -906,13 +888,11 @@ public class Record extends Vector<Integer> {
 									this.minValueTriggered = this.maxValueTriggered = point;
 								}
 								this.tmpTriggerRange = new TriggerRange(i);
-							}
-							else {
+							} else {
 								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
 								if (point < this.minValueTriggered) this.minValueTriggered = point;
 							}
-						}
-						else {
+						} else {
 							if (this.triggerRanges != null) {
 								this.tmpTriggerRange.setOut(i);
 								this.triggerRanges.add(this.tmpTriggerRange);
@@ -928,8 +908,7 @@ public class Record extends Vector<Integer> {
 						log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + "), " + range.out + "(" //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 								+ TimeLine.getFomatedTime(this.getTime_ms(range.out)) + ")"); //$NON-NLS-1$
 					}
-				}
-				else
+				} else
 					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 			}
 			if (this.triggerRanges != null) {
@@ -944,8 +923,7 @@ public class Record extends Vector<Integer> {
 						log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + "), " + range.out + "(" //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 								+ TimeLine.getFomatedTime(this.getTime_ms(range.in)) + ")"); //$NON-NLS-1$
 					}
-				}
-				else
+				} else
 					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 			}
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1036,13 +1014,11 @@ public class Record extends Vector<Integer> {
 			index = index + this.zoomOffset;
 			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
-		}
-		else if (this.parent.isScopeMode) {
+		} else if (this.parent.isScopeMode) {
 			index = index + this.parent.scopeModeOffset;
 			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
-		}
-		else {
+		} else {
 			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
 		}
@@ -1088,9 +1064,8 @@ public class Record extends Vector<Integer> {
 	public Integer realGet(int index) {
 		try {
 			return super.size() != 0 ? super.get(index) : 0;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			log.log(Level.WARNING, String.format("%s - %20s: size = %d - indesx = %d", this.parent.name, this.name, this.size(), index));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			log.log(Level.WARNING, String.format("%s - %20s: size = %d - indesx = %d", this.parent.name, this.name, super.size(), index));
 			return super.size() != 0 ? super.get(index - 1) : 0;
 		}
 	}
@@ -1160,8 +1135,7 @@ public class Record extends Vector<Integer> {
 		if (enabled) {
 			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
 			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
-		}
-		else {
+		} else {
 			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1) this.channelConfigKey = this.parent.getChannelConfigName();
 			this.maxScaleValue = this.parent.getDevice().translateValue(this, this.maxValue / 1000.0);
 			this.minScaleValue = this.parent.getDevice().translateValue(this, this.minValue / 1000.0);
@@ -1218,16 +1192,14 @@ public class Record extends Vector<Integer> {
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
-			}
-			else if (maxValueAbs < 500) {
+			} else if (maxValueAbs < 500) {
 				if (delta <= 0.1)
 					this.df.applyPattern("0.00"); //$NON-NLS-1$
 				else if (delta <= 1)
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					this.df.applyPattern("0"); //$NON-NLS-1$
-			}
-			else {
+			} else {
 				if (delta <= 5)
 					this.df.applyPattern("0.0"); //$NON-NLS-1$
 				else
@@ -1295,7 +1267,7 @@ public class Record extends Vector<Integer> {
 	 * @return the isActive
 	 */
 	public boolean isActive() {
-		return this.isActive == null || this.size() == 0 ? false : this.isActive;
+		return this.isActive == null || super.size() == 0 ? false : this.isActive;
 	}
 
 	/**
@@ -1341,12 +1313,10 @@ public class Record extends Vector<Integer> {
 	public double getTime_ms(int index) {
 		if (this.parent.isZoomMode) {
 			return (this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index + this.zoomOffset) : this.timeStep_ms.getTime_ms(index + this.zoomOffset)) - this.zoomTimeOffset;
-		}
-		else if (this.parent.isScopeMode) {
+		} else if (this.parent.isScopeMode) {
 			return this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index + this.parent.scopeModeOffset) - this.parent.timeStep_ms.getTime_ms(this.parent.scopeModeOffset)
 					: this.timeStep_ms.getTime_ms(index + this.parent.scopeModeOffset) - this.timeStep_ms.getTime_ms(this.parent.scopeModeOffset);
-		}
-		else
+		} else
 			return this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index) : this.timeStep_ms.getTime_ms(index);
 	}
 
@@ -1430,13 +1400,11 @@ public class Record extends Vector<Integer> {
 		if (this.parent.isScopeMode) {
 			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || this.parent.timeStep_ms.isConstant) {
 				timeOffset_ms = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount - this.parent.scopeModeSize) / 10.0;
-			}
-			else {
+			} else {
 				timeOffset_ms = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(this.elementCount - this.parent.scopeModeSize)
 						: this.parent.timeStep_ms.getTime_ms(this.elementCount - this.parent.scopeModeSize);
 			}
-		}
-		else if (this.parent.isZoomMode) {
+		} else if (this.parent.isZoomMode) {
 			timeOffset_ms = this.zoomTimeOffset;
 		}
 		return timeOffset_ms;
@@ -1450,17 +1418,14 @@ public class Record extends Vector<Integer> {
 			if (this.parent.isScopeMode) {
 				if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
 					this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * this.parent.scopeModeSize / 10.0;
-				}
-				else {
+				} else {
 					this.drawTimeWidth = this.timeStep_ms != null ? this.timeStep_ms.getDeltaTime(this.elementCount - 1 - this.parent.scopeModeSize, this.elementCount - 1)
 							: this.parent.timeStep_ms.getDeltaTime(this.elementCount - 1 - this.parent.scopeModeSize, this.elementCount - 1);
 				}
-			}
-			else if (!this.parent.isZoomMode) { // normal not manipulated view
+			} else if (!this.parent.isZoomMode) { // normal not manipulated view
 				if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
 					this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount - 1) / 10.0;
-				}
-				else {
+				} else {
 					this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.lastElement() : this.parent.timeStep_ms.lastElement()) / 10.0;
 				}
 			}
@@ -1554,8 +1519,7 @@ public class Record extends Vector<Integer> {
 				return this.elementAt(index) != null ? StringHelper.getFormatedWithMinutes("%2d %04.1f", this.device.translateValue(this, this.elementAt(index) / 1000.)).trim() : GDE.STRING_STAR; //$NON-NLS-1$
 			else
 				return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
-		}
-		else
+		} else
 			return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
 	}
 
@@ -1569,8 +1533,7 @@ public class Record extends Vector<Integer> {
 				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
 			else
 				return this.getDecimalFormat().format(finalValue);
-		}
-		else
+		} else
 			return this.getDecimalFormat().format(finalValue);
 	}
 
@@ -1584,12 +1547,10 @@ public class Record extends Vector<Integer> {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
 			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
 				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
-			}
-			else {
+			} else {
 				formattedValue = String.format("%8.6f", this.device.translateValue(this, value)); //$NON-NLS-1$
 			}
-		}
-		else {
+		} else {
 			formattedValue = this.getDecimalFormat().format(this.device.translateValue(this, value));
 		}
 		return formattedValue;
@@ -1612,12 +1573,10 @@ public class Record extends Vector<Integer> {
 		if (this.device.isGPSCoordinates(this)) {
 			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
 				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
-			}
-			else {
+			} else {
 				formattedValue = String.format("%8.6f", this.device.translateValue(this, value)); //$NON-NLS-1$
 			}
-		}
-		else {
+		} else {
 			formattedValue = this.getDecimalFormat().format(this.device.translateValue(this, value));
 		}
 		return formattedValue;
@@ -1678,8 +1637,7 @@ public class Record extends Vector<Integer> {
 					if (indexs[0] == indexs[1]) {
 						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
 								- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
-					}
-					else {
+					} else {
 						int grad1 = this.get(indexs[1]) / 1000000;
 						double deltaValueY = (grad1 + ((this.get(indexs[1]) / 1000000.0 - grad1) / 0.60)) - (grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60));
 						double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0])
@@ -1691,21 +1649,18 @@ public class Record extends Vector<Integer> {
 										- (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)
 								.intValue();
 					}
-				}
-				else {
+				} else {
 					if (indexs[0] == indexs[1]) {
 						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue))
 								.intValue();
-					}
-					else {
+					} else {
 						int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
 						double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0])
 								: this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
 						double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						pointPosY = Double
-								.valueOf(this.parent.drawAreaBounds.height
-										- (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
+								- (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)
 								.intValue();
 					}
 				}
@@ -1717,8 +1672,7 @@ public class Record extends Vector<Integer> {
 			//			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
 			//		if(pointPosY < 0)
 			//			log.log(Level.WARNING, "pointPosY < 0");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage() + " xPos = " + xPos, e); //$NON-NLS-1$
 		}
 		return pointPosY > this.parent.drawAreaBounds.height ? this.parent.drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
@@ -1791,8 +1745,6 @@ public class Record extends Vector<Integer> {
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / this.parent.drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / this.parent.drawAreaBounds.height;
-		//double timeDelta = (1.0 * points.x * this.size() - 1) / drawAreaBounds.width * this.getTimeStep_ms() / 1000; //sec
-		//this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
 		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; //sec
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
@@ -1861,8 +1813,7 @@ public class Record extends Vector<Integer> {
 	public void setMinDisplayValue(double newMinDisplayValue) {
 		if (this.device.isGPSCoordinates(this)) {
 			this.minDisplayValue = this.device.translateValue(this, newMinDisplayValue) * 1000;
-		}
-		else
+		} else
 			this.minDisplayValue = newMinDisplayValue;
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this)) {
@@ -1878,8 +1829,7 @@ public class Record extends Vector<Integer> {
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
 		if (this.device.isGPSCoordinates(this)) {
 			this.maxDisplayValue = this.device.translateValue(this, newMaxDisplayValue) * 1000;
-		}
-		else
+		} else
 			this.maxDisplayValue = newMaxDisplayValue;
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this)) {
@@ -2071,8 +2021,8 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_POSITION_LEFT);
 		if (tmpValue != null && tmpValue.length() > 0) this.isPositionLeft = Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
-		if (tmpValue != null && tmpValue.length() >= 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]),
-				Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
+		if (tmpValue != null && tmpValue.length() >= 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]),
+				Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
 		tmpValue = recordProps.get(LINE_WITH);
 		if (tmpValue != null && tmpValue.length() > 0) this.lineWidth = Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(LINE_STYLE);
@@ -2096,8 +2046,7 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(DATA_TYPE);
 		if (tmpValue != null && tmpValue.length() > 0) try {
 			this.dataType = Record.DataType.fromValue(tmpValue);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			if (tmpValue.startsWith("GPS") && tmpValue.endsWith("degree")) this.dataType = Record.DataType.fromValue(tmpValue.substring(0, tmpValue.lastIndexOf(GDE.STRING_BLANK)));
 		}
 
@@ -2206,18 +2155,17 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setAvgValue() {
 		synchronized (this) {
-			if (this.size() > 0) {
+			if (super.size() > 0) {
 				long sum = 0;
 				int zeroCount = 0;
 				for (Integer xi : this) { // ET loops over all elements of the vector
 					if (xi != null && xi != 0) {
 						sum += xi;
-					}
-					else {
+					} else {
 						zeroCount++;
 					}
 				}
-				this.avgValue = (this.realSize() - zeroCount) != 0 ? Long.valueOf(sum / (this.realSize() - zeroCount)).intValue() : 0; // ET realSize corresponds to the looped elements
+				this.avgValue = (super.size() - zeroCount) != 0 ? Long.valueOf(sum / (super.size() - zeroCount)).intValue() : 0; // ET realSize corresponds to the looped elements
 			}
 		}
 	}
@@ -2297,12 +2245,11 @@ public class Record extends Vector<Integer> {
 				for (Integer xi : this) { // ET loops over all elements of the vector
 					if (xi != null && xi != 0) { // sigma is based on the same population as avg
 						sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
-					}
-					else {
+					} else {
 						zeroCount++;
 					}
 				}
-				this.sigmaValue = (this.realSize() - zeroCount - 1) != 0 ? Double.valueOf(Math.sqrt(sumPoweredValues / (this.realSize() - zeroCount - 1)) * 1000).intValue() : 0; // ET realSize corresponds to the looped elements
+				this.sigmaValue = (super.size() - zeroCount - 1) != 0 ? Double.valueOf(Math.sqrt(sumPoweredValues / (super.size() - zeroCount - 1)) * 1000).intValue() : 0; // ET realSize corresponds to the looped elements
 			}
 		}
 	}

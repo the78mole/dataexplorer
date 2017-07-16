@@ -70,7 +70,7 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 
 		transitions = new TreeMap<Long, Transition>();
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
-		for (int i = 0; i < record.size(); i++) {
+		for (int i = 0; i < record.realSize(); i++) {
 			if (record.elementAt(i) == null) break;
 			long timeStamp_100ns = (long) (record.getTime_ms(i) * 10.);
 			double translatedValue = device.translateValue(record, record.elementAt(i) / 1000.);

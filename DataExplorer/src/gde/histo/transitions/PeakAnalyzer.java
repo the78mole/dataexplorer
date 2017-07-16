@@ -72,7 +72,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 		transitions = new TreeMap<Long, Transition>();
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
 		int samplingTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
-		for (int i = 0; i < record.size(); i++) {
+		for (int i = 0; i < record.realSize(); i++) {
 			if (record.elementAt(i) == null) break;
 			if (log.isLoggable(Level.FINER) && i > 0 && samplingTimespan_ms * 2 <= (long) (record.getTime_ms(i) - record.getTime_ms(i - 1)))
 				log.log(Level.FINER, String.format("timestamps with distance >= 2 * samplingPeriod: %,d %,d", (int) record.getTime_ms(i), (int) record.getTime_ms(i - 1)));

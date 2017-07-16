@@ -318,7 +318,7 @@ public final class VaultCollector {
 		final IDevice device = this.application.getActiveDevice();
 
 		trailPoints.put(TrailTypes.REAL_FIRST, record.elementAt(0));
-		trailPoints.put(TrailTypes.REAL_LAST, record.elementAt(record.size() - 1));
+		trailPoints.put(TrailTypes.REAL_LAST, record.elementAt(record.realSize() - 1));
 
 		final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
