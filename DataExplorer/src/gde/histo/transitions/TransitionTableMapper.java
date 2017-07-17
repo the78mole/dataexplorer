@@ -41,19 +41,20 @@ public final class TransitionTableMapper {
 	 * @return the row with additional columns for the transitions groups
 	 */
 	public static synchronized String[] getExtendedRow(RecordSet recordSet, int index, String[] dataTableRow) {
+		int tableColumnsSize = recordSet.getVisibleAndDisplayableRecordsForTable().size() + 1;
 		HashMap<Integer, TransitionGroupType> transitionGroups = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber()).getTransitionGroups();
-		dataTableRow = Arrays.copyOf(dataTableRow, recordSet.size() + 1 + transitionGroups.size());
+		dataTableRow = Arrays.copyOf(dataTableRow, tableColumnsSize + transitionGroups.size());
 
-		int i = recordSet.size() + 1;
+		int columnIndex = tableColumnsSize;
 		for (Entry<Integer, TransitionGroupType> transitionsGroupsEntry : transitionGroups.entrySet()) {
 			TreeMap<Long, Transition> transitions = recordSet.getHistoTransitions().get(transitionsGroupsEntry.getKey());
 			if (transitions != null) {
 				Transition transition = transitions.get((long) recordSet.getTime_ms(index));
 				if (transition != null) {
-					dataTableRow[i] = Integer.toString(transition.getTransitionType().getTransitionId());
+					dataTableRow[columnIndex] = Integer.toString(transition.getTransitionType().getTransitionId());
 				}
 			}
-			i++;
+			columnIndex++;
 		}
 		return dataTableRow;
 	}
