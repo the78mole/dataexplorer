@@ -158,7 +158,7 @@ public final class DirectoryScanner {
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.DATA).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), this.settings.getSubDirectoryLevelMax());
 				this.directoryFilesCount = files.size();
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO,
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
 						String.format("%04d files in histoDataDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA).getFileName(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
@@ -167,7 +167,7 @@ public final class DirectoryScanner {
 				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.IMPORT).toString());
 				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), this.settings.getSubDirectoryLevelMax());
 				this.directoryFilesCount += files.size();
-				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files in histoImportDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT).getFileName(), //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files in histoImportDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT).getFileName(), //$NON-NLS-1$
 						this.validatedDirectories.get(DirectoryType.IMPORT)));
 
 				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
@@ -203,8 +203,7 @@ public final class DirectoryScanner {
 					if (!file.delete()) {
 						log.log(Level.WARNING, "could not delete link file ", file); //$NON-NLS-1$
 					}
-				}
-				else {
+				} else {
 					tmpSelectedFilesCount++;
 					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
 					for (VaultCollector truss : HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory)) {
@@ -214,16 +213,13 @@ public final class DirectoryScanner {
 								log.log(Level.INFO,
 										String.format("OSD candidate is in the exclusion list %s %s   %s", actualFile, truss.getVault().getLogRecordsetBaseName(), truss.getVault().getStartTimeStampFormatted())); //$NON-NLS-1$
 								this.suppressedTrusses.put(truss.getVault().getVaultName(), truss);
-							}
-							else
+							} else
 								this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
-						}
-						else
+						} else
 							this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
 					}
 				}
-			}
-			else if (!supportedImportExtention.isEmpty() && file.getName().endsWith(supportedImportExtention)) {
+			} else if (!supportedImportExtention.isEmpty() && file.getName().endsWith(supportedImportExtention)) {
 				if (this.settings.getSearchDataPathImports()
 						|| (this.validatedDirectories.containsKey(DirectoryType.IMPORT) && file.toPath().startsWith(this.validatedDirectories.get(DirectoryType.IMPORT)))) {
 					tmpSelectedFilesCount++;
@@ -234,20 +230,17 @@ public final class DirectoryScanner {
 						if (ExclusionData.isExcluded(truss.getVault().getLogFileAsPath(), truss.getVault().getLogRecordsetBaseName())) {
 							log.log(Level.INFO, String.format("BIN candidate is in the exclusion list %s %s  %s", file, truss.getVault().getLogRecordsetBaseName(), truss.getVault().getStartTimeStampFormatted())); //$NON-NLS-1$
 							this.suppressedTrusses.put(truss.getVault().getVaultName(), truss);
-						}
-						else
+						} else
 							this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
-					}
-					else
+					} else
 						this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
 				}
-			}
-			else {
+			} else {
 				// file is discarded
 			}
 		}
 		this.selectedFilesCount += tmpSelectedFilesCount;
-		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%04d files found --- %04d total trusses --- %04d excluded trusses", files.size(), //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%04d files found --- %04d total trusses --- %04d excluded trusses", files.size(), //$NON-NLS-1$
 				this.unsuppressedTrusses.size() - unsuppressedSize + this.suppressedTrusses.size() - suppressedSize, this.suppressedTrusses.size() - suppressedSize));
 	}
 
@@ -262,18 +255,15 @@ public final class DirectoryScanner {
 			try {
 				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
 				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
 					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
-		}
-		else {
+		} else {
 			try {
 				Integer.parseInt(fileName.substring(0, 4));
 				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				if (fileName.substring(0, fileName.length()).length() <= 8 + 4) recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}

@@ -243,11 +243,11 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					// reduce memory consumption in advance to the garbage collection
 					histoRecordSet.cleanup();
 
-					log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE) ) log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
 							recordSetTrusses.get(i).getVault().getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));
 				}
 			}
-			log.log(Level.TIME, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoVaults.size(), recordSetsInfo.size(), //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoVaults.size(), recordSetsInfo.size(), //$NON-NLS-1$
 					TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNs), recordSetTrusses.keySet().toString(), filePath));
 		}
 		return histoVaults;

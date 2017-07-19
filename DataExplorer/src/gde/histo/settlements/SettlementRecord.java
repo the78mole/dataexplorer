@@ -58,18 +58,18 @@ public final class SettlementRecord extends Vector<Integer> {
 	 */
 	public static final double					OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
 
-	private static final int						INITIAL_RECORD_CAPACITY			= 22;
-	private static final String					BELOW_LIMIT								= MeasurementPropertyTypes.BELOW_LIMIT.value();
-	private static final String					BEYOND_LIMIT							= MeasurementPropertyTypes.BEYOND_LIMIT.value();
+	private static final int						INITIAL_RECORD_CAPACITY				= 22;
+	private static final String					BELOW_LIMIT										= MeasurementPropertyTypes.BELOW_LIMIT.value();
+	private static final String					BEYOND_LIMIT									= MeasurementPropertyTypes.BEYOND_LIMIT.value();
 
 	private final SettlementType				settlement;
 
 	private final RecordSet							parent;
 	private final int										logChannelNumber;
-	String															name;																																			// measurement name Höhe
+	String															name;																																					// measurement name Höhe
 
 	List<PropertyType>									properties										= new ArrayList<>();														// offset, factor, reduction, ...
-	private UniversalQuantile<Integer>	quantile									= null;
+	private UniversalQuantile<Integer>	quantile											= null;
 
 	/**
 	 * Creates a vector to hold data points.
@@ -79,12 +79,12 @@ public final class SettlementRecord extends Vector<Integer> {
 	 */
 	public SettlementRecord(SettlementType newSettlement, RecordSet parent, int logChannelNumber) {
 		super(INITIAL_RECORD_CAPACITY);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newSettlement.getName() + " Settlement(IDevice , SettlementType , int )"); //$NON-NLS-1$
 		this.settlement = newSettlement;
 		this.name = newSettlement.getName();
 		this.parent = parent;
 		this.logChannelNumber = logChannelNumber;
 		initializeProperties(this, newSettlement.getProperty());
+		log.log(Level.FINE, "newSettlement  ", this); //$NON-NLS-1$
 	}
 
 	/**
@@ -101,17 +101,22 @@ public final class SettlementRecord extends Vector<Integer> {
 	}
 
 	@Override
+	public synchronized String toString() {
+		String belowLimit = getBelowLimit() != -Double.MAX_VALUE ? String.format("%.1f", getBelowLimit()) : "none";
+		String beyondLimit = getBeyondLimit() != Double.MAX_VALUE ? String.format("%.1f", getBeyondLimit()) : "none";
+		return String.format("%s channel=%d  limits=%s/%s", this.name, this.logChannelNumber, belowLimit, beyondLimit);
+	}
+
+	@Override
 	public synchronized boolean add(Integer e) {
 		double translateValue = translateValue(e / 1000.0);
 		if (translateValue > getBeyondLimit()) {
-			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("beyond limit=%f value=%f   %s", getBeyondLimit(), translateValue, this.name)); //$NON-NLS-1$
+			log.log(Level.WARNING, String.format("discard beyond value=%f", translateValue), this); //$NON-NLS-1$
 			return false;
-		}
-		else if (translateValue < getBelowLimit()) {
-			if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("below limit=%f value=%f   %s", getBelowLimit(),translateValue, this.name)); //$NON-NLS-1$
+		} else if (translateValue < getBelowLimit()) {
+			log.log(Level.WARNING, String.format("discard below value=%f", translateValue), this); //$NON-NLS-1$
 			return false;
-		}
-		else {
+		} else {
 			return super.add(e);
 		}
 	}
@@ -270,7 +275,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	 */
 	public double reverseTranslateValue(double value) { // todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
 		double newValue = (value - this.getOffset()) / this.getFactor() + this.getReduction();
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 

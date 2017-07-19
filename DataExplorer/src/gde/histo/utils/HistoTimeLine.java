@@ -97,7 +97,7 @@ public final class HistoTimeLine {
 	private TreeMap<Long, Double>					relativeTimeScale;																							// maps histoset timestamps to x-axis with range 0 to 1
 	private Density												density;																												// degree of population on the x -axis
 	private final TreeMap<Long, Integer>	scalePositions			= new TreeMap<>(Collections.reverseOrder());
-	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms= new TreeMap<Integer, List<Long>>();				// access timestamps by x axis position (naturalOrder)
+	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms	= new TreeMap<Integer, List<Long>>();				// access timestamps by x axis position (naturalOrder)
 
 	/**
 	 * Take the timeline width and calculates the x-axis pixel positions for the timestamp values.
@@ -116,6 +116,12 @@ public final class HistoTimeLine {
 		setScalePositions();
 	}
 
+	@Override
+	public String toString() {
+		return String.format("width=%d  leftmostTimeStamp = %,d  rightmostTimeStamp = %,d  density=%s scalePositionsSize=%d scaleTimeStamps_ms=%d", this.width, this.leftmostTimeStamp,
+				this.rightmostTimeStamp, this.density.toString(), this.scaleTimeStamps_ms.size(), this.scaleTimeStamps_ms.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum());
+	}
+
 	/**
 	 * Draw the time line for the standard x-axis and the logarithmic distance axis.
 	 * Respect left/right margin, i.e. uses the chart region only.
@@ -128,7 +134,7 @@ public final class HistoTimeLine {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(DataExplorer.COLOR_BLACK);
 		gc.drawLine(x0 - 1, y0, x0 + this.width + 1, y0);
-		if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
 		// calculate the maximum time to be displayed and define the corresponding label format
 		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getTopTimeStamp_ms() - this.trailRecordSet.getLastTimeStamp_ms());
@@ -137,23 +143,18 @@ public final class HistoTimeLine {
 		Point pt; // to calculate the space required to draw the time values
 		if (timeFormat == DateTimePattern.MMdd) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0745);
-		}
-		else if (timeFormat == DateTimePattern.MMdd_HH) {
+		} else if (timeFormat == DateTimePattern.MMdd_HH) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0744);
-		}
-		else if (timeFormat == DateTimePattern.yyyyMM) {
+		} else if (timeFormat == DateTimePattern.yyyyMM) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0743);
-		}
-		else if (timeFormat == DateTimePattern.yyyyMMdd) {
+		} else if (timeFormat == DateTimePattern.yyyyMMdd) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0742);
-		}
-		else if (timeFormat == DateTimePattern.yyyyMMdd_HHmm) {
+		} else if (timeFormat == DateTimePattern.yyyyMMdd_HHmm) {
 			timeLineDescription = Messages.getString(MessageIds.GDE_MSGT0741);
-		}
-		else {
+		} else {
 			throw new UnsupportedOperationException();
 		}
-		pt = gc.textExtent(LocalizedDateTime.getFormatedTime(timeFormat, this.histoSet.firstKey())); // $NON-NLS-1$
+		pt = gc.textExtent(LocalizedDateTime.getFormatedTime(timeFormat, this.histoSet.isEmpty() ? 11 : this.histoSet.firstKey())); // $NON-NLS-1$
 		GraphicsUtils.drawTimeLineText(timeLineDescription, (x0 + this.width / 2), y0 + pt.y * 5 / 2 + 2, gc, SWT.HORIZONTAL);
 		drawTickMarks(gc, x0, y0, pt, timeFormat);
 	}
@@ -165,7 +166,7 @@ public final class HistoTimeLine {
 	 */
 	private DateTimePattern getScaleFormat(long totalDisplayTime_ms) {
 		final DateTimePattern timeFormat;
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "totalDisplayTime_ms = " + totalDisplayTime_ms); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "totalDisplayTime_ms = " + totalDisplayTime_ms); //$NON-NLS-1$
 
 		long totalTime_month = TimeUnit.DAYS.convert(totalDisplayTime_ms, TimeUnit.MILLISECONDS) / 30;
 		Calendar cal = Calendar.getInstance();
@@ -179,8 +180,7 @@ public final class HistoTimeLine {
 				timeFormat = DateTimePattern.yyyyMMdd;
 			else
 				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
-		}
-		else {
+		} else {
 			if (this.density == Density.EXTREME)
 				timeFormat = DateTimePattern.yyyyMM;
 			else if (this.density == Density.HIGH)
@@ -190,7 +190,7 @@ public final class HistoTimeLine {
 			else
 				timeFormat = DateTimePattern.yyyyMMdd_HHmm;
 		}
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timeLineText = " + Messages.getString(MessageIds.GDE_MSGT0267)); //$NON-NLS-1$
 		return timeFormat;
 	}
 
@@ -219,16 +219,15 @@ public final class HistoTimeLine {
 				leftMargin = rightMargin = this.width / (this.relativeTimeScale.size() + 1);
 			else
 				leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
-		}
-		else {
+		} else {
 			leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
 		}
 		int netWidth = this.width - leftMargin - rightMargin;
-		HistoTimeLine.log.log(Level.FINER, String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", this.width, leftMargin, rightMargin, netWidth)); //$NON-NLS-1$
+		log.log(Level.FINER, String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", this.width, leftMargin, rightMargin, netWidth)); //$NON-NLS-1$
 
 		for (Entry<Long, Double> entry : this.relativeTimeScale.entrySet()) {
 			this.scalePositions.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
-			if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "timeStamp = " + entry.getKey() + " position = " + this.scalePositions.get(entry.getKey())); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeStamp = " + entry.getKey() + " position = " + this.scalePositions.get(entry.getKey())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -240,34 +239,32 @@ public final class HistoTimeLine {
 		long maxVerifiedTimeStamp = -1; // first timeStamp in the HistoSet after maximumTimeStamp which is the first one due to descending order
 
 		// pass 1: build distances list and distances sum for all timestamps in the timestamp sliding window
-		HistoTimeLine.log.log(Level.FINER, String.format("leftmostTimeStamp = %,d  rightmostTimeStamp = %,d", this.leftmostTimeStamp, this.rightmostTimeStamp)); //$NON-NLS-1$
+		log.log(Level.FINER, "", this); //$NON-NLS-1$
 		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
 		long lastTimeStamp = 0;
 		long applicableDistancesSum = 0;
 		for (Entry<Long, List<ExtendedVault>> entry : this.histoSet.subMap(this.leftmostTimeStamp, true, this.rightmostTimeStamp, true).entrySet()) {
 			long currentTimeStamp = entry.getKey();
-			if (HistoTimeLine.log.isLoggable(Level.FINER)) {
+			if (log.isLoggable(Level.FINER)) {
 				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());
-				HistoTimeLine.log.log(Level.FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (lastTimeStamp != 0) {
 				long currentDistance = lastTimeStamp - currentTimeStamp;
 				applicableDistances.put(currentTimeStamp, currentDistance);
 				applicableDistancesSum += currentDistance;
-			}
-			else {
+			} else {
 				maxVerifiedTimeStamp = currentTimeStamp;
 			}
 			lastTimeStamp = currentTimeStamp;
 		}
-		HistoTimeLine.log.log(Level.FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//pass 2: build the relative timeScale list from relative distances
 		if (this.settings.isXAxisReversed()) {
 			this.relativeTimeScale = new TreeMap<>(Collections.reverseOrder());
 			this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
-		}
-		else {
+		} else {
 			this.relativeTimeScale = new TreeMap<>();
 			this.relativeTimeScale.put(maxVerifiedTimeStamp, 1.); // highest timestamp is at the rightmost position
 		}
@@ -283,13 +280,12 @@ public final class HistoTimeLine {
 					this.relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
 				else
 					this.relativeTimeScale.put(entry.getKey(), 1. - relativeTimeScaleSum);
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) {
-					HistoTimeLine.log.log(Level.FINEST, "relativeTimeScale = " + entry.getValue()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "relativeTimeScale = " + entry.getValue()); //$NON-NLS-1$
 				}
 			}
-			HistoTimeLine.log.log(Level.FINER, "relativeTimeScaleSum = " + relativeTimeScaleSum); //$NON-NLS-1$
-		}
-		else {
+			log.log(Level.FINER, "relativeTimeScaleSum = " + relativeTimeScaleSum); //$NON-NLS-1$
+		} else {
 			// pass 2.1: build normalized distances List
 			LinkedHashMap<Long, Double> normalizedDistances = new LinkedHashMap<>();
 			double normalizedDistancesMin = 0.;
@@ -303,11 +299,11 @@ public final class HistoTimeLine {
 				normalizedDistances.put(entry.getKey(), normalizedDistance);
 				normalizedDistancesMin = Math.min(normalizedDistancesMin, normalizedDistance);
 				normalizedDistancesSum += normalizedDistance;
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) {
-					HistoTimeLine.log.log(Level.FINEST, "normalizedDistance=" + normalizedDistance); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "normalizedDistance=" + normalizedDistance); //$NON-NLS-1$
 				}
 			}
-			HistoTimeLine.log.log(Level.FINER, "normalizedDistancesSum=" + normalizedDistancesSum); //$NON-NLS-1$
+			log.log(Level.FINER, "normalizedDistancesSum=" + normalizedDistancesSum); //$NON-NLS-1$
 
 			// pass 2.2: take logDistanceMin as a reference and scale to the final position range which is 0 to 1
 			// high spread values result in a rather equidistant placement of timesteps (distant timestamps move close together which results in more space for timesteps with small distances)
@@ -321,11 +317,11 @@ public final class HistoTimeLine {
 					this.relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
 				else
 					this.relativeTimeScale.put(entry2.getKey(), 1. - relativeTimeScaleSum);
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) {
-					HistoTimeLine.log.log(Level.FINEST, "relativeTimeScale=" + this.relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "relativeTimeScale=" + this.relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
 				}
 			}
-			HistoTimeLine.log.log(Level.FINER, "relativeTimeScaleSum=" + relativeTimeScaleSum); //$NON-NLS-1$
+			log.log(Level.FINER, "relativeTimeScaleSum=" + relativeTimeScaleSum); //$NON-NLS-1$
 		}
 	}
 
@@ -342,8 +338,7 @@ public final class HistoTimeLine {
 				double absoluteDistance = relativeDistance * this.width;
 				if (absoluteDistance > 0.5)
 					relativeDistances.add(Math.abs(lastEntry.getValue() - entry.getValue()));
-				else if (HistoTimeLine.log.isLoggable(Level.FINER))
-					HistoTimeLine.log.log(Level.FINER, String.format("subpixel distance discarded at %d    absoluteDistance = %f", entry.getKey(), absoluteDistance)); //$NON-NLS-1$
+				else if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("subpixel distance discarded at %d    absoluteDistance = %f", entry.getKey(), absoluteDistance)); //$NON-NLS-1$
 
 			}
 			lastEntry = entry;
@@ -364,10 +359,10 @@ public final class HistoTimeLine {
 				this.density = Density.HIGH;
 			else
 				this.density = Density.EXTREME;
-			if (HistoTimeLine.log.isLoggable(Level.FINE)) HistoTimeLine.log.log(Level.FINE, String.format("absoluteDistance=%d  boxType=%s   relativeDistancesMin=%f relativeDistancesMax=%f", //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("absoluteDistance=%d  boxType=%s   relativeDistancesMin=%f relativeDistancesMax=%f", //$NON-NLS-1$
 					absoluteDistance, this.density.toString(), relativeDistances.get(0), relativeDistances.get(relativeDistances.size() - 1)));
 		}
-		if (HistoTimeLine.log.isLoggable(Level.FINER)) HistoTimeLine.log.log(Level.FINER, String.format("density = %s  ", this.density.toString())); //$NON-NLS-1$
+		log.log(Level.FINER, "", this); //$NON-NLS-1$
 	}
 
 	private void drawTickMarks(GC gc, int x0, int y0, Point pt, DateTimePattern timeFormat) {
@@ -385,8 +380,7 @@ public final class HistoTimeLine {
 				GraphicsUtils.drawTextCentered(text, xPos, y0 + tickLength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 				lastText = text;
 				lastXPosLabel = xPos;
-			}
-			else {
+			} else {
 				gc.drawLine(xPos, y0 + 1, xPos, y0 + tickLength / 2);
 			}
 		}
@@ -397,8 +391,8 @@ public final class HistoTimeLine {
 	 * @return the timestamp position in the drawing area (relative to x0 which is the left position of the drawing canvas)
 	 */
 	public int getXPosTimestamp(long timestamp_ms) {
-		if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, "scalePositionsSize=" + this.scalePositions.size() + "  timestamp_ms=  ", timestamp_ms); //$NON-NLS-1$
-		return  this.scalePositions.get(timestamp_ms);
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "scalePositionsSize=" + this.scalePositions.size() + "  timestamp_ms=  ", timestamp_ms); //$NON-NLS-1$
+		return this.scalePositions.get(timestamp_ms);
 	}
 
 	/**
@@ -463,18 +457,17 @@ public final class HistoTimeLine {
 		if (this.settings.isXAxisReversed()) {
 			Entry<Integer, List<Long>> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
 				if (previous == null || entry.getValue() != previous.getKey()) {
 					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
 					previous = this.scaleTimeStamps_ms.lastEntry();
 				}
 				previous.getValue().add(entry.getKey()); // results in a reverse timeStamp order (decreasing timestamps)
 			}
-		}
-		else {
+		} else {
 			Entry<Integer, List<Long>> previous = null;
 			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed
-				if (HistoTimeLine.log.isLoggable(Level.FINEST)) HistoTimeLine.log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
 				if (previous == null || entry.getValue() != previous.getKey()) {
 					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
 					previous = this.scaleTimeStamps_ms.firstEntry(); // due to decreasing x axis positions in the scalePositions map

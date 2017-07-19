@@ -75,7 +75,7 @@ public final class HistoSetCollector {
 	private HistoSet							histoSet;
 	private int										matchingTrussesCount		= 0;																// selected by menu settings (eliminated by checks, e.g. device, object and retrospect period)
 	private int										availableTrussesCount		= 0;																// added to the trailrecordset (empty vaults eliminated, identical vaults eliminated based on setting)
-	private long									fileSizeSum_B						= 0;																// size of all the histo files which have been read to build the histo recordsets
+	private long									recordSetBytesSum				= 0;																// size of all the histo files which have been read to build the histo recordsets
 	private int										elapsedTime_ms					= 0;																// total time for rebuilding the HistoSet
 
 	private TrailRecordSet				trailRecordSet					= null;															// histo data transformed in a recordset format
@@ -127,8 +127,7 @@ public final class HistoSetCollector {
 				if (newTotalCount == 0) {
 					this.presenter.setProgress(newEndPercentage, this.sThreadId);
 					this.progressCycle = 0.;
-				}
-				else {
+				} else {
 					this.presenter.setProgress(this.progressStart, this.sThreadId);
 					this.progressCycle = (newEndPercentage - this.progressStart) / (double) newTotalCount;
 				}
@@ -154,8 +153,7 @@ public final class HistoSetCollector {
 				else if (newCounter % this.stepSize == 0) {
 					this.counter = newCounter;
 					this.presenter.setProgress((int) (newCounter * this.stepSize * this.progressCycle + this.progressStart), this.sThreadId);
-				}
-				else
+				} else
 					; // progress is set if stepSize is reached
 			}
 		}
@@ -169,13 +167,19 @@ public final class HistoSetCollector {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("matchingTrussesCount=%,d  availableTrussesCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", this.matchingTrussesCount, //$NON-NLS-1$
+				this.availableTrussesCount, this.recordSetBytesSum, this.elapsedTime_ms);
+	}
+
 	/**
 	 * Re- initializes the class.
 	 */
 	public synchronized void initialize() {
 		this.histoSet = HistoSet.getInstance();
 
-		this.fileSizeSum_B = 0;
+		this.recordSetBytesSum = 0;
 		this.matchingTrussesCount = 0;
 		this.availableTrussesCount = 0;
 		this.elapsedTime_ms = 0;
@@ -197,7 +201,7 @@ public final class HistoSetCollector {
 				for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, progress)) {
 					if (!histoVault.isTruss()) {
 						this.histoSet.putVault(histoVault);
-						this.fileSizeSum_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+						this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 					}
 				}
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs loaded from cache = %d", trussJobsSize - trussJobs.size())); //$NON-NLS-1$
@@ -209,12 +213,11 @@ public final class HistoSetCollector {
 						for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue())) {
 							if (!histoVault.isTruss()) {
 								this.histoSet.putVault(histoVault);
-								this.fileSizeSum_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+								this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 							}
 							newVaults.add(histoVault);
 						}
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						throw new UnsupportedOperationException(pathEntry.getKey().toString(), e);
 					}
 				}
@@ -267,8 +270,7 @@ public final class HistoSetCollector {
 					this.histoSet.clear();
 					if ((new Date().getTime() - startTimeFileValid) > 0) log.log(Level.TIME, String.format("%,5d trusses        select folders     time=%,6d [ms]  ::  per second:%5d", trussesCount, //$NON-NLS-1$
 							new Date().getTime() - startTimeFileValid, trussesCount * 1000 / (new Date().getTime() - startTimeFileValid)));
-				}
-				else { // histo record sets are ready to use
+				} else { // histo record sets are ready to use
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("%,5d trusses  file paths verified     time=%s [ss.SSS]", trussesCount, //$NON-NLS-1$
 							StringHelper.getFormatedDuration("ss.SSS", new Date().getTime() - startTimeFileValid))); //$NON-NLS-1$
 				}
@@ -277,7 +279,7 @@ public final class HistoSetCollector {
 			{
 				if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
 					isRebuilt = true;
-					this.fileSizeSum_B = 0;
+					this.recordSetBytesSum = 0;
 					if (trussesCount <= 0)
 						progress.set(LoadProgress.CACHED.endPercentage);
 					else {
@@ -287,12 +289,12 @@ public final class HistoSetCollector {
 							// step: build the workload map consisting of the cache key and the file path
 							trussJobs = getTrusses4Screening(DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
 							nanoTimeCheckFilesSum += System.nanoTime();
-							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0)
-								log.log(Level.TIME, String.format("%,5d trusses        job check          time=%,6d [ms]  ::  per second:%5d", trussesCount, //$NON-NLS-1$
-										TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), trussesCount * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
+							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0) log.log(Level.TIME,
+									String.format("%,5d trusses        job check          time=%,6d [ms]  ::  per second:%5d", trussJobs.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum(), //$NON-NLS-1$
+											TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum), trussesCount * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum)));
 							progress.set(LoadProgress.MATCHED.endPercentage);
 						}
-						long fileSizeSumCached_B = 0;
+						long recordSetBytesCachedSum = 0;
 						{// step: put cached vaults into the histoSet map and reduce workload map
 							long nanoTimeReadVaultSum = -System.nanoTime();
 							int tmpHistoSetsSize = this.histoSet.size();
@@ -301,15 +303,15 @@ public final class HistoSetCollector {
 							for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, progress)) {
 								if (!histoVault.isTruss()) {
 									this.histoSet.putVault(histoVault);
-									fileSizeSumCached_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+									recordSetBytesCachedSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 								}
 							}
-							this.fileSizeSum_B = fileSizeSumCached_B;
+							this.recordSetBytesSum = recordSetBytesCachedSum;
 							nanoTimeReadVaultSum += System.nanoTime();
 							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum) > 0) log.log(Level.TIME,
-								String.format("%,5d vaults         load from cache    time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size() - tmpHistoSetsSize, //$NON-NLS-1$
+									String.format("%,5d vaults         load from cache    time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size() - tmpHistoSetsSize, //$NON-NLS-1$
 											TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum), (this.histoSet.size() - tmpHistoSetsSize) * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadVaultSum),
-											this.fileSizeSum_B / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
+											this.recordSetBytesSum / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadVaultSum)));
 							int realProgress = DataExplorer.application.getProgressPercentage()
 									+ (int) ((LoadProgress.CACHED.endPercentage - DataExplorer.application.getProgressPercentage()) * this.histoSet.size() / (double) (this.histoSet.size() + 10 * jobSize)); // 10 is the estimated processing time ratio between reading from files and reading from cache
 							progress.set(Math.max(LoadProgress.RESTORED.endPercentage, realProgress));
@@ -323,7 +325,7 @@ public final class HistoSetCollector {
 								for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue())) {
 									if (!histoVault.isTruss()) {
 										this.histoSet.putVault(histoVault);
-										this.fileSizeSum_B += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+										this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 									}
 									newVaults.add(histoVault);
 								}
@@ -331,9 +333,9 @@ public final class HistoSetCollector {
 							}
 							nanoTimeReadRecordSetSum += System.nanoTime();
 							if (newVaults.size() > 0) log.log(Level.TIME,
-								String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+									String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
 											TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
-											(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
+											(this.recordSetBytesSum - recordSetBytesCachedSum) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
 						}
 						{// step: save vaults in the file system
 							long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
@@ -342,9 +344,9 @@ public final class HistoSetCollector {
 							}
 							nanoTimeWriteVaultSum += System.nanoTime();
 							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum) > 0 && cacheSize_B > 0) log.log(Level.TIME,
-								String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+									String.format("%,5d recordsets     store in cache     time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
 											TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
-											(this.fileSizeSum_B - fileSizeSumCached_B) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
+											(this.recordSetBytesSum - recordSetBytesCachedSum) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
 							progress.set(LoadProgress.CACHED.endPercentage);
 						}
 						// step: identify duplicate vaults (origin is duplicated log files with the same contents)
@@ -372,13 +374,13 @@ public final class HistoSetCollector {
 						// this.trailRecordSet.checkAllDisplayable();
 						this.trailRecordSet.applyTemplate(true); // needs reasonable data
 						nanoTimeTrailRecordSet += System.nanoTime();
-						if (this.fileSizeSum_B > 0 && log.isLoggable(Level.TIME)) log.log(Level.TIME,
+						if (this.recordSetBytesSum > 0 && log.isLoggable(Level.FINE)) log.log(Level.FINE,
 								String.format("%,5d trailTimeSteps to TrailRecordSet  time=%,6d [ms]  ::  per second:%5d", this.histoSet.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
 										this.histoSet.size() > 0 ? this.histoSet.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
 						log.log(Level.TIME,
 								String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size(), //$NON-NLS-1$
 										new Date().getTime() - startTimeFileValid, (int) (this.histoSet.size() * 1000. / (new Date().getTime() - startTimeFileValid) + .5),
-										(int) (this.fileSizeSum_B / 1000. / (new Date().getTime() - startTimeFileValid) + .5)));
+										(int) (this.recordSetBytesSum / 1000. / (new Date().getTime() - startTimeFileValid) + .5)));
 					}
 				}
 				{
@@ -392,8 +394,7 @@ public final class HistoSetCollector {
 			this.elapsedTime_ms = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000000);
 			if (log.isLoggable(Level.FINE)) log.log(Level.TIME, "time = " + StringHelper.getFormatedTime("mm:ss:SSS", this.elapsedTime_ms)); //$NON-NLS-1$ //$NON-NLS-2$
 			return isRebuilt;
-		}
-		finally {
+		} finally {
 			progress.set(100);
 		}
 	}
@@ -429,13 +430,11 @@ public final class HistoSetCollector {
 						trusses4Paths.get(actualFile.toPath()).put(truss.getVault().getVaultFileName().toString(), truss);
 					else
 						log.log(Level.WARNING, "duplicate vault was discarded: ", truss);
-				}
-				else {
+				} else {
 					invalidRecordSetsCount++;
 					log.log(Level.FINE, "skip   ", truss);
 				}
-			}
-			else if (!supportedImportExtention.isEmpty() && actualFile.getName().endsWith(supportedImportExtention)) {
+			} else if (!supportedImportExtention.isEmpty() && actualFile.getName().endsWith(supportedImportExtention)) {
 				boolean isValidObject = truss.isConsistentStartTimeStamp(minStartTimeStamp_ms) && truss.isConsistentObjectKey();
 				if (isValidObject) {
 					if (!trusses4Paths.containsKey(actualFile.toPath())) trusses4Paths.put(actualFile.toPath(), new HashMap<String, VaultCollector>());
@@ -445,15 +444,14 @@ public final class HistoSetCollector {
 						trusses4Paths.get(actualFile.toPath()).put(truss.getVault().getVaultFileName().toString(), truss);
 					else
 						log.log(Level.WARNING, "duplicate vault was discarded: ", truss);
-				}
-				else {
+				} else {
 					invalidRecordSetsCount++;
 					log.log(Level.FINE, "skip   ", truss);
 				}
 			}
 		}
 		this.matchingTrussesCount = this.histoSet.getUnsuppressedTrusses().size() - invalidRecordSetsCount;
-		log.log(Level.INFO,
+		log.log(Level.FINE,
 				String.format("%04d trusses taken --- %04d checked trusses --- %04d invalid trusses", trusses4Paths.size(), this.histoSet.getUnsuppressedTrusses().size(), invalidRecordSetsCount)); //$NON-NLS-1$
 		return trusses4Paths;
 
@@ -473,6 +471,10 @@ public final class HistoSetCollector {
 
 	public TrailRecordSet getTrailRecordSet() {
 		return this.trailRecordSet;
+	}
+
+	public long getRecordSetBytesSum() {
+		return this.recordSetBytesSum;
 	}
 
 }

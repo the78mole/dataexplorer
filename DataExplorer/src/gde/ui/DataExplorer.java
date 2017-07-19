@@ -868,9 +868,8 @@ public class DataExplorer extends Composite {
 	 * if a histo window is selected: determine histo files, read histo data and initialize window tab.
 	 */
 	public synchronized void setupHistoWindows() {
-		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("started")); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("started")); //$NON-NLS-1$
 		this.histoSet = HistoSet.getInstance();
-		this.histoSet.initialize();
 
 		if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
 

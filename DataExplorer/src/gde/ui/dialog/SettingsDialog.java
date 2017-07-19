@@ -1323,7 +1323,7 @@ public class SettingsDialog extends Dialog {
 								this.histoSamplingTimespan_ms.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								//this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
 								this.histoSamplingTimespan_ms.setItems(SettingsDialog.this.settings.getSamplingTimespanValues());
-								this.histoSamplingTimespan_ms.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getSamplingTimespan_ms() / 1000.);
+								this.histoSamplingTimespan_ms.setText(String.valueOf(SettingsDialog.this.settings.getSamplingTimespan_ms() / 1000.));
 								this.histoSamplingTimespan_ms.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
 								this.histoSamplingTimespan_ms.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -2254,7 +2254,7 @@ public class SettingsDialog extends Dialog {
 		int index = 0; // relativ
 		String format = this.settings.getTimeFormat().toString().trim().substring(0, 3);
 		for (; index < this.timeFormatCombo.getItemCount(); index++) {
-			if (this.timeFormatCombo.getItems()[index].trim().startsWith(format)) 
+			if (this.timeFormatCombo.getItems()[index].trim().startsWith(format))
 				return index;
 		}
 		return index;

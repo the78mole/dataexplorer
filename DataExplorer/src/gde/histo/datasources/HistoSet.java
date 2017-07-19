@@ -120,8 +120,11 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 	};
 
 	public static HistoSet getInstance() {
-		if (HistoSet.histoSet == null) HistoSet.histoSet = new HistoSet();
-		return HistoSet.histoSet;
+		if (histoSet == null) {
+			histoSet = new HistoSet();
+			histoSet.initialize();
+		}
+		return histoSet;
 	}
 
 	private HistoSet() {
@@ -139,9 +142,7 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 		this.directoryScanner.initialize();
 		this.histoSetCollector.initialize();
 
-		if (log.isLoggable(Level.INFO))
-			log.log(Level.INFO, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
-					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
+		log.log(Level.FINER, "", this);
 	}
 
 	/**
@@ -156,9 +157,13 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 		super.clear();
 
 		// this.histoFilePaths.clear(); is accomplished by files validation
-		if (log.isLoggable(Level.OFF))
-			log.log(Level.OFF, String.format("device=%s  channel=%d  objectKey=%s", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
-					this.application.getActiveChannelNumber(), this.application.getObjectKey()));
+		log.log(Level.FINER, "", this);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("device=%s  channel=%d  objectKey=%s timeSteps=%d size=%d", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
+				this.application.getActiveChannelNumber(), this.application.getObjectKey(), this.size(), this.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum());
 	}
 
 	/**
@@ -229,6 +234,7 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 						String.format("%,d", this.directoryScanner.getSuppressedTrusses().size() + this.directoryScanner.getUnsuppressedTrusses().size()),
 						String.format("%,d", this.directoryScanner.getUnsuppressedTrusses().size()), //
 						String.format("%,d", this.histoSetCollector.getMatchingTrussesCount()), String.format("%,d", this.histoSetCollector.getAvailableTrussesCount()), //
+						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.) });
 
 	}
