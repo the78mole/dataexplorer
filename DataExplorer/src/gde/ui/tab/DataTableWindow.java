@@ -393,7 +393,7 @@ public class DataTableWindow extends CTabItem {
 			@Override
 			public void keyReleased(KeyEvent event) {
 				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyReleased, keycode: " + event.keyCode));
-				if (event.keyCode == SWT.MOD2) {
+				if (event.keyCode == SWT.MOD2 && DataTableWindow.this.rowVector.size() > 0) {
 					int rowIndex = DataTableWindow.this.rowVector.get(DataTableWindow.this.rowVector.size() - 1) + this.selectionFlowIndex;
 					//check table bounds reached
 					rowIndex = rowIndex < 0 ? 0 : rowIndex > DataTableWindow.this.dataTable.getItems().length - 1 ? DataTableWindow.this.dataTable.getItems().length - 1 : rowIndex;
