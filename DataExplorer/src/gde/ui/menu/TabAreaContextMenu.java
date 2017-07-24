@@ -100,7 +100,6 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
-					TabAreaContextMenu.this.displayGraphicsCurveSurvey.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.getSelection());
 				}
 				if (type == TabMenuType.HISTOGRAPHICS) {
 					TabAreaContextMenu.this.suppressModeItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.getSelection());
@@ -410,20 +409,22 @@ public class TabAreaContextMenu {
 						;
 					}
 				});
-				this.displayGraphicsCurveSurvey = new MenuItem(popupMenu, SWT.CHECK);
-				this.displayGraphicsCurveSurvey.setText(Messages.getString(MessageIds.GDE_MSGT0876));
-				if (!GDE.IS_OS_ARCH_ARM) this.displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
-				this.displayGraphicsCurveSurvey.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						TabAreaContextMenu.log.log(Level.FINEST, "displayGraphicsCurveSurvey action performed! " + e); //$NON-NLS-1$
-						boolean selection = TabAreaContextMenu.this.displayGraphicsCurveSurvey.getSelection();
-						TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.setSelection(selection);
-						TabAreaContextMenu.this.application.enableCurveSurvey(selection);
-						TabAreaContextMenu.this.application.updateHistoTabs(false, false);
-						;
-					}
-				});
+				if (type != TabMenuType.GRAPHICS) {
+					this.displayGraphicsCurveSurvey = new MenuItem(popupMenu, SWT.CHECK);
+					this.displayGraphicsCurveSurvey.setText(Messages.getString(MessageIds.GDE_MSGT0876));
+					if (!GDE.IS_OS_ARCH_ARM) this.displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
+					this.displayGraphicsCurveSurvey.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							TabAreaContextMenu.log.log(Level.FINEST, "displayGraphicsCurveSurvey action performed! " + e); //$NON-NLS-1$
+							boolean selection = TabAreaContextMenu.this.displayGraphicsCurveSurvey.getSelection();
+							TabAreaContextMenu.this.application.getMenuBar().graphicsCurveSurveyMenuItem.setSelection(selection);
+							TabAreaContextMenu.this.application.enableCurveSurvey(selection);
+							TabAreaContextMenu.this.application.updateHistoTabs(false, false);
+							;
+						}
+					});
+				}
 				this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
 			}
 
