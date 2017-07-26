@@ -38,9 +38,6 @@ import gde.device.EvaluationType;
 import gde.device.FigureTypes;
 import gde.device.IDevice;
 import gde.device.LevelingTypes;
-import gde.device.MeasurementMappingType;
-import gde.device.ReferenceGroupType;
-import gde.device.ReferenceRuleTypes;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
@@ -48,7 +45,6 @@ import gde.histo.recordings.RecordingsCollector;
 import gde.histo.transitions.Transition;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
-import gde.histo.utils.Spot;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -62,156 +58,6 @@ public final class SettlementCollector {
 	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
 	private final static Settings			settings		= Settings.getInstance();
-
-	/**
-	 * Perform the aggregation of translated record values.
-	 * The aggregation is based on the reference rule.
-	 * @author Thomas Eickert
-	 */
-	private class RecordGroup {
-
-		private final ReferenceGroupType	referenceGroupType;
-		private final Record[]						records;
-		private final SettlementRecord		histoSettlement;
-
-		public RecordGroup(SettlementRecord histoSettlement, ReferenceGroupType referenceGroupType) {
-			this.histoSettlement = histoSettlement;
-			this.referenceGroupType = referenceGroupType;
-			this.records = new Record[referenceGroupType.getMeasurementMapping().size() + referenceGroupType.getSettlementMapping().size()];
-
-			int i = 0;
-			for (MeasurementMappingType measurementMappingType : referenceGroupType.getMeasurementMapping()) {
-				this.records[i] = histoSettlement.getParent().get(histoSettlement.getParent().getRecordNames()[measurementMappingType.getMeasurementOrdinal()]);
-				i++;
-			}
-			if (!referenceGroupType.getSettlementMapping().isEmpty()) throw new UnsupportedOperationException("settlements based on settlements not supported");
-		}
-
-		/**
-		 * @return true if at least one of the records contains reasonable data which can be displayed
-		 */
-		public boolean hasReasonableData() {
-			for (Record record : this.records) {
-				if (record.hasReasonableData()) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		/**
-		 * @return the aggregated translated maximum value
-		 */
-		public double getRealMax() {
-			double result = 0;
-			for (int i = 0; i < this.records.length; i++) {
-				Record record = this.records[i];
-				final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.getRealMaxValue() / 1000.);
-				result = calculateAggregate(result, i, translatedValue);
-			}
-			return result;
-		}
-
-		/**
-		 * @return the aggregated translated minimum value
-		 */
-		public double getRealMin() {
-			double result = 0;
-			for (int i = 0; i < this.records.length; i++) {
-				Record record = this.records[i];
-				final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.getRealMinValue() / 1000.);
-				result = calculateAggregate(result, i, translatedValue);
-			}
-			return result;
-		}
-
-		/**
-		 * @param index
-		 * @return the aggregated translated value at this real index position (irrespective of zoom / scope)
-		 */
-		public Double getReal(int index) {
-			Double result = 0.;
-			for (int i = 0; i < this.records.length; i++) {
-				Record record = this.records[i];
-				if (record.elementAt(index) == null) {
-					result = null;
-					break;
-				}
-				else {
-					final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.elementAt(index) / 1000.);
-					result = calculateAggregate(result, i, translatedValue);
-				}
-			}
-			return result;
-		}
-
-		/**
-		 * @param recurrentResult from the previous aggregation step
-		 * @param aggregationStepIndex is the 0-based number of the current aggregation step
-		 * @param translatedValue
-		 * @return the recurrentResult aggregated based on the translated value
-		 */
-		private double calculateAggregate(double recurrentResult, int aggregationStepIndex, double translatedValue) {
-			if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.AVG) {
-				recurrentResult += (translatedValue - recurrentResult) / (aggregationStepIndex + 1);
-			}
-			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MAX) {
-				if (aggregationStepIndex != 0)
-					recurrentResult = Math.max(recurrentResult, translatedValue);
-				else
-					recurrentResult = translatedValue;
-			}
-			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MIN) {
-				if (aggregationStepIndex == 0)
-					recurrentResult = translatedValue;
-				else
-					recurrentResult = Math.max(recurrentResult, translatedValue);
-			}
-			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.PRODUCT) {
-				if (aggregationStepIndex == 0)
-					recurrentResult = translatedValue;
-				else
-					recurrentResult *= translatedValue;
-			}
-			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.QUOTIENT) {
-				if (aggregationStepIndex == 0)
-					recurrentResult = translatedValue;
-				else
-					recurrentResult /= translatedValue;
-			}
-			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SPREAD) {
-				if (aggregationStepIndex == 0)
-					recurrentResult = translatedValue;
-				else
-					recurrentResult -= translatedValue;
-			}
-			else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SUM) {
-				recurrentResult += translatedValue;
-			}
-			else
-				throw new UnsupportedOperationException();
-			return recurrentResult;
-		}
-
-		/**
-		 * @param fromIndex
-		 * @param toIndex
-		 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
-		 */
-		public List<Spot<Double>> getSubPoints(int fromIndex, int toIndex) {
-			int recordSize = toIndex - fromIndex;
-			List<Spot<Double>> result = new ArrayList<>(recordSize);
-			for (int i = fromIndex; i < toIndex; i++) {
-				if (getReal(i) != null) result.add(new Spot<Double>(this.histoSettlement.getParent().getTime_ms(i), getReal(i)));
-			}
-			log.log(Level.FINER, "", Arrays.toString(result.toArray()));
-			return result;
-		}
-
-		public String getComment() {
-			return this.referenceGroupType.getComment();
-		}
-	}
 
 	/**
 	 * Take histo transitions which are applicable and fetch trigger time steps and records from the parent.
@@ -340,7 +186,7 @@ public final class SettlementCollector {
 		TransitionCalculusType calculus = histoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
 		log.log(Level.FINEST, GDE.STRING_GREATER, calculus);
 		final ChannelType logChannel = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(histoSettlement.getLogChannelNumber());
-		final RecordGroup recordGroup = new SettlementCollector().new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
+		final RecordGroup recordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
 		if (recordGroup.hasReasonableData()) {
 			final int reverseTranslatedResult;
 			if (calculus.getCalculusType() == CalculusTypes.DELTA) {
@@ -357,7 +203,7 @@ public final class SettlementCollector {
 			}
 			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getDeltaBasis(), calculus.getLeveling(), transition);
-				final RecordGroup divisorRecordGroup = new SettlementCollector().new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
+				final RecordGroup divisorRecordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
@@ -376,7 +222,7 @@ public final class SettlementCollector {
 				throw new UnsupportedOperationException();
 			}
 			// add to settlement record --- no recordgroup zero ratios which often occur for discharge logs from UDP60
-			boolean isNeglectableRatioValue = recordGroup.records.length > 1 && reverseTranslatedResult == 0.0
+			boolean isNeglectableRatioValue = recordGroup.getSize() > 1 && reverseTranslatedResult == 0.0
 					&& (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE);
 			if (!isNeglectableRatioValue) histoSettlement.add(reverseTranslatedResult);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
