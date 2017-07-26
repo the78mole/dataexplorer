@@ -134,9 +134,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * @param channelNumber the channel number to be used
 	 * @param newName for the records like "1) Laden"
 	 * @param measurementNames array of the device supported measurement names
-	 * @param newTimeStep_ms time in msec of device measures points
+	 * @param newTimeSteps
 	 */
-	protected AbstractRecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, double newTimeStep_ms) {
+	protected AbstractRecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, TimeSteps newTimeSteps) {
 		super(measurementNames.length);
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -146,7 +146,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 
 		this.recordNames = measurementNames.clone();
-		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
+		this.timeStep_ms = newTimeSteps;
 		this.description = (this.device != null ? this.device.getName() + GDE.STRING_MESSAGE_CONCAT : GDE.STRING_EMPTY) + DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	}
 
@@ -260,8 +260,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 				if (tmpRecord.isPositionLeft && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
-		}
-		else {
+		} else {
 			for (String recordName : this.recordNames) {
 				log.log(Level.FINER, "record name = " + recordName); //$NON-NLS-1$
 				Record tmpRecord = this.get(recordName);
@@ -279,8 +278,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	public Record get(int recordOrdinal) {
 		try {
 			return this.get(this.recordNames[recordOrdinal]);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return super.size() > 0 ? this.get(0) : null;
 		}
@@ -442,9 +440,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * @param newHorizontalGridRecordOrdinal of the horizontal grid record name to set
 	 */
 	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
-		if (newHorizontalGridRecordOrdinal >= this.size()) newHorizontalGridRecordOrdinal = 0;
-		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(newHorizontalGridRecordOrdinal)) ? this.getSyncMasterRecordOrdinal(this.get(newHorizontalGridRecordOrdinal))
-				: newHorizontalGridRecordOrdinal;
+		int tmpOrdinal = newHorizontalGridRecordOrdinal;
+		if (tmpOrdinal >= this.size()) tmpOrdinal = 0;
+		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(tmpOrdinal)) ? this.getSyncMasterRecordOrdinal(this.get(tmpOrdinal)) : tmpOrdinal;
 	}
 
 	/**

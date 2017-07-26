@@ -88,9 +88,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param useDevice the instance of the device
 	 * @param channelNumber the channel number to be used
 	 * @param recordNames
+	 * @param timeSteps
 	 */
-	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames) {
-		super(useDevice, channelNumber, "Trail", recordNames, -1); //$NON-NLS-1$
+	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames, TimeSteps timeSteps) {
+		super(useDevice, channelNumber, "Trail", recordNames, timeSteps); //$NON-NLS-1$
 		String deviceSignature = useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber;
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		if (this.template != null) this.template.load();
@@ -106,9 +107,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public static synchronized TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
 		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
-		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names);
+		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
+
+		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names, timeSteps);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.getName() + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
-		newTrailRecordSet.timeStep_ms = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
 		LinkedHashMap<Integer, SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlements();
 		LinkedHashMap<Integer, ScoreGroupType> channelScoreGroups = device.getDeviceConfiguration().getChannel(channelConfigNumber).getScoreGroups();

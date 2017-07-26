@@ -124,12 +124,12 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @param channelNumber the channel number to be used
 	 * @param newName for the records like "1) Laden"
 	 * @param measurementNames array of the device supported measurement names
-	 * @param newTimeStep_ms time in msec of device measures points
+	 * @param newTimeSteps
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	private RecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
-		super(useDevice, channelNumber, newName, measurementNames, newTimeStep_ms);
+	private RecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, TimeSteps newTimeSteps, boolean isRawValue, boolean isFromFileValue) {
+		super(useDevice, channelNumber, newName, measurementNames, newTimeSteps);
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 	}
@@ -276,8 +276,7 @@ public final class RecordSet extends AbstractRecordSet {
 				this.description = splitDescription[0] + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.timeStep_ms.getStartTimeStamp());
 			else
 				this.description = recordSet.description;
-		}
-		else {
+		} else {
 			this.description = recordSet.description;
 		}
 		this.isSaved = false;
@@ -368,8 +367,7 @@ public final class RecordSet extends AbstractRecordSet {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-		}
-		else
+		} else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0035, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, points.length, this.size() })); // $NON-NLS-1$
 
 		this.hasDisplayableData = true;
@@ -397,8 +395,7 @@ public final class RecordSet extends AbstractRecordSet {
 			for (int i = 0; i < points.length; i++) {
 				try {
 					this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					// temp
 				}
 			}
@@ -409,8 +406,7 @@ public final class RecordSet extends AbstractRecordSet {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-		}
-		else
+		} else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
 
 		this.hasDisplayableData = true;
@@ -454,8 +450,7 @@ public final class RecordSet extends AbstractRecordSet {
 
 		if (this.settings.isDataTableTransitions()) {
 			return TransitionTableMapper.getExtendedRow(this, index, dataTableRow);
-		}
-		else
+		} else
 			return dataTableRow;
 	}
 
@@ -515,11 +510,9 @@ public final class RecordSet extends AbstractRecordSet {
 	public String getFormatedTime_sec(int index, boolean isAbsolute) {
 		if (isAbsolute) {
 			return this.timeStep_ms.getFormattedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, index);
-		}
-		else if (this.getMaxTime_ms() > GDE.ONE_HOUR_MS * 24. * 365. * 11.) {
+		} else if (this.getMaxTime_ms() > GDE.ONE_HOUR_MS * 24. * 365. * 11.) {
 			return this.timeStep_ms.getFormattedTime(DateTimePattern.yyyyMMdd_HHmmssSSS, index);
-		}
-		else {
+		} else {
 			final DurationPattern formatString;
 			if (this.getMaxTime_ms() <= GDE.ONE_HOUR_MS)
 				formatString = DurationPattern.mm_ss_SSS;
@@ -722,8 +715,9 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return String[] containing record names
 	 */
 	public String[] getNoneCalculationRecordNames() {
-		if (this.noneCalculationRecords.length == 0 )
+		if (this.noneCalculationRecords.length == 0) {
 			this.noneCalculationRecords = this.device.getNoneCalculationMeasurementNames(this.parent.number, this.recordNames);
+		}
 		return this.noneCalculationRecords;
 	}
 
@@ -811,18 +805,19 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms,
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double newTimeStep_ms,
 			boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
-		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		String tmpRecordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		TimeSteps timeSteps = new TimeSteps(device.getTimeStep_ms(), INITIAL_RECORD_CAPACITY);
 
-		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
+		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, tmpRecordSetName, recordNames, timeSteps, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms(), INITIAL_RECORD_CAPACITY);
 
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), INITIAL_RECORD_CAPACITY);
+			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(),
+					INITIAL_RECORD_CAPACITY);
 			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "added record for " + recordNames[i] + " - " + newRecordSet.size()); //$NON-NLS-1$
@@ -888,8 +883,7 @@ public final class RecordSet extends AbstractRecordSet {
 				// synchronize scale format
 				newRecord.numberFormat = this.get(0).numberFormat;
 				newRecord.df = (DecimalFormat) this.get(0).df.clone();
-			}
-			else {
+			} else {
 				newRecord.setNumberFormat(-1);
 			}
 			// set all scales of compare set to left
@@ -979,8 +973,7 @@ public final class RecordSet extends AbstractRecordSet {
 		if (this.description.contains(GDE.STRING_NEW_LINE)) {
 			this.description = this.description.substring(0, this.description.indexOf(GDE.STRING_NEW_LINE)).trim() + Messages.getString(MessageIds.GDE_MSGT0681, new String[] { fileName })
 					+ this.description.substring(tmpDescription.indexOf(GDE.STRING_NEW_LINE));
-		}
-		else {
+		} else {
 			this.description = this.description.trim() + Messages.getString(MessageIds.GDE_MSGT0681, new String[] { fileName });
 		}
 	}
@@ -1003,8 +996,7 @@ public final class RecordSet extends AbstractRecordSet {
 						log.log(Level.FINER, "CalculationThread isAlive"); //$NON-NLS-1$
 						Thread.sleep(1000);
 					}
-				}
-				catch (InterruptedException e) {
+				} catch (InterruptedException e) {
 					//ignore
 				}
 				Channel activeChannel = RecordSet.this.channels.getActiveChannel();
@@ -1014,8 +1006,7 @@ public final class RecordSet extends AbstractRecordSet {
 		try {
 			dataLoadThread.setPriority(Thread.NORM_PRIORITY - 2);
 			dataLoadThread.start();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
 	}
@@ -1066,8 +1057,7 @@ public final class RecordSet extends AbstractRecordSet {
 					break;
 				}
 			}
-		}
-		else {
+		} else {
 			for (String recordKey : this.recordNames) {
 				if (get(recordKey).isActive()) {
 					size = get(recordKey).size();
@@ -1126,8 +1116,7 @@ public final class RecordSet extends AbstractRecordSet {
 					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth " + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-		}
-		else {
+		} else {
 			if (!this.isZoomMode) {
 				for (Record record : this.values()) {
 					record.minZoomScaleValue = record.minScaleValue;
@@ -1207,10 +1196,10 @@ public final class RecordSet extends AbstractRecordSet {
 		if (this.isZoomMode) {
 			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute() && this.timeStep_ms != null) ? this.timeStep_ms.startTimeStamp_ms + this.get(0).zoomTimeOffset
 					: this.get(0).zoomTimeOffset;
-		}
-		else if (this.isScopeMode) {
+		} else if (this.isScopeMode) {
 			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute() && this.timeStep_ms != null)
-					? this.timeStep_ms.startTimeStamp_ms + this.timeStep_ms.getTime_ms(this.scopeModeOffset + 1) : this.timeStep_ms.getTime_ms(this.scopeModeOffset + 1);
+					? this.timeStep_ms.startTimeStamp_ms + this.timeStep_ms.getTime_ms(this.scopeModeOffset + 1)
+					: this.timeStep_ms.getTime_ms(this.scopeModeOffset + 1);
 		}
 		return startTime;
 	}
@@ -1229,12 +1218,10 @@ public final class RecordSet extends AbstractRecordSet {
 			if (record.zoomTimeOffset + xShift_ms <= 0) {
 				record.zoomOffset = 0;
 				record.zoomTimeOffset = 0.0;
-			}
-			else if (record.zoomTimeOffset + record.drawTimeWidth + xShift_ms > record.getMaxTime_ms()) {
+			} else if (record.zoomTimeOffset + record.drawTimeWidth + xShift_ms > record.getMaxTime_ms()) {
 				record.zoomTimeOffset = record.getMaxTime_ms() - record.drawTimeWidth;
 				record.zoomOffset = record.findBestIndex(record.zoomTimeOffset);
-			}
-			else {
+			} else {
 				record.zoomTimeOffset = record.zoomTimeOffset + xShift_ms;
 				record.zoomOffset = record.findBestIndex(record.zoomTimeOffset);
 			}
@@ -1464,8 +1451,7 @@ public final class RecordSet extends AbstractRecordSet {
 			if (tmpValue != null && tmpValue.length() > 0) {
 				try {
 					this.horizontalGridRecordOrdinal = Integer.valueOf(tmpValue.trim());
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					this.horizontalGridRecordOrdinal = -1;
 				}
 			}
@@ -1489,8 +1475,7 @@ public final class RecordSet extends AbstractRecordSet {
 					this.voltageLimits[i] = Integer.valueOf(strVoltageValues[i].trim());
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0002) + GDE.STRING_NEW_LINE + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
@@ -1503,8 +1488,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public boolean isCutLeftEdgeEnabled() {
 		try {
 			return this.application.isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (this.get(0).zoomTimeOffset == 0);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}
@@ -1517,8 +1501,7 @@ public final class RecordSet extends AbstractRecordSet {
 		Record tmpRecord;
 		try {
 			tmpRecord = this.get(0);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 		return this.application.isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (tmpRecord.zoomTimeOffset + tmpRecord.drawTimeWidth >= tmpRecord.getMaxTime_ms());
@@ -1614,8 +1597,7 @@ public final class RecordSet extends AbstractRecordSet {
 					if (this.isScopeMode) {
 						tmpRecord.scopeMin = tmpSyncMin;
 						tmpRecord.scopeMax = tmpSyncMax;
-					}
-					else {
+					} else {
 						tmpRecord.syncMinValue = tmpSyncMin;
 						tmpRecord.syncMaxValue = tmpSyncMax;
 					}
@@ -1627,14 +1609,12 @@ public final class RecordSet extends AbstractRecordSet {
 					if (this.isScopeMode) {
 						syncRecord.scopeMin = tmpSyncMin;
 						syncRecord.scopeMax = tmpSyncMax;
-					}
-					else {
+					} else {
 						syncRecord.syncMinValue = tmpSyncMin;
 						syncRecord.syncMaxValue = tmpSyncMax;
 					}
 				}
-			}
-			else {
+			} else {
 				log.log(Level.WARNING, String.format("Check device XML regarding <property name=\"scale_sync_ref_ordinal\" value=\"%d\" type=\"Integer\" />", syncRecordOrdinal));
 			}
 
@@ -1698,8 +1678,7 @@ public final class RecordSet extends AbstractRecordSet {
 					OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
 				else if (fullQualifiedFileName.endsWith(GDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
@@ -1802,8 +1781,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public void setStartTimeStamp(long startTimeStamp) {
 		if (this.timeStep_ms != null) {
 			this.timeStep_ms.setStartTimeStamp(startTimeStamp);
-		}
-		else
+		} else
 			log.log(Level.WARNING, "time step vector is null !");
 	}
 
