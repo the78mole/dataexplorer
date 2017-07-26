@@ -258,7 +258,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
 	 */
 	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor) {
-		this(population, isSample, 99., 99., new ArrayList<>());
+		this(population, isSample, sigmaFactor, outlierFactor, new ArrayList<>());
 	}
 
 	/**
