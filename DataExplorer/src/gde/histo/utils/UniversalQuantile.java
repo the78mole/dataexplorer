@@ -148,6 +148,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		 * Test client
 		 * @param args
 		 */
+		@SuppressWarnings("unused")
 		public static void main(String[] args) {
 			double x = Double.parseDouble(args[0]);
 
@@ -170,7 +171,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 			return count > 0 ? avg : 0;
 		}
 
-		public double getSigma(boolean isSample) {
+		public double getSigma(@SuppressWarnings("hiding") boolean isSample) {
 			return count > 0 ? Math.sqrt(varTimesN / (isSample ? count - 1 : count)) : 0;
 		}
 
@@ -206,7 +207,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	/**
-	 * @param population is taken as a sample (for the standard deviation)
+	 * @param population holds the y value which is taken as a sample (for the standard deviation)
 	 * @param sigmaFactor specifies the tolerance interval <em>TI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
 	 */
@@ -221,6 +222,19 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		}
 
 		Collections.sort(this.trunk);
+
+		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m)
+		double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
+		double extremumRange = (getQuantile(1. - outlierProbability) - getQuantile(outlierProbability)) * outlierFactor;
+		while (this.trunk.size() > 0 && this.trunk.get(0).doubleValue() < getQuantile(outlierProbability) - extremumRange) {
+			this.castaways.add(this.trunk.get(0));
+			this.trunk.remove(0);
+		}
+		while (this.trunk.size() > 0 && this.trunk.get(this.trunk.size() - 1).doubleValue() > getQuantile(1. - outlierProbability) + extremumRange) {
+			this.castaways.add(this.trunk.get(this.trunk.size() - 1));
+			this.trunk.remove(this.trunk.size() - 1);
+		}
+		if (this.trunk.isEmpty()) throw new UnsupportedOperationException("empty trunk");
 
 		this.firstValidElement = population.get(0).y();
 		this.lastValidElement = population.get(population.size() - 1).y();

@@ -20,6 +20,7 @@
 package gde.histo.recordings;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -49,8 +50,15 @@ public final class TrailRecordCutter {
 		if (!subPoints.isEmpty()) {
 			this.quantile = new UniversalQuantile<>(subPoints); // take all points for display
 
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.BOXPLOT_SIGMA_FACTOR, UniversalQuantile.BOXPLOT_OUTLIER_FACTOR); // eliminate Tukey outliers for regression
-			subPoints.removeAll(tmpQuantile.getOutliers());
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.BOXPLOT_SIGMA_FACTOR, UniversalQuantile.BOXPLOT_OUTLIER_FACTOR);
+
+			// eliminate Tukey outliers for regression
+			List<Double> outliers = tmpQuantile.getOutliers();
+			for (Iterator<Spot<Double>> iterator = subPoints.iterator(); iterator.hasNext();) {
+				Spot<Double> spot = iterator.next();
+				if (outliers.contains(spot.y())) iterator.remove();
+			}
+
 			this.regression = new SingleResponseRegression<>(subPoints, RegressionType.QUADRATIC);
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER,

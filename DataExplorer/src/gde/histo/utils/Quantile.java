@@ -141,30 +141,6 @@ public class Quantile {
 		}
 
 		/**
-		 * fractional error less than x.xx * 10 ^ -4.
-		 * @param z
-		 * @return erf(z) acc. to Algorithm 26.2.17 in Abromowitz and Stegun, Handbook of Mathematical
-		 */
-		public static double erf2(double z) {
-			double t = 1.0 / (1.0 + 0.47047 * Math.abs(z));
-			double poly = t * (0.3480242 + t * (-0.0958798 + t * (0.7478556)));
-			double ans = 1.0 - poly * Math.exp(-z * z);
-			if (z >= 0)
-				return ans;
-			else
-				return -ans;
-		}
-
-		/**
-		 * See Gaussia.java for a better way to compute Phi(z)
-		 * @param z
-		 * @return the cumulative normal distribution
-		 */
-		public static double Phi(double z) {
-			return 0.5 * (1.0 + erf(z / (Math.sqrt(2.0))));
-		}
-
-		/**
 		 * @param sigmaFactor defines the tolerance interval (<em>TI = &plusmn; z * &sigma; with z >= 0</em>)
 		 * @return the probability that a normal deviate lies in the tolerance interval
 		 */
@@ -172,18 +148,6 @@ public class Quantile {
 			return erf(sigmaFactor / Math.sqrt(2.));
 		}
 
-		/**
-		 * Test client
-		 * @param args
-		 */
-		public static void main(String[] args) {
-			double x = Double.parseDouble(args[0]);
-
-			System.out.println(String.format("erf(%f)  = %f", x, ErrorFunction.erf(x))); //$NON-NLS-1$
-			System.out.println(String.format("erf2(%f)  = %f", x, ErrorFunction.erf2(x))); //$NON-NLS-1$
-			System.out.println(String.format("Phi(%f)  = %f", x, ErrorFunction.Phi(x))); //$NON-NLS-1$
-			System.out.println();
-		}
 	}
 
 	/**
@@ -728,18 +692,6 @@ public class Quantile {
 	 */
 	public int getSize() {
 		return this.dPopulation == null ? this.iPopulation.size() : this.dPopulation.size();
-	}
-
-	/**
-	 * @return the outliers based on the sigmaFactor and the outlierFactor
-	 */
-	public <T> List<T> getOutliers() {
-		if (this.iOutliers != null)
-			return (List<T>) this.iOutliers;
-		else if (this.dOutliers != null)
-			return (List<T>) this.dOutliers;
-		else
-			return (List<T>) this.d2Outliers;
 	}
 
 }

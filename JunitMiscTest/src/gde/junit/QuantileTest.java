@@ -35,8 +35,8 @@ import gde.histo.utils.Quantile.Fixings;
 import gde.histo.utils.Spot;
 import gde.histo.utils.UniversalQuantile;
 
-public class QuantileTest extends TestSuperClass { 
-	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285 
+public class QuantileTest extends TestSuperClass {
+	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
 	private final static String	$CLASS_NAME										= QuantileTest.class.getName();
 	private final static Logger	log														= Logger.getLogger($CLASS_NAME);
@@ -48,33 +48,14 @@ public class QuantileTest extends TestSuperClass {
 
 	private Quantile						quantile;
 	private final Integer[]			recordArray										= { 99999, -99999, null, 0, null, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, -5 };	// Size = 18
-	private final Integer[]			sortedArray										= { -99999, -5, 0, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, 99999, null, null };	// realSize = 16 with zero
-	private final double				q0WithZeros										= -99999;																																										// minimum
-	private final double				q1WithZeros										= (8 + 10) / 2.0;																																						// 25%
-	private final double				q2WithZeros										= (50 + 51) / 2.0;																																					// median
-	private final double				q3WithZeros										= (100 + 101) / 2.0;																																				// 75%
-	private final double				q4WithZeros										= 99999.;																																										// maximum
-	private final double				q33PerCentWithZeros						= 25.;
 	private final double				q0Zeros2Null									= -99999.;																																									// minimum
 	private final double				q1Zeros2Null									= 10.;																																											// 25%
 	private final double				q2Zeros2Null									= 51.;																																											// median
 	private final double				q3Zeros2Null									= 101.;																																											// 75%
 	private final double				q4Zeros2Null									= 99999.;																																										// maximum
 	private final double				q33PerCentZeros2Null					= 25.;
-	private final double				lowerWhiskerZeros2NullLimit		= 10. - (101 - 10) * 1.5;																																		// -126.5
-	private final double				upperWhiskerZeros2NullLimit		= 101. + (101 - 10) * 1.5;																																	// 237.5
 	private final double				qLowerWhiskerZeros2Null				= -5;
 	private final double				qUpperWhiskerZeros2Null				= 175.;
-	private final double				lowerWhiskerSampleWithZeros		= 10. - (101 - 10) * 1.5;																																		// -126.5
-	private final double				upperWhiskerSampleWithZeros		= 101. + (101 - 10) * 1.5;																																	// 237.5
-	private final double				qLowerWhiskerSampleWithZeros	= -129.875;																																									// equals the lower fence (1.5*IQR below Q1) for the sample
-	private final double				qUpperWhiskerSampleWithZeros	= 239.125;																																									// equals the upper fence (1.5*IQR above Q3) for the sample
-	private final double				q0SampleWithZeros							= -99999;																																										// minimum
-	private final double				q1SampleWithZeros							= 8 + .25 * (10 - 8);																																				// 25%
-	private final double				q2SampleWithZeros							= 50 + .5 * (51 - 50);																																			// median
-	private final double				q3SampleWithZeros							= 100 + .75 * (101 - 100);																																	// 75%
-	private final double				q4SampleWithZeros							= 99999.;																																										// maximum
-	private final double				q33PerCentSampleWithZeros			= 10 + .61 * (25 - 10);
 	private final double				q0SampleZeros2Null						= -99999.;																																									// minimum
 	private final double				q1SampleZeros2Null						= 10.;																																											// 25%
 	private final double				q2SampleZeros2Null						= 51.;																																											// median
@@ -338,90 +319,6 @@ public class QuantileTest extends TestSuperClass {
 						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
 		}
-	}
-
-	/**
-	 * ET: Vector    Integer performance for sigma based on parallel streams vs. conventional: 17 sec vs. 23 sec
-	 * ET: Vector    Double  performance for sigma based on parallel streams vs. conventional: 39 sec vs. 71 sec
-	 * ET: ArrayList Double  performance for sigma based on parallel streams vs. conventional: 38 sec vs. 69 sec
-	 * ET figures: 10.000 calculations for a Vector / ArrayList with 589.824 elements
-	 */
-	private void estSigmaPerformance() { // ET 10.06.2017 remove sigmaFigure caching before reactivating
-		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
-		for (int i = 0; i < 15; i++) {
-			record.addAll(record);
-		}
-		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-		ArrayList<Double> arrayList = new ArrayList<Double>();
-		for (Integer value : record) {
-			arrayList.add(value != null ? value.doubleValue() : null);
-		}
-		Quantile quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
-		log.log(Level.INFO, " ---> " + this.quantile.getAvgFigure());
-		log.log(Level.INFO, " ---> " + this.quantile.getAvgSlow());
-		log.log(Level.INFO, " ---> " + this.quantile.getSigmaOBS());
-		log.log(Level.INFO, " ---> " + this.quantile.getSigmaRunningOBS());
-		log.log(Level.INFO, " ---> " + this.quantile.getSigmaFigure());
-		long nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			this.quantile.getSigmaOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			this.quantile.getSigmaRunningOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			this.quantile.getSigmaFigure();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			this.quantile.getSigmaOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			this.quantile.getSigmaRunningOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			this.quantile.getSigmaFigure();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			quantileArray.getSigmaOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			quantileArray.getSigmaRunningOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			quantileArray.getSigmaFigure();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			quantileArray.getSigmaOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			quantileArray.getSigmaRunningOBS();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
-		nanoTime = System.nanoTime();
-		for (int i = 0; i < 9999; i++) {
-			quantileArray.getSigmaFigure();
-		}
-		log.log(Level.INFO, " ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime));
 	}
 
 	public void testSampleZero2Null() {
