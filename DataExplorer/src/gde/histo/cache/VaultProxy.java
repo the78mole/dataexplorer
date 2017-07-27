@@ -53,8 +53,7 @@ public final class VaultProxy {
 			try {
 				jaxbUnmarshaller = HistoVault.getJaxbContext().createUnmarshaller();
 				jaxbUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -71,8 +70,7 @@ public final class VaultProxy {
 				jaxbMarshaller = HistoVault.getJaxbContext().createMarshaller();
 				jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 				jaxbMarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -84,7 +82,7 @@ public final class VaultProxy {
 	 * @return the vault or null
 	 * @throws JAXBException
 	 */
-	public HistoVault load(Path fullQualifiedFileName) throws JAXBException {
+	public static HistoVault load(Path fullQualifiedFileName) throws JAXBException {
 		return (HistoVault) getUnmarshaller().unmarshal(fullQualifiedFileName.toFile());
 	}
 
@@ -93,7 +91,7 @@ public final class VaultProxy {
 	 * @return the vault or null
 	 * @throws JAXBException
 	 */
-	public HistoVault load(InputStream inputStream) throws JAXBException {
+	public static HistoVault load(InputStream inputStream) throws JAXBException {
 		return (HistoVault) getUnmarshaller().unmarshal(inputStream);
 	}
 
@@ -102,8 +100,8 @@ public final class VaultProxy {
 	 * @param fullQualifiedFileName is the vault path
 	 * @throws JAXBException
 	 */
-	public void store(HistoVault newVault, Path fullQualifiedFileName) throws JAXBException {
-		getMarshaller().marshal(this, fullQualifiedFileName.toFile());
+	public static void store(HistoVault newVault, Path fullQualifiedFileName) throws JAXBException {
+		getMarshaller().marshal(newVault, fullQualifiedFileName.toFile());
 	}
 
 	/**
@@ -111,7 +109,7 @@ public final class VaultProxy {
 	 * @param outputStream is a stream to the target path
 	 * @throws JAXBException
 	 */
-	public void store(HistoVault newVault, OutputStream outputStream) throws JAXBException {
+	public static void store(HistoVault newVault, OutputStream outputStream) throws JAXBException {
 		getMarshaller().marshal(newVault, outputStream);
 	}
 

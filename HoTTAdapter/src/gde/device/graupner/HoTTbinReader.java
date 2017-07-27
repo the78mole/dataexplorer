@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
@@ -50,7 +50,7 @@ import gde.utils.StringHelper;
 
 /**
  * Class to read Graupner HoTT binary data as saved on SD-Cards
- * 
+ *
  * @author Winfried Brügmann
  */
 public class HoTTbinReader {
@@ -111,13 +111,13 @@ public class HoTTbinReader {
 
 	/**
 	 * get data file info data
-	 * 
+	 *
 	 * @param buffer
 	 *            byte array containing the first 64 byte to analyze the header
 	 * @return hash map containing header data as string accessible by public
 	 *         header keys
-	 * @throws IOException 
-	 * @throws DataTypeException 
+	 * @throws IOException
+	 * @throws DataTypeException
 	 * @throws Exception
 	 */
 	public static HashMap<String, String> getFileInfo(File file) throws IOException, DataTypeException {
@@ -134,7 +134,7 @@ public class HoTTbinReader {
 			fileInfo = new HashMap<String, String>();
 			fileInfo.put(HoTTAdapter.FILE_PATH, file.getPath());
 			file_input = new FileInputStream(file);
-			data_in = new DataInputStream(file_input); // MARK ### see below
+			data_in = new DataInputStream(file_input); 
 
 			// begin evaluate for HoTTAdapterX files containing normal HoTT V4
 			// sensor data
@@ -192,10 +192,8 @@ public class HoTTbinReader {
 			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
 				HoTTAdapter.isSensorType[i] = false;
 			}
+			data_in.close();
 
-			if (data_in != null)
-				data_in.close(); // ET MARK ### not sure if there is a resource
-			// leak without this line
 			file_input = new FileInputStream(file);
 			data_in = new DataInputStream(file_input);
 			data_in.read(buffer);
@@ -267,7 +265,7 @@ public class HoTTbinReader {
 
 	/**
 	 * convert from Rx dbm to strength using lookup table
-	 * 
+	 *
 	 * @param inValue
 	 * @return
 	 */
@@ -283,7 +281,7 @@ public class HoTTbinReader {
 
 	/**
 	 * read complete file data and display the first found record set
-	 * 
+	 *
 	 * @param filePath
 	 * @throws Exception
 	 */
@@ -306,7 +304,7 @@ public class HoTTbinReader {
 
 	/**
 	 * read log data according to version 0
-	 * 
+	 *
 	 * @param file
 	 * @throws IOException
 	 * @throws DataInconsitsentException
@@ -747,7 +745,7 @@ public class HoTTbinReader {
 	/**
 	 * compose the record set extend to give capability to identify source of
 	 * this record set
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 */
@@ -758,7 +756,7 @@ public class HoTTbinReader {
 	/**
 	 * compose the record set extend to give capability to identify source of
 	 * this record set
-	 * 
+	 *
 	 * @param fileName
 	 * @return
 	 */
@@ -788,7 +786,7 @@ public class HoTTbinReader {
 
 	/**
 	 * read log data according to version 0
-	 * 
+	 *
 	 * @param file
 	 * @param data_in
 	 * @throws IOException
@@ -1200,7 +1198,7 @@ public class HoTTbinReader {
 	// code. so this specific code is not scattered over two classes.
 	/**
 	 * parse the buffered data from buffer and add points to record set
-	 * 
+	 *
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
@@ -1211,7 +1209,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer
-	 * 
+	 *
 	 * @param _buf
 	 */
 	protected static void parse4Receiver(byte[] _buf) {
@@ -1241,7 +1239,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer and add points to record set
-	 * 
+	 *
 	 * @param _buf
 	 * @throws DataInconsitsentException
 	 */
@@ -1252,7 +1250,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer
-	 * 
+	 *
 	 * @param _buf
 	 */
 	protected static void parse4Channel(byte[] _buf) {
@@ -1303,7 +1301,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 2 and add points to record set
-	 * 
+	 *
 	 * @param sdLogVersion
 	 * @param _buf0
 	 * @param _buf1
@@ -1320,7 +1318,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 2
-	 * 
+	 *
 	 * @param sdLogVersion
 	 * @param _buf0
 	 * @param _buf1
@@ -1349,7 +1347,7 @@ public class HoTTbinReader {
 
 	/**
 	 * detect the SD Log Version V3 or V4
-	 * 
+	 *
 	 * @param _buf1
 	 * @param _buf2
 	 * @return
@@ -1364,7 +1362,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 3 and add points to record set
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1380,7 +1378,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 3
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1444,7 +1442,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 4 and add points to record set
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1462,7 +1460,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 4
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1526,7 +1524,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 4 and add points to record set
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1544,7 +1542,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 4
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1614,7 +1612,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 4 and add points to record set
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1631,7 +1629,7 @@ public class HoTTbinReader {
 
 	/**
 	 * parse the buffered data from buffer 0 to 4 and add points to record set
-	 * 
+	 *
 	 * @param _buf0
 	 * @param _buf1
 	 * @param _buf2
@@ -1697,7 +1695,7 @@ public class HoTTbinReader {
 	/**
 	 * @param file
 	 * @param numberDatablocks
-	 * @return get a rectified start timestamp if the files's last modified timestamp does not correspond with the filename 
+	 * @return get a rectified start timestamp if the files's last modified timestamp does not correspond with the filename
 	 */
 	protected static long getStartTimeStamp(File file, long numberDatablocks) {
 		final long startTimeStamp;
@@ -1724,9 +1722,9 @@ public class HoTTbinReader {
 				log.log(Level.FINE,	"lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", file.lastModified()) + " " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", lastModifiedDate.getTimeInMillis()));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			else {
-				// spread the logCounter into steps of 10 minutes 
+				// spread the logCounter into steps of 10 minutes
 				GregorianCalendar fileNameDate = new GregorianCalendar(year, month - 1, day, 0, 0, 0);
-				fileNameDate.add(GregorianCalendar.MINUTE, 10 * (logCounter % (24 * 6)));
+				fileNameDate.add(Calendar.MINUTE, 10 * (logCounter % (24 * 6)));
 				startTimeStamp = fileNameDate.getTimeInMillis();
 				log.log(Level.FINE, "fileNameDate=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", fileNameDate.getTimeInMillis())); //$NON-NLS-1$ //$NON-NLS-2$
 			}

@@ -38,35 +38,35 @@ import gde.histo.utils.UniversalQuantile;
 public class QuantileTest extends TestSuperClass {
 	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
-	private final static String	$CLASS_NAME										= QuantileTest.class.getName();
-	private final static Logger	log														= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME									= QuantileTest.class.getName();
+	private final static Logger	log													= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * value 100; reduce to 0 to shorten the elapsed Junit test time
 	 */
-	private final static int		performanceTestLoops					= 100;
+	private final static int		performanceTestLoops				= 100;
 
 	private Quantile						quantile;
-	private final Integer[]			recordArray										= { 99999, -99999, null, 0, null, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, -5 };	// Size = 18
-	private final double				q0Zeros2Null									= -99999.;																																									// minimum
-	private final double				q1Zeros2Null									= 10.;																																											// 25%
-	private final double				q2Zeros2Null									= 51.;																																											// median
-	private final double				q3Zeros2Null									= 101.;																																											// 75%
-	private final double				q4Zeros2Null									= 99999.;																																										// maximum
-	private final double				q33PerCentZeros2Null					= 25.;
-	private final double				qLowerWhiskerZeros2Null				= -5;
-	private final double				qUpperWhiskerZeros2Null				= 175.;
-	private final double				q0SampleZeros2Null						= -99999.;																																									// minimum
-	private final double				q1SampleZeros2Null						= 10.;																																											// 25%
-	private final double				q2SampleZeros2Null						= 51.;																																											// median
-	private final double				q3SampleZeros2Null						= 101.;																																											// 75%
-	private final double				q4SampleZeros2Null						= 99999.;																																										// maximum
-	private final double				q33PerCentSampleZeros2Null		= 25 + .28 * (49 - 25);
-	private final Integer[]			size1Array										= { -99999 };
-	private final double				qxSize1Array									= -99999.;
-	private final Integer[]			size1ArrayNull								= { null };
+	private final Integer[]			recordArray									= { 99999, -99999, null, 0, null, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, -5 };	// Size = 18
+	private final double				q0Zeros2Null								= -99999.;																																									// minimum
+	private final double				q1Zeros2Null								= 10.;																																											// 25%
+	private final double				q2Zeros2Null								= 51.;																																											// median
+	private final double				q3Zeros2Null								= 101.;																																											// 75%
+	private final double				q4Zeros2Null								= 99999.;																																										// maximum
+	private final double				q33PerCentZeros2Null				= 25.;
+	private final double				qLowerWhiskerZeros2Null			= -5;
+	private final double				qUpperWhiskerZeros2Null			= 175.;
+	private final double				q0SampleZeros2Null					= -99999.;																																									// minimum
+	private final double				q1SampleZeros2Null					= 10.;																																											// 25%
+	private final double				q2SampleZeros2Null					= 51.;																																											// median
+	private final double				q3SampleZeros2Null					= 101.;																																											// 75%
+	private final double				q4SampleZeros2Null					= 99999.;																																										// maximum
+	private final double				q33PerCentSampleZeros2Null	= 25 + .28 * (49 - 25);
+	private final Integer[]			size1Array									= { -99999 };
+	private final double				qxSize1Array								= -99999.;
+	private final Integer[]			size1ArrayNull							= { null };
 
-	private static final double	DELTA													= 1e-9;
+	private static final double	DELTA												= 1e-9;
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -138,8 +138,8 @@ public class QuantileTest extends TestSuperClass {
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), true);
-					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS), true);
+					this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS));
+					quantileArray = new Quantile(arrayList, EnumSet.of(Fixings.REMOVE_NULLS));
 					nanoTimeSigmaInt -= System.nanoTime();
 					this.quantile.getSigmaFigure();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -197,8 +197,8 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt)
+						+ "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
@@ -212,8 +212,8 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt)
+						+ "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
 		}
 		{
@@ -338,8 +338,7 @@ public class QuantileTest extends TestSuperClass {
 		try {
 			this.quantile = new Quantile(record, EnumSet.noneOf(Fixings.class), 6, 9);
 			fail("Should throw an exception");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			//
 		}
 	}
@@ -382,8 +381,7 @@ public class QuantileTest extends TestSuperClass {
 		try {
 			this.quantile.getQuartile2();
 			fail("Should throw an exception");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			//
 		}
 	}

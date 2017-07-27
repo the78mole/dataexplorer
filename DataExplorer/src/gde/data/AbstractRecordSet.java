@@ -143,7 +143,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 		this.device = useDevice;
 
 		this.parent = this.channels.get(channelNumber);
-		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
+		this.name = newName.length() <= AbstractRecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeSteps;

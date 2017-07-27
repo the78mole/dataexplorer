@@ -27,7 +27,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -115,8 +114,7 @@ public final class HistoCurveUtils {
 			yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		else {
+		} else {
 			if (device != null) { // adapt to device specific range
 				if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
 					; // in case of an empty record leave the values unchanged
@@ -145,8 +143,7 @@ public final class HistoCurveUtils {
 				if (record.getAvgValue() > 0) { // main part of curve is on positive side
 					yMinValueDisplay = 0;
 					yMinValue = yMinValueDisplay - record.getOffset();
-				}
-				else {// main part of curve is on negative side
+				} else {// main part of curve is on negative side
 					yMaxValueDisplay = 0;
 					yMaxValue = yMaxValueDisplay - record.getOffset();
 				}
@@ -189,8 +186,7 @@ public final class HistoCurveUtils {
 			else
 				gc.setForeground(DataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
-		}
-		else {
+		} else {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); //yMax
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -243,7 +239,7 @@ public final class HistoCurveUtils {
 		Point newPoint, oldPoint = null;
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
-				drawHistoMarker(gc, newPoint, record.getColor(), timeLine.getDensity());
+				drawHistoMarker(gc, newPoint, timeLine.getDensity());
 				if (oldPoint != null) {
 					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
@@ -291,8 +287,7 @@ public final class HistoCurveUtils {
 		for (PointArray pointArray : suitePoints) {
 			if (pointArray == null) {
 				; // neither boxplot nor the rangeplot needs this information
-			}
-			else {
+			} else {
 				if (record.getTrailSelector().isBoxPlotSuite()) {
 					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
 					// helper variables
@@ -309,25 +304,23 @@ public final class HistoCurveUtils {
 					gc.drawLine(posX - halfBoxWidth, q2PosY, posX + halfBoxWidth, q2PosY);
 					// draw min and lower whisker
 					if (q0PosY > qLowerWhiskerY) {
-						drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), record.getColor(), timeLine.getDensity());
+						drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), timeLine.getDensity());
 					}
 					gc.drawLine(posX, qLowerWhiskerY, posX, q1PosY);
 					gc.drawLine(posX - halfBoxWidth / 2, qLowerWhiskerY, posX + halfBoxWidth / 2, qLowerWhiskerY);
 					// draw max and upper whisker
 					if (q4PosY < qUpperWhiskerY) {
-						drawHistoMarker(gc, new Point(posX, pointArray.getY(4)), record.getColor(), timeLine.getDensity());
+						drawHistoMarker(gc, new Point(posX, pointArray.getY(4)), timeLine.getDensity());
 					}
 					gc.drawLine(posX, qUpperWhiskerY, posX, q3PosY);
 					gc.drawLine(posX - halfBoxWidth / 2, qUpperWhiskerY, posX + halfBoxWidth / 2, qUpperWhiskerY);
-				}
-				else if (record.getTrailSelector().isRangePlotSuite()) { // other suite members do not require a special treatment
+				} else if (record.getTrailSelector().isRangePlotSuite()) { // other suite members do not require a special treatment
 					final int posX = pointArray.getX();
-					drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), record.getColor(), timeLine.getDensity());
+					drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), timeLine.getDensity());
 					// helper variables
 					if (oldPoints == null) {
 						; // no connecting lines required
-					}
-					else {
+					} else {
 						final int oldPosX = oldPoints.getX();
 						if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
 						// draw main curve
@@ -347,8 +340,7 @@ public final class HistoCurveUtils {
 					gc.setLineStyle(SWT.LINE_SOLID);
 
 					oldPoints = pointArray;
-				}
-				else {
+				} else {
 					throw new UnsupportedOperationException();
 				}
 			}
@@ -366,21 +358,18 @@ public final class HistoCurveUtils {
 		}
 	}
 
-	private static void drawHistoMarker(GC gc, Point newPoint, Color color, Density density) {
+	private static void drawHistoMarker(GC gc, Point newPoint, Density density) {
 		if (density == HistoTimeLine.Density.LOW) {
 			//Color last = gc.getBackground();
 			//gc.setBackground(color);
 			//gc.fillOval(newPoint.x - 4, newPoint.y - 4, 8, 8);
 			//gc.setBackground(last);
 			gc.drawOval(newPoint.x - 3, newPoint.y - 3, 6, 6);
-		}
-		else if (density == HistoTimeLine.Density.MEDIUM) {
+		} else if (density == HistoTimeLine.Density.MEDIUM) {
 			gc.drawOval(newPoint.x - 2, newPoint.y - 2, 4, 4);
-		}
-		else if (density == HistoTimeLine.Density.HIGH) {
+		} else if (density == HistoTimeLine.Density.HIGH) {
 			gc.drawOval(newPoint.x - 1, newPoint.y - 1, 2, 2);
-		}
-		else if (density == HistoTimeLine.Density.EXTREME) {
+		} else if (density == HistoTimeLine.Density.EXTREME) {
 			gc.drawOval(newPoint.x - 1, newPoint.y - 1, 2, 2);
 		}
 	}
@@ -422,8 +411,7 @@ public final class HistoCurveUtils {
 				gc.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
 				if (actualRecord.getTrailSelector().isTrailSuite()) {
 					HistoCurveUtils.drawHistoSuite(actualRecord, gc, x0, y0, width, height, timeLine);
-				}
-				else {
+				} else {
 					// CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
 					HistoCurveUtils.drawHistoCurve(actualRecord, gc, x0, y0, width, height, timeLine);
 				}

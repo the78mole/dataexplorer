@@ -126,7 +126,13 @@ public final class VaultCollector {
 				}
 			}
 
-			complementScorePoints(recordSet, scorePoints);
+			scorePoints[ScoreLabelTypes.DURATION_MM.ordinal()] = (int) (recordSet.getMaxTime_ms() / 60000. * 1000. + .5);
+			scorePoints[ScoreLabelTypes.AVERAGE_TIME_STEP_MS.ordinal()] = (int) (recordSet.getAverageTimeStep_ms() * 1000.);
+			scorePoints[ScoreLabelTypes.MAXIMUM_TIME_STEP_MS.ordinal()] = (int) (recordSet.getMaximumTimeStep_ms() * 1000.);
+			scorePoints[ScoreLabelTypes.MINIMUM_TIME_STEP_MS.ordinal()] = (int) (recordSet.getMinimumTimeStep_ms() * 1000.);
+			scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (recordSet.getSigmaTimeStep_ms() * 1000.);
+			scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = recordSet.getRecordDataSize(true);
+
 			setScorePoints(scorePoints);
 		}
 	}
@@ -149,8 +155,7 @@ public final class VaultCollector {
 
 			if (!record.hasReasonableData()) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
-			}
-			else {
+			} else {
 				StatisticsType measurementStatistics = measurementType.getStatistics();
 				if (measurementStatistics != null) { // this creates trail types mismatch  :  && record.hasReasonableData()) {
 					trailPoints.putAll(getTrailStatisticsPoints(record, measurementStatistics, recordSet));
@@ -186,24 +191,21 @@ public final class VaultCollector {
 						evaluator.addFromTransition(transition);
 					}
 					histoSettlements.put(settlementType.getName(), histoSettlement);
-				}
-				else if (transitionAmountType != null) {
+				} else if (transitionAmountType != null) {
 					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					AmountEvaluator evaluator = new AmountEvaluator(histoSettlement);
 					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
 					histoSettlements.put(settlementType.getName(), histoSettlement);
-				}
-				else if (calculationType != null) {
+				} else if (calculationType != null) {
 					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					CalculusEvaluator evaluator = new CalculusEvaluator(histoSettlement);
 					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
 					histoSettlements.put(settlementType.getName(), histoSettlement);
-				}
-				else {
+				} else {
 					throw new UnsupportedOperationException();
 				}
 			}
@@ -235,8 +237,7 @@ public final class VaultCollector {
 				trailPoints.put(TrailTypes.REAL_AVG, record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0);
 			else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
 				trailPoints.put(TrailTypes.REAL_AVG, triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
-		}
-		else {
+		} else {
 			trailPoints.put(TrailTypes.REAL_AVG, record.getAvgValue());
 		}
 		if (measurementStatistics.isMax()) {
@@ -244,8 +245,7 @@ public final class VaultCollector {
 				trailPoints.put(TrailTypes.REAL_MAX, record.getMaxValueTriggered());
 			else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
 				trailPoints.put(TrailTypes.REAL_MAX, triggerRefOrdinal < 0 ? record.getRealMaxValue() : (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
-		}
-		else {
+		} else {
 			trailPoints.put(TrailTypes.REAL_MAX, record.getRealMaxValue());
 		}
 		if (measurementStatistics.isMin()) {
@@ -253,8 +253,7 @@ public final class VaultCollector {
 				trailPoints.put(TrailTypes.REAL_MIN, record.getMinValueTriggered());
 			else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) //
 				trailPoints.put(TrailTypes.REAL_MIN, triggerRefOrdinal < 0 ? record.getRealMinValue() : (Integer) record.getMinValueTriggered(triggerRefOrdinal));
-		}
-		else {
+		} else {
 			trailPoints.put(TrailTypes.REAL_MIN, record.getRealMinValue());
 		}
 		if (measurementStatistics.isSigma()) {
@@ -262,8 +261,7 @@ public final class VaultCollector {
 				trailPoints.put(TrailTypes.REAL_SD, record.getSigmaValueTriggered());
 			else if (triggerRefOrdinal < 0 || record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
 				trailPoints.put(TrailTypes.REAL_SD, triggerRefOrdinal < 0 ? (Integer) record.getSigmaValue() : (Integer) record.getSigmaValueTriggered(triggerRefOrdinal));
-		}
-		else {
+		} else {
 			trailPoints.put(TrailTypes.REAL_SD, record.getSigmaValue());
 		}
 		if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
@@ -272,8 +270,7 @@ public final class VaultCollector {
 					int deltaValue = record.getSumTriggeredRange();
 					double translatedValue = device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction / offset
 					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, (int) (device.reverseTranslateValue(record, translatedValue) * 1000.));
-				}
-				else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+				} else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					int deltaValue = record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal());
 					double translatedValue = device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction / offset
 					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, (int) (device.reverseTranslateValue(record, translatedValue) * 1000.));
@@ -287,8 +284,7 @@ public final class VaultCollector {
 						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.)
 								/ device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
 						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, (int) (device.reverseTranslateValue(record, ratio) * 1000.)); // multiply by 1000 -> all ratios are internally stored multiplied by thousand
-					}
-					else if (referencedStatistics.isMax()) {
+					} else if (referencedStatistics.isMax()) {
 						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.)
 								/ device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
 						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, (int) (device.reverseTranslateValue(record, ratio) * 1000.)); // multiply by 1000 -> all ratios are internally stored multiplied by thousand
@@ -406,20 +402,6 @@ public final class VaultCollector {
 	}
 
 	/**
-	 * Fill in score points calculated from recordset data.
-	 * @param recordSet
-	 * @param scorePoints
-	 */
-	private void complementScorePoints(RecordSet recordSet, Integer[] scorePoints) {
-		scorePoints[ScoreLabelTypes.DURATION_MM.ordinal()] = (int) (recordSet.getMaxTime_ms() / 60000. * 1000. + .5);
-		scorePoints[ScoreLabelTypes.AVERAGE_TIME_STEP_MS.ordinal()] = (int) (recordSet.getAverageTimeStep_ms() * 1000.);
-		scorePoints[ScoreLabelTypes.MAXIMUM_TIME_STEP_MS.ordinal()] = (int) (recordSet.getMaximumTimeStep_ms() * 1000.);
-		scorePoints[ScoreLabelTypes.MINIMUM_TIME_STEP_MS.ordinal()] = (int) (recordSet.getMinimumTimeStep_ms() * 1000.);
-		scorePoints[ScoreLabelTypes.SIGMA_TIME_STEP_MS.ordinal()] = (int) (recordSet.getSigmaTimeStep_ms() * 1000.);
-		scorePoints[ScoreLabelTypes.SAMPLED_READINGS.ordinal()] = recordSet.getRecordDataSize(true);
-	}
-
-	/**
 	 * Add the score points to the vault.
 	 * @param scorePoints
 	 */
@@ -438,8 +420,7 @@ public final class VaultCollector {
 			log.log(Level.INFO, String.format("%s candidate found for wrong device '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogDeviceName(), this.vault.getLogFilePath(), //$NON-NLS-1$
 					this.vault.getStartTimeStampFormatted()));
 			return false;
-		}
-		else
+		} else
 			return true;
 	}
 
@@ -449,8 +430,7 @@ public final class VaultCollector {
 					String.format("%s candidate for invalid channel  %d '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogChannelNumber(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
 							this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
-		}
-		else
+		} else
 			return true;
 	}
 
@@ -464,8 +444,7 @@ public final class VaultCollector {
 			log.log(Level.FINE, String.format("%s candidate out of time range      '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
 					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
-		}
-		else
+		} else
 			return true;
 	}
 
@@ -476,13 +455,11 @@ public final class VaultCollector {
 			log.log(Level.INFO, String.format("%s candidate found for empty object '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogObjectKey(), //$NON-NLS-1$
 					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = this.settings.getFilesWithoutObject();
-		}
-		else if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
+		} else if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
 			log.log(Level.INFO, String.format("%s candidate found for wrong object '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
 					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = this.settings.getFilesWithOtherObject();
-		}
-		else if (this.application.getActiveObject() == null || isValidatedObjectKey) {
+		} else if (this.application.getActiveObject() == null || isValidatedObjectKey) {
 			log.log(Level.FINE, String.format("%s candidate found for object       '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
 					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = true;

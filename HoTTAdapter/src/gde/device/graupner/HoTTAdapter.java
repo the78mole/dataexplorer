@@ -164,10 +164,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 
 		/**
-		 * @param isSensorType sensors which are available are marked with true
-		 * @return names of the sensors which are available
+		 * @return names of the sensors which are available (w/o receiver, w/o 'channels')
 		 */
-		public static List<String> getSensorNames(boolean[] isSensorType) {
+		public static List<String> getSensorNames() {
 			List<String> sensors = new ArrayList<String>();
 			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
 				if (HoTTAdapter.isSensorType[i]) sensors.add(HoTTAdapter.Sensor.fromOrdinal(i).name());
@@ -176,17 +175,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 
 		/**
-		 * @param isSensorType sensors which are available are marked with true
-		 * @return channel numbers of the sensors which are available including the receiver
+		 * @return channel numbers of the sensors which are available (including the receiver and 'channels')
 		 */
-		public static List<Integer> getChannelNumbers(boolean[] isSensorType) {
-			List<Integer> sensors = new ArrayList<Integer>();
-			sensors.add(Sensor.RECEIVER.channelNumber); // always present
-			sensors.add(Sensor.CHANNEL.channelNumber); // always present
+		public static List<Integer> getChannelNumbers() {
+			List<Integer> result = new ArrayList<Integer>();
+			result.add(Sensor.RECEIVER.channelNumber); // always present
+			result.add(Sensor.CHANNEL.channelNumber); // always present
 			for (int i = 1; i < HoTTAdapter.isSensorType.length; i++) {
-				if (HoTTAdapter.isSensorType[i]) sensors.add(HoTTAdapter.Sensor.fromOrdinal(i).channelNumber);
+				if (HoTTAdapter.isSensorType[i]) result.add(HoTTAdapter.Sensor.fromOrdinal(i).channelNumber);
 			}
-			return sensors;
+			return result;
 		}
 
 		public static List<Sensor> getAsList() {
@@ -1318,7 +1316,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterM.class) || HoTTAdapter.this.getClass().equals(HoTTAdapterX.class)) {
 									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
 								} else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class) || HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class)) {
-									HoTTbinReader2.channels.switchChannel(selectedChannel.getName());
+									HoTTbinReader.channels.switchChannel(selectedChannel.getName());
 									selectedChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
 								} else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class)) {
 									HoTTbinReader.channels.switchChannel(selectedChannel.getName());

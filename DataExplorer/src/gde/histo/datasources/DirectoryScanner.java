@@ -249,7 +249,7 @@ public final class DirectoryScanner {
 	 * @param fileName
 	 * @return
 	 */
-	private String getRecordSetExtend(String fileName) {
+	private static String getRecordSetExtend(String fileName) {
 		String recordSetNameExtend = GDE.STRING_EMPTY;
 		if (fileName.contains(GDE.STRING_UNDER_BAR)) {
 			try {

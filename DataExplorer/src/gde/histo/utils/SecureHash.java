@@ -38,16 +38,17 @@ public final class SecureHash {
 	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	public static String sha1(String input) {
+		StringBuilder sb = new StringBuilder();
 		byte[] hashBytes = null;
 		try {
 			hashBytes = MessageDigest.getInstance("SHA1").digest(input.getBytes()); //$NON-NLS-1$
-		}
-		catch (NoSuchAlgorithmException e) {
+			if (hashBytes != null) {
+				for (byte hashByte : hashBytes) {
+					sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
+				}
+			}
+		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
-		}
-		StringBuilder sb = new StringBuilder();
-		for (byte hashByte : hashBytes) {
-			sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
 		}
 		return sb.toString();
 	}
@@ -59,25 +60,26 @@ public final class SecureHash {
 	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	public static String sha1(File file) throws IOException {
+		StringBuilder sb = new StringBuilder();
 		MessageDigest sha1Digest = null;
 		try {
 			sha1Digest = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
-		}
-		catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		byte[] hashBytes = null;
-		try (FileInputStream fis = new FileInputStream(file)) {
-			byte[] data = new byte[8192]; // most file systems are configured to use block sizes of 4096 or 8192
-			int read = 0;
-			while ((read = fis.read(data)) != -1) {
-				sha1Digest.update(data, 0, read);
+
+			byte[] hashBytes = null;
+			try (FileInputStream fis = new FileInputStream(file)) {
+				byte[] data = new byte[8192]; // most file systems are configured to use block sizes of 4096 or 8192
+				int read = 0;
+				while ((read = fis.read(data)) != -1) {
+					sha1Digest.update(data, 0, read);
+				}
+				hashBytes = sha1Digest.digest();
 			}
-			hashBytes = sha1Digest.digest();
-		}
-		StringBuilder sb = new StringBuilder();
-		for (byte hashByte : hashBytes) {
-			sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
+			for (byte hashByte : hashBytes) {
+				sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
+			}
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
 		}
 		return sb.toString();
 	}

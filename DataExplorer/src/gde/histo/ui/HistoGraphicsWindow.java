@@ -54,7 +54,7 @@ public final class HistoGraphicsWindow extends CTabItem {
 	private HistoSelectorComposite	curveSelectorComposite;
 	private HistoGraphicsComposite	graphicsComposite;
 
-	private final DataExplorer			application = DataExplorer.getInstance();
+	private final DataExplorer			application							= DataExplorer.getInstance();
 
 	public HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
@@ -88,8 +88,7 @@ public final class HistoGraphicsWindow extends CTabItem {
 			this.graphicsComposite.doRedrawGraphics();
 			this.graphicsComposite.updateCaptions();
 			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -107,8 +106,7 @@ public final class HistoGraphicsWindow extends CTabItem {
 	public void updateCaptions() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.graphicsComposite.updateCaptions();
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -124,8 +122,7 @@ public final class HistoGraphicsWindow extends CTabItem {
 	public void updateCurveSelectorTable() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -149,15 +146,14 @@ public final class HistoGraphicsWindow extends CTabItem {
 			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
-		newSelectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth / 2 ? tabFolderClientAreaWidth / 2 : newSelectorCompositeWidth;
-		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth };
-		log.log(Level.FINER, "newSelectorCompositeWidth= ", newSelectorCompositeWidth); //$NON-NLS-1$
+		int selectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth / 2 ? tabFolderClientAreaWidth / 2 : newSelectorCompositeWidth;
+		int[] newWeights = new int[] { selectorCompositeWidth, tabFolderClientAreaWidth - selectorCompositeWidth };
+		log.log(Level.FINER, "newSelectorCompositeWidth= ", selectorCompositeWidth); //$NON-NLS-1$
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			try {
 				this.graphicSashForm.setWeights(this.sashFormWeights);
-			}
-			catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -234,14 +230,14 @@ public final class HistoGraphicsWindow extends CTabItem {
 		this.graphicSashForm.print(imageGC);
 		if (GDE.IS_MAC) {
 			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
-			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), bounds.width - graphics.getBounds().width, 0);
+			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(graphics.getImageData())), bounds.width - graphics.getBounds().width, 0);
 		}
 		imageGC.dispose();
 
 		return tabContentImage;
 	}
 
-	ImageData flipHorizontal(ImageData inputImageData) {
+	private static ImageData flipHorizontal(ImageData inputImageData) {
 		int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
 		int outBytesPerLine = inputImageData.width * bytesPerPixel;
 		byte[] outDataBytes = new byte[inputImageData.data.length];

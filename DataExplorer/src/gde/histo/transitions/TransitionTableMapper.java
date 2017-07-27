@@ -43,7 +43,7 @@ public final class TransitionTableMapper {
 	public static synchronized String[] getExtendedRow(RecordSet recordSet, int index, String[] dataTableRow) {
 		int tableColumnsSize = recordSet.getVisibleAndDisplayableRecordsForTable().size() + 1;
 		HashMap<Integer, TransitionGroupType> transitionGroups = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber()).getTransitionGroups();
-		dataTableRow = Arrays.copyOf(dataTableRow, tableColumnsSize + transitionGroups.size());
+		String[] tableRow = Arrays.copyOf(dataTableRow, tableColumnsSize + transitionGroups.size());
 
 		int columnIndex = tableColumnsSize;
 		for (Entry<Integer, TransitionGroupType> transitionsGroupsEntry : transitionGroups.entrySet()) {
@@ -51,12 +51,12 @@ public final class TransitionTableMapper {
 			if (transitions != null) {
 				Transition transition = transitions.get((long) recordSet.getTime_ms(index));
 				if (transition != null) {
-					dataTableRow[columnIndex] = Integer.toString(transition.getTransitionType().getTransitionId());
+					tableRow[columnIndex] = Integer.toString(transition.getTransitionType().getTransitionId());
 				}
 			}
 			columnIndex++;
 		}
-		return dataTableRow;
+		return tableRow;
 	}
 
 }

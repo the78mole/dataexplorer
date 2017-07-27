@@ -348,7 +348,7 @@ public class Quantile {
 	 * @param iPopulation
 	 * @param fixings define how to proceed with the data
 	 */
-	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings, boolean obsolete) {
+	public Quantile(Vector<Integer> iPopulation, EnumSet<Fixings> fixings) {
 		this.dPopulation = null;
 		if (iPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.fixings = fixings;
@@ -377,7 +377,7 @@ public class Quantile {
 	 * @param dPopulation
 	 * @param fixings define how to proceed with the data
 	 */
-	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings, boolean obsolete) {
+	public Quantile(Collection<Double> dPopulation, EnumSet<Fixings> fixings) {
 		this.iPopulation = null;
 		if (dPopulation.isEmpty()) throw new UnsupportedOperationException();
 		this.fixings = fixings;

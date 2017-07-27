@@ -83,8 +83,7 @@ public final class VaultReaderWriter {
 				histoVaults = HistoOsdReaderWriter.readVaults(filePath, trusses.values());
 			else
 				throw new IllegalArgumentException();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			histoVaults = new ArrayList<ExtendedVault>();
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 			log.log(Level.INFO, String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
@@ -133,8 +132,7 @@ public final class VaultReaderWriter {
 					if (map.size() == 0) trussJobsIterator.remove();
 				}
 			}
-		}
-		else if (!VaultReaderWriter.settings.isZippedCache() && FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
+			} else if (!VaultReaderWriter.settings.isZippedCache() && FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
 			Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 			while (trussJobsIterator.hasNext()) {
 				final Map<String, VaultCollector> map = trussJobsIterator.next().getValue();
@@ -184,23 +182,20 @@ public final class VaultReaderWriter {
 						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
 							vaultIO.store(histoVault, zipOutputStream);
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							log.log(Level.SEVERE, e.getMessage(), e);
 						}
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			FileUtils.checkDirectoryAndCreate(cacheFilePath.toString());
 			for (ExtendedVault histoVault : newVaults) {
 				Path filePath = cacheFilePath.resolve(histoVault.getVaultFileName());
 				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
 					vaultIO.store(histoVault, outputStream);
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}

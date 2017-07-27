@@ -36,7 +36,9 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class PeakAnalyzer extends AbstractAnalyzer {
+	@SuppressWarnings("hiding")
 	final static String			$CLASS_NAME	= PeakAnalyzer.class.getName();
+	@SuppressWarnings("hiding")
 	final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final RecordSet	recordSet;
@@ -88,8 +90,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 					this.thresholdDeque.initialize(i);
 					this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 					log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
-				}
-				else { // continue waiting for trigger fire
+				} else { // continue waiting for trigger fire
 					this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 				}
 				break;
@@ -104,15 +105,13 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 					this.recoveryDeque.initialize(i);
 					this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
 					log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
-				}
-				else if (!this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns)) {
+				} else if (!this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns)) {
 					this.triggerState = TriggerState.WAITING;
 					log.log(Level.FINER, " isThresholdTimeExceeded ", this); //$NON-NLS-1$
 					this.referenceDeque.addLastByMoving(this.thresholdDeque);
 					// referenceStartIndex is not modified by jitters
 					this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-				}
-				else { // threshold phase continues
+				} else { // threshold phase continues
 					this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 				}
 				break;
@@ -134,8 +133,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 						this.referenceDeque.initialize(this.recoveryDeque.startIndex);
 						this.referenceDeque.addLastByMoving(this.recoveryDeque);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
-					}
-					else {
+					} else {
 						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("%d trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 								transitionType.getTransitionId(), this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 						this.triggerState = TriggerState.WAITING;
@@ -145,11 +143,9 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 						// referenceStartIndex is not modified by jitters
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
-				}
-				else if (isPersistentRecovery) { // go on with the recovery
+				} else if (isPersistentRecovery) { // go on with the recovery
 					this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
-				}
-				else {
+				} else {
 					log.log(Level.FINER, " recovery level not stable ", this); //$NON-NLS-1$
 					// try to extend the threshold time
 					int removedCount = this.thresholdDeque.tryAddLastByMoving(this.recoveryDeque);
@@ -160,8 +156,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 						this.triggerState = TriggerState.TRIGGERED;
 						// thresholdStartIndex is not modified by jitters;
 						this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
-					}
-					else {
+					} else {
 						// now the threshold time is exceeded and the current value does not fit in the recovery phase
 						this.triggerState = TriggerState.WAITING;
 						this.referenceDeque.addLastByMoving(this.thresholdDeque);

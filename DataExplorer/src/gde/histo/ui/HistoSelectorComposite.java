@@ -62,7 +62,7 @@ public final class HistoSelectorComposite extends Composite {
 	private final static String			$CLASS_NAME							= HistoSelectorComposite.class.getName();
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
-	private static final int				TEXT_EXTENT_FACTOR				= 6;
+	private static final int				TEXT_EXTENT_FACTOR			= 6;
 
 	private final DataExplorer			application							= DataExplorer.getInstance();
 	private final HistoSet					histoSet								= HistoSet.getInstance();
@@ -141,8 +141,7 @@ public final class HistoSelectorComposite extends Composite {
 								toggleRecordSelection(tableItem, false, false);
 							}
 						}
-					}
-					else {
+					} else {
 						for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
 							if (!tableItem.getChecked()) {
 								toggleRecordSelection(tableItem, false, true);
@@ -256,8 +255,7 @@ public final class HistoSelectorComposite extends Composite {
 						isOneVisible = true;
 						item.setChecked(true);
 						item.setData(DataExplorer.OLD_STATE, true);
-					}
-					else {
+					} else {
 						item.setChecked(false);
 						item.setData(DataExplorer.OLD_STATE, false);
 					}
@@ -320,8 +318,7 @@ public final class HistoSelectorComposite extends Composite {
 			HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(true);
 			tableItem.setData(DataExplorer.OLD_STATE, true);
 			setHeaderSelection(true);
-		}
-		else {
+		} else {
 			activeRecord.setVisible(false);
 			// activeRecord.setDisplayable(false);
 			HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(false);
@@ -345,9 +342,11 @@ public final class HistoSelectorComposite extends Composite {
 			isToggled = true;
 			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selection state changed = " + activeRecord.getName()); //$NON-NLS-1$
 			// get newest timestamp and newest recordSet within this entry (both collections are in descending order)
-			if (activeRecord != null) setRecordSelection(activeRecord, isTableSelection && item.getChecked() || forceVisible, item);
+			if (activeRecord != null) {
+				setRecordSelection(activeRecord, isTableSelection && item.getChecked() || forceVisible, item);
+				if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "isVisible= " + activeRecord.isVisible()); //$NON-NLS-1$
+			}
 		}
-		if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "isVisible= " + activeRecord.isVisible()); //$NON-NLS-1$
 		return isToggled;
 	}
 

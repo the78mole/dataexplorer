@@ -60,7 +60,7 @@ public final class LocalizedDateTime {
 		private final String	userPattern;
 		private final String	userUtcPattern;
 
-		private DateTimePattern(int displaySequence, String userPattern, String userUtcPattern) {
+		private DateTimePattern(@SuppressWarnings("unused") int displaySequence, String userPattern, String userUtcPattern) {
 			this.userPattern = userPattern;
 			this.userUtcPattern = userUtcPattern;
 		}
@@ -78,8 +78,7 @@ public final class LocalizedDateTime {
 			if (Settings.getInstance().isDateTimeUtc()) {
 				sdf = new SimpleDateFormat(this.userUtcPattern);
 				sdf.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
-			}
-			else {
+			} else {
 				sdf = new SimpleDateFormat(this.userPattern);
 			}
 			return sdf;
@@ -109,7 +108,7 @@ public final class LocalizedDateTime {
 		 */
 		public static final DurationPattern	VALUES[]	= values();
 
-		private DurationPattern(int displaySequence, String userPattern, String userUtcPattern) {
+		private DurationPattern(@SuppressWarnings("unused") int displaySequence, String userPattern, String userUtcPattern) {
 			this.userPattern = userPattern;
 			this.userUtcPattern = userUtcPattern;
 		}
@@ -126,8 +125,7 @@ public final class LocalizedDateTime {
 			final SimpleDateFormat sdf;
 			if (Settings.getInstance().isDateTimeUtc()) {
 				sdf = new SimpleDateFormat(this.userUtcPattern);
-			}
-			else {
+			} else {
 				sdf = new SimpleDateFormat(this.userPattern);
 			}
 			// avoid wrong number of hours due to a locale setting other than UTC/GMT
@@ -159,8 +157,7 @@ public final class LocalizedDateTime {
 	public static String getFormatedTime(DateTimePattern formatPattern, long timeStamp_ms) {
 		if (timeStamp_ms <= GDE.ONE_HOUR_MS * 24 * 365 * 11) {
 			return LocalizedDateTime.getFormatedDuration(DurationPattern.get(formatPattern), timeStamp_ms);
-		}
-		else {
+		} else {
 			return formatPattern.getFormatter().format(timeStamp_ms);
 		}
 	}
@@ -194,8 +191,7 @@ public final class LocalizedDateTime {
 				return String.format("%d%s %d%s", Math.abs(y.toTotalMonths()), Messages.getString(MessageIds.GDE_MSGT0868), Math.abs(y.getDays()), Messages.getString(MessageIds.GDE_MSGT0869)); //$NON-NLS-1$
 			else
 				return String.format("%d%s %s", Math.abs(y.getDays()), Messages.getString(MessageIds.GDE_MSGT0869), getFormatedDuration(DurationPattern.HH_mm, Math.abs(timestamp1_ms - timestamp2_ms))); //$NON-NLS-1$
-		}
-		else {
+		} else {
 			return getFormatedDuration(DurationPattern.HH_mm, Math.abs(timestamp1_ms - timestamp2_ms));
 		}
 	}

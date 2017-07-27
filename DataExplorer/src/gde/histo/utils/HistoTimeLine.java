@@ -235,6 +235,7 @@ public final class HistoTimeLine {
 	 * Calculate the relative position on the timescale based on isReversed and isTimeframeAdjustment.
 	 * (leftmost: 0, rightmost: 1)
 	 */
+	@SuppressWarnings("unused")
 	private void setRelativeScale() {
 		long maxVerifiedTimeStamp = -1; // first timeStamp in the HistoSet after maximumTimeStamp which is the first one due to descending order
 
@@ -269,6 +270,7 @@ public final class HistoTimeLine {
 			this.relativeTimeScale.put(maxVerifiedTimeStamp, 1.); // highest timestamp is at the rightmost position
 		}
 		double applicableDistancesTotal = applicableDistancesSum;
+		@SuppressWarnings("unused")
 		final boolean isNaturalTimescale = false; // true is not used anymore: use 'non-logarithmic' with a spread ordinal of zero which results in values very close to the natural timescale
 		if (isNaturalTimescale == true) { // build final relative TimeScale List --- this a simple version illustrating the calculation baseline
 			double relativeTimeScaleSum = 0.;

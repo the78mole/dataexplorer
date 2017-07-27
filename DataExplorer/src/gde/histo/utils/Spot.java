@@ -28,13 +28,14 @@ package gde.histo.utils;
  */
 public final class Spot<T extends Number> implements Comparable<Spot<T>> {
 
-	private final T						x;																				// x coordinate
-	private final T						y;																				// y coordinate
+	private final T	x;	// x coordinate
+	private final T	y;	// y coordinate
 
 	/**
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 */
+	@SuppressWarnings("unchecked") // ET there is no simple solution to create an instance of T; see https://stackoverflow.com/questions/75175/create-instance-of-generic-type-in-java
 	public Spot(T x, T y) {
 		if (x instanceof Double) {
 			if (Double.isInfinite(x.doubleValue()) || Double.isInfinite(y.doubleValue())) throw new IllegalArgumentException("infinite");
@@ -42,15 +43,13 @@ public final class Spot<T extends Number> implements Comparable<Spot<T>> {
 			// convert -0.0 to +0.0
 			this.x = x.doubleValue() == 0.0 ? (T) new Double(0.0) : x;
 			this.y = y.doubleValue() == 0.0 ? (T) new Double(0.0) : y;
-		}
-		else if (x instanceof Float) {
+		} else if (x instanceof Float) {
 			if (Float.isInfinite(x.floatValue()) || Float.isInfinite(y.floatValue())) throw new IllegalArgumentException("infinite");
 			if (Float.isNaN(x.floatValue()) || Float.isNaN(y.floatValue())) throw new IllegalArgumentException("NaN");
 			// convert -0.0 to +0.0
 			this.x = x.floatValue() == 0.0 ? (T) new Float(0.0) : x;
 			this.y = y.floatValue() == 0.0 ? (T) new Float(0.0) : y;
-		}
-		else {
+		} else {
 			this.x = x;
 			this.y = y;
 		}
@@ -83,11 +82,11 @@ public final class Spot<T extends Number> implements Comparable<Spot<T>> {
 		return 0;
 	}
 
-  /**
-   * @return a string representation of this point in the format (x, y)
-   */
-  @Override
-  public String toString() {
-      return "(" + this.x + ", " + this.y + ")";
-  }
+	/**
+	 * @return a string representation of this point in the format (x, y)
+	 */
+	@Override
+	public String toString() {
+		return "(" + this.x + ", " + this.y + ")";
+	}
 }

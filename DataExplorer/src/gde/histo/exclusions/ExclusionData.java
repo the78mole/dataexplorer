@@ -98,16 +98,6 @@ public final class ExclusionData extends Properties {
 		load();
 	}
 
-	@Deprecated
-	public ExclusionData() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	public ExclusionData(Properties newDefaults) {
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public synchronized String toString() {
 		StringBuilder sb = new StringBuilder();

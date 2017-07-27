@@ -21,7 +21,6 @@ package gde.device.graupner;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
@@ -50,7 +49,9 @@ import gde.utils.StringHelper;
  * supports sampling to maximize the throughput.
  */
 public class HoTTbinHistoReader2 extends HoTTbinReader2 {
+	@SuppressWarnings("hiding")
 	final private static String	$CLASS_NAME	= HoTTbinHistoReader2.class.getName();
+	@SuppressWarnings("hiding")
 	final private static Logger	log					= Logger.getLogger(HoTTbinHistoReader2.$CLASS_NAME);
 
 	private static enum TimeMark {
@@ -65,7 +66,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 	private static VaultCollector	truss;
 
 	@Deprecated // shadows the base class method
-	public static synchronized void read(String filePath) throws Exception {
+	public static synchronized void read(@SuppressWarnings("hiding") String filePath) throws Exception {
 	}
 
 	@Deprecated // shadows the base class method
@@ -78,7 +79,6 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 	/**
 	 * @param newTruss which is promoted to a full vault object if the file has a minimum length.
-	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws DataTypeException
 	 * @throws DataInconsitsentException
@@ -443,18 +443,18 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = HoTTbinReader.lostPackages.getMaxValue() * recordTimespan_ms * 1000;
 			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = HoTTbinReader.lostPackages.getMinValue() * recordTimespan_ms * 1000;
 			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = (int) HoTTbinReader.lostPackages.getSigmaValue() * recordTimespan_ms * 1000;
-			scores[ScoreLabelTypes.SENSORS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000; // do not subtract Channel / Receiver --- is always false
-			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.VARIO.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.GPS.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.GAM.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSORS.ordinal()] = HoTTAdapter.Sensor.getSensorNames().size() * 1000; // do not subtract Channel / Receiver --- is always false
+			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.VARIO.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.GPS.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.GAM.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
 			scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) (HoTTbinHistoReader2.filePath.getFileName().toString().startsWith(GDE.TEMP_FILE_STEM.substring(0, 1)) ? 4.2 * 1000 : 4.0 * 1000); // V4 with and without container
 			scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader2.dataBlockSize;
 			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() + 2) * 1000; // +2 for channel / receiver
+			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (HoTTAdapter.Sensor.getSensorNames().size() + 2) * 1000; // +2 for channel / receiver
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 
@@ -775,18 +775,18 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = HoTTbinReader.lostPackages.getMaxValue() * recordTimespan_ms * 1000;
 			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = HoTTbinReader.lostPackages.getMinValue() * recordTimespan_ms * 1000;
 			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = (int) HoTTbinReader.lostPackages.getSigmaValue() * recordTimespan_ms * 1000;
-			scores[ScoreLabelTypes.SENSORS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() * 1000; // do not subtract Channel / Receiver --- is always false
-			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.VARIO.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.GPS.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.GAM.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSORS.ordinal()] = HoTTAdapter.Sensor.getSensorNames().size() * 1000; // do not subtract Channel / Receiver --- is always false
+			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.VARIO.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.GPS.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.GAM.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.EAM.name()) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = HoTTAdapter.Sensor.getSensorNames().contains(HoTTAdapter.Sensor.ESC.name()) ? 1000 : 0;
 			scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) (HoTTbinHistoReader2.filePath.getFileName().toString().startsWith(GDE.TEMP_FILE_STEM.substring(0, 1)) ? 4.2 * 1000 : 4.0 * 1000); // V4 with and without container
 			scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader2.dataBlockSize;
 			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) fileLength;
-			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (HoTTAdapter.Sensor.getSensorNames(HoTTAdapter.isSensorType).size() + 2) * 1000; // +2 for channel / receiver
+			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (HoTTAdapter.Sensor.getSensorNames().size() + 2) * 1000; // +2 for channel / receiver
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 

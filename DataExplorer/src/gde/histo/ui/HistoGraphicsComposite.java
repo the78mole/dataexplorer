@@ -166,7 +166,7 @@ public final class HistoGraphicsComposite extends Composite {
 				switch (HistoGraphicsComposite.this.graphicsType) {
 				default:
 				case HISTO:
-					HistoGraphicsComposite.this.application.openHelpDialog("", "HelpInfo_94.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_94.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				}
 			}
@@ -214,7 +214,7 @@ public final class HistoGraphicsComposite extends Composite {
 				@Override
 				public void mouseExit(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
-					HistoGraphicsComposite.this.graphicCanvas.setCursor(HistoGraphicsComposite.this.application.getCursor());
+					HistoGraphicsComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
 				}
 			});
 			this.graphicCanvas.addMouseListener(new MouseAdapter() {

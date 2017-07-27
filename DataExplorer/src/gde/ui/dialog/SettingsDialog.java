@@ -878,7 +878,7 @@ public class SettingsDialog extends Dialog {
 									this.histoSpreadGrade.setLayoutData(formData);
 									this.histoSpreadGrade.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									//this.histoSpreadGrade.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
-									this.histoSpreadGrade.setItems(SettingsDialog.this.settings.getXAxisSpreadGradeNomenclatures());
+									this.histoSpreadGrade.setItems(Settings.getXAxisSpreadGradeNomenclatures());
 									this.histoSpreadGrade.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getXAxisSpreadGrade());
 									this.histoSpreadGrade.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0818));
 									this.histoSpreadGrade.addSelectionListener(new SelectionAdapter() {
@@ -958,7 +958,7 @@ public class SettingsDialog extends Dialog {
 									this.histoBoxplotScale.setLayoutData(formData);
 									this.histoBoxplotScale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									//this.histoBoxplotScale.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
-									this.histoBoxplotScale.setItems(SettingsDialog.this.settings.getBoxplotScaleNomenclatures());
+									this.histoBoxplotScale.setItems(Settings.getBoxplotScaleNomenclatures());
 									this.histoBoxplotScale.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotScale());
 									this.histoBoxplotScale.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0813));
 									this.histoBoxplotScale.addSelectionListener(new SelectionAdapter() {
@@ -990,7 +990,7 @@ public class SettingsDialog extends Dialog {
 									this.histoBoxplotSizeAdaptation.setLayoutData(formData);
 									this.histoBoxplotSizeAdaptation.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									//this.histoBoxplotSizeAdaptation.setBounds(370, GDE.IS_MAC_COCOA ? 20 : 24, 47, GDE.IS_LINUX ? 22 : 20);
-									this.histoBoxplotSizeAdaptation.setItems(SettingsDialog.this.settings.getBoxplotSizeAdaptationNomenclatures());
+									this.histoBoxplotSizeAdaptation.setItems(Settings.getBoxplotSizeAdaptationNomenclatures());
 									this.histoBoxplotSizeAdaptation.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getBoxplotSizeAdaptation());
 									this.histoBoxplotSizeAdaptation.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
 									this.histoBoxplotSizeAdaptation.addSelectionListener(new SelectionAdapter() {
@@ -1322,7 +1322,7 @@ public class SettingsDialog extends Dialog {
 								this.histoSamplingTimespan_ms.setLayoutData(formData);
 								this.histoSamplingTimespan_ms.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								//this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC_COCOA ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
-								this.histoSamplingTimespan_ms.setItems(SettingsDialog.this.settings.getSamplingTimespanValues());
+								this.histoSamplingTimespan_ms.setItems(Settings.getSamplingTimespanValues());
 								this.histoSamplingTimespan_ms.setText(String.valueOf(SettingsDialog.this.settings.getSamplingTimespan_ms() / 1000.));
 								this.histoSamplingTimespan_ms.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
 								this.histoSamplingTimespan_ms.addSelectionListener(new SelectionAdapter() {

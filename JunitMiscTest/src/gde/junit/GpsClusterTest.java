@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 									2017 Thomas Eickert
 ****************************************************************************************/
@@ -26,8 +26,8 @@ import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.utils.GpsCoordinate;
 
-public class GpsClusterTest extends TestSuperClass { 
-	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285 
+public class GpsClusterTest extends TestSuperClass {
+	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
 	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
 	private final static String	$CLASS_NAME	= GpsClusterTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
@@ -39,8 +39,6 @@ public class GpsClusterTest extends TestSuperClass {
 	private final GpsCoordinate	ssa					= new GpsCoordinate(41.8843714, 12.4801847);
 	private final GpsCoordinate	chi					= new GpsCoordinate(-43.8098021, -176.7061281);
 	private final GpsCoordinate	nkv					= new GpsCoordinate(-38.977128, 177.858698);
-
-	private static final double	DELTA				= 1e-9;
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -102,9 +100,9 @@ public class GpsClusterTest extends TestSuperClass {
 		this.gpsCluster.setClusters();
 		assertEquals("S TwoMemberCluster", 3, this.gpsCluster.getClusters().size());
 	}
-	
+
 	public void testLocationFiles() {
-		String location; 
+		String location;
 		location = GeoCodes.getLocation(this.s21);
 		System.out.println(location);
 		location = GeoCodes.getLocation(this.s21_E);

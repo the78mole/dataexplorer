@@ -66,7 +66,6 @@ import org.xml.sax.SAXException;
 
 import gde.GDE;
 import gde.device.DeviceConfiguration;
-import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -2460,7 +2459,7 @@ public class Settings extends Properties {
 	/**
 	 * @return three boxplot graphics sizes as localized texts
 	 */
-	public String[] getBoxplotScaleNomenclatures() {
+	public static String[] getBoxplotScaleNomenclatures() {
 		return Messages.getString(MessageIds.GDE_MSGT0802).split(GDE.STRING_COMMA);
 	}
 
@@ -2489,7 +2488,7 @@ public class Settings extends Properties {
 	/**
 	 * @return four boxplot size adaptation levels as localized texts ranging from none to large. the adaptation is based on the log duration.
 	 */
-	public String[] getBoxplotSizeAdaptationNomenclatures() {
+	public static String[] getBoxplotSizeAdaptationNomenclatures() {
 		return Messages.getString(MessageIds.GDE_MSGT0803).split(GDE.STRING_COMMA);
 	}
 
@@ -2518,7 +2517,7 @@ public class Settings extends Properties {
 	/**
 	 * @return six spreading labels starting with 0 to 5 for the history x axis
 	 */
-	public String[] getXAxisSpreadGradeNomenclatures() {
+	public static String[] getXAxisSpreadGradeNomenclatures() {
 		return Messages.getString(MessageIds.GDE_MSGT0823).split(GDE.STRING_COMMA);
 	}
 
@@ -2619,7 +2618,7 @@ public class Settings extends Properties {
 	/**
 	 * @return sampling timespan values in seconds with seven values ranging from 0.001 to 10.0 based on the current locale
 	 */
-	public String[] getSamplingTimespanValues() {
+	public static String[] getSamplingTimespanValues() {
 		double[] values_ss = { 10., 5., 1., .5, .1, .05, .001 };
 		String[] textValues = new String[7];
 		for (int i = 0; i < values_ss.length; i++) {

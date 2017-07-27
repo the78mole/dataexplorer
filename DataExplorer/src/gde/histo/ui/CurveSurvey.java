@@ -360,6 +360,30 @@ public final class CurveSurvey {
 			}
 		}
 
+		/**
+		 * Set the line properties for the next line draw operations.
+		 * @param lineMark
+		 * @param defaultColor in case of a null color in the lineMark
+		 */
+		private void setLineMark(LineMark lineMark) {
+			CurveSurvey.this.canvasGC.setLineWidth(lineMark.lineWidth);
+			CurveSurvey.this.canvasGC.setLineDash(lineMark.lineDash);
+			CurveSurvey.this.canvasGC.setLineStyle(lineMark.lineStyle);
+			if (lineMark.lineColor == null)
+				CurveSurvey.this.canvasGC.setForeground(CurveSurvey.this.trailRecord.getColor());
+			else
+				CurveSurvey.this.canvasGC.setForeground(SWTResourceManager.getColor(lineMark.lineColor));
+		}
+
+		private int getBoxWidth() {
+			int boxWidth = 15;
+			if (Math.abs(CurveSurvey.this.xPosDelta - CurveSurvey.this.xPosMeasure) > boxWidth) {
+				boxWidth += ((int) Math.log(Math.abs(CurveSurvey.this.xPosDelta - CurveSurvey.this.xPosMeasure))) * 4 - 10;
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("boxwidth=%d ", boxWidth)); //$NON-NLS-1$
+			}
+			return boxWidth + boxWidth * (Settings.getInstance().getBoxplotScaleOrdinal() - 1) / 2;
+		}
+
 	}
 
 	private final Settings			settings		= Settings.getInstance();
@@ -482,30 +506,6 @@ public final class CurveSurvey {
 			}
 			this.linePainter.drawBoxplot(xPosMidBounds, yPosBoxplot);
 		}
-	}
-
-	/**
-	 * Set the line properties for the next line draw operations.
-	 * @param lineMark
-	 * @param defaultColor in case of a null color in the lineMark
-	 */
-	private void setLineMark(LineMark lineMark) {
-		this.canvasGC.setLineWidth(lineMark.lineWidth);
-		this.canvasGC.setLineDash(lineMark.lineDash);
-		this.canvasGC.setLineStyle(lineMark.lineStyle);
-		if (lineMark.lineColor == null)
-			this.canvasGC.setForeground(this.trailRecord.getColor());
-		else
-			this.canvasGC.setForeground(SWTResourceManager.getColor(lineMark.lineColor));
-	}
-
-	private int getBoxWidth() {
-		int boxWidth = 15;
-		if (Math.abs(this.xPosDelta - this.xPosMeasure) > boxWidth) {
-			boxWidth += ((int) Math.log(Math.abs(this.xPosDelta - this.xPosMeasure))) * 4 - 10;
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("boxwidth=%d ", boxWidth)); //$NON-NLS-1$
-		}
-		return boxWidth + boxWidth * (this.settings.getBoxplotScaleOrdinal() - 1) / 2;
 	}
 
 	/**

@@ -20,8 +20,6 @@
 package gde.junit;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -47,13 +45,6 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		log.setUseParentHandlers(true);
 	}
 
-	private List<String> getProblemFileNames() {
-		ArrayList<String> problemFileNames = new ArrayList<String>();
-		//		problemFileNames.add("2016-02-12_T-Rex 250_.osd"); // header has java.io.UTFDataFormatException: malformed input around byte 8
-		//		problemFileNames.add("2015-05-14_T-Rex 250 Kanaele.osd"); // RecordSet #1 consists of 86 records whereas the recordSetDataPointer value of the next recordSet allows 85 records only
-		return problemFileNames;
-	}
-
 	/**
 	 * fills histoSet by reading all logs into all devices and all channels.
 	 * uses cache data.
@@ -64,7 +55,6 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 	public void testBuildHistoSet4TestSamples() {
 		System.out
 				.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
-		List<String> problemFileNames = getProblemFileNames();
 		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
 
 		HistoSet histoSet = HistoSet.getInstance();
@@ -83,14 +73,13 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 				setupDeviceChannelObject(deviceEntry.getKey(), 1, "");
 				for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 					this.channels.setActiveChannelNumber(channelEntry.getKey());
-					histoSet.rebuild4Test(this.deviceConfigurations);
+					histoSet.rebuild4Test();
 					System.out.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
 				}
 			}
 
 			histoSet.setHistoFilePaths4Test(this.dataPath.toPath(), 5, this.deviceConfigurations);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.toString());
 		}
@@ -109,9 +98,10 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 	 * @return
 	 */
 	private IDevice setDevice(String fileDeviceName) {
-		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
-		if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu")) return null; // iCharger308DUO gde.device.UsbPortType missing
-		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+		String deviceName = fileDeviceName;
+		if (this.legacyDeviceNames.get(fileDeviceName) != null) deviceName = this.legacyDeviceNames.get(fileDeviceName);
+		if (deviceName.toLowerCase().contains("hottviewer") || deviceName.toLowerCase().contains("mpu")) return null; // iCharger308DUO gde.device.UsbPortType missing
+		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
 		if (deviceConfig == null) return null;
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
 		this.application.setActiveDeviceWoutUI(device);

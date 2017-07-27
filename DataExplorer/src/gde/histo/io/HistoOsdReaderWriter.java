@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import gde.GDE;
+import gde.data.AbstractRecordSet;
 import gde.data.Channel;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -77,7 +78,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 */
 	public static List<VaultCollector> readTrusses(File file, String objectDirectory) throws IOException, NotSupportedFileFormatException {
 		List<VaultCollector> trusses = new ArrayList<>();
-		final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(file.toString());
+		final HashMap<String, String> header = OsdReaderWriter.getHeader(file.toString());
 		final String logObjectKey = header.containsKey(GDE.OBJECT_KEY) ? header.get(GDE.OBJECT_KEY).intern() : GDE.STRING_EMPTY;
 		final int fileVersion = Integer.valueOf(header.get(GDE.DATA_EXPLORER_FILE_VERSION).trim()).intValue();
 		final int recordSetSize = Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
@@ -126,15 +127,14 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		InputStream inputStream;
 		if (zip_entry != null) {
 			inputStream = zip_input;
-		}
-		else {
+		} else {
 			zip_input.close();
 			zip_input = null;
 			inputStream = new FileInputStream(file);
 		}
 
 		try (DataInputStream data_in = new DataInputStream(inputStream)) { // closes the inputStream also
-			final HashMap<String, String> header = HistoOsdReaderWriter.getHeader(filePath.toString());
+			final HashMap<String, String> header = OsdReaderWriter.getHeader(filePath.toString());
 			final double logDataExplorerVersion = header.containsKey(GDE.DATA_EXPLORER_FILE_VERSION) ? Double.parseDouble(header.get(GDE.DATA_EXPLORER_FILE_VERSION)) : 1.; // OpenSerialData version : 1
 			final int numberRecordSets = Integer.parseInt(header.get(GDE.RECORD_SET_SIZE));
 
@@ -159,8 +159,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 				if (!recordSetTrusses.containsKey(i)) {
 					// defer reading any unused recordsets until a recordset is actually required
 					if (unreadDataPointer < 0) unreadDataPointer = recordSetDataPointer;
-				}
-				else {
+				} else {
 					long nanoTime = System.nanoTime();
 					if (unreadDataPointer > -1) {
 						// make up all deferred readings in one single step
@@ -174,7 +173,8 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 						}
 						unreadDataPointer = -1;
 					}
-					RecordSet histoRecordSet = OsdReaderWriter.buildRecordSet(recordSetTrusses.get(i).getVault().getLogRecordsetBaseName(), recordSetTrusses.get(i).getVault().getLogChannelNumber(), recordSetInfo, false);
+					RecordSet histoRecordSet = OsdReaderWriter.buildRecordSet(recordSetTrusses.get(i).getVault().getLogRecordsetBaseName(), recordSetTrusses.get(i).getVault().getLogChannelNumber(),
+							recordSetInfo, false);
 					String[] noneCalculationMeasurementNames = histoRecordSet.getNoneCalculationRecordNames();
 					int numberRecordAndTimeStamp = noneCalculationMeasurementNames.length + (histoRecordSet.isTimeStepConstant() ? 0 : 1);
 
@@ -192,7 +192,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					if (histoRecordSet.getDevice() instanceof IHistoDevice) {
 						int[] maxPoints = new int[noneCalculationMeasurementNames.length];
 						int[] minPoints = new int[noneCalculationMeasurementNames.length];
-						String[] recordKeys = recordKeys = HistoOsdReaderWriter.getRecordKeys(recordsProperties);
+						String[] recordKeys = HistoOsdReaderWriter.getRecordKeys(recordsProperties);
 						List<String> noneCalculationMeasurementNameList = Arrays.asList(noneCalculationMeasurementNames);
 						for (int j = 0; j < recordKeys.length; j++) {
 							int index = noneCalculationMeasurementNameList.indexOf(recordKeys[j]);
@@ -243,8 +243,9 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					// reduce memory consumption in advance to the garbage collection
 					histoRecordSet.cleanup();
 
-					if (log.isLoggable(Level.FINE) ) log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
-							recordSetTrusses.get(i).getVault().getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));
+					if (log.isLoggable(Level.FINE))
+						log.log(Level.FINE, String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", recordSetInfoChannel.getName(), //$NON-NLS-1$
+								recordSetTrusses.get(i).getVault().getStartTimeStampFormatted(), recordDataSize, recordSetDataPointer, numberRecordAndTimeStamp));
 				}
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", histoVaults.size(), recordSetsInfo.size(), //$NON-NLS-1$
@@ -275,8 +276,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
 		if (idx1 > 0 && idx2 > idx1) {
 			return recordSetComment.substring(idx1 + 1, idx2).split(","); //$NON-NLS-1$
-		}
-		else {
+		} else {
 			return new String[] { "RECEIVER" };
 		}
 	}
@@ -292,12 +292,10 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		if (idx1 > 0) {
 			try {
 				return Double.parseDouble(recordSetComment.substring(idx1 + label.length(), recordSetComment.length()).replace(',', '.').replaceAll("[^0-9.]", "")); // change comma to dot and take digits, dots and signs only //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				return null;
 			}
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
@@ -326,8 +324,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					values[4] = doubleFormat.parse(times[3].substring(0, times[3].indexOf(" "))).doubleValue(); //$NON-NLS-1$
 					values[5] = doubleFormat.parse(times[4].substring(0, times[4].indexOf(" "))).doubleValue(); //$NON-NLS-1$
 				}
-			}
-			catch (ParseException e) {
+			} catch (ParseException e) {
 				// ignore and keep packageLoss as null
 			}
 		}
@@ -343,10 +340,9 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 		HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetInfo.get(GDE.RECORD_SET_PROPERTIES), Record.DELIMITER, RecordSet.propertyKeys);
 		// try 1: osd version >= 3 only --- V 1 and 2 do not carry a recordset start timestamp
-		if (recordSetProps.containsKey(RecordSet.START_TIME_STAMP) && recordSetProps.get(RecordSet.START_TIME_STAMP).length() > 0) {
-			startTimestamp_ms = Long.parseLong(recordSetProps.get(RecordSet.START_TIME_STAMP).trim());
-		}
-		else { // copied from gde.data.RecordSet.setDeserializedProperties(String)
+		if (recordSetProps.containsKey(AbstractRecordSet.START_TIME_STAMP) && recordSetProps.get(AbstractRecordSet.START_TIME_STAMP).length() > 0) {
+			startTimestamp_ms = Long.parseLong(recordSetProps.get(AbstractRecordSet.START_TIME_STAMP).trim());
+		} else { // copied from gde.data.RecordSet.setDeserializedProperties(String)
 			try {
 				// try 2: check if the original time stamp in the recordset comment is available
 				String recordSetDescription = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
@@ -371,8 +367,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
 					startTimestamp_ms = calendar.getTimeInMillis();
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				// ignore and keep startTimestamp_ms = 0
 			}
 		}
@@ -381,8 +376,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd" + ' ' + " HH:mm:ss"); //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				startTimestamp_ms = simpleDateFormat.parse(recordSetInfo.get(GDE.CREATION_TIME_STAMP)).getTime();
-			}
-			catch (Exception ex) { // ParseException ex) {
+			} catch (Exception ex) { // ParseException ex) {
 				throw new RuntimeException(ex);
 			}
 		}

@@ -20,15 +20,12 @@
 package gde.histo.device;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 /**
  * Sample candidate without any further selection support.
  * @author Thomas Eickert (USER)
  */
 public class Candidate {
-	private final static String		$CLASS_NAME	= Candidate.class.getName();
-	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
 	protected int[]									points;
 	protected long									timeStep_ms	= -1;

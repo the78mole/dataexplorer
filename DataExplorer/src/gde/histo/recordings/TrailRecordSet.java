@@ -34,7 +34,6 @@ import org.eclipse.swt.graphics.Color;
 import gde.GDE;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
-import gde.data.RecordSet;
 import gde.data.TimeSteps;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
@@ -53,8 +52,10 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public final class TrailRecordSet extends AbstractRecordSet {
+	@SuppressWarnings("hiding")
 	private static final String						$CLASS_NAME					= TrailRecordSet.class.getName();
 	private static final long							serialVersionUID		= -1580283867987273535L;
+	@SuppressWarnings("hiding")
 	private static final Logger						log									= Logger.getLogger($CLASS_NAME);
 
 	public static final String						BASE_NAME_SEPARATOR	= " | ";
@@ -358,13 +359,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				// recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				// recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				if (!isHorizontalGridOrdinalSet && record.isVisible()) { // set curve grid to the first visible record
-					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					color = this.template.getProperty(AbstractRecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
 					this.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-					this.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-					this.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					this.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(AbstractRecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					this.setHorizontalGridType(Integer.valueOf(this.template.getProperty(AbstractRecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 					this.setHorizontalGridRecordOrdinal(record.getOrdinal()); // initial use top score trail record
 					isHorizontalGridOrdinalSet = true;
 				}
@@ -419,8 +420,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public long getDisplayTimeStamp_ms(int index) {
 		if (this.settings.isXAxisReversed()) {
 			return this.timeStep_ms.get(index) / 10;
-		}
-		else {
+		} else {
 			return this.timeStep_ms.get(this.timeStep_ms.size() - 1 - index) / 10;
 		}
 	}
@@ -442,8 +442,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		Record record = this.get(recordKey);
 		if (record != null) {
 			return record.isMeasurementMode() || record.isDeltaMeasurementMode();
-		}
-		else
+		} else
 			return false;
 	}
 

@@ -183,8 +183,8 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 		this.directoryScanner.setHistoFilePaths4Test(filePath, subDirLevelMax, devices);
 	}
 
-	public void rebuild4Test(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		this.histoSetCollector.rebuild4Test(deviceConfigurations);
+	public void rebuild4Test() throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		this.histoSetCollector.rebuild4Test();
 	}
 
 	public TrailRecordSet getTrailRecordSet() {

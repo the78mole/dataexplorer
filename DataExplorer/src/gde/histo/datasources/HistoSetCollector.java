@@ -35,14 +35,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.DeviceConfiguration;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -187,12 +185,12 @@ public final class HistoSetCollector {
 		this.trailRecordSet = null;
 	}
 
-	public void rebuild4Test(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+	public void rebuild4Test() throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		// this.clear();
 		{
 			if (this.histoSet.getUnsuppressedTrusses().size() > 0) {
 				// step: build the workload map consisting of the cache key and the file path
-				Map<Path, Map<String, VaultCollector>> trussJobs = getTrusses4Screening(deviceConfigurations);
+				Map<Path, Map<String, VaultCollector>> trussJobs = getTrusses4Screening();
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
 
 				// step: put cached vaults into the histoSet map and reduce workload map
@@ -287,7 +285,7 @@ public final class HistoSetCollector {
 						{
 							long nanoTimeCheckFilesSum = -System.nanoTime();
 							// step: build the workload map consisting of the cache key and the file path
-							trussJobs = getTrusses4Screening(DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+							trussJobs = getTrusses4Screening();
 							nanoTimeCheckFilesSum += System.nanoTime();
 							if (TimeUnit.NANOSECONDS.toMillis(nanoTimeCheckFilesSum) > 0) log.log(Level.TIME,
 									String.format("%,5d trusses        job check          time=%,6d [ms]  ::  per second:%5d", trussJobs.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum(), //$NON-NLS-1$
@@ -332,10 +330,9 @@ public final class HistoSetCollector {
 								progress.countInLoop(trussJobsEntry.getValue().size());
 							}
 							nanoTimeReadRecordSetSum += System.nanoTime();
-							if (newVaults.size() > 0) log.log(Level.TIME,
-									String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
-											TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
-											(this.recordSetBytesSum - recordSetBytesCachedSum) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
+							if (newVaults.size() > 0) log.log(Level.TIME, String.format("%,5d recordsets     create from files  time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
+									TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeReadRecordSetSum),
+									(this.recordSetBytesSum - recordSetBytesCachedSum) / TimeUnit.NANOSECONDS.toMicros(nanoTimeReadRecordSetSum)));
 						}
 						{// step: save vaults in the file system
 							long nanoTimeWriteVaultSum = -System.nanoTime(), cacheSize_B = 0;
@@ -377,10 +374,9 @@ public final class HistoSetCollector {
 						if (this.recordSetBytesSum > 0 && log.isLoggable(Level.FINE)) log.log(Level.FINE,
 								String.format("%,5d trailTimeSteps to TrailRecordSet  time=%,6d [ms]  ::  per second:%5d", this.histoSet.size(), TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet), //$NON-NLS-1$
 										this.histoSet.size() > 0 ? this.histoSet.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeTrailRecordSet) : 0));
-						log.log(Level.TIME,
-								String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size(), //$NON-NLS-1$
-										new Date().getTime() - startTimeFileValid, (int) (this.histoSet.size() * 1000. / (new Date().getTime() - startTimeFileValid) + .5),
-										(int) (this.recordSetBytesSum / 1000. / (new Date().getTime() - startTimeFileValid) + .5)));
+						log.log(Level.TIME, String.format("%,5d trailTimeSteps total              time=%,6d [ms]  ::  per second:%5d  ::  Rate=%,6d MB/s", this.histoSet.size(), //$NON-NLS-1$
+								new Date().getTime() - startTimeFileValid, (int) (this.histoSet.size() * 1000. / (new Date().getTime() - startTimeFileValid) + .5),
+								(int) (this.recordSetBytesSum / 1000. / (new Date().getTime() - startTimeFileValid) + .5)));
 					}
 				}
 				{
@@ -403,12 +399,11 @@ public final class HistoSetCollector {
 	 * Determine the vaults which are required for the data access.
 	 * Select osd file candidates for the active device and the active channel; select as well for objectKey and start timestamp.
 	 * Select bin file candidates for object key based on the parent directory name and last modified.
-	 * @param deviceConfigurations
 	 * @return trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	*/
-	private Map<Path, Map<String, VaultCollector>> getTrusses4Screening(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
+	private Map<Path, Map<String, VaultCollector>> getTrusses4Screening() throws IOException, NotSupportedFileFormatException {
 		final Map<Path, Map<String, VaultCollector>> trusses4Paths = new LinkedHashMap<>();
 		final Map<Long, Set<String>> trusses4Start = new HashMap<Long, Set<String>>();
 		final List<Integer> channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
