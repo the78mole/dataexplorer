@@ -196,7 +196,7 @@
                 <symbol></symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <trailDisplay discloseAll="true" defaultTrail="last" />
                 <label>label_trip</label>
             </Measurement>
@@ -1809,7 +1809,7 @@
                 <symbol></symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <trailDisplay discloseAll="true" defaultTrail="last" />
             </Measurement>
             <Measurement>
@@ -2634,7 +2634,7 @@
                 <symbol></symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>voltage G</name>
@@ -4232,7 +4232,7 @@
                 <symbol></symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>voltage G</name>

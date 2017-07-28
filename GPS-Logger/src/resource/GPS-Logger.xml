@@ -115,7 +115,7 @@
                 <symbol>l</symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -280,7 +280,7 @@
                 <symbol>l</symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>current_ML</name>
@@ -406,7 +406,7 @@
                 <symbol>l</symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -633,7 +633,7 @@
                 <symbol>l</symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>current_ML</name>

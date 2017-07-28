@@ -55,7 +55,7 @@
                 <symbol>s</symbol>
                 <unit>km</unit>
                 <active>true</active>
-                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="Werte in 1/10km"/>
             </Measurement>
             <Measurement>
