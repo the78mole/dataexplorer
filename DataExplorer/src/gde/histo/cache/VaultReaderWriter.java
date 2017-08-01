@@ -14,6 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
+		DataExplorer uses Guava 22.0, released May 22, 2017,
+		which is available from http://code.google.com/p/guava-libraries/.
+		Guava is subject to the Apache License v. 2.0:
+		https://github.com/google/guava/blob/master/COPYING
+
+		Copyright 2017 Google Inc.
     Copyright (c) 2017,2018 Thomas Eickert
 ****************************************************************************************/
 
@@ -40,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -51,6 +58,9 @@ import gde.histo.datasources.SourceDataSetExplorer.SourceDataSet;
 import gde.histo.datasources.VaultPicker.ProgressManager;
 import gde.histo.datasources.VaultPicker.TrussJobs;
 import gde.histo.device.IHistoDevice;
+import gde.histo.innercache.Cache;
+import gde.histo.innercache.CacheBuilder;
+import gde.histo.innercache.CacheStats;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -60,11 +70,14 @@ import gde.utils.FileUtils;
  * @author Thomas Eickert (USER)
  */
 public final class VaultReaderWriter {
-	private final static String				$CLASS_NAME	= VaultReaderWriter.class.getName();
-	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
+	private final static String											$CLASS_NAME	= VaultReaderWriter.class.getName();
+	private final static Logger											log					= Logger.getLogger($CLASS_NAME);
 
-	private final static DataExplorer	application	= DataExplorer.getInstance();
-	private final static Settings			settings		= Settings.getInstance();
+	private final static DataExplorer								application	= DataExplorer.getInstance();
+	private final static Settings										settings		= Settings.getInstance();
+
+	private final static Cache<String, HistoVault>	memoryCache	=																		//
+			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();													// key is the vaultName
 
 	/**
 	 * Read file and populate the vault from the recordset.
@@ -75,7 +88,7 @@ public final class VaultReaderWriter {
 			dataSet.readVaults(trusses);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
-			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
+			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
 					application.getActiveDevice().getName(), application.getActiveChannelNumber(), filePath));
 		}
 	}
@@ -117,7 +130,12 @@ public final class VaultReaderWriter {
 						if (vaultName != null) {
 							HistoVault histoVault = null;
 							try {
-								histoVault = VaultProxy.load(new BufferedInputStream(zf.getInputStream(vaultName)));
+								histoVault = memoryCache.get(truss.getVault().getVaultName(), new Callable<HistoVault>() {
+									@Override
+									public HistoVault call() throws Exception {
+										return VaultProxy.load(new BufferedInputStream(zf.getInputStream(vaultName)));
+									}
+								});
 								vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
 								trussesIterator.remove();
 							} catch (Exception e) {
@@ -140,7 +158,12 @@ public final class VaultReaderWriter {
 						HistoVault histoVault = null;
 						File vaultFile = cacheFilePath.resolve(truss.getVault().getVaultName()).toFile();
 						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(vaultFile))) {
-							histoVault = VaultProxy.load(inputStream);
+							histoVault = memoryCache.get(truss.getVault().getVaultName(), new Callable<HistoVault>() {
+								@Override
+								public HistoVault call() throws Exception {
+									return VaultProxy.load(inputStream);
+								}
+							});
 							vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
 							trussesIterator.remove();
 						} catch (Exception e) {
@@ -151,6 +174,10 @@ public final class VaultReaderWriter {
 				if (map.isEmpty()) trussJobsIterator.remove();
 			}
 		}
+		log.off(() -> {
+			CacheStats stats = memoryCache.stats();
+			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
+		});
 		return vaults;
 	}
 
@@ -208,6 +235,19 @@ public final class VaultReaderWriter {
 			} catch (Exception e) {
 				log.log(SEVERE, e.getMessage(), e);
 			}
+			memoryCache.put(histoVault.vaultName, histoVault);
 		}
+	}
+
+	/**
+	 * @return the size of the cache in bytes
+	 */
+	public static long getCacheSize() {
+		Path directory = Settings.getInstance().getHistoCacheDirectory();
+		return FileUtils.size(directory);
+	}
+
+	public static long getInnerCacheHitCount() {
+		return memoryCache.stats().hitCount();
 	}
 }

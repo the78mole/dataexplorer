@@ -48,6 +48,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import com.sun.istack.internal.Nullable;
 
@@ -133,12 +134,12 @@ public final class VaultPicker {
 	/**
 	 * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
 	 */
-	private final TreeMap<Long, List<ExtendedVault>>	pickedVaults				= new TreeMap<>(Collections.reverseOrder());
+	private final TreeMap<Long, List<ExtendedVault>>	pickedVaults			= new TreeMap<>(Collections.reverseOrder());
 
 	/**
 	 * Excluded vaults via ignore lists
 	 */
-	private List<ExtendedVault>												suppressedVaults		= new ArrayList<>();
+	private List<ExtendedVault>												suppressedVaults	= new ArrayList<>();
 	/**
 	 * Number of files which have been read for getting vaults
 	 */
@@ -154,16 +155,16 @@ public final class VaultPicker {
 	/**
 	 * Size of all the histo files which have been read to build the histo recordsets
 	 */
-	private long																			recordSetBytesSum		= 0;
+	private long																			recordSetBytesSum	= 0;
 	/**
 	 * Total time for rebuilding the HistoSet in micorseconds
 	 */
-	private int																				elapsedTime_us			= 0;
+	private int																				elapsedTime_us		= 0;
 
 	/**
 	 * Histo vault data transformed in a recordset format
 	 */
-	private TrailRecordSet														trailRecordSet			= null;
+	private TrailRecordSet														trailRecordSet		= null;
 
 	public enum LoadProgress {
 		STARTED(2), INITIALIZED(5), PATHS_VERIFIED(7), SCANNED(11), MATCHED(22), RESTORED(50), LOADED(80), CACHED(97), RECORDED(99), DONE(100);
@@ -541,6 +542,7 @@ public final class VaultPicker {
 	 */
 	private void loadVaultsFromCache(TrussJobs trussJobs, Optional<ProgressManager> progress) throws IOException {
 		long nanoTime = System.nanoTime();
+		long hitCount = VaultReaderWriter.getInnerCacheHitCount();
 		int tmpHistoSetsSize = this.pickedVaults.size();
 		for (ExtendedVault histoVault : VaultReaderWriter.loadFromCaches(trussJobs, progress)) {
 			if (!histoVault.isTruss()) {
@@ -553,8 +555,8 @@ public final class VaultPicker {
 		int loadCount = this.pickedVaults.size() - tmpHistoSetsSize;
 		if (loadCount > 0) {
 			long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-			log.time(() -> String.format("%,5d vaults     load from cache    time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-					loadCount, micros / 1000, loadCount * 1000000 / micros, (int) (this.recordSetBytesSum / 1.024 / 1.024 / micros)));
+			log.time(() -> String.format("%,5d/%,5d      vaults cached/hit  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
+					loadCount, VaultReaderWriter.getInnerCacheHitCount() - hitCount, micros / 1000, loadCount * 1000000 / micros, (int) (this.recordSetBytesSum / 1.024 / 1.024 / micros)));
 		}
 	}
 
@@ -563,19 +565,18 @@ public final class VaultPicker {
 	 * @return the suppressed vaults which have been detected in the vaults list
 	 */
 	private List<ExtendedVault> removeSuppressedHistoVaults() {
-		List<ExtendedVault> removed = new ArrayList<>();
-		this.pickedVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
-			if (ExclusionData.isExcluded(v.getLoadFileAsPath(), v.getLogRecordsetBaseName())) {
-				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
-						v.getLoadFilePath(), v.getLogRecordsetBaseName(), v.getStartTimeStampFormatted()));
-				removed.add(v);
-			}
-		});
+		long totalSize = this.pickedVaults.values().parallelStream().flatMap(Collection::stream).count();
+		List<ExtendedVault> removed = this.pickedVaults.values().parallelStream().flatMap(Collection::stream) //
+				.filter(v -> ExclusionData.isExcluded(v.getLoadFileAsPath(), v.getLogRecordsetBaseName())) //
+				.collect(Collectors.toList());
 		for (ExtendedVault vault : removed) {
+			log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //
+					vault.getLoadFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
 			List<ExtendedVault> vaultList = this.pickedVaults.get(vault.getLogStartTimestamp_ms());
 			vaultList.remove(vault);
 			if (vaultList.isEmpty()) this.pickedVaults.remove(vault.getLogStartTimestamp_ms());
 		}
+		log.fine(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
 		return removed;
 	}
 
@@ -595,7 +596,7 @@ public final class VaultPicker {
 				removed.add(vault);
 			}
 		}
-		log.finer(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
+		log.fine(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
 		return removed;
 	}
 
@@ -659,6 +660,9 @@ public final class VaultPicker {
 		return this.readFilesCount;
 	}
 
+	/**
+	 * @return the number of files which have log data for the object, device, analysis timespan etc.
+	 */
 	public int getMatchingFilesCount() {
 		return this.matchingFilesCount;
 	}
