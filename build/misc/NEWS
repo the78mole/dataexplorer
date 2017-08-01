@@ -15,6 +15,7 @@ GNU DataExplorer - News - comes with version 3.3.0 - 01 Aug 2017
 	- fix start time stamp using last modified of log file
 	- fix header in graphics window displaying consistent actual date, this is independent of the log file date
 	- add MDL converter functionality for MC-28/MC-26 from/to MC-32,MC-20,MX-20,MC-16
+	- update MDL-Plug-in
 
 3) iCharger (serial communication only)
 	- fix problems with received strings which are not a valid status
@@ -77,6 +78,7 @@ GNU DataExplorer - News - comes with version 3.3.0 - 01 Aug 2017
 	- Korrektur des Start-Zeit-Eintrages unter Einbeziehung des letzten Änderungsdatums der Log-Dateien
 	- Korrektur der Überschrift im Grafik-Fenster zum aktuellen Bearbeitungsdatum, das ist unabhängig vom Log-Datumseintrag
 	- MDL Konvertierungdfunktionalität für MC-28/MC-26 from/to MC-32,MC-20,MX-20,MC-16 (keine Beta Firmware)
+	- Update des MDL Plug-ins
 
 3) iCharger (nur serielle Kommunikation)
 	- Korrektur beim Empfang von Zeichenketten mit ungültiger Information
