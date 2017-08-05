@@ -2353,7 +2353,7 @@ public class DeviceConfiguration {
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateName(final int stateNumber) {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? this.getStateType().getProperty().get(stateNumber).getName()
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? this.getStateProperty(stateNumber).getName()
 				: "state_data_recording" : "state_data_recording";
 	}
 
@@ -2362,7 +2362,7 @@ public class DeviceConfiguration {
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateNameReplacement(final int stateNumber) {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateType().getProperty().get(stateNumber).getName())
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? xmlResource.getReplacement(this.getStateProperty(stateNumber).getName())
 				: xmlResource.getReplacement("state_data_recording") : xmlResource.getReplacement("state_data_recording");
 	}
 
