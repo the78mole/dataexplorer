@@ -151,7 +151,7 @@ public class CSVSerialDataReaderWriter {
 					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
 
 				Vector<String> stateNames = new Vector<String>(device.getStateType().getProperty().size());
-				for (int i = 0; i < device.getStateType().getProperty().size(); i++) {
+				for (int i = 1; i <= device.getStateType().getProperty().size(); i++) {
 					stateNames.add(device.getRecordSetStateNameReplacement(i));
 				}
 						

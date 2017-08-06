@@ -155,7 +155,7 @@ public class JetiDataReader {
 					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
 
 					try {
-						recordSetNameExtend = device.getRecordSetStateNameReplacement(0); // state name
+						recordSetNameExtend = device.getRecordSetStateNameReplacement(1); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
