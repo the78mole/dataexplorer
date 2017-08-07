@@ -587,6 +587,10 @@ public class MenuToolBar {
 									MenuToolBar.this.editObject.setEnabled(false);
 									MenuToolBar.this.isObjectoriented = false;
 								}
+								else {
+									MenuToolBar.this.isObjectoriented = true;
+									MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getText();
+								}
 								MenuToolBar.this.settings.setObjectList(tmpObjects.toArray(new String[1]), currentIndex);
 								
 								MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
