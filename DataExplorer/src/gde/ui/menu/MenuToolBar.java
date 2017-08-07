@@ -510,7 +510,7 @@ public class MenuToolBar {
 											MenuToolBar.this.deleteObject.setEnabled(true);
 											MenuToolBar.this.editObject.setEnabled(true);
 											MenuToolBar.this.isObjectoriented = true;
-											//MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getItem(selectionIndex);
+											MenuToolBar.this.activeObjectKey = newObjKey;
 										}
 										MenuToolBar.this.application.updateObjectDescriptionWindow();
 										new ObjectKeyScanner(newObjKey).start();

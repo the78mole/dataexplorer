@@ -81,7 +81,7 @@ public class ObjectData {
 	}
 
 	/**
-	 * Constructor for default initialisation
+	 * Constructor for default initialization
 	 * @param objectFilePath
 	 */
 	public ObjectData(String objectFilePath) {

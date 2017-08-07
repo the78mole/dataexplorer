@@ -1170,7 +1170,7 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * updates the object describtion window with current object data
+	 * updates the object description window with current object data
 	 */
 	public void updateObjectDescriptionWindow() {
 		if (this.objectDescriptionTabItem != null && !this.objectDescriptionTabItem.isDisposed()) {

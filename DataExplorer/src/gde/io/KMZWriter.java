@@ -288,11 +288,15 @@ public class KMZWriter {
 			String randomColor = "";
 			if (application.isObjectoriented()) {
 				ObjectData object = application.getObject();
-				Properties properties = object.getProperties();
-				if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()) != null)
-					isExtrude = Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()).toString());
-				if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()) != null)
-					randomColor = Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()).toString()) ? "random" : "";
+				if (object != null) {
+					Properties properties = object.getProperties();
+					if (properties != null) {
+						if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()) != null)
+							isExtrude = Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_EXTRUDE.value()).toString());
+						if (properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()) != null)
+							randomColor = Boolean.parseBoolean(properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_IS_RANDOM_COLOR.value()).toString()) ? "random" : "";
+					}
+				}
 			}
 			else { //device oriented
 				Integer activeChannelNumber = application.getActiveChannelNumber();
