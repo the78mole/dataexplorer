@@ -206,10 +206,8 @@ public class GathererThread extends Thread {
 			catch (Throwable e) {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
 				if (e instanceof TimeOutException && isProgrammExecuting) {
-					finalizeRecordSet(false);
-					if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, " waiting..."); //$NON-NLS-1$
-					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2601));
-					recordSet = null;
+					//tolerate timeout, just update status message
+					this.application.setStatusMessage(">>>> serial port Timeout <<<<");
 				}
 				// this case will be reached while iCharger program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
