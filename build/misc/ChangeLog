@@ -6,6 +6,7 @@ Version 3.3.1 - xx yyy 2017
 * fix object initialization using wrong object key
 * fix serial connected iCharger live gatherer tolerating timeouts
 * fix object update problem while removing objects
+* fix HoTTAdapter* GAM capacity filter null value
 
 Version 3.3.0 - 01 Jul 2017
 OVERVIEW:

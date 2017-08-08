@@ -928,7 +928,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader.pointsGAM[19] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGAM[20] = DataParser.parse2Short(_buf3, 5) * 1000;
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.recordSet.getRecordDataSize(true) <= 20
-					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGAM[21] / 1000 + HoTTbinReader.pointsGAM[19] / 1000 * HoTTbinReader.pointsGAM[20] / 1000 / 2500 + 2)) {
+					|| (HoTTbinReader.tmpCapacity != 0 && Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGAM[21] / 1000 + HoTTbinReader.pointsGAM[19] / 1000 * HoTTbinReader.pointsGAM[20] / 1000 / 2500 + 2))) {
 				HoTTbinReader.pointsGAM[21] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {

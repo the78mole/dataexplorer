@@ -73,7 +73,8 @@ public class HoTTbinReader {
 	static byte[]																buf;
 	static byte[]																buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf7, buf8, buf9, bufA, bufB, bufC, bufD;
 	static long																	timeStep_ms;
-	static int[]																pointsReceiver, pointsGAM, pointsEAM, pointsVario, pointsGPS, pointsChannel, pointsESC;
+	static int[]																pointsReceiver, pointsEAM, pointsVario, pointsGPS, pointsChannel, pointsESC;
+	static int[]																pointsGAM;
 	static RecordSet														recordSetReceiver, recordSetGAM, recordSetEAM, recordSetVario, recordSetGPS, recordSetChannel, recordSetESC;
 	static int																	tmpVoltageRx								= 0;
 	static int																	tmpTemperatureRx						= 0;
@@ -1481,7 +1482,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGAM[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			HoTTbinReader.pointsGAM[2] = DataParser.parse2Short(_buf3, 5) * 1000;
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.recordSetGAM.getRecordDataSize(true) <= 20
-					|| Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGAM[3] / 1000 + HoTTbinReader.pointsGAM[1] / 1000 * HoTTbinReader.pointsGAM[2] / 1000 / 2500 + 2)) {
+					|| (HoTTbinReader.tmpCapacity != 0 && Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReader.pointsGAM[3] / 1000 + HoTTbinReader.pointsGAM[1] / 1000 * HoTTbinReader.pointsGAM[2] / 1000 / 2500 + 2))) {
 				HoTTbinReader.pointsGAM[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
