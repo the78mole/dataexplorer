@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V31.xsd">
+    <Device>
+        <name>Pulsar3</name>
+        <manufacturer>Elprog</manufacturer>
+        <manufacturerURL>http://www.elprog.com.pl/english</manufacturerURL>
+        <group>charger</group>
+        <image>Pulsar3.png</image>
+        <usage>true</usage>
+    </Device>
+    <SerialPort>
+        <port>/dev/tty.Bluetooth-Incoming-Port</port>
+        <baudeRate>19200</baudeRate>
+        <dataBits>DATABITS_8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>false</isRTS>
+        <isDTR>false</isDTR>
+        <TimeOut>
+            <ReadTimeOut>5000</ReadTimeOut>
+            <ReadStableIndex>8</ReadStableIndex>
+            <WriteCharDelayTime>0</WriteCharDelayTime>
+            <WriteDelayTime>0</WriteDelayTime>
+        </TimeOut>
+    </SerialPort>
+    <TimeBase>
+        <name>time</name>
+        <symbol>t</symbol>
+        <unit>msec</unit>
+        <timeStep>5000.0</timeStep>
+    </TimeBase>
+    <DataBlock>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="160"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="24"/>
+        <timeUnit>sec</timeUnit>
+        <separator>comma</separator>
+        <leader>#</leader>
+        <trailer>0D0A</trailer>
+        <preferredDataLocation>/Users/brueg/Documents/DataExplorer/Pulsar3</preferredDataLocation>
+        <preferredFileExtention>*.acp</preferredFileExtention>
+    </DataBlock>
+    <State>
+        <property name="state_charge" value="1" type="Integer" description="Ladeoperation"/>
+        <property name="state_discharge" value="2" type="Integer" description="Entladeoperation"/>
+        <property name="state_monitoring" value="3" type="Integer" description="Beobachten"/>
+        <property name="state_dry_time" value="4" type="Integer" description="Warten auf anderen Status"/>
+        <property name="state_finish" value="5" type="Integer" description="alle Programme abgelaufen"/>
+        <property name="state_error" value="6" type="Integer" description="Fehler"/>
+    </State>
+    <Channels>
+        <Channel name="type_outlet" type="TYPE_OUTLET">
+            <Measurement>
+                <name>voltage</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>current</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>power</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>energy</name>
+                <symbol>E</symbol>
+                <unit>Wh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>battery_temperature</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>battery_internal_resistance</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>balance</name>
+                <symbol>Bal</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 5</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 6</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 7</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 8</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 9</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 10</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 11</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 12</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 13</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 14</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 15</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage 16</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
+            <ScoreGroups/>
+        </Channel>
+    </Channels>
+    <Desktop>
+        <property name="table_tab" value="true"/>
+        <property name="digital_tab" value="true"/>
+        <property name="analog_tab" value="true"/>
+        <property name="voltage_per_cell_tab" value="true" target_reference_ordinal="8"/>
+        <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
+        <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
+    </Desktop>
+</DeviceProperties>
