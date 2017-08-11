@@ -68,7 +68,6 @@ public class DataParser extends NMEAParser {
 
 	/**
 	 * constructor to initialize required configuration parameter
-	 * a 
 	 * @param useTimeFactor
 	 * @param useLeaderChar
 	 * @param useSeparator

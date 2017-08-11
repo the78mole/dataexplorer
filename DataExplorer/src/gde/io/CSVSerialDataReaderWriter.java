@@ -149,11 +149,6 @@ public class CSVSerialDataReaderWriter {
 				
 				if (device.getStateType() == null) 
 					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
-
-				Vector<String> stateNames = new Vector<String>(device.getStateType().getProperty().size());
-				for (int i = 1; i <= device.getStateType().getProperty().size(); i++) {
-					stateNames.add(device.getRecordSetStateNameReplacement(i));
-				}
 						
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
@@ -184,7 +179,7 @@ public class CSVSerialDataReaderWriter {
 						
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.getState());
 						
-						recordSetNameExtend = stateNames.get(data.getState() - 1); // cached state name
+						recordSetNameExtend = device.getRecordSetStateNameReplacement(data.getState());
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
