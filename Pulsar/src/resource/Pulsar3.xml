@@ -6,7 +6,7 @@
         <manufacturerURL>http://www.elprog.com.pl/english</manufacturerURL>
         <group>charger</group>
         <image>Pulsar3.png</image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
     <SerialPort>
         <port>/dev/tty.Bluetooth-Incoming-Port</port>
