@@ -169,6 +169,7 @@ public class GPXDataReaderWriter {
 			boolean										isElevation							= false;
 			boolean										isTime									= false, isDateSet = false;
 			boolean										isNumSatelites					= false;
+			boolean										isSpeed									= false;
 			Boolean										isExtensionFirstCalled	= null;
 			boolean										isExtension							= false;
 			final int[]								date										= new int[3];
@@ -205,6 +206,8 @@ public class GPXDataReaderWriter {
 						this.isTime = true;//<time>2012-04-19T15:37:33Z</time>
 					else if (qName.equalsIgnoreCase("sat")) //$NON-NLS-1$
 						this.isNumSatelites = true;//<sat>10</sat>
+					else if (qName.equalsIgnoreCase("speed")) //$NON-NLS-1$
+						this.isSpeed = true;//<speed>10.1</speed>
 
 					//<extensions>
 					else if (qName.equalsIgnoreCase("extensions")) { //$NON-NLS-1$
@@ -261,6 +264,7 @@ public class GPXDataReaderWriter {
 					this.points[this.pointsIndex++] = (int) (Double.valueOf(this.tmpPoints.get("lon").replace(GDE.STRING_PLUS, GDE.STRING_EMPTY).trim()) * 1000000); //$NON-NLS-1$
 					this.points[this.pointsIndex++] = this.tmpPoints.get("ele") != null ? (int) (Double.valueOf(this.tmpPoints.get("ele").trim()) * 1000000) : 0; //$NON-NLS-1$
 					this.points[this.pointsIndex++] = this.tmpPoints.get("sat") != null ? Integer.valueOf(this.tmpPoints.get("sat").trim()) * 1000 : 0; //$NON-NLS-1$
+					this.points[this.pointsIndex++] = this.tmpPoints.get("speed") != null ? (int) (Double.valueOf(this.tmpPoints.get("speed").trim()) * 1000) : 0; //$NON-NLS-1$
 
 					if (this.isExtensionFirstCalled != null || this.isExtension == false) {
 						if (this.isExtensionFirstCalled == null || this.isExtensionFirstCalled) {
@@ -269,8 +273,8 @@ public class GPXDataReaderWriter {
 							if (GPXDataReaderWriter.log.isLoggable(Level.FINE)) GPXDataReaderWriter.log.log(Level.FINE, "measurementSize = " + measurementSize); //$NON-NLS-1$
 
 							Vector<String> vecRecordNames = new Vector<String>();
-							//add the 4 always contained records
-							for (int i = 0; i < 4; i++) {
+							//add the 5 always contained records
+							for (int i = 0; i < 5; i++) {
 								vecRecordNames.add(device.getMeasurementNamesReplacements(activeChannel.getNumber())[i]);
 							}
 							//ad records from extension declaration
@@ -455,6 +459,10 @@ public class GPXDataReaderWriter {
 					else if (this.isNumSatelites) {
 						this.tmpPoints.put("sat", new String(ch, start, length)); //<sat>10</sat> //$NON-NLS-1$
 						this.isNumSatelites = false;
+					}
+					else if (this.isSpeed) {
+						this.tmpPoints.put("speed", new String(ch, start, length)); //<speed>10.1</speed> //$NON-NLS-1$
+						this.isSpeed = false;
 					}
 					else if (this.isExtension && this.extensionName.length() > 3) {
 						if (isExtensionFirstCalled != null && isExtensionFirstCalled) 

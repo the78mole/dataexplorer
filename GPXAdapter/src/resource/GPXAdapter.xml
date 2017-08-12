@@ -54,9 +54,9 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>4????</name>
-                <symbol>-</symbol>
-                <unit></unit>
+                <name>Speed</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
