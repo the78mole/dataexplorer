@@ -109,8 +109,8 @@ public class LogViewReader {
 		deviceMap.put("pichler p60 80w 220v", "PichlerP60 80W"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario duo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("wstech linkvario", "LinkaVario"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("wstech linkvario duo", "LinkVario"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("wstech linkvario", "LinkVario"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("wstech linkvario duo", "LinkVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("qc copter", "QC-Copter"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1721,43 +1721,43 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, new String(buffer));
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$			
 			
-//			buffer = new byte[115];
-//			position += data_in.read(buffer);
-//			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, new String(buffer));
-//			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
-//			//4 byte before R_%
+			buffer = new byte[115];
+			position += data_in.read(buffer);
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, new String(buffer));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
+			//4 byte before R_%
 			
-			//search for R_% <17> %@
-			position += data_in.skip(100);
-			Vector<Byte> byteBuffer = new Vector<Byte>();
-			buffer = new byte[1];
-			boolean isSignature = false;
-			while (!isSignature) {
-				position += data_in.read(buffer);
-				byteBuffer.add(buffer[0]);
-				if (buffer[0] == 'R') {
-					position += data_in.read(buffer);
-					if (buffer[0] != '_')
-						continue;
-					position += data_in.read(buffer);
-					if (buffer[0] == '%')
-						isSignature = true;
-				}
-			}
-
-			//time format
-			buffer = new byte[4];
-			for (int j = 0; j < buffer.length; j++) {
-				buffer[i] = byteBuffer.get(byteBuffer.size()-2-j);
-			}
-			int numberChars = parse2Int(buffer)-3;
-
+//			//search for R_% <17> %@
+//			position += data_in.skip(100);
+//			Vector<Byte> byteBuffer = new Vector<Byte>();
+//			buffer = new byte[1];
+//			boolean isSignature = false;
+//			while (!isSignature) {
+//				position += data_in.read(buffer);
+//				byteBuffer.add(buffer[0]);
+//				if (buffer[0] == 'R') {
+//					position += data_in.read(buffer);
+//					if (buffer[0] != '_')
+//						continue;
+//					position += data_in.read(buffer);
+//					if (buffer[0] == '%')
+//						isSignature = true;
+//				}
+//			}
+//
+//			//time format
 //			buffer = new byte[4];
-//			position += data_in.read(buffer);
-//			int numberChars = parse2Int(buffer);
+//			for (int j = 0; j < buffer.length; j++) {
+//				buffer[i] = byteBuffer.get(byteBuffer.size()-2-j);
+//			}
+//			int numberChars = parse2Int(buffer)-3;
+
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int numberChars = parse2Int(buffer);
 			
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "numberChars = " + numberChars); //$NON-NLS-1$
-			if (numberChars > 1000) 
+			if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, "numberChars = " + numberChars); //$NON-NLS-1$
+			if (numberChars > 100) 
 				throw new DataInconsitsentException("Corrupt input file");
 			buffer = new byte[numberChars];
 			position += data_in.read(buffer);
