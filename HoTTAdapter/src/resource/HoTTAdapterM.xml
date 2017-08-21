@@ -68,6 +68,7 @@
                 <unit>ms</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_vpack</label>
             </Measurement>
             <Measurement>
@@ -76,7 +77,6 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_tx</label>
             </Measurement>
             <Measurement>
@@ -85,7 +85,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-                <property name="scale_sync_ref_ordinal" value="4" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="4" type="Integer"/>
                 <label>label_rx</label>
             </Measurement>
             <Measurement>
@@ -112,9 +112,17 @@
                 <unit>V</unit>
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <property name="scale_sync_ref_ordinal" value="6" type="Integer"/>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>lable_voltage_rx_min</label>
+            </Measurement>
+            <Measurement>
+                <name>event</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>lable_event Rx</label>
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
@@ -292,12 +300,19 @@
                 <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_rx</label>
             </Measurement>
+            <Measurement>
+                <name>event</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>lable_event Vario</label>
+            </Measurement>
             <Settlements/>
             <ReferenceGroups/>
             <TransitionGroups/>
             <Transitions/>
-            <ScoreGroups>
-            </ScoreGroups>
+            <ScoreGroups/>
         </Channel>
         <Channel name="GPS" type="TYPE_CONFIG">
             <Measurement>
@@ -385,7 +400,7 @@
                 <unit>km</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <trailDisplay discloseAll="true" defaultTrail="last" />
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_trip</label>
             </Measurement>
             <Measurement>
@@ -406,12 +421,19 @@
                 <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_rx</label>
             </Measurement>
+            <Measurement>
+                <name>event</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>lable_event GPS</label>
+            </Measurement>
             <Settlements/>
             <ReferenceGroups/>
             <TransitionGroups/>
             <Transitions/>
-            <ScoreGroups>
-            </ScoreGroups>
+            <ScoreGroups/>
         </Channel>
         <Channel name="GAM" type="TYPE_CONFIG">
             <Measurement>
@@ -589,7 +611,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="17" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="17" type="Integer"/>
                 <label>label_voltage_sensor 2 GAM</label>
             </Measurement>
             <Measurement>
@@ -608,8 +630,48 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
-                <property name="scale_sync_ref_ordinal" value="19" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <label>label_temperature_sensor 2 GAM</label>
+            </Measurement>
+            <Measurement>
+                <name>speed</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <label>label_speed GAM</label>
+            </Measurement>
+            <Measurement>
+                <name>cell_voltage min</name>
+                <symbol>Vcmin</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <label>label_cell_voltage min GAM</label>
+            </Measurement>
+            <Measurement>
+                <name>cell_number min</name>
+                <symbol>Vcmin</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <label>label_cell_number min GAM</label>
+            </Measurement>
+            <Measurement>
+                <name>pressure</name>
+                <symbol>p</symbol>
+                <unit>bar</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <label>label_pressure GAM</label>
+            </Measurement>
+            <Measurement>
+                <name>event</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>lable_event GAM</label>
             </Measurement>
             <Settlements>
                 <Settlement settlementId="1">
@@ -698,6 +760,7 @@
                         <transitionCalculus transitionGroupId="100" calculusType="ratio_permille" unsigned="true" referenceGroupId="1" leveling="smooth_minmax" referenceGroupIdDivisor="2" divisorLeveling="smooth_minmax" deltaBasis="bothAvg" comment="Divide the voltage peak value by the current peak value. Determine the peak value by comparing the smoothed threshold extremum value with the smoothed reference value (and recovery extremum value in case of peaks and pulses)."/>
                     </evaluation>
                     <property name="factor" value="1" type="Double" description="Permille is milliOhm"/>
+                    <property name="scale_sync_ref_ordinal" value="28" type="Integer" description="r_i_cells"/>
                     <label>settlementlabel_r_i_pack</label>
                 </Settlement>
                 <Settlement settlementId="17">
@@ -763,6 +826,24 @@
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
+                <TransitionGroup transitionGroupId="0">
+                    <TransitionMapping transitionId="0" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="1">
+                    <TransitionMapping transitionId="1" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="3">
+                    <TransitionMapping transitionId="3" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="4">
+                    <TransitionMapping transitionId="4" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="6">
+                    <TransitionMapping transitionId="6" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="7">
+                    <TransitionMapping transitionId="7" comment="for test only"/>
+                </TransitionGroup>
                 <TransitionGroup transitionGroupId="100" comment="R_i transitions based on current values">
                     <TransitionMapping transitionId="0"/>
                     <TransitionMapping transitionId="1"/>
@@ -780,8 +861,7 @@
                 <Transition transitionId="6" refOrdinal="2" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
                 <Transition transitionId="7" refOrdinal="2" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
-            <ScoreGroups>
-            </ScoreGroups>
+            <ScoreGroups/>
         </Channel>
         <Channel name="EAM" type="TYPE_CONFIG">
             <Measurement>
@@ -1022,7 +1102,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="23" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="23" type="Integer"/>
                 <label>label_voltage_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
@@ -1041,7 +1121,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
-                <property name="scale_sync_ref_ordinal" value="25" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="25" type="Integer"/>
                 <label>label_temperature_sensor 2 EAM</label>
             </Measurement>
             <Measurement>
@@ -1052,6 +1132,30 @@
                 <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm EAM</label>
+            </Measurement>
+            <Measurement>
+                <name>motor_runtime</name>
+                <symbol>tm</symbol>
+                <unit>sec</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <label>label_cell_voltage min EAM</label>
+            </Measurement>
+            <Measurement>
+                <name>speed</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <label>label_speed EAM</label>
+            </Measurement>
+            <Measurement>
+                <name>event</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>lable_event EAM</label>
             </Measurement>
             <Settlements>
                 <Settlement settlementId="1">
@@ -1228,6 +1332,7 @@
                         <transitionCalculus transitionGroupId="100" calculusType="ratio_permille" unsigned="true" referenceGroupId="1" leveling="smooth_minmax" referenceGroupIdDivisor="2" divisorLeveling="smooth_minmax" deltaBasis="bothAvg" comment="Divide the voltage peak value by the current peak value. Determine the peak value by comparing the smoothed threshold extremum value with the smoothed reference value (and recovery extremum value in case of peaks and pulses)."/>
                     </evaluation>
                     <property name="factor" value="1" type="Double" description="Permille is milliOhm"/>
+                    <property name="scale_sync_ref_ordinal" value="43" type="Integer" description="r_i_cells"/>
                     <label>settlementlabel_r_i_pack</label>
                 </Settlement>
                 <Settlement settlementId="17">
@@ -1325,6 +1430,24 @@
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
+                <TransitionGroup transitionGroupId="0">
+                    <TransitionMapping transitionId="0" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="1">
+                    <TransitionMapping transitionId="1" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="3">
+                    <TransitionMapping transitionId="3" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="4">
+                    <TransitionMapping transitionId="4" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="6">
+                    <TransitionMapping transitionId="6" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="7">
+                    <TransitionMapping transitionId="7" comment="for test only"/>
+                </TransitionGroup>
                 <TransitionGroup transitionGroupId="100" comment="R_i transitions based on current values">
                     <TransitionMapping transitionId="0"/>
                     <TransitionMapping transitionId="1"/>
@@ -1342,8 +1465,7 @@
                 <Transition transitionId="6" refOrdinal="2" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
                 <Transition transitionId="7" refOrdinal="2" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
-            <ScoreGroups>
-            </ScoreGroups>
+            <ScoreGroups/>
         </Channel>
         <Channel name="type_channels" type="TYPE_CONFIG">
             <Measurement>
@@ -1368,7 +1490,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-                <property name="scale_sync_ref_ordinal" value="1" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer"/>
                 <label>label_rx</label>
             </Measurement>
             <Measurement>
@@ -1384,7 +1506,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
@@ -1392,7 +1514,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
@@ -1400,7 +1522,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
@@ -1408,7 +1530,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
@@ -1416,7 +1538,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
@@ -1424,7 +1546,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
@@ -1432,7 +1554,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
@@ -1440,69 +1562,69 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
                 <symbol></symbol>
                 <unit>µsec</unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="3" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="3" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Power Off</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <label>label_tx_power_off</label>
             </Measurement>
@@ -1510,7 +1632,7 @@
                 <name>Batt Low</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <label>label_tx_voltage_alarm</label>
             </Measurement>
@@ -1518,7 +1640,7 @@
                 <name>Reset</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <label>label_tx_reset</label>
             </Measurement>
@@ -1526,7 +1648,7 @@
                 <name>Reserve</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <label>for future use</label>
             </Measurement>
@@ -1534,8 +1656,7 @@
             <ReferenceGroups/>
             <TransitionGroups/>
             <Transitions/>
-            <ScoreGroups>
-            </ScoreGroups>
+            <ScoreGroups/>
         </Channel>
         <Channel name="ESC" type="TYPE_CONFIG">
             <Measurement>
@@ -1607,7 +1728,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="6" type="Integer"/>
                 <label>label_temperature_ext ESC</label>
             </Measurement>
             <Measurement>
@@ -1615,7 +1736,7 @@
                 <symbol>U_min</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <property name="scale_sync_ref_ordinal" value="1" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_voltage_bat_min ESC</label>
@@ -1626,7 +1747,7 @@
                 <unit>A_max</unit>
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="2" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="2" type="Integer"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_current_bat_max ESC</label>
             </Measurement>
@@ -1636,7 +1757,7 @@
                 <unit>1/min</unit>
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="5" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="5" type="Integer"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_rpm_max ESC</label>
             </Measurement>
@@ -1645,7 +1766,7 @@
                 <symbol>T1_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="6" type="Integer"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_temperature_fet_max ESC</label>
             </Measurement>
@@ -1654,9 +1775,17 @@
                 <symbol>T2_max</symbol>
                 <unit>°C</unit>
                 <active>true</active>
-                <property name="scale_sync_ref_ordinal" value="6" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="6" type="Integer"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_temperature_ext_max ESC</label>
+            </Measurement>
+            <Measurement>
+                <name>event</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>lable_event ESC</label>
             </Measurement>
             <Settlements>
                 <Settlement settlementId="16">
@@ -1707,6 +1836,24 @@
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
+                <TransitionGroup transitionGroupId="0">
+                    <TransitionMapping transitionId="0" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="1">
+                    <TransitionMapping transitionId="1" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="3">
+                    <TransitionMapping transitionId="3" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="4">
+                    <TransitionMapping transitionId="4" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="6">
+                    <TransitionMapping transitionId="6" comment="for test only"/>
+                </TransitionGroup>
+                <TransitionGroup transitionGroupId="7">
+                    <TransitionMapping transitionId="7" comment="for test only"/>
+                </TransitionGroup>
                 <TransitionGroup transitionGroupId="100" comment="R_i transitions based on current values">
                     <TransitionMapping transitionId="0"/>
                     <TransitionMapping transitionId="1"/>
@@ -1724,14 +1871,13 @@
                 <Transition transitionId="6" refOrdinal="2" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
                 <Transition transitionId="7" refOrdinal="2" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
-            <ScoreGroups>
-            </ScoreGroups>
+            <ScoreGroups/>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
         <property name="enable_channel" value="false" type="Boolean"/>
         <property name="text_mode" value="true" type="Boolean"/>
         <property name="outlier_sigma" value="3.29" type="Double" description="3.29 sigma allows 0.1% outliers, i.e. we allow 1 lower and 1 upper outlier for a population of 2000 measurements"/>
-        <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the base population IQR multiplied by 2.0; must be greater than 1.0"/>
+        <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the tolerance interval extended by a factor of 2.0"/>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>

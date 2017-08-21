@@ -7,6 +7,8 @@ Version 3.3.1 - xx yyy 2017
 * fix serial connected iCharger live gatherer tolerating timeouts
 * fix object update problem while removing objects
 * fix HoTTAdapter* GAM capacity filter null value
+HoTTAdapter
+	* add missing measurements (GAM,EAM) and events(inverse bits) to HoTTAdapter
 
 Version 3.3.0 - 01 Jul 2017
 OVERVIEW:

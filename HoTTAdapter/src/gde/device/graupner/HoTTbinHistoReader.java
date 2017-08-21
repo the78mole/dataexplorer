@@ -180,14 +180,14 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinHistoReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinHistoReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
-		HoTTbinHistoReader.pointsReceiver = new int[9];
-		HoTTbinHistoReader.pointsGAM = new int[21];
-		HoTTbinHistoReader.pointsEAM = new int[28];
-		HoTTbinHistoReader.pointsVario = new int[7];
+		HoTTbinHistoReader.pointsReceiver = new int[10];
+		HoTTbinHistoReader.pointsGAM = new int[26];
+		HoTTbinHistoReader.pointsEAM = new int[31];
+		HoTTbinHistoReader.pointsVario = new int[8];
 		HoTTbinHistoReader.pointsVario[2] = 100000;
-		HoTTbinHistoReader.pointsGPS = new int[12];
+		HoTTbinHistoReader.pointsGPS = new int[13];
 		HoTTbinHistoReader.pointsChannel = new int[23];
-		HoTTbinHistoReader.pointsESC = new int[13];
+		HoTTbinHistoReader.pointsESC = new int[14];
 		HoTTbinHistoReader.timeStep_ms = 0;
 		HoTTbinHistoReader.buf = new byte[HoTTbinHistoReader.dataBlockSize];
 		HoTTbinHistoReader.buf0 = new byte[30];
@@ -598,14 +598,14 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinHistoReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinHistoReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
-		HoTTbinHistoReader.pointsReceiver = new int[9];
-		HoTTbinHistoReader.pointsGAM = new int[21];
-		HoTTbinHistoReader.pointsEAM = new int[28];
-		HoTTbinHistoReader.pointsVario = new int[7];
+		HoTTbinHistoReader.pointsReceiver = new int[10];
+		HoTTbinHistoReader.pointsGAM = new int[26];
+		HoTTbinHistoReader.pointsEAM = new int[31];
+		HoTTbinHistoReader.pointsVario = new int[8];
 		HoTTbinHistoReader.pointsVario[2] = 100000;
-		HoTTbinHistoReader.pointsGPS = new int[12];
+		HoTTbinHistoReader.pointsGPS = new int[13];
 		HoTTbinHistoReader.pointsChannel = new int[23];
-		HoTTbinHistoReader.pointsESC = new int[13];
+		HoTTbinHistoReader.pointsESC = new int[14];
 		HoTTbinHistoReader.timeStep_ms = 0;
 		HoTTbinHistoReader.buf = new byte[HoTTbinHistoReader.dataBlockSize];
 		HoTTbinHistoReader.buf0 = new byte[30];
