@@ -791,6 +791,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			@Override
 			public void run() {
 				try {
+					boolean isInitialSwitched = false;
 					HoTTAdapterD.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
@@ -808,6 +809,15 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
 								HoTTbinReaderD.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								if (!isInitialSwitched) {
+									Channel activeChannel = HoTTAdapterD.this.application.getActiveChannel();
+									HoTTbinReaderD.channels.switchChannel(activeChannel.getName());
+									activeChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
+									isInitialSwitched = true;
+								}
+								else {
+									HoTTAdapterD.this.makeInActiveDisplayable(HoTTbinReaderD.recordSet);
+								}
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
