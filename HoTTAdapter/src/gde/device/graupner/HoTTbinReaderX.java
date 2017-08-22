@@ -84,7 +84,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			if (inputFile.exists()) {
 				byte[] buffer = new byte[HoTTbinReaderX.headerSize];
 				data_in.read(buffer);
-				if (new String(buffer).startsWith("GRAUPNER SD LOG8")) {
+				if (new String(buffer).startsWith("GRAUPNER SD LOG")) {
 					//check for internal used buffer size 23 == HoTT V2, 64 HoTT V4 (normal receiver/sensor
 					buffer = new byte[23];
 					for (int i = 0; i < 4; i++) {

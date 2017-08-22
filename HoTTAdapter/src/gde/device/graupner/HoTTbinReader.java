@@ -140,7 +140,7 @@ public class HoTTbinReader {
 			// sensor data
 			data_in.read(buffer);
 
-			if (new String(buffer).startsWith("GRAUPNER SD LOG8")) {
+			if (new String(buffer).startsWith("GRAUPNER SD LOG")) {
 				boolean isHoTTV4 = true;
 				data_in.close();
 				file_input = new FileInputStream(file);
