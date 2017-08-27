@@ -149,7 +149,7 @@ public final class DirectoryScanner {
 		isFullChange = isFullChange
 				|| (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT)) : this.validatedDirectories.containsKey(DirectoryType.IMPORT));
 		isFullChange = isFullChange || (lastImportExtention != null ? !lastImportExtention.equals(this.validatedImportExtention) : this.validatedImportExtention != null);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
 
 		if (isFullChange) {
 			this.unsuppressedTrusses.clear();

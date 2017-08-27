@@ -868,7 +868,7 @@ public class DataExplorer extends Composite {
 	 * if a histo window is selected: determine histo files, read histo data and initialize window tab.
 	 */
 	public synchronized void setupHistoWindows() {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("started")); //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
 		this.histoSet = HistoSet.getInstance();
 
 		if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
@@ -992,6 +992,7 @@ public class DataExplorer extends Composite {
 	 * updates the histo table.
 	 */
 	public synchronized void updateHistoTable(final boolean forceClean) {
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -2045,6 +2046,7 @@ public class DataExplorer extends Composite {
 	 * @param rebuildStep
 	 */
 	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (this.histoGraphicsTabItem != null &&  ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
 					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()))) {
@@ -2074,6 +2076,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public synchronized void rebuildHisto(RebuildStep rebuildStep, boolean isWithUi) {
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
 		boolean isRebuilt = false;
 		try {
 			setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));
@@ -2126,6 +2129,7 @@ public class DataExplorer extends Composite {
 	 * @param redrawCurveSelector
 	 */
 	public void updateHistoGraphicsWindow(boolean redrawCurveSelector) {
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 				DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);

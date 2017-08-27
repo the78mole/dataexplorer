@@ -126,7 +126,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.WARNING, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
 					HistoSelectorComposite.this.application.clearMeasurementModes();
 					if (!HistoSelectorComposite.this.curveSelectorHeader.getSelection()) {
 						// use this check button to deselect all selected curves
@@ -170,7 +170,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
@@ -246,6 +246,7 @@ public final class HistoSelectorComposite extends Composite {
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent event) {
+							if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
 							Combo combo = (Combo) event.getSource();
 							record.getTrailSelector().setTrailTextSelectedIndex(combo.getSelectionIndex());
 							HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);

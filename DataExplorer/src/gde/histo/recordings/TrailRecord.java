@@ -643,6 +643,7 @@ public final class TrailRecord extends Record {
 	 * @return the localized value of the label property from the device channel entry or an empty string.
 	 */
 	public String getLabel() {
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
 		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoreGroupType.getLabel();
 		return getDeviceXmlReplacement(label);
 	}
