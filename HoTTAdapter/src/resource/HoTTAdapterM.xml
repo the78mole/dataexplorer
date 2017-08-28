@@ -121,7 +121,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event Rx</label>
             </Measurement>
             <Settlements/>
@@ -305,7 +305,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event Vario</label>
             </Measurement>
             <Settlements/>
@@ -426,7 +426,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event GPS</label>
             </Measurement>
             <Settlements/>
@@ -670,7 +670,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event GAM</label>
             </Measurement>
             <Settlements>
@@ -1154,7 +1154,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event EAM</label>
             </Measurement>
             <Settlements>
@@ -1784,7 +1784,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event ESC</label>
             </Measurement>
             <Settlements>
