@@ -121,7 +121,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Settlements/>
@@ -305,13 +305,8 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>lable_event Vario</label>
-=======
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_event Vario</label>
->>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
@@ -446,13 +441,8 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>lable_event GPS</label>
-=======
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_event GPS</label>
->>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
@@ -696,13 +686,8 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>lable_event GAM</label>
-=======
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_event GAM</label>
->>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements>
                 <Settlement settlementId="1">
@@ -1185,13 +1170,8 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>lable_event EAM</label>
-=======
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_event EAM</label>
->>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements>
                 <Settlement settlementId="1">
@@ -1820,13 +1800,8 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>lable_event ESC</label>
-=======
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
                 <label>label_event ESC</label>
->>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements>
                 <Settlement settlementId="16">
