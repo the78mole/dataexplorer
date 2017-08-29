@@ -944,11 +944,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						+ (HoTTbinReader.pointsGAM[26] / 1000) + " + " + (HoTTbinReader.pointsGAM[24] / 1000 * HoTTbinReader.pointsGAM[25] / 1000 / 2500 + 2));
 			}
 			HoTTbinReader.pointsGAM[27] = Double.valueOf(HoTTbinReader.pointsGAM[24] / 1000.0 * HoTTbinReader.pointsGAM[25]).intValue();
+			//cell voltage
 			for (int j = 0; j < 6; j++) {
 				HoTTbinReader.pointsGAM[j + 29] = (_buf1[3 + j] & 0xFF) * 1000;
 				if (HoTTbinReader.pointsGAM[j + 29] > 0) {
 					maxVotage = HoTTbinReader.pointsGAM[j + 29] > maxVotage ? HoTTbinReader.pointsGAM[j + 29] : maxVotage;
-					minVotage = HoTTbinReader.pointsGAM[j + 27] < minVotage ? HoTTbinReader.pointsGAM[j + 27] : minVotage;
+					minVotage = HoTTbinReader.pointsGAM[j + 29] < minVotage ? HoTTbinReader.pointsGAM[j + 29] : minVotage;
 				}
 			}
 			HoTTbinReader.pointsGAM[28] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
