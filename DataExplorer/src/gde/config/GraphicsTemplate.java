@@ -101,7 +101,7 @@ public class GraphicsTemplate extends Properties {
 				}
 			}
 
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName != null && this.selectedFileName.equals(GDE.STRING_EMPTY) || this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			this.storeToXML(new FileOutputStream(new File(this.currentFileFilePath)), "-- DataExplorer GraphicsTemplate --"); //$NON-NLS-1$
 			this.isSaved = true;
 			this.selectedFileName = null;
