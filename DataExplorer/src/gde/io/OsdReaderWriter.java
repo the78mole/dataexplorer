@@ -514,6 +514,7 @@ public class OsdReaderWriter {
 			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 		}
 		recordSet.setRecordSetDescription(recordSetComment);
+		recordSet.setSaved(true); //setRecordSetDescription is calling setUnsavedReason()
 
 		//apply record sets records properties
 		if (log.isLoggable(Level.FINE)) {

@@ -370,7 +370,7 @@ public class SelectorComposite extends Composite {
 				break;
 			}
 			if (activeRecord != null) {
-				activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+				//activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 				if (isTableSelection && item.getChecked() || forceVisible) {
 					activeRecord.setVisible(true);
 					SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
