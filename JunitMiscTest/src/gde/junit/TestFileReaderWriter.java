@@ -672,8 +672,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 									drawCurves(recordSet, 1024, 768);
 								}
 							}
-
+							
 							String absolutFilePath = tmpDir1 + file.getName();
+							if (absolutFilePath.contains("_lov")) //exclude LogView files
+								continue;
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
 							System.out.println("writing as   : " + absolutFilePath);
 							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, false, "UTF-8");
@@ -726,7 +728,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
 							if(this.legacyDeviceNames.get(fileDeviceName) != null) 
 								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName); 
-							if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu") || fileDeviceName.contains("HoTTAdapterD"))
+							if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu") || fileDeviceName.contains("HoTTAdapter3") || fileDeviceName.contains("HoTTAdapterD"))
 								continue;
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
